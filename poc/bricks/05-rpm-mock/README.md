@@ -348,3 +348,11 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Les 40 paquets de la source golang portent `License: BSD and Public Domain` ; ni `BSD` ni `Public Domain` n'est un identifiant de la liste de reuse 6.2.0 (base de Q2).
 - La `LICENSE` et le `PATENTS` de Go sont dans le paquet `golang`, sous `/usr/share/doc/golang/` et non `/usr/share/licenses/` (base de Q1) ; texte non lu ; sa présence dans le buildroot de mock n'est pas mesurée (aucun `tsflags` ni `nodocs` dans le `dnf.conf` de `rocky-9.tpl`, défauts de dnf non lus).
 - Non prévu : `golang-src` porte `golang-fips/openssl` et `crypto/internal/boring` ; leur liaison dans le binaire n'est pas mesurée.
+
+**Additif du 16/11/2026 (écrit à 18:25:54 UTC) : étape `releve9` ajoutée à [`m2.sh`](m2.sh), NON LANCÉE** (pendant l'attente de M5 de la 06, sur relecture du conseiller). Hôte seul, réseau ; un seul rpm téléchargé (`golang 1.25.9-1.el9_7`), jamais installé ni exécuté ; `s1.sh` et `poc/packaging/` inchangés. C'est un préalable de Q1 :
+- elle archive au journal ce que mock 6.9 fait de la documentation : aucun `nodocs`, et dnf lancé avec `--installroot` dans le chroot de bootstrap ;
+- elle vérifie la signature de l'en-tête du rpm par la clé de Rocky ;
+- elle lit le marquage de la `LICENSE` et du `PATENTS` de Go (`%doc` ou `%license`), et leur texte si la charge est en xz.
+- Témoins sur des rpm réels ([journal](resultats/m2-releve9-temoins.log)) : le lecteur de l'étape tient sur un rpm de Rocky 9, dont la charge est en zstd ; les bits de drapeaux sont éprouvés sur un rpm de Fedora 24.
+- Banc hors réseau, rpm synthétique : dix-sept cas au code attendu ([journal](resultats/m2-releve9-essai-local.log)). Prédictions H1 à H11 ([détail](resultats/m2-predictions.md)).
+- Temps passé : 4,20 h à HEAD 58835a7, même méthode ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées ; décision avec toi à 5 pw.

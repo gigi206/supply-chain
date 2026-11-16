@@ -1,0 +1,28 @@
+# m2-releve9-temoins.sh, lancé à 2026-11-16T18:24:47Z
+OK   clé de Rocky (cache de la santé de la 05) : empreinte 21CB256AE16FC54C6E652949702D426D350D275D égale à FP_ROCKY
+OK   github.com/sassoftware/relic/v8 v8.2.0 : h1 recalculé h1:9/L4S4I6an/JsPNhmcTpqfiOIsLb/iJaePZD1xR+ulE=, égal au .ziphash et au go.sum de Kyverno main-b2e65e2 ; functest/packages/rocky-basesystem-11-13.el9.noarch.rpm : 7101 octets, sha256 759a53df902b6dc0db856ae3c021f99b7a9ce65d76ea7da268b2042001c5ff5d
+OK   github.com/sassoftware/relic v7.2.1+incompatible : h1 recalculé h1:Pwyh1F3I0r4clFJXkSI8bOyJINGqpgjJU3DYAZeI05A=, égal au .ziphash et au go.sum de Kyverno v1.19.2 ; functest/packages/zlib-1.2.8-10.fc24.i686.rpm : 100270 octets, sha256 bca19e050044dc3aa38bc4a6e02c98d4186dfb6402b7fdfe81ea424c36e15bf3
+## 1. rocky-basesystem (Rocky 9) par le lecteur de l'étape, extrait de m2.sh
+lecteur extrait : 178 lignes, sha256 ffce621e49c4fc93554cae9daf79e48497278a8fee56e32adaf69e8eeba1fb21
+lead 96 octets ; signature : 8 tags, fin à l'octet 4500 ; en-tête principal : 38 tags, octets 4504 à 7057 ; charge : 44 octets
+OK   signature, tag 273 : sha256 de l'en-tête principal égal
+OK   tag 5092 : sha256 de la charge égal (algorithme 8)
+OK   signature OpenPGP de l'en-tête (tag 268) : VALIDSIG 21CB256AE16FC54C6E652949702D426D350D275D ; en-tête altéré refusé
+OK   en-tête : basesystem 0:11-13.el9.noarch
+OK   License: de l'en-tête égale au primary : Public Domain
+sourcerpm : basesystem-11-13.el9.src.rpm ; format de charge : cpio ; compresseur : zstd ; drapeaux : 19
+tags de fichiers absents (1116, 1117, 1118, 1030, 1037, 1035, 1028 ou 5008)
+code 1 (attendu : 1, « tags de fichiers absents », après les lignes OK)
+## 2. zlib (Fedora 24) par un lecteur minimal à part
+zlib 1.2.8-10.fc24.i686 ; compresseur xz ; tag 5011 [8]
+  drapeaux    0 (0x0) ; mode 120777 ; /usr/lib/libz.so.1
+  drapeaux    0 (0x0) ; mode 100755 ; /usr/lib/libz.so.1.2.8
+  drapeaux    0 (0x0) ; mode 40755 ; /usr/share/doc/zlib
+  drapeaux    2 (0x2) ; mode 100644 ; /usr/share/doc/zlib/ChangeLog
+  drapeaux    2 (0x2) ; mode 100644 ; /usr/share/doc/zlib/FAQ
+  drapeaux    0 (0x0) ; mode 40755 ; /usr/share/licenses/zlib
+  drapeaux  128 (0x80) ; mode 100644 ; /usr/share/licenses/zlib/README
+OK   bit 2 sur 2 fichier(s), tous sous /usr/share/doc/ ; bit 128 sur 1 fichier(s), tous sous /usr/share/licenses/
+OK   cpio (newc) : 7 entrées ; 4 fichier(s) régulier(s) non vide(s) à l'empreinte sha256 égale à l'en-tête (sur 4 réguliers ; un lien physique ne porte ses données qu'une fois)
+fichiers effacés
+code 0

@@ -644,3 +644,77 @@ Fin à 17:59:47 UTC (`chrono.tsv`). Journal : [m2-releve8.log](m2-releve8.log), 
 - Q1 et Q2 restent tes décisions, avant le premier build de la 05.
 
 **Note du 2026-11-16 (2026-11-16T18:02:21Z) sur l'additif de `releve8`** : la ligne G7 de l'additif (commit 1d90dfd) dit « une forme ancienne de Fedora, pas une expression SPDX ». L'origine Fedora n'a jamais été lue ; seul compte le constat du passage ci-dessus (identifiants absents de la liste de reuse 6.2.0). La ligne n'est pas réécrite.
+
+## Additif du 16/11/2026 (écrit à 18:25:54 UTC) : étape `releve9` ajoutée à `m2.sh`, NON LANCÉE
+
+Pendant l'attente de M5 de la 06 (pas avant 20:38:15 UTC), sur relecture du conseiller. **Hôte seul, réseau, un seul rpm téléchargé (jamais installé ni exécuté)** : ni cluster, ni Zot ; `s1.sh`, `poc/packaging/` et les scripts de la 06 inchangés. Elle demande ton accord nommé, et ne chevauche pas M5.
+
+**Pourquoi.** `releve8` a laissé Q1 sans deux faits : le texte de la `LICENSE` et du `PATENTS` de Go, et leur marquage dans le rpm (`%doc` ou `%license`). Ce marquage décide s'ils peuvent manquer d'un buildroot installé sans documentation. Lecture faite à sec ce jour, dans une copie de l'archive du tag `mock-6.9-1` (sha256 `3c034916…`, celui de `releve2`) :
+- aucune ligne `nodocs` ni `excludedocs` dans mock ; les seuls `tsflags` sont ceux du plugin SELinux (`nocontexts`) ;
+- le gestionnaire de paquets du buildroot principal (non bootstrap) lance dnf avec `--installroot`, dans le chroot de bootstrap, après avoir écrit le `dnf.conf` du modèle dans le buildroot ;
+- les options ajoutées viennent de `dnf4_common_opts` (`deltarpm`, `allow_vendor_change`, `--allowerasing` par défaut, `config.py` l. 378) : ni `--config` ni `nodocs`. Aucun modèle de `mock-core-configs` ni `s1.sh` ne redéfinit `_common_opts` ;
+- le `tsflags=nodocs` de `s1.sh` (l. 260) est dans `dnf_conf`, la configuration de l'étape racine, pas dans celle de mock ;
+- l'image de bootstrap est `$BOOT`, par digest dans Zot (`s1.sh` l. 332), pas celle du modèle.
+
+`releve9` archive ces lectures au journal.
+
+**Témoins hors réseau, sur des rpm réels** ([m2-releve9-temoins.sh](m2-releve9-temoins.sh), [journal](m2-releve9-temoins.log), lancé à 18:24:47 UTC). Deux rpm d'essai de modules Go déjà en cache (correctif de Kyverno, brique 08). Pour chaque module, le `h1` du zip est recalculé, et il est égal au `.ziphash` et à un `go.sum` de Kyverno.
+- `rocky-basesystem-11-13.el9.noarch.rpm` (Rocky 9) passe par **le lecteur de l'étape, extrait tel quel de `m2.sh`** :
+  - la signature OpenPGP de l'en-tête (tag 268) donne VALIDSIG par `FP_ROCKY`, avec la clé de Rocky ; l'en-tête altéré est refusé ;
+  - les tags 273 et 5092 sont égaux, et le nom, l'EVR et la `License:` sont lus ;
+  - **la charge est en zstd** ;
+  - puis KO attendu, « tags de fichiers absents » : ce paquet ne porte aucun fichier.
+- `zlib-1.2.8-10.fc24.i686.rpm` (Fedora 24) passe par un lecteur minimal à part, faute de la clé de Fedora :
+  - le bit 2 est sur les deux fichiers sous `/usr/share/doc/`, le bit 128 sur le seul fichier sous `/usr/share/licenses/` ;
+  - cpio de la charge en xz lu ; les quatre fichiers réguliers ont une empreinte sha256 égale à l'en-tête.
+- Restent de mémoire : les autres bits de la table, et le cpio d'une charge zstd (non lue).
+
+**Ce que fait l'étape** :
+- partie hors réseau :
+  - sha256 de l'archive gardée exigé ; version de `mock-core-configs` égale à l'épingle `45.2-1.el9` de `s1.sh` ;
+  - `nodocs`, `tsflags` et `excludedocs` cherchés dans toute l'archive ;
+  - huit plages de `package_manager.py`, `config.py` et `buildroot.py` archivées, chacune avec une ligne d'ancre exigée (sinon KO) ;
+  - `_common_opts` cherché dans `mock-core-configs` et dans `s1.sh` ; `tsflags=nodocs` de `s1.sh` situé dans `dnf_conf` ;
+- épingles de `s1.sh` et golang des builds OBS lus comme `releve8` ; sha256 de la `LICENSE` et du `PATENTS` de Go 1.24.7 (`mise.toml`), copie de comparaison ;
+- clé de Rocky et AppStream de vault 9.7 par `lire_r7` et `depot_r7`, non modifiées ; témoin altéré refusé ;
+- entrée `golang 0:1.25.9-1.el9_7.x86_64` du primary signé : une seule, somme sha256, emplacement relatif sans `..` ni `xml:base`, taille bornée à 64 Mio, sinon KO ; filelists par `fichiers_r8` ;
+- rpm téléchargé entier ; taille et sha256 du primary exigés ;
+- signature OpenPGP de l'en-tête (tag 268) vérifiée par `gpgv` avec le trousseau de la clé de Rocky. VALIDSIG par `FP_ROCKY` et en-tête altéré refusé sont exigés, sinon KO. Absente : « non vérifiée », code 0. Sans elle, l'authenticité reposerait sur la seule chaîne `repomd.xml` signé, primary, sha256 ;
+- en-tête lu en Python : nom, EVR et `License:` égaux au primary, fichiers (dossiers exclus) égaux au filelists, tags 273 et 5092 égaux quand ils sont présents. L'étape journalise les drapeaux, le mode, la taille et l'empreinte des fichiers de doc et de licence, et la répartition des drapeaux sur tous les fichiers ;
+- charge en xz : `LICENSE` et `PATENTS` extraits du cpio, sha256 égal à l'en-tête exigé, texte archivé. Autre compresseur, ou cpio inattendu : NON LUE, code 0. Aucun décompresseur zstd n'est installé ni ajouté à `mise.toml` ;
+- efface tout à la fin, sauf après un KO.
+
+`bash -n` passe ; shellcheck ne relève aucun avertissement (`-S warning`). Banc hors réseau : [m2-releve9-essai-local.sh](m2-releve9-essai-local.sh) ([journal](m2-releve9-essai-local.log), lancé à 18:24:56 UTC, après la dernière modification de `m2.sh`) :
+- `curl` et `go` y sont simulés ; `gpg` et `gpgv` sont les vrais ; l'archive réelle de mock est copiée ;
+- le rpm est synthétique, signé par une clé d'essai jetable : le banc éprouve la logique et les refus, les témoins éprouvent le format.
+
+Dix-sept cas au code attendu, chaque refus pour la raison attendue :
+- code 0 : nominal (xz, `LICENSE` égale à la copie) ; zstd (charge non lue) ; `LICENSE` différente de la copie ; sans tag 268 (« non vérifiée ») ;
+- KO, code 1 :
+  - rpm et dépôt : somme du rpm fausse ; taille hors borne ; emplacement avec `..` ; archive de mock altérée ; signature d'AppStream fausse ;
+  - en-tête : magie du lead fausse ; en-tête tronqué ; nombre d'entrées hors borne ; fichier de l'en-tête absent du filelists ; release différente du primary ;
+  - empreintes et signatures : `LICENSE` de la charge différente de l'en-tête ; SHA256 de l'en-tête faux ; tag 268 qui signe un autre contenu.
+
+| # | Prédiction | Confiance | Ce qu'elle change |
+|---|---|---|---|
+| H1 | Partie hors réseau tenue sur les points suivants :<br>• archive au sha256 attendu, `mock-core-configs` 45.2 ;<br>• seules trouvailles : les trois lignes `nocontext(s)` du plugin SELinux ;<br>• huit ancres tenues ;<br>• aucun `_common_opts` dans `mock-core-configs` ;<br>• une ligne de `s1.sh` (le `tsflags=nodocs` de `dnf_conf`) | Haute : banc sur la même archive | Non tenue : KO, rien du réseau n'est lu |
+| H2 | Clé à l'empreinte `FP_ROCKY` ; `repomd.xml` d'AppStream signé, sha256 `06f01d40…` comme le 12/11 et `releve8` | Haute : vault figé | sha256 différent : vault 9.7 a changé, à noter |
+| H3 | Une seule entrée golang `0:1.25.9-1.el9_7.x86_64`, à `Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm`, sous 64 Mio | Haute pour l'entrée (`releve8`) ; Moyenne pour l'emplacement ; taille non prédite | Refusée : KO, corrigé à sec, nouvel accord |
+| H4 | rpm conforme au primary (taille et sha256) | Haute | Non tenue : KO |
+| H5 | Signature de l'en-tête (tag 268) : VALIDSIG par `FP_ROCKY`, en-tête altéré refusé | Haute : témoin `rocky-basesystem` el9, même clé | Non tenue : KO |
+| H6 | Tags 273 et 5092 présents et égaux | Haute : même témoin | Différents : KO |
+| H7 | Nom, EVR et `License: BSD and Public Domain` égaux au primary ; 64 fichiers égaux au filelists | Haute : témoin el9 pour l'en-tête ; tags de fichiers éprouvés sur zlib fc24 seulement | Non tenue : KO ; corrigé à sec, nouvel accord |
+| H8 | `LICENSE` et `PATENTS` portent le bit 2 (doc) seul, pas le bit 128 (license) ; le bit 2 n'est posé sur aucun fichier hors de `/usr/share/doc/` | Moyenne : bits éprouvés sur zlib fc24 ; marquage de golang déduit de son chemin | Tenue : ces fichiers sont `%doc`, une installation sans documentation les écarte |
+| H9 | sha256 de la `LICENSE` et du `PATENTS` égaux à ceux de Go 1.24.7 | Moyenne : texte stable d'une version à l'autre, non vérifié | Égal : le texte est celui de Go 1.24.7 de `mise.toml`. Différent : seulement « non conclu » |
+| H10 | Charge en zstd : NON LUE, code 0, texte non lu | Haute : témoin el9 en zstd | xz : texte archivé, sha256 égal à l'en-tête exigé |
+| H11 | Fichiers effacés, code 0 | Haute | — |
+
+**Ce que `releve9` ne tranchera pas** :
+- **la présence de la notice dans le buildroot** : deux maillons restent hors de portée à sec :
+  - quel `dnf.conf` dnf lit avec `--installroot` quand aucune option de mock ne nomme de configuration : la source de dnf n'est pas lue ;
+  - les macros rpm et le `dnf.conf` de l'image de bootstrap `$BOOT`, que l'étape ne tire pas.
+
+  Ils se mesurent au premier build (`root.log`, ou un `test -s` dans le spec). Ils ne comptent que si la notice est copiée depuis le buildroot ; une notice portée par les sources, comme pour le deb, les rend sans objet ;
+- **le texte**, si la charge est en zstd (H10) : seule l'égalité de sha256 avec Go 1.24.7 (H9) le renseigne ;
+- la liaison de `golang-fips/openssl` et de `crypto/internal/boring` dans le binaire : prédiction pour le premier build, pas un constat ;
+- Q1 et Q2 : tes décisions, sans recommandation ici.

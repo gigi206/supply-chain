@@ -89,6 +89,28 @@
 #               Prédictions : resultats/m2-predictions.md, section releve8. Banc hors réseau : resultats/m2-releve8-essai-local.sh.
 #               Lancé le 16/11/2026 à 17:59:30 UTC (« Oui » à « Je lance m2.sh releve8 ? »), code 0 : G1 à G7 et G9 tenues, G8
 #               non tenue pour le chemin (LICENSE de Go sous /usr/share/doc/golang/) ; golang 1.25.9-1.el9_7 le plus haut (m2-releve8.log).
+#   releve9     hôte seul, réseau (ajouté à sec le 16/11/2026, pendant l'attente de M5 de la 06, sur relecture du conseiller,
+#               NON LANCÉ) : préalable de Q1 (notice de Go). Partie hors réseau : archive du tag gardée par releve (sha256
+#               contrôlé), version de mock-core-configs égale à l'épingle de s1.sh ; nodocs, tsflags et excludedocs cherchés sans
+#               distinction de casse dans toute l'archive ; plages archivées (ancre exigée, sinon KO) : choix de --installroot et
+#               du chroot d'exécution de dnf (package_manager.py), écriture du dnf.conf du buildroot, uses_bootstrap_image et
+#               .rpmmacros d'installation (buildroot.py), options communes de dnf (package_manager.py, config.py) ;
+#               _common_opts cherché dans mock-core-configs et dans s1.sh ; tsflags=nodocs de s1.sh situé dans dnf_conf (étape
+#               racine).
+#               Partie réseau : épingles et golang des builds OBS lus comme releve8 ; clé de Rocky et AppStream de vault 9.7 par
+#               lire_r7 et depot_r7, non modifiées (témoin altéré refusé) ; entrée golang 0:<EVR OBS>.x86_64 du primary signé
+#               (une seule, sha256, emplacement relatif sans « .. » ni base, taille bornée à 64 Mio) ; filelists par fichiers_r8 ;
+#               rpm téléchargé entier, taille et sha256 du primary exigés ; jamais installé ni exécuté. Signature OpenPGP de
+#               l'en-tête (tag 268) vérifiée par gpgv avec le trousseau de la clé de Rocky : VALIDSIG par FP_ROCKY exigé et en-tête
+#               altéré refusé, sinon KO ; absente : « non vérifiée », code 0. En-tête lu en Python
+#               (structure et numéros de tags écrits de mémoire, éprouvés par : nom, EVR et License: égaux au primary, fichiers
+#               égaux au filelists, SHA256 de l'en-tête et empreinte de la charge quand ils sont présents) : drapeaux, mode,
+#               taille et empreinte des fichiers de doc et de licence ; bits 2 (doc) et 128 (license) éprouvés hors réseau sur
+#               des rpm réels (resultats/m2-releve9-temoins.sh). LICENSE et PATENTS comparés par sha256 à ceux de Go 1.24.7
+#               (mise.toml). Charge en xz :
+#               décompressée en mémoire, LICENSE et PATENTS extraits, sha256 égal à l'en-tête exigé, texte archivé ; autre
+#               compresseur ou cpio inattendu : NON LUE, code 0. Fichiers effacés à la fin, sauf après un KO.
+#               Prédictions : resultats/m2-predictions.md, section releve9. Banc hors réseau : resultats/m2-releve9-essai-local.sh.
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le
@@ -119,6 +141,7 @@
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve6  (journal : resultats/m2-releve6.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve7  (journal : resultats/m2-releve7.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve8  (journal : resultats/m2-releve8.log)
+#                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve9  (journal : resultats/m2-releve9.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -834,6 +857,311 @@ PY
   gpgconf --kill all 2>/dev/null || true
   rm -rf -- "${d:?}"
   echo "fichiers effacés (clé, métadonnées)"
+}
+
+passage_r9() { # fichier-relatif-aux-sources début fin ligne-d-ancre texte-d-ancre : plage archivée, ancre exigée (sinon KO)
+  local f=$T/mock-src/$1
+  [ -f "$f" ] && sed -n "${4}p" "$f" | grep -q -F -- "$5" \
+    || { echo "KO   ancre absente : $1:$4 devrait contenir « $5 »" >&2; exit 1; }
+  echo "### $1, lignes $2 à $3 (ancre $4 : « $5 »)"
+  sed -n "${2},${3}p" "$f" | awk -v n="$2" '{printf "  %d: %s\n", n + NR - 1, $0}' | cut -c1-170
+}
+
+etape_releve9() {
+  local d=$T/releve7 a=$T/mock.tar.gz v cle fp s h o p g u b9=$((64 * 1024 * 1024))
+  echo "## partie hors réseau : archive du tag $MOCK_TAG gardée par releve (lue, jamais exécutée)"
+  [ -s "$a" ] || { echo "KO   archive $a absente" >&2; exit 1; }
+  s=$(sha256sum < "$a" | cut -c1-64)
+  [ "$s" = "$ARCHIVE_SHA" ] && echo "OK   sha256 de l'archive : $s" \
+    || { echo "KO   sha256 de l'archive : $s (attendu : $ARCHIVE_SHA)" >&2; exit 1; }
+  rm -rf -- "${T:?}/mock-src"; mkdir "$T/mock-src"
+  tar -xzf "$a" -C "$T/mock-src" --strip-components=1
+  s=$(sed -n 's/^Version:[[:space:]]*//p' "$T/mock-src/mock-core-configs/mock-core-configs.spec" | head -1)
+  p=$(grep -c -F '"mock-core-configs 45.2-1.el9 epel9"' "$here/s1.sh" || true)
+  [ "$s" = 45.2 ] && [ "$p" = 1 ] && echo "OK   mock-core-configs de l'archive : $s ; épingle de s1.sh : mock-core-configs 45.2-1.el9" \
+    || { echo "KO   mock-core-configs de l'archive : « $s », épingle 45.2-1.el9 trouvée $p fois dans s1.sh" >&2; exit 1; }
+  echo "### nodocs, tsflags et excludedocs, sans distinction de casse, dans toute l'archive (tests compris)"
+  ( cd "$T/mock-src" && grep -rn -I -i -E 'nodocs|tsflags|excludedocs' . ) | cut -c1-170 | sed 's/^/  /' || true
+  passage_r9 mock/py/mockbuild/package_manager.py 140 150 147 'self.is_bootstrap_image = buildroot.uses_bootstrap_image'
+  passage_r9 mock/py/mockbuild/package_manager.py 155 165 157 "self.common_opts = copy.copy(config.get(f'{self.name}_common_opts', []))"
+  passage_r9 mock/py/mockbuild/config.py 374 380 378 "config_opts['dnf4_common_opts'] = ["
+  passage_r9 mock/py/mockbuild/package_manager.py 211 251 237 'if self.support_installroot and not self.is_bootstrap_image:'
+  passage_r9 mock/py/mockbuild/package_manager.py 284 339 322 'if not self.support_installroot or self.is_bootstrap_image:'
+  passage_r9 mock/py/mockbuild/package_manager.py 700 709 706 "dnfconf_path = self.buildroot.make_chroot_path('etc', 'dnf', 'dnf.conf')"
+  passage_r9 mock/py/mockbuild/buildroot.py 1155 1158 1158 'return self.is_bootstrap and self.use_chroot_image'
+  passage_r9 mock/py/mockbuild/buildroot.py 786 803 797 '.rpmmacros'
+  echo "### _common_opts dans les modèles (mock-core-configs) et dans s1.sh"
+  ( cd "$T/mock-src" && grep -rn -I -E '_common_opts' mock-core-configs ) | cut -c1-170 | sed 's/^/  /' || true
+  echo "  lignes de s1.sh : $(grep -c -E '_common_opts|nodocs|excludedocs' "$here/s1.sh" || true) (_common_opts, nodocs ou excludedocs)"
+  rm -rf -- "${T:?}/mock-src"
+  echo "### s1.sh (non modifié) : fonction qui porte tsflags=nodocs"
+  p=$(grep -n -x 'tsflags=nodocs' "$here/s1.sh" | cut -d: -f1)
+  h=$(grep -n '^dnf_conf() { # configuration de dnf de l.étape racine$' "$here/s1.sh" | cut -d: -f1)
+  [ "$(printf '%s\n' "$p" | grep -c .)" = 1 ] && [ "$(printf '%s\n' "$h" | grep -c .)" = 1 ] && [ "$h" -lt "$p" ] \
+    && [ "$((p - h))" -le 10 ] \
+    || { echo "KO   tsflags=nodocs (ligne(s) « $p ») hors de dnf_conf (ligne(s) « $h ») de s1.sh" >&2; exit 1; }
+  sed -n "${h},${p}p" "$here/s1.sh" | awk -v n="$h" '{printf "  %d: %s\n", n + NR - 1, $0}'
+  echo "## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)"
+  v=$(sed -n 's|^VAULT97=\(https://[A-Za-z0-9./-]*\)$|\1|p' "$here/s1.sh")
+  cle=$(sed -n 's|^CLE_ROCKY=\(https://[A-Za-z0-9./-]*\)$|\1|p' "$here/s1.sh")
+  fp=$(sed -n 's/^FP_ROCKY=\([0-9A-F]\{40\}\)\([[:space:]].*\)\{0,1\}$/\1/p' "$here/s1.sh")
+  o=$(sed -n 's/^  <bdep name="golang" version="\([0-9.]*\)" release="\([0-9A-Za-z._]*\)" arch="x86_64" .* project="Rocky:9\.7" repository="appstream"\/>$/\1-\2/p' \
+    "$here/../../benchmarks/obs/resultats/build-1/rocky_9/_buildenv")
+  for u in "VAULT97:$v" "CLE_ROCKY:$cle" "FP_ROCKY:$fp" "golang de build-1/rocky_9/_buildenv:$o"; do
+    p=$(printf '%s' "${u#*:}" | grep -c . || true)
+    [ "$p" = 1 ] && echo "OK   ${u%%:*} : ${u#*:}" \
+      || { echo "KO   ${u%%:*} : $p ligne(s) reconnue(s) (attendu : 1)" >&2; exit 1; }
+  done
+  echo "## copie de comparaison : Go épinglé par mise.toml"
+  g=$(go env GOROOT)
+  echo "$(go version) ; LICENSE sha256 $(sha256sum < "$g/LICENSE" | cut -c1-64) ; PATENTS sha256 $(sha256sum < "$g/PATENTS" | cut -c1-64)"
+  rm -rf -- "${d:?}"; mkdir -p "$d"; mkdir -m 700 "$d/gnupg"; export GNUPGHOME=$d/gnupg
+  echo "## clé de Rocky (trousseau temporaire)"
+  h=$(lire_r7 RPM-GPG-KEY-Rocky-9 "$cle") || exit 1
+  [ "$h" = 200 ] || { echo "KO   $cle : HTTP $h" >&2; exit 1; }
+  s=$(gpg --batch --with-colons --show-keys "$d/RPM-GPG-KEY-Rocky-9" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}' || true)
+  [ "$s" = "$fp" ] && echo "OK   empreinte de la clé de Rocky : $s" \
+    || { echo "KO   empreinte de la clé de Rocky : « $s » (attendu : $fp)" >&2; exit 1; }
+  gpg --batch --quiet --no-default-keyring --keyring "$d/cles.gpg" --import "$d/RPM-GPG-KEY-Rocky-9" 2>/dev/null \
+    || { echo "KO   clé de Rocky non importée" >&2; exit 1; }
+  echo "## AppStream de vault 9.7, épinglé par s1.sh"
+  depot_r7 vault-AppStream "$v/AppStream/x86_64/os" || { echo "KO   vault-AppStream absent" >&2; exit 1; }
+  cp "$d/vault-AppStream.repomd.xml" "$d/temoin.xml"; echo x >> "$d/temoin.xml"
+  s=$(gpgv --keyring "$d/cles.gpg" --status-fd 1 "$d/vault-AppStream.repomd.xml.asc" "$d/temoin.xml" 2>/dev/null | awk '$2 == "VALIDSIG"' || true)
+  [ -z "$s" ] && echo "OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé" \
+    || { echo "KO   témoin altéré accepté" >&2; exit 1; }
+  echo "## entrée du rpm golang 0:$o.x86_64 dans le primary signé"
+  p=$(python3 -I - "$d" "$o" "$b9" <<'PY'
+import bz2, glob, gzip, lzma, re, sys, xml.etree.ElementTree as E
+d, o, borne = sys.argv[1], sys.argv[2], int(sys.argv[3])
+C = '{http://linux.duke.edu/metadata/common}'; R = '{http://linux.duke.edu/metadata/rpm}'
+src = glob.glob(d + '/vault-AppStream.primary.xml.*')
+if len(src) != 1:
+    sys.exit(f"{len(src)} primary sur disque (attendu : 1)")
+ver, rel = o.rsplit('-', 1)
+t = []
+with {'gz': gzip.open, 'xz': lzma.open, 'bz2': bz2.open}[src[0].rsplit('.', 1)[1]](src[0]) as f:
+    for _, p in E.iterparse(f):
+        if p.tag != C + 'package':
+            continue
+        v = p.find(C + 'version')
+        if (p.get('type') == 'rpm' and p.findtext(C + 'name') == 'golang' and p.findtext(C + 'arch') == 'x86_64'
+                and (v.get('epoch') or '0') == '0' and v.get('ver') == ver and v.get('rel') == rel):
+            c, l, z = p.find(C + 'checksum'), p.find(C + 'location'), p.find(C + 'size')
+            t.append((c.get('type') if c is not None else None, (c.text or '').strip() if c is not None else '',
+                      l.get('href') if l is not None else None, l.get('{http://www.w3.org/XML/1998/namespace}base') if l is not None else None,
+                      l.get('base') if l is not None else None, z.get('package') if z is not None else None,
+                      (p.findtext(f'{C}format/{R}license') or '').strip()))
+        p.clear()
+if len(t) != 1:
+    sys.exit(f"{len(t)} entrée(s) golang 0:{o}.x86_64 dans le primary (attendu : 1)")
+typ, sha, href, b1, b2, taille, lic = t[0]
+if typ != 'sha256' or not re.fullmatch(r'[0-9a-f]{64}', sha):
+    sys.exit(f"somme du paquet absente ou mal formée : {typ} {sha}")
+if b1 is not None or b2 is not None:
+    sys.exit(f"location avec base refusée : {b1 or b2}")
+if not href or not re.fullmatch(r'[A-Za-z0-9._+-]+(/[A-Za-z0-9._+-]+)*\.rpm', href) or any(s in ('.', '..') for s in href.split('/')):
+    sys.exit(f"emplacement du paquet refusé : {href}")
+if not (taille or '').isdigit() or not 0 < int(taille) <= borne:
+    sys.exit(f"taille du paquet hors borne : {taille} (borne : {borne} octets)")
+if not lic or '\t' in lic:
+    sys.exit("License: absente du primary")
+print(f"{sha}\t{href}\t{taille}\t{lic}")
+PY
+  ) || { echo "KO   entrée du rpm golang refusée" >&2; exit 1; }
+  IFS=$'\t' read -r s h u g <<< "$p"
+  echo "primary : golang 0:$o.x86_64 ; sha256 $s ; $h ; $u octets (borne : $b9) ; License: $g"
+  printf 'golang\t0:%s.x86_64\n' "$o" > "$d/vault-AppStream.golang"
+  fichiers_r8 vault-AppStream "$v/AppStream/x86_64/os"
+  echo "## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)"
+  p=$(lire_r7 golang.rpm "$v/AppStream/x86_64/os/$h") || exit 1
+  [ "$p" = 200 ] || { echo "KO   HTTP $p sur $v/AppStream/x86_64/os/$h" >&2; exit 1; }
+  [ "$(stat -c %s "$d/golang.rpm")" = "$u" ] || { echo "KO   taille du rpm $(stat -c %s "$d/golang.rpm") (primary : $u)" >&2; exit 1; }
+  [ "$(sha256sum < "$d/golang.rpm" | cut -c1-64)" = "$s" ] && echo "OK   rpm conforme au primary : $u octets, sha256 $s" \
+    || { echo "KO   sha256 du rpm différent du primary ($s)" >&2; exit 1; }
+  python3 -I - "$d/golang.rpm" "$d/vault-AppStream.fichiers" "golang 0:$o.x86_64" "$g" "$(go env GOROOT)" "$d" "$fp" <<'PY' || { echo "KO   en-tête du rpm" >&2; exit 1; }
+import hashlib, lzma, os, re, stat, struct, subprocess, sys
+rpm, fic, attendu, lic_primary, goroot, d, fp = sys.argv[1:8]   # lecteur repris tel quel par resultats/m2-releve9-temoins.sh
+b = open(rpm, 'rb').read()
+def ko(m):
+    sys.exit(m)
+# Structure et numéros de tags écrits de mémoire (format rpm v3/v4) : éprouvés par les contrôles croisés ci-dessous.
+if b[:4] != b'\xed\xab\xee\xdb':
+    ko("magie du lead absente")
+def entete(off, nom):
+    if b[off:off + 4] != b'\x8e\xad\xe8\x01':
+        ko(f"magie de l'en-tête {nom} absente (octet {off})")
+    if len(b) < off + 16:
+        ko(f"en-tête {nom} tronqué")
+    il, dl = struct.unpack('>II', b[off + 8:off + 16])
+    if il > 65536 or dl > 256 * 1024 * 1024:
+        ko(f"en-tête {nom} : {il} entrées, {dl} octets de données, hors borne")
+    st = off + 16 + 16 * il
+    fin = st + dl
+    if fin > len(b):
+        ko(f"en-tête {nom} tronqué ({fin} > {len(b)})")
+    idx = {}
+    for i in range(il):
+        tag, typ, ofs, cnt = struct.unpack('>IIII', b[off + 16 + 16 * i:off + 32 + 16 * i])
+        if ofs >= dl and cnt:
+            ko(f"en-tête {nom} : tag {tag} hors des données")
+        idx[tag] = (typ, ofs, cnt)
+    return idx, b[st:fin], off, fin
+def val(h, tag):
+    idx, data = h[0], h[1]
+    if tag not in idx:
+        return None
+    typ, ofs, cnt = idx[tag]
+    if typ in (6, 8, 9):
+        r, p = [], ofs
+        for _ in range(1 if typ == 6 else cnt):
+            e = data.find(b'\0', p)
+            if e < 0:
+                ko(f"tag {tag} : chaîne non terminée")
+            r.append(data[p:e].decode('utf-8', 'replace')); p = e + 1
+        return r[0] if typ == 6 else r
+    w = {2: ('B', 1), 1: ('B', 1), 3: ('H', 2), 4: ('I', 4), 5: ('Q', 8)}.get(typ)
+    if w:
+        if ofs + w[1] * cnt > len(data):
+            ko(f"tag {tag} : tableau hors des données")
+        return list(struct.unpack(f'>{cnt}{w[0]}', data[ofs:ofs + w[1] * cnt]))
+    if typ == 7:
+        return data[ofs:ofs + cnt]
+    ko(f"tag {tag} : type {typ} inconnu")
+sig = entete(96, 'de signature')
+m0 = (sig[3] + 7) // 8 * 8
+hdr = entete(m0, 'principal')
+charge = b[hdr[3]:]
+print(f"lead 96 octets ; signature : {len(sig[0])} tags, fin à l'octet {sig[3]} ; en-tête principal : {len(hdr[0])} tags, "
+      f"octets {m0} à {hdr[3]} ; charge : {len(charge)} octets")
+x = val(sig, 273)
+if x is None:
+    print("signature, tag 273 (SHA256 de l'en-tête) : absent, non éprouvé")
+elif x == hashlib.sha256(b[m0:hdr[3]]).hexdigest():
+    print("OK   signature, tag 273 : sha256 de l'en-tête principal égal")
+else:
+    ko(f"signature, tag 273 : {x} différent du sha256 de l'en-tête principal")
+x, alg = val(hdr, 5092), val(hdr, 5093)
+if x is None:
+    print("tag 5092 (empreinte de la charge) : absent, non éprouvé")
+elif alg == [8] and hashlib.sha256(charge).hexdigest() in x:
+    print("OK   tag 5092 : sha256 de la charge égal (algorithme 8)")
+else:
+    ko(f"tag 5092 : {x} (algorithme {alg}) ne correspond pas à la charge")
+x = val(sig, 268)
+if x is None:
+    print("signature OpenPGP de l'en-tête (tag 268) : absente, non vérifiée")
+else:
+    def gpgv(f):
+        r = subprocess.run(['gpgv', '--keyring', os.path.join(d, 'cles.gpg'), '--status-fd', '1', os.path.join(d, 'sig268.bin'), f],
+                           capture_output=True, text=True)
+        return [z.split()[-1] for z in r.stdout.splitlines() if z.split()[1:2] == ['VALIDSIG']]
+    with open(os.path.join(d, 'sig268.bin'), 'wb') as f:
+        f.write(x)
+    with open(os.path.join(d, 'entete.bin'), 'wb') as f:
+        f.write(b[m0:hdr[3]])
+    with open(os.path.join(d, 'entete-temoin.bin'), 'wb') as f:
+        f.write(b[m0:hdr[3]] + b'x')
+    v = gpgv(os.path.join(d, 'entete.bin'))
+    if v != [fp]:
+        ko(f"signature OpenPGP de l'en-tête (tag 268) refusée : VALIDSIG {v} (attendu : {fp})")
+    if gpgv(os.path.join(d, 'entete-temoin.bin')):
+        ko("signature (tag 268) acceptée sur l'en-tête altéré")
+    print(f"OK   signature OpenPGP de l'en-tête (tag 268) : VALIDSIG {v[0]} ; en-tête altéré refusé")
+ep = val(hdr, 1003)
+nevr = f"{val(hdr, 1000)} {ep[0] if ep else 0}:{val(hdr, 1001)}-{val(hdr, 1002)}.{val(hdr, 1022)}"
+if nevr != attendu:
+    ko(f"nom et EVR de l'en-tête : {nevr} (attendu : {attendu})")
+print(f"OK   en-tête : {nevr}")
+if val(hdr, 1014) != lic_primary:
+    ko(f"License: de l'en-tête « {val(hdr, 1014)} » différente du primary « {lic_primary} »")
+print(f"OK   License: de l'en-tête égale au primary : {lic_primary}")
+print(f"sourcerpm : {val(hdr, 1044)} ; format de charge : {val(hdr, 1124)} ; compresseur : {val(hdr, 1125)} ; drapeaux : {val(hdr, 1126)}")
+bn, dn, di = val(hdr, 1117), val(hdr, 1118), val(hdr, 1116)
+modes, fl, dg = val(hdr, 1030), val(hdr, 1037), val(hdr, 1035)
+tailles = val(hdr, 1028) or val(hdr, 5008)
+if None in (bn, dn, di, modes, fl, dg, tailles):
+    ko("tags de fichiers absents (1116, 1117, 1118, 1030, 1037, 1035, 1028 ou 5008)")
+n = len(bn)
+if not all(len(z) == n for z in (di, modes, fl, dg, tailles)) or max(di) >= len(dn):
+    ko("tableaux de fichiers de longueurs différentes")
+algo = val(hdr, 5011)
+print(f"{n} entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : {algo if algo else 'absent'}")
+ch = [dn[di[i]] + bn[i] for i in range(n)]
+reg = {ch[i] for i in range(n) if not stat.S_ISDIR(modes[i] & 0xFFFF)}
+with open(fic, encoding='utf-8') as f:
+    fl_set = {x.rstrip('\n').split('\t')[2] for x in f if x.strip()}
+if reg != fl_set:
+    ko(f"fichiers de l'en-tête ≠ filelists : {len(reg - fl_set)} en trop, {len(fl_set - reg)} manquants")
+print(f"OK   {len(reg)} fichiers (dossiers exclus) égaux au filelists signé")
+bits = {1: 'config', 2: 'doc', 4: 'icon', 8: 'missingok', 16: 'noreplace', 32: 'specfile', 64: 'ghost', 128: 'license',
+        256: 'readme', 2048: 'pubkey', 4096: 'artifact'}   # table écrite de mémoire ; 2 et 128 éprouvés (m2-releve9-temoins.sh)
+def lire(v):
+    return '+'.join(nm for k, nm in bits.items() if v & k) or 'aucun'
+par = {}
+for i in range(n):
+    par.setdefault(fl[i], []).append(i)
+print("### drapeaux de fichiers (FILEFLAGS, tag 1037) ; bits 2 et 128 éprouvés, autres bits de mémoire")
+for v_, l_ in sorted(par.items()):
+    sd = sum(1 for i in l_ if ch[i].startswith('/usr/share/doc/'))
+    print(f"  {v_} (0x{v_:x}, {lire(v_)}) : {len(l_)} entrées, dont {sd} sous /usr/share/doc/")
+motif = re.compile(r'(LICEN[CS]E|COPYING|PATENTS|NOTICE)([._-][A-Za-z0-9._-]*)?')
+ref = {}
+for nm in ('LICENSE', 'PATENTS'):
+    with open(os.path.join(goroot, nm), 'rb') as f:
+        ref[nm] = hashlib.sha256(f.read()).hexdigest()
+voulus = {}
+print("### fichiers sous /usr/share/doc ou /usr/share/licenses, ou au nom de licence")
+for i in range(n):
+    if ch[i].startswith(('/usr/share/doc/', '/usr/share/licenses/')) or motif.fullmatch(bn[i]):
+        cmp_ = ''
+        if algo == [8] and bn[i] in ref:
+            cmp_ = f" ; {'égale à' if dg[i] == ref[bn[i]] else 'différente de'} la copie de Go de mise.toml"
+            voulus['.' + ch[i]] = (dg[i], bn[i])
+        print(f"  {ch[i]} : drapeaux {fl[i]} (0x{fl[i]:x}, {lire(fl[i])}) ; mode {modes[i] & 0xFFFF:o} ; {tailles[i]} octets ; "
+              f"empreinte {dg[i]}{cmp_}")
+comp = val(hdr, 1125)
+print(f"## charge ({val(hdr, 1124)}, {comp})")
+if comp not in ('xz', 'lzma'):
+    print(f"NON LUE : compresseur {comp}, aucun décompresseur sans installation ; texte non lu")
+    sys.exit(0)
+if not voulus:
+    print("NON LUE : aucune empreinte sha256 de LICENSE ou PATENTS dans l'en-tête")
+    sys.exit(0)
+dec = lzma.LZMADecompressor(lzma.FORMAT_AUTO)
+cp = dec.decompress(charge, max_length=512 * 1024 * 1024)
+if not dec.eof:
+    ko("charge non décompressée en entier (borne de 512 Mio)")
+p, vus, k = 0, {}, 0
+while True:
+    if cp[p:p + 6] != b'070701':
+        print(f"NON LUE : en-tête cpio inattendu à l'octet {p} : {cp[p:p + 6]!r}")
+        sys.exit(0)
+    f_ = [int(cp[p + 6 + 8 * j:p + 14 + 8 * j], 16) for j in range(13)]
+    taille, ln = f_[6], f_[11]
+    nom = cp[p + 110:p + 110 + ln - 1].decode('utf-8', 'replace')
+    q = (p + 110 + ln + 3) // 4 * 4
+    if nom == 'TRAILER!!!':
+        break
+    k += 1
+    if nom in voulus:
+        vus[nom] = cp[q:q + taille]
+    p = (q + taille + 3) // 4 * 4
+print(f"cpio : {k} entrées")
+for nom, (e, court) in sorted(voulus.items()):
+    t = vus.get(nom)
+    if t is None:
+        ko(f"{nom} absent de la charge")
+    if hashlib.sha256(t).hexdigest() != e:
+        ko(f"{nom} : sha256 de la charge différent de l'empreinte de l'en-tête")
+    l_ = t.decode('utf-8', 'replace').splitlines()
+    print(f"OK   {nom[1:]} : sha256 égal à l'en-tête ; {len(t)} octets ; {len(l_)} lignes")
+    for z in l_[:200]:
+        print(f"  | {z}")
+PY
+  gpgconf --kill all 2>/dev/null || true
+  rm -rf -- "${d:?}"
+  echo "fichiers effacés (clé, métadonnées, rpm)"
 }
 
 # Cœur de la voie 2, NON BRANCHÉ (voir l'en-tête) : ni étape, ni pod. Rien ici n'est appelé par lancer.
