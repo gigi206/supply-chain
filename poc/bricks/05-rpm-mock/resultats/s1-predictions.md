@@ -232,3 +232,21 @@ P1 est inchangée. Base relue sans lecture du cluster :
   le 13/11/2026 à 14:17:00 UTC, après S5b ([`06/resultats/s1r-prealables.log`](../../06-deb-sbuild/resultats/s1r-prealables.log)).
 - **Sortie rpm** : `prealables` exige `prefetch-rpm` dans le `NotIn`, donc `rpm_appliquer` avant elle. R3 à R6 sont relues dans
   [`s1-sortie-predictions.md`](s1-sortie-predictions.md).
+
+## Résultat de `prealables`, le 16/11/2026 de 22:49:55 à 22:49:56 UTC (note écrite à 2026-11-16T22:50:26Z ; rien n'est réécrit)
+
+Question : « Je lance prealables ? ». Réponse : « Oui, lance prealables ».
+
+- Commande : `DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/s1.sh prealables </dev/null`, sur `84b100f`. `date -u` : 22:49:55
+  avant, 22:49:56 UTC après ; `chrono.tsv` : idem. Code 0, 0 KO. Premier passage de l'étape.
+- Journal : [`s1-prealables.log`](s1-prealables.log) (sha256 `8cd39d73…`).
+- **P1 tenue** : `prefetch-rpm-sortie` présente ; `NotIn` à `prefetch-deb,prefetch-gomod,prefetch-rpm` ; kube-apiserver lit
+  `/etc/rancher/rke2/pod-security.yaml` (exemption de kata) ; `s1-05-racine` admis en dry-run serveur, rien créé.
+- Lectures sans seuil prédit :
+  - sc-build : 6 CPU et 10189584Ki de mémoire allouables ; aucun conteneur en cours avec une demande de mémoire.
+  - Zot : 5551 Mo libres sous `/` (où se trouve `/var/lib/zot`). À rapprocher de P7 (archive de la racine entre 400 et 900 Mo),
+    sans seuil fixé ici.
+- Rien n'est posé dans le cluster ni écrit dans Zot.
+
+Suite, chaque point sur accord nommé : ajout à `s1.sh` pour N3 et N4 (banc à sec) ; décision `extras` ; `amorce`, `hote` de nouveau,
+`racine`, `image`, `essais`, `verrou`.
