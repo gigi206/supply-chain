@@ -539,3 +539,9 @@ Prochaine ligne : `s6a.sh periodique` (L9, L10 : cluster et Zot, premier scan de
 16:08:35 UTC, code 0, `bilan : tout OK`. **L9 et L10 tenues** : CronJob du deb mis à jour sur D ; premier scan de D publié
 (`ca8946f4…`, referrers 0 puis 1) et vérifié sur l'hôte ; deb 1.0.0-2 `f66bbeb2` extrait ; 67 vulnérabilités, 0 KEV.
 Prochaine ligne : `s6a.sh fraicheur` (L11, `sc-stockage`, avant 2026-11-17T13:16:51Z), sur accord nommé.
+
+## Carte, ligne 10 : `fraicheur` (note de 2026-11-16T16:10:01Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6a.sh fraicheur (L11, sc-stockage) ? ». Du 16/11 16:09:22 au 16/11 16:09:43 UTC, code 0,
+`bilan : tout OK`. **L11 tenue** : la série du deb suivie par `ScanEnRetard` porte sur D (16/11, 16:08:29 UTC), égale dans
+Prometheus aux lectures de l'hôte. L'échéance de 2026-11-17T13:16:51Z ne s'applique plus.
+Prochaine ligne : `s6a.sh grafana` (L12, lectures seules, avant 2026-11-17T09:30:00Z), sur accord nommé.

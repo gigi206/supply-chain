@@ -573,3 +573,14 @@ fin dans la même seconde d'après `date -u`), code 0, `bilan : tout OK`, « S6A
 - Six lignes contenant le motif jeton|token (étape du jeton du scanner), masquées à l'écran, laissées dans le journal comme le 14/11.
 - Le CronJob du deb vise désormais D ; la série suivie par `ScanEnRetard` reste celle de `039949f9` jusqu'à `fraicheur`
   (échéance 2026-11-17T13:16:51Z).
+
+## Résultat de L11 (note de 2026-11-16T16:10:01Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6a.sh fraicheur (L11, sc-stockage) ? ». À abd5981, du 16/11 16:09:22 au 16/11 16:09:43 UTC, code 0
+relevé juste après la commande, `bilan : tout OK` ([journal](s6a-fraicheur.log), réécrit, version du 14/11 dans git ; aucune ligne
+`jeton|token`).
+- **L11 tenue** : `s6a-deb.conf` réécrit sur D (`SCANS=… builds/scan/sample-app-deb@sha256:60f25f5c…`), lu par systemd
+  (`DropInPaths`) ; `fraicheur-scan.py` installé identique (`6a08cc6e…`) ; `Result` à `success`, timer `active` ; trois séries dans
+  Prometheus égales aux lectures de l'hôte, 21 s après le début de l'étape : deb 1794845309 (16/11, 16:08:29 UTC, date du referrer
+  de L9), image 1794821512 (16/11, 09:31:52 UTC), base 1794810654 (16/11, 06:30:54 UTC).
+- `ScanEnRetard` suit désormais D : prochaine échéance 2026-11-17T18:08:29Z, après le passage planifié du deb du 17/11 à 11:15 UTC.
+  Son état après l'étape sera relu par la commande 6 (L13).
