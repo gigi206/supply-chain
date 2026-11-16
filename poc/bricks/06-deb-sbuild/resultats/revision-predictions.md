@@ -669,3 +669,7 @@ mesurés (`../../05-rpm-mock/resultats/m2-predictions.md`). Les lignes 11 (M5 à
 **Note du 2026-11-16 (2026-11-16T19:23:32Z) : complément de `releve9` de la 05 relancé** (préparé en 05ac074 ; « Oui », 19:23:02 à
 19:23:08 UTC, code 0) : `/usr/lib/golang/VERSION` marqué `%doc` comme la notice de Go. Les lignes 11 (M5 à M8) et 12 restent ;
 prochaine : `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5), pas avant 2026-11-16T20:38:15Z, sur accord nommé.
+
+**Note du 2026-11-16 (2026-11-16T19:33:41Z) : fiche de faits des trois tags `I:` de lintian, hors des lignes de la carte.** [`lintian-tags-info.md`](lintian-tags-info.md), sans
+recommandation ni décision ; rien lancé, `poc/packaging` inchangé. Les lignes 11 (M5 à M8) et 12 restent ; prochaine :
+`ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5), pas avant 2026-11-16T20:38:15Z, sur accord nommé.
