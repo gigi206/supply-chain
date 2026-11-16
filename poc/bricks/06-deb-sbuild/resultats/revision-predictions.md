@@ -459,3 +459,56 @@ réécrits (versions du 11/11 dans git) ; aucune ligne `jeton|token`.
   (`scan.scan_present`, 0 énoncé), cohérent avec la cible `039949f9` rendue le 14/11.
 Prochaine ligne : relecture hors ligne de `ScanEnRetard` (U13) et relevé daté des épinglages de `s6a.sh` et `s6b.sh`, puis S6a
 `periodique fraicheur grafana` (ligne 10, refusée de 09:00 à 12:59 UTC), sur accord nommé.
+
+## Carte, ligne 10 : relecture de `ScanEnRetard` (U13) et relevé daté de `s6a.sh` et `s6b.sh` (note de 2026-11-16T15:55:25Z ; rien n'est réécrit)
+Relecture hors ligne, à f9a7938, relue par le conseiller. Rien lancé, rien lu dans le cluster, dans Zot ni sur `sc-stockage`.
+- **U13 : mécanisme relu, non mesuré.** `ScanEnRetard` (`19-observabilite/config/regles/alertes.yml` l. 81-86) se déclenche, par
+  dépôt, si le dernier referrer de scan a plus de 26 h, ou si la série d'un des deux dépôts manque (`for: 5m`). La série est écrite
+  par `fraicheur-scan.py` sur `sc-stockage` pour le digest fixé dans `SCANS`, que `s6a.sh fraicheur` a posé le 14/11 sur
+  `039949f9` (`s6a-fraicheur.log`). L'alerte ne voit donc pas D : elle reste inactive tant que les passages de 11:15 UTC sur
+  `039949f9` réussissent, et aucun journal archivé ne montre ceux des 15/11 et 16/11. **Erreur de la ligne U13 de la carte** : c'est
+  `fraicheur` qui fait passer la série sur D, pas `periodique` (qui rend le CronJob sur D). U13 se lira par une lecture seule sur
+  `sc-stockage`, sur accord, avant `periodique` : historique de `ALERTS{alertname="ScanEnRetard"}` depuis 2026-11-15T20:39:34Z,
+  valeur actuelle de la série du deb, notifications de `ScanEnRetard` au récepteur.
+- **Contrainte de délai.** Après `periodique`, plus rien ne rafraîchit la série de `039949f9` : `fraicheur` doit passer avant son
+  dernier referrer plus 26 h (échéance donnée par la lecture ci-dessus). Si `periodique` finit en KO après avoir appliqué le
+  CronJob, ou si `fraicheur` est refusée, l'alerte sonnera à cette échéance. `grafana` refuse dès qu'un passage planifié a eu lieu
+  après `periodique` (`s6a.sh` l. 480-484) : elle doit passer avant 09:30 UTC le lendemain. `periodique` refuse de 09:00 à 12:59 UTC
+  (l. 270).
+- **Une étape par appel** : `s6a.sh` n'en accepte qu'une (l. 528). La ligne 10 fait trois commandes ; code relevé après chacune,
+  arrêt au premier non nul.
+- **Relevé de `s6a.sh`** :
+  - datées après S5b : `DEB_SHA` f66bbeb2 (S3 du 14/11 ; N7 de S5 le 16/11, `s5-kata.log`) ; `DEB_REF` 60f25f5c (S4d3 du 15/11,
+    `s4d3-porte.log` ; présent dans Zot le 16/11, `s5-porte.log`) ; `APP_REF` 3a7ca1b1, égal à `IMAGE` de `plateforme.sh` (07a),
+    sample-app jugée `ok|ok` le 16/11 (`s5-porte.log`). Ligne `DEB|sample-app_1.0.0-2_amd64.deb, sha256 f66bbeb2…` attendue
+    aux l. 360 et 496 : `scanner.sh` (07a, l. 61) affiche le nom du seul fichier de la couche, que `deb/construire-deb.yaml`
+    (l. 112-124) y met tel que sbuild l'a produit ; la construction de D sous Kata le 16/11 a produit
+    `sample-app_1.0.0-2_amd64.deb f66bbeb2` avec `60f25f5c` (`s5-n7-kata.log` du cache, écrit à 15:38:32Z ; `s5-kata.log`).
+  - constantes de la 07a (`val07`, `OUTILS`, `BASE_DIGEST`) égales à `plateforme.sh` ; aucun commit depuis 4229318 (14/11) sur
+    `scanner.sh`, `fraicheur-scan.py`, `alertes.yml`, `scan-job.yaml`, `plateforme.sh` ni `limites.tsv` ; réciproques des trois
+    `s6a-*.patch` applicables (`git apply -R --check`, code 0).
+  - non vérifiée : `ARBRE` (6391fd43 est un commit du dépôt de Forgejo, absent de ce dépôt) ; ne sert qu'à `releve`.
+  - **non datée par un journal** : le 14/11, `comparer_cronjobs` a tourné avant que `scan-sample-app-deb` existe ; cette fois,
+    `kubectl apply --dry-run=server` (apply côté client) porte sur l'objet créé par `--server-side`. À mesurer par
+    `S6A_SEC=1 periodique`, qui n'écrit rien (précédent : `s6a-periodique-sec.log`, 14/11, 20:58:42Z).
+  - commentaires périmés, sans effet : `# S4d1` (l. 54), `039949f9` dans l'en-tête (l. 6).
+  - écarts attendus au 14/11 : D au lieu de `039949f9` ; referrers de D dans `builds/scan/sample-app-deb` 0 avant (porte de S5 :
+    `scan.scan_present`), 1 après ; CronJob `scan-sample-app-deb` mis à jour, non créé ; fichier complémentaire réécrit sur D.
+- **Relevé de `s6b.sh` et de `rejeu/`, pour la ligne 11 (sans effet sur la ligne 10)** :
+  - datées après S5b : `DEB_DIGEST` D ; `ENTREES` bb7599a2, 50dc73f7, f0ed7a71 (relues par S5 le 16/11) ; `CHROOT_SHA` aec1c7a9 et
+    451786240 octets (`s4a-pipeline.log`, 13/11, 14:52:43Z).
+  - d'avant S5b, indépendantes de Zot : `INRELEASE`, `PACKAGES_XZ`, `CLES`, `SDE` (S1 du 10/11, instantané 20261105T000000Z fixe) ;
+    `EPINGLES` (V3 du 12/11, paquets de la VM).
+  - **périmée** : `INVOCATION=454728c5` (l. 118), PipelineRun de `039949f9` (décision 1 du 12/11). Le nom figure aussi dans la
+    politique figée `rejeu/politique-replay-deb.md` (l. 16) et dans un commentaire de `verifier_deb.py` (l. 3) ; les scripts de
+    `rejeu/` n'épinglent rien d'autre (sujet et invocation passés en argument). Le choix parmi les provenances de D (dont
+    c3d27e05, chemin 2 de S4d3, la plus récente, seule jugée par la porte) est une décision du propriétaire, suivie d'un correctif
+    sur accord ; une nouvelle version de la politique figée est aussi à décider. `finishedOn` de c3d27e05 non relevé : créé à
+    2026-11-15T20:31:44Z (`s4d3-chemins.log` l. 41), donc `rebuild` pas avant 2026-11-16T20:31:44Z.
+  - journaux et fichiers périmés : la garde d'`etape_vsa` lit `s6b-rebuild.log`, dont la version du 12/11 (sur `039949f9`) la
+    satisfait ; `vsa_deb.py` refuserait dans la VM (manifeste reconstruit comparé au sujet, l. 50). `s6b-vsa.bundle.json` et
+    `s6b-vsa-enonce.json` portent `039949f9` : `pousser_vsa` les refuse (sujet comparé à D, l. 739). L'ordre `transporter`,
+    `verifier`, `rebuild`, `vsa` est à fixer dans l'additif de la ligne 11.
+  - messages périmés, sans effet : `039949f9` aux l. 746 et 749.
+Prochaine ligne : additif de prédictions de la ligne 10 dans `s6a-service-predictions.md` (lecture seule de U13, `S6A_SEC=1
+periodique`, puis `periodique`, `fraicheur`, `grafana`), sur accord ; puis chaque lancement sur accord nommé.
