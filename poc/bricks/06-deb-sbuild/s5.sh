@@ -41,7 +41,7 @@ mkdir -p "$T"
 trap 'rm -rf "$T/auth"' EXIT
 umask 022
 
-PIPE_BUILDER=$REG/tekton/pipelines/builder-sbuild@sha256:a9d48331da1290b06e7ead017c5536161bb0a8a515d39e61f99c8f752dfdc88b   # S4a
+PIPE_BUILDER=$REG/tekton/pipelines/builder-sbuild@sha256:71f84839cf5781134d5461128e5e0676b4b5a1f7491ef3738bec0a9485dd0bd9   # S4a, rejeu du 13/11/2026 (Zot neuf après S5b)
 PIPE_DEB=$REG/tekton/pipelines/sample-app-deb@sha256:d1fb3871ec550f0fb49bc81b7fe6be932417ddd76297d5698e61d20e5ad7df26     # S4d3, révision 1.0.0-2 (15/11/2026)
 BUILDER_DIGEST=sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590   # S4a (A13)
 BUILDER=$REG/builds/builders/sbuild-debian13@$BUILDER_DIGEST
@@ -261,7 +261,7 @@ etape_prealables() {
   mesure "objets s5 dans builds" "$(kubectl get taskrun,pod,pvc -n builds -l poc.test/jalon=s5 -o name | wc -l)" 0
   mesure "dépôt $ALTEREE dans Zot" "$(SSL_CERT_FILE=$P/ca-poc.crt crane ls "$REG_HOTE/$ALTEREE" 2>/dev/null | paste -sd, - || true)" ""
   for f in "$DEB" "$APP" "$FERMETURE" "$CONSTRUIT"; do echo "$f $(envel "$f")"; done | tee "$T/enveloppes-avant"
-  mesure "enveloppes de départ (deb, sample-app)" "$(awk 'NR <= 2 {print $2}' "$T/enveloppes-avant" | paste -sd' ' -)" "8 28"
+  mesure "enveloppes de départ (deb, sample-app)" "$(awk 'NR <= 2 {print $2}' "$T/enveloppes-avant" | paste -sd' ' -)" "8 6"   # S4d3 du 15/11/2026
   ecarts
 }
 
@@ -321,13 +321,13 @@ etape_prefetch() {
   mesure "N1 témoin : miroir d'un paquet" "$(lignes s5-n1-temoin 'miroir : 1 paquets')" 1
   echo "## N1 : même paquet, sha256 faux (dernier chiffre changé)"
   r=$(tr_lancer s5-n1-faux); tr_journal s5-n1-faux 8
-  mesure "N1 hash faux : TaskRun" "$r" "False|Failed"
+  mesure "N1 hash faux : TaskRun" "$r" "False|StepFailed"
   mesure "N1 hash faux : refus par apt-helper (« téléchargement refusé »)" "$(lignes s5-n1-faux "téléchargement refusé : $(cut -d' ' -f3 "$T/paquet-miroir")")" 1
   mesure "N1 hash faux : contrôle du shell non atteint (« sha256 différent »)" "$(lignes s5-n1-faux 'sha256 différent')" 0
   mesure "N1 hash faux : message d'apt-helper « Hash Sum mismatch »" "$( [ "$(lignes s5-n1-faux 'Hash Sum mismatch')" -ge 1 ] && echo oui || echo non)" oui
   echo "## N2 : InRelease au mauvais sha256 (premier chiffre changé)"
   r=$(tr_lancer s5-n2-inrelease); tr_journal s5-n2-inrelease 8
-  mesure "N2 : TaskRun" "$r" "False|Failed"
+  mesure "N2 : TaskRun" "$r" "False|StepFailed"
   mesure "N2 : refus par apt-helper sur l'InRelease" "$(lignes s5-n2-inrelease 'téléchargement refusé : dists/trixie/InRelease')" 1
   mesure "N2 : aucun index ni paquet téléchargé" "$(lignes s5-n2-inrelease 'index main/')" 0
   for r in s5-n1-temoin s5-n1-faux s5-n2-inrelease; do echo "     $r : chains.tekton.dev/signed « $(tr_signe $r) »"; done
@@ -372,11 +372,11 @@ FIN
     "$(awk '$1 == "miroir" {a = $4; t = $5} $1 == "miroir-inrelease" {print ($4 != a) "|" ($5 == t)}' "$T/alterer.log")" "1|1"
   echo "## N3 : construire-builder sous Kata sur chaque copie"
   r=$(tr_lancer s5-n3-deb); tr_journal s5-n3-deb 6
-  mesure "N3 .deb altéré : TaskRun" "$r" "False|Failed"
+  mesure "N3 .deb altéré : TaskRun" "$r" "False|StepFailed"
   mesure "N3 .deb altéré : refus par la revérification (« paquet altéré »)" "$(lignes s5-n3-deb "paquet altéré : $p")" 1
   mesure "N3 .deb altéré : ni miroir revérifié ni apt lancé" "$(lignes s5-n3-deb 'miroir revérifié')|$(lignes s5-n3-deb 'apt-get install hors ligne')" "0|0"
   r=$(tr_lancer s5-n3-inrelease); tr_journal s5-n3-inrelease 6
-  mesure "N3 InRelease altéré : TaskRun" "$r" "False|Failed"
+  mesure "N3 InRelease altéré : TaskRun" "$r" "False|StepFailed"
   mesure "N3 InRelease altéré : refus par la revérification" "$(lignes s5-n3-inrelease 'InRelease du miroir différent')" 1
   mesure "N3 : pods sous Kata (tekton.dev/task|nœud|runtime)" "$(tr_pod s5-n3-deb) $(tr_pod s5-n3-inrelease)" "construire-builder|sc-build|kata construire-builder|sc-build|kata"
   echo "## N3 témoin : construire-builder sur le miroir intact (rien n'est publié)"
@@ -434,7 +434,7 @@ etape_fermeture() {
     attendu "$c dans Zot (étape zot)" "$(oras manifest fetch --descriptor --ca-file "$P/ca-poc.crt" "$REG_HOTE/$ALTEREE@$(cat "$T/digest-$c")" 2>/dev/null | jq -r '.digest' || true)" "$(cat "$T/digest-$c")"
     echo "## N5 : preparer-deb sur la fermeture $c"
     r=$(tr_lancer "s5-n5-$c"); tr_journal "s5-n5-$c" 6
-    mesure "N5 $c : TaskRun" "$r" "False|Failed"
+    mesure "N5 $c : TaskRun" "$r" "False|StepFailed"
     mesure "N5 $c : tirage par digest réussi (oras)" "$(lignes "s5-n5-$c" 'fermeture deb : ')" 1
   done
   mesure "N5 paquet-modifie : refus par la confrontation au verrou" "$(lignes s5-n5-paquet-modifie "paquet différent du verrou : $(cat "$T/paquet-fermeture")")" 1

@@ -407,3 +407,9 @@ l'a produite après S5b (Zot neuf le 13/11). Rien lancé.
   bloque pas S5.
 - Prédictions de `prealables`, conditionnées au correctif 5 : additif de [`s5-predictions.md`](s5-predictions.md).
 Prochaine ligne : correctif d'épinglage 5, sur accord nommé ; puis S5 `prealables`, sur accord nommé.
+
+## Correctif d'épinglage 5 appliqué (note de 2026-11-16T15:08:49Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique le correctif d'épinglage 5 ? ». `revision-epinglage-5.patch` appliqué tel quel à `s5.sh`
+(`git apply --check` puis `git apply`, code 0 ; diff de l'arbre identique au correctif, `bash -n` code 0) : plus aucune occurrence de
+`a9d48331`, de `"8 28"` ni de `"False|Failed"` ; `71f84839` une fois, `"8 6"` une fois, `"False|StepFailed"` cinq fois. Rien lancé.
+Prochaine ligne : S5 `prealables` (additif Q1 à Q8 de `s5-predictions.md`), sur accord nommé.
