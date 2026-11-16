@@ -318,3 +318,14 @@ Journal `s6b-rebuild.log`, sans ligne `jeton|token` ; celui du 12/11 reste dans 
   étiquettes inchangées.
 - Manifeste poussé par digest dans `builds/vsa/sample-app-deb` : `sha256:97b4100d…`. Relecture anonyme : un seul referrer de D,
   au digest poussé ; aucune étiquette. Copie : `s6b-vsa-manifeste.json`.
+
+## Résultat de M8 (note de 2026-11-16T20:59:25Z, écrit à 2026-11-16T20:59:40Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh lire_vsa (M8) ? ». Le 16/11 à 20:59:25 UTC (début et fin dans la même seconde), code 0, `bilan : tout OK`. Journal
+`s6b-lire_vsa.log`, sans ligne `jeton|token`.
+
+**M8 tenue.**
+- VSA lue par `COSIGN_REPOSITORY` : clé de VSA acceptée (1 vérifiée), clé de Chains refusée (0, « Found: 0 »).
+- Provenance (tag `.att`) : clé de VSA refusée (0) ; témoin, clé de Chains acceptée, **8 énoncés vérifiés**.
+- Chaque lecture : une seule connexion, vers Zot.
+
+**Ligne 11 de la carte faite** (M1 à M8 tenues).

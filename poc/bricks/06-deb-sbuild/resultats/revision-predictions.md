@@ -689,3 +689,8 @@ Prochaine ligne : `s6b.sh pousser_vsa` (M7), sur accord nommé.
 « Oui, lance-le » à « Je lance s6b.sh pousser_vsa (M7) ? ». Du 16/11 20:56:02 au 16/11 20:56:05 UTC, code 0. **M7 tenue** : VSA de D poussée dans
 `builds/vsa/sample-app-deb` (manifeste `97b4100d…`, un seul referrer de D, aucune étiquette) ; `builds/sample-app-deb` inchangé.
 Prochaine ligne : `s6b.sh lire_vsa` (M8), sur accord nommé.
+
+## Carte, ligne 11 : `lire_vsa` (note de 2026-11-16T20:59:25Z, écrit à 2026-11-16T20:59:40Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh lire_vsa (M8) ? ». Le 16/11 à 20:59:25 UTC, code 0. **M8 tenue** : clé de VSA acceptée et clé de Chains refusée pour la VSA,
+l'inverse pour la provenance (8 énoncés vérifiés), aucune connexion hors de Zot. **Ligne 11 faite** (M1 à M8 tenues).
+Prochaine ligne : 12, `DISTRO=rke2 s6a.sh porte` (W1 à W7, [`s6a-service-predictions.md`](s6a-service-predictions.md)), sur accord nommé.
