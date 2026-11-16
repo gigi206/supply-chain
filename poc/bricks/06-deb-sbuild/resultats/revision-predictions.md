@@ -545,3 +545,10 @@ Prochaine ligne : `s6a.sh fraicheur` (L11, `sc-stockage`, avant 2026-11-17T13:16
 `bilan : tout OK`. **L11 tenue** : la série du deb suivie par `ScanEnRetard` porte sur D (16/11, 16:08:29 UTC), égale dans
 Prometheus aux lectures de l'hôte. L'échéance de 2026-11-17T13:16:51Z ne s'applique plus.
 Prochaine ligne : `s6a.sh grafana` (L12, lectures seules, avant 2026-11-17T09:30:00Z), sur accord nommé.
+
+## Carte, ligne 10 : `grafana` (note de 2026-11-16T16:10:48Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6a.sh grafana (L12, lectures seules) ? ». Le 16/11 à 16:10:31 UTC, code 0, `bilan : tout OK`.
+**L12 tenue** : passage de `periodique` sur D, signature d'OpenBao, poussage dans Zot et mesure de `fraicheur-scan` sur D
+visibles par l'auditeur dans Grafana ; aucun identifiant de `poc-scan` dans les réponses.
+Prochaine ligne : `JOURNAL=…/lecture-u13-apres.log lecture-u13.sh` (L13, lecture seule ; U13 jusqu'à la fin de l'étape 10), sur
+accord nommé.

@@ -584,3 +584,15 @@ relevé juste après la commande, `bilan : tout OK` ([journal](s6a-fraicheur.log
   de L9), image 1794821512 (16/11, 09:31:52 UTC), base 1794810654 (16/11, 06:30:54 UTC).
 - `ScanEnRetard` suit désormais D : prochaine échéance 2026-11-17T18:08:29Z, après le passage planifié du deb du 17/11 à 11:15 UTC.
   Son état après l'étape sera relu par la commande 6 (L13).
+
+## Résultat de L12 (note de 2026-11-16T16:10:48Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6a.sh grafana (L12, lectures seules) ? ». À 96e15ad, le 16/11 à 16:10:31 UTC (début et fin dans la
+même seconde d'après `date -u`), code 0, `bilan : tout OK` ([journal](s6a-grafana.log), réécrit, version du 14/11 dans git).
+- **L12 tenue** : aucun passage planifié depuis `periodique` (16:06:34Z) ; 14 lignes du job `s6a-manuel` lues par l'auditeur (non
+  affichées), `SOURCE|`, `BASE|`, `DEB|sample-app_1.0.0-2_amd64.deb, sha256 f66bbeb2…`, `ARTEFACT|deb`, `SCAN|`, `ATTESTATION|`,
+  `PUBLIE|` visibles ; une ligne `OK` contenant le motif jeton|token (révocation du jeton du scanner), masquée à l'écran, préfixe
+  relu ; `PUBLIE|` égale à celle de `periodique` (`ca8946f4…`, referrer de D) ; signature du scanner dans l'audit d'OpenBao
+  (2 lignes, non affichées) ; poussage par `poc-scan` dans `builds/scan/sample-app-deb` dans l'audit de Zot ; ligne de
+  `fraicheur-scan` `scan builds/scan/sample-app=1794821512 builds/scan/sample-app-deb=1794845309, base 1794810654`, égale aux séries
+  de L11 ; ni mot de passe de `poc-scan` ni son encodage dans les réponses ; requêtes en HTTP 200. Réponses de Grafana effacées
+  (dossier absent après l'étape).
