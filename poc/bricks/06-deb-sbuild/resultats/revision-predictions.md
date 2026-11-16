@@ -694,3 +694,8 @@ Prochaine ligne : `s6b.sh lire_vsa` (M8), sur accord nommé.
 « Oui, lance-le » à « Je lance s6b.sh lire_vsa (M8) ? ». Le 16/11 à 20:59:25 UTC, code 0. **M8 tenue** : clé de VSA acceptée et clé de Chains refusée pour la VSA,
 l'inverse pour la provenance (8 énoncés vérifiés), aucune connexion hors de Zot. **Ligne 11 faite** (M1 à M8 tenues).
 Prochaine ligne : 12, `DISTRO=rke2 s6a.sh porte` (W1 à W7, [`s6a-service-predictions.md`](s6a-service-predictions.md)), sur accord nommé.
+
+## Carte, ligne 12 : `porte` (note de 2026-11-16T21:01:18Z, écrit à 2026-11-16T21:01:48Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6a.sh porte (ligne 12) ? ». Du 16/11 21:00:48 au 16/11 21:01:18 UTC, code 0. W1 à W7 tenues
+([`s6a-service-predictions.md`](s6a-service-predictions.md)) : **U14 tenue**, ec en succès, horodatage 8/8, VSA `1/1` et scan
+`ok` sur D. **Lignes 11 et 12 faites : la cascade de la révision 1.0.0-2 sur le cluster est finie.**

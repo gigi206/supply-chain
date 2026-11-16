@@ -667,3 +667,18 @@ deb ne réussit aucun passage ; chaque passage réussi la repousse.
 Relevé par le conseiller. Le titre dit « préparé à partir de 2026-11-16T16:41:27Z » : cette heure est celle de l'écriture dans ce
 fichier (`date -u` de la commande d'insertion), pas celle du début de la préparation, qui n'a pas été relevée. Lire « écrit à
 2026-11-16T16:41:27Z ».
+
+## Résultat de la ligne 12, W1 à W7 (note de 2026-11-16T21:01:18Z, écrit à 2026-11-16T21:01:48Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6a.sh porte (ligne 12) ? ». Du 16/11 21:00:48 au 16/11 21:01:18 UTC, code 0, `bilan : tout OK`. Journal `s6a-porte.log`, sans ligne `jeton|token`.
+
+**W1 à W7 tenues ; U14 tenue.**
+- W1 : D présent dans Zot ; `referrers du deb dans builds/vsa/sample-app-deb : 1, VSA attendue : ok`. Le scan de D est attesté
+  par la ligne `VERDICT` (W6), le journal n'a pas de ligne de préalable à part pour lui.
+- W2 : 0 PipelineRun en cours dans `builds` ; passage d'horodatage `horodatage-29914381` ; provenance jugée
+  `c3d27e05-b4cd-487b-8980-7a40b3336ffc`.
+- W3 : `VERDICT|s6a-deb|true||trusted_task.tagged|…` : succès de ec, aucune violation, avertissement `trusted_task.tagged` seul.
+- W4 : horodatage `ok`, `8/8 enveloppe(s) couverte(s), 8 bundle(s) vérifié(s)`.
+- W5 : **VSA `ok`, `1/1 VSA retenue(s)`** dans `builds/vsa/sample-app-deb`.
+- W6 : **scan `ok`**, `1 énoncé(s) vérifié(s)` dans `builds/scan/sample-app-deb`. Le journal ne donne pas l'empreinte de
+  l'énoncé : son égalité à `ca8946f4…` n'est pas lue ici. Un seul énoncé : aucun passage planifié réussi du deb depuis.
+- W7 : Job de la porte `1/` ; `bilan : tout OK`, code 0.
