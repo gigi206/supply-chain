@@ -250,3 +250,23 @@ Le bundle git (`e1e6b713…`, 8,0 Ko) est identique à celui du 12/11.
 - **`finishedOn` signé : 2026-11-15T20:38:15Z** (dans la fourchette prédite, avant la fin de S4d3).
 
 **Délai** : `rebuild` possible à partir de **2026-11-16T20:38:15Z**.
+
+## Résultat de M4 (note de 2026-11-16T16:32:50Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh repetition (M4) ? ». Du 16/11 16:31:44 au 16/11 16:32:50 UTC, code 0, `bilan : PASSED
+(répétition, non comptée)`. Journal `s6b-repetition.log`, sans ligne `jeton|token`.
+
+**M4 tenue : D est reconstruit dans le domaine pour la première fois**, lien établi (porteuse à 1 au début et à la fin, donc non
+comptée).
+- Deux lignes retirées de la copie de répétition, comme le 12/11 : l'attente de 20 s et le refus de porteuse. Copie à
+  `1422b13d…` des deux côtés.
+- Préalables : les 5 entrées, le chroot (`aec1c7a9…`) et le verrou (`verrou=162 paquets`, identiques) sont conformes.
+- Préparation : vendor `go1.26.10` ; marked 16.4.1 conforme au lockfile.
+- Paquet source `sample-app 1.0.0-2` (`SOURCE_DATE_EPOCH` 1794693332) ; orig `1591a05b…`, `.dsc` `b284bd60…`.
+- Construction : sbuild, code 0 en 61 s, aucune ligne apt en http(s). Le deb obtenu est
+  `sample-app_1.0.0-2_amd64.deb` `f66bbeb2…`, celui de S3.
+- Couche `d8f9685c…` (1955840 octets).
+- **Résultat : `manifeste_reconstruit` = `sujet_provenance` = D (`60f25f5c…`), `verdict=PASSED`.**
+- Durée du service : 65 s (environ 72 s prédits).
+
+Le `.dsc` reconstruit, `b284bd60…`, est celui de la pipeline (l. 55 de `s4d-prealables.log`), et non celui de `sources.sh` sur
+l'hôte (U15, `ee2a6b8e…`). C'est cohérent avec l'égalité du manifeste.

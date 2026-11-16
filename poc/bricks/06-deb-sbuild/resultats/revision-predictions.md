@@ -628,3 +628,9 @@ Prochaine ligne : `s6b.sh verifier` (M3, arrêt si pas exactement 8 bundles vér
 - Recette, entrées, commit, Go et chroot conformes.
 - `finishedOn` 2026-11-15T20:38:15Z : `rebuild` possible à partir de 2026-11-16T20:38:15Z.
 Prochaine ligne : `s6b.sh repetition` (M4, lien établi, non comptée), sur accord nommé.
+
+## Carte, ligne 11 : `repetition` (note de 2026-11-16T16:32:50Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh repetition (M4) ? ». Du 16/11 16:31:44 au 16/11 16:32:50 UTC, code 0. **M4 tenue** : D
+reconstruit dans `sc-replay`, lien établi et non comptée (deb `f66bbeb2…`, couche `d8f9685c…`, manifeste `60f25f5c…`,
+`PASSED`, 65 s).
+Prochaine ligne : `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5, lien coupé), pas avant 2026-11-16T20:38:15Z, sur accord nommé.
