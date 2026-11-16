@@ -530,3 +530,19 @@ refusé, ne repasseront plus telles quelles tant que Zot garde ce referrer (mêm
 réseau, `kubectl`, `curl` et `ssh` remplacés par des simulations : réponses normales (code 0), `"manifests": null` (0 referrer,
 code 0), lectures en échec (une ligne « LECTURE RATÉE » par lecture, code 1) ; requêtes envoyées par ssh relues après décodage.
 Rien lu dans le cluster, dans Zot ni sur `sc-stockage`.
+
+## Résultats de L1 à L7 (note de 2026-11-16T16:04:43Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance lecture-u13.sh (lecture seule, L1 à L7) ? ». À a6a7527, du 16/11 16:04:21 au 16/11 16:04:22 UTC,
+code 0 relevé juste après la commande, « toutes les lectures faites » ([journal](lecture-u13.log), aucune ligne `jeton|token`).
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| L1 | `15 11 * * * Etc/UTC`, non suspendu, dernier passage planifié `2026-11-16T11:15:00Z`, dernier succès `2026-11-16T11:16:56Z` ; cible `039949f9` seule | Tenue |
+| L2 | `scan-sample-app-deb-29912355` (15/11) et `-29913795` (16/11) : 11:15:00 à 11:16:56Z, 1 succès, 0 échec chacun ; trois Jobs de `scan-sample-app` (14, 15 et 16/11, 09:30) réussis | Tenue |
+| L3 | `039949f9` : HTTP 200, trois referrers de scan, 14/11 21:01:35Z, 15/11 11:16:51Z, 16/11 11:16:51Z ; D : HTTP 200, aucun referrer de scan | Tenue |
+| L4 | `ScanEnRetard` et `ScanBientotRefuse` : santé `ok`, `inactive` (évaluées à 16:04:07Z) | Tenue |
+| L5 | Série du deb 1794827811 (16/11 11:16:51Z), égale au referrer le plus récent ; deux valeurs dans la fenêtre : 15/11 11:16:51Z dès le début, 16/11 11:16:51Z vue dès 11:19:34Z ; image 16/11 09:31:52Z, base 16/11 06:30:54Z | Tenue |
+| L6 | Aucune ligne `ALERTS` de scan dans la fenêtre ; récepteur : 2 entrées du journal de l'unité, aucune notification de scan. **U13 tenue jusqu'à la lecture** | Tenue |
+| L7 | Échéance 2026-11-17T13:16:51Z | Tenue |
+
+`fraicheur` doit donc passer avant le 17/11 à 13:16:51 UTC ; `grafana` avant le 17/11 à 09:30 UTC.

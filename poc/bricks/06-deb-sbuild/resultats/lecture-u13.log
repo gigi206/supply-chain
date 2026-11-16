@@ -1,0 +1,37 @@
+# lecture-u13.sh, 2026-11-16T16:04:21Z ; fenêtre depuis 2026-11-15T20:39:34Z (69887 s)
+## CronJob scan-sample-app-deb et Jobs de l'espace scan (API)
+horaire 15 11 * * * Etc/UTC ; suspendu false
+dernier passage planifié 2026-11-16T11:15:00Z ; dernier succès 2026-11-16T11:16:56Z
+cible : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+  5 Job(s)
+  scan-sample-app-29910810 début 2026-11-14T09:30:00Z fin 2026-11-14T09:31:56Z succès 1 échecs 0
+  scan-sample-app-29912250 début 2026-11-15T09:30:00Z fin 2026-11-15T09:31:57Z succès 1 échecs 0
+  scan-sample-app-29913690 début 2026-11-16T09:30:00Z fin 2026-11-16T09:31:56Z succès 1 échecs 0
+  scan-sample-app-deb-29912355 début 2026-11-15T11:15:00Z fin 2026-11-15T11:16:56Z succès 1 échecs 0
+  scan-sample-app-deb-29913795 début 2026-11-16T11:15:00Z fin 2026-11-16T11:16:56Z succès 1 échecs 0
+## referrers de scan dans builds/scan/sample-app-deb (Zot, lecture anonyme ; date org.opencontainers.image.created)
+039949f9 : HTTP 200, 3 referrer(s) de scan
+  2026-11-14T21:01:35Z
+  2026-11-15T11:16:51Z
+  2026-11-16T11:16:51Z
+60f25f5c : HTTP 200, 0 referrer(s) de scan
+## Prometheus : règles de scan (nom, santé, état, dernière évaluation)
+  ScanEnRetard	ok	inactive	2026-11-16T16:04:07.034003363Z
+  ScanBientotRefuse	ok	inactive	2026-11-16T16:04:07.034068585Z
+## Prometheus : séries de fraîcheur maintenant (nom, dépôt, valeur, date)
+  (series.json : 3 résultat(s))
+  scan_dernier_referrer_timestamp_seconds builds/scan/sample-app 1794821512 2026-11-16T09:31:52Z
+  base_grype_construite_timestamp_seconds vulndb/grype 1794810654 2026-11-16T06:30:54Z
+  scan_dernier_referrer_timestamp_seconds builds/scan/sample-app-deb 1794827811 2026-11-16T11:16:51Z
+## Prometheus : valeurs distinctes de la série du deb dans la fenêtre (première vue, pas de 60 s)
+  (plage.json : 1 résultat(s))
+  vue dès 2026-11-15T20:39:34Z : 1794741411 (2026-11-15T11:16:51Z)
+  vue dès 2026-11-16T11:19:34Z : 1794827811 (2026-11-16T11:16:51Z)
+## Prometheus : ALERTS de scan dans la fenêtre (max_over_time ; 0 résultat : jamais pending ni firing)
+  (alerts.json : 0 résultat(s))
+## récepteur local : notifications de scan depuis 2026-11-15T20:39:34Z (reçu à, alerte, statut, début, fin)
+  2 entrée(s) du journal de l'unité dans la fenêtre
+  0 notification(s) de scan
+## échéance : dernière valeur de la série du deb plus 26 h
+échéance : 2026-11-17T13:16:51Z
+# fin, 2026-11-16T16:04:22Z ; bilan : toutes les lectures faites

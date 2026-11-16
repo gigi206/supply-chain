@@ -520,3 +520,10 @@ periodique`, puis `periodique`, `fraicheur`, `grafana`), sur accord ; puis chaqu
 hors réseau avec des commandes simulées. Six commandes, chacune sur accord nommé : `lecture-u13`, `S6A_SEC=1 periodique`,
 `periodique`, `fraicheur`, `grafana`, `lecture-u13` après. Rien lancé.
 Prochaine ligne : `lecture-u13.sh` (L1 à L7), sur accord nommé.
+
+## Carte, ligne 10 : `lecture-u13.sh` (note de 2026-11-16T16:04:43Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance lecture-u13.sh (lecture seule, L1 à L7) ? ». Du 16/11 16:04:21 au 16/11 16:04:22 UTC, code 0, toutes
+les lectures faites. **L1 à L7 tenues** (détail dans `s6a-service-predictions.md`) : passages du deb des 15/11 et 16/11 réussis sur
+`039949f9`, aucun scan de D, aucune alerte de scan ni notification depuis 2026-11-15T20:39:34Z. **U13 tenue jusqu'à 16:04:21Z.**
+Échéance pour `fraicheur` : 2026-11-17T13:16:51Z.
+Prochaine ligne : `S6A_SEC=1 s6a.sh periodique` (L8, rien d'écrit), sur accord nommé.
