@@ -1,0 +1,25 @@
+# lintian.sh prealables, 2026-11-16T17:12:44Z
+## index de l'instantané 20261105T000000Z (copie gardée par S1, hors réseau)
+OK   signataires d'InRelease (clés primaires) : 04B54C3CDCA79751B16BC6B5225629DF75B188BD 41587F7DB8C774BCCF131416762F67A0B2C39DE4 B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8
+OK   InRelease : 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+OK   Packages listé dans InRelease : 4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940
+OK   Packages.xz décompressé : 4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940
+OK   lintian dans l'index : 2.122.0
+## racine de S1
+OK   racine.tar : f8f221cadb6fe64ad6b3cf3a4baf6464ffe860d0cca80691dc3a47739381ca44
+OK   InRelease de la racine : 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+OK   Packages de la racine : 4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940
+OK   sources.list de la racine : deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20261105T000000Z trixie main
+paquets installés de la racine : 166
+OK   paquets de la racine hors de l'index : 0
+OK   lintian déjà dans la racine : 0
+nœuds de périphérique de la racine (non extraits) : 8
+## sources des deux révisions
+OK   sample-app_1.0.0-1.dsc : 9050679ed60032a2a3587b330c314717d1d781d46553363773f669951de9bef6
+OK     sample-app_1.0.0.orig.tar.gz (Checksums-Sha256 de sample-app_1.0.0-1.dsc) : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb
+OK     sample-app_1.0.0-1.debian.tar.xz (Checksums-Sha256 de sample-app_1.0.0-1.dsc) : 863cf4da65a7efa58dc7a9491c8754d0a3a3146145e8fd1945994ee9e2ed3f4f
+OK   sample-app_1.0.0-2.dsc : ee2a6b8ef65f2464d4cae5ea7e79b3ec796c01f9efcc53c27bec128695221002
+OK     sample-app_1.0.0.orig.tar.gz (Checksums-Sha256 de sample-app_1.0.0-2.dsc) : 1591a05bd1d42241ec4ad501e0c01af61368c4de0e3e374c8df0a7e7ad5b2ffa
+OK     sample-app_1.0.0-2.debian.tar.xz (Checksums-Sha256 de sample-app_1.0.0-2.dsc) : 0cc3d47e9c283ff5cefa7c3dd247a9495e05faaee3aed4001159e81de08a4371
+## place libre sous ~/.cache : 65517 Mo
+bilan : tout OK

@@ -155,3 +155,12 @@ signataire ou une seule personne pour presque toutes les fusions). « Hors chemi
 sbuild et mmdebstrap sont au chemin critique dans `projects.tsv` : à contredire par le propriétaire s'il le juge autrement. lintian est ajouté à `tools/health/projects.tsv`.
 Prochaine commande de l'étape : `lintian.sh prealables` (commande 1), sur accord nommé.
 
+### Résultat de la commande 1, `prealables` (écrit à 2026-11-16T17:12:56Z)
+
+Lancée sur « Oui » (réponse à « Je lance lintian.sh prealables (hors réseau) ? »), de 2026-11-16T17:12:44Z à 17:12:47Z,
+**code 0**, `bilan : tout OK` : [`lintian-prealables.log`](lintian-prealables.log). **Y1 tenue** : les trois clés épinglées
+signent InRelease `0584fba3…` ; Packages `4f2c68d6…` listé et égal à `Packages.xz` décompressé ; lintian `2.122.0` dans l'index ;
+racine `f8f221ca…`, ses listes et son `sources.list` égaux ; 166 paquets, 0 hors index, lintian absent ; 8 nœuds de périphérique ;
+`.dsc` `9050679e…` et `ee2a6b8e…`, chaque fichier de leurs `Checksums-Sha256` égal. Place libre sous `~/.cache` : 65 517 Mo.
+Prochaine commande : `lintian.sh resoudre` (hors réseau), sur accord nommé.
+
