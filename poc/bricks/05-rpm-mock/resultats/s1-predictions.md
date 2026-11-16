@@ -418,3 +418,27 @@ Une fois le correctif appliqué, la sonde s'arrête aussi pour `extras`.
 
 Suite, chaque point sur accord nommé : appliquer le correctif (une ligne datée à l'en-tête de `s1.sh`) et le commiter ; `amorce`,
 `hote` de nouveau (HB1 à HB8, HX1, HX2), `racine` (lire `rpm` dans sa liste), `image`, `essais`, `verrou`.
+
+## Correctif `extras` appliqué au dépôt (note du 2026-11-16, écrite à 2026-11-16T23:28:57Z ; rien n'est réécrit)
+
+Question : « J'applique le correctif extras et je le commite ? ». Réponse : « Oui, applique-le ».
+
+- `git apply` de [`s1-extras.patch`](../s1-extras.patch) le 16/11/2026 à 23:28:10 UTC (`date -u` de la commande), sur `50aed81`.
+  `s1.sh` passe de `710f3904…` à `ad9febc5…`, le sha256 de la copie bancée. `git apply -R --check` passe juste après.
+- **Banc `extras` repassé sur le fichier du dépôt avant la ligne datée**, le 16/11/2026 de 23:28:16 à 23:28:18 UTC : 27 OK, 0 KO
+  ([journal](s1-extras-banc-applique.log)). Hors des deux lignes d'en-tête et du bilan, son journal est identique à celui de la copie.
+  - Le banc lit le `s1.sh` d'avant dans un dossier de base sous `~/.cache`, extrait de `50aed81` : c'est la ligne « s1.sh du
+    dépôt `710f3904…` » de son en-tête. Le fichier du dépôt y figure comme « copie modifiée `ad9febc5…` ».
+  - python3 y est en 3.13.12, contre 3.15.2 au banc de la copie : le banc a été lancé depuis la racine du dépôt, et non depuis le
+    scratchpad, et le shim de mise choisit la version selon le dossier (vérifié après coup). Les deux passages donnent les
+    mêmes lignes.
+- Une ligne datée est ensuite ajoutée à l'en-tête de `s1.sh`, sans rien réécrire. `s1.sh` vaut désormais `ad16fc99…`. Le correctif
+  ne s'applique donc plus dans un sens ni dans l'autre ; son fichier reste comme trace.
+- **Sur le fichier final** :
+  - `bash -n` passe ;
+  - shellcheck 0.11.0 ne relève aucun avertissement et compte toujours 13 remarques ;
+  - le banc N3/N4, le 16/11/2026 de 23:28:27 à 23:28:28 UTC, donne 35 OK, 0 KO ([journal](s1-extras-banc-n34-applique.log)).
+- Rien n'est lancé : HX1, HX2, EX1 et EX2 attendent `hote`, `essais` et `verrou`.
+
+Suite, chaque point sur accord nommé : push ; `amorce`, `hote` de nouveau (HB1 à HB8, HX1, HX2), `racine` (lire `rpm` dans sa
+liste), `image`, `essais`, `verrou`.

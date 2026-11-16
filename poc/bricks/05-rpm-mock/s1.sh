@@ -18,6 +18,12 @@
 #   image       image d'essai assemblée sans rien exécuter (crane append) : racine, puis une couche de configuration (mock :
 #               vault 9.7 en baseurl fixes, bootstrap par digest dans Zot, macros d'OBS ; stockage de podman sous /w) ;
 #               poussée dans Zot sous essais-05/mock-rocky9:s1
+#               Ajout extras (../s1-extras.patch, préparé à sec le 16/11/2026, NON APPLIQUÉ ; décision du propriétaire
+#               « Extras sur vault ») : le dépôt extras du modèle rocky-9 passe lui aussi du mirrorlist (9.8, mouvant) à la
+#               baseurl fixe de vault 9.7 ; hote vérifie aussi son repomd.xml par gpgv ; la sonde d'essais s'arrête avant mock
+#               s'il reste un mirrorlist pour BaseOS, AppStream, CRB ou extras
+#               Ajout appliqué au dépôt le 16/11/2026 à 23:28:10 UTC (« Oui, applique-le »), sha256 égal à la copie bancée
+#               (ad9febc5…) ; non lancé.
 #   essais      pod Kata privilégié, root, label prefetch-rpm, image d'essai : sonde (capacités, montages, versions, clés,
 #               dépôts actifs de mock) ; podman pull de l'image de bootstrap par digest et image mount ; puis, pour nspawn puis
 #               simple : mock --buildsrpm et --rebuild de sample-app, sha256 du src.rpm et du rpm, place de /w, scrub
@@ -188,7 +194,7 @@ etape_hote() { # hôte seul, ni cluster ni Zot : peut tourner avant S5b ; à rej
   depot_hote baseos98 "$ROCKY98/BaseOS/x86_64/os" 1 "$FP_ROCKY"
   depot_hote appstream98 "$ROCKY98/AppStream/x86_64/os" 1 "$FP_ROCKY"
   depot_hote epel9 "$EPEL9" 0 "$e"
-  for n in BaseOS AppStream CRB; do
+  for n in BaseOS AppStream CRB extras; do
     curl -fsSL --max-time 60 -o "$d/v97-$n.repomd.xml" "$VAULT97/$n/x86_64/os/repodata/repomd.xml"
     curl -fsSL --max-time 60 -o "$d/v97-$n.repomd.xml.asc" "$VAULT97/$n/x86_64/os/repodata/repomd.xml.asc"
     attendu "vault 9.7 $n : signataire de repomd.xml" \
@@ -326,7 +332,7 @@ etape_racine() {
   pod_retirer s1-05-racine
 }
 
-# Configuration de mock : modèle rocky-9 de mock-core-configs 45.2-1, mirrorlist de BaseOS, AppStream et CRB remplacés par les
+# Configuration de mock : modèle rocky-9 de mock-core-configs 45.2-1, mirrorlist de BaseOS, AppStream, CRB et extras remplacés par les
 # baseurl fixes de vault 9.7 (D2 a) ; image de bootstrap par digest dans Zot, non « prête » (mock y installe dnf : M2 exigera
 # une image prête) ; macros d'OBS (poc.prjconf) ; racines de mock sous /w (tmpfs).
 MOCK_CFG="include('templates/rocky-9.tpl')
@@ -342,7 +348,7 @@ config_opts['macros']['%_buildhost'] = 'reproducible'
 config_opts['macros']['%source_date_epoch_from_changelog'] = '1'
 config_opts['macros']['%use_source_date_epoch_as_buildtime'] = '1'
 config_opts['macros']['%clamp_mtime_to_source_date_epoch'] = '1'
-for r in ('BaseOS', 'AppStream', 'CRB'):
+for r in ('BaseOS', 'AppStream', 'CRB', 'extras'):
     config_opts['dnf.conf'] = config_opts['dnf.conf'].replace(
         'mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=\$basearch&repo=%s-\$releasever\n' % r,
         'baseurl=$VAULT97/%s/x86_64/os/\n' % r)
@@ -389,8 +395,8 @@ for k in /usr/share/distribution-gpg-keys/rocky/*; do
 done
 mock -r @CFG@ --debug-config > /w/debug-config.log 2>&1; echo "mock --debug-config : rc $?"
 grep -o -E "(baseurl|mirrorlist|metalink)=[^[:space:]\\\\]+" /w/debug-config.log | sort | uniq -c | sed "s/^/dépôt de mock : /"
-n=$(grep -o -E "mirrorlist=[^[:space:]\\\\]*repo=(BaseOS|AppStream|CRB)-[$]releasever([^-]|$)" /w/debug-config.log | wc -l)
-echo "mirrorlist restants pour BaseOS, AppStream et CRB : $n"
+n=$(grep -o -E "mirrorlist=[^[:space:]\\\\]*repo=(BaseOS|AppStream|CRB|extras)-[$]releasever([^-]|$)" /w/debug-config.log | wc -l)
+echo "mirrorlist restants pour BaseOS, AppStream, CRB et extras : $n"
 [ "$n" = 0 ] || { echo "KO   remplacement des mirrorlist par vault 9.7 incomplet : mock non lancé"; exit 0; }
 echo "## podman imbriqué"
 podman info --format "stockage : {{.Store.GraphDriverName}} sous {{.Store.GraphRoot}}" 2>&1 | tail -n 1
