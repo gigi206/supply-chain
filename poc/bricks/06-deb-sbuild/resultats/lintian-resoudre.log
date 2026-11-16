@@ -1,0 +1,11 @@
+# lintian.sh resoudre, 2026-11-16T17:14:21Z
+OK   racine.tar : f8f221cadb6fe64ad6b3cf3a4baf6464ffe860d0cca80691dc3a47739381ca44
+racine extraite dans ~/.cache/supply-chain-poc/06/lintian/chroot (350 Mo)
+## simulation d'apt dans la racine (hors réseau, listes de la racine)
+OK   Packages de la racine extraite : 4f2c68d67001d595fbd343f6dbad44468953a51c4d9dec3a4803249f6e295940
+OK   code d'apt-get -s : 0
+lignes Inst : 157 ; Conf : 157 ; Remv : 0
+  0 upgraded, 157 newly installed, 0 to remove and 0 not upgraded.
+verrou écrit : 157 paquet(s), 22984704 octets de .deb, sha256 06588f5edb9d690f61198e53c8ceff261013fb1dfff936f29ef24a4bf9a54187
+OK   lintian dans le verrou : 2.122.0 all
+bilan : tout OK (verrou à commiter avant telecharger)

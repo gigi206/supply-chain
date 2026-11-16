@@ -164,3 +164,14 @@ racine `f8f221ca…`, ses listes et son `sources.list` égaux ; 166 paquets, 0 h
 `.dsc` `9050679e…` et `ee2a6b8e…`, chaque fichier de leurs `Checksums-Sha256` égal. Place libre sous `~/.cache` : 65 517 Mo.
 Prochaine commande : `lintian.sh resoudre` (hors réseau), sur accord nommé.
 
+### Résultat de la commande 2, `resoudre` (écrit à 2026-11-16T17:14:43Z)
+
+Lancée sur « Oui » (réponse à « Je lance lintian.sh resoudre (hors réseau) ? »), de 2026-11-16T17:14:21Z à 17:14:24Z,
+**code 0**, `bilan : tout OK` : [`lintian-resoudre.log`](lintian-resoudre.log). Racine extraite (350 Mo). `apt-get -s` code 0 :
+157 lignes `Inst`, 157 `Conf`, 0 `Remv`, « 0 upgraded » ; lintian `2.122.0 all` dans le verrou ; chaque paquet dans l'index (le mode
+`verrou` refuse sinon). Verrou [`../lintian/verrou-lintian.txt`](../lintian/verrou-lintian.txt) : **157 paquets, 22 984 704
+octets**, sha256 `06588f5e…`, recompté hors du script (157 lignes, même somme des tailles). **Y2 tenue** : nombre dans la plage
+130 à 200. La taille, environ 23,0 Mo, est sous l'ordre de grandeur annoncé (environ 26 Mo, 168 paquets par la résolution
+simplifiée) : écart d'estimation, sans critère attaché. Verrou commité avec ce résultat, avant `telecharger`.
+Prochaine commande : `lintian.sh telecharger` (réseau : snapshot.debian.org en https), sur accord nommé.
+
