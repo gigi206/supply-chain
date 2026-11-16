@@ -442,3 +442,38 @@ Question : « J'applique le correctif extras et je le commite ? ». Réponse : �
 
 Suite, chaque point sur accord nommé : push ; `amorce`, `hote` de nouveau (HB1 à HB8, HX1, HX2), `racine` (lire `rpm` dans sa
 liste), `image`, `essais`, `verrou`.
+
+## Étape `amorce` : prédictions (note du 2026-11-16, écrite à 2026-11-16T23:35:31Z, avant tout passage ; rien n'est réécrit)
+
+L'étape copie par digest deux manifestes amd64 de `quay.io/rockylinux/rockylinux` dans Zot, sous `amont/rockylinux/rockylinux` :
+`ed654c69…` (9.8, image de `racine`) et `ee90dc0e…` (9.7, bootstrap de mock). Elle relit ensuite chaque digest dans Zot. Ces
+écritures sont **définitives** : Zot n'autorise pas la suppression. Journal prévu : `s1-amorce.log` (préfixe `s1` par défaut ; aucun
+journal de ce nom n'existe encore).
+
+**État vérifié par le script qui écrit cette note, à son écriture** (assertions, lecture seule) :
+- Le cache OCI local `…/08/telechargements/oci/amont/rockylinux` n'existe pas. `miroir` lira donc chaque manifeste et ses blobs sur
+  quay.io une première fois, puis les enverra à Zot depuis ce cache.
+- `s1-amorce.log` n'existe pas encore. `s1.sh` crée `$T` (ligne 75) avant que l'étape y écrive son fichier d'authentification.
+- `prealables` a relevé 5551 Mo libres pour Zot ([journal](s1-prealables.log)). La taille des deux images n'a pas été relevée.
+
+**Signatures** : le 05/11, `cosign tree` n'a trouvé aucune entrée sur les tags `9.7` et `9.8`, et leurs index n'avaient aucun
+manifeste d'attestation ([sante-signatures.log](sante-signatures.log)). Ce relevé ne vaut que pour cosign, sur les tags ; il n'a été
+refait ni depuis, ni par digest, et `amorce` ne relit pas les signatures. L'intégrité de la copie tient au digest épinglé : d'après le
+commentaire de `miroir` ([`commun.sh`](../../08-trust-plane/commun.sh)), oras relit et vérifie chaque blob par digest à chaque copie.
+
+**En cas d'échec** : un KO après la première copie laisse dans Zot une écriture définitive. Un rejeu sous le même préfixe écraserait
+`s1-amorce.log` ; il se fera donc sous un autre préfixe, ou l'écrasement sera noté.
+
+| | Prédiction | Confiance |
+|---|---|---|
+| AM1 | Deux lignes « copié dans Zot : …/amont/rockylinux/rockylinux@sha256:… (cache telechargements/oci/amont/rockylinux/rockylinux) », d'abord `ed654c69…`, puis `ee90dc0e…` | Moyenne-haute (quay.io garde-t-il les deux manifestes par digest ? non relu depuis le 05/11) |
+| AM2 | Deux lignes OK, « digest de l'amorce 9.8 dans Zot » et « digest du bootstrap 9.7 dans Zot », chacune égale au digest épinglé ; aucune KO | Haute si AM1 tient (copie par digest, manifeste recopié tel quel) |
+| AM3 | Zot ne coupe pas l'envoi (pas de « i/o timeout ») : il reçoit les blobs du cache local | Moyenne-haute (même chemin `miroir` que les deux passages d'amorce de la 06, le 13/11 à 14:17:05 et 14:52:30 UTC : [s1r-amorce.log](../../06-deb-sbuild/resultats/s1r-amorce.log), [s1-amorce.log](../../06-deb-sbuild/resultats/s1-amorce.log)) |
+| AM4 | L'étape dure moins de 5 minutes, de la ligne « 05 S1 amorce » à « 05 S1 amorce fait » de `chrono.tsv` | Faible (débit de quay.io non mesuré) |
+
+**Lectures amont indépendantes, non modifiées** : [`sante.sh`](../sante.sh) (ligne 125) et [`releve-amont.sh`](../releve-amont.sh)
+(lignes 32 et 58) ne listent que BaseOS, AppStream et CRB. Ce sont des relevés passés du 05/11, dont le rejeu n'est pas prévu ; le
+correctif `extras` ne les touche pas.
+
+Suite, chaque point sur accord nommé : `amorce` ; `hote` de nouveau sous un nouveau préfixe (HB1 à HB8, HX1, HX2), `racine` (lire
+`rpm` dans sa liste), `image`, `essais`, `verrou`.
