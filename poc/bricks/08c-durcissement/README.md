@@ -1449,3 +1449,9 @@ Carte, relevés, contrôles et prédictions : README de la [08](../08-trust-plan
 `sortie-builds.sh` reçoit les étapes `rpm_sec`, `rpm_appliquer`, `rpm_temoins` et `rpm_retirer`, et son étape `rejeu` pose aussi
 `prefetch-rpm-sortie` ; `builds-sans-internet.yaml` a `prefetch-rpm` dans son `NotIn` (« Oui, applique-le »). Aucun rejeu de zéro
 avant `rpm_temoins`. Détail : [s1-sortie-predictions.md](../05-rpm-mock/resultats/s1-sortie-predictions.md) de la 05.
+
+## Additif du 16/11/2026, 22:29:50 UTC : `rpm_sec` de la sortie rpm, passé dans le dépôt
+
+`sortie-builds.sh rpm_sec` (« Oui, lance rpm_sec ») : 22:29:13 UTC, code 0, 0 KO, hôte seul
+([journal](resultats/sortie-rpm_sec.log)). R1 de la 05 tenue. Rien n'est posé dans le cluster ; `rpm_appliquer` attend son accord.
+Détail : [s1-sortie-predictions.md](../05-rpm-mock/resultats/s1-sortie-predictions.md) de la 05.

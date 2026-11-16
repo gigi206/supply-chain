@@ -151,3 +151,23 @@ Question : « J'applique le correctif de sortie rpm et je le commite ? ». Répo
   s'applique dès maintenant.
 
 Suite, chaque point sur accord nommé : push ; `rpm_sec` ; `rpm_appliquer` ; `rpm_temoins`.
+
+## Résultat de `rpm_sec` dans le dépôt, le 16/11/2026 à 22:29:13 UTC (note écrite à 2026-11-16T22:29:50Z ; rien n'est réécrit)
+
+Question : « Je lance rpm_sec ? ». Réponse : « Oui, lance rpm_sec ».
+
+- Commande : `DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/sortie-builds.sh rpm_sec </dev/null`, sur `0aa5e9b`.
+  `date -u` avant et après : 22:29:13 UTC ; `chrono.tsv` de la 08c : début et fin à 22:29:13 UTC. Code 0, 0 KO.
+  Hôte seul : aucune lecture du cluster.
+- Journal : [`08c/resultats/sortie-rpm_sec.log`](../../08c-durcissement/resultats/sortie-rpm_sec.log)
+  (sha256 `446db88c…`). C'est le premier journal `rpm_sec` de la 08c : aucun journal archivé n'est écrasé.
+- **R1 tenue, dans le dépôt cette fois.** Les cinq politiques du dépôt sont lues et tous les invariants passent ;
+  `prefetch-rpm-sortie` est la seule politique à sélectionner les pods `prefetch-rpm`. Sans `prefetch-rpm` dans le `NotIn`,
+  seule `CiliumNetworkPolicy prefetch-rpm-sortie` est signalée ; sans cette politique, seul `tekton.dev/task=prefetch-rpm`.
+- **Contrôle annoncé avant le lancement, tenu :** hors en-tête, le journal est identique à
+  [`s1-sortie-rpm_sec.log`](s1-sortie-rpm_sec.log) du 12/11 (copie détachée de `47154e8`) : `diff` vide.
+- Limite inchangée : `DEPOT_POL` ne voit pas les deux NetworkPolicy de la 06 ; leur effet sur les invariants reste à mesurer
+  dans le cluster, par `rpm_appliquer` (R3). `deb_sec` n'a pas été repassé : R2 reste mesurée sur la copie du 12/11.
+- Rien n'est posé dans le cluster. Les fichiers de travail de `sortie-builds.sh` ont été réécrits, comme à chaque lancement.
+
+Suite, chaque point sur accord nommé : `rpm_appliquer` (R3) ; `rpm_temoins` (R4, R5). Aucun rejeu de zéro avant `rpm_temoins`.
