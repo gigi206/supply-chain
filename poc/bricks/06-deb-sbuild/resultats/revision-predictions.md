@@ -562,3 +562,29 @@ codes 0).
 - Avant la ligne 11, décisions du propriétaire (note de 2026-11-16T15:55:25Z) : provenance de D retenue pour la VSA (au lieu de
   `454728c5`), nouvelle version de la politique figée, ordre `transporter`, `verifier`, `rebuild`, `vsa`, `pousser_vsa`, `lire_vsa`.
 Prochaine ligne : ligne 11 (S6b, VSA de D), après ces décisions.
+
+## Carte, ligne 11 : décisions du propriétaire (note de 2026-11-16T16:17:15Z ; rien n'est réécrit)
+Relu par le conseiller avant d'être posé. Choix faits en réponse à deux questions.
+- **Provenance de D retenue pour la VSA : `c3d27e05-b4cd-487b-8980-7a40b3336ffc`** (chemin 2 de S4d3), à la place de `454728c5`.
+  - Même critère que le 12/11 : c'est la provenance la plus récente de D, et la seule jugée par les portes (`s4d3-porte.log`
+    l. 4, `s5-porte.log` l. 9).
+  - Écartées : `576b7e61` (chemin 1) et les deux exécutions du 14/11 (`s4d-pipeline.log`, UID non relevés). D porte 8 enveloppes
+    (`s5-porte.log` l. 4).
+  - « La plus récente » peut changer : `rattrapage-deb` recrée le PipelineRun s'il est purgé. Une relecture est à prévoir dans
+    l'additif, avant `transporter`.
+  - `rebuild` pas avant 2026-11-16T20:31:44Z. C'est une borne basse : `vsa_deb.py` (l. 89-92) compare la fin du rebuild à
+    `finishedOn`, qui n'est pas relevé.
+- **Politique figée : nouvelle version fondée sur le critère, sans UID.**
+  - La l. 16 énonce le critère (provenance la plus récente du sujet, celle que juge la porte), sans UID. L'UID est déjà dans
+    `inputAttestations` de la VSA (`vsa_deb.py` l. 109).
+  - La l. 89 (limite liée à S5b et à `039949f9`) est reformulée sans digest.
+  - Une ligne datée renvoie à la version du 12/11.
+  - Le texte doit passer la garde d'`etape_vsa` : ni « à décider », ni « non figé », ni « projet du », ni « question au
+    propriétaire ».
+  - Constaté avant la décision : `git diff 97ae561 HEAD -- deb/ rejeu/` est vide. Les tâches `preparer-deb` et `construire-deb`
+    datent de e4b9b7d (11/11), donc les sections 2 et 3 restent valables.
+- Restent pour l'additif :
+  - l'ordre `transporter`, `verifier`, `rebuild`, `vsa`, `pousser_vsa`, `lire_vsa` ;
+  - le commentaire de `verifier_deb.py` (l. 3), qui cite `454728c5` : le laisser, ou prédire son nouveau sha256.
+Prochaine ligne : correctif (`INVOCATION` de `s6b.sh`, nouvelle version de la politique) et additif de la ligne 11, à préparer sur
+accord.
