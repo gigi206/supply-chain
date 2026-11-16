@@ -163,3 +163,38 @@ Après `--calculate-build-dependencies`, l'accroissement du nombre n'est pas pr�
 **La modification de `s1.sh` demande un accord avant que `verrou` ne tourne.**
 
 **Accord du 12/11/2026, noté à 15:32:22 UTC** : « Oui, valide-la ». La correction de la sonde de l'étape `verrou` et l'ajout joint (commit 870ba1d) sont validés. L'étape elle-même n'est pas lancée : elle tournera après S5b, sur accord nommé.
+
+## Second passage de l'étape `hote`, prédictions HB1 à HB8 (note du 2026-11-16, écrit à 2026-11-16T22:10:53Z ; rien n'est réécrit), NON LANCÉ
+
+**Pourquoi.** S5b est fait depuis le 13/11/2026. L'en-tête de `s1.sh` dit `hote` « à rejouer avant racine, pub/9.8 et EPEL bougent ».
+Ce passage la rejoue d'abord, seule, comme sonde d'épinglage : si un paquet épinglé a bougé, `s1.sh` change avant tout geste
+dans le cluster. Il ne remplace pas le passage d'avant `racine`, qui compare les repomd lus par dnf à ceux de l'hôte.
+
+**Commande prévue**, sur accord nommé : `PREFIXE=s1-2 DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/s1.sh hote`. `PREFIXE` ne sert
+dans cette étape qu'au nom du journal (`resultats/s1-2-hote.log`) : le journal du 12/11 (`s1-hote.log`) et ses liens restent
+intacts. Les étapes suivantes ne lisent de `hote` que `$T/hote` (clés) et `$T/fp-epel`, hors du dépôt ; elles garderont le
+préfixe par défaut (étiquette `:s1` de Zot). Hôte seul, réseau, ni cluster ni Zot.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| HB1 | Sources : `sample-app-1.0.0.tar.gz` et `sample-app.spec` « OK » contre le `SHA256SUMS` du cache (repassé par N1 : `07521c1e…` et `918a83f5…`) | Haute |
+| HB2 | Clés : sha256 égaux au 12/11 (Rocky `3a66e521…`, EPEL `fcf0eab4…`) ; empreinte de Rocky égale à `FP_ROCKY` ; empreinte d'EPEL `FF8AD134…` présente sur la page publiée | Haute |
+| HB3 | vault 9.7 : BaseOS, AppStream et CRB signés par la clé de Rocky, repomd.xml aux mêmes sha256 que le 12/11 (`fa6d5054…`, `06f01d40…`, `3936113e…`) | Haute (dépôt figé) |
+| HB4 | pub 9.8, BaseOS et AppStream : repomd.xml signés par la clé de Rocky ; sha256 relevés, non prédits | Haute pour la signature |
+| HB5 | EPEL 9 : `repomd.xml.asc` absent, primary contrôlé par repomd ; sha256 relevé, non prédit | Haute |
+| HB6 | `podman 5.8.2-8.el9_8` et `skopeo 1.22.2-9.el9_8` toujours dans AppStream 9.8, aux mêmes sha256 (`561d6e4d…`, `c6cca7fe…`) | Moyenne-haute : garde des anciennes constructions d'une mineure non mesurée |
+| HB7 | `mock 6.9-1.el9` et `mock-core-configs 45.2-1.el9` toujours dans EPEL 9, aux mêmes sha256 (`a5043350…`, `84f19c05…`) | Moyenne : EPEL ne garde en général que la dernière construction |
+| HB8 | Code 0, aucune ligne KO | Moyenne (produit de HB6 et HB7) |
+
+**Si une prédiction tombe :**
+- un épinglage absent (KO du lecteur, code 1) : arrêt ; les épinglages ne sont pas touchés sans décision du propriétaire. Pour mock,
+  toutes les lectures de M2 sont au tag `mock-6.9-1` : changer de version est une décision, pas un correctif ;
+- un échec sans ligne KO (`curl -f`, `set -e`) sur `pub/rocky/9.8` : si 9.8 n'est plus la mineure courante et a rejoint le vault,
+  D4 (a) est à revoir avec le propriétaire ;
+- vault 9.7 différent du 12/11 : arrêt, à comprendre avant tout autre geste.
+
+**Lu à sec pour la suite (pas pour ce passage).** `etape_essais` affiche le nom et le sha256 du src.rpm et du rpm, et archive
+la fin de `build.log` et `root.log` ; elle ne rapatrie pas le rpm et ne lit pas son en-tête. N2 s'y lit (nom du src.rpm), N5
+peut-être dans la fin du `build.log` ; N3 (fichiers de licence, bit 128, sha256) et N4 (`x11-fichiers` sur le binaire) demandent
+un ajout à `s1.sh`, donc un banc à sec et un accord, avant `essais`. La relecture de `etape_prealables` et des attentes R3 à R6
+contre les journaux d'après S5b reste à faire avant `rpm_appliquer` et `prealables`.
