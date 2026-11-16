@@ -260,3 +260,10 @@ récente du deb = PipelineRun `c3d27e05…` (`$W/s4d3-06/uid-chemin-2`, écrit l
   supprimés par le `trap` de leur étape. Reprise : `retirer` seule, sur accord.
 - **Durée** : le 11/11, les étapes ont pris de 37 s (`prefetch`) à environ 7 min (`kata`), soit une quinzaine de minutes de
   calcul ; la chaîne sera lancée en arrière-plan, code et heure de fin relevés par la même commande.
+
+### Résultat de Q9 (note de 2026-11-16T15:26:59Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S5 `zot` (écriture dans Zot des deux fermetures altérées, Q9) ? ». `s5.sh zot` à 012cd11, du 16/11
+15:25:43 au 16/11 15:26:41 UTC, code 0 relevé juste après la commande, 2 OK, 0 KO, 0 ÉCART ; lignes « S5a zot » et « fait » dans
+`chrono.tsv` ; journal `s5-zot.log` réécrit (version du 11/11 dans git) ; dossier d'identifiants `auth` retiré par l'étape.
+- **Q9 tenue** : `paquet-modifie` relu en lecture anonyme à `a549729d…`, `paquet-en-trop` à `b27225cf…`, sous
+  `entrees/sample-app-deb/fermeture-alteree`.

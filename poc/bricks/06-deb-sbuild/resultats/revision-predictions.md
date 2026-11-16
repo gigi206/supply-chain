@@ -439,3 +439,10 @@ puis `git apply`, code 0 ; diff de l'arbre identique au correctif ; `bash -n` co
 plus aucune au champ 4) ; N1 mesure « Hashes of received file » (l. 327) ; « Hash Sum mismatch » ne reste que dans la mesure de N4.
 Rien lancé.
 Prochaine ligne : S5 `zot` (écriture dans Zot, Q9), sur accord nommé.
+
+## Carte, ligne 9 : S5 `zot` (note de 2026-11-16T15:26:59Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S5 `zot` (écriture dans Zot des deux fermetures altérées, Q9) ? ». `s5.sh zot` à 012cd11, du 16/11
+15:25:43 au 16/11 15:26:41 UTC, code 0 relevé juste après la commande, 2 OK, 0 KO, 0 ÉCART ; lignes « S5a zot » et « fait » dans
+`chrono.tsv` ; journal `s5-zot.log` réécrit (version du 11/11 dans git) ; dossier d'identifiants `auth` retiré par l'étape.
+- **Q9 tenue** : les deux fermetures altérées sont dans Zot à `a549729d…` et `b27225cf…`.
+Prochaine ligne : S5 `prefetch miroir fermeture kata sbuild porte retirer` (Q10 à Q22), sur accord nommé.
