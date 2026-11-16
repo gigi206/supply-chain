@@ -241,3 +241,22 @@ récente du deb = PipelineRun `c3d27e05…` (`$W/s4d3-06/uid-chemin-2`, écrit l
 - **Ordre proposé**, un accord par lancement : correctif 6 ; `zot` seule (écriture dans Zot) ; puis
   `prefetch miroir fermeture kata sbuild porte retirer` (cluster, Internet en 80 pour `prefetch` et `miroir`).
 - **Ne mesure pas** : ce que la note « Ce que S5a ne mesure pas » exclut déjà ; U13 (`ScanEnRetard`), qui n'est pas jugée par S5.
+
+### Note de 2026-11-16T15:16:49Z sur les deux additifs (relecture du conseiller ; rien n'est réécrit)
+- **Deux heures non mesurées, corrigées** : « copie du 14/11 à 23:24 » (Q4) venait d'un `ls` en heure locale ; `date -u -r` donne
+  **2026-11-14T22:24:38Z**. « écrit le 15/11 à 20:38 UTC » (`uid-chemin-2`) était une conversion ; `date -u -r` donne
+  **2026-11-15T20:38:25Z**.
+- **Source de Q18** (au lieu de « suppose ») : `prealables` du 16/11 à 15:09 UTC relève 8 enveloppes sur le deb, comme S4d3 à la fin
+  de `chemins` le 15/11 (`s4d3-chemins.log` l. 78) : aucun PipelineRun n'a ajouté de provenance au deb entre les deux. Q18 reste à
+  moyenne-haute pour la durée de S5 elle-même.
+- **Source de Q20, moitié deb** : le CronJob du scan du deb a été rendu par S6a `periodique` le 14/11 (20:59:40 à 21:01:45 UTC,
+  `chrono.tsv`), avant le correctif d'épinglage 3 (22:57:45Z) ; `rendre_deb` (`s6a.sh` l. 276-277) y écrit `DEB_REF` en dur, alors
+  `039949f9` (`s6a-periodique.log` l. 29). Le CronJob en service scanne donc `039949f9`, pas D : `refus` du scan de D, **confiance
+  haute** (non relu dans le cluster).
+- **Mode d'échec de la chaîne** : `lancer` (`08-trust-plane/commun.sh` l. 329-338) tourne sous `set -euo pipefail`
+  (`politique.sh` l. 73) ; un KO en fin d'étape arrête la chaîne, sans ligne « fait » dans `chrono.tsv` (le 11/11 : `prefetch`,
+  `miroir`, `fermeture` et `kata`). `retirer` ne tourne alors pas. Restent dans `builds` : les TaskRuns `s5-*` déjà créés, le PVC
+  `s5-miroir` (4Gi, après `miroir`) et `s5-entrees` (1Gi, après `fermeture`) ; les pods d'essai `s5-miroir-essai` et `s5-sbuild` sont
+  supprimés par le `trap` de leur étape. Reprise : `retirer` seule, sur accord.
+- **Durée** : le 11/11, les étapes ont pris de 37 s (`prefetch`) à environ 7 min (`kata`), soit une quinzaine de minutes de
+  calcul ; la chaîne sera lancée en arrière-plan, code et heure de fin relevés par la même commande.
