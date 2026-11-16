@@ -432,3 +432,10 @@ correction n'a pas suivi. **Correctif 6** préparé et archivé, **non appliqué
 [`revision-correctif-6.patch`](../revision-correctif-6.patch) (`git apply --check` code 0 ; extraction essayée sur
 `s4d-pipeline-1-construire.log` : champ 4 « sample-a », champ 5 « f66bbeb2 »). Additif Q9 à Q22 dans `s5-predictions.md`. Rien lancé.
 Prochaine ligne : correctif 6, sur accord nommé ; puis `zot`, sur accord nommé.
+
+## Correctif 6 appliqué (note de 2026-11-16T15:17:47Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique le correctif 6 ? ». `revision-correctif-6.patch` appliqué tel quel à `s5.sh` (`git apply --check`
+puis `git apply`, code 0 ; diff de l'arbre identique au correctif ; `bash -n` code 0) : extraction du deb de N7 au champ 5 (l. 460,
+plus aucune au champ 4) ; N1 mesure « Hashes of received file » (l. 327) ; « Hash Sum mismatch » ne reste que dans la mesure de N4.
+Rien lancé.
+Prochaine ligne : S5 `zot` (écriture dans Zot, Q9), sur accord nommé.
