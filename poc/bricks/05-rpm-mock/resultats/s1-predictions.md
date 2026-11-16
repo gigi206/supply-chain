@@ -314,3 +314,5 @@ rapatrié, avec le lecteur d'en-tête de `releve9` ; pour N4, le repli serait à
 
 Suite, chaque point sur accord nommé : appliquer l'ajout (une ligne datée à l'en-tête de `s1.sh`) et le commiter ; décision
 `extras` ; `amorce`, `hote` de nouveau, `racine` (lire `rpm` dans sa liste), `image`, `essais`, `verrou`.
+
+*Correction de date (note écrite à 2026-11-16T23:02:44Z, rien n'est réécrit)* : l'en-tête de la section « Ajout N3 et N4 à `essais` » ci-dessus dit « note du 2026-11-17 ». C'est faux en UTC : la note est du 2026-11-16, écrite à 2026-11-16T23:02:29Z, comme l'indique son en-tête. « 2026-11-17 » a été tapé à la main d'après l'horloge locale, contre la règle « heure tirée de date -u ». Même erreur dans la note correspondante de `docs/03-validation-briques.md`, corrigée de même.
