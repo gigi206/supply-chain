@@ -356,3 +356,8 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Témoins sur des rpm réels ([journal](resultats/m2-releve9-temoins.log)) : le lecteur de l'étape tient sur un rpm de Rocky 9, dont la charge est en zstd ; les bits de drapeaux sont éprouvés sur un rpm de Fedora 24.
 - Banc hors réseau, rpm synthétique : dix-sept cas au code attendu ([journal](resultats/m2-releve9-essai-local.log)). Prédictions H1 à H11 ([détail](resultats/m2-predictions.md)).
 - Temps passé : 4,20 h à HEAD 58835a7, même méthode ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées ; décision avec toi à 5 pw.
+
+**Passage de `releve9`, le 16/11/2026 à 18:42:23 UTC (« Oui » à « Je lance m2.sh releve9 ? »)** (écrit à 18:43:19 UTC) : code 0 ([journal](resultats/m2-releve9.log)) ; H1 à H7 et H9 à H11 tenues ; H8 tenue pour la `LICENSE` et le `PATENTS`, non tenue pour le reste ([détail](resultats/m2-predictions.md)).
+- Le rpm `golang 1.25.9-1.el9_7` est signé par la clé de Rocky (signature de l'en-tête vérifiée) ; sa charge est en zstd, non lue.
+- Sa `LICENSE` et son `PATENTS` sont des fichiers `%doc`, pas `%license`, et ont les mêmes sha256 que ceux de Go 1.24.7 de `mise.toml` : le texte de la notice est connu (base de Q1).
+- Non prévu : une troisième entrée marquée doc hors de `/usr/share/doc/`, non identifiée.

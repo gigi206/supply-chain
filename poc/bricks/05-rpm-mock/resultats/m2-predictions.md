@@ -718,3 +718,32 @@ Dix-sept cas au code attendu, chaque refus pour la raison attendue :
 - **le texte**, si la charge est en zstd (H10) : seule l'égalité de sha256 avec Go 1.24.7 (H9) le renseigne ;
 - la liaison de `golang-fips/openssl` et de `crypto/internal/boring` dans le binaire : prédiction pour le premier build, pas un constat ;
 - Q1 et Q2 : tes décisions, sans recommandation ici.
+
+## Passage de `releve9`, le 16/11/2026 à 18:42:23 UTC (« Oui » à « Je lance m2.sh releve9 ? »), code 0 (écrit à 18:43:19 UTC)
+
+Fin à 18:42:30 UTC (`chrono.tsv`). Journal : [m2-releve9.log](m2-releve9.log), 227 lignes ; fichiers effacés (seule l'archive `mock.tar.gz` reste sous `~/.cache/supply-chain-poc/05/m2/`).
+
+| # | Résultat |
+|---|---|
+| H1 | **Tenue** : archive `3c034916…`, `mock-core-configs` 45.2 ; seules trouvailles : les trois lignes `nocontext(s)` du plugin SELinux ; huit ancres tenues ; aucun `_common_opts` dans `mock-core-configs` ; une ligne de `s1.sh`, le `tsflags=nodocs` de `dnf_conf` |
+| H2 | **Tenue** : clé `21CB256A…`, `repomd.xml` d'AppStream signé, sha256 `06f01d40…` |
+| H3 | **Tenue** : une entrée, `Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm`, 1 298 609 octets |
+| H4 | **Tenue** : rpm conforme au primary, sha256 `5ebd7026…` |
+| H5 | **Tenue** : signature de l'en-tête (tag 268) VALIDSIG par `21CB256A…` ; en-tête altéré refusé |
+| H6 | **Tenue** : tags 273 et 5092 égaux |
+| H7 | **Tenue** : `golang 0:1.25.9-1.el9_7.x86_64`, `License: BSD and Public Domain` ; 64 fichiers égaux au filelists (98 entrées avec les dossiers) |
+| H8 | **Tenue pour la `LICENSE` et le `PATENTS`, non tenue pour le reste** : tous deux portent le bit 2 (doc) seul, pas le bit 128. Mais 3 entrées portent le bit 2, dont 2 seulement sous `/usr/share/doc/` : la troisième entrée n'est pas identifiée (l'étape n'imprime que les chemins de doc et de licence) |
+| H9 | **Tenue** : sha256 de la `LICENSE` (`911f8f57…`, 1 453 octets) et du `PATENTS` (`96f408bf…`, 1 303 octets) égaux à ceux de Go 1.24.7 de `mise.toml` |
+| H10 | **Tenue** : charge en zstd, NON LUE |
+| H11 | **Tenue** : fichiers effacés, code 0 |
+
+**Ce que cela établit pour Q1** :
+- le texte de la notice est connu au bit près : la `LICENSE` et le `PATENTS` du paquet `golang` 1.25.9-1.el9_7 (1 453 et 1 303 octets) ont les mêmes sha256 que ceux de Go 1.24.7 de `mise.toml`. Le texte n'est pas lu dans le rpm ; c'est celui de la copie de mise ;
+- dans le rpm, ce sont des fichiers `%doc` (bit 2), pas `%license` : une installation sans documentation les écarterait du buildroot, selon le rôle prêté au bit 2 (le comportement de rpm n'est pas lu). Si on les y installe, leur présence dépend des deux maillons non mesurés de l'additif (le `dnf.conf` lu par dnf, et les macros de l'image `$BOOT`), à mesurer au premier build.
+
+**Non prévu** :
+- 33 entrées portent la valeur 4096, lue « artifact » par la table écrite de mémoire, qu'aucun témoin n'éprouve : non interprétée ;
+- la troisième entrée marquée doc (H8) : non identifiée, sans nouveau téléchargement.
+
+Q1 et Q2 restent tes décisions, à poser avant le premier build de la 05, après relecture du conseiller.
+

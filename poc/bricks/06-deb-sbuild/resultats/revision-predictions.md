@@ -660,3 +660,8 @@ sort sur 1.0.0-1 et plus sur 1.0.0-2. Les lignes 11 (M5 à M8) et 12 restent ; p
 **Note du 2026-11-16 (2026-11-16T18:00:29Z) : `releve8` de la 05 lancée** (« Oui », 17:59:30 à 17:59:47 UTC, code 0) : préalables de Q1 et Q2
 mesurés (`../../05-rpm-mock/resultats/m2-predictions.md`). Les lignes 11 (M5 à M8) et 12 restent ; prochaine :
 `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5), pas avant 2026-11-16T20:38:15Z, sur accord nommé.
+
+**Note du 2026-11-16 (2026-11-16T18:43:19Z) : `releve9` de la 05 préparée puis lancée** (préparation commitée en 68624bb ; « Oui », 18:42:23 à
+18:42:30 UTC, code 0) : marquage et empreinte de la notice de Go dans le rpm golang, pour Q1
+(`../../05-rpm-mock/resultats/m2-predictions.md`, H1 à H11). Les lignes 11 (M5 à M8) et 12 restent ; prochaine :
+`ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5), pas avant 2026-11-16T20:38:15Z, sur accord nommé.

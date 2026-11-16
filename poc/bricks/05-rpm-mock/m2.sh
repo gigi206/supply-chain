@@ -111,6 +111,8 @@
 #               décompressée en mémoire, LICENSE et PATENTS extraits, sha256 égal à l'en-tête exigé, texte archivé ; autre
 #               compresseur ou cpio inattendu : NON LUE, code 0. Fichiers effacés à la fin, sauf après un KO.
 #               Prédictions : resultats/m2-predictions.md, section releve9. Banc hors réseau : resultats/m2-releve9-essai-local.sh.
+#               Lancé le 16/11/2026 à 18:42:23 UTC (« Oui » à « Je lance m2.sh releve9 ? »), code 0 : H1 à H7 et H9 à H11
+#               tenues, H8 tenue pour LICENSE et PATENTS (bit 2, %doc) ; sha256 égaux à Go 1.24.7 ; charge zstd (m2-releve9.log).
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le
