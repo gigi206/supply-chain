@@ -552,3 +552,13 @@ Prochaine ligne : `s6a.sh grafana` (L12, lectures seules, avant 2026-11-17T09:30
 visibles par l'auditeur dans Grafana ; aucun identifiant de `poc-scan` dans les réponses.
 Prochaine ligne : `JOURNAL=…/lecture-u13-apres.log lecture-u13.sh` (L13, lecture seule ; U13 jusqu'à la fin de l'étape 10), sur
 accord nommé.
+
+## Carte, ligne 10 close : `lecture-u13` après `fraicheur` (note de 2026-11-16T16:11:35Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance lecture-u13.sh après fraicheur (L13, lecture seule) ? ». Du 16/11 16:11:09 au 16/11 16:11:10 UTC,
+code 0. **L13 tenue ; U13 tenue** : `ScanEnRetard` inactive, sans aucune ligne `ALERTS` ni notification de scan, de la fin de S4d3
+(2026-11-15T20:39:34Z) à la fin de l'étape 10 ; la série suivie porte sur D. **Ligne 10 close** : L1 à L13 tenues (six commandes,
+codes 0).
+- Effet en place : les portes de `s4d3.sh` et de `s5.sh`, qui attendent le scan du deb refusé, ne repasseront plus telles quelles.
+- Avant la ligne 11, décisions du propriétaire (note de 2026-11-16T15:55:25Z) : provenance de D retenue pour la VSA (au lieu de
+  `454728c5`), nouvelle version de la politique figée, ordre `transporter`, `verifier`, `rebuild`, `vsa`, `pousser_vsa`, `lire_vsa`.
+Prochaine ligne : ligne 11 (S6b, VSA de D), après ces décisions.

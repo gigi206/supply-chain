@@ -596,3 +596,15 @@ même seconde d'après `date -u`), code 0, `bilan : tout OK` ([journal](s6a-graf
   `fraicheur-scan` `scan builds/scan/sample-app=1794821512 builds/scan/sample-app-deb=1794845309, base 1794810654`, égale aux séries
   de L11 ; ni mot de passe de `poc-scan` ni son encodage dans les réponses ; requêtes en HTTP 200. Réponses de Grafana effacées
   (dossier absent après l'étape).
+
+## Résultat de L13 (note de 2026-11-16T16:11:35Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance lecture-u13.sh après fraicheur (L13, lecture seule) ? ». À a6a8a2f, du 16/11 16:11:09 au 16/11
+16:11:10 UTC, code 0 relevé juste après la commande, « toutes les lectures faites » ([journal](lecture-u13-apres.log), aucune ligne
+`jeton|token`).
+- **L13 tenue** : CronJob ciblant D seul, dernier passage planifié toujours `2026-11-16T11:15:00Z` ; D : un referrer de scan,
+  16:08:29Z (celui de L9) ; série du deb 1794845309, à sa date ; `ScanEnRetard` et `ScanBientotRefuse` `inactive` ; aucune ligne
+  `ALERTS` de scan ni notification de scan dans toute la fenêtre depuis 2026-11-15T20:39:34Z : **U13 tenue de l'étape 8 à l'étape
+  10** ; échéance 2026-11-17T18:08:29Z.
+- Constats non prédits, sans écart : le dernier succès du CronJob est passé à `2026-11-16T16:08:34Z`, le job `s6a-manuel` créé
+  depuis lui comptant comme le sien ; la valeur de D apparaît « vue dès 16:10:34Z » à cause de la grille de 60 s de la lecture
+  (alignée sur 20:39:34), et non d'un retard sur `fraicheur`, qui l'a lue dans Prometheus avant 16:09:43Z.
