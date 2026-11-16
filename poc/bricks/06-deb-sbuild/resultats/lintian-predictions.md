@@ -175,3 +175,10 @@ octets**, sha256 `06588f5e…`, recompté hors du script (157 lignes, même somm
 simplifiée) : écart d'estimation, sans critère attaché. Verrou commité avec ce résultat, avant `telecharger`.
 Prochaine commande : `lintian.sh telecharger` (réseau : snapshot.debian.org en https), sur accord nommé.
 
+### Résultat de la commande 3, `telecharger` (écrit à 2026-11-16T17:18:53Z)
+
+Lancée sur « Lance le » (réponse à « Je lance lintian.sh telecharger (réseau, snapshot.debian.org) ? »), de 2026-11-16T17:18:19Z
+à 17:18:40Z, **code 0**, `bilan : tout OK` : [`lintian-telecharger.log`](lintian-telecharger.log). Verrou commité et inchangé
+(`06588f5e…`) ; 157 `.deb` téléchargés et contrôlés (sha256 et taille), 0 déjà présent ; 22 984 704 octets ; 157 fichiers `.deb`
+dans le dossier. **Y3 tenue.** Prochaine commande : `lintian.sh installer` (hors réseau), sur accord nommé.
+
