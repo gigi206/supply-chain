@@ -380,3 +380,30 @@ Prochaine ligne : correctif d'épinglage 4, sur accord nommé ; puis S5 `prealab
 (`git apply --check` puis `git apply`, code 0) : `PIPE_DEB` → `d1fb3871…` (l. 45), porte sample-app → `ok|6/6` (l. 565). Plus aucune
 occurrence de `82c8373d` ni de `28/28` dans `s5.sh`. Rien lancé.
 Prochaine ligne : additif de prédictions de S5 (nouvelles valeurs), puis S5 `prealables`, sur accord nommé.
+
+## Carte, ligne 9 : deux autres valeurs périmées dans `s5.sh`, correctif d'épinglage 5 préparé (note de 2026-11-16T15:07:58Z ; rien n'est réécrit)
+Relecture d'avant `prealables`, à b390e3e, hors ligne : chaque attente de `etape_prealables` est confrontée au dernier journal qui
+l'a produite après S5b (Zot neuf le 13/11). Rien lancé.
+- **Erreur de la note de 2026-11-15T20:44:46Z** : le « relevé complet » ne l'était pas, et « Restent valables : S4a (`a9d48331`… » est
+  faux. Le rejeu de S4a du 13/11 a poussé la pipeline `builder-sbuild@71f84839…` (`s4a-taches.log` l. 10, `s4a-pipeline.log` l. 2) ;
+  `s5.sh` l. 44 épingle encore `a9d48331` (10/11). **Cause** : le relevé comparait aux journaux d'avant S5b (`s4a-provenance.log`
+  date du 10/11 et n'a pas été rejoué) au lieu de dater chaque valeur par le journal qui l'a produite.
+- **Pourquoi ce bundle a changé** : `s4a.sh`, `builder/` et `08-trust-plane/commun.sh` sont inchangés entre 52b00a2 et 774471f
+  (`git log`), et les tâches aussi (`prefetch-deb@4dac0609`, `construire-builder@746c2e11` aux deux dates). `etape_taches` signe la
+  pipeline à chaque passage (`s4a.sh` l. 218, `tkn pipeline sign`), avec une clé EC P-256 (`politique.sh` l. 371) ; cette signature
+  n'est pas versionnée, à la différence de celles des tâches, et une signature ECDSA change à chaque fois. **Explication probable,
+  non mesurée** : les spécifications des deux bundles ne sont pas comparées, et la présence de `a9d48331` dans Zot n'est pas relevée.
+- **Erreur de la note de 2026-11-15T20:45:27Z** : « plus aucune occurrence de `28/28` » est vrai, mais `prealables` attend encore
+  `"8 28"` enveloppes (deb, sample-app) à la l. 264, alors que S4d3 a mesuré 8 et **6** (`s4d3-chemins.log` l. 78-79).
+- **Effet sans correctif** : si `a9d48331` est absent de Zot, `prealables` s'arrête à l'export par une erreur de crane, sans ligne
+  KO ; sinon, l'écart des enveloppes la fait finir en KO.
+- **Troisième valeur, pour les étapes suivantes** : `"False|Failed"` aux l. 324, 330, 375, 379 et 437. Le 11/11 a mesuré
+  `False|StepFailed` six fois, chaque fois en ÉCART (`s5-prefetch.log` l. 23 et 37, `s5-miroir.log` l. 28 et 38, `s5-fermeture.log`
+  l. 29 et 40). Ne touche pas `prealables`.
+- **Correctif d'épinglage 5**, préparé et archivé, **non appliqué** : [`revision-epinglage-5.patch`](../revision-epinglage-5.patch)
+  (`git apply --check` code 0) : `PIPE_BUILDER` → `71f84839…` (l. 44), enveloppes de départ → `"8 6"` (l. 264), cinq libellés →
+  `False|StepFailed`.
+- **Relevé à refaire avec cette datation avant les lignes 10 à 12** : celui du 15/11 couvrait aussi `s6a.sh` et `s6b.sh`. Ne
+  bloque pas S5.
+- Prédictions de `prealables`, conditionnées au correctif 5 : additif de [`s5-predictions.md`](s5-predictions.md).
+Prochaine ligne : correctif d'épinglage 5, sur accord nommé ; puis S5 `prealables`, sur accord nommé.

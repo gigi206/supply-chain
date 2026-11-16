@@ -159,3 +159,30 @@ Journaux : `s5-fermeture.log` (premier passage : `s5-fermeture-1.log`), `s5-kata
 - **le libellé d'`apt-helper` absent** des cinq lignes gardées (P6).
 
 **Leçon** : un contrôle sur l'hôte doit utiliser les valeurs réelles, pas des valeurs factices, et rejouer l'outil réel (`dpkg-buildpackage`) plutôt que la cible seule. Les deux premières erreurs auraient été vues sur l'hôte.
+
+---
+## Additif de la révision 1.0.0-2 : `prealables` (note de 2026-11-16T15:07:58Z, avant tout lancement ; rien n'est réécrit)
+
+Ligne 9 de la carte de la cascade ([`revision-predictions.md`](revision-predictions.md)). Ces prédictions valent pour `s5.sh`
+**avec le correctif d'épinglage 5 appliqué** ; sans lui, `prealables` n'est pas lancée. Elles ne portent que sur `prealables` :
+lecture de l'API et de Zot, travail sur l'hôte, admission à blanc, aucune écriture. Les étapes suivantes auront leur propre
+additif. Chaque valeur vient du dernier journal qui l'a produite après S5b (Zot neuf le 13/11) ; la référence de forme est
+`s5-prealables.log` du 11/11.
+
+| # | Prédiction | Source de la valeur | Confiance |
+|---|---|---|---|
+| Q1 | Export de `builder-sbuild@71f84839` et `sample-app-deb@d1fb3871` réussi ; tâches `prefetch,construire,publier` et `preparer,construire,publier` ; image de `prefetch-deb` égale à l'amorce `7378260c` | `s4a-taches.log` l. 10 (13/11) ; `s4d3-prealables.log` l. 24 (15/11) ; `s1r-amorce.log` l. 3 (13/11) | Haute pour `d1fb3871` ; moyenne-haute pour `71f84839`, non relu dans Zot depuis le 13/11 |
+| Q2 | Les quatre tâches dans la liste revue, aux mêmes digests que le 11/11 : `prefetch-deb@4dac0609`, `construire-builder@746c2e11`, `preparer-deb@588617b8`, `construire-deb@3726ff0b` | `s4a-taches.log` l. 5 et 8 (13/11) ; `s4d-taches.log` l. 5 et 8 (15/11) | Haute |
+| Q3 | Paramètres de `prefetch`, de `construire` (builder) et de `preparer` égaux à ceux du 11/11 ; fermeture deb de la pipeline `bb7599a2` ; liste égale à `builder/paquets.txt` (`b47135c9…`) ; paquet témoin du miroir `g++-x86-64-linux-gnu_14.2.0-1_amd64.deb` (1200 octets) | `s4a.sh` et `builder/` inchangés depuis le 10/11 (`paquets.txt` : 029ee64) ; `s4d-taches.log` l. 11 (15/11) | Haute |
+| Q4 | Copie de S4b : 162 paquets confrontés au verrou, 167 fichiers ; layout de la copie intacte `bb7599a2` ; `paquet-modifie` `a549729d…` (167 couches) et `paquet-en-trop` `b27225cf…` (168 couches), une couche différente chacun | copie du 14/11 à 23:24 (S4b de la cascade, U9) ; 167 fichiers comptés le 16/11 ; oras 1.3.6 relu le 16/11 ; `layout` fixe la date de création et trie les fichiers | Haute |
+| Q5 | 16 objets admis à blanc côté serveur : 12 TaskRuns, 2 PVC, 2 pods | 11/11 ; mêmes tâches ; politiques remises par S5b | Moyenne-haute : aucun TaskRun isolé admis depuis S5b |
+| Q6 | Politiques réseau de `builds` : les six du 11/11 (trois NetworkPolicy, trois CiliumNetworkPolicy), mêmes sélecteurs ; relevé sans mesure | 11/11 | Moyenne |
+| Q7 | Aucun objet `s5` dans `builds` ; dépôt `fermeture-alteree` **absent** de Zot ; enveloppes de départ `8 6` (deb `60f25f5c`, sample-app) ; fermeture et image de build relevées sans mesure | Zot neuf depuis S5b, étape `zot` non rejouée (`chrono.tsv` l. 206-208, dernière S5a le 11/11) ; `s4d3-chemins.log` l. 78-79 (15/11) | Haute |
+| Q8 | Code 0, aucun ÉCART ni KO | Q1 à Q7 | Moyenne-haute |
+
+- **Conséquence de Q7** : `fermeture` exige les deux fermetures altérées dans Zot (l. 434). L'étape `zot`, qui écrit dans Zot et
+  demande un accord à part, est donc à refaire avant `fermeture`.
+- **Écart d'annonce du 11/11, noté sans réécriture** : P2 annonçait 13 TaskRuns ; `s5-prealables.log` en admet 12 (l. 26 à 37),
+  et `rendre_tout` en rend 12.
+- **Non mesuré par `prealables`** : la présence de `a9d48331` dans Zot, et l'égalité des spécifications des bundles `a9d48331` et
+  `71f84839`.
