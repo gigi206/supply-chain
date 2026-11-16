@@ -682,3 +682,8 @@ fichier (`date -u` de la commande d'insertion), pas celle du début de la prépa
 - W6 : **scan `ok`**, `1 énoncé(s) vérifié(s)` dans `builds/scan/sample-app-deb`. Le journal ne donne pas l'empreinte de
   l'énoncé : son égalité à `ca8946f4…` n'est pas lue ici. Un seul énoncé : aucun passage planifié réussi du deb depuis.
 - W7 : Job de la porte `1/` ; `bilan : tout OK`, code 0.
+
+## Note de 2026-11-16T21:06:37Z : portée de W6 (rien n'est réécrit)
+Relevé par le conseiller. « W1 à W7 tenues » vaut pour W6 au sens de `scan ok` et du nombre d'énoncés (1) seulement.
+L'empreinte prédite `ca8946f4…` n'est pas lue dans le journal, et « aucun passage planifié réussi du deb depuis » est déduit
+de ce nombre, pas mesuré. U14 n'en dépend pas : elle ne demande que le scan `ok`.
