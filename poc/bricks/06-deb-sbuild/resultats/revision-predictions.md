@@ -615,3 +615,9 @@ Prochaine ligne : correctif 7, sur accord nommé ; puis chaque étape de l'addit
 **M1 tenue** : la politique a pour sha256 `30ee17ec…` (détail dans `s6b-predictions.md`). Ce commit est `POLITIQUE_COMMIT` ; il est
 à pousser avant `vsa`.
 Prochaine ligne : `s6b.sh transporter` (M2), sur accord nommé.
+
+## Carte, ligne 11 : `transporter` (note de 2026-11-16T16:29:56Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh transporter (M2) ? ». Du 16/11 16:29:52 au 16/11 16:29:56 UTC, code 0.
+- **M2 tenue** : 8 bundles horodatés de D, 7 entrées aux digests prédits (packaging `f0ed7a71…`), 402 Mo transportés.
+- Constat non prédit, sans écart : clé de Chains et chaîne de la TSA renouvelées par S5b (`688af09`, 13/11).
+Prochaine ligne : `s6b.sh verifier` (M3, arrêt si pas exactement 8 bundles vérifiés dont `c3d27e05`), sur accord nommé.

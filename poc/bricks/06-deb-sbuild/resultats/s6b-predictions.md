@@ -208,3 +208,25 @@ allumée, chroot du 12/11 présent (451786240 octets), 12008 Mo libres. Rien d'�
 
 Le commit qui porte ce résultat fige la nouvelle politique : c'est `POLITIQUE_COMMIT` de la commande 5. Il est à pousser avant cette
 commande.
+
+## Résultat de M2 (note de 2026-11-16T16:29:56Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh transporter (M2) ? ». Du 16/11 16:29:52 au 16/11 16:29:56 UTC, code 0. Journal
+`s6b-transporter.log`, sans ligne `jeton|token`.
+**M2 tenue :**
+- sujet D et tag `.att` copiés, **8 bundles horodatés**, 7 entrées lues ;
+- tâches : `preparer-deb` `588617b8…` et `construire-deb` `3726ff0b…` ;
+- image de build : manifeste seul de `sbuild-debian13` `749d746c…` ;
+- fermetures : `bb7599a2…` (deb) et `50dc73f7…` (sources) ;
+- packaging : `f0ed7a71…` ;
+- `outils-prefetch` : `68e0ae70…`, inchangé depuis le 12/11 (non prédit) ;
+- `verifier_deb.py` `7498fdad…` ; archive de 402 Mo dans la VM.
+
+**Constat non prédit, sans écart :** les ancres de confiance transportées ne sont plus celles du 12/11.
+- `chains.pub` : `1e7b2a03…` au lieu de `a7ca8ce8…`.
+- `tsa-chaine.pem` : `5d795cf4…` au lieu de `e18e1214…`.
+- Ce sont les fichiers de `08-trust-plane/resultats/` tels que S5b les a réécrits (commit `688af09` du 13/11, aucune modification
+  depuis).
+- C'est attendu : S5b a recréé le plan de confiance, donc la clé de Chains et la TSA. La VM vérifiera les bundles de D avec ces
+  ancres-là (M3).
+
+Le bundle git (`e1e6b713…`, 8,0 Ko) est identique à celui du 12/11.
