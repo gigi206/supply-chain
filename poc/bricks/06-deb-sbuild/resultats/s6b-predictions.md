@@ -196,3 +196,15 @@ de `rebuild` lien coupé : `virsh -c qemu:///system domif-setlink sc-replay <int
 nouveau (69 lignes de sortie avant et après, mêmes codes) ; la politique modifiée ne porte aucune des mentions refusées par
 `etape_vsa`. La nouvelle garde refuse le journal de `rebuild` du 12/11 (aucune ligne `manifeste_reconstruit=` D). VM `sc-replay`
 allumée, chroot du 12/11 présent (451786240 octets), 12008 Mo libres. Rien d'écrit dans la VM, dans le cluster ni dans Zot.
+
+## Résultat de M1 (note de 2026-11-16T16:27:36Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique le correctif 7 ? ». `revision-correctif-7.patch` appliqué tel quel (`git apply`, code 0).
+**M1 tenue.**
+- Politique : sha256 `30ee17ec…`.
+- `s6b.sh` et la politique sont égaux octet pour octet aux copies modifiées à sec.
+- `s6b.sh` : `bash -n` sans erreur ; shellcheck, mêmes codes qu'avant.
+- `INVOCATION` vaut `c3d27e05-b4cd-487b-8980-7a40b3336ffc`.
+- `verifier_deb.py`, `rebuild_deb.sh` et `vsa_deb.py` sont inchangés (`7498fdad…`, `55ebf681…`, `34799510…`).
+
+Le commit qui porte ce résultat fige la nouvelle politique : c'est `POLITIQUE_COMMIT` de la commande 5. Il est à pousser avant cette
+commande.

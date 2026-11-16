@@ -609,3 +609,9 @@ accord.
   - Règle d'arrêt après `verifier` : exactement 8 bundles vérifiés, dont `c3d27e05`.
   - `rebuild` possible au plus tard à partir de 2026-11-16T20:39:34Z, puisque `finishedOn` précède la fin de S4d3.
 Prochaine ligne : correctif 7, sur accord nommé ; puis chaque étape de l'additif sur accord nommé.
+
+## Carte, ligne 11 : correctif 7 appliqué (note de 2026-11-16T16:27:36Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique le correctif 7 ? ». Appliqué tel quel à `s6b.sh` et à `rejeu/politique-replay-deb.md`.
+**M1 tenue** : la politique a pour sha256 `30ee17ec…` (détail dans `s6b-predictions.md`). Ce commit est `POLITIQUE_COMMIT` ; il est
+à pousser avant `vsa`.
+Prochaine ligne : `s6b.sh transporter` (M2), sur accord nommé.

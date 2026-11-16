@@ -63,7 +63,7 @@
 #
 #   Rejeu du deb (préparé le 12/11/2026 à partir de 10:33:26 UTC, après « Oui, prépare-les » ; modèle : R3 et R4 de la brique 10) :
 #   transporter  ACCORD NOMMÉ. SUR L'HÔTE, transport non fiable : copies anonymes (oras) du layout du deb, de son tag .att, de
-#           ses bundles horodatés et des entrées de la provenance 454728c5 (décision 1 du 12/11/2026), lues sans vérification,
+#           ses bundles horodatés et des entrées de la provenance retenue (INVOCATION), lues sans vérification,
 #           dans un layout OCI ; manifeste seul de l'image de build ; bundle git de toutes les références de Forgejo ; ancres
 #           de confiance de la 08 ; verifier_deb.py. Le tout copié dans /home/replay/s6b/r3, vidé d'abord.
 #   verifier  ACCORD NOMMÉ. DANS LA VM : rejeu/verifier_deb.py (bundles horodatés vérifiés hors réseau, provenance extraite,
@@ -85,7 +85,7 @@
 #   lire_vsa de la brique 10 ; APRÈS S5b, ordre c, et après vsa) :
 #   pousser_vsa  ACCORD DU PROPRIÉTAIRE À CHAQUE PUSH. SUR L'HÔTE, compte poc-replay (D5 : builds/** par digest seulement).
 #           Refus sans le bundle archivé par vsa, si la copie de la CA du PoC diffère de celle de la 08, ou si le layout du
-#           deb (039949f9) n'est pas dans Zot (après S5b : seulement si le build l'a reproduit). Bundle revérifié sur l'hôte
+#           deb (DEB_DIGEST) n'est pas dans Zot (après une remise à zéro de Zot). Bundle revérifié sur l'hôte
 #           par la clé de VSA ; manifeste fait main (subject = layout du deb) poussé par digest dans builds/vsa/sample-app-deb,
 #           le dépôt que dérive la porte ; aucun referrer ni tag ajouté à builds/sample-app-deb.
 #   lire_vsa  ACCORD NOMMÉ. Lecture anonyme : VSA par COSIGN_REPOSITORY (clé de VSA acceptée, clé de Chains refusée) ;
@@ -115,7 +115,8 @@ SDE=1789199741                                                                  
 CHROOT_SHA=aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086      # s4a-pipeline.log : chroot de 749d746c
 CHROOT_TAILLE=451786240
 DEB_SUJET=builds/sample-app-deb@$DEB_DIGEST
-INVOCATION=454728c5-59a8-45e1-b972-549d343aadac      # décision 1 du propriétaire du 12/11/2026 (s6b-releve.log, H1)
+INVOCATION=c3d27e05-b4cd-487b-8980-7a40b3336ffc      # décision du propriétaire du 16/11/2026 (révision 1.0.0-2, ligne 11) :
+#   provenance la plus récente de D, seule jugée par la porte (chemin 2 de S4d3) ; avant : 454728c5 (12/11/2026, 039949f9)
 URL_TSA=http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp   # identifiant de la TSA (replay.sh de la 10)
 R08=$h06/../08-trust-plane/resultats                  # clé publique de Chains et chaîne de la TSA (comme s4d2.sh)
 VM=sc-replay
@@ -669,6 +670,8 @@ etape_vsa() { # DANS LA VM, sous unshare -rn : rejeu/vsa_deb.py (énoncé), sign
   git -C "$h06" branch -r --contains HEAD | grep -q . || { echo "REFUS : HEAD ($(git -C "$h06" rev-parse --short HEAD)) non poussé"; exit 1; }
   grep -q '^OK   sortie de la VM inchangée' "$R/s6b-rebuild.log" && grep -q '^OK   rebuild terminé' "$R/s6b-rebuild.log" \
     && grep -q '^bilan : PASSED' "$R/s6b-rebuild.log" || { echo "REFUS : rebuild non valable hors ligne (resultats/s6b-rebuild.log)"; exit 1; }
+  # le journal doit porter sur le sujet (ajouté le 16/11/2026, correctif 7 : celui du 12/11, sur 039949f9, passait la garde)
+  grep -qx "manifeste_reconstruit=$DEB_DIGEST" "$R/s6b-rebuild.log" || { echo "REFUS : resultats/s6b-rebuild.log ne porte pas sur $DEB_DIGEST"; exit 1; }
   u=https://github.com/gigi206/supply-chain/blob/$c/$f
   mkdir -p "$x" && git -C "$h06" show "$c:$f" > "$x/politique-replay-deb.md"
   ! grep -qiE 'non figé|projet du|à décider|question au propriétaire' "$x/politique-replay-deb.md" \
@@ -743,10 +746,10 @@ print(("OK   " if ok else "KO   ") + f"énoncé du bundle identique à s6b-vsa-e
 sys.exit(0 if ok else 1)
 EOP
   echo "## sujet dans Zot (lecture anonyme)"
-  # descripteur du layout du deb ; absent après S5b si le build n'a pas reproduit 039949f9 : refus, rien poussé
+  # descripteur du layout du deb ; absent après une remise à zéro de Zot : refus, rien poussé
   s=$(anon -I -H 'Accept: application/vnd.oci.image.manifest.v1+json' "https://$ZOT/v2/${DEB_SUJET%@*}/manifests/$DEB_DIGEST" \
     | tr -d '\r' | python3 -I -c 'import sys,json; h={l.split(": ",1)[0].lower(): l.split(": ",1)[1] for l in sys.stdin.read().splitlines() if ": " in l}; print(json.dumps({"mediaType": h["content-type"], "digest": h["docker-content-digest"], "size": int(h["content-length"])}))') \
-    || { echo "REFUS : $DEB_SUJET absent de Zot (S5b n'a pas reproduit 039949f9 ?)"; exit 1; }
+    || { echo "REFUS : $DEB_SUJET absent de Zot (Zot remis à zéro ?)"; exit 1; }
   echo "sujet : $s"
   [ "$(python3 -I -c 'import json,sys; print(json.loads(sys.argv[1])["digest"])' "$s")" = "$DEB_DIGEST" ] || { echo "REFUS : digest du sujet différent"; exit 1; }
   ra=$(anon "https://$ZOT/v2/${DEB_SUJET%@*}/referrers/$DEB_DIGEST" | python3 -I -c 'import json,sys; print(len(json.load(sys.stdin)["manifests"]))')

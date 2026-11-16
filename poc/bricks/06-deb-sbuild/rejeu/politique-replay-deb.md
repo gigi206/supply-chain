@@ -13,7 +13,7 @@ Chaque condition est éliminatoire : un échec arrête le replay avant tout buil
    - sujet égal au layout du deb ;
    - jeton RFC 3161 de la TSA.
 
-   L'énoncé retenu est celui du bundle vérifié de l'`invocationId` demandé, jamais celui du transport. Le propriétaire a retenu `454728c5` le 12/11/2026 : c'est la provenance la plus récente, celle que juge la porte.
+   L'énoncé retenu est celui du bundle vérifié de l'`invocationId` demandé, jamais celui du transport. Le propriétaire désigne cet `invocationId` avant chaque replay, selon un critère fixe : celui de la provenance de PipelineRun la plus récente du sujet (`finishedOn` le plus tardif), celle que juge la porte. Le domaine ne vérifie pas ce critère : il vérifie que l'énoncé retenu est celui de l'`invocationId` demandé. La VSA nomme cette provenance par le bundle qu'elle cite dans `inputAttestations`.
 2. `_type`, `predicateType`, `builder.id` et `buildType` : mêmes valeurs que dans la brique 10.
 3. Le sujet est le layout OCI du deb (`builds/sample-app-deb`). Son digest est celui comparé à la section 4.
 4. `resolvedDependencies` déclare, chacun avec un digest :
@@ -86,4 +86,9 @@ Avec un verdict `FAILED`, aucune VSA n'est signée ni poussée.
 - Les mêmes que la brique 10 : avec D1 (b) et D2 (a), le propriétaire, ou le root de l'hôte, peut forger à la fois la provenance et la VSA.
 - La provenance propre des deux fermetures et de l'artefact de packaging n'est pas vérifiée par le domaine. Seuls leurs digests déclarés le sont.
 - Le chroot repose sur les clés de l'archive Debian du trousseau de la VM, et sur l'instantané de snapshot.debian.org.
-- S5b remet Zot à zéro. `inputAttestations` désignera alors un bundle horodaté effacé, et la VSA ne reviendra que par un bundle versionné re-poussé, si `039949f9` se reproduit.
+- Une remise à zéro de Zot, comme S5b le 13/11/2026, efface le bundle horodaté que désigne `inputAttestations`, et la VSA avec lui. La VSA ne revient alors que par un bundle versionné re-poussé, si le build reproduit le même digest ; sinon, il faut un nouveau replay.
+
+## Versions
+
+- 12/11/2026, commit `97ae561` : première version, appliquée au deb `039949f9` avec la provenance `454728c5`.
+- 16/11/2026 : révision 1.0.0-2 du deb. La section 1 énonce le critère de la provenance sans nommer d'`invocationId`, et la dernière limite ne nomme plus de digest. Les autres sections sont inchangées.
