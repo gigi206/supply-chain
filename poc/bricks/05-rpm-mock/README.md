@@ -361,3 +361,5 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Le rpm `golang 1.25.9-1.el9_7` est signé par la clé de Rocky (signature de l'en-tête vérifiée) ; sa charge est en zstd, non lue.
 - Sa `LICENSE` et son `PATENTS` sont des fichiers `%doc`, pas `%license`, et ont les mêmes sha256 que ceux de Go 1.24.7 de `mise.toml` : le texte de la notice est connu (base de Q1).
 - Non prévu : une troisième entrée marquée doc hors de `/usr/share/doc/`, non identifiée.
+
+**Complément de `releve9` (écrit à 18:46:26 UTC), préparé à sec, NON RELANCÉ** : le lecteur liste en plus les entrées au bit 2 hors de `/usr/share/doc/` et celles à un bit autre que 2 et 128 ; même rpm, même accès réseau. Banc rejoué, dix-sept cas au code attendu. Prédictions H12 à H14 ([détail](resultats/m2-predictions.md)) ; journal du premier passage renommé [m2-releve9-premier-passage.log](resultats/m2-releve9-premier-passage.log).

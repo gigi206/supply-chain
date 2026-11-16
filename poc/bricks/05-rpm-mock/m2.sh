@@ -112,7 +112,10 @@
 #               compresseur ou cpio inattendu : NON LUE, code 0. Fichiers effacés à la fin, sauf après un KO.
 #               Prédictions : resultats/m2-predictions.md, section releve9. Banc hors réseau : resultats/m2-releve9-essai-local.sh.
 #               Lancé le 16/11/2026 à 18:42:23 UTC (« Oui » à « Je lance m2.sh releve9 ? »), code 0 : H1 à H7 et H9 à H11
-#               tenues, H8 tenue pour LICENSE et PATENTS (bit 2, %doc) ; sha256 égaux à Go 1.24.7 ; charge zstd (m2-releve9.log).
+#               tenues, H8 tenue pour LICENSE et PATENTS (bit 2, %doc) ; sha256 égaux à Go 1.24.7 ; charge zstd (journal renommé
+#               m2-releve9-premier-passage.log).
+#               Complété à sec le 16/11/2026, après ce passage, sur relecture du conseiller, NON RELANCÉ : chemin, drapeaux, mode
+#               et taille de chaque entrée au bit 2 hors de /usr/share/doc/, et de chaque entrée à un bit autre que 2 et 128.
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le
@@ -1107,6 +1110,10 @@ print("### drapeaux de fichiers (FILEFLAGS, tag 1037) ; bits 2 et 128 éprouvés
 for v_, l_ in sorted(par.items()):
     sd = sum(1 for i in l_ if ch[i].startswith('/usr/share/doc/'))
     print(f"  {v_} (0x{v_:x}, {lire(v_)}) : {len(l_)} entrées, dont {sd} sous /usr/share/doc/")
+print("### entrées au bit 2 hors de /usr/share/doc/, et entrées à un bit autre que 2 et 128 (chemin, drapeaux, mode, taille)")
+for i in range(n):
+    if (fl[i] & 2 and not ch[i].startswith('/usr/share/doc/')) or fl[i] & ~(2 | 128):
+        print(f"  {ch[i]} : drapeaux {fl[i]} (0x{fl[i]:x}, {lire(fl[i])}) ; mode {modes[i] & 0xFFFF:o} ; {tailles[i]} octets")
 motif = re.compile(r'(LICEN[CS]E|COPYING|PATENTS|NOTICE)([._-][A-Za-z0-9._-]*)?')
 ref = {}
 for nm in ('LICENSE', 'PATENTS'):

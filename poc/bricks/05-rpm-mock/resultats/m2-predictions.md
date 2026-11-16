@@ -747,3 +747,15 @@ Fin à 18:42:30 UTC (`chrono.tsv`). Journal : [m2-releve9.log](m2-releve9.log), 
 
 Q1 et Q2 restent tes décisions, à poser avant le premier build de la 05, après relecture du conseiller.
 
+## Complément de `releve9` du 16/11/2026 (écrit à 18:46:26 UTC), préparé à sec après le premier passage, NON RELANCÉ
+
+Sur relecture du conseiller, pendant l'attente de M5 de la 06. Le premier passage a laissé une entrée inconnue : 3 entrées portent le bit 2, dont une hors de `/usr/share/doc/`, que l'étape n'imprimait pas. Si cette entrée sert à Go lui-même, une installation sans documentation toucherait plus que la notice. Le passage ci-dessus n'est pas réécrit ; son journal est renommé [m2-releve9-premier-passage.log](m2-releve9-premier-passage.log), et le premier journal du banc [m2-releve9-essai-local-premier.log](m2-releve9-essai-local-premier.log).
+
+**Seul changement de `m2.sh`** : le lecteur liste en plus chaque entrée au bit 2 hors de `/usr/share/doc/`, et chaque entrée à un bit autre que 2 et 128, avec chemin, drapeaux, mode et taille. Rien d'autre ne change : même rpm, mêmes contrôles, même accès réseau. `bash -n` et shellcheck (`-S warning`) passent. Banc rejoué ([journal](m2-releve9-essai-local.log), lancé à 18:45:59 UTC, après la modification) : le rpm synthétique porte en plus un `VERSION` au bit 2 hors de doc et une entrée à 4096, toutes deux listées ; dix-sept cas au code attendu, mêmes refus qu'au premier banc (comparés par `diff`).
+
+| # | Prédiction | Confiance | Ce qu'elle change |
+|---|---|---|---|
+| H12 | L'entrée au bit 2 hors de `/usr/share/doc/` est `/usr/lib/golang/VERSION` | Faible : souvenir du spec de Fedora, non lu | Si `VERSION` est `%doc`, une installation sans documentation l'écarterait (rôle du bit 2 non lu dans rpm) ; ce que Go en ferait n'est pas mesuré |
+| H13 | Les 33 entrées à 4096 sont listées ; aucune n'est sous `/usr/share/doc/` | Haute pour le décompte (premier passage) ; chemins non prédits | Descriptif ; valeur 4096 non interprétée (table de mémoire) |
+| H14 | Tout le reste comme au premier passage : mêmes sha256 (`06f01d40…`, `5ebd7026…`), signature VALIDSIG, 64 fichiers, répartition 62, 3 et 33, charge zstd, code 0 | Haute : vault figé | Écart : vault 9.7 a changé entre les deux passages, à noter |
+

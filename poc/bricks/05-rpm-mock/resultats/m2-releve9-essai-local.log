@@ -1,4 +1,4 @@
-# m2-releve9-essai-local.sh, lancé à 2026-11-16T18:24:56Z
+# m2-releve9-essai-local.sh, lancé à 2026-11-16T18:45:59Z
 clé d'essai : 1 empreinte de 40 caractères
 source remplacée : 1
 FP_ROCKY d essai : 1
@@ -199,34 +199,38 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 33c586f6a8615a4236c8f96ea7ed4ed56fce32984423dbf6251e917477b726b5
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (446 octets)
+vault-AppStream : repomd.xml sha256 68ff78c34d2277a75b756daf8808ff8f45cbc9c84a8246bc48c785ee482df44a
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (444 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 ac89e2160f12fdb3de0afd955f75a7cd3d8551710bca4134823f7012da344d40 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1424 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 ac9cb1656027203adeebfcef158a13b03cb9d37063673b0f5feeedc4870881c6 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1688 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1424 octets, sha256 ac89e2160f12fdb3de0afd955f75a7cd3d8551710bca4134823f7012da344d40
-lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1180 ; charge : 244 octets
+OK   rpm conforme au primary : 1688 octets, sha256 ac9cb1656027203adeebfcef158a13b03cb9d37063673b0f5feeedc4870881c6
+lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1392 ; charge : 296 octets
 OK   signature, tag 273 : sha256 de l'en-tête principal égal
 OK   tag 5092 : sha256 de la charge égal (algorithme 8)
 OK   signature OpenPGP de l'en-tête (tag 268) : VALIDSIG <empreinte d essai> ; en-tête altéré refusé
 OK   en-tête : golang 0:1.25.9-1.el9_7.x86_64
 OK   License: de l'en-tête égale au primary : BSD and Public Domain
 sourcerpm : golang-1.25.9-1.el9_7.src.rpm ; format de charge : cpio ; compresseur : xz ; drapeaux : 2
-5 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
-OK   3 fichiers (dossiers exclus) égaux au filelists signé
+7 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
+OK   5 fichiers (dossiers exclus) égaux au filelists signé
 ### drapeaux de fichiers (FILEFLAGS, tag 1037) ; bits 2 et 128 éprouvés, autres bits de mémoire
   0 (0x0, aucun) : 3 entrées, dont 1 sous /usr/share/doc/
-  2 (0x2, doc) : 2 entrées, dont 2 sous /usr/share/doc/
+  2 (0x2, doc) : 3 entrées, dont 2 sous /usr/share/doc/
+  4096 (0x1000, artifact) : 1 entrées, dont 0 sous /usr/share/doc/
+### entrées au bit 2 hors de /usr/share/doc/, et entrées à un bit autre que 2 et 128 (chemin, drapeaux, mode, taille)
+  /usr/lib/golang/VERSION : drapeaux 2 (0x2, doc) ; mode 100644 ; 8 octets
+  /usr/lib/golang/api/go1.txt : drapeaux 4096 (0x1000, artifact) ; mode 100644 ; 3 octets
 ### fichiers sous /usr/share/doc ou /usr/share/licenses, ou au nom de licence
   /usr/share/doc/golang : drapeaux 0 (0x0, aucun) ; mode 40755 ; 0 octets ; empreinte 
   /usr/share/doc/golang/LICENSE : drapeaux 2 (0x2, doc) ; mode 100644 ; 32 octets ; empreinte 31680284914270802e6bf9265d85a7e67f6027c4f646234b873744597a0b1dc8 ; égale à la copie de Go de mise.toml
   /usr/share/doc/golang/PATENTS : drapeaux 2 (0x2, doc) ; mode 100644 ; 16 octets ; empreinte 15584c7255685f3626217fde3194f847a8d09631dac7bec1b08efbbfb114bdac ; égale à la copie de Go de mise.toml
 ## charge (cpio, xz)
-cpio : 5 entrées
+cpio : 7 entrées
 OK   /usr/share/doc/golang/LICENSE : sha256 égal à l'en-tête ; 32 octets ; 2 lignes
   | Copyright essai
   | licence d essai
@@ -431,28 +435,32 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 8e0fa9fc8e9b11b3dd8543b365f72e123b28f70acf06f391b9bcd2d64e5d1328
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (445 octets)
+vault-AppStream : repomd.xml sha256 d16c0646a6a9308839afb197fd65a95e7076fda5b066df514450bb0044211af9
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (446 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 c278980a1e9bc918e286706a25fbbd9b900580db0ed2c77b94fbb0b30c66ec1a ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1248 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 cb72cb9fbf1ff14f25829195c95d104b7759edbe0d80b1c1d0bb92ded0807b0f ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1464 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1248 octets, sha256 c278980a1e9bc918e286706a25fbbd9b900580db0ed2c77b94fbb0b30c66ec1a
-lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1180 ; charge : 68 octets
+OK   rpm conforme au primary : 1464 octets, sha256 cb72cb9fbf1ff14f25829195c95d104b7759edbe0d80b1c1d0bb92ded0807b0f
+lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1396 ; charge : 68 octets
 OK   signature, tag 273 : sha256 de l'en-tête principal égal
 OK   tag 5092 : sha256 de la charge égal (algorithme 8)
 OK   signature OpenPGP de l'en-tête (tag 268) : VALIDSIG <empreinte d essai> ; en-tête altéré refusé
 OK   en-tête : golang 0:1.25.9-1.el9_7.x86_64
 OK   License: de l'en-tête égale au primary : BSD and Public Domain
 sourcerpm : golang-1.25.9-1.el9_7.src.rpm ; format de charge : cpio ; compresseur : zstd ; drapeaux : 2
-5 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
-OK   3 fichiers (dossiers exclus) égaux au filelists signé
+7 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
+OK   5 fichiers (dossiers exclus) égaux au filelists signé
 ### drapeaux de fichiers (FILEFLAGS, tag 1037) ; bits 2 et 128 éprouvés, autres bits de mémoire
   0 (0x0, aucun) : 3 entrées, dont 1 sous /usr/share/doc/
-  2 (0x2, doc) : 2 entrées, dont 2 sous /usr/share/doc/
+  2 (0x2, doc) : 3 entrées, dont 2 sous /usr/share/doc/
+  4096 (0x1000, artifact) : 1 entrées, dont 0 sous /usr/share/doc/
+### entrées au bit 2 hors de /usr/share/doc/, et entrées à un bit autre que 2 et 128 (chemin, drapeaux, mode, taille)
+  /usr/lib/golang/VERSION : drapeaux 2 (0x2, doc) ; mode 100644 ; 8 octets
+  /usr/lib/golang/api/go1.txt : drapeaux 4096 (0x1000, artifact) ; mode 100644 ; 3 octets
 ### fichiers sous /usr/share/doc ou /usr/share/licenses, ou au nom de licence
   /usr/share/doc/golang : drapeaux 0 (0x0, aucun) ; mode 40755 ; 0 octets ; empreinte 
   /usr/share/doc/golang/LICENSE : drapeaux 2 (0x2, doc) ; mode 100644 ; 32 octets ; empreinte 31680284914270802e6bf9265d85a7e67f6027c4f646234b873744597a0b1dc8 ; égale à la copie de Go de mise.toml
@@ -658,34 +666,38 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 a81410ae8ba9d3b47c1155b8f4c552bdb6507fd1290eeb66ee018814ba8d3f8e
+vault-AppStream : repomd.xml sha256 4aeaf3e2c80714447b618dd73e92ea62a5bd16df161531714e3ab2daeeb1cdd5
 OK   vault-AppStream : primary (gz) conforme à repomd.xml (445 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 35edbf6dc084531017821cdec287ef734cc3e7b156ecbc908cc26c588c21c1f6 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1420 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 e24454fa395826aefd4238f36116f9ea2d32929d8b898ee8241fee7ec4aad856 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1680 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1420 octets, sha256 35edbf6dc084531017821cdec287ef734cc3e7b156ecbc908cc26c588c21c1f6
-lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1180 ; charge : 240 octets
+OK   rpm conforme au primary : 1680 octets, sha256 e24454fa395826aefd4238f36116f9ea2d32929d8b898ee8241fee7ec4aad856
+lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1392 ; charge : 288 octets
 OK   signature, tag 273 : sha256 de l'en-tête principal égal
 OK   tag 5092 : sha256 de la charge égal (algorithme 8)
 OK   signature OpenPGP de l'en-tête (tag 268) : VALIDSIG <empreinte d essai> ; en-tête altéré refusé
 OK   en-tête : golang 0:1.25.9-1.el9_7.x86_64
 OK   License: de l'en-tête égale au primary : BSD and Public Domain
 sourcerpm : golang-1.25.9-1.el9_7.src.rpm ; format de charge : cpio ; compresseur : xz ; drapeaux : 2
-5 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
-OK   3 fichiers (dossiers exclus) égaux au filelists signé
+7 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
+OK   5 fichiers (dossiers exclus) égaux au filelists signé
 ### drapeaux de fichiers (FILEFLAGS, tag 1037) ; bits 2 et 128 éprouvés, autres bits de mémoire
   0 (0x0, aucun) : 3 entrées, dont 1 sous /usr/share/doc/
-  2 (0x2, doc) : 2 entrées, dont 2 sous /usr/share/doc/
+  2 (0x2, doc) : 3 entrées, dont 2 sous /usr/share/doc/
+  4096 (0x1000, artifact) : 1 entrées, dont 0 sous /usr/share/doc/
+### entrées au bit 2 hors de /usr/share/doc/, et entrées à un bit autre que 2 et 128 (chemin, drapeaux, mode, taille)
+  /usr/lib/golang/VERSION : drapeaux 2 (0x2, doc) ; mode 100644 ; 8 octets
+  /usr/lib/golang/api/go1.txt : drapeaux 4096 (0x1000, artifact) ; mode 100644 ; 3 octets
 ### fichiers sous /usr/share/doc ou /usr/share/licenses, ou au nom de licence
   /usr/share/doc/golang : drapeaux 0 (0x0, aucun) ; mode 40755 ; 0 octets ; empreinte 
   /usr/share/doc/golang/LICENSE : drapeaux 2 (0x2, doc) ; mode 100644 ; 16 octets ; empreinte 687b08588e639cf935202e2ca8011420cab2c5200a7bed2832794977be635177 ; différente de la copie de Go de mise.toml
   /usr/share/doc/golang/PATENTS : drapeaux 2 (0x2, doc) ; mode 100644 ; 16 octets ; empreinte 15584c7255685f3626217fde3194f847a8d09631dac7bec1b08efbbfb114bdac ; égale à la copie de Go de mise.toml
 ## charge (cpio, xz)
-cpio : 5 entrées
+cpio : 7 entrées
 OK   /usr/share/doc/golang/LICENSE : sha256 égal à l'en-tête ; 16 octets ; 1 lignes
   | Copyright autre
 OK   /usr/share/doc/golang/PATENTS : sha256 égal à l'en-tête ; 16 octets ; 1 lignes
@@ -889,34 +901,38 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 d11cd46eb57f364099814a6fb1d22ae67bd115a199a628c2e0001ad1d4805623
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (447 octets)
+vault-AppStream : repomd.xml sha256 14b9043829668f9d198fe7479e0c3d3a3052ba0ac5ad3d84cde2b81df242aebc
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (446 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 c615a72387f4606fb52794d518dc71b675534c629b0989157ecea65f95868720 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1296 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 4bb84fe286630848a24e560cca8183fb8799822c7cde7285f59cb63195256399 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1560 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1296 octets, sha256 c615a72387f4606fb52794d518dc71b675534c629b0989157ecea65f95868720
-lead 96 octets ; signature : 1 tags, fin à l'octet 193 ; en-tête principal : 19 tags, octets 200 à 1052 ; charge : 244 octets
+OK   rpm conforme au primary : 1560 octets, sha256 4bb84fe286630848a24e560cca8183fb8799822c7cde7285f59cb63195256399
+lead 96 octets ; signature : 1 tags, fin à l'octet 193 ; en-tête principal : 19 tags, octets 200 à 1264 ; charge : 296 octets
 OK   signature, tag 273 : sha256 de l'en-tête principal égal
 OK   tag 5092 : sha256 de la charge égal (algorithme 8)
 signature OpenPGP de l'en-tête (tag 268) : absente, non vérifiée
 OK   en-tête : golang 0:1.25.9-1.el9_7.x86_64
 OK   License: de l'en-tête égale au primary : BSD and Public Domain
 sourcerpm : golang-1.25.9-1.el9_7.src.rpm ; format de charge : cpio ; compresseur : xz ; drapeaux : 2
-5 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
-OK   3 fichiers (dossiers exclus) égaux au filelists signé
+7 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
+OK   5 fichiers (dossiers exclus) égaux au filelists signé
 ### drapeaux de fichiers (FILEFLAGS, tag 1037) ; bits 2 et 128 éprouvés, autres bits de mémoire
   0 (0x0, aucun) : 3 entrées, dont 1 sous /usr/share/doc/
-  2 (0x2, doc) : 2 entrées, dont 2 sous /usr/share/doc/
+  2 (0x2, doc) : 3 entrées, dont 2 sous /usr/share/doc/
+  4096 (0x1000, artifact) : 1 entrées, dont 0 sous /usr/share/doc/
+### entrées au bit 2 hors de /usr/share/doc/, et entrées à un bit autre que 2 et 128 (chemin, drapeaux, mode, taille)
+  /usr/lib/golang/VERSION : drapeaux 2 (0x2, doc) ; mode 100644 ; 8 octets
+  /usr/lib/golang/api/go1.txt : drapeaux 4096 (0x1000, artifact) ; mode 100644 ; 3 octets
 ### fichiers sous /usr/share/doc ou /usr/share/licenses, ou au nom de licence
   /usr/share/doc/golang : drapeaux 0 (0x0, aucun) ; mode 40755 ; 0 octets ; empreinte 
   /usr/share/doc/golang/LICENSE : drapeaux 2 (0x2, doc) ; mode 100644 ; 32 octets ; empreinte 31680284914270802e6bf9265d85a7e67f6027c4f646234b873744597a0b1dc8 ; égale à la copie de Go de mise.toml
   /usr/share/doc/golang/PATENTS : drapeaux 2 (0x2, doc) ; mode 100644 ; 16 octets ; empreinte 15584c7255685f3626217fde3194f847a8d09631dac7bec1b08efbbfb114bdac ; égale à la copie de Go de mise.toml
 ## charge (cpio, xz)
-cpio : 5 entrées
+cpio : 7 entrées
 OK   /usr/share/doc/golang/LICENSE : sha256 égal à l'en-tête ; 32 octets ; 2 lignes
   | Copyright essai
   | licence d essai
@@ -1121,14 +1137,14 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 2e1e182936f76a589688d8b0c67f72dc9ad7e8637376acfdb780213da14416c4
+vault-AppStream : repomd.xml sha256 a2a7528a2c1a766829edb574a71a5482e18239bd592fc7fda5b102cc4eec8b12
 OK   vault-AppStream : primary (gz) conforme à repomd.xml (397 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 0000000000000000000000000000000000000000000000000000000000000000 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1424 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 0000000000000000000000000000000000000000000000000000000000000000 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1688 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
 KO   sha256 du rpm différent du primary (0000000000000000000000000000000000000000000000000000000000000000)
 code 1
@@ -1329,16 +1345,16 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 9461ee2bfcddcd346b728b64fb844f64ee59efd0ee9f939ba4c09d0acc0cb73e
+vault-AppStream : repomd.xml sha256 f608b4255cd53dd702ffaaa91e4e6c45d4a16f6cee8b5194235da9ac3bf33a32
 OK   vault-AppStream : primary (gz) conforme à repomd.xml (445 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 36aabfe51abbc01ce4ec0b3d8ac75a1f29a6bd7bc0298bd9de149308efe60606 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1424 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 2639fd17d5a7657df28cc8fe9f9c6ce27f4c310ef6dc314a5fe13419edbe3623 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1688 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1424 octets, sha256 36aabfe51abbc01ce4ec0b3d8ac75a1f29a6bd7bc0298bd9de149308efe60606
+OK   rpm conforme au primary : 1688 octets, sha256 2639fd17d5a7657df28cc8fe9f9c6ce27f4c310ef6dc314a5fe13419edbe3623
 magie du lead absente
 KO   en-tête du rpm
 code 1
@@ -1539,17 +1555,17 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 5bbcf5792025bca21d8f074cde434a62617e708b9b29e1e9d076f1f385b6d36b
+vault-AppStream : repomd.xml sha256 efec818dde4f5af4ec7ec84cc2ff725b84823dcf94032093e126d27ef1f15906
 OK   vault-AppStream : primary (gz) conforme à repomd.xml (446 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 92c5c84e6f10a971be3348aa85845cf1da08416e7fd104464dc8fc7741c1b2ce ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1424 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 4e7f18a046114df8dc70a69c7a3f9cd206d0914f82ec5572256618f042d7ca9b ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1688 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1424 octets, sha256 92c5c84e6f10a971be3348aa85845cf1da08416e7fd104464dc8fc7741c1b2ce
-en-tête de signature tronqué (16328 > 1424)
+OK   rpm conforme au primary : 1688 octets, sha256 4e7f18a046114df8dc70a69c7a3f9cd206d0914f82ec5572256618f042d7ca9b
+en-tête de signature tronqué (16328 > 1688)
 KO   en-tête du rpm
 code 1
 == cas borne
@@ -1749,16 +1765,16 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 56924464b5d96629fedd16fcb2255945351f6c5523d3dc1f7daa48ef89613a2b
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (445 octets)
+vault-AppStream : repomd.xml sha256 ebfdb1fa246df6dd1c99bc88a80f6adf1829a1e14b37bfc7b0dd7dba94abc963
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (446 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 52525d094fdcf726b73b26b7987af855c2446ea84db2d896675a8a8880cd4fff ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1424 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 40238ff925903a42ef0c0d8a1517ed2b38f9c6803fb0e2b2802f20131bb7772a ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1688 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1424 octets, sha256 52525d094fdcf726b73b26b7987af855c2446ea84db2d896675a8a8880cd4fff
+OK   rpm conforme au primary : 1688 octets, sha256 40238ff925903a42ef0c0d8a1517ed2b38f9c6803fb0e2b2802f20131bb7772a
 en-tête de signature : 100002 entrées, 184 octets de données, hors borne
 KO   en-tête du rpm
 code 1
@@ -1959,24 +1975,24 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 429656a259b0d7aeb826dfbee6b7f64e5e2c0e05bea225e3b58d2f002c5e6f35
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (445 octets)
+vault-AppStream : repomd.xml sha256 9dcff7b437aafb23fe2345c5d141b9ff042e65be8ee4bd075a3af99b6ad9dc41
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (446 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 f12d8e67d4092e73f0ea6b7a6aa98236ce165786c1bfb8b2f18de61dec8ea16d ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1560 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 03ea26cb70352a360c61b08ece7322695c8ba8794c8896f4f3a6defa196ae880 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1788 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1560 octets, sha256 f12d8e67d4092e73f0ea6b7a6aa98236ce165786c1bfb8b2f18de61dec8ea16d
-lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1284 ; charge : 276 octets
+OK   rpm conforme au primary : 1788 octets, sha256 03ea26cb70352a360c61b08ece7322695c8ba8794c8896f4f3a6defa196ae880
+lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1476 ; charge : 312 octets
 OK   signature, tag 273 : sha256 de l'en-tête principal égal
 OK   tag 5092 : sha256 de la charge égal (algorithme 8)
 OK   signature OpenPGP de l'en-tête (tag 268) : VALIDSIG <empreinte d essai> ; en-tête altéré refusé
 OK   en-tête : golang 0:1.25.9-1.el9_7.x86_64
 OK   License: de l'en-tête égale au primary : BSD and Public Domain
 sourcerpm : golang-1.25.9-1.el9_7.src.rpm ; format de charge : cpio ; compresseur : xz ; drapeaux : 2
-6 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
+8 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
 fichiers de l'en-tête ≠ filelists : 1 en trop, 0 manquants
 KO   en-tête du rpm
 code 1
@@ -2177,8 +2193,8 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 11858c4e0ac823a76c76469fbbed2da11ec84daa6c8962a9ff461822d5a591f7
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (451 octets)
+vault-AppStream : repomd.xml sha256 22e3dd9f6ddecfee7bbfa8e3d75fc0ed15187d3e54d5924f63d91797c76a6f57
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (450 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
@@ -2382,34 +2398,38 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 b037100aec7426c10dd140448f40d8f5567219b4de704ad0d9adea8e9637a3f0
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (446 octets)
+vault-AppStream : repomd.xml sha256 ccef04ead3a7eede09d124b4bc63fac89c3267aa50e0dcaa7a53c6022e297fce
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (447 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 542470f55fe0f735152bf14a056c00a7b38ec9fd455c63cebf38f655dc698b3d ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1436 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 72a99ece7257497b275d47468027f43e303b5e0e7f8ad1193104a20a54d93fca ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1700 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1436 octets, sha256 542470f55fe0f735152bf14a056c00a7b38ec9fd455c63cebf38f655dc698b3d
-lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1180 ; charge : 256 octets
+OK   rpm conforme au primary : 1700 octets, sha256 72a99ece7257497b275d47468027f43e303b5e0e7f8ad1193104a20a54d93fca
+lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1392 ; charge : 308 octets
 OK   signature, tag 273 : sha256 de l'en-tête principal égal
 OK   tag 5092 : sha256 de la charge égal (algorithme 8)
 OK   signature OpenPGP de l'en-tête (tag 268) : VALIDSIG <empreinte d essai> ; en-tête altéré refusé
 OK   en-tête : golang 0:1.25.9-1.el9_7.x86_64
 OK   License: de l'en-tête égale au primary : BSD and Public Domain
 sourcerpm : golang-1.25.9-1.el9_7.src.rpm ; format de charge : cpio ; compresseur : xz ; drapeaux : 2
-5 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
-OK   3 fichiers (dossiers exclus) égaux au filelists signé
+7 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
+OK   5 fichiers (dossiers exclus) égaux au filelists signé
 ### drapeaux de fichiers (FILEFLAGS, tag 1037) ; bits 2 et 128 éprouvés, autres bits de mémoire
   0 (0x0, aucun) : 3 entrées, dont 1 sous /usr/share/doc/
-  2 (0x2, doc) : 2 entrées, dont 2 sous /usr/share/doc/
+  2 (0x2, doc) : 3 entrées, dont 2 sous /usr/share/doc/
+  4096 (0x1000, artifact) : 1 entrées, dont 0 sous /usr/share/doc/
+### entrées au bit 2 hors de /usr/share/doc/, et entrées à un bit autre que 2 et 128 (chemin, drapeaux, mode, taille)
+  /usr/lib/golang/VERSION : drapeaux 2 (0x2, doc) ; mode 100644 ; 8 octets
+  /usr/lib/golang/api/go1.txt : drapeaux 4096 (0x1000, artifact) ; mode 100644 ; 3 octets
 ### fichiers sous /usr/share/doc ou /usr/share/licenses, ou au nom de licence
   /usr/share/doc/golang : drapeaux 0 (0x0, aucun) ; mode 40755 ; 0 octets ; empreinte 
   /usr/share/doc/golang/LICENSE : drapeaux 2 (0x2, doc) ; mode 100644 ; 32 octets ; empreinte 31680284914270802e6bf9265d85a7e67f6027c4f646234b873744597a0b1dc8 ; égale à la copie de Go de mise.toml
   /usr/share/doc/golang/PATENTS : drapeaux 2 (0x2, doc) ; mode 100644 ; 16 octets ; empreinte 15584c7255685f3626217fde3194f847a8d09631dac7bec1b08efbbfb114bdac ; égale à la copie de Go de mise.toml
 ## charge (cpio, xz)
-cpio : 5 entrées
+cpio : 7 entrées
 ./usr/share/doc/golang/LICENSE : sha256 de la charge différent de l'empreinte de l'en-tête
 KO   en-tête du rpm
 code 1
@@ -2812,17 +2832,17 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 9fdbba16a24f7a7acb6d3c75cf8434061d4409df7b6885c418c0116c315c356f
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (447 octets)
+vault-AppStream : repomd.xml sha256 e8bea75e0ed38f5f0fddcadf0bf849b2e5220e4978d41a7e458658b6c9bae34d
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (445 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 4e47c3aa10c044e59a59f2dd78467cf806388e803593bb34d3930a9492fdfc49 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1424 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 cfaa159209b2e892dce197c6736de5f2905d5d7d1c3850af30d7ddec5ac49b39 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1688 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1424 octets, sha256 4e47c3aa10c044e59a59f2dd78467cf806388e803593bb34d3930a9492fdfc49
-lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1180 ; charge : 244 octets
+OK   rpm conforme au primary : 1688 octets, sha256 cfaa159209b2e892dce197c6736de5f2905d5d7d1c3850af30d7ddec5ac49b39
+lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1392 ; charge : 296 octets
 OK   signature, tag 273 : sha256 de l'en-tête principal égal
 OK   tag 5092 : sha256 de la charge égal (algorithme 8)
 OK   signature OpenPGP de l'en-tête (tag 268) : VALIDSIG <empreinte d essai> ; en-tête altéré refusé
@@ -3026,17 +3046,17 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 5664fe2702bfdcb23d0158bdd4de92ffda1f39cb876f3e7ca51408458448d171
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (446 octets)
+vault-AppStream : repomd.xml sha256 1ee3699460794d380a667d4d46143563a5c8daf9cbdcdbd32e0eb67bf601197f
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (445 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 0661982072c6df24a36648c313d986dffd80b189a4799408e892d563affe2a44 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1424 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 4bd50a7780c9ed4c966d00a7e72ffaff17c8c98dccbb72e95d9cd376af27f164 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1688 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1424 octets, sha256 0661982072c6df24a36648c313d986dffd80b189a4799408e892d563affe2a44
-lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1180 ; charge : 244 octets
+OK   rpm conforme au primary : 1688 octets, sha256 4bd50a7780c9ed4c966d00a7e72ffaff17c8c98dccbb72e95d9cd376af27f164
+lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1392 ; charge : 296 octets
 signature, tag 273 : 0000000000000000000000000000000000000000000000000000000000000000 différent du sha256 de l'en-tête principal
 KO   en-tête du rpm
 code 1
@@ -3237,8 +3257,8 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 e9cbb695e92905b6ff9d715d17dfa54c002a9a4776a75c3faab8d08ef0e73c1e
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (448 octets)
+vault-AppStream : repomd.xml sha256 e136f5495a49721db39ab51052eb028680dc09017c4fdd8510e045bae0ec9b35
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (449 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
@@ -3442,17 +3462,17 @@ go version go-essai linux/amd64 ; LICENSE sha256 31680284914270802e6bf9265d85a7e
 OK   empreinte de la clé de Rocky : <empreinte d essai>
 ## AppStream de vault 9.7, épinglé par s1.sh
 OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
-vault-AppStream : repomd.xml sha256 4e341a4a551290ed258ca5f301e5a26b884e2e6ae6aecc5618a4c3b703b79e13
-OK   vault-AppStream : primary (gz) conforme à repomd.xml (447 octets)
+vault-AppStream : repomd.xml sha256 f8cf2a260b274d0097235c781f46d6554774f3b0917f79840be3d9468ac46be1
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (444 octets)
 vault-AppStream : 2 paquets dans le primary
 OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
 ## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
-primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 19cdf54bbb28f670c622a86eb067bc8878ca02874863a51649f26c236e0f4d53 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1424 octets (borne : 67108864) ; License: BSD and Public Domain
-OK   vault-AppStream : filelists (gz) conforme à repomd.xml (278 octets)
-vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 3 fichiers (dossiers exclus)
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 6ea9a5beb8b41af79118e26b6c12af9d69e22472f9d6b3c9fa8fe0df2cf46d5c ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1688 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (301 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 5 fichiers (dossiers exclus)
 ## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
-OK   rpm conforme au primary : 1424 octets, sha256 19cdf54bbb28f670c622a86eb067bc8878ca02874863a51649f26c236e0f4d53
-lead 96 octets ; signature : 2 tags, fin à l'octet 327 ; en-tête principal : 19 tags, octets 328 à 1180 ; charge : 244 octets
+OK   rpm conforme au primary : 1688 octets, sha256 6ea9a5beb8b41af79118e26b6c12af9d69e22472f9d6b3c9fa8fe0df2cf46d5c
+lead 96 octets ; signature : 2 tags, fin à l'octet 328 ; en-tête principal : 19 tags, octets 328 à 1392 ; charge : 296 octets
 OK   signature, tag 273 : sha256 de l'en-tête principal égal
 OK   tag 5092 : sha256 de la charge égal (algorithme 8)
 signature OpenPGP de l'en-tête (tag 268) refusée : VALIDSIG [] (attendu : <empreinte d essai>)

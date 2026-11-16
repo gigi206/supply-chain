@@ -6,7 +6,8 @@
 # depuis un dossier de pages, 404 sinon ; go simulé : GOROOT d'essai (LICENSE et PATENTS synthétiques). gpg et gpgv sont les vrais.
 # Le rpm golang est synthétique, fabriqué ici en Python selon la même structure écrite de mémoire que le lecteur de l'étape :
 # le banc éprouve la logique et les refus, pas la conformité au vrai format rpm (que seul le vrai passage éprouve).
-# Cas : nominal (charge xz, en-tête signé par la clé d'essai, LICENSE égale à la copie de comparaison) ; zstd (charge non lue,
+# Cas : nominal (charge xz, en-tête signé par la clé d'essai, LICENSE égale à la copie de comparaison, VERSION au bit 2 hors de
+# /usr/share/doc et une entrée à 4096 : toutes deux listées) ; zstd (charge non lue,
 # code 0) ; differente (LICENSE différente de la copie, code 0) ; sans_sig (pas de tag 268 : « non vérifiée », code 0) ; somme du
 # rpm fausse ; magie du lead fausse ; en-tête tronqué ; nombre d'entrées de l'en-tête hors borne ; fichier de l'en-tête absent du
 # filelists ; taille du primary hors borne ; LICENSE de la charge différente de l'empreinte de l'en-tête ; archive de mock
@@ -89,9 +90,10 @@ lic = open(ref, 'rb').read() if cas != 'differente' else b'Copyright autre\n'
 pat = b'brevets d essai\n'
 fichiers = [('/usr/bin/go', 0o100755, 0, b'binaire'), ('/usr/lib/golang', 0o40755, 0, b''),
             ('/usr/share/doc/golang', 0o40755, 0, b''),
-            ('/usr/share/doc/golang/LICENSE', 0o100644, 2, lic), ('/usr/share/doc/golang/PATENTS', 0o100644, 2, pat)]
+            ('/usr/share/doc/golang/LICENSE', 0o100644, 2, lic), ('/usr/share/doc/golang/PATENTS', 0o100644, 2, pat),
+            ('/usr/lib/golang/VERSION', 0o100644, 2, b'go1.25.9'), ('/usr/lib/golang/api/go1.txt', 0o100644, 4096, b'api')]
 if cas == 'fichiers':
-    fichiers.append(('/usr/lib/golang/VERSION', 0o100644, 0, b'go1.25.9'))
+    fichiers.append(('/usr/lib/golang/extra', 0o100644, 0, b'extra'))
 def cpio(fs):
     out, i = b'', 0
     for nm, mode, _, dat in fs + [('TRAILER!!!', 0, 0, b'')]:
@@ -139,7 +141,7 @@ p = ['<?xml version="1.0" encoding="UTF-8"?>',
 fl = ['<?xml version="1.0" encoding="UTF-8"?>', '<filelists xmlns="http://linux.duke.edu/metadata/filelists" packages="2">',
       '<package pkgid="' + '1' * 64 + '" name="golang" arch="x86_64"><version epoch="0" ver="1.25.9" rel="1.el9_7"/>'
       + ''.join(f'<file>{q}</file>' if m & 0o100000 else f'<file type="dir">{q}</file>'
-                for q, m, _, _ in fichiers if not (cas == 'fichiers' and q.endswith('VERSION'))) + '</package>',
+                for q, m, _, _ in fichiers if not (cas == 'fichiers' and q.endswith('/extra'))) + '</package>',
       '<package pkgid="' + '2' * 64 + '" name="golang-bin" arch="x86_64"><version epoch="0" ver="1.25.9" rel="1.el9_7"/>'
       '<file>/usr/lib/golang/bin/go</file></package>', '</filelists>']
 bp, bf = gzip.compress('\n'.join(p).encode()), gzip.compress('\n'.join(fl).encode())
