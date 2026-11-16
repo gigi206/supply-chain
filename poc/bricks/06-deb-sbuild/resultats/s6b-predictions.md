@@ -270,3 +270,20 @@ comptée).
 
 Le `.dsc` reconstruit, `b284bd60…`, est celui de la pipeline (l. 55 de `s4d-prealables.log`), et non celui de `sources.sh` sur
 l'hôte (U15, `ee2a6b8e…`). C'est cohérent avec l'égalité du manifeste.
+
+## Résultat de M5 (note de 2026-11-16T20:46:43Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh rebuild (M5) ? ». Du 16/11 20:41:40 au 16/11 20:46:43 UTC, code 0, `bilan : PASSED, lien coupé, fini avant le rétablissement`.
+Journal `s6b-rebuild.log`, sans ligne `jeton|token` ; celui du 12/11 reste dans `c66202e`.
+
+**M5 tenue : D est reconstruit dans le domaine, lien coupé.**
+- Délai : 1443 min depuis `finishedOn` 2026-11-15T20:38:15Z (au moins 1440 prédits).
+- `rebuild_deb.sh` `55ebf681…` des deux côtés.
+- Lien coupé de 2026-11-16T20:41:41Z à 2026-11-16T20:46:41Z ; sortie de la VM inchangée pendant la coupure (tx_bytes=6320208 tx_packets=59313).
+- sbuild : code 0 en 62 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0.
+- Deb `sample-app_1.0.0-2_amd64.deb f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)` ; couche `sha256:d8f9685c8962286e3fdeba09788df7396dd62dc05ed166868778694a1e065637 (1955840 octets)`.
+- **`manifeste_reconstruit` = `sujet_provenance` = D (`60f25f5c…`), `verdict=PASSED`**, fini à 2026-11-16T20:43:07Z, avant le rétablissement.
+- Mêmes valeurs que M4, première occurrence de chaque champ comparée dans les deux journaux : 19 champs (entrées,
+  chroot, verrou, vendor, marked, paquet source, deb, couche, manifeste, sujet, verdict).
+- Dans l'invité, porteuse de `enp1s0` à 0 au début et à la fin (`porteuse_enp1s0=0`, `porteuse_fin=enp1s0=0`), et `tx` de
+  l'invité inchangés (`tx_packets=59313`) : la reconstruction compte, à la différence de M4 (lien établi).
+- Durée : de 20:41:41 à 20:43:07 UTC dans la VM, soit 86 s pour `rebuild_deb.sh`.

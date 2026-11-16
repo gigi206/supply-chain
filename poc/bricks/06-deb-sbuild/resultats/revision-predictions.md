@@ -673,3 +673,8 @@ prochaine : `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5), pas avant 2026-11-16T2
 **Note du 2026-11-16 (2026-11-16T19:33:41Z) : fiche de faits des trois tags `I:` de lintian, hors des lignes de la carte.** [`lintian-tags-info.md`](lintian-tags-info.md), sans
 recommandation ni décision ; rien lancé, `poc/packaging` inchangé. Les lignes 11 (M5 à M8) et 12 restent ; prochaine :
 `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5), pas avant 2026-11-16T20:38:15Z, sur accord nommé.
+
+## Carte, ligne 11 : `rebuild` (note de 2026-11-16T20:46:43Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh rebuild (M5) ? ». Du 16/11 20:41:40 au 16/11 20:46:43 UTC, code 0. **M5 tenue** : D reconstruit dans `sc-replay`,
+lien coupé de 2026-11-16T20:41:41Z à 2026-11-16T20:46:41Z, sortie de la VM inchangée, `PASSED` (deb `f66bbeb2…`, manifeste `60f25f5c…`).
+Prochaine ligne : un push sur accord, puis `POLITIQUE_COMMIT=2d366066b5a42698bcb87e3df95f2e6ca7660629 s6b.sh vsa` (M6), sur accord nommé.
