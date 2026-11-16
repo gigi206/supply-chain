@@ -1443,3 +1443,9 @@ Le bloc 08c entre dans `rejeu.sh`, après la VSA et avant `fuites` : `h1_api`, `
 La phrase « `rejeu.sh` n'est pas concerné » (effets de H1) ne vaut plus pour « J8 (résolveurs) », déplacée après le bloc.
 
 Carte, relevés, contrôles et prédictions : README de la [08](../08-trust-plane/README.md), section « Rejeu de zéro S5b ».
+
+## Additif du 16/11/2026, 22:25:00 UTC : sortie rpm de la brique 05, correctif appliqué au dépôt, NON POSÉ dans le cluster
+
+`sortie-builds.sh` reçoit les étapes `rpm_sec`, `rpm_appliquer`, `rpm_temoins` et `rpm_retirer`, et son étape `rejeu` pose aussi
+`prefetch-rpm-sortie` ; `builds-sans-internet.yaml` a `prefetch-rpm` dans son `NotIn` (« Oui, applique-le »). Aucun rejeu de zéro
+avant `rpm_temoins`. Détail : [s1-sortie-predictions.md](../05-rpm-mock/resultats/s1-sortie-predictions.md) de la 05.

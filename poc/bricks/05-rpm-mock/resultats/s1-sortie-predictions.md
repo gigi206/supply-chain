@@ -134,3 +134,20 @@ l'étape dans un tube). État laissé à chaque point d'arrêt de `rpm_appliquer
 **Ordre inchangé**, chaque point sur accord nommé : appliquer le correctif, le commiter et le pousser ; `rpm_sec` ; `rpm_appliquer` ;
 `rpm_temoins` ; puis `prealables` et la suite de S1. La contrainte « aucun rejeu de zéro entre le correctif et `rpm_temoins` »
 tient : aucun rejeu de zéro n'est prévu avant le 28/11.
+
+## Correctif appliqué au dépôt (note du 2026-11-16, écrit à 2026-11-16T22:25:00Z ; rien n'est réécrit)
+
+Question : « J'applique le correctif de sortie rpm et je le commite ? ». Réponse : « Oui, applique-le ».
+
+- `git apply` de [`s1-sortie-rpm.patch`](../s1-sortie-rpm.patch) (sha256 `5dbd6627…`) le 16/11/2026 à 22:24:20 UTC (`date -u` de la
+  commande), sur `ef047e5`. `git apply -R --check` passe juste après : le dépôt porte le correctif à l'identique.
+- Une ligne datée ajoutée ensuite, sans rien réécrire, à chacun des trois fichiers dont l'en-tête disait le correctif non appliqué :
+  `sortie-builds.sh`, `builds-sans-internet.yaml` et `politiques/prefetch-rpm-sortie.yaml`. Après ces lignes, `git apply --check`
+  échoue en sens direct et en sens inverse (lignes ajoutées dans le contexte des blocs) : le fichier du correctif reste comme trace.
+- `bash -n` passe. shellcheck 0.11.0 ne relève aucun avertissement (`-S warning`). Au niveau info, il relève quatre remarques
+  (SC1091, SC2015, deux SC2016), les mêmes que sur `sortie-builds.sh` de `ef047e5` (comparaison des sorties).
+- **Rien n'est posé dans le cluster.** Aucune étape `rpm_*` n'a tourné. Depuis ce commit, `sortie-builds.sh rejeu` poserait
+  `prefetch-rpm-sortie` et attendrait trois labels dans le `NotIn` : la contrainte « aucun rejeu de zéro avant `rpm_temoins` »
+  s'applique dès maintenant.
+
+Suite, chaque point sur accord nommé : push ; `rpm_sec` ; `rpm_appliquer` ; `rpm_temoins`.
