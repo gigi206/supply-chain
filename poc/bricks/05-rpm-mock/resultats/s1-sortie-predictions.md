@@ -81,3 +81,56 @@ Les deux étapes ont tourné sur une copie détachée de `47154e8`, avec le corr
 - Ces journaux n'appartiennent pas à la 08c, puisque le correctif n'y est pas appliqué. Les fichiers de travail de `sortie-builds.sh` (`~/.cache/…/travail/sortie-builds`) ont été réécrits par ce passage, comme à chaque lancement.
 
 R3 à R6 attendent S5b et l'application du correctif.
+
+## Relecture à sec d'après S5b (note du 2026-11-16, écrit à 2026-11-16T22:23:08Z ; rien n'est réécrit), NON LANCÉ
+
+Après « continue », relecture du dépôt et des journaux archivés seulement, sans lecture du cluster ni de Zot, relue par le
+conseiller. Elle ne change aucune prédiction, elle en précise la base.
+
+**Correctif.** `git apply --check` passe sur `3371cdf`. `sortie-builds.sh` et `builds-sans-internet.yaml` n'ont pas changé depuis
+`47154e8`, la base du correctif.
+
+**État de départ de `rpm_appliquer`** (`NotIn` à `["prefetch-gomod","prefetch-deb"]`, `prefetch-rpm-sortie` absente) : c'est
+l'état du rejeu de S5b ([`08c/resultats/sortie-rejeu.log`](../../08c-durcissement/resultats/sortie-rejeu.log), 13/11/2026,
+12:58:08 UTC), et celui que relève encore la 06 le 16/11/2026 à 15:09:15 UTC
+([`06/resultats/s5-prealables.log`](../../06-deb-sbuild/resultats/s5-prealables.log), sélecteurs), qui est le dernier relevé archivé
+des politiques de `builds`. `rpm_appliquer` contrôle de toute façon cet état avant d'écrire.
+
+**L'inventaire a changé depuis le rejeu.** Le 13/11 à 12:58 UTC, `builds` avait quatre politiques. Le 16/11, il en a six : la 06 a
+posé deux NetworkPolicy, `builder-sans-sortie` et `construction-deb-sans-sortie`. Elles n'ont ni entrée ni sortie, et sélectionnent
+par `matchLabels` les tâches `construire-builder` et `construire-deb`.
+- Lecture des filtres (`sortie-builds.sh` l. 60 à 104, `08-trust-plane/selecteurs.jq`) : aucune des deux ne sélectionne
+  `prefetch-gomod`, `prefetch-deb`, `prefetch-rpm` ni un pod sans label. Aucune n'autorise de trafic ni de sortie par CIDR, aucune
+  n'a d'`egressDeny`. Les contrôles de `invariants_rpm` devraient donc tenir avec sept politiques.
+- **Aucun passage archivé des invariants de `sortie-builds.sh` avec cet inventaire** : le dernier est le rejeu du 13/11, avec quatre
+  politiques. Le « invariants OK » de R3 sera une première mesure.
+- **Limite** : `DEPOT_POL` (cinq fichiers) ne contient pas les politiques de la 06, que `rpm_sec` ne voit donc pas. Consignée, non
+  corrigée ici.
+
+**Si R3 tombe.** Chaque étape s'arrête au premier KO (`attendu` sort en code 1 ; `set -euo pipefail` ; `lancer` enchaîne
+l'étape dans un tube). État laissé à chaque point d'arrêt de `rpm_appliquer` :
+- KO sur le `NotIn` de départ ou sur la présence de `prefetch-rpm-sortie` : rien d'écrit.
+- KO sur `valide prefetch-rpm-sortie` : `prefetch-rpm-sortie` posée, `NotIn` inchangé. `builds-sans-internet` sélectionne alors encore
+  les pods `prefetch-rpm`, et son refus des adresses publiques l'emporte : aucune sortie publique ouverte. Aucun pod de ce label n'existe.
+- KO sur `valide builds-sans-internet`, sur le `NotIn` d'après ou sur les invariants : les deux politiques sont posées, la sortie rpm est
+  en place.
+- Repli : `rpm_retirer`, sur accord. Son `kubectl patch` commence par un `test` du `NotIn` exact à trois labels. Si le `NotIn`
+  n'a pas changé, ce `test` échoue et rien n'est modifié : le retrait se ferait alors par la seule suppression de
+  `prefetch-rpm-sortie`, commande à part, sur accord.
+
+**R4, Zot.** Ce qui suit est un analogue, pas une mesure du port 5000. `08-trust-plane/politique/prefetch-sortie.yaml` a la même règle
+`toCIDR 192.168.161.13/32`, sur le port 3000, et le témoin `prefetch-gomod` a joint Forgejo par elle le 10/11, avant S5b
+([`sortie-deb_temoins.log`](../../08c-durcissement/resultats/sortie-deb_temoins.log)). sc-stockage est un nœud du cluster, et
+`policy-cidr-match-mode=nodes` (posé le 30/10) a été relu par l'agent de sc-confiance pendant S5b
+(`08-trust-plane/resultats/rejeu-s5b-plateforme-ctl.log`).
+
+**Préconditions des témoins, relues après S5b** (les derniers témoins datent du 10/11) :
+- L'image `outils-prefetch@sha256:68e0ae70…` a été reconstruite à l'identique le 13/11 (`03-deps-closure/resultats/f2-image.log`).
+- La ConfigMap `ca-poc` est posée dans `builds` (`rejeu-s5b-plateforme.log`).
+- Le dépôt `workspace/sample-app` existe sur Forgejo : sa tête a été lue le 13/11 (`rejeu-s5b-06-b.log`). Un dépôt absent se lirait
+  « Forgejo : refusé » et fausserait R5 pour le pod sans label.
+- L'URL vault 9.7 BaseOS ajoutée aux témoins est celle dont HB3 a vérifié le `repomd.xml` le 16/11 ([`s1-2-hote.log`](s1-2-hote.log)).
+
+**Ordre inchangé**, chaque point sur accord nommé : appliquer le correctif, le commiter et le pousser ; `rpm_sec` ; `rpm_appliquer` ;
+`rpm_temoins` ; puis `prealables` et la suite de S1. La contrainte « aucun rejeu de zéro entre le correctif et `rpm_temoins` »
+tient : aucun rejeu de zéro n'est prévu avant le 28/11.

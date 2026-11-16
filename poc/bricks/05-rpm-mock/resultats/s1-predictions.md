@@ -214,3 +214,21 @@ code 0, 14 lignes OK, aucune KO ([journal](s1-2-hote.log)). **HB1 à HB8 tenues.
 Rien n'a touché le cluster ni Zot. Restent avant `essais` : le correctif de sortie rpm et ses étapes, la relecture de
 `prealables` et de R3 à R6 contre les journaux d'après S5b, l'ajout à `s1.sh` pour N3 et N4, la décision `extras` avant `image` ;
 chacun sur accord.
+
+## Relecture à sec de `prealables` d'après S5b (note du 2026-11-16, écrit à 2026-11-16T22:23:08Z ; rien n'est réécrit), NON LANCÉ
+
+P1 est inchangée. Base relue sans lecture du cluster :
+- **Exemption Pod Security de kata** : relue pendant S5b (`--admission-control-config-file=/etc/rancher/rke2/pod-security.yaml`,
+  `08-trust-plane/resultats/rejeu-s5b-plateforme-ctl.log`).
+- **Admission.** Les règles `pods-isolation` et `zone-build` (`08-trust-plane/politique/admission.yaml`) et celles de
+  `08c-durcissement/politiques/kyverno/durcissement.yaml` n'ont pas changé depuis la préparation de `s1.sh` (12/11). Lues en
+  entier, elles sont satisfaites par la spec `s1-05-racine` :
+  - runtimeClass `kata`, qui admet le conteneur privilégié ;
+  - `emptyDir` en mémoire, sans `hostPath` ;
+  - `nodeSelector` `zone=build` et `automountServiceAccountToken: false` ;
+  - limites de CPU et de mémoire ;
+  - image de `sc-stockage.poc.test:5000` par digest.
+- **Précédent de même forme** : `s1-racine` de la 06 (Kata, uid 0, privilégié, mêmes limites, label `prefetch-deb`) a été admis
+  le 13/11/2026 à 14:17:00 UTC, après S5b ([`06/resultats/s1r-prealables.log`](../../06-deb-sbuild/resultats/s1r-prealables.log)).
+- **Sortie rpm** : `prealables` exige `prefetch-rpm` dans le `NotIn`, donc `rpm_appliquer` avant elle. R3 à R6 sont relues dans
+  [`s1-sortie-predictions.md`](s1-sortie-predictions.md).
