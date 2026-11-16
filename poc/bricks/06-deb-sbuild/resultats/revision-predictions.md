@@ -684,3 +684,8 @@ Push de `e7d60e1` fait avant (« Oui, pousse »). « Oui, lance-le » à « Je l
 VSA de D `PASSED` (`POC_REPLAY_BIT_IDENTIQUE`), `timeVerified` 20:43:07Z, signée par la clé du domaine et revérifiée ;
 énoncé `d61d7b3d…` et bundle `4a9cef23…` archivés.
 Prochaine ligne : `s6b.sh pousser_vsa` (M7), sur accord nommé.
+
+## Carte, ligne 11 : `pousser_vsa` (note de 2026-11-16T20:56:05Z, écrit à 2026-11-16T20:56:20Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh pousser_vsa (M7) ? ». Du 16/11 20:56:02 au 16/11 20:56:05 UTC, code 0. **M7 tenue** : VSA de D poussée dans
+`builds/vsa/sample-app-deb` (manifeste `97b4100d…`, un seul referrer de D, aucune étiquette) ; `builds/sample-app-deb` inchangé.
+Prochaine ligne : `s6b.sh lire_vsa` (M8), sur accord nommé.

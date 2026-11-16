@@ -304,3 +304,17 @@ Journal `s6b-rebuild.log`, sans ligne `jeton|token` ; celui du 12/11 reste dans 
 - Signature : `attest-blob` code 0, sans service (ni tlog ni horodatage) ; `verify-blob-attestation` avec la clé du domaine,
   code 0, « Verified OK » ; bundle `application/vnd.dev.sigstore.bundle.v0.3+json`, énoncé identique à `enonce.json`.
 - Archivés : `s6b-vsa-enonce.json` `d61d7b3d…` et `s6b-vsa.bundle.json` `4a9cef23…`, égaux aux copies de la VM.
+
+## Résultat de M7 (note de 2026-11-16T20:56:05Z, écrit à 2026-11-16T20:56:20Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh pousser_vsa (M7) ? ». Du 16/11 20:56:02 au 16/11 20:56:05 UTC, code 0, `bilan : tout OK`. Journal `s6b-pousser_vsa.log`, sans ligne
+`jeton|token`.
+
+**M7 tenue : VSA de D poussée dans Zot.**
+- Gardes passées sans rien afficher : bundle et énoncé présents, copie de la CA égale à celle de la 08, mot de passe de
+  `poc-replay` présent.
+- Bundle revérifié sur l'hôte avec la clé de VSA, « Verified OK », 0 `connect()` ; énoncé identique à `s6b-vsa-enonce.json`,
+  sujet `…@sha256:60f25f5c3fb5…`, `PASSED`, `['POC_REPLAY_BIT_IDENTIQUE']`.
+- Sujet lu dans Zot (anonyme) : digest D, 400 octets. Referrers de D dans `builds/sample-app-deb` : 0 avant et après ;
+  étiquettes inchangées.
+- Manifeste poussé par digest dans `builds/vsa/sample-app-deb` : `sha256:97b4100d…`. Relecture anonyme : un seul referrer de D,
+  au digest poussé ; aucune étiquette. Copie : `s6b-vsa-manifeste.json`.
