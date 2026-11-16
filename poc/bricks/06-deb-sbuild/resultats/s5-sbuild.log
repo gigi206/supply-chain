@@ -1,4 +1,4 @@
-# s5.sh sbuild, 2026-11-11T21:48:30Z
+# s5.sh sbuild, 2026-11-16T15:38:32Z
 ## debian/rules du paquet témoin
      #!/usr/bin/make -f
      build build-arch build-indep:
@@ -11,7 +11,7 @@
      clean:
      	rm -rf debian/tmp debian/files
 ## N6 : pod d'essai Kata (image de build, UID 1000), sans label tekton.dev/task
-pod s5-sbuild créé à 21:48:30
+pod s5-sbuild créé à 15:38:32
 pod s5-sbuild prêt sur sc-build, runtimeClassName « kata »
      pod|0
      sbuild|0

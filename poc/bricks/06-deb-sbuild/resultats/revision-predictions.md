@@ -446,3 +446,16 @@ Prochaine ligne : S5 `zot` (écriture dans Zot, Q9), sur accord nommé.
 `chrono.tsv` ; journal `s5-zot.log` réécrit (version du 11/11 dans git) ; dossier d'identifiants `auth` retiré par l'étape.
 - **Q9 tenue** : les deux fermetures altérées sont dans Zot à `a549729d…` et `b27225cf…`.
 Prochaine ligne : S5 `prefetch miroir fermeture kata sbuild porte retirer` (Q10 à Q22), sur accord nommé.
+
+## Carte, ligne 9 : S5 `prefetch miroir fermeture kata sbuild porte retirer` (note de 2026-11-16T15:41:03Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S5 `prefetch miroir fermeture kata sbuild porte retirer` (Q10 à Q22) ? ». À 91e76f7, en
+arrière-plan, du 16/11 15:27:20 au 16/11 15:40:27 UTC, code 0 relevé par la même commande, **72 OK, 0 KO, 0 ÉCART** ; les sept
+lignes « fait » sont dans `chrono.tsv` (`prefetch` 21 s, `miroir` 4 min 34 s, `fermeture` 34 s, `kata` 5 min 43 s, `sbuild` 57 s,
+`porte` 57 s, `retirer` 1 s). Journaux `s5-{prefetch,miroir,fermeture,kata,sbuild,porte,retirer}.log` et `s5-sbuild-build.log`
+réécrits (versions du 11/11 dans git) ; aucune ligne `jeton|token`.
+- **Q10 à Q22 tenues** (détail dans `s5-predictions.md`) : N1 à N7 refusent, leurs témoins réussissent ; N7 sous Kata produit
+  `f66bbeb2` et D `60f25f5c` ; enveloppes inchangées ; porte : deb VSA et scan refusés, sample-app `ok|ok`. **Ligne 9 close.**
+- U13 n'est pas jugée par S5 (note du 15/11). Le refus du scan de D confirme que le CronJob deb ne scanne pas D
+  (`scan.scan_present`, 0 énoncé), cohérent avec la cible `039949f9` rendue le 14/11.
+Prochaine ligne : relecture hors ligne de `ScanEnRetard` (U13) et relevé daté des épinglages de `s6a.sh` et `s6b.sh`, puis S6a
+`periodique fraicheur grafana` (ligne 10, refusée de 09:00 à 12:59 UTC), sur accord nommé.

@@ -267,3 +267,33 @@ récente du deb = PipelineRun `c3d27e05…` (`$W/s4d3-06/uid-chemin-2`, écrit l
 `chrono.tsv` ; journal `s5-zot.log` réécrit (version du 11/11 dans git) ; dossier d'identifiants `auth` retiré par l'étape.
 - **Q9 tenue** : `paquet-modifie` relu en lecture anonyme à `a549729d…`, `paquet-en-trop` à `b27225cf…`, sous
   `entrees/sample-app-deb/fermeture-alteree`.
+
+### Résultats de Q10 à Q22 (note de 2026-11-16T15:41:03Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S5 `prefetch miroir fermeture kata sbuild porte retirer` (Q10 à Q22) ? ». À 91e76f7, en
+arrière-plan, du 16/11 15:27:20 au 16/11 15:40:27 UTC, code 0 relevé par la même commande, **72 OK, 0 KO, 0 ÉCART** ; les sept
+lignes « fait » sont dans `chrono.tsv` (`prefetch` 21 s, `miroir` 4 min 34 s, `fermeture` 34 s, `kata` 5 min 43 s, `sbuild` 57 s,
+`porte` 57 s, `retirer` 1 s). Journaux `s5-{prefetch,miroir,fermeture,kata,sbuild,porte,retirer}.log` et `s5-sbuild-build.log`
+réécrits (versions du 11/11 dans git) ; aucune ligne `jeton|token`.
+- **Q10 tenue** : N1 témoin `True|Succeeded`, pod `prefetch-deb|sc-build|-`, miroir d'un paquet.
+- **Q11 tenue** : N1 hash faux `False|StepFailed`, « téléchargement refusé » 1, « sha256 différent » 0, « Hashes of received file »
+  présent (correctif 6).
+- **Q12 tenue** : N2 `False|StepFailed`, refus sur l'InRelease, aucun index.
+- **Q13 tenue** : miroir complet ; copies `1|1200` et `1|1` ; N3 `.deb` et InRelease refusés par la revérification
+  (`False|StepFailed`), pods `construire-builder|sc-build|kata` ; N3 témoin `True|Succeeded`, `DIGEST_CONSTRUIT` `749d746c…`.
+- **Q14 tenue** : N4 intact `0|1` et `0|1` ; InRelease altéré `1|0` (« is not signed ») ; `.deb` altéré `0|1` puis `1|0`, « Hash Sum
+  mismatch ».
+- **Q15 tenue** : commit `6391fd43` ; N5 témoin `True|Succeeded`, 162 paquets ; les deux fermetures altérées tirées par digest puis
+  refusées par la confrontation au verrou (`False|StepFailed`).
+- **Q16 tenue** : N7 hors Kata `False|PodAdmissionFailed` (Pod Security « restricted », privileged), aucun pod ; N7 témoin
+  `True|Succeeded` sous Kata, deb **`f66bbeb2`**, `DIGEST_CONSTRUIT` **`60f25f5c…`** = D (correctif 6 : extraction juste).
+- **Q17 tenue** : journal `.build` 1 ; connexion du pod à Zot en code 0 ; depuis `debian/rules` sous sbuild, échec, interfaces `lo`.
+- **Q18 tenue** : enveloppes `8 → 8`, `6 → 6`, `8 → 8`, `4 → 4` ; Chains annote `true` partout, `failed` pour N7 hors Kata.
+- **Q19 tenue** : provenance la plus récente du deb : PipelineRun `c3d27e05…`.
+- **Q20 tenue** : deb `true||trusted_task.tagged`, `ok|8/8`, VSA refusée (0/0) et scan refusé (`scan.scan_present`, 0 énoncé pour D) ;
+  sample-app `true||trusted_task.tagged`, `ok|6/6`, VSA `ok` (1/1), scan `ok` (**5** énoncés, 4 le 15/11 : un passage du CronJob de
+  plus).
+- **Q21 tenue** : aucun objet `s5` restant ; les fermetures altérées restent dans Zot.
+- **Q22 tenue** : code 0 et aucun ÉCART à chaque étape. Le 11/11, quatre étapes avaient fini en KO sur des écarts de libellé ou
+  d'extraction ; les correctifs 5 et 6 les ont levés sans toucher à une barrière.
+
+**Toutes les barrières refusent de nouveau, chaque témoin est accepté**, sur la révision 1.0.0-2 (deb `f66bbeb2`, D `60f25f5c`).
