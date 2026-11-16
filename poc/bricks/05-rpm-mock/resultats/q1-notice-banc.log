@@ -1,0 +1,31 @@
+# q1-notice-banc.py, lancé à 2026-11-16T21:49:38Z ; banc sha256 67f09d5b22d2bb7291d572e659de487aa8f312503d555c3dfec37f530a5bfcbe, générateur sha256 a245a4701ab746a8b1140cdfd2c460313fa761024ac8cfd1d79f2279c0460723, Python 3.13.12
+spec avant : git show HEAD:poc/packaging/sample-app.spec (HEAD ff7b491), sha256 e1281b3d796db7211865de8fe3602488bfefa7bb47b9bccbbd98d6ef058fcb80
+spec après : poc/packaging/sample-app.spec (écrit à 2026-11-16T21:49:26Z), sha256 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6
+Go de comparaison : 1.24.7 de mise.toml (LICENSE, PATENTS, src/runtime/memmove_amd64.s) ; copyright : poc/packaging/debian/copyright
+tenue     Q1 lignes retirées : Release 1 et ligne %license seulement : ['Release:        1%{?dist}', '%license LICENSES/Apache-2.0.txt vendor/github.com/go-chi/chi/v5/LICENSE web/node_modules/marked/LICENSE.md']
+tenue     Q1 entrée de changelog suivie d'une ligne vide puis de l'entrée 1.0.0-1 : ['', '* Wed Oct 28 2026 Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid> - 1.0.0-1']
+tenue     Q1 lignes ajoutées hors %prep : Release 2, %license, changelog : ['Release:        2%{?dist}', '%license LICENSES/Apache-2.0.txt vendor/github.com/go-chi/chi/v5/LICENSE web/node_modules/marked/LICENSE.md golang-LICENSE golang-PATENTS golang-NOTICES', '* Mon Nov 16 2026 Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid> - 1.0.0-2', '- Notices de la bibliothèque standard de Go portées dans le paquet : golang-LICENSE, golang-PATENTS,', '  golang-NOTICES (attributions des paragraphes 8 et 9 du deb, notice X11 de runtime/memmove_amd64.s)']
+tenue     Q2 « % » ajouté seulement dans Release et %license : ['Release:        2%{?dist}', '%license LICENSES/Apache-2.0.txt vendor/github.com/go-chi/chi/v5/LICENSE web/node_modules/marked/LICENSE.md golang-LICENSE golang-PATENTS golang-NOTICES']
+tenue     Q3 une ligne %license, noms de base distincts : ['Apache-2.0.txt', 'LICENSE', 'LICENSE.md', 'golang-LICENSE', 'golang-PATENTS', 'golang-NOTICES']
+tenue     Q4 ligne hors here-doc : commentaire sans %, ou ligne vide d'origine avant %build : '# Notices de Go portées par le packaging (décision Q1 de la brique 05, 16/11/2026) : textes écrits ici, non copiés'
+tenue     Q4 ligne hors here-doc : commentaire sans %, ou ligne vide d'origine avant %build : "# du buildroot ; golang-LICENSE et golang-PATENTS sont la LICENSE et le PATENTS de Go à l'octet près."
+tenue     Q4 golang-LICENSE : délimiteur entre apostrophes : cat > golang-LICENSE <<'FIN_GOLANG_LICENSE'
+tenue     Q4 golang-LICENSE : corps propre (27 lignes)
+tenue     Q4 golang-PATENTS : délimiteur entre apostrophes : cat > golang-PATENTS <<'FIN_GOLANG_PATENTS'
+tenue     Q4 golang-PATENTS : corps propre (22 lignes)
+tenue     Q4 golang-NOTICES : délimiteur entre apostrophes : cat > golang-NOTICES <<'FIN_GOLANG_NOTICES'
+tenue     Q4 golang-NOTICES : corps propre (38 lignes)
+tenue     Q4 ligne hors here-doc : commentaire sans %, ou ligne vide d'origine avant %build : ''
+tenue     Q4 trois here-docs : ['golang-LICENSE', 'golang-NOTICES', 'golang-PATENTS']
+tenue     Q5 bash du %prep : code 0, aucune sortie : (0, b'')
+tenue     Q5 golang-LICENSE : sha256 attendu : 911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad
+tenue     Q5 golang-LICENSE : égal au fichier de Go
+tenue     Q5 golang-PATENTS : sha256 attendu : 96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc
+tenue     Q5 golang-PATENTS : égal au fichier de Go
+         golang-NOTICES : 2178 octets, sha256 b55ad0c8a612da4686b24f04c6ec024a5f193a97c9010f233b49d8e6973dea03
+tenue     Q6 paragraphe 8 du deb présent tel quel : ['Copyright: © 2009, 2011 The Go Authors. All rights reserved.', 'Based on code © 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier']
+tenue     Q6 paragraphe 9 du deb présent tel quel : ['Copyright: © 2010 The Go Authors. All rights reserved.', 'Based on code © 1993 by Sun Microsystems, Inc. All rights reserved.']
+tenue     Q6 notice X11 = lignes 1 à 24 de memmove_amd64.s sans « // » : ['OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN', 'THE SOFTWARE.', '']
+tenue     Q6 notice X11 : permission et garantie présentes
+# code 0
+# code 0, fin 2026-11-16T21:49:38Z

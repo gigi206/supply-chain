@@ -171,3 +171,5 @@ des deux étapes établie par les lignes « fait » de `chrono.tsv`. B2 et B3 re
 *Note du 14/11/2026, 22:53:08 UTC* : `paquets.sh deb modules` à c279dd2, de 22:52:47 à 22:52:50 UTC, code 0 relevé juste après la commande, sur le deb f66bbeb2 : B2 et B3 tenues de nouveau (deb 1.0.0-2 refait par l'option 1 de la 06).
 
 *Note du 16/11/2026, 21:28:56 UTC* : volet rpm : la normalisation SPDX du tag `BSD and Public Domain` de golang (Rocky 9.7) lui revient, par la décision Q2 du propriétaire (« Oui, reporter ») ; voir [m2-predictions.md](../05-rpm-mock/resultats/m2-predictions.md).
+
+*Note du 16/11/2026, 21:53:30 UTC* : deux points ouverts, non décidés, relevés en portant la notice de Go au spec du rpm (brique 05) et qui touchent aussi le `Comment:` de `debian/copyright` (décision 2 du 12/11) : le texte Go du deb dit « Google Inc. », la `LICENSE` de Go 1.24.7 « Google LLC » ; l'en-tête Sun de `math/log1p.go` porte « provided that this notice is preserved », que la ligne « Based on code © » ne reproduit pas ; voir [m2-predictions.md](../05-rpm-mock/resultats/m2-predictions.md).

@@ -828,3 +828,58 @@ Pistes pour le volet rpm de la 13a, non décidées : une table écrite à la mai
 « Go » et « X11 » le 12/11, ou `fedora-license-data` après un audit au doc 04.
 
 Q1 et Q2 sont tranchées ; `poc/packaging/` reste inchangé jusqu'à la mise en forme de Q1 (contenu et forme non tranchés).
+
+## Portage de Q1 au spec (note du 2026-11-16, écrit à 2026-11-16T21:53:30Z ; rien n'est réécrit)
+
+Un brouillon à sec, relu par le conseiller, a été présenté le 16/11/2026 avec la question « Je porte ce brouillon au spec et je le commite avec son banc ? »
+Réponse : « Oui, porte-le ».
+
+**Fait** : `poc/packaging/sample-app.spec` écrit à 2026-11-16T21:49:26Z par
+[`q1-notice-genere.py`](q1-notice-genere.py) (copié tel quel du brouillon : sa docstring garde le nom `genere.py`) ; sha256
+`e1281b3d…` → `918a83f5…`. Changements : `Release: 2%{?dist}` ; en `%prep`, trois fichiers écrits par here-doc (délimiteur entre
+apostrophes), sans rien copier du buildroot ; ces trois noms ajoutés à la ligne `%license` ; entrée 1.0.0-2 au changelog, datée du
+`date -u` de la commande d'écriture (Mon Nov 16 2026). Le générateur exige l'état d'avant (assertions sur le spec de ff7b491) :
+il n'est pas rejouable sur le spec porté.
+- `golang-LICENSE` et `golang-PATENTS` : la `LICENSE` et le `PATENTS` de Go 1.24.7 (`mise.toml`) à l'octet près, sha256
+  `911f8f57…` et `96f408bf…`, égaux à ceux du rpm `golang` 1.25.9-1.el9_7 (`releve9`).
+- `golang-NOTICES` (2178 octets, sha256 `b55ad0c8…`) : trois lignes d'introduction ; les attributions des paragraphes 8 (Moshier)
+  et 9 (Sun) telles que dans le `Comment:` de `debian/copyright` (copyright Debian de golang-1.24-src 1.24.4-1) ; l'en-tête X11
+  de `runtime/memmove_amd64.s` (lignes 1 à 24 de Go 1.24.7, sans « // »).
+- Noms préfixés `golang-` : rpm copie chaque fichier de `%license` sous son seul nom de base (`cp -pr`, `poc/benchmarks/obs/resultats/build-v1/rocky_9/build.log`
+  l. 924-926) ; un `LICENSE` de Go aurait le même nom de base que celui de chi.
+
+Banc hors réseau ([script](q1-notice-banc.py), copié tel quel du brouillon, docstring au nom `banc.py` ;
+[journal](q1-notice-banc.log)), lancé le 16/11/2026 à 21:49:38 UTC (`chrono.tsv`), sous le même accord (la question citait le
+banc), sur `git show HEAD` (ff7b491) contre le
+fichier écrit : code 0, 24 contrôles tenus (lignes changées et seulement elles, `%` ajouté seulement dans `Release` et `%license`,
+noms de base distincts, corps des here-docs sans `%`, CR, espace final ni ligne `#`/`%`, shell du `%prep` exécuté par bash
+dans un dossier vide : sha256 attendus, attributions et en-tête X11 égaux à leurs sources). Des passages antérieurs, sur le
+brouillon, hors du dépôt et sans heure archivée : le premier a eu deux contrôles NON TENUS, dus au banc (ligne vide d'origine
+avant `%build`), corrigés avant les suivants. **Le banc prouve le contenu, pas la lecture du spec par rpm** (`rpmbuild` et
+`rpmspec` absents de l'hôte) : forme non éprouvée avant le premier build.
+
+Écarts à la note Q1, présentés avec le brouillon : paragraphes 8 et 9 ajoutés (gardés par la règle de chemin de la 13a, liaison
+non mesurée) ; paragraphes 2 et 3 du deb non repris (X11 vient de l'en-tête de `memmove_amd64.s`, pas de la liste de Debian) ;
+seuls `LICENSE` et `PATENTS` sont prouvés égaux en Go 1.25.9, l'en-tête X11 et les paragraphes 8 et 9 n'y sont pas lus.
+
+Points ouverts, non décidés : la `LICENSE` de Go dit « Google LLC », le texte Go du `Comment:` du deb « Google Inc. » ;
+l'en-tête Sun de `math/log1p.go` (Go 1.24.7) porte « provided that this notice is preserved », que la ligne « Based on code © »
+(deb et rpm) ne reproduit pas.
+
+Autre lecteur du spec : `poc/benchmarks/obs/construire.sh` (banc A2, l. 44-45) le lit dans le cache de packaging avec
+`sample-app_1.0.0-1.dsc`, absent de ce cache depuis la révision 1.0.0-2 du deb (`ls` du 16/11/2026) ; le banc A2 n'est pas rejoué.
+
+Prédictions pour la suite, écrites avant tout lancement (aucun n'est accordé) :
+- N1 (`packaging:sources`, accord à part) : la copie du spec dans le cache a le sha256 `918a83f5…` ; les quatre autres lignes de
+  `SHA256SUMS` (archive rpm, orig, `.dsc`, `.debian.tar.xz` de 1.0.0-2) sont inchangées (copie gardée avant le passage) ; sinon arrêt.
+- N2 (premier `mock --buildsrpm`, `s1.sh` l. 400 ou 462) : première lecture du spec par rpm ; code 0 et un src.rpm dont la
+  Release commence par 2.
+- N3 (rpm binaire, lecteur d'en-tête de `releve9` ou équivalent) : `/usr/share/licenses/sample-app/golang-LICENSE`,
+  `golang-PATENTS` et `golang-NOTICES`, bit 128 (`%license`), sha256 `911f8f57…`, `96f408bf…` et `b55ad0c8…` ; les trois
+  fichiers de licence d'avant toujours présents.
+- N4 (`x11-fichiers` sur le binaire du rpm, Go 1.25.9) : `runtime/memmove_amd64.s` présent ; absent : la notice X11 serait à revoir
+  (nouvelle Release).
+- N5 (journal du build) : `SOURCE_DATE_EPOCH` relevé, issu de la nouvelle entrée du changelog ; s'il tombe après l'heure du build,
+  le clamp des mtime ne joue pas : à noter, sans conclure d'avance.
+- N6 (premier verrou) : l'empreinte de la `LICENSE` dans l'en-tête du rpm `golang` verrouillé égale `911f8f57…` (contrôle déjà
+  prévu par la note Q1).

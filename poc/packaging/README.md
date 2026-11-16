@@ -53,3 +53,13 @@ Les dates des deux changelogs sont celles du commit de sample-app.
 - sample-app est sous Apache-2.0 ;
 - chi est sous MIT ;
 - `marked` combine MIT et BSD-3-Clause : son `LICENSE.md` contient aussi la licence de Markdown.
+
+## Note du 2026-11-16 (écrit à 2026-11-16T21:53:30Z ; rien n'est réécrit)
+
+Le spec passe en `Release: 2%{?dist}` (ligne 11 de ce fichier : `1` jusqu'ici). Il porte les notices de la bibliothèque
+standard de Go, liée statiquement : `golang-LICENSE`, `golang-PATENTS` et `golang-NOTICES`, écrits en `%prep` et listés au
+`%license` (décision Q1 de la brique 05, [détail](../bricks/05-rpm-mock/resultats/m2-predictions.md)). L'entrée 1.0.0-2, en tête du
+changelog du spec, est datée du 16/11/2026 ; l'entrée 1.0.0-1 garde sa date. La phrase « Les dates des deux changelogs sont
+celles du commit de sample-app » ne vaut donc plus pour l'entrée de tête du rpm (pour le deb, voir le commentaire de `SDE_DEB` dans
+[`sources.sh`](sources.sh)). La copie du spec dans le cache attend un nouveau passage de
+`mise run packaging:sources`.
