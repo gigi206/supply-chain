@@ -608,3 +608,57 @@ même seconde d'après `date -u`), code 0, `bilan : tout OK` ([journal](s6a-graf
 - Constats non prédits, sans écart : le dernier succès du CronJob est passé à `2026-11-16T16:08:34Z`, le job `s6a-manuel` créé
   depuis lui comptant comme le sien ; la valeur de D apparaît « vue dès 16:10:34Z » à cause de la grille de 60 s de la lecture
   (alignée sur 20:39:34), et non d'un retard sur `fraicheur`, qui l'a lue dans Prometheus avant 16:09:43Z.
+
+## Additif de la révision 1.0.0-2, ligne 12 de la cascade (préparé à partir de 2026-11-16T16:41:27Z, pendant l'attente de M5, après « j'ai besoin que tu avances ») : NON LANCÉ
+
+Porte du deb sur D (`60f25f5c`, S4d3 du 15/11) au lieu de `039949f9` ; mesure de U14 de
+[`revision-predictions.md`](revision-predictions.md). Relu par le conseiller avant commit. Une seule commande, sur accord nommé,
+code relevé juste après :
+
+`DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/s6a.sh porte` (cluster : Job `porte-s6a-deb` de l'espace `porte`, recréé ;
+un passage d'horodatage ; lectures anonymes de Zot). Journal `s6a-porte.log` réécrit (version du 14/11 dans git).
+
+**Préalable, hors du script.** La ligne 11 jusqu'à M8 tenue : VSA de D poussée par `pousser_vsa` (M7) et relue par `lire_vsa`
+(M8). `etape_porte` adapte son attente au nombre de referrers de D dans `builds/vsa/sample-app-deb` (`s6a.sh` l. 439-441) : lancée
+avant M7, elle finirait en `bilan : tout OK` avec une VSA `refus` attendue, sans mesurer U14. La prédiction exige donc la ligne
+`referrers du deb dans builds/vsa/sample-app-deb : 1, VSA attendue : ok` ; toute autre valeur est un écart, même si le script
+rend 0. De même, la provenance jugée (W2) n'est qu'affichée par le script, sans `mesure` : elle se lit dans le journal.
+
+**Code relu à sec.**
+- `git diff 040a891 HEAD` (porte du 14/11) : dans `s6a.sh`, seuls changent `DEB`, `DEB_SHA` et `DEB_REF` (révision 1.0.0-2) et
+  deux motifs de `periodique` et `grafana`. `etape_porte`, `politique.sh`, `politique/` de la 08, `politique/porte/` de la 07a et
+  `vsa-cle-publique.pem` de la 10 sont inchangés dans le dépôt.
+- Le Job lit la ConfigMap `porte` en service : `juger` ne la réapplique pas. Elle n'est pas relue ici. Aucune étape lancée depuis
+  la porte de S5 (16/11) ne la réapplique : `cm_porte` n'apparaît ni dans `s4d3.sh`, ni dans `s5.sh`, ni dans `s6a.sh`, ni dans
+  `s6b.sh`. C'est donc celle qui a jugé D à S4d3 (15/11) et à S5 (16/11).
+- `vsa.sh` retient une VSA vérifiée par la clé du domaine si elle porte D en sujet, le `verifier.id` du domaine et `PASSED` ; il ne
+  lit pas `inputAttestations`. `rejeu/` n'a pas changé depuis `97ae561` hors de la politique (`git diff --stat`) : `vsa_deb.py`
+  écrit le même `verifier.id` (l. 101) que la VSA retenue le 14/11.
+- `scan.rego` juge le scan le plus récent : 7 jours au plus (`scan_recent`), base construite 3 jours au plus avant lui
+  (`base_recente`), pas de KEV sans VEX.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| W1 | Préalables : D présent dans Zot ; au moins un scan de D dans `builds/scan/sample-app-deb` ; `referrers du deb dans builds/vsa/sample-app-deb : 1, VSA attendue : ok` | Haute si M7 tient (un referrer de D dans `builds/vsa/sample-app-deb`, au digest poussé) |
+| W2 | 0 PipelineRun en cours dans `builds` ; un passage d'horodatage (nom non prédit) ; provenance de PipelineRun la plus récente du deb : `c3d27e05-b4cd-487b-8980-7a40b3336ffc`, celle que cite la VSA | Haute (M3 ; `s5-porte.log` l. 9) |
+| W3 | Ligne `VERDICT` du cas `s6a-deb` : `success` de ec à `true`, aucune violation, avertissement `trusted_task.tagged` seul, comme à S4d3 et S5 sur D ; durée du conteneur ec non prédite | Haute (`s4d3-porte.log` l. 6, `s5-porte.log` l. 11) |
+| W4 | Horodatage `ok`, `8/8 enveloppe(s) couverte(s)`, 8 bundles vérifiés | Haute pour `ok` et 8/8 (`s5-porte.log` l. 11) ; moyenne pour le nombre de bundles |
+| W5 | **VSA `ok`, `1/1 VSA retenue(s)`** dans `builds/vsa/sample-app-deb` | Haute si M7 tient : `pousser_vsa` revérifie le bundle avec `vsa-cle-publique.pem` (`s6b.sh` l. 735) ; même `verifier.id` qu'au 14/11 |
+| W6 | **Scan `ok`** ; énoncés vérifiés : 1 (`ca8946f4…`, `scannedAt` 2026-11-16T16:08:24Z, base du 16/11 06:30:54Z, 0 KEV), plus un par passage planifié réussi du CronJob du deb depuis ; le plus récent retenu | Haute pour `ok` (L10) ; le nombre dépend de l'heure du lancement |
+| W7 | Job de la porte `1/` ; `bilan : tout OK`, code 0 ; avec W1 et W2 lues dans le journal : **U14 tenue** | Haute si W1 à W6 tiennent |
+
+**Effets.** Job `porte-s6a-deb` recréé dans l'espace `porte` ; un passage d'horodatage. Aucune étape des lignes 11 et 12 ne lance
+de PipelineRun dans `builds` ; seul `rattrapage-deb` le pourrait. Rien d'écrit dans Zot hors de ce passage. Lignes `S6a porte` et
+`S6a porte fait` dans `chrono.tsv`.
+**Cas d'échec.**
+- VSA `refus` avec W1 tenue : VSA de D écartée par `vsa.sh` (motif dans la ligne `ECARTE` du conteneur `vsa`) ; arrêt et décision.
+- Scan `refus` par `scan_recent` : porte passée plus de 7 jours après le dernier scan réussi de D.
+- Provenance jugée autre que `c3d27e05` (W2) : la politique figée veut que la VSA cite la provenance que juge la porte. Un autre
+  UID casse ce critère, même si `vsa.sh` rend `ok`. U14 n'est alors pas déclarée tenue sans décision du propriétaire. Un
+  PipelineRun recréé par `rattrapage-deb` ajouterait aussi deux enveloppes à D : W4 (8/8) et le témoin de M8 (8 énoncés)
+  changeraient avec lui.
+
+**Délai.** Aucune borne propre à la porte avant 2026-11-23T16:08:24Z (`scannedAt` de L9 plus 7 jours), tant que le CronJob du
+deb ne réussit aucun passage ; chaque passage réussi la repousse.
+**Contrôles à sec faits.** `bash -n s6a.sh`, code 0 ; diffs et recherches ci-dessus. Rien lu dans le cluster, dans Zot ni sur
+`sc-stockage`.

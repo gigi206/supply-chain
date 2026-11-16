@@ -634,3 +634,13 @@ Prochaine ligne : `s6b.sh repetition` (M4, lien établi, non comptée), sur acco
 reconstruit dans `sc-replay`, lien établi et non comptée (deb `f66bbeb2…`, couche `d8f9685c…`, manifeste `60f25f5c…`,
 `PASSED`, 65 s).
 Prochaine ligne : `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5, lien coupé), pas avant 2026-11-16T20:38:15Z, sur accord nommé.
+
+## Carte, ligne 12 : additif de prédictions préparé à sec (note de 2026-11-16T16:41:27Z ; rien n'est réécrit)
+Préparé pendant l'attente de M5, après « j'ai besoin que tu avances » ; relu par le conseiller avant commit. Additif W1 à W7 dans
+[`s6a-service-predictions.md`](s6a-service-predictions.md) : une commande, `DISTRO=rke2 s6a.sh porte`, après M8 seulement.
+- `etape_porte` adapte son attente au nombre de VSA de D : lancée avant `pousser_vsa`, elle rendrait 0 sans mesurer U14. La
+  prédiction exige `1, VSA attendue : ok` et la provenance jugée `c3d27e05`, lues dans le journal.
+- Code de la porte inchangé dans le dépôt depuis celle du 14/11 (`040a891`), hors des constantes du deb ; ConfigMap `porte` non
+  relue, réappliquée par aucune étape depuis S5.
+Rien lancé, rien lu dans le cluster, dans Zot ni sur `sc-stockage`.
+Prochaine ligne : `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5, lien coupé), pas avant 2026-11-16T20:38:15Z, sur accord nommé.
