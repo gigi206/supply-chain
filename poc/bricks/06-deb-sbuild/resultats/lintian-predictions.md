@@ -96,3 +96,40 @@ part. Les sorties d'erreur de lintian (root projeté) sont relevées, pas prédi
 - Espace de noms éprouvé sur un dossier vide du scratchpad : root projeté (UID 0), seule interface `lo`, `/dev` de l'hôte lié par
   `mount --rbind`.
 - Non éprouvés : `chroot` dans la racine, apt et dpkg dans l'espace de noms, lintian.
+
+## Additif : commande 0, relevé de santé de lintian (écrit à 2026-11-16T17:06:51Z, préparé à sec sans accord nommé) : NON LANCÉ
+
+Préparé en suite de la décision « Relevé de santé d'abord (Recommandé) », après le message « Continue » du propriétaire, qui ne
+répond pas à la question « Je prépare le relevé de santé de lintian pour docs/04 ? » ; rien n'est lancé.
+Script : [`../sante-lintian.sh`](../sante-lintian.sh), nouveau. Une commande, **sur accord nommé**, code relevé juste après :
+`mise exec -- poc/bricks/06-deb-sbuild/sante-lintian.sh salsa debian`. Lectures publiques et anonymes, en https seulement
+(redirections https comprises) : salsa.debian.org (API GitLab v4, projet `lintian/lintian`), sources.debian.org,
+security-tracker.debian.org. Journaux `resultats/sante-lintian-salsa.log` et `resultats/sante-lintian-debian.log` ; cache
+`~/.cache/supply-chain-poc/06/sante-lintian/`. Toute lecture ou analyse en échec (erreur HTTP, forme de réponse inattendue,
+changelog sans entrée lisible) écrit une ligne `KO` et arrête l'étape ; le code vaut 1 dès qu'une ligne `KO` sort. Rien
+d'installé, rien dans le cluster ni dans Zot. Le verdict est écrit ensuite au doc 04 (§4, projets hors GitHub), avec le journal
+pour preuve ; lintian est alors ajouté à `tools/health/projects.tsv` (§7, étape 1), comme sbuild et mmdebstrap.
+
+| # | Étape | Prédiction | Confiance |
+|---|---|---|---|
+| Z1 | `salsa` | Projet `lintian/lintian` trouvé, non archivé ; tags lus ; dernier tag et sa date non prédits ; aucune ligne `KO` | Moyenne : API GitLab de salsa jamais lue par ce dépôt, forme des réponses prise de la documentation de GitLab |
+| Z2 | `salsa` | Au moins un commit sur 90 jours ; nombre et auteurs non prédits ; employeurs **non établis** (adresses debian.org ou personnelles) | Haute pour « non établis » ; moyenne pour l'activité |
+| Z3 | `salsa` | Fusionneurs de 100 MR fusionnées (les plus récemment mises à jour) et période couverte non prédits. Signature du dernier tag : relevée telle que l'API la rapporte ; un 404 ne prouve pas l'absence de signature GPG, et rien n'en sera déduit | Sans objet |
+| Z4 | `salsa` | `SECURITY.md` : HTTP 404 (absent) ; non bloquant pour un outil de distro (§1 du doc 04) ; Scorecard n/d (hors GitHub) | Moyenne |
+| Z5 | `debian` | `2.122.0` listée dans la suite `trixie` ; une version dans `sid`, égale ou plus récente ; date de l'entrée `2.122.0` du changelog relevée ; au moins une entrée sur 12 mois ; aucune entrée illisible ; Maintainer : l'équipe de lintian (liste debian.org) ; aucune ligne `KO` | Haute pour trixie (index de l'instantané, `lintian.sh`) ; moyenne pour le reste |
+| Z6 | `debian` | Entrées CVE et TEMP du security tracker : nombre non prédit ; le compte ne distingue pas ouvert de résolu, seules les rubriques « Open issues » et « Resolved issues » sont relevées présentes ou non | Sans objet |
+| Z7 | verdict | **Aucun critère « Risqué »** (release de moins de 12 mois, projet non archivé, plus d'un signataire d'upload sur 12 mois) ; verdict attendu **« À surveiller, hors chemin critique »** : Scorecard n/d et employeurs non établis. Hors chemin critique : lintian juge le paquet source, ne produit ni ne signe aucun artefact, et la porte ne le lit pas. Critère « releases signées » : jugé sur la version employée, comme les rpm signés de Rocky pour rpm et createrepo_c : `.deb` de l'instantané, sous l'InRelease vérifié par gpgv (Y1), puis sha256 du verrou (Y3) ; pas sur les tags de salsa | Moyenne |
+
+**Cas d'échec.**
+- Un critère « Risqué » mesuré : lintian est interdit (règle du propriétaire) ; l'étape lintian est suspendue, décision du
+  propriétaire.
+- Verdict limite (par exemple un seul signataire d'upload sur 12 mois, ou une seule personne pour presque toutes les fusions) :
+  la décision revient au propriétaire, comme pour debuerreotype et OSS Rebuild ; aucun verdict écrit sans elle.
+- Une ligne `KO` (réseau, HTTP, forme de réponse) : arrêt, rien relancé sans nouvel accord.
+
+**Contrôles à sec faits (16/11/2026).** `bash -n` et shellcheck (`-S warning`), sans avertissement. Analyse du changelog
+(Python) passée sur des copies fabriquées : dates, signataires, fenêtres de 6 et 12 mois, date de la version employée, lecture
+arrêtée à la première entrée de plus de 12 mois après elle ; témoins négatifs : une date illisible et une date sans fuseau
+(`-0000`) comptées illisibles, sans trace ; changelog vide : `KO`, code 1. `debian/control` (awk) : adresses réduites à leur
+domaine. Expressions jq passées sur des JSON fabriqués (fusionneurs, période des MR, tags, suites) ; témoin négatif : JSON de forme
+inattendue, `KO`, code 1. Aucune lecture réseau faite à sec : les URL et la forme des réponses ne sont pas éprouvées.
