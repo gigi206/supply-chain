@@ -182,3 +182,12 @@ Lancée sur « Lance le » (réponse à « Je lance lintian.sh telecharger (rés
 (`06588f5e…`) ; 157 `.deb` téléchargés et contrôlés (sha256 et taille), 0 déjà présent ; 22 984 704 octets ; 157 fichiers `.deb`
 dans le dossier. **Y3 tenue.** Prochaine commande : `lintian.sh installer` (hors réseau), sur accord nommé.
 
+### Résultat de la commande 4, `installer` (écrit à 2026-11-16T17:19:46Z)
+
+Lancée sur « Oui » (réponse à « Je lance lintian.sh installer (hors réseau) ? »), de 2026-11-16T17:19:27Z à 17:19:35Z,
+**code 0**, `bilan : tout OK` : [`lintian-installer.log`](lintian-installer.log). Verrou inchangé ; racine réextraite
+(`f8f221ca…`, 350 Mo) ; 157 `.deb` recontrôlés dans la racine ; `dpkg -i` code 0, 157 lignes « Setting up », 0 ligne d'erreur ;
+0 paquet hors de l'état `ii` ; installés = racine + verrou (323 paquets = 166 + 157, liste `cc8c2995…`) ; lintian `2.122.0` ;
+`dpkg --audit` vide. **Y4 tenue** : premier `chroot`, premier dpkg et scripts de maintenance dans l'espace de noms, sans incident
+relevé. Prochaine commande : `lintian.sh juger` (hors réseau), sur accord nommé.
+

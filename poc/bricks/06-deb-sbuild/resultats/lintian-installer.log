@@ -1,0 +1,15 @@
+# lintian.sh installer, 2026-11-16T17:19:27Z
+OK   verrou commité et inchangé : 157 paquet(s), sha256 06588f5edb9d690f61198e53c8ceff261013fb1dfff936f29ef24a4bf9a54187
+OK   racine.tar : f8f221cadb6fe64ad6b3cf3a4baf6464ffe860d0cca80691dc3a47739381ca44
+racine extraite dans ~/.cache/supply-chain-poc/06/lintian/chroot (350 Mo)
+OK   157 .deb recontrôlés dans la racine
+## dpkg -i (hors réseau)
+lignes « Setting up » : 157 ; lignes d'erreur : 0
+OK   code de dpkg -i : 0
+## paquets installés
+OK   paquets dans un autre état que ii : 0
+OK   installés = racine + verrou : cc8c2995ae3dc18fa126a307dc65a2d441a5334c11782f17a0f115e6c174d684
+paquets installés : 323
+OK   lintian : 2.122.0
+OK   dpkg --audit : 0
+bilan : tout OK
