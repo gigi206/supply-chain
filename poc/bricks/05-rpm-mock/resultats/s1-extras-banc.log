@@ -1,0 +1,67 @@
+# banc-extras.sh, 2026-11-16T23:23:49Z, python3 3.15.2
+# s1.sh du dépôt 710f3904acd20cd17a4c4c0156fc75083b8b07bf49b5b1d3964b249405224290 ; copie modifiée ad9febc5da084f95b0f4006b540c1b0806b0bf85bff4c043ba83bef6e28b8e90
+## A : lignes changées
+OK   lignes retirées : 5
+OK   lignes ajoutées : 9
+> #               Ajout extras (../s1-extras.patch, préparé à sec le 16/11/2026, NON APPLIQUÉ ; décision du propriétaire
+> #               « Extras sur vault ») : le dépôt extras du modèle rocky-9 passe lui aussi du mirrorlist (9.8, mouvant) à la
+> #               baseurl fixe de vault 9.7 ; hote vérifie aussi son repomd.xml par gpgv ; la sonde d'essais s'arrête avant mock
+> #               s'il reste un mirrorlist pour BaseOS, AppStream, CRB ou extras
+<   for n in BaseOS AppStream CRB; do
+>   for n in BaseOS AppStream CRB extras; do
+< # Configuration de mock : modèle rocky-9 de mock-core-configs 45.2-1, mirrorlist de BaseOS, AppStream et CRB remplacés par les
+> # Configuration de mock : modèle rocky-9 de mock-core-configs 45.2-1, mirrorlist de BaseOS, AppStream, CRB et extras remplacés par les
+< for r in ('BaseOS', 'AppStream', 'CRB'):
+> for r in ('BaseOS', 'AppStream', 'CRB', 'extras'):
+< n=$(grep -o -E "mirrorlist=[^[:space:]\\\\]*repo=(BaseOS|AppStream|CRB)-[$]releasever([^-]|$)" /w/debug-config.log | wc -l)
+< echo "mirrorlist restants pour BaseOS, AppStream et CRB : $n"
+> n=$(grep -o -E "mirrorlist=[^[:space:]\\\\]*repo=(BaseOS|AppStream|CRB|extras)-[$]releasever([^-]|$)" /w/debug-config.log | wc -l)
+> echo "mirrorlist restants pour BaseOS, AppStream, CRB et extras : $n"
+## B : MOCK_CFG exécuté sur le dnf.conf de rocky-9.tpl
+OK   sha256 de l'archive de mock gardée : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+OK   rocky-9.tpl dans l'archive : 1
+OK   MOCK_CFG : lignes qui diffèrent entre avant et après : 2
+### avant
+sections : 26 ; actives hors main : ['baseos', 'appstream', 'crb', 'extras']
+  baseos : baseurl https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/ ; mirrorlist -
+  appstream : baseurl https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/ ; mirrorlist -
+  crb : baseurl https://dl.rockylinux.org/vault/rocky/9.7/CRB/x86_64/os/ ; mirrorlist -
+  extras : baseurl - ; mirrorlist https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-$releasever
+toutes les sections actives en baseurl fixe de vault 9.7 : False
+### apres
+sections : 26 ; actives hors main : ['baseos', 'appstream', 'crb', 'extras']
+  baseos : baseurl https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/ ; mirrorlist -
+  appstream : baseurl https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/ ; mirrorlist -
+  crb : baseurl https://dl.rockylinux.org/vault/rocky/9.7/CRB/x86_64/os/ ; mirrorlist -
+  extras : baseurl https://dl.rockylinux.org/vault/rocky/9.7/extras/x86_64/os/ ; mirrorlist -
+toutes les sections actives en baseurl fixe de vault 9.7 : True
+actives appstream,baseos,crb,extras appstream,baseos,crb,extras
+mirrorlist-actifs 1 0
+sections-changees extras
+extras-debug-inchange True
+OK   sections actives, avant puis après : appstream,baseos,crb,extras appstream,baseos,crb,extras
+OK   sections actives encore en mirrorlist, avant puis après : 1 0
+OK   sections changées par le correctif : extras
+OK   extras-debug inchangé : True
+OK   baseurl d'extras après : https://dl.rockylinux.org/vault/rocky/9.7/extras/x86_64/os/
+## C : garde de la sonde
+OK   ligne de garde trouvée, dépôt puis copie : 1 1
+OK   texte, modèle brut : garde du dépôt puis de la copie : 3 4
+OK   texte, remplacement du dépôt (extras restant) : garde du dépôt puis de la copie : 0 1
+OK   texte, remplacement de la copie : garde de la copie : 0
+OK   repr, modèle brut : garde du dépôt puis de la copie : 3 4
+OK   repr, remplacement du dépôt (extras restant) : garde du dépôt puis de la copie : 0 1
+OK   repr, remplacement de la copie : garde de la copie : 0
+OK   le modèle brut a extras-debug et extras-source en mirrorlist (exclus par ([^-]|$)) : 2
+## D : boucle vault 9.7 de hote
+OK   boucle extraite (lignes) : 7
+OK   boucle simulée : code : 0
+OK   repomd.xml signés (simulés) : 4
+OK   URL demandées : 8
+OK   URL d'extras : 2
+## E : bash -n et shellcheck
+OK   bash -n de la copie : 0
+OK   version de shellcheck : 0.11.0
+OK   shellcheck -S warning de la copie : code : 0
+OK   remarques shellcheck (tous niveaux), dépôt puis copie : 13 13
+# bilan : tenu, fin 2026-11-16T23:23:51Z

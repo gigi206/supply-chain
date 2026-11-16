@@ -342,3 +342,79 @@ Question : « J'applique l'ajout N3 et N4 et je le commite ? ». Réponse : « O
 
 Suite, chaque point sur accord nommé : push ; décision `extras` ; `amorce`, `hote` de nouveau, `racine`, `image`, `essais`,
 `verrou`.
+
+## Décision `extras` et correctif préparé à sec (note du 2026-11-16, écrite à 2026-11-16T23:27:15Z ; rien n'est réécrit ; NON APPLIQUÉ)
+
+Question : « Quel sort pour le dépôt extras de mock ? ». Réponse : « Extras sur vault ». La recommandation avait été relue par le
+conseiller avant d'être présentée.
+
+**Faits qui la fondent** (déjà archivés) :
+- `releve6` (X6) : seul `extras` restait actif hors de vault 9.7, par mirrorlist ([m2-predictions.md](m2-predictions.md)).
+- `releve7` (Y2 à Y7) : ce mirrorlist sert `/9.8/extras/`, une version qui bouge. `vault/rocky/9.7/extras` existe, signé par la clé
+  de Rocky. Par nom et par provides, aucun paquet de `chroot_setup_cmd` n'en vient.
+- Le banc OBS de référence n'avait que BaseOS et AppStream. `rocky_9` de
+  [`poc.meta.xml`](../../../benchmarks/obs/projets/poc.meta.xml) renvoie à `Rocky:9.7/standard`, qui renvoie à `appstream` et
+  `baseos` ([`Rocky-9.7.meta.xml`](../../../benchmarks/obs/projets/Rocky-9.7.meta.xml)). CRB n'y était pas non plus, et S1
+  l'épingle déjà sur vault 9.7.
+  - La règle que S1 applique de fait est donc : tous les dépôts que le modèle `rocky-9.tpl` active sont mis sur vault 9.7.
+    Elle se déduit de D2 (a) et du choix de ce jour ; le propriétaire a choisi une option, il n'a pas énoncé cette règle.
+  - L'écart de CRB avec la référence n'est pas décidé ici.
+
+**Ce que fait le correctif** ([`s1-extras.patch`](../s1-extras.patch), sha256 `2d4ef595…`, sur `s1.sh` `710f3904…`) :
+1. `MOCK_CFG` : `extras` est ajouté au remplacement des mirrorlist par les baseurl fixes de vault 9.7.
+2. Garde de la sonde d'`essais` : `extras` est compté avec BaseOS, AppStream et CRB, et mock n'est pas lancé s'il reste un
+   mirrorlist. `str.replace` ne dit rien quand il ne trouve rien : la garde est le seul contrôle qui voit un remplacement sans
+   effet. `([^-]|$)` écarte toujours `extras-debug` et `extras-source`.
+3. `hote` : le `repomd.xml` d'`extras` de vault 9.7 est vérifié par gpgv, comme les trois autres.
+4. Quatre lignes d'en-tête décrivent l'ajout ; on y ajoutera une ligne datée s'il est appliqué.
+
+Cela corrige deux phrases, sans les réécrire :
+- le paragraphe « Passage de `releve6` » (12/11) du [README](../README.md) (« la sonde de S1 le listera sans s'arrêter ») ;
+- la ligne « Dépôts de debug et de sources » de ce fichier (garde limitée à BaseOS, AppStream et CRB).
+Une fois le correctif appliqué, la sonde s'arrête aussi pour `extras`.
+
+**Banc hors réseau** ([script](s1-extras-banc.sh), [journal](s1-extras-banc.log)), le 16/11/2026 de 23:23:49 à 23:23:51 UTC :
+27 OK, 0 KO.
+- Diff : 5 lignes retirées, 9 ajoutées, rien d'autre.
+- `MOCK_CFG` du dépôt et de la copie : chacun est développé par bash, puis exécuté par python3 sur le `dnf.conf` de `rocky-9.tpl`.
+  Ce modèle est lu, jamais exécuté, dans l'archive de mock 6.9-1 gardée par `releve`, au sha256 `3c034916…` contrôlé.
+  - Avant le correctif : 4 sections actives, dont `extras` en mirrorlist.
+  - Après : les 4 sections sont en baseurl de vault 9.7, et celle d'`extras` vaut `…/vault/rocky/9.7/extras/x86_64/os/`. C'est
+    le chemin dont `releve7` a vérifié la signature : dossier `extras/` retenu sous vault 9.7 et `repomd.xml` signé par la
+    clé de Rocky ([m2-releve7.log](m2-releve7.log), lignes 19, 20 et 36), chemin composé par `m2.sh` en
+    `$v/${x%/}/x86_64/os`.
+  - Seule la section `extras` change ; `extras-debug` est inchangée.
+- Garde : la ligne est lancée telle quelle par `sh`, sur le texte et sur sa forme repr. Les comptes sont donnés pour l'ancienne
+  garde, puis pour la nouvelle :
+  - modèle brut : 3, puis 4 ;
+  - remplacement du dépôt actuel, où `extras` reste en mirrorlist : 0, puis 1. C'est ce que le correctif fait voir ;
+  - remplacement de la copie : 0 avec la nouvelle garde.
+- Boucle de `hote`, extraite de la copie, avec `curl`, `gpgv` et `attendu` simulés : 4 signatures et 8 URL, dont les 2 d'`extras`.
+- `bash -n` passe. shellcheck 0.11.0 ne relève aucun avertissement et compte 13 remarques, avant comme après.
+- Un premier passage du banc, le 16/11/2026 de 23:23:37 à 23:23:39 UTC, bilan tenu, a été écrasé dans le scratchpad et n'est
+  pas archivé. Le script du banc a ensuite reçu une ligne, `: "$VAULT97" "$FP_ROCKY"`, pour un avertissement de shellcheck sur
+  le banc lui-même. Le passage archivé est celui d'après.
+- **Banc N3/N4 repassé sur la copie** ([journal](s1-extras-banc-n34.log)), le 16/11/2026 de 23:23:51 à 23:23:52 UTC : 35 OK, 0 KO.
+- **Non couvert** :
+  - le vrai affichage de `mock --debug-config` ;
+  - un vrai dnf ;
+  - la signature réelle d'`extras` aujourd'hui (Y3 date du 12/11) ;
+  - le contenu réel du buildroot.
+
+**Couplages hors de `s1.sh`, non modifiés** ([`m2.sh`](../m2.sh)) :
+- `releve6` contrôle le texte exact de la boucle de `s1.sh`. S'il était rejoué, il s'arrêterait en KO (« releve6 à revoir »).
+  C'est une mesure passée et archivée, dont le rejeu n'est pas prévu.
+- `voie2_preparer` n'accepte que les URL sous BaseOS, AppStream et CRB de vault 9.7. Un paquet venu d'`extras` y serait refusé :
+  KO, pas de faux OK. Cela ne se décide que si le cas se présente (voir EX2).
+
+**Prédictions** (écrites avant tout passage ; elles complètent HB1 à HB8 pour le prochain `hote`, et P1 à P12 pour `essais`) :
+
+| | Prédiction | Confiance |
+|---|---|---|
+| HX1 | `hote` : le `repomd.xml` d'`extras` de vault 9.7 est signé par la clé de Rocky (`VALIDSIG` `FP_ROCKY`) ; sha256 relevé, non prédit | Haute (Y3, dépôt figé) |
+| HX2 | `hote` : 15 lignes OK au lieu de 14, dont 4 pour vault 9.7 au lieu de 3 ; aucune KO ; HB1 à HB8 inchangées | Moyenne-haute (HB6 et HB7 restent les points faibles) |
+| EX1 | `essais` : la sonde affiche 4 baseurl de vault 9.7 (BaseOS, AppStream, CRB, `extras`) parmi les « dépôt de mock », et « mirrorlist restants pour BaseOS, AppStream, CRB et extras : 0 » ; les mirrorlist des dépôts inactifs restent listés | Moyenne (format réel de `--debug-config` non lu) |
+| EX2 | `verrou` : aucune URL sous `/extras/` dans le verrou, donc aucun paquet du buildroot venu d'`extras`. Les journaux d'`essais` ne sont pas retenus comme lecture : qu'ils donnent le dépôt de chaque paquet n'est pas vérifié | Moyenne (Y5 et Y6 par nom ; une dépendance indirecte n'est pas exclue) |
+
+Suite, chaque point sur accord nommé : appliquer le correctif (une ligne datée à l'en-tête de `s1.sh`) et le commiter ; `amorce`,
+`hote` de nouveau (HB1 à HB8, HX1, HX2), `racine` (lire `rpm` dans sa liste), `image`, `essais`, `verrou`.
