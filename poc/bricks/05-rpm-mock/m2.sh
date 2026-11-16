@@ -116,6 +116,8 @@
 #               m2-releve9-premier-passage.log).
 #               Complété à sec le 16/11/2026, après ce passage, sur relecture du conseiller, NON RELANCÉ : chemin, drapeaux, mode
 #               et taille de chaque entrée au bit 2 hors de /usr/share/doc/, et de chaque entrée à un bit autre que 2 et 128.
+#               Relancé le 16/11/2026 à 19:23:02 UTC (« Oui »), code 0 : H12 à H14 tenues ; /usr/lib/golang/VERSION au bit 2
+#               (%doc) ; 33 entrées à 4096 sous /usr/lib/.build-id (m2-releve9.log).
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le

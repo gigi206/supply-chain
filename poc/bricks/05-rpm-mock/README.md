@@ -363,3 +363,6 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Non prévu : une troisième entrée marquée doc hors de `/usr/share/doc/`, non identifiée.
 
 **Complément de `releve9` (écrit à 18:46:26 UTC), préparé à sec, NON RELANCÉ** : le lecteur liste en plus les entrées au bit 2 hors de `/usr/share/doc/` et celles à un bit autre que 2 et 128 ; même rpm, même accès réseau. Banc rejoué, dix-sept cas au code attendu. Prédictions H12 à H14 ([détail](resultats/m2-predictions.md)) ; journal du premier passage renommé [m2-releve9-premier-passage.log](resultats/m2-releve9-premier-passage.log).
+
+**Second passage de `releve9` (complément), le 16/11/2026 à 19:23:02 UTC (« Oui »)** (écrit à 19:23:32 UTC) : code 0 ([journal](resultats/m2-releve9.log)), H12 à H14 tenues. L'entrée inconnue est `/usr/lib/golang/VERSION`, marquée `%doc` comme la notice ; les 33 entrées à 4096 sont sous `/usr/lib/.build-id/`. Ce que Go fait sans `VERSION` n'est pas mesuré.
+- Temps passé : 4,93 h de commits à HEAD 05ac074, même méthode ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées (personnes-semaines, unité de l'ADR 0000) ; décision avec toi à 5 pw.

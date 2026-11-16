@@ -759,3 +759,17 @@ Sur relecture du conseiller, pendant l'attente de M5 de la 06. Le premier passag
 | H13 | Les 33 entrées à 4096 sont listées ; aucune n'est sous `/usr/share/doc/` | Haute pour le décompte (premier passage) ; chemins non prédits | Descriptif ; valeur 4096 non interprétée (table de mémoire) |
 | H14 | Tout le reste comme au premier passage : mêmes sha256 (`06f01d40…`, `5ebd7026…`), signature VALIDSIG, 64 fichiers, répartition 62, 3 et 33, charge zstd, code 0 | Haute : vault figé | Écart : vault 9.7 a changé entre les deux passages, à noter |
 
+## Second passage de `releve9` (complément), le 16/11/2026 à 19:23:02 UTC (« Oui » à « Je relance m2.sh releve9 (complément) ? »), code 0 (écrit à 19:23:32 UTC)
+
+Fin à 19:23:08 UTC (`chrono.tsv`). Journal : [m2-releve9.log](m2-releve9.log), 262 lignes ; fichiers effacés. Les liens vers `m2-releve9.log` écrits au premier passage mènent désormais à ce journal ; celui du premier passage est [m2-releve9-premier-passage.log](m2-releve9-premier-passage.log).
+
+| # | Résultat |
+|---|---|
+| H12 | **Tenue** : l'entrée au bit 2 hors de `/usr/share/doc/` est `/usr/lib/golang/VERSION` (mode 100644, 60 octets) |
+| H13 | **Tenue** : les 33 entrées à 4096 sont toutes sous `/usr/lib/.build-id/` (17 dossiers et 16 liens symboliques) ; aucune sous `/usr/share/doc/` |
+| H14 | **Tenue** : mêmes sha256 (`06f01d40…`, `5ebd7026…`), VALIDSIG par `21CB256A…`, 64 fichiers, répartition 62, 3 et 33, charge zstd, code 0 |
+
+**Ce que cela ajoute pour Q1** : dans le rpm `golang`, `VERSION` du GOROOT est marqué `%doc`, comme la `LICENSE` et le `PATENTS`. Une installation sans documentation l'écarterait aussi, selon le rôle prêté au bit 2 (comportement de rpm non lu) ; ce que Go fait sans `VERSION` n'est pas mesuré. Les deux maillons non mesurés (le `dnf.conf` lu par dnf, les macros de l'image `$BOOT`) restent à mesurer au premier build.
+
+Le journal des témoins ([m2-releve9-temoins.log](m2-releve9-temoins.log), 18:24:47 UTC) date d'avant le complément : il cite le lecteur à 178 lignes (`ffce621e…`). Les lignes ajoutées viennent après le contrôle où `basesystem` s'arrête, et ne tournent pas sur ce témoin.
+

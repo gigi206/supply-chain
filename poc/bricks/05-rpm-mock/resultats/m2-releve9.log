@@ -1,0 +1,262 @@
+# m2.sh releve9, 2026-11-16T19:23:02Z
+## partie hors réseau : archive du tag mock-6.9-1 gardée par releve (lue, jamais exécutée)
+OK   sha256 de l'archive : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+OK   mock-core-configs de l'archive : 45.2 ; épingle de s1.sh : mock-core-configs 45.2-1.el9
+### nodocs, tsflags et excludedocs, sans distinction de casse, dans toute l'archive (tests compris)
+  ./mock/py/mockbuild/plugins/selinux.py:36:       - option '--setopt=tsflags=nocontext' is appended to each 'yum' command
+  ./mock/py/mockbuild/plugins/selinux.py:99:        option = "--setopt=tsflags=nocontexts"
+  ./docs/Plugin-SELinux.md:9:* option `--setopt=tsflags=nocontext` is appended to each 'yum' command
+### mock/py/mockbuild/package_manager.py, lignes 140 à 150 (ancre 147 : « self.is_bootstrap_image = buildroot.uses_bootstrap_image »)
+  140:         self.config = config
+  141:         self.plugins = plugins
+  142:         # the buildroot we install into
+  143:         self.buildroot = buildroot
+  144:         self.init_install_output = ""
+  145:         self.bootstrap_buildroot = bootstrap_buildroot
+  146:         # self.buildroot generated from bootstrap image
+  147:         self.is_bootstrap_image = buildroot.uses_bootstrap_image
+  148:         self.pkg_manager_config = ""
+  149: 
+  150:         self.command = self.get_command(config)
+### mock/py/mockbuild/package_manager.py, lignes 155 à 165 (ancre 157 : « self.common_opts = copy.copy(config.get(f'{self.name}_common_opts', [])) »)
+  155:             self.builddep_command = [builddep_override, "builddep"]
+  156: 
+  157:         self.common_opts = copy.copy(config.get(f'{self.name}_common_opts', []))
+  158: 
+  159:         disabled_plugins = self.config.get(f"{self.name}_disable_plugins", [])
+  160:         self.common_opts.extend([f"--disableplugin={x}" for x in
+  161:                                  disabled_plugins])
+  162: 
+  163:         if 'forcearch' in self.config and self.config['forcearch']:
+  164:             self.common_opts.extend(['--forcearch', self.config['forcearch']])
+  165: 
+### mock/py/mockbuild/config.py, lignes 374 à 380 (ancre 378 : « config_opts['dnf4_common_opts'] = [ »)
+  374:     config_opts["yum_avoid_opts"] = {}
+  375: 
+  376:     config_opts['dnf4_command'] = '/usr/bin/dnf-3'
+  377:     config_opts['dnf4_system_command'] = '/usr/bin/dnf-3'
+  378:     config_opts['dnf4_common_opts'] = ['--setopt=deltarpm=False', '--setopt=allow_vendor_change=yes', '--allowerasing']
+  379:     config_opts['dnf4_install_command'] = 'install python3-dnf python3-dnf-plugins-core'
+  380:     config_opts['dnf4_disable_plugins'] = ['local', 'spacewalk', 'versionlock']
+### mock/py/mockbuild/package_manager.py, lignes 211 à 251 (ancre 237 : « if self.support_installroot and not self.is_bootstrap_image: »)
+  211:                 # rpm installed into bootstrap by host's package management
+  212:                 _do("installed into bootstrap", cmd + [
+  213:                     "--root", self.bootstrap_buildroot.make_chroot_path()
+  214:                 ])
+  215:         else:
+  216:             # Execute with installroot from host
+  217:             _do("from host and used with --installroot", cmd)
+  218: 
+  219:     @traceLog()
+  220:     def build_invocation(self, *args):
+  221:         invocation = []
+  222:         args = list(args)
+  223:         cmd = args[0]
+  224:         opts = self.adjust_command_options(cmd, copy.copy(self.common_opts))
+  225:         if cmd == 'builddep':
+  226:             args = args[1:]
+  227:             invocation += self.builddep_command
+  228:             opts += self.config.get(self.name + '_builddep_opts', [])
+  229:         elif cmd == 'resolvedep':
+  230:             if self.resolvedep_command:
+  231:                 args = args[1:]
+  232:                 invocation = self.resolvedep_command
+  233:             else:
+  234:                 invocation = [self.command]
+  235:         else:
+  236:             invocation = [self.command]
+  237:         if self.support_installroot and not self.is_bootstrap_image:
+  238:             invocation += ['--installroot', self.buildroot.make_chroot_path('')]
+  239:         if cmd in ['upgrade', 'update', 'module']:
+  240:             invocation += ['-y']
+  241:         releasever = self.config['releasever']
+  242:         if releasever:
+  243:             invocation += ['--releasever', str(releasever)]
+  244:         if not self.config['online']:
+  245:             invocation.append('-C')
+  246:         if self.config['enable_disable_repos']:
+  247:             invocation += self.config['enable_disable_repos']
+  248: 
+  249:         invocation += (args + opts) if self.place_common_opts_after else (opts + args)
+  250: 
+  251:         return invocation
+### mock/py/mockbuild/package_manager.py, lignes 284 à 339 (ancre 322 : « if not self.support_installroot or self.is_bootstrap_image: »)
+  284:     @traceLog()
+  285:     def _execute_mounted(self, *args, **kwargs):
+  286: 
+  287:         # intentionally we do not call bootstrap hook here - it does not have sense
+  288:         env = self.config['environment'].copy()
+  289:         env.update(util.get_proxy_environment(self.config))
+  290:         # installation-time specific homedir
+  291:         env['HOME'] = self.buildroot.prepare_installation_time_homedir()
+  292:         env['LC_MESSAGES'] = 'C.UTF-8'
+  293:         if self.buildroot.nosync_path:
+  294:             env['LD_PRELOAD'] = self.buildroot.nosync_path
+  295:         invocation = self.build_invocation(*args)
+  296:         self.buildroot.root_log.debug(invocation)
+  297:         kwargs.setdefault("pivot_root_chroot", self.buildroot.config.get("pivot_root_chroot", False))
+  298:         kwargs['printOutput'] = kwargs.get('printOutput', True)
+  299:         if not self.config['print_main_output']:
+  300:             kwargs.pop('printOutput', None)
+  301:         else:
+  302:             kwargs.setdefault("pty", True)
+  303:         self.buildroot.nuke_rpm_db()
+  304: 
+  305:         error = None
+  306:         max_attempts = int(self.config['package_manager_max_attempts'])
+  307:         for attempt in range(max(max_attempts, 1)):
+  308:             if error:
+  309:                 sleep_seconds = int(self.config['package_manager_attempt_delay'])
+  310:                 self.buildroot.root_log.warning(
+  311:                         "%s command failed, retrying, attempt #%s, sleeping %ss",
+  312:                     self.name.upper(), attempt + 1, sleep_seconds)
+  313:                 time.sleep(sleep_seconds)
+  314: 
+  315:             try:
+  316:                 # either it does not support --installroot (microdnf) or
+  317:                 # it is bootstrap image made by container with incomaptible dnf/rpm
+  318:                 personality = kwargs.pop("personality", None)
+  319:                 if self.buildroot.is_bootstrap and not self.buildroot.config["forcearch"]:
+  320:                     personality = self.buildroot.config["repo_arch"]
+  321: 
+  322:                 if not self.support_installroot or self.is_bootstrap_image:
+  323:                     out = util.do(invocation, env=env,
+  324:                                   chrootPath=self.buildroot.make_chroot_path(),
+  325:                                   personality=personality, **kwargs)
+  326:                 elif self.bootstrap_buildroot is None:
+  327: 
+  328: 
+  329:                     out = util.do(invocation, env=env,
+  330:                                   personality=personality, **kwargs)
+  331:                 else:
+  332:                     out = util.do(invocation, env=env,
+  333:                                   chrootPath=self.bootstrap_buildroot.make_chroot_path(),
+  334:                                   nspawn_args=self.bootstrap_buildroot.config['nspawn_args'],
+  335:                                   personality=personality, **kwargs)
+  336:                 error = None
+  337:                 break
+  338:             except Error as e:
+  339:                 error = YumError(str(e))
+### mock/py/mockbuild/package_manager.py, lignes 700 à 709 (ancre 706 : « dnfconf_path = self.buildroot.make_chroot_path('etc', 'dnf', 'dnf.conf') »)
+  700:     def initialize_config(self):
+  701:         super(Dnf, self).initialize_config()
+  702:         config_content = self.get_pkg_manager_config()
+  703:         self.pkg_manager_config = config_content
+  704:         check_yum_config(config_content, self.buildroot.root_log)
+  705:         file_util.mkdirIfAbsent(self.buildroot.make_chroot_path('etc', 'dnf'))
+  706:         dnfconf_path = self.buildroot.make_chroot_path('etc', 'dnf', 'dnf.conf')
+  707:         file_util.write_if_changed(dnfconf_path, config_content)
+  708:         self.initialize_vars()
+  709: 
+### mock/py/mockbuild/buildroot.py, lignes 1155 à 1158 (ancre 1158 : « return self.is_bootstrap and self.use_chroot_image »)
+  1155: 
+  1156:     @property
+  1157:     def uses_bootstrap_image(self):
+  1158:         return self.is_bootstrap and self.use_chroot_image
+### mock/py/mockbuild/buildroot.py, lignes 786 à 803 (ancre 797 : « .rpmmacros »)
+  786: 
+  787:     @traceLog()
+  788:     def prepare_installation_time_homedir(self):
+  789:         """ Create a fake home directory with an appropriate .rpmmacros. """
+  790: 
+  791:         rpm_config_home = os.path.join(self.rootdir, "installation-homedir")
+  792:         file_util.mkdirIfAbsent(rpm_config_home)
+  793: 
+  794:         # Since /proc and /sys are mounted special filesystems when RPM is running
+  795:         # to install the buildroot, it doesn't make sense for RPM to try and
+  796:         # set the permissions on them - and that might fail with permission errors.
+  797:         with open(os.path.join(rpm_config_home, ".rpmmacros"), "w") as macro_fd:
+  798:             macro_fd.write("%_netsharedpath /proc:/sys\n")
+  799: 
+  800:         # To make the DNF (and wrapped RPM) use the appropriate .rpmmacros file
+  801:         # we need to set the $HOME environment variable to non-standard
+  802:         # directory.  But note that we don't just set HOME=/rpmconfig because
+  803:         # `rpm --rootdir <ROOTDIR>` reads the macros file from caller's
+### _common_opts dans les modèles (mock-core-configs) et dans s1.sh
+  lignes de s1.sh : 1 (_common_opts, nodocs ou excludedocs)
+### s1.sh (non modifié) : fonction qui porte tsflags=nodocs
+  252: dnf_conf() { # configuration de dnf de l'étape racine
+  253:   cat <<EOF
+  254: [main]
+  255: gpgcheck=1
+  256: install_weak_deps=0
+  257: keepcache=1
+  258: cachedir=/w/cache
+  259: reposdir=/w/aucun
+  260: tsflags=nodocs
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## copie de comparaison : Go épinglé par mise.toml
+go version go1.24.7 linux/amd64 ; LICENSE sha256 911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad ; PATENTS sha256 96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : 21CB256AE16FC54C6E652949702D426D350D275D
+## AppStream de vault 9.7, épinglé par s1.sh
+OK   vault-AppStream : repomd.xml signé par 21CB256AE16FC54C6E652949702D426D350D275D
+vault-AppStream : repomd.xml sha256 06f01d405f2d4743dd3fea4a3bf4e2ffada91b652b94d9458468064db15287d6
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (2315831 octets)
+vault-AppStream : 8708 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
+## entrée du rpm golang 0:1.25.9-1.el9_7.x86_64 dans le primary signé
+primary : golang 0:1.25.9-1.el9_7.x86_64 ; sha256 5ebd70263e373e689cf267245a9fcb93be46ab621b6d90f1bb51a564f3209a25 ; Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm ; 1298609 octets (borne : 67108864) ; License: BSD and Public Domain
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (17319365 octets)
+vault-AppStream : 1 paquets de la source golang retrouvés dans le filelists, 64 fichiers (dossiers exclus)
+## rpm golang (téléchargé entier, somme du primary exigée ; jamais installé, jamais exécuté)
+OK   rpm conforme au primary : 1298609 octets, sha256 5ebd70263e373e689cf267245a9fcb93be46ab621b6d90f1bb51a564f3209a25
+lead 96 octets ; signature : 8 tags, fin à l'octet 4500 ; en-tête principal : 64 tags, octets 4504 à 22193 ; charge : 1276416 octets
+OK   signature, tag 273 : sha256 de l'en-tête principal égal
+OK   tag 5092 : sha256 de la charge égal (algorithme 8)
+OK   signature OpenPGP de l'en-tête (tag 268) : VALIDSIG 21CB256AE16FC54C6E652949702D426D350D275D ; en-tête altéré refusé
+OK   en-tête : golang 0:1.25.9-1.el9_7.x86_64
+OK   License: de l'en-tête égale au primary : BSD and Public Domain
+sourcerpm : golang-1.25.9-1.el9_7.src.rpm ; format de charge : cpio ; compresseur : zstd ; drapeaux : 19
+98 entrées de fichiers ; algorithme des empreintes de fichiers (tag 5011) : [8]
+OK   64 fichiers (dossiers exclus) égaux au filelists signé
+### drapeaux de fichiers (FILEFLAGS, tag 1037) ; bits 2 et 128 éprouvés, autres bits de mémoire
+  0 (0x0, aucun) : 62 entrées, dont 1 sous /usr/share/doc/
+  2 (0x2, doc) : 3 entrées, dont 2 sous /usr/share/doc/
+  4096 (0x1000, artifact) : 33 entrées, dont 0 sous /usr/share/doc/
+### entrées au bit 2 hors de /usr/share/doc/, et entrées à un bit autre que 2 et 128 (chemin, drapeaux, mode, taille)
+  /usr/lib/.build-id : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/31 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/31/3ecf37fc77f4e0d5780576dd6077168f991200 : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 60 octets
+  /usr/lib/.build-id/3c : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/3c/bafbed5802dff5c21b34efcb0c6eb249a408ac : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 63 octets
+  /usr/lib/.build-id/3e : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/3e/ffc25aad992ac6172e97bc4d4e35e60fb5d681 : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 33 octets
+  /usr/lib/.build-id/46 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/46/984cd4ab7b96549da8c9c64310df9bb55c1207 : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 51 octets
+  /usr/lib/.build-id/82 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/82/0e3a73af7a145d868d5496bbd11b8a95a2aab7 : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 52 octets
+  /usr/lib/.build-id/88 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/88/b13b6a12e6bee4728c995220534533484cba77 : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 62 octets
+  /usr/lib/.build-id/89 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/89/4a769804d7204c0ca305d31e75ee18eb24d958 : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 62 octets
+  /usr/lib/.build-id/93 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/93/46b7e76e8f2b13624bc0584c735d2e48af887a : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 58 octets
+  /usr/lib/.build-id/9d : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/9d/d7174ac65f48e1648be6ba71cf69bed469b39f : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 73 octets
+  /usr/lib/.build-id/be : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/be/ee87b323b7a49d1df65e6297163925694f4620 : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 60 octets
+  /usr/lib/.build-id/c8 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/c8/ed7ac1ee374d97cbab9392f2226f38aeb77c0b : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 51 octets
+  /usr/lib/.build-id/d0 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/d0/62e763cd4eb3de7bea08a471175f0a4ac9976c : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 62 octets
+  /usr/lib/.build-id/d4 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/d4/d91fcb29271b335b4ae2e309e40cdb3151a5e2 : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 53 octets
+  /usr/lib/.build-id/e0 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/e0/3f58fdaeba7ef0de38c49aceea1bc5c881027d : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 36 octets
+  /usr/lib/.build-id/f9 : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/f9/b345d2f65a848ead41af3cca74b3f5d80557e8 : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 51 octets
+  /usr/lib/.build-id/fe : drapeaux 4096 (0x1000, artifact) ; mode 40755 ; 0 octets
+  /usr/lib/.build-id/fe/75cfb8428053bff7aa31a83253f44c6fdd29e6 : drapeaux 4096 (0x1000, artifact) ; mode 120777 ; 55 octets
+  /usr/lib/golang/VERSION : drapeaux 2 (0x2, doc) ; mode 100644 ; 60 octets
+### fichiers sous /usr/share/doc ou /usr/share/licenses, ou au nom de licence
+  /usr/share/doc/golang : drapeaux 0 (0x0, aucun) ; mode 40755 ; 0 octets ; empreinte 
+  /usr/share/doc/golang/LICENSE : drapeaux 2 (0x2, doc) ; mode 100644 ; 1453 octets ; empreinte 911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad ; égale à la copie de Go de mise.toml
+  /usr/share/doc/golang/PATENTS : drapeaux 2 (0x2, doc) ; mode 100644 ; 1303 octets ; empreinte 96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc ; égale à la copie de Go de mise.toml
+## charge (cpio, zstd)
+NON LUE : compresseur zstd, aucun décompresseur sans installation ; texte non lu
+fichiers effacés (clé, métadonnées, rpm)
