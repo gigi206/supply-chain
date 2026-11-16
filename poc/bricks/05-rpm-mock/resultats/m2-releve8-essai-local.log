@@ -1,0 +1,328 @@
+# m2-releve8-essai-local.sh, lancé à 2026-11-16T17:52:33Z
+clés d'essai : 2 empreintes de 40 caractères
+source remplacée : 1
+FP_ROCKY d essai : 1
+== cas nominal
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 17fe28f39e427402a9c98f9c1652e4cdbe15de4e261e950499832eff12b7da35
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (275 octets)
+vault-BaseOS : 1 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 c7481384c8db37e31468d896d3054aec352075d9e8eb21c6079958f1004d9502
+OK   vault-AppStream : primary (xz) conforme à repomd.xml (428 octets)
+vault-AppStream : 5 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 9be5fd33634d58417904a834febd67ea3b3a982b82996c43ea2aca2e77818dad
+OK   vault-CRB : primary (gz) conforme à repomd.xml (270 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
+## paquets de la source golang (sourcerpm golang-*) et fournisseurs de « golang », lus dans les primary signés
+OK   rpmvercmp : 9 témoins tenus (dans les deux sens)
+### vault-BaseOS : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+### vault-AppStream : 4 paquet(s) de la source golang ou fournisseur(s) de golang
+  golang 0:1.24.6-1.el9_6.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.24.6-1.el9_6.src.rpm ; fournit golang
+  golang 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm ; fournit golang
+  golang-bin 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-src 0:1.25.9-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+### vault-CRB : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+## fournisseurs de « golang » (BuildRequires: golang >= 1.24 du spec), du plus haut au plus bas (rpmvercmp)
+  vault-AppStream golang 0:1.25.9-1.el9_7.x86_64
+  vault-AppStream golang 0:1.24.6-1.el9_6.x86_64
+plus haute version qui fournit golang : golang 0:1.25.9-1.el9_7.x86_64 (vault-AppStream)
+constructions du paquet golang : 2
+golang 1.25.9-1.el9_7 (builds OBS, banc A2) présent dans vault 9.7 : oui
+golang 1.25.9-1.el9_7 est la plus haute construction du paquet golang : oui
+## fichiers de licence des paquets de la source golang (filelists signés par la chaîne repomd.xml)
+OK   vault-AppStream : filelists (xz) conforme à repomd.xml (440 octets)
+vault-AppStream : 4 paquets de la source golang retrouvés dans le filelists, 10 fichiers (dossiers exclus)
+### vault-AppStream
+golang 0:1.24.6-1.el9_6.x86_64 : 2 fichiers ; 1 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+  doc  /usr/share/licenses/golang/LICENSE
+golang 0:1.25.9-1.el9_7.x86_64 : 3 fichiers ; 2 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+  doc  /usr/share/licenses/golang/LICENSE
+  doc  /usr/share/licenses/golang/PATENTS
+golang-bin 0:1.25.9-1.el9_7.x86_64 : 1 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-src 0:1.25.9-1.el9_7.noarch : 4 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 2 autres au nom de licence
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/LICENSE
+fichiers effacés (clé, métadonnées)
+code 0
+== cas plusieurs
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 f9425eaee9840a4d8aff0cc88fb313d037569fd95bdccd1c503aaa0a450ccfcf
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (275 octets)
+vault-BaseOS : 1 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 02d57bb552e4cfc6bcc0f35868318d7a14a45628e5118c2520b7d65ddc28cafd
+OK   vault-AppStream : primary (xz) conforme à repomd.xml (444 octets)
+vault-AppStream : 6 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 4d9debbf289d6824c1b436cfa31d2f403fb555f4e415fe1abd8278b8feaa3804
+OK   vault-CRB : primary (gz) conforme à repomd.xml (270 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
+## paquets de la source golang (sourcerpm golang-*) et fournisseurs de « golang », lus dans les primary signés
+OK   rpmvercmp : 9 témoins tenus (dans les deux sens)
+### vault-BaseOS : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+### vault-AppStream : 5 paquet(s) de la source golang ou fournisseur(s) de golang
+  golang 0:1.24.6-1.el9_6.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.24.6-1.el9_6.src.rpm ; fournit golang
+  golang 0:1.25.10-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.10-1.el9_7.src.rpm ; fournit golang
+  golang 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm ; fournit golang
+  golang-bin 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-src 0:1.25.9-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+### vault-CRB : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+## fournisseurs de « golang » (BuildRequires: golang >= 1.24 du spec), du plus haut au plus bas (rpmvercmp)
+  vault-AppStream golang 0:1.25.10-1.el9_7.x86_64
+  vault-AppStream golang 0:1.25.9-1.el9_7.x86_64
+  vault-AppStream golang 0:1.24.6-1.el9_6.x86_64
+plus haute version qui fournit golang : golang 0:1.25.10-1.el9_7.x86_64 (vault-AppStream)
+constructions du paquet golang : 3
+golang 1.25.9-1.el9_7 (builds OBS, banc A2) présent dans vault 9.7 : oui
+golang 1.25.9-1.el9_7 est la plus haute construction du paquet golang : non
+## fichiers de licence des paquets de la source golang (filelists signés par la chaîne repomd.xml)
+OK   vault-AppStream : filelists (xz) conforme à repomd.xml (452 octets)
+vault-AppStream : 5 paquets de la source golang retrouvés dans le filelists, 12 fichiers (dossiers exclus)
+### vault-AppStream
+golang 0:1.24.6-1.el9_6.x86_64 : 2 fichiers ; 1 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+  doc  /usr/share/licenses/golang/LICENSE
+golang 0:1.25.10-1.el9_7.x86_64 : 2 fichiers ; 1 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+  doc  /usr/share/licenses/golang/LICENSE
+golang 0:1.25.9-1.el9_7.x86_64 : 3 fichiers ; 2 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+  doc  /usr/share/licenses/golang/LICENSE
+  doc  /usr/share/licenses/golang/PATENTS
+golang-bin 0:1.25.9-1.el9_7.x86_64 : 1 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-src 0:1.25.9-1.el9_7.noarch : 4 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 2 autres au nom de licence
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/LICENSE
+fichiers effacés (clé, métadonnées)
+code 0
+== cas signature
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 f9425eaee9840a4d8aff0cc88fb313d037569fd95bdccd1c503aaa0a450ccfcf
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (275 octets)
+vault-BaseOS : 1 paquets dans le primary
+KO   vault-AppStream : signataire de repomd.xml «  » (attendu : <empreinte d essai>)
+code 1
+== cas somme
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 f9425eaee9840a4d8aff0cc88fb313d037569fd95bdccd1c503aaa0a450ccfcf
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (275 octets)
+vault-BaseOS : 1 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 72ff985d6a89d9ca30cc5a869d4c40b3a205de8088c6ef2f4f4d85b0dd7cfeab
+OK   vault-AppStream : primary (xz) conforme à repomd.xml (372 octets)
+vault-AppStream : 3 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 59771b2fbacbd541812a30b32b8af394f29fc4bf706f2d0e1e9755f79e400754
+OK   vault-CRB : primary (gz) conforme à repomd.xml (270 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
+## paquets de la source golang (sourcerpm golang-*) et fournisseurs de « golang », lus dans les primary signés
+OK   rpmvercmp : 9 témoins tenus (dans les deux sens)
+### vault-BaseOS : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+### vault-AppStream : 3 paquet(s) de la source golang ou fournisseur(s) de golang
+  golang 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm ; fournit golang
+  golang-bin 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-src 0:1.25.9-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+### vault-CRB : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+## fournisseurs de « golang » (BuildRequires: golang >= 1.24 du spec), du plus haut au plus bas (rpmvercmp)
+  vault-AppStream golang 0:1.25.9-1.el9_7.x86_64
+plus haute version qui fournit golang : golang 0:1.25.9-1.el9_7.x86_64 (vault-AppStream)
+constructions du paquet golang : 1
+golang 1.25.9-1.el9_7 (builds OBS, banc A2) présent dans vault 9.7 : oui
+golang 1.25.9-1.el9_7 est la plus haute construction du paquet golang : oui
+## fichiers de licence des paquets de la source golang (filelists signés par la chaîne repomd.xml)
+KO   vault-AppStream : sha256 du filelists différent de repomd.xml (0000000000000000000000000000000000000000000000000000000000000000)
+code 1
+== cas zero
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 d64952ff60010aada592d2ccedcfe3b7b13819cfffe194610a30069af44ee692
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (275 octets)
+vault-BaseOS : 1 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 c027cd298d44c465745625a76531b4dec47cea334eec12988691b72d36f38710
+OK   vault-AppStream : primary (xz) conforme à repomd.xml (372 octets)
+vault-AppStream : 3 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 59771b2fbacbd541812a30b32b8af394f29fc4bf706f2d0e1e9755f79e400754
+OK   vault-CRB : primary (gz) conforme à repomd.xml (270 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
+## paquets de la source golang (sourcerpm golang-*) et fournisseurs de « golang », lus dans les primary signés
+OK   rpmvercmp : 9 témoins tenus (dans les deux sens)
+### vault-BaseOS : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+### vault-AppStream : 3 paquet(s) de la source golang ou fournisseur(s) de golang
+  golang 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm ; fournit golang
+  golang-bin 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-src 0:1.25.9-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+### vault-CRB : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+## fournisseurs de « golang » (BuildRequires: golang >= 1.24 du spec), du plus haut au plus bas (rpmvercmp)
+  vault-AppStream golang 0:1.25.9-1.el9_7.x86_64
+plus haute version qui fournit golang : golang 0:1.25.9-1.el9_7.x86_64 (vault-AppStream)
+constructions du paquet golang : 1
+golang 1.25.9-1.el9_7 (builds OBS, banc A2) présent dans vault 9.7 : oui
+golang 1.25.9-1.el9_7 est la plus haute construction du paquet golang : oui
+## fichiers de licence des paquets de la source golang (filelists signés par la chaîne repomd.xml)
+0 entrées filelists dans repomd.xml (attendu : 1)
+KO   vault-AppStream : entrée filelists de repomd.xml refusée
+code 1
+== cas deux
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 d64952ff60010aada592d2ccedcfe3b7b13819cfffe194610a30069af44ee692
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (275 octets)
+vault-BaseOS : 1 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 f3e844614337a46117d9c7bc989cbd95c6a38130adaa5526a688f54756848720
+OK   vault-AppStream : primary (xz) conforme à repomd.xml (372 octets)
+vault-AppStream : 3 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 59771b2fbacbd541812a30b32b8af394f29fc4bf706f2d0e1e9755f79e400754
+OK   vault-CRB : primary (gz) conforme à repomd.xml (270 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
+## paquets de la source golang (sourcerpm golang-*) et fournisseurs de « golang », lus dans les primary signés
+OK   rpmvercmp : 9 témoins tenus (dans les deux sens)
+### vault-BaseOS : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+### vault-AppStream : 3 paquet(s) de la source golang ou fournisseur(s) de golang
+  golang 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm ; fournit golang
+  golang-bin 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-src 0:1.25.9-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+### vault-CRB : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+## fournisseurs de « golang » (BuildRequires: golang >= 1.24 du spec), du plus haut au plus bas (rpmvercmp)
+  vault-AppStream golang 0:1.25.9-1.el9_7.x86_64
+plus haute version qui fournit golang : golang 0:1.25.9-1.el9_7.x86_64 (vault-AppStream)
+constructions du paquet golang : 1
+golang 1.25.9-1.el9_7 (builds OBS, banc A2) présent dans vault 9.7 : oui
+golang 1.25.9-1.el9_7 est la plus haute construction du paquet golang : oui
+## fichiers de licence des paquets de la source golang (filelists signés par la chaîne repomd.xml)
+2 entrées filelists dans repomd.xml (attendu : 1)
+KO   vault-AppStream : entrée filelists de repomd.xml refusée
+code 1
+== cas absent
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 630ffd02698a792fda963c0b3819e2210f925ecb82b1189750fe6134a5c2d498
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (275 octets)
+vault-BaseOS : 1 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 4b1a9640ac777e7f16e1b572745e20eaa67beb2a4006daff074c4fd55de77fc2
+OK   vault-AppStream : primary (xz) conforme à repomd.xml (372 octets)
+vault-AppStream : 2 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 e1d055e2491d3cda41719d8681e9b18937488921b6a756b946b0381f751c9b3b
+OK   vault-CRB : primary (gz) conforme à repomd.xml (270 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
+## paquets de la source golang (sourcerpm golang-*) et fournisseurs de « golang », lus dans les primary signés
+OK   rpmvercmp : 9 témoins tenus (dans les deux sens)
+### vault-BaseOS : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+### vault-AppStream : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+### vault-CRB : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+aucun paquet de la source golang dans BaseOS, AppStream ni CRB de vault 9.7
+KO   paquets golang non relevés
+code 1
+== cas cle
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## clé de Rocky (trousseau temporaire)
+KO   empreinte de la clé de Rocky : « <autre empreinte> » (attendu : <empreinte d essai>)
+code 1
+== cas manque
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 8a70a8c438f7ddf983237156ed497e376fb49df5a4dbcbb1254cdfd4659d0151
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (275 octets)
+vault-BaseOS : 1 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 897f23aac6c44cc79281280b6ab80c03c0e0d25c7777fc82676b497de81e2859
+OK   vault-AppStream : primary (xz) conforme à repomd.xml (372 octets)
+vault-AppStream : 3 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 fa64de4eb197507b7b008886bd8b99bc8c7ae84f9d5b325ed9bcd1723841c0f1
+OK   vault-CRB : primary (gz) conforme à repomd.xml (270 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
+## paquets de la source golang (sourcerpm golang-*) et fournisseurs de « golang », lus dans les primary signés
+OK   rpmvercmp : 9 témoins tenus (dans les deux sens)
+### vault-BaseOS : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+### vault-AppStream : 3 paquet(s) de la source golang ou fournisseur(s) de golang
+  golang 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm ; fournit golang
+  golang-bin 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-src 0:1.25.9-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+### vault-CRB : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+## fournisseurs de « golang » (BuildRequires: golang >= 1.24 du spec), du plus haut au plus bas (rpmvercmp)
+  vault-AppStream golang 0:1.25.9-1.el9_7.x86_64
+plus haute version qui fournit golang : golang 0:1.25.9-1.el9_7.x86_64 (vault-AppStream)
+constructions du paquet golang : 1
+golang 1.25.9-1.el9_7 (builds OBS, banc A2) présent dans vault 9.7 : oui
+golang 1.25.9-1.el9_7 est la plus haute construction du paquet golang : oui
+## fichiers de licence des paquets de la source golang (filelists signés par la chaîne repomd.xml)
+OK   vault-AppStream : filelists (xz) conforme à repomd.xml (332 octets)
+1 paquet(s) du primary absent(s) du filelists : golang-src 0:1.25.9-1.el9_7.noarch
+KO   vault-AppStream : filelists illisible
+code 1

@@ -336,3 +336,9 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - `vault/rocky/9.7/extras` existe, signé par la clé de Rocky : 58 paquets, dont 51 noms sur 57 sont des `*-release` de dépôts tiers ou de SIG. `pub/rocky/9/extras` en compte 59 (deux noms de plus) ; son identité avec ce que servent les miroirs n'est pas mesurée.
 - Par nom et par provides, aucun paquet de `chroot_setup_cmd` ne vient d'`extras`, et aucun nom d'`extras` n'est dans BaseOS, AppStream ou CRB 9.7. Une dépendance indirecte n'est pas exclue.
 - V1 reste de confiance moyenne. Que faire d'`extras` reste à décider avec toi, après S5b.
+
+**Additif du 16/11/2026 (écrit à 17:49:32 UTC) : étape `releve8` ajoutée à [`m2.sh`](m2.sh), NON LANCÉE** (après « Continue », pendant l'attente de M5 de la 06, sur relecture du conseiller). Étape 7 de la séquence d'après S5b (spec du rpm). Hôte seul, réseau, lecture d'index seulement ; aucun rpm téléchargé ; `s1.sh` et `poc/packaging/` inchangés. Elle mesure les préalables de Q1 (notice de Go au `%license`) et de Q2 (tag `License:` de golang en SPDX), deux décisions qui t'attendent avant le premier build de la 05 :
+- les constructions de golang dans BaseOS, AppStream et CRB de vault 9.7, signés par la clé de Rocky, avec leur tag `License:`, leur classement par `rpmvercmp`, et le rang de `1.25.9-1.el9_7` (celle des builds OBS) ;
+- les fichiers de licence de ces paquets, lus dans le filelists signé par la même chaîne.
+- Banc hors réseau, `gpg` réel et clés d'essai jetables : neuf cas au code attendu ([journal](resultats/m2-releve8-essai-local.log)). Prédictions G1 à G9 ([détail](resultats/m2-predictions.md)).
+- Temps passé : 4,04 h à HEAD 075ef5a, même méthode ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées ; décision avec toi à 5 pw.

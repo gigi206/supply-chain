@@ -573,3 +573,49 @@ Fin à 17:54:46 UTC (`chrono.tsv`). Résultats écrits à partir de 17:55:24 UTC
 - **`pub/rocky/9/extras` et les `/9.8/extras/` des miroirs ne sont pas comparés.** La liste de 59 paquets est celle de l'origine, sous `/9/` ; que les miroirs servent la même chose n'est pas mesuré.
 - **V1 reste de confiance moyenne.** Le contenu d'`extras` est maintenant lu ; le comportement de dnf avec `--installroot` sans `--config`, le binaire de dnf choisi à l'exécution et le `$releasever` effectif de l'appel du verrou ne le sont pas.
 - Que faire d'`extras` reste ta décision, après S5b ; `s1.sh` ne change pas d'ici là.
+
+## Additif du 16/11/2026 (écrit à 17:49:13 UTC) : étape `releve8` ajoutée à `m2.sh`, NON LANCÉE
+
+Après « Continue », pendant l'attente de M5 de la 06, sur relecture du conseiller. **Hôte seul, réseau, lecture d'index seulement** : ni cluster, ni Zot, ni rpm téléchargé ; `s1.sh` et `poc/packaging/` inchangés. Elle demande ton accord nommé.
+
+**Pourquoi.** Étape 7 de la séquence d'après S5b : le spec du rpm doit suivre la décision des axes 1 et 2 de la 13a avant le premier build de la 05. Constats relus à HEAD 075ef5a : `License: Apache-2.0 AND MIT AND BSD-3-Clause` (`sample-app.spec` l. 11) ; `%license` (l. 35) liste trois fichiers, aucune notice de la bibliothèque standard de Go, que le binaire lie ; `BuildRequires: golang >= 1.24` (l. 15) n'épingle rien ; spec `e1281b3d…`, dernier commit 4b9722e (29/10/2026). Les six `_buildenv` rocky_9 du banc OBS (l. 37) donnent golang `1.25.9-1.el9_7`, projet `Rocky:9.7`, dépôt `appstream`. Deux questions t'attendent avant le premier build de la 05, pas avant cette mesure : Q1, ajouter la notice de Go au `%license` (pendant de la décision 2 du deb) ; Q2, comment normaliser en SPDX le tag `License:` de golang. Elles demandent trois faits non mesurés : la plus haute construction de golang dans vault 9.7, son tag `License:`, et le paquet et le chemin qui portent la `LICENSE` de Go. Aucune étape de la cascade de la 06 ne lit le spec (`git grep` de `s6a.sh` et `s6b.sh`), et il n'est pas dans l'artefact de packaging (`s4c.sh` l. 39-41).
+
+**Ce que fait l'étape** :
+- lit `VAULT97`, `CLE_ROCKY` et `FP_ROCKY` dans `s1.sh`, et la ligne golang de `poc/benchmarks/obs/resultats/build-1/rocky_9/_buildenv` ; une ligne chacune, sinon KO ;
+- télécharge la clé de Rocky et exige l'empreinte `FP_ROCKY` (trousseau temporaire) ;
+- lit BaseOS, AppStream et CRB de vault 9.7 par `depot_r7`, non modifiée : `repomd.xml` signé par `FP_ROCKY`, primary égal à la somme du `repomd.xml` ; un témoin altéré (le `repomd.xml` d'AppStream plus une ligne) doit être refusé ;
+- dans les trois primary, retient les paquets dont le `sourcerpm` est `golang-*` et ceux qui fournissent `golang`. Elle journalise leur EVR, leur arch, leur tag `License:` et leur `sourcerpm`. Les fournisseurs de `golang` sont classés par une réécriture en Python de `rpmvercmp`, faite sans relire la source de rpm. Elle doit d'abord tenir neuf témoins choisis par nous, dans les deux sens (`~`, `^`, zéros de tête, alpha contre numérique) ; le journal liste toutes les constructions, ce qui permet de contrôler le classement à la main. Elle dit ensuite si `1.25.9-1.el9_7` est présent, et s'il est la plus haute construction du paquet `golang`. Aucun paquet de la source golang : KO ;
+- pour chaque dépôt qui porte la source golang : l'entrée `filelists` du même `repomd.xml` signé (une seule, sha256, emplacement contrôlé), une somme égale, et chaque paquet retenu présent dans le filelists, sinon KO. Elle liste les fichiers sous `/usr/share/licenses` et `/usr/share/doc`, et les autres fichiers au nom de licence, en majuscules (`LICENSE`, `LICENCE`, `COPYING`, `PATENTS`, `NOTICE`, avec un suffixe éventuel) : `license.go` n'est pas retenu, un fichier de licence en minuscules ne l'est pas non plus ;
+- efface tout à la fin, sauf après un KO, comme `releve7`. Le dossier de travail est celui de `lire_r7` et `depot_r7` (`~/.cache/supply-chain-poc/05/m2/releve7`), vidé au début ; rien dans `/tmp`. La taille du filelists d'AppStream n'est pas connue ; le 12/11, le primary pesait 2 315 831 octets ([m2-releve7.log](m2-releve7.log)).
+
+`bash -n` passe, et shellcheck ne relève aucun avertissement (`-S warning`). Banc hors réseau : [m2-releve8-essai-local.sh](m2-releve8-essai-local.sh) ([journal](m2-releve8-essai-local.log), lancé à 17:52:33 UTC, après la dernière modification de `m2.sh`). `curl` y est simulé ; `gpg` et `gpgv` sont les vrais, avec deux clés d'essai jetables. Le `_buildenv` réel est copié. Les neuf cas rendent le code attendu :
+- nominal (golang 1.24.6 et 1.25.9, `golang-bin`, `golang-src`, et un leurre `golang-github-x-y` d'une autre source, écarté ; `license.go` dans `golang-src`, non retenu) : code 0, `1.25.9-1.el9_7` présent et plus haut ;
+- plusieurs versions (1.25.10 en plus) : code 0, 1.25.10 classé au-dessus de 1.25.9 (comparaison non lexicale), « plus haute : non » ;
+- signature d'AppStream fausse : KO, code 1 ;
+- somme du filelists fausse : KO, code 1 ;
+- zéro entrée `filelists` : KO, code 1 ;
+- deux entrées `filelists` : KO, code 1 ;
+- aucun paquet golang : KO, code 1 ;
+- empreinte de clé différente : KO, code 1 ;
+- paquet du primary absent du filelists : KO, code 1.
+
+Non couverts : les vrais formats des métadonnées de Rocky (aucun primary ni filelists de Rocky en cache pour les éprouver hors réseau : `find` du 16/11 sur `~/.cache/supply-chain-poc`), les redirections, `curl` lui-même en échec, un code HTTP autre que 200 et 404, le `.bz2`, et le vrai `lancer`.
+
+| # | Prédiction | Confiance | Ce qu'elle change |
+|---|---|---|---|
+| G1 | La clé a l'empreinte `FP_ROCKY` ; les `repomd.xml` de BaseOS, AppStream et CRB 9.7 sont signés par elle, aux mêmes sha256 que dans [m2-releve7.log](m2-releve7.log) (AppStream `06f01d40…`) | Haute : vault figé, même contrôle que `releve7` | Non tenue : KO, rien d'autre n'est lu. sha256 différent : vault 9.7 a changé depuis le 12/11, à noter |
+| G2 | AppStream a une seule entrée `filelists`, conforme à sa somme, et tous les paquets de la source golang y sont | Haute pour la forme ; taille non prédite | Non tenue : KO, Q1 reste sans préalable |
+| G3 | La source golang n'est que dans AppStream : rien dans BaseOS ni dans CRB | Moyenne : les `_buildenv` disent `appstream` ; CRB n'est pas lu pour golang | Non tenue : d'autres constructions entrent dans le classement |
+| G4 | `golang 1.25.9-1.el9_7` est présent dans AppStream de vault 9.7 | Haute : six `_buildenv` du banc OBS, projet `Rocky:9.7` | Non tenue : les builds OBS ont pris une construction que vault ne garde pas |
+| G5 | `1.25.9-1.el9_7` est la plus haute construction du paquet `golang`, et le seul fournisseur de `golang` est ce paquet | Moyenne : les `_buildenv` sont commités le 29/10/2026 (`git log`) ; une mise à jour de 9.7 parue ensuite, avant le gel, n'est pas exclue | Dit quelle construction un verrou de mock pourrait tirer, sans le prouver (voir plus bas) |
+| G6 | AppStream de vault 9.7 garde plusieurs constructions de golang | Moyenne : 9.8 en compte sept, mesure hors dépôt du 12/11 | Seulement descriptif |
+| G7 | Le tag `License:` de golang, golang-bin et golang-src en `1.25.9-1.el9_7` est `BSD and Public Domain` | Faible : mesuré sur 9.8 seulement (1.26.x), hors dépôt | Base de Q2 : une forme ancienne de Fedora, pas une expression SPDX |
+| G8 | La `LICENSE` et le `PATENTS` de Go sont sous `/usr/share/licenses/golang/` dans le paquet `golang`, pas dans `golang-src` ; `golang-src` porte d'autres `LICENSE`, du code vendu (`vendor/golang.org/x/…`) | Faible : souvenir du spec de Fedora, non lu | Base de Q1 : le chemin d'où copier la notice |
+| G9 | Témoin altéré refusé, fichiers effacés, code 0 | Haute | — |
+
+**Ce que `releve8` ne tranchera pas** :
+- Q1 et Q2 : ce sont tes décisions, posées après la mesure. Cette étape ne les prépare par aucune recommandation ;
+- **la construction que prendra mock** : celle du premier verrou réel. Les priorités de dépôt, les modules, `extras` (par mirrorlist) et la résolution de dnf ne sont pas lus ;
+- **le texte des fichiers de licence** : aucun rpm n'est téléchargé, seuls les chemins sont lus ;
+- **la normalisation SPDX** : `fedora-license-data` n'a aucune ligne au doc 04 ni dans `tools/health/projects.tsv` (`grep`), et n'est pas lu ; le tag est relevé brut ;
+- un équivalent rpm de `Static-Built-Using`, et toute conclusion de conformité juridique.

@@ -651,3 +651,8 @@ Y1 à Y8 tenues ([`lintian-predictions.md`](lintian-predictions.md)). Le tag `mi
 sort sur 1.0.0-1 et plus sur 1.0.0-2. Les lignes 11 (M5 à M8) et 12 restent ; prochaine : `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild`
 (M5), pas avant 2026-11-16T20:38:15Z, sur accord nommé.
 
+
+**Note du 2026-11-16 (2026-11-16T17:49:32Z) : étape 7 (spec du rpm) préparée à sec, hors des lignes de la carte.** Étape `releve8` ajoutée à
+`m2.sh` de la 05, NON LANCÉE : constructions de golang de vault 9.7, tag `License:` et fichiers de licence, pour Q1 et Q2
+(`../../05-rpm-mock/resultats/m2-predictions.md`, G1 à G9). Le spec n'est lu par aucune étape des lignes 11 et 12. Les lignes 11
+(M5 à M8) et 12 restent ; prochaine : `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5), pas avant 2026-11-16T20:38:15Z, sur accord nommé.

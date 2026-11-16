@@ -72,6 +72,21 @@
 #               Prédictions : resultats/m2-predictions.md, section releve7. Banc hors réseau : resultats/m2-releve7-essai-local.sh.
 #               Lancé le 12/11/2026 à 17:54:37 UTC (« Oui » à « Je lance releve7 ? »), code 0 : Y1 à Y7 tenues ; extras existe
 #               dans vault 9.7, signé par la clé de Rocky, 58 paquets ; aucun croisement par nom (m2-releve7.log).
+#   releve8     hôte seul, réseau, lecture d'index seulement (ajouté à sec le 16/11/2026, après « Continue », sur
+#               relecture du conseiller, NON LANCÉ) : étape 7 de la séquence d'après S5b (spec du rpm), préalables
+#               de Q1 et Q2. s1.sh lu, jamais modifié (VAULT97, CLE_ROCKY, FP_ROCKY), et la ligne golang du _buildenv de
+#               poc/benchmarks/obs/resultats/build-1/rocky_9 (une ligne chacune, sinon KO). Clé de Rocky, BaseOS, AppStream et CRB
+#               de vault 9.7 par lire_r7 et depot_r7, non modifiées (repomd.xml signé par FP_ROCKY, primary égal à sa somme ;
+#               témoin altéré refusé), dans leur dossier de travail $T/releve7, vidé au début. Dans les primary : paquets dont le
+#               sourcerpm est golang-* et fournisseurs de « golang », avec EVR, tag License: et sourcerpm ; fournisseurs classés
+#               par une réécriture en Python de rpmvercmp, sans relecture de la source de rpm (neuf témoins choisis par nous, exigés
+#               dans les deux sens ; toutes les constructions sont listées) ; présence et rang de la
+#               construction des builds OBS. Puis, pour chaque dépôt qui porte la source golang, l'entrée filelists du même
+#               repomd.xml (une seule, sha256, emplacement contrôlé), somme égale ; chaque paquet retenu doit y être ; fichiers sous
+#               /usr/share/licenses et /usr/share/doc, et autres fichiers au nom de licence, en majuscules (LICENSE, LICENCE, COPYING, PATENTS, NOTICE, suffixe
+#               éventuel après « . », « _ » ou « - »).
+#               Aucun rpm téléchargé, aucune normalisation SPDX. Fichiers effacés à la fin, sauf après un KO.
+#               Prédictions : resultats/m2-predictions.md, section releve8. Banc hors réseau : resultats/m2-releve8-essai-local.sh.
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le
@@ -101,6 +116,7 @@
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve5  (journal : resultats/m2-releve5.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve6  (journal : resultats/m2-releve6.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve7  (journal : resultats/m2-releve7.log)
+#                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve8  (journal : resultats/m2-releve8.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -564,6 +580,258 @@ PY
   rm -rf -- "${d:?}"
   echo "fichiers effacés (clé, métadonnées, modèle extrait) ; archive gardée sous ~/.cache"
   [ "$e" = 0 ] || { echo "KO   écart ci-dessus (mirrorlist) : code 1" >&2; exit 1; }
+}
+
+fichiers_r8() { # étiquette URL-du-dépôt : entrée filelists du repomd.xml déjà vérifié par depot_r7 (même passage), somme
+                # égale ; fichiers des paquets de <étiquette>.golang mis à plat dans <étiquette>.fichiers ; tout écart : KO
+  local lab=$1 b=$2 d=$T/releve7 h s p x
+  p=$(python3 -I - "$d/$lab.repomd.xml" <<'PY'
+import re, sys, xml.etree.ElementTree as E
+n = {'r': 'http://linux.duke.edu/metadata/repo'}
+d = [x for x in E.parse(sys.argv[1]).getroot().findall('r:data', n) if x.get('type') == 'filelists']
+if len(d) != 1:
+    sys.exit(f"{len(d)} entrées filelists dans repomd.xml (attendu : 1)")
+c, h = d[0].find('r:checksum', n), d[0].find('r:location', n)
+if c is None or h is None or c.get('type') != 'sha256' or not re.fullmatch(r'[0-9a-f]{64}', (c.text or '').strip()):
+    sys.exit("somme sha256 du filelists absente ou mal formée")
+h = h.get('href') or ''
+if not re.fullmatch(r'repodata/[A-Za-z0-9._-]+\.xml\.(gz|xz|bz2)', h):
+    sys.exit(f"emplacement du filelists refusé : {h}")
+print(c.text.strip(), h)
+PY
+  ) || { echo "KO   $lab : entrée filelists de repomd.xml refusée" >&2; exit 1; }
+  s=${p%% *}; p=${p#* }
+  x=${p##*.}
+  h=$(lire_r7 "$lab.filelists.xml.$x" "$b/$p") || exit 1
+  [ "$h" = 200 ] || { echo "KO   $lab : HTTP $h sur $b/$p" >&2; exit 1; }
+  [ "$(sha256sum < "$d/$lab.filelists.xml.$x" | cut -c1-64)" = "$s" ] \
+    && echo "OK   $lab : filelists ($x) conforme à repomd.xml ($(stat -c %s "$d/$lab.filelists.xml.$x") octets)" \
+    || { echo "KO   $lab : sha256 du filelists différent de repomd.xml ($s)" >&2; exit 1; }
+  python3 -I - "$lab" "$d/$lab.filelists.xml.$x" "$d/$lab.golang" "$d/$lab.fichiers" <<'PY' || { echo "KO   $lab : filelists illisible" >&2; exit 1; }
+import bz2, gzip, lzma, sys, xml.etree.ElementTree as E
+l, src, sel, out = sys.argv[1:5]
+ouvrir = {'gz': gzip.open, 'xz': lzma.open, 'bz2': bz2.open}[src.rsplit('.', 1)[1]]
+F = '{http://linux.duke.edu/metadata/filelists}'
+with open(sel, encoding='utf-8') as f:
+    voulus = {tuple(x.rstrip('\n').split('\t')[:2]) for x in f if x.strip()}
+vus, n = set(), 0
+with ouvrir(src) as f, open(out, 'w', encoding='utf-8') as o:
+    for _, p in E.iterparse(f):
+        if p.tag != F + 'package':
+            continue
+        v = p.find(F + 'version')
+        c = (p.get('name'), f"{v.get('epoch')}:{v.get('ver')}-{v.get('rel')}.{p.get('arch')}")
+        if c in voulus:
+            vus.add(c)
+            for x in p.findall(F + 'file'):
+                if x.get('type') != 'dir':
+                    o.write(f"{c[0]}\t{c[1]}\t{x.text}\n")
+                    n += 1
+        p.clear()
+manque = sorted(voulus - vus)
+if manque:
+    sys.exit(f"{len(manque)} paquet(s) du primary absent(s) du filelists : {' ; '.join(' '.join(m) for m in manque)}")
+print(f"{l} : {len(vus)} paquets de la source golang retrouvés dans le filelists, {n} fichiers (dossiers exclus)")
+PY
+}
+
+etape_releve8() {
+  local d=$T/releve7 v cle fp s h x n u o
+  local -a l=()
+  echo "## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)"
+  v=$(sed -n 's|^VAULT97=\(https://[A-Za-z0-9./-]*\)$|\1|p' "$here/s1.sh")
+  cle=$(sed -n 's|^CLE_ROCKY=\(https://[A-Za-z0-9./-]*\)$|\1|p' "$here/s1.sh")
+  fp=$(sed -n 's/^FP_ROCKY=\([0-9A-F]\{40\}\)\([[:space:]].*\)\{0,1\}$/\1/p' "$here/s1.sh")
+  o=$(sed -n 's/^  <bdep name="golang" version="\([0-9.]*\)" release="\([0-9A-Za-z._]*\)" arch="x86_64" .* project="Rocky:9\.7" repository="appstream"\/>$/\1-\2/p' \
+    "$here/../../benchmarks/obs/resultats/build-1/rocky_9/_buildenv")
+  for x in "VAULT97:$v" "CLE_ROCKY:$cle" "FP_ROCKY:$fp" "golang de build-1/rocky_9/_buildenv:$o"; do
+    n=$(printf '%s' "${x#*:}" | grep -c . || true)
+    [ "$n" = 1 ] && echo "OK   ${x%%:*} : ${x#*:}" \
+      || { echo "KO   ${x%%:*} : $n ligne(s) reconnue(s) (attendu : 1)" >&2; exit 1; }
+  done
+  rm -rf -- "${d:?}"; mkdir -p "$d"; mkdir -m 700 "$d/gnupg"; export GNUPGHOME=$d/gnupg
+  echo "## clé de Rocky (trousseau temporaire)"
+  h=$(lire_r7 RPM-GPG-KEY-Rocky-9 "$cle") || exit 1
+  [ "$h" = 200 ] || { echo "KO   $cle : HTTP $h" >&2; exit 1; }
+  s=$(gpg --batch --with-colons --show-keys "$d/RPM-GPG-KEY-Rocky-9" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}' || true)
+  [ "$s" = "$fp" ] && echo "OK   empreinte de la clé de Rocky : $s" \
+    || { echo "KO   empreinte de la clé de Rocky : « $s » (attendu : $fp)" >&2; exit 1; }
+  gpg --batch --quiet --no-default-keyring --keyring "$d/cles.gpg" --import "$d/RPM-GPG-KEY-Rocky-9" 2>/dev/null \
+    || { echo "KO   clé de Rocky non importée" >&2; exit 1; }
+  echo "## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh"
+  for u in BaseOS AppStream CRB; do
+    depot_r7 "vault-$u" "$v/$u/x86_64/os" || { echo "KO   vault-$u absent" >&2; exit 1; }
+  done
+  cp "$d/vault-AppStream.repomd.xml" "$d/temoin.xml"; echo x >> "$d/temoin.xml"
+  s=$(gpgv --keyring "$d/cles.gpg" --status-fd 1 "$d/vault-AppStream.repomd.xml.asc" "$d/temoin.xml" 2>/dev/null | awk '$2 == "VALIDSIG"' || true)
+  [ -z "$s" ] && echo "OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé" \
+    || { echo "KO   témoin altéré accepté" >&2; exit 1; }
+  echo "## paquets de la source golang (sourcerpm golang-*) et fournisseurs de « golang », lus dans les primary signés"
+  python3 -I - "$d" "$o" <<'PY' || { echo "KO   paquets golang non relevés" >&2; exit 1; }
+import bz2, glob, gzip, lzma, os, re, sys, xml.etree.ElementTree as E
+d, obs = sys.argv[1], sys.argv[2]
+C = '{http://linux.duke.edu/metadata/common}'; R = '{http://linux.duke.edu/metadata/rpm}'
+
+def segs(s):  # rpmvercmp réécrit sans relecture de la source de rpm : segments, ~ avant tout, ^ après la fin seulement
+    i, r = 0, []
+    while i < len(s):
+        c = s[i]
+        if c in '~^':
+            r.append(c); i += 1
+        elif c.isascii() and c.isdigit():
+            j = i
+            while j < len(s) and s[j].isascii() and s[j].isdigit():
+                j += 1
+            r.append(('n', s[i:j])); i = j
+        elif c.isascii() and c.isalpha():
+            j = i
+            while j < len(s) and s[j].isascii() and s[j].isalpha():
+                j += 1
+            r.append(('a', s[i:j])); i = j
+        else:
+            i += 1
+    return r
+
+def vercmp(a, b):
+    if a == b:
+        return 0
+    x, y = segs(a), segs(b)
+    i = 0
+    while True:
+        p = x[i] if i < len(x) else None
+        q = y[i] if i < len(y) else None
+        if p == '~' or q == '~':
+            if p != '~':
+                return 1
+            if q != '~':
+                return -1
+            i += 1; continue
+        if p == '^' or q == '^':
+            if p is None:
+                return -1
+            if q is None:
+                return 1
+            if p != '^':
+                return 1
+            if q != '^':
+                return -1
+            i += 1; continue
+        if p is None or q is None:
+            return 0 if p is None and q is None else (-1 if p is None else 1)
+        if p[0] != q[0]:
+            return 1 if p[0] == 'n' else -1
+        if p[0] == 'n':
+            u, v = p[1].lstrip('0'), q[1].lstrip('0')
+            if len(u) != len(v):
+                return 1 if len(u) > len(v) else -1
+        else:
+            u, v = p[1], q[1]
+        if u != v:
+            return 1 if u > v else -1
+        i += 1
+
+def evrcmp(a, b):
+    for u, v in zip(a, b):
+        if u == v:
+            continue
+        if isinstance(u, int):
+            return 1 if u > v else -1
+        r = vercmp(u, v)
+        if r:
+            return r
+    return 0
+
+temoins = [('1.25.10', '1.25.9', 1), ('1.25.9', '1.25.9', 0), ('1.el9_7', '2.el9_7', -1), ('1.0~rc1', '1.0', -1),
+           ('1.0^git1', '1.0', 1), ('1.0^git1', '1.0.1', -1), ('1.010', '1.9', 1), ('1.a', '1.1', -1), ('el9_10', 'el9_9', 1)]
+for a, b, r in temoins:
+    if vercmp(a, b) != r or vercmp(b, a) != -r:
+        sys.exit(f"témoin de rpmvercmp faux : {a} contre {b} (attendu : {r})")
+print(f"OK   rpmvercmp : {len(temoins)} témoins tenus (dans les deux sens)")
+
+def ouvrir(f):
+    return {'gz': gzip.open, 'xz': lzma.open, 'bz2': bz2.open}[f.rsplit('.', 1)[1]](f)
+
+fourn, total = [], 0
+for dep in ('vault-BaseOS', 'vault-AppStream', 'vault-CRB'):
+    src = glob.glob(os.path.join(d, dep + '.primary.xml.*'))
+    if len(src) != 1:
+        sys.exit(f"{dep} : {len(src)} primary sur disque (attendu : 1)")
+    sel = []
+    with ouvrir(src[0]) as f:
+        for _, p in E.iterparse(f):
+            if p.tag != C + 'package':
+                continue
+            if p.get('type') == 'rpm':
+                v = p.find(C + 'version')
+                nom, arch = p.findtext(C + 'name'), p.findtext(C + 'arch')
+                srpm = p.findtext(f'{C}format/{R}sourcerpm') or ''
+                m = re.fullmatch(r'(.+)-([^-]+)-([^-]+)\.src\.rpm', srpm)
+                prov = {e.get('name') for e in p.findall(f'{C}format/{R}provides/{R}entry')}
+                if (m and m.group(1) == 'golang') or 'golang' in prov:
+                    ep = v.get('epoch') or '0'
+                    if not ep.isdigit():
+                        sys.exit(f"{dep} : époque illisible pour {nom} : {ep}")
+                    lic = (p.findtext(f'{C}format/{R}license') or '').strip()
+                    sel.append((nom, f"{ep}:{v.get('ver')}-{v.get('rel')}.{arch}", (int(ep), v.get('ver'), v.get('rel')),
+                                arch, lic or '(vide)', srpm or '(absent)', 'golang' in prov, bool(m and m.group(1) == 'golang')))
+            p.clear()
+    total += len(sel)
+    with open(os.path.join(d, dep + '.golang'), 'w', encoding='utf-8') as o:
+        for s in sel:
+            if s[7]:
+                o.write(f"{s[0]}\t{s[1]}\n")
+    print(f"### {dep} : {len(sel)} paquet(s) de la source golang ou fournisseur(s) de golang")
+    for s in sorted(sel, key=lambda s: (s[0], s[1])):
+        print(f"  {s[0]} {s[1]} ; License: {s[4]} ; sourcerpm {s[5]}{' ; fournit golang' if s[6] else ''}")
+    fourn += [(dep, s) for s in sel if s[6]]
+if not total:
+    sys.exit("aucun paquet de la source golang dans BaseOS, AppStream ni CRB de vault 9.7")
+print("## fournisseurs de « golang » (BuildRequires: golang >= 1.24 du spec), du plus haut au plus bas (rpmvercmp)")
+if not fourn:
+    sys.exit("aucun fournisseur de golang")
+import functools
+fourn.sort(key=functools.cmp_to_key(lambda a, b: evrcmp(a[1][2], b[1][2])), reverse=True)
+for dep, s in fourn:
+    print(f"  {dep} {s[0]} {s[1]}")
+h = fourn[0]
+egaux = [x for x in fourn if evrcmp(x[1][2], h[1][2]) == 0 and x[1][0] != h[1][0]]
+print(f"plus haute version qui fournit golang : {h[1][0]} {h[1][1]} ({h[0]}){' ; même EVR chez : ' + ' '.join(x[1][0] for x in egaux) if egaux else ''}")
+gol = [s for _, s in fourn if s[0] == 'golang']
+print(f"constructions du paquet golang : {len(gol)}")
+print(f"golang {obs} (builds OBS, banc A2) présent dans vault 9.7 : {'oui' if any(s[1].split(':', 1)[1].rsplit('.', 1)[0] == obs for s in gol) else 'non'}")
+print(f"golang {obs} est la plus haute construction du paquet golang : {'oui' if gol and max(gol, key=functools.cmp_to_key(lambda a, b: evrcmp(a[2], b[2])))[1].split(':', 1)[1].rsplit('.', 1)[0] == obs else 'non'}")
+PY
+  echo "## fichiers de licence des paquets de la source golang (filelists signés par la chaîne repomd.xml)"
+  for u in BaseOS AppStream CRB; do
+    if [ -s "$d/vault-$u.golang" ]; then l+=("vault-$u"); fi
+  done
+  [ "${#l[@]}" -gt 0 ] || { echo "KO   aucun dépôt ne porte la source golang" >&2; exit 1; }
+  for u in "${l[@]}"; do
+    fichiers_r8 "$u" "$v/${u#vault-}/x86_64/os"
+  done
+  python3 -I - "$d" "${l[@]}" <<'PY' || { echo "KO   fichiers de licence non relevés" >&2; exit 1; }
+import os, re, sys
+d, labs = sys.argv[1], sys.argv[2:]
+motif = re.compile(r'(LICEN[CS]E|COPYING|PATENTS|NOTICE)([._-][A-Za-z0-9._-]*)?')
+for lab in labs:
+    with open(os.path.join(d, lab + '.fichiers'), encoding='utf-8') as f:
+        lignes = [x.rstrip('\n').split('\t') for x in f if x.strip()]
+    par = {}
+    for nom, evr, chemin in lignes:
+        par.setdefault((nom, evr), []).append(chemin)
+    print(f"### {lab}")
+    for (nom, evr), ch in sorted(par.items()):
+        doc = sorted(c for c in ch if c.startswith(('/usr/share/licenses/', '/usr/share/doc/')))
+        lic = sorted(c for c in ch if motif.fullmatch(os.path.basename(c)) and c not in doc)
+        print(f"{nom} {evr} : {len(ch)} fichiers ; {len(doc)} sous /usr/share/licenses ou /usr/share/doc ; {len(lic)} autres au nom de licence")
+        for c in doc:
+            print(f"  doc  {c}")
+        for c in lic:
+            print(f"  nom  {c}")
+PY
+  gpgconf --kill all 2>/dev/null || true
+  rm -rf -- "${d:?}"
+  echo "fichiers effacés (clé, métadonnées)"
 }
 
 # Cœur de la voie 2, NON BRANCHÉ (voir l'en-tête) : ni étape, ni pod. Rien ici n'est appelé par lancer.
