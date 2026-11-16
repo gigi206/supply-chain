@@ -68,3 +68,24 @@ Le seul précédent archivé est la révision 1.0.0-2 ([`revision-predictions.md
 `poc/packaging/debian/` (rules, watch, control) en ferait une nouvelle. Par analogie, elle rouvrirait la même cascade : sources,
 build, mesures, provenance, rejeu et VSA. C'est une projection, pas une mesure. La cascade de 1.0.0-2 n'est pas finie : M5 à M8
 et la ligne 12 restent.
+
+## Décision du propriétaire (note du 2026-11-16, écrit à 2026-11-16T21:15:12Z ; rien n'est réécrit)
+
+Une recommandation, retouchée sur relecture du conseiller, a été présentée le 16/11/2026 avec la question « Pas de révision dédiée pour les trois tags I: de lintian ? ».
+Réponse : « Oui, pas de révision ».
+
+**Décision : pas de révision dédiée.** `poc/packaging/debian/` reste en 1.0.0-2 (première ligne du changelog lue à l'écriture
+de cette note) et les trois tags `I:` restent.
+
+Motifs de la recommandation présentée (la réponse ne porte que sur la question) :
+- les trois tags n'ajoutent rien au contenu ni à la provenance du deb, lu dans leurs textes et non mesuré (pour le tag 1, que
+  le binaire reste identique n'est pas éprouvé par un build) ; au contraire, le champ de
+  `missing-static-built-using-field-for-golang-package` est lu par la 13a (`paquets.py`) ;
+- lintian est hors chemin critique et aucun build ne le lance.
+
+Piste de la recommandation, non décidée : si une autre raison impose un jour une révision, 1 et 2 pourraient y être joints
+(1 éprouvé d'abord par un banc hors réseau, binaire au bit près ; 2 en commentaires seuls, forme que propose le texte du tag),
+et le choix pour 3 se ferait à cette révision.
+
+La section « Ce que coûterait une modification » disait la cascade de 1.0.0-2 inachevée : elle est finie depuis (ligne 12,
+commit `c9d73eb`).
