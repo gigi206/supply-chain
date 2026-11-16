@@ -8,6 +8,7 @@
 # Additif du 12/11/2026, 14:30 UTC : retenue par le propriétaire (« Oui, prépare-la » : 443 et Zot) ; intégration préparée dans
 # ../s1-sortie-rpm.patch (sortie-builds.sh rpm_appliquer), NON APPLIQUÉE ; prédictions : ../resultats/s1-sortie-predictions.md.
 # Additif du 16/11/2026, 22:24:20 UTC : correctif appliqué au dépôt (« Oui, applique-le ») ; politique NON POSÉE dans le cluster (rpm_appliquer).
+# Additif du 16/11/2026, 22:32:52 UTC : politique POSÉE dans le cluster par rpm_appliquer, 22:31:59 à 22:32:02 UTC (« Oui, lance rpm_appliquer »).
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:

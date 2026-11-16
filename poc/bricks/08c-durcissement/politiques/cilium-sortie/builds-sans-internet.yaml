@@ -13,6 +13,7 @@
 # Additif du 12/11/2026, 14:26 UTC (correctif ../05-rpm-mock/s1-sortie-rpm.patch, après S5b, sur accord) : prefetch-rpm ajouté au
 # NotIn, pour la sortie dédiée des pods rpm de la brique 05 (../05-rpm-mock/politiques/prefetch-rpm-sortie.yaml ; rpm_appliquer).
 # Additif du 16/11/2026, 22:24:20 UTC : correctif appliqué au dépôt (« Oui, applique-le ») ; NotIn à trois labels NON POSÉ dans le cluster.
+# Additif du 16/11/2026, 22:32:52 UTC : NotIn à trois labels POSÉ dans le cluster par rpm_appliquer, 22:31:59 à 22:32:02 UTC (« Oui, lance rpm_appliquer »).
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:

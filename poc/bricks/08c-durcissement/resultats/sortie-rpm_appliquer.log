@@ -1,0 +1,16 @@
+# sortie-builds.sh rpm_appliquer, 2026-11-16T22:31:59Z
+OK   NotIn de builds-sans-internet avant : ["prefetch-gomod","prefetch-deb"]
+OK   prefetch-rpm-sortie absente
+kubectl : ciliumnetworkpolicy.cilium.io/prefetch-rpm-sortie created
+OK   prefetch-rpm-sortie valide pour Cilium : True
+kubectl : ciliumnetworkpolicy.cilium.io/builds-sans-internet configured
+OK   builds-sans-internet valide pour Cilium : True
+OK   NotIn de builds-sans-internet après : ["prefetch-gomod","prefetch-deb","prefetch-rpm"]
+politiques de builds : NetworkPolicy builder-sans-sortie, NetworkPolicy construction-deb-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui sélectionnent un pod de prefetch-gomod : CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-image : 
+OK   politiques à sortie CIDR dont les pods seraient aussi sous un refus : 
+OK   labels exclus d'un refus sans politique de sortie dédiée : 
+OK   politiques qui sélectionnent un pod de prefetch-deb : CiliumNetworkPolicy prefetch-deb-sortie
+OK   politiques qui sélectionnent un pod de builds sans label : CiliumNetworkPolicy builds-sans-internet
+OK   politiques qui sélectionnent un pod de prefetch-rpm : CiliumNetworkPolicy prefetch-rpm-sortie

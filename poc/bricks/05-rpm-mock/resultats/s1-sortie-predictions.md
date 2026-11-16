@@ -171,3 +171,29 @@ Question : « Je lance rpm_sec ? ». Réponse : « Oui, lance rpm_sec ».
 - Rien n'est posé dans le cluster. Les fichiers de travail de `sortie-builds.sh` ont été réécrits, comme à chaque lancement.
 
 Suite, chaque point sur accord nommé : `rpm_appliquer` (R3) ; `rpm_temoins` (R4, R5). Aucun rejeu de zéro avant `rpm_temoins`.
+
+## Résultat de `rpm_appliquer`, le 16/11/2026 de 22:31:59 à 22:32:02 UTC (note écrite à 2026-11-16T22:32:52Z ; rien n'est réécrit)
+
+Question : « Je lance rpm_appliquer ? ». Réponse : « Oui, lance rpm_appliquer ».
+
+- État de départ relu en lecture seule à 22:31:37 UTC, avant la question : `NotIn` à `["prefetch-gomod","prefetch-deb"]`,
+  `prefetch-rpm-sortie` absente, six politiques dans `builds`.
+- Commande : `DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/sortie-builds.sh rpm_appliquer </dev/null`, sur `72abe3c`.
+  `date -u` : 22:31:59 avant, 22:32:02 UTC après ; `chrono.tsv` de la 08c : 22:31:59 à 22:32:02 UTC. Code 0, 0 KO.
+- Journal : [`08c/resultats/sortie-rpm_appliquer.log`](../../08c-durcissement/resultats/sortie-rpm_appliquer.log)
+  (sha256 `1903ad4c…`), premier journal de ce nom.
+- **R3 tenue.**
+  - Contrôles de départ OK, puis `prefetch-rpm-sortie` créée et `builds-sans-internet` modifiée : chacune valide pour Cilium
+    (condition `Valid` à `True`) ; l'étape entière a duré 3 s, sous les 60 s de la prédiction.
+  - `NotIn` après : `["prefetch-gomod","prefetch-deb","prefetch-rpm"]`.
+  - **Première mesure des invariants avec sept politiques**, dont les deux NetworkPolicy de la 06 (`builder-sans-sortie`,
+    `construction-deb-sans-sortie`) : tous OK. `prefetch-rpm-sortie` est la seule politique à sélectionner un pod `prefetch-rpm`,
+    `prefetch-sortie` la seule pour `prefetch-gomod`, `prefetch-deb-sortie` la seule pour `prefetch-deb` ; aucune politique
+    n'autorise de trafic vers `construire-image` ; aucun label exclu sans sortie dédiée.
+- **État du cluster depuis 22:32:02 UTC** : la sortie rpm est posée, conforme au dépôt (`kubectl diff -f` des deux YAML,
+  code 0, avant l'ajout des lignes de commentaire). Aucun pod `prefetch-rpm` n'existe encore :
+  R4 et R5 ne sont pas mesurées. `deb_appliquer` et `deb_retirer` ne sont plus à lancer. Repli possible : `rpm_retirer`, sur accord.
+- Une ligne datée est ajoutée à l'en-tête des deux YAML, qui les disaient « NON POSÉ(E) dans le cluster » (commentaires seulement,
+  sans effet sur les objets).
+
+Suite, sur accord nommé : `rpm_temoins` (R4, R5). Aucun rejeu de zéro avant `rpm_temoins`.

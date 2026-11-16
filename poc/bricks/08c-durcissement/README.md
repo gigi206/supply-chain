@@ -1455,3 +1455,10 @@ avant `rpm_temoins`. Détail : [s1-sortie-predictions.md](../05-rpm-mock/resulta
 `sortie-builds.sh rpm_sec` (« Oui, lance rpm_sec ») : 22:29:13 UTC, code 0, 0 KO, hôte seul
 ([journal](resultats/sortie-rpm_sec.log)). R1 de la 05 tenue. Rien n'est posé dans le cluster ; `rpm_appliquer` attend son accord.
 Détail : [s1-sortie-predictions.md](../05-rpm-mock/resultats/s1-sortie-predictions.md) de la 05.
+
+## Additif du 16/11/2026, 22:32:52 UTC : sortie rpm de la brique 05 POSÉE dans le cluster
+
+`sortie-builds.sh rpm_appliquer` (« Oui, lance rpm_appliquer ») : 22:31:59 à 22:32:02 UTC, code 0, 0 KO
+([journal](resultats/sortie-rpm_appliquer.log)). `prefetch-rpm-sortie` posée, `NotIn` de `builds-sans-internet` à trois labels,
+invariants OK avec les sept politiques de `builds`. `deb_appliquer` et `deb_retirer` ne sont plus à lancer. Les témoins
+(`rpm_temoins`) attendent leur accord ; aucun rejeu de zéro avant eux.
