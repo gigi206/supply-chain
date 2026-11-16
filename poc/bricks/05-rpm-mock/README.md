@@ -368,3 +368,4 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Temps passé : 4,93 h de commits à HEAD 05ac074, même méthode ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées (personnes-semaines, unité de l'ADR 0000) ; décision avec toi à 5 pw.
 
 - 2026-11-16T21:25:14Z : décision Q1 (« Oui, portée ») : la notice de Go ira au `%license` du rpm, portée par le packaging ; contenu et forme non tranchés, spec inchangé, rien lancé ; Q2 ouverte ([détail](resultats/m2-predictions.md)).
+- 2026-11-16T21:28:56Z : décision Q2 (« Oui, reporter ») : normalisation SPDX du tag de golang reportée au volet rpm de la 13a, `License:` du spec inchangé d'ici là ; spec inchangé, rien lancé ([détail](resultats/m2-predictions.md)).

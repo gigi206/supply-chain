@@ -169,3 +169,5 @@ présents dans le deb ; expression de licence inchangée, 0 erreur.
 des deux étapes établie par les lignes « fait » de `chrono.tsv`. B2 et B3 restent tenues.
 
 *Note du 14/11/2026, 22:53:08 UTC* : `paquets.sh deb modules` à c279dd2, de 22:52:47 à 22:52:50 UTC, code 0 relevé juste après la commande, sur le deb f66bbeb2 : B2 et B3 tenues de nouveau (deb 1.0.0-2 refait par l'option 1 de la 06).
+
+*Note du 16/11/2026, 21:28:56 UTC* : volet rpm : la normalisation SPDX du tag `BSD and Public Domain` de golang (Rocky 9.7) lui revient, par la décision Q2 du propriétaire (« Oui, reporter ») ; voir [m2-predictions.md](../05-rpm-mock/resultats/m2-predictions.md).

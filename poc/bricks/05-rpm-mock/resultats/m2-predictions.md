@@ -795,3 +795,36 @@ Points de la recommandation présentée, que la réponse ne tranche pas :
 - `Release` à passer à 2 : le banc OBS a construit un 1.0.0-1 sur le spec `e1281b3d`.
 
 Rien n'est modifié : `poc/packaging/` attend aussi Q2.
+
+## Décision Q2 du propriétaire (note du 2026-11-16, écrit à 2026-11-16T21:28:56Z ; rien n'est réécrit)
+
+Une recommandation, retouchée sur relecture du conseiller, a été présentée le 16/11/2026 avec la question « Q2 reportée au volet rpm de la 13a, License: inchangé d'ici là ? »
+Réponse : « Oui, reporter ».
+
+**Décision Q2 : la normalisation SPDX du tag `BSD and Public Domain` de golang est reportée au volet rpm de la 13a ; d'ici là,
+le tag `License:` du spec reste `Apache-2.0 AND MIT AND BSD-3-Clause`.**
+
+Motifs de la recommandation présentée (la réponse ne porte que sur la question) :
+- sous les traductions validées le 12/11/2026 pour la 13a (« Go » → BSD-3-Clause, « X11 » → MIT,
+  [paquets-lies.log](../../13a-licences/resultats/paquets-lies.log), copyright de golang-1.24-src, deb 1.0.0-1), la bibliothèque
+  standard liée relève d'identifiants déjà présents dans l'expression du spec. Le découpage par fichier de Go 1.25.9 de Rocky
+  n'est pas lu ;
+- seul un volet rpm de la 13a lirait le tag de golang ; ce volet n'existe pas et le premier build de la 05 n'en dépend pas ;
+- `fedora-license-data` n'est pas audité (0 ligne au doc 04 et dans `tools/health/projects.tsv`).
+
+Risque présenté avec la recommandation : « public domain » figure, hors tests et `testdata`, dans six fichiers des copies locales
+de Go 1.24.7 et 1.26.10 (`grep -ril`, lu le 16/11), les mêmes dans les deux : trois d'autres architectures (`md5block_386.s`,
+`md5block_s390x.s`, `md5block_ppc64x.s`), un générateur sous `crypto/md5/_asm/`, et deux que leur nom n'écarte pas d'amd64
+(sans suffixe, ou `_amd64`), sans ligne `//go:build` : `crypto/internal/fips140/aes/aes_generic.go` et `math/exp_amd64.s`. Leur compilation n'est pas lue, et leur
+liaison n'est mesurée ni pour le deb ni pour le rpm ; Go 1.25.9 n'est pas lu. Dans `paquets-lies.log`, borné aux noms de
+licence des paragraphes du copyright de golang-1.24-src, « domain » apparaît 0 fois ; le texte de ce copyright n'est pas relu.
+S'ils sont liés, le tag `License:` changera plus tard, avec une nouvelle Release. Contrôle proposé, non décidé : au premier
+build, sur le modèle de `x11-fichiers`.
+
+Point ouvert, non décidé : ces deux mentions touchent aussi le contenu de la notice de Q1 (non tranché) et le `Comment:` du
+`debian/copyright` du deb.
+
+Pistes pour le volet rpm de la 13a, non décidées : une table écrite à la main pour ce seul tag, revue par le propriétaire comme
+« Go » et « X11 » le 12/11, ou `fedora-license-data` après un audit au doc 04.
+
+Q1 et Q2 sont tranchées ; `poc/packaging/` reste inchangé jusqu'à la mise en forme de Q1 (contenu et forme non tranchés).
