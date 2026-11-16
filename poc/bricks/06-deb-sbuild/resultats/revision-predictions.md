@@ -413,3 +413,13 @@ Prochaine ligne : correctif d'épinglage 5, sur accord nommé ; puis S5 `prealab
 (`git apply --check` puis `git apply`, code 0 ; diff de l'arbre identique au correctif, `bash -n` code 0) : plus aucune occurrence de
 `a9d48331`, de `"8 28"` ni de `"False|Failed"` ; `71f84839` une fois, `"8 6"` une fois, `"False|StepFailed"` cinq fois. Rien lancé.
 Prochaine ligne : S5 `prealables` (additif Q1 à Q8 de `s5-predictions.md`), sur accord nommé.
+
+## Carte, ligne 9 : S5 `prealables` (note de 2026-11-16T15:09:57Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S5 `prealables` (lecture et admission à blanc, Q1 à Q8) ? ». `s5.sh prealables` à 7d09bd3, du 16/11 15:09:15 au 16/11 15:09:18 UTC, code 0 relevé juste après la commande, 39 OK, 0 KO,
+0 ÉCART ; lignes « S5a prealables » et « fait » dans `chrono.tsv`. Journal `s5-prealables.log` réécrit (version du 11/11 dans git).
+- **Q1 à Q8 tenues** (détail dans `s5-predictions.md`) : bundles `71f84839` et `d1fb3871` exportés, quatre tâches dans la liste
+  revue, copie de la fermeture conforme au verrou, layouts aux digests du 11/11, 16 objets admis à blanc, enveloppes `8 6`,
+  `fermeture-alteree` absent de Zot.
+- Reste de S5, à décider : `zot` (écriture dans Zot des deux fermetures altérées, accord à part), puis `prefetch miroir fermeture
+  kata sbuild porte retirer`, avec leur additif de prédictions commité avant. `fermeture` exige `zot`.
+Prochaine ligne : additif de prédictions des étapes suivantes de S5, puis `zot`, sur accord nommé.

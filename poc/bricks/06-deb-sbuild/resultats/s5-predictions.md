@@ -186,3 +186,21 @@ additif. Chaque valeur vient du dernier journal qui l'a produite après S5b (Zot
   et `rendre_tout` en rend 12.
 - **Non mesuré par `prealables`** : la présence de `a9d48331` dans Zot, et l'égalité des spécifications des bundles `a9d48331` et
   `71f84839`.
+
+### Résultats de l'additif `prealables` (note de 2026-11-16T15:09:57Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S5 `prealables` (lecture et admission à blanc, Q1 à Q8) ? ». `s5.sh prealables` à 7d09bd3, du 16/11 15:09:15 au 16/11 15:09:18 UTC, code 0 relevé juste après la commande, 39 OK, 0 KO,
+0 ÉCART ; lignes « S5a prealables » et « fait » dans `chrono.tsv`. Journal `s5-prealables.log` réécrit (version du 11/11 dans git).
+- **Q1 tenue** : export des deux bundles réussi (`71f84839` est donc dans Zot) ; tâches `prefetch,construire,publier` et
+  `preparer,construire,publier` ; image de `prefetch-deb` = amorce `7378260c`.
+- **Q2 tenue** : `prefetch-deb@4dac0609`, `construire-builder@746c2e11`, `preparer-deb@588617b8`, `construire-deb@3726ff0b`, tous
+  dans la liste revue.
+- **Q3 tenue** : paramètres égaux à ceux du 11/11 ; fermeture deb `bb7599a2` ; liste `b47135c9…` ; paquet témoin
+  `g++-x86-64-linux-gnu_14.2.0-1_amd64.deb` (1200 octets).
+- **Q4 tenue** : 162 paquets, 167 fichiers ; layout intact `bb7599a2` ; `paquet-modifie` `a549729d…` (167 couches), `paquet-en-trop`
+  `b27225cf…` (168 couches), une couche différente chacun : mêmes digests que le 11/11.
+- **Q5 tenue** : 16 objets admis à blanc (12 TaskRuns, 2 PVC, 2 pods) ; les trois TaskRuns de N5 sans variable de pipeline restante.
+- **Q6 tenue** : six politiques, mêmes sélecteurs que le 11/11.
+- **Q7 tenue** : aucun objet `s5` ; `fermeture-alteree` absent de Zot ; enveloppes `8 6`. Relevées sans mesure : fermeture
+  `bb7599a2` **8** (4 le 11/11), image de build `749d746c` **4** (4 le 11/11).
+- **Q8 tenue** : code 0, aucun ÉCART ni KO.
+- Non mesuré : l'égalité des spécifications de `a9d48331` et `71f84839` ; la présence de `a9d48331` dans Zot.
