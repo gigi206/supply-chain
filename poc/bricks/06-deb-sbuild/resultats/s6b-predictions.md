@@ -287,3 +287,20 @@ Journal `s6b-rebuild.log`, sans ligne `jeton|token` ; celui du 12/11 reste dans 
 - Dans l'invité, porteuse de `enp1s0` à 0 au début et à la fin (`porteuse_enp1s0=0`, `porteuse_fin=enp1s0=0`), et `tx` de
   l'invité inchangés (`tx_packets=59313`) : la reconstruction compte, à la différence de M4 (lien établi).
 - Durée : de 20:41:41 à 20:43:07 UTC dans la VM, soit 86 s pour `rebuild_deb.sh`.
+
+## Résultat de M6 (note de 2026-11-16T20:51:35Z, écrit à 2026-11-16T20:52:06Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh vsa (M6) ? ». Du 16/11 20:51:33 au 16/11 20:51:35 UTC, code 0. Journal `s6b-vsa.log` : une ligne `jeton|token`, le contrôle
+« signature de Chains et jeton de la TSA », de même forme que dans le journal précédent.
+
+**M6 tenue : VSA de D signée par la clé du domaine.**
+- Garde du correctif passée : le journal de M5 porte `manifeste_reconstruit=` D.
+- Politique `https://github.com/gigi206/supply-chain/blob/2d366066b5a42698bcb87e3df95f2e6ca7660629/poc/bricks/06-deb-sbuild/rejeu/politique-replay-deb.md`, sha256 `30ee17ec…` des deux côtés ; `vsa_deb.py` de HEAD (`e7d60e1`) `34799510…` des deux côtés.
+- Entrées : `verifier_deb.py` sans KO ; reconstruction `PASSED`, manifeste D, code 0, porteuse à 0 au départ et à la fin.
+- `bundles de l'invocation c3d27e05-b4cd-487b-8980-7a40b3336ffc parmi 8` : un seul (`bundle-fea50d0f5cc04dae`), revérifié ;
+  énoncé identique à la provenance vérifiée par `verifier_deb.py`.
+- `timeVerified` 2026-11-16T20:43:07Z (fin de M5), au moins 24 h après `finishedOn` 2026-11-15T20:38:15Z.
+- `verificationResult` `PASSED`, `verifiedLevels` `['POC_REPLAY_BIT_IDENTIQUE']` ; `inputAttestations` : le bundle
+  `horodatage/bundles@sha256:826004d6…`.
+- Signature : `attest-blob` code 0, sans service (ni tlog ni horodatage) ; `verify-blob-attestation` avec la clé du domaine,
+  code 0, « Verified OK » ; bundle `application/vnd.dev.sigstore.bundle.v0.3+json`, énoncé identique à `enonce.json`.
+- Archivés : `s6b-vsa-enonce.json` `d61d7b3d…` et `s6b-vsa.bundle.json` `4a9cef23…`, égaux aux copies de la VM.

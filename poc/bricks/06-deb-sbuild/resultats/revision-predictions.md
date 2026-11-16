@@ -678,3 +678,9 @@ recommandation ni décision ; rien lancé, `poc/packaging` inchangé. Les lignes
 « Oui, lance-le » à « Je lance s6b.sh rebuild (M5) ? ». Du 16/11 20:41:40 au 16/11 20:46:43 UTC, code 0. **M5 tenue** : D reconstruit dans `sc-replay`,
 lien coupé de 2026-11-16T20:41:41Z à 2026-11-16T20:46:41Z, sortie de la VM inchangée, `PASSED` (deb `f66bbeb2…`, manifeste `60f25f5c…`).
 Prochaine ligne : un push sur accord, puis `POLITIQUE_COMMIT=2d366066b5a42698bcb87e3df95f2e6ca7660629 s6b.sh vsa` (M6), sur accord nommé.
+
+## Carte, ligne 11 : `vsa` (note de 2026-11-16T20:51:35Z, écrit à 2026-11-16T20:52:06Z ; rien n'est réécrit)
+Push de `e7d60e1` fait avant (« Oui, pousse »). « Oui, lance-le » à « Je lance s6b.sh vsa (M6) ? ». Du 16/11 20:51:33 au 16/11 20:51:35 UTC, code 0. **M6 tenue** :
+VSA de D `PASSED` (`POC_REPLAY_BIT_IDENTIQUE`), `timeVerified` 20:43:07Z, signée par la clé du domaine et revérifiée ;
+énoncé `d61d7b3d…` et bundle `4a9cef23…` archivés.
+Prochaine ligne : `s6b.sh pousser_vsa` (M7), sur accord nommé.
