@@ -423,3 +423,12 @@ Prochaine ligne : S5 `prealables` (additif Q1 à Q8 de `s5-predictions.md`), sur
 - Reste de S5, à décider : `zot` (écriture dans Zot des deux fermetures altérées, accord à part), puis `prefetch miroir fermeture
   kata sbuild porte retirer`, avec leur additif de prédictions commité avant. `fermeture` exige `zot`.
 Prochaine ligne : additif de prédictions des étapes suivantes de S5, puis `zot`, sur accord nommé.
+
+## Carte, ligne 9 : additif des étapes suivantes de S5, correctif 6 préparé (note de 2026-11-16T15:13:21Z ; rien n'est réécrit)
+Relecture des étapes `zot` à `retirer` contre les journaux du 11/11 : deux défauts du script, mesurés ce jour-là, n'ont jamais été
+corrigés : l'extraction du deb dans `kata` (champ 4 au lieu de 5, `s5-kata.log` l. 21) et le libellé « Hash Sum mismatch » de N1
+dans `prefetch` (`s5-prefetch.log` l. 26, libellé réel « Hashes of received file », l. 17). Le bilan du 11/11 les nommait ; la
+correction n'a pas suivi. **Correctif 6** préparé et archivé, **non appliqué** :
+[`revision-correctif-6.patch`](../revision-correctif-6.patch) (`git apply --check` code 0 ; extraction essayée sur
+`s4d-pipeline-1-construire.log` : champ 4 « sample-a », champ 5 « f66bbeb2 »). Additif Q9 à Q22 dans `s5-predictions.md`. Rien lancé.
+Prochaine ligne : correctif 6, sur accord nommé ; puis `zot`, sur accord nommé.

@@ -204,3 +204,40 @@ additif. Chaque valeur vient du dernier journal qui l'a produite après S5b (Zot
   `bb7599a2` **8** (4 le 11/11), image de build `749d746c` **4** (4 le 11/11).
 - **Q8 tenue** : code 0, aucun ÉCART ni KO.
 - Non mesuré : l'égalité des spécifications de `a9d48331` et `71f84839` ; la présence de `a9d48331` dans Zot.
+
+---
+## Additif de la révision 1.0.0-2 : étapes `zot` à `retirer` (note de 2026-11-16T15:13:21Z, avant tout lancement ; rien n'est réécrit)
+
+Ces prédictions valent pour `s5.sh` **avec le correctif 6 appliqué** ([`revision-correctif-6.patch`](../revision-correctif-6.patch),
+non appliqué à cette heure). Ce correctif corrige deux défauts mesurés le 11/11 et restés dans le script ; sans lui, `prefetch` et
+`kata` finissent en KO sur un écart garanti :
+- `kata` : l'extraction du deb prend le champ 4 (nom du fichier) au lieu du champ 5 (empreinte) : « sample-a » le 11/11
+  (`s5-kata.log` l. 21). Le champ 5 donne `f66bbeb2` sur la ligne « deb produit » de `s4d-pipeline-1-construire.log` (15/11).
+- `prefetch` : apt-helper 3.0.4 n'écrit pas « Hash Sum mismatch » pour N1 (`s5-prefetch.log` l. 26) ; il écrit « Hashes of received
+  file » (l. 17). La mesure prend ce libellé. Celle de N4 (`apt-get download`, l. 412) garde « Hash Sum mismatch », mesuré le 11/11
+  (`s5-miroir.log` l. 72).
+
+Valeurs : celles du 11/11 (journaux `s5-*.log` de cette date, dans git) sauf les quatre qui suivent la révision et S5b : deb du témoin
+N7 `f66bbeb2`, `DIGEST_CONSTRUIT` de N7 = D `60f25f5c`, enveloppes de départ `8 6 8 4` (`prealables` du 16/11), provenance la plus
+récente du deb = PipelineRun `c3d27e05…` (`$W/s4d3-06/uid-chemin-2`, écrit le 15/11 à 20:38 UTC).
+
+| # | Étape | Prédiction | Confiance |
+|---|---|---|---|
+| Q9 | `zot` (écriture, compte poc-ecriture) | `paquet-modifie` relu en lecture anonyme à `a549729d…`, `paquet-en-trop` à `b27225cf…` | Haute |
+| Q10 | `prefetch` | N1 témoin `True|Succeeded`, pod `prefetch-deb|sc-build|-`, miroir d'un paquet | Haute ; dépend d'Internet en 80 vers snapshot.debian.org |
+| Q11 | `prefetch` | N1 hash faux `False|StepFailed` ; « téléchargement refusé » 1 ; « sha256 différent » 0 ; « Hashes of received file » présent | Haute |
+| Q12 | `prefetch` | N2 `False|StepFailed` ; refus sur `dists/trixie/InRelease` 1 ; aucun index | Haute |
+| Q13 | `miroir` | prefetch complet `True|Succeeded` ; copies altérées `1|1200` et `1|1` ; N3 `.deb` et InRelease `False|StepFailed`, refus par la revérification, pods `construire-builder|sc-build|kata` ; N3 témoin `True|Succeeded`, `DIGEST_CONSTRUIT` = `749d746c` | Moyenne-haute : Internet ; témoin reproduit deux fois le 13/11 (`s4a-pipeline.log` l. 78) |
+| Q14 | `miroir` | N4 : intact `0|1` puis `0|1` ; InRelease altéré `1|0` ; `.deb` altéré `0|1` puis `1|0`, « Hash Sum mismatch » | Haute : même amorce `7378260c`, même apt |
+| Q15 | `fermeture` | commit et dépôt `6391fd43` ; N5 témoin `True|Succeeded`, 162 paquets ; deux fermetures altérées présentes (Q9), tirées, `False|StepFailed`, refusées par la confrontation au verrou (paquet différent ; 163 fichiers pour 162) | Haute ; le packaging `f0ed7a71` du bundle `d1fb3871` ne touche pas la fermeture |
+| Q16 | `kata` | N7 hors Kata `False|PodAdmissionFailed`, refus de Pod Security « restricted » (privileged), aucun pod ; N7 témoin `True|Succeeded`, `construire-deb|sc-build|kata`, deb `f66bbeb2`, `DIGEST_CONSTRUIT` = `60f25f5c` | Haute : S4d du 14/11 et S4d3 du 15/11, deux fois chacune sous Kata |
+| Q17 | `sbuild` | journal `.build` 1 ; connexion TCP à Zot depuis le pod en code 0 ; `debian/rules` exécuté une fois, connexion en échec, interfaces `lo` | Moyenne-haute : image de build `749d746c` identique, passage tenu le 11/11 |
+| Q18 | `porte` | aucun TaskRun en cours ; enveloppes `8 → 8`, `6 → 6`, `8 → 8`, `4 → 4` ; annotations de Chains relevées (`true`, `failed` pour N7 hors Kata) | Moyenne-haute : suppose qu'aucun PipelineRun ne tourne pendant S5 (rattrapage repris en S4d3, PipelineRun déjà présent pour `6391fd43`) |
+| Q19 | `porte` | provenance de PipelineRun la plus récente du deb : `c3d27e05…` | Haute |
+| Q20 | `porte` | deb : `true||trusted_task.tagged`, `ok|8/8`, `refus|refus` ; sample-app : `true||trusted_task.tagged`, `ok|6/6`, `ok|ok` | Moyenne-haute : le scan de sample-app doit dater de 7 jours au plus et sa base de 3 jours au plus avant lui (`07a/politique/porte/scan.rego` l. 80-109) ; dernier verdict `ok` le 15/11, non relu depuis |
+| Q21 | `retirer` | aucun objet `s5` restant ; les fermetures altérées restent dans Zot | Haute |
+| Q22 | toutes | code 0 et aucun ÉCART à chaque étape | Moyenne-haute |
+
+- **Ordre proposé**, un accord par lancement : correctif 6 ; `zot` seule (écriture dans Zot) ; puis
+  `prefetch miroir fermeture kata sbuild porte retirer` (cluster, Internet en 80 pour `prefetch` et `miroir`).
+- **Ne mesure pas** : ce que la note « Ce que S5a ne mesure pas » exclut déjà ; U13 (`ScanEnRetard`), qui n'est pas jugée par S5.
