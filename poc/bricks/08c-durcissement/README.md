@@ -1462,3 +1462,10 @@ Détail : [s1-sortie-predictions.md](../05-rpm-mock/resultats/s1-sortie-predicti
 ([journal](resultats/sortie-rpm_appliquer.log)). `prefetch-rpm-sortie` posée, `NotIn` de `builds-sans-internet` à trois labels,
 invariants OK avec les sept politiques de `builds`. `deb_appliquer` et `deb_retirer` ne sont plus à lancer. Les témoins
 (`rpm_temoins`) attendent leur accord ; aucun rejeu de zéro avant eux.
+
+## Additif du 16/11/2026, 22:44:22 UTC : témoins de la sortie rpm
+
+`sortie-builds.sh rpm_temoins` (« Oui, lance rpm_temoins ») : 22:35:44 à 22:43:18 UTC, code 0
+([journal](resultats/sortie-rpm_temoins.log)). Pod `prefetch-rpm` : DNS, public en 443 et Zot joints, le reste refusé ; les quatre
+autres témoins rendent les mêmes verdicts que le 10/11, plus dl.rockylinux.org (joint en 443 pour `prefetch-gomod`, en 80 pour
+`prefetch-deb`, refusé ailleurs). R4 et R5 de la 05 tenues. La contrainte « aucun rejeu de zéro avant `rpm_temoins` » est levée.

@@ -197,3 +197,39 @@ Question : « Je lance rpm_appliquer ? ». Réponse : « Oui, lance rpm_applique
   sans effet sur les objets).
 
 Suite, sur accord nommé : `rpm_temoins` (R4, R5). Aucun rejeu de zéro avant `rpm_temoins`.
+
+## Résultat de `rpm_temoins`, le 16/11/2026 de 22:35:44 à 22:43:18 UTC (note écrite à 2026-11-16T22:44:22Z ; rien n'est réécrit)
+
+Question : « Je lance rpm_temoins ? ». Réponse : « Oui, lance rpm_temoins ».
+
+- Préalables relus à 22:35 UTC, avant la question, sans rien modifier : aucun pod `sortie-*` dans `builds`, ConfigMap `ca-poc`
+  présente, nœud `sc-build` à marque `zone` ; pods témoins `prefetch-rpm` et sans label admis en `kubectl create --dry-run=server`
+  (filtre jq extrait du script, image `68e0ae70…`), rien créé.
+- Commande : `DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/sortie-builds.sh rpm_temoins </dev/null`, sur `a0557df`.
+  `date -u` : 22:35:44 avant, 22:43:18 UTC après ; `chrono.tsv` de la 08c : idem. Code 0.
+- Journal : [`08c/resultats/sortie-rpm_temoins.log`](../../08c-durcissement/resultats/sortie-rpm_temoins.log) (sha256 `2f04919c…`).
+- Le dernier pod (`sortie-rpm`, supprimé sans attente par le script) a disparu à 22:43:49 UTC (`kubectl wait --for=delete`) :
+  aucun pod `sortie-*` ne reste.
+
+**R4 tenue**, pod `prefetch-rpm` : trois noms résolus ; snapshot.debian.org en 80 refusé ; proxy.golang.org et dl.rockylinux.org
+en 443 joints (HTTP 200) ; dl.rockylinux.org en 80 refusé ; API de RKE2 refusée ; **Zot joint (HTTP 200)** ; Forgejo refusé
+(délai de 30 s dépassé). La règle `toCIDR 192.168.161.13/32` en 5000 est donc mesurée : elle ouvre Zot, et seulement sur ce port
+(Forgejo, même adresse en 3000, reste fermé).
+
+**R5 tenue**, mêmes témoins pour les autres labels :
+- `prefetch-gomod` : dl.rockylinux.org joint en 443 (HTTP 200), refusé en 80 ; le reste comme le 10/11 (proxy.golang.org joint,
+  Zot et API refusés, Forgejo joint).
+- `prefetch-deb` : dl.rockylinux.org refusé en 443 et **joint en 80 (HTTP 200)** : pas de redirection vers https, le cas le moins
+  sûr de la prédiction tient sans réserve.
+- sans label : dl.rockylinux.org refusé en 443 et en 80 ; API de RKE2 (HTTP 401), Zot et Forgejo joints, comme le 10/11.
+- `construire-image` : tout refusé, DNS compris.
+- **Comparaison avec [`sortie-deb_temoins.log`](../../08c-durcissement/resultats/sortie-deb_temoins.log) du 10/11**, hors lignes
+  de dl.rockylinux.org, adresses résolues et bloc du témoin rpm : une seule différence, le Forgejo du témoin `prefetch-deb`. Le
+  10/11, la trace de `TimeoutExpired` (défaut corrigé le 10/11 à 14:35 UTC dans le script) ; ici, « Forgejo : refusé
+  (TimeoutExpired) ». Même verdict, refusé.
+
+**Bilan de la sortie rpm** : R1, R3, R4 et R5 tenues ; R2 mesurée sur la copie du 12/11 seulement ; R6 attend un rejeu de zéro.
+La contrainte « aucun rejeu de zéro avant `rpm_temoins` » est levée ; celle de date (pas avant le 28/11) demeure.
+
+Suite de S1, chaque point sur accord nommé : `s1.sh prealables` (P1) ; ajout à `s1.sh` pour N3 et N4 ; décision `extras` ;
+`amorce`, `hote` de nouveau, `racine`, `image`, `essais`, `verrou`.
