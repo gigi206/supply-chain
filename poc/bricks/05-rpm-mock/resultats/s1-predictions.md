@@ -316,3 +316,29 @@ Suite, chaque point sur accord nommé : appliquer l'ajout (une ligne datée à l
 `extras` ; `amorce`, `hote` de nouveau, `racine` (lire `rpm` dans sa liste), `image`, `essais`, `verrou`.
 
 *Correction de date (note écrite à 2026-11-16T23:02:44Z, rien n'est réécrit)* : l'en-tête de la section « Ajout N3 et N4 à `essais` » ci-dessus dit « note du 2026-11-17 ». C'est faux en UTC : la note est du 2026-11-16, écrite à 2026-11-16T23:02:29Z, comme l'indique son en-tête. « 2026-11-17 » a été tapé à la main d'après l'horloge locale, contre la règle « heure tirée de date -u ». Même erreur dans la note correspondante de `docs/03-validation-briques.md`, corrigée de même.
+
+## Ajout N3 et N4 appliqué au dépôt (note du 2026-11-16, écrite à 2026-11-16T23:07:32Z ; rien n'est réécrit)
+
+Question : « J'applique l'ajout N3 et N4 et je le commite ? ». Réponse : « Oui, applique-le ».
+
+- `git apply` de [`s1-n34.patch`](../s1-n34.patch) le 16/11/2026 à 23:06:52 UTC (`date -u` de la commande), sur `92830e6`.
+  `git apply -R --check` passe juste après. Le sha256 de `s1.sh` vaut alors `7a5ec25f…`, celui de la copie bancée
+  ([`s1-n34-banc.log`](s1-n34-banc.log)).
+- Une ligne datée est ensuite ajoutée à l'en-tête de `s1.sh`, sans rien réécrire. Après elle, `git apply --check` échoue dans
+  les deux sens (ligne ajoutée dans le contexte) : le fichier du correctif reste comme trace. `s1.sh` vaut désormais `710f3904…`.
+- **Banc repassé sur le `s1.sh` du dépôt**, le 16/11/2026 de 23:07:04 à 23:07:05 UTC : 35 OK, 0 KO
+  ([`s1-n34-banc-applique.log`](s1-n34-banc-applique.log), son en-tête porte `710f3904…`). `bash -n` passe ; shellcheck
+  0.11.0 sans avertissement (`-S warning`).
+- Trois précisions sur la note de préparation, relues par le conseiller :
+  - « Rien n'arrête l'étape » a une exception : le `livrer` de `n34-binaire.py` n'est pas gardé. Sous `set -e`, son échec sortirait
+    avant `pod_retirer`, le pod restant en place ; les journaux de mock sont déjà archivés à ce moment. Le correctif n'est pas
+    modifié pour cela.
+  - Les deux passages du banc d'avant les corrections (22:59:55 UTC avec deux KO, puis 23:00:34 UTC) ont été écrasés dans le
+    scratchpad et ne sont pas archivés : la phrase « deux défauts trouvés par le banc » n'a pas de journal derrière elle.
+  - La précondition « `rpm` dans la racine » n'est pas propre à l'ajout : la sonde existante lance déjà `rpm -q`, et `rpm2cpio`
+    est dans le même paquet. La lecture de la liste des rpm de `racine` couvre les deux.
+- `-trimpath` est dans le `%build` du spec (`GOFLAGS`) : la forme `runtime/…` attendue par A4 tient.
+- Rien n'est lancé : `essais` n'a pas tourné.
+
+Suite, chaque point sur accord nommé : push ; décision `extras` ; `amorce`, `hote` de nouveau, `racine`, `image`, `essais`,
+`verrou`.

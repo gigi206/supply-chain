@@ -21,6 +21,13 @@
 #   essais      pod Kata privilégié, root, label prefetch-rpm, image d'essai : sonde (capacités, montages, versions, clés,
 #               dépôts actifs de mock) ; podman pull de l'image de bootstrap par digest et image mount ; puis, pour nspawn puis
 #               simple : mock --buildsrpm et --rebuild de sample-app, sha256 du src.rpm et du rpm, place de /w, scrub
+#               Ajout N3 et N4 (../s1-n34.patch, préparé à sec le 16/11/2026, NON APPLIQUÉ ; prédictions :
+#               resultats/s1-predictions.md, section « Ajout N3 et N4 ») : après les journaux de mock, pod encore en vie, rpm
+#               binaire de sample-app rapatrié sous $T/rpm-<isolation> (sha256 comparé à la sonde) ; puis SONDE_N34 dans le pod :
+#               fichiers de licence de l'en-tête (drapeaux, bit 128, empreintes), BUILDTIME, CHANGELOGTIME et mtime (N5),
+#               binaire usr/bin/sample-app isolé par rpm2cpio et n34-binaire.py (N4) ; sorties brutes, rien n'arrête l'étape
+#               Ajout appliqué au dépôt le 16/11/2026 à 23:06:52 UTC (« Oui, applique-le »), sha256 égal à la copie bancée
+#               (7a5ec25f…) ; non lancé.
 #   verrou      (ajoutée le 12/11/2026 après le relevé de M2) pod Kata privilégié, root, label prefetch-rpm, image d'essai :
 #               configuration jumelle avec bootstrap_image_ready=True ; mock --buildsrpm puis --calculate-build-dependencies,
 #               isolation ISOLATION (simple par défaut) ; verrou archivé (resultats/s1-verrou.json) et résumé ; rien poussé
@@ -412,6 +419,48 @@ for iso in nspawn simple; do
 done
 true'
 
+# Ajout N3 et N4 (../s1-n34.patch, préparé à sec le 16/11/2026, NON APPLIQUÉ). SONDE reste inchangée : P9 à P11 et les durées
+# gardent leur sens. En-tête lu par rpm -qp dans le pod (l'hôte n'a pas rpm) ; sorties brutes, contrôlées dans les notes contre les
+# prédictions. golang-NOTICES contient la chaîne runtime/memmove_amd64.s : N4 ne lit que le binaire isolé (n34-binaire.py).
+SONDE_N34='set -u
+for iso in nspawn simple; do
+  echo "## $iso"
+  set -- /w/res-$iso/sample-app-[0-9]*.x86_64.rpm
+  [ -e "$1" ] || { echo "rpm binaire de sample-app ($iso) : aucun"; continue; }
+  echo "rpm binaire de sample-app ($iso) : $# fichier(s)"
+  [ $# = 1 ] || { echo "plusieurs rpm binaires : lecture non faite"; continue; }
+  f=$1
+  echo "algorithme des empreintes de fichiers : $(rpm -qp --qf "%{FILEDIGESTALGO}" "$f" 2>&1)"
+  rpm -qp --qf "[%{FILEFLAGS} %{FILENAMES} %{FILEDIGESTS}\n]" "$f" > /w/n34/fichiers-$iso.txt 2>&1
+  echo "rpm -qp, fichiers : rc $?, $(wc -l < /w/n34/fichiers-$iso.txt) ligne(s)"
+  grep " /usr/share/licenses/" /w/n34/fichiers-$iso.txt | while read -r fl nm dg; do
+    case $fl in ""|*[!0-9]*) echo "licence, ligne illisible : $fl $nm $dg"; continue ;; esac
+    echo "licence : $nm ; drapeaux $fl ; bit 128 : $((fl / 128 % 2)) ; empreinte ${dg:-aucune}"
+  done
+  echo "dates : $(rpm -qp --qf "buildtime %{BUILDTIME} ; changelogtime %{CHANGELOGTIME}" "$f" 2>&1)"
+  rpm -qp --qf "[%{FILEMTIMES}\n]" "$f" 2>&1 | sort -u > /w/n34/mtimes-$iso.txt
+  echo "mtime des fichiers : $(wc -l < /w/n34/mtimes-$iso.txt) valeur(s) distincte(s), min $(sort -n /w/n34/mtimes-$iso.txt | head -n 1), max $(sort -n /w/n34/mtimes-$iso.txt | tail -n 1)"
+  rpm2cpio "$f" > /w/n34/charge-$iso.cpio 2> /w/n34/rpm2cpio-$iso.err
+  echo "rpm2cpio : rc $?, $(wc -c < /w/n34/charge-$iso.cpio) octets"
+  python3 -I /w/n34/n34-binaire.py /w/n34/charge-$iso.cpio 2>&1; echo "n34-binaire.py : rc $?"
+  rm -f /w/n34/charge-$iso.cpio
+done
+true'
+
+rapatrier_rpms() { # nom : rpm binaires de sample-app copiés du pod sous $T/rpm-<isolation>, sha256 comparé à la sonde ; n'arrête rien
+  local iso f s a
+  for iso in nspawn simple; do
+    rm -rf "$T/rpm-$iso"; mkdir -p "$T/rpm-$iso"
+    for f in $(kubectl exec -n builds "$1" -- sh -c "cd /w/res-$iso 2>/dev/null && ls sample-app-[0-9]*.x86_64.rpm 2>/dev/null; true" </dev/null); do
+      if kubectl exec -n builds "$1" -- cat "/w/res-$iso/$f" </dev/null > "$T/rpm-$iso/$f"; then
+        s=$(sha256sum < "$T/rpm-$iso/$f" | cut -c1-64)
+        a=$(sed -n "s/^rpm $iso : $f \([0-9a-f]\{64\}\)$/\1/p" "$T/essais.log")
+        if [ "$s" = "$a" ]; then echo "OK   rpm $iso rapatrié : $f $s"; else echo "ÉCART rpm $iso rapatrié : $f $s (sonde : ${a:-absente})"; fi
+      else echo "ÉCART rpm $iso : copie de $f en échec"; fi
+    done
+  done
+}
+
 etape_essais() {
   local d img n=s1-05-essais
   d=$(cat "$T/image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape image" >&2; exit 1; }
@@ -428,6 +477,10 @@ etape_essais() {
   kubectl exec -n builds "$n" -- sh -c 'for f in /w/res-*/build.log /w/res-*/root.log; do [ -e "$f" ] && { echo "### $f"; tail -n 200 "$f"; }; done' \
     </dev/null 2>&1 | grep -i -v -E 'jeton|token' > "$R/$PREFIXE-essais-mock.log" || true
   echo "journaux de mock : $(wc -l < "$R/$PREFIXE-essais-mock.log") lignes, resultats/$PREFIXE-essais-mock.log"
+  echo "## N3 et N4 : rpm binaire de sample-app (ajout ../s1-n34.patch)"
+  rapatrier_rpms "$n"
+  livrer "$n" /w/n34/n34-binaire.py "$here/n34-binaire.py"
+  dans "$n" essais-n34 <<<"$SONDE_N34"
   pod_retirer "$n"
 }
 
