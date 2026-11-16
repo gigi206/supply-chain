@@ -198,3 +198,19 @@ la fin de `build.log` et `root.log` ; elle ne rapatrie pas le rpm et ne lit pas 
 peut-être dans la fin du `build.log` ; N3 (fichiers de licence, bit 128, sha256) et N4 (`x11-fichiers` sur le binaire) demandent
 un ajout à `s1.sh`, donc un banc à sec et un accord, avant `essais`. La relecture de `etape_prealables` et des attentes R3 à R6
 contre les journaux d'après S5b reste à faire avant `rpm_appliquer` et `prealables`.
+
+## Résultat du second passage de `hote` (note du 2026-11-16, écrit à 2026-11-16T22:13:46Z ; rien n'est réécrit)
+
+Lancement accordé le 16/11/2026 (question « Je lance s1.sh hote (PREFIXE=s1-2) ? », réponse « Oui, lance hote »), de 22:12:52 à
+22:13:11 UTC (`chrono.tsv`), HEAD 1dd8ec5, commande `PREFIXE=s1-2 DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/s1.sh hote` :
+code 0, 14 lignes OK, aucune KO ([journal](s1-2-hote.log)). **HB1 à HB8 tenues.**
+- Toutes les lignes du journal sont égales à celles du 12/11 ([`s1-hote.log`](s1-hote.log)), sauf l'en-tête et deux lignes d'EPEL :
+  repomd.xml `454b0238…` → `73fd2581…`, primary `22a1bc17…` → `ccc17999…` (HB5 ne prédisait pas ces sommes).
+- Non prédit : les repomd.xml de pub 9.8 (BaseOS `abac8b17…`, AppStream `a3ca4230…`) sont aussi les mêmes que le 12/11 ;
+  ils n'ont pas bougé en quatre jours. Cela ne dit rien de leur état au passage d'avant `racine`.
+- Les quatre épinglages tiennent, aux mêmes sha256 : mock 6.9-1.el9, mock-core-configs 45.2-1.el9 (EPEL), podman 5.8.2-8.el9_8,
+  skopeo 1.22.2-9.el9_8 (AppStream 9.8). `s1.sh` n'a pas à changer pour eux.
+- HB1 : les sources contrôlées sont celles du passage N1 (spec `918a83f5…`).
+Rien n'a touché le cluster ni Zot. Restent avant `essais` : le correctif de sortie rpm et ses étapes, la relecture de
+`prealables` et de R3 à R6 contre les journaux d'après S5b, l'ajout à `s1.sh` pour N3 et N4, la décision `extras` avant `image` ;
+chacun sur accord.
