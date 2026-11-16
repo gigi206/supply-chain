@@ -137,3 +137,62 @@ Journal : `s6b-v4.log` (`chrono.tsv` : début et fin à la même seconde). Aucun
 - L'empreinte suffit à l'identité : l'InRelease que la VM lit est celui que S1 a vérifié sur l'hôte avec les clés de ftp-master, octet pour octet.
 - La signature n'est pas encore vérifiée **par le trousseau de la VM**. Dans la voie A, c'est apt, pendant mmdebstrap, qui la vérifie, avec `sqv` et ce trousseau : un échec y arrêterait le chroot. Le témoin préalable V4c reste à faire, avec `sqv`, dont je n'ai pas relevé la syntaxe : à lire dans la VM (`sqv --help`) avant d'écrire la commande.
 
+
+## Additif de la révision 1.0.0-2, ligne 11 de la cascade (écrit à 2026-11-16T16:22:46Z, corrigé avant commit après relecture du conseiller, après « Oui, prépare-les ») : NON LANCÉ
+
+VSA du deb D (`60f25f5c`, S4d3 du 15/11) au lieu de `039949f9`, sur la provenance `c3d27e05` (décisions du propriétaire, note de
+2026-11-16T16:17:15Z de [`revision-predictions.md`](revision-predictions.md)). Correctif préparé et archivé, **non appliqué** :
+[`revision-correctif-7.patch`](../revision-correctif-7.patch) (`s6b.sh` : `INVOCATION`, garde d'`etape_vsa` sur le sujet du
+journal de `rebuild`, commentaires et message périmés ; `rejeu/politique-replay-deb.md` : nouvelle version, l. 16 et dernière
+limite, section « Versions »). `rejeu/verifier_deb.py`, `rebuild_deb.sh` et `vsa_deb.py` ne changent pas : sha256 `7498fdad…`,
+`55ebf681…` et `34799510…`, égaux à ceux des journaux du 12/11 ; le commentaire de `verifier_deb.py` (l. 3) qui cite `454728c5`
+reste, sans effet. Hors du correctif, sans effet sur la ligne 11 (recherche `git grep` de `97ae561`, `6cc94a50`, `454728c5` et
+`POLITIQUE_COMMIT` dans tout le dépôt) : mentions historiques de `docs/03-validation-briques.md`, des journaux et des prédictions du
+12/11 ; `POLITIQUE_COMMIT` de `replay.sh` (brique 10, sa propre politique) ; `rejeu.sh` de la 08 n'appelle `pousser_vsa` et `lire_vsa`
+qu'avec `POUSSER_VSA=1`, sans épinglage.
+
+Commandes, chacune sur accord nommé, code relevé juste après, arrêt au premier code non nul (`s6b.sh` ne prend qu'une étape par
+appel ; chaque étape réécrit `resultats/s6b-<étape>.log`, dont la version du 12/11 ou du 14/11 reste dans git) :
+0. Correctif 7 appliqué tel quel, puis commité. **Ce commit fige la nouvelle politique** : c'est `POLITIQUE_COMMIT`. Il doit être
+   poussé avant la commande 5 (push sur accord).
+1. `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh transporter` (hôte : lectures anonymes de Zot et de Forgejo, copie dans
+   `/home/replay/s6b/r3`, vidé d'abord).
+2. `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh verifier` (VM). **Relecture du critère, décidable sur le journal** : la porte
+   juge la provenance de PipelineRun au `finishedOn` le plus tardif (`prov_pr` de la 08, `max_by(finishedOn)`), et la porte de S5
+   l'a mesurée le 16/11 : `c3d27e05`, avec 8 enveloppes sur D (`s5-porte.log` l. 4 et 9). Toute nouvelle exécution sur D ajouterait
+   des enveloppes, donc des bundles. **Arrêt et décision si `verifier` ne compte pas exactement 8 bundles vérifiés, ou si
+   `c3d27e05` n'est pas parmi eux.** Le journal ne montre ni la nature (PipelineRun ou tâche) ni `finishedOn` de chaque bundle :
+   l'ordre des jetons de M3 est une prédiction, pas la règle d'arrêt.
+3. `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh repetition` (VM, lien établi, non comptée). Elle n'était pas dans l'ordre noté le
+   16/11 ; je l'ajoute, parce qu'elle peut passer avant le délai de 24 h et révèle un écart de reconstruction avant `rebuild`.
+4. `ATTENTE_HORS_LIGNE=300 mise exec -- poc/bricks/06-deb-sbuild/s6b.sh rebuild` (lien de la VM coupé 300 s, comme le 12/11),
+   pas avant `finishedOn` + 24 h, lu dans `verifie.txt` par la commande 2.
+5. `POLITIQUE_COMMIT=<commit de la commande 0> mise exec -- poc/bricks/06-deb-sbuild/s6b.sh vsa` (VM, `unshare -rn`, signature
+   par la clé du domaine ; rien dans Zot). Préalable : HEAD poussé.
+6. `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh pousser_vsa` (accord propre à ce push ; compte `poc-replay`).
+7. `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh lire_vsa` (lecture anonyme).
+
+`vsa_essai` n'est pas rejoué : ses trois refus ne dépendent pas du sujet (mesurés le 12/11).
+
+| # | Étape | Prédiction | Confiance |
+|---|---|---|---|
+| M1 | correctif 7 | `git apply --check` code 0 (fait à sec) ; après application, sha256 de la politique `30ee17ec…` (copie modifiée, calculée à sec) ; `bash -n` sans erreur et shellcheck sans avertissement nouveau | Haute |
+| M2 | `transporter` | Sujet et tag `.att` de D copiés ; **8 bundles horodatés** de D ; 7 entrées lues ; `construire-deb` `3726ff0b…`, `preparer-deb` `588617b8…`, manifeste seul de `sbuild-debian13` `749d746c…`, `fermeture-deb` `bb7599a2…`, `fermeture-sources` `50dc73f7…`, `packaging` **`f0ed7a71…`** (au lieu de `c1719b13`) ; `outils-prefetch` non prédit (`68e0ae70…` si inchangé depuis le 12/11) ; `verifier_deb.py` `7498fdad…` ; archive d'environ 400 Mo | Haute pour 8 (`s5-porte.log` l. 4), les fermetures, le packaging et les tâches (journaux de S4d3 et de S5) ; moyenne pour la taille |
+| M3 | `verifier` | `ko=0` ; 8 bundles sur 8 vérifiés, **8 `invocationId` distincts** (pour chacun des quatre PipelineRuns qui ont produit D, celui du PipelineRun et celui de sa tâche `publier`), dont `576b7e61` et `c3d27e05` ; jeton de TSA de `c3d27e05` le plus récent des 8, le 15/11 entre 20:31:44 et 20:39:34 UTC ; provenance `c3d27e05` extraite ; `_type`, `predicateType`, `builder.id`, `buildType` et sujet OK ; entrées de M2 ; commit `6391fd43` présent, arbre propre ; 15 lignes clés trouvées ; couche du chroot du domaine `1029232e…`, égale à celle de l'image déclarée ; Go égal à `outils-prefetch` ; `finishedOn` entre 2026-11-15T20:31:44Z et 20:39:34Z | Haute pour 8 bundles et la présence de `c3d27e05`, pour la recette et le chroot (tâches, image et chroot de la VM inchangés) ; moyenne pour le schéma de deux enveloppes par PipelineRun (enveloppes de D 4 → 8 par S4d3, `s4d3-chemins.log` l. 78) et pour l'ordre des jetons (le 12/11, le PipelineRun `454728c5` suivait sa tâche de 3 s) |
+| M4 | `repetition` | Deux lignes retirées ; `verrou=162 paquets` ; sbuild code 0, aucune ligne apt en http(s) ; `couche=sha256:d8f9685c…` (1955840 octets, celle de `s4d-pipeline.log` l. 32) ; **`manifeste_reconstruit` = D** ; `verdict=PASSED` ; environ 72 s | Moyenne-haute : D a été reproduit par les deux exécutions du 14/11 (`s4d-pipeline.log` l. 32 et 89), par les deux chemins de S4d3 et par le témoin N7 de S5 (`s5-kata.log` l. 22), jamais dans le domaine |
+| M5 | `rebuild` | Délai au moins 1440 min depuis `finishedOn` ; `rebuild_deb.sh` `55ebf681…` des deux côtés ; lien coupé, `tx_bytes` et `tx_packets` inchangés pendant les 300 s ; fin avant le rétablissement ; mêmes valeurs que M4 ; `bilan : PASSED, lien coupé, fini avant le rétablissement` | Haute si M4 tient |
+| M6 | `vsa` | Garde du correctif : le journal de M5 porte `manifeste_reconstruit=` D (celui du 12/11 ne passerait plus) ; politique `https://github.com/gigi206/supply-chain/blob/<commit 0>/…`, sha256 `30ee17ec…` des deux côtés ; `vsa_deb.py` `34799510…` ; `bundles de l'invocation c3d27e05… parmi 8` : un seul ; `timeVerified` (fin de M5) au moins 24 h après `finishedOn` ; `PASSED`, `['POC_REPLAY_BIT_IDENTIQUE']` ; `inputAttestations` : ce bundle de `horodatage/bundles` ; signature et `verify-blob-attestation` code 0 ; énoncé et bundle archivés | Haute si M5 tient |
+| M7 | `pousser_vsa` | Bundle revérifié sur l'hôte, 0 `connect()` ; énoncé : sujet `…@sha256:60f25f5c3fb5…`, `PASSED` ; copie de la CA égale à celle de la 08 et mot de passe de `poc-replay` présent (contrôlés à sec, sans rien afficher) ; sujet lu dans Zot, digest D ; referrers de D dans `builds/sample-app-deb` : 0 avant et après ; étiquettes inchangées ; un referrer de D dans `builds/vsa/sample-app-deb`, au digest poussé, aucune étiquette ; `bilan : tout OK` | Haute (même étape le 14/11, après S5b) |
+| M8 | `lire_vsa` | Clé de VSA acceptée et clé de Chains refusée pour la VSA ; l'inverse pour la provenance ; témoin : **8 énoncés vérifiés** (enveloppes de D) ; aucune connexion hors de Zot ; `bilan : tout OK` | Haute pour les verdicts ; moyenne pour 8 |
+
+**Effets.** Dans la VM : `/home/replay/s6b/r3`, `r4` et `r5` vidés puis réécrits ; le chroot du 12/11 est gardé. Sur l'hôte : journaux
+`s6b-transporter`, `-verifier`, `-repetition`, `-rebuild`, `-vsa`, `-pousser_vsa`, `-lire_vsa`, et `s6b-vsa-enonce.json`,
+`s6b-vsa.bundle.json`, `s6b-vsa-manifeste.json` réécrits ; `chrono.tsv`. Dans Zot : un manifeste, le blob du bundle et une
+configuration vide dans `builds/vsa/sample-app-deb`. La porte de la ligne 12 doit alors retenir une VSA de D.
+**Cas d'échec.** Provenance plus récente que `c3d27e05` (M3) : arrêt avant `rebuild`, décision. Manifeste reconstruit différent de
+D (M4 ou M5) : `FAILED`, aucune VSA signée ; c'est un constat sur la reproductibilité dans le domaine, à porter au propriétaire. Arrêt
+de `rebuild` lien coupé : `virsh -c qemu:///system domif-setlink sc-replay <interface> up` (ligne écrite par le script).
+**Contrôles à sec faits.** Correctif : `git apply --check` code 0, `bash -n` de la copie modifiée, shellcheck sans avertissement
+nouveau (69 lignes de sortie avant et après, mêmes codes) ; la politique modifiée ne porte aucune des mentions refusées par
+`etape_vsa`. La nouvelle garde refuse le journal de `rebuild` du 12/11 (aucune ligne `manifeste_reconstruit=` D). VM `sc-replay`
+allumée, chroot du 12/11 présent (451786240 octets), 12008 Mo libres. Rien d'écrit dans la VM, dans le cluster ni dans Zot.

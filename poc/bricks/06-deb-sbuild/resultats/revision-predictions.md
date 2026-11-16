@@ -588,3 +588,24 @@ Relu par le conseiller avant d'être posé. Choix faits en réponse à deux ques
   - le commentaire de `verifier_deb.py` (l. 3), qui cite `454728c5` : le laisser, ou prédire son nouveau sha256.
 Prochaine ligne : correctif (`INVOCATION` de `s6b.sh`, nouvelle version de la politique) et additif de la ligne 11, à préparer sur
 accord.
+
+## Carte, ligne 11 : correctif 7 et additif préparés (note de 2026-11-16T16:26:42Z ; rien n'est réécrit)
+« Oui, prépare-les » à « Je prépare le correctif et l'additif de la ligne 11 ? ». Relus par le conseiller avant commit.
+- **Correctif 7**, préparé et archivé, **non appliqué** : [`revision-correctif-7.patch`](../revision-correctif-7.patch)
+  (`git apply --check` code 0).
+  - `s6b.sh` : `INVOCATION` passe à `c3d27e05`.
+  - `s6b.sh`, au-delà des deux décisions : **nouvelle garde d'`etape_vsa`**, qui exige que `s6b-rebuild.log` porte
+    `manifeste_reconstruit=` D (le journal du 12/11 passait la garde) ; message de refus et commentaires périmés de
+    `pousser_vsa` corrigés.
+  - Politique, nouvelle version (sha256 `30ee17ec…`) :
+    - la l. 16 énonce le critère (provenance de PipelineRun au `finishedOn` le plus tardif, celle que juge la porte), sans UID ;
+    - elle dit que le domaine ne vérifie pas ce critère, seulement l'`invocationId` demandé ;
+    - la dernière limite ne nomme plus de digest ;
+    - section « Versions » ajoutée.
+- **Additif M1 à M8** dans [`s6b-predictions.md`](s6b-predictions.md). Ordre : correctif appliqué et commité (ce commit est
+  `POLITIQUE_COMMIT`, à pousser), `transporter`, `verifier`, `repetition`, `rebuild` (`ATTENTE_HORS_LIGNE=300`), `vsa`,
+  `pousser_vsa`, `lire_vsa`.
+  - **`repetition` est ajoutée** à l'ordre noté à 16:17:15Z : elle peut passer avant le délai de 24 h.
+  - Règle d'arrêt après `verifier` : exactement 8 bundles vérifiés, dont `c3d27e05`.
+  - `rebuild` possible au plus tard à partir de 2026-11-16T20:39:34Z, puisque `finishedOn` précède la fin de S4d3.
+Prochaine ligne : correctif 7, sur accord nommé ; puis chaque étape de l'additif sur accord nommé.
