@@ -250,3 +250,67 @@ Question : « Je lance prealables ? ». Réponse : « Oui, lance prealables ».
 
 Suite, chaque point sur accord nommé : ajout à `s1.sh` pour N3 et N4 (banc à sec) ; décision `extras` ; `amorce`, `hote` de nouveau,
 `racine`, `image`, `essais`, `verrou`.
+
+## Ajout N3 et N4 à `essais`, préparé à sec (note du 2026-11-17, écrite à 2026-11-16T23:02:29Z ; rien n'est réécrit ; NON APPLIQUÉ)
+
+Préparé après « continue », sur relecture du conseiller (approche, puis points de vigilance), sans toucher au cluster ni à Zot.
+
+**Ce que fait l'ajout** ([`s1-n34.patch`](../s1-n34.patch), sha256 `2da76de2…`, et [`n34-binaire.py`](../n34-binaire.py),
+`b88ce099…`). `SONDE` reste inchangée, donc P9 à P11 et les durées gardent leur sens. Après les journaux de mock, et avant le
+retrait du pod, `etape_essais` :
+1. rapatrie le rpm binaire de sample-app de chaque isolation sous `$T/rpm-<isolation>` (`kubectl exec … cat`), et compare son
+   sha256 à la ligne « rpm <isolation> » de la sonde. Si une lecture dans le pod échoue, N3 et N4 restent faisables sans rebuild ;
+2. livre `n34-binaire.py` sous `/w/n34`, hors de `/w/src` que `mock --sources` lit ;
+3. lance `SONDE_N34` dans le pod. Pour chaque isolation : `FILEDIGESTALGO` ; les fichiers de l'en-tête sous
+   `/usr/share/licenses/` (drapeaux, bit 128, empreinte) par `rpm -qp --qf` ; `BUILDTIME` et `CHANGELOGTIME` ; le nombre de
+   mtime distincts, avec min et max ; puis `rpm2cpio` et `n34-binaire.py`, qui isole `usr/bin/sample-app` avant de chercher les
+   noms de fichiers source. L'isolement est nécessaire : `golang-NOTICES` contient la chaîne `runtime/memmove_amd64.s`.
+
+Sorties brutes : rien n'arrête l'étape, le contrôle se fait dans les notes contre les prédictions ci-dessous.
+
+**Banc hors réseau** ([script](s1-n34-banc.sh), [journal](s1-n34-banc.log)), le 16/11/2026 de 23:01:07 à 23:01:09 UTC :
+35 OK, 0 KO.
+- `n34-binaire.py`, sur une archive newc du cpio de l'hôte autour du binaire du deb 1.0.0-1 de la 06 (sha256 épinglé) : sortie
+  égale aux lignes de [`x11-fichiers.log`](../../13a-licences/resultats/x11-fichiers.log) de la 13a, noms avec et sans `./`.
+  Refus vérifiés : archive tronquée, membre absent, magie fausse, membre vide (lien dur). L'isolement est vérifié : un faux
+  binaire à côté de `golang-NOTICES` donne `memmove_amd64.s` absent.
+- `SONDE_N34` sous bash avec `rpm` et `rpm2cpio` simulés : code 0 dans tous les cas, y compris aucun rpm, deux rpm, une ligne
+  d'en-tête illisible et `rpm2cpio` en échec.
+- `rapatrier_rpms` sous `set -euo pipefail` avec `kubectl` simulé : égalité et écart signalés, debuginfo ignoré, pod absent sans
+  arrêt.
+- Deux défauts trouvés par le banc avant tout passage et corrigés dans la copie :
+  - GNU cpio 2.15 écrit les noms sans `./` : le premier cas « noms en ./ » ne l'était pas, une archive réécrite le couvre
+    désormais ;
+  - un répertoire n'a pas d'empreinte, donc le champ vide décalait la lecture : l'ordre est maintenant drapeaux, nom,
+    empreinte.
+- `bash -n` passe sur la copie modifiée. shellcheck 0.11.0 ne relève aucun avertissement ; au niveau info, il ajoute une
+  remarque SC2016 (5 → 6), celle de `SONDE_N34`.
+- **Non couvert** : un vrai rpm (forme réelle de `--qf`, nom des membres écrits par `rpm2cpio`, charge zstd) ; le python3 3.9
+  du pod (seulement `ast` en version 3.9) ; un vrai `kubectl exec`.
+
+**Précondition, non vérifiée.** mock requiert `python3`, `python3-rpm` et `tar` (primary d'EPEL relu), et `rpm2cpio` est dans
+le paquet `rpm` de BaseOS 9.8. Que `rpm` lui-même soit dans la racine n'est pas vérifié : à lire dans la liste des rpm du journal
+de `racine`, avant `image`. S'il manque, `SONDE_N34` affiche « not found » sans s'arrêter. N3 reste alors faisable sur le rpm
+rapatrié, avec le lecteur d'en-tête de `releve9` ; pour N4, le repli serait à décider.
+
+**Prédictions** (écrites avant tout passage ; précisent N3 à N5 de [`m2-predictions.md`](m2-predictions.md)) :
+
+| | Prédiction | Confiance |
+|---|---|---|
+| A1 | Pour chaque isolation dont le `--rebuild` passe : « OK   rpm <isolation> rapatrié », sha256 égal à la sonde | Haute |
+| A2 | `FILEDIGESTALGO` vaut 8 (sha256) | Haute |
+| A3 (N3) | Six fichiers sous `/usr/share/licenses/sample-app/`, bit 128 à 1, empreintes : `golang-LICENSE` `911f8f57…`, `golang-PATENTS` `96f408bf…`, `golang-NOTICES` `b55ad0c8…` (calculées sur les blocs du spec), `Apache-2.0.txt` `074e6e32…`, `LICENSE` `a2d51b75…` (chi), `LICENSE.md` `8e3a3f82…` (marked) (archive des sources) ; plus la ligne du répertoire, sans empreinte | Haute pour les empreintes ; moyenne pour les noms (copie sous le nom de base, non relue dans rpm) |
+| A4 (N4) | `memmove_amd64.s` PRÉSENT sous la forme `runtime/memmove_amd64.s` ; témoin `asm_amd64.s` présent, `asm_arm.s` absent ; les huit autres motifs X11 absents ; `n34-binaire.py : rc 0` | Moyenne-haute (Go 1.25.9 au lieu de 1.24 du deb) |
+| A5 (N5) | `BUILDTIME` = `CHANGELOGTIME` = 1794830400 (16/11/2026 à 12:00 UTC, date du changelog à midi) ; mtime max 1794830400, valeurs distinctes parmi 1793229566 (archive des sources) et 1794830400 : le clamp joue, l'heure du build tombant après | Moyenne pour l'égalité ; faible pour midi et le fuseau du chroot |
+| A6 | Les lignes de N3 et N5 sont les mêmes pour nspawn et simple, si les deux construisent | Moyenne |
+| A7 | L'ajout ne prend pas plus d'une minute de l'étape | Moyenne |
+
+**Où se lit chaque N.**
+- N2 : ligne « src.rpm <isolation> » de la sonde existante.
+- N3 et N5 : lignes « licence », « dates » et « mtime » de `essais-n34`.
+- N4 : sortie de `n34-binaire.py` dans `essais-n34`.
+- **N6 est hors de cet ajout.** `verrou` ne lit pas l'en-tête du rpm `golang` : la comparaison de sa `LICENSE` à `911f8f57…`
+  reste à placer, sur accord à part.
+
+Suite, chaque point sur accord nommé : appliquer l'ajout (une ligne datée à l'en-tête de `s1.sh`) et le commiter ; décision
+`extras` ; `amorce`, `hote` de nouveau, `racine` (lire `rpm` dans sa liste), `image`, `essais`, `verrou`.
