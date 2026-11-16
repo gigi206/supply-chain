@@ -1,21 +1,21 @@
-# s6b.sh verifier, 2026-11-12T10:42:41Z
+# s6b.sh verifier, 2026-11-16T16:30:47Z
 7498fdaddefe4b210dfcf9040d76087986aa453716048c646b2aa9ac00b2a7a8  verifier_deb.py
 ## ancres de confiance (copiées depuis le dépôt)
-  a7ca8ce8d133aa9b459e1c9e433f3e96d6b02e21331e38689dfa173cf5a6b75b  chains.pub
-  e18e1214b84ff6ecfd0be8558f3f70a101815683d9f22ee651a88d5e197c2739  tsa-chaine.pem
+  1e7b2a03f9d5d289898e63b57410aeafa4e3680e86474d4f35aaa4e01f0c5e65  chains.pub
+  5d795cf497c7e029398f898f23a4812246108a5a2d50cfc997aa00a543944bc2  tsa-chaine.pem
 OK   racine de confiance de la TSA construite dans la VM
-OK   digest du sujet transporté : 039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   digest du sujet transporté : 60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
 ## bundles horodatés : vérifiés hors réseau (clé de Chains, sujet, jeton de la TSA)
-OK   bundle-10f81cd1fa33cd55 : vérifié ; invocationId 629b6bb1-9a9f-45a6-a3bb-e4e9650f6a65 ; jeton de la TSA : Nov 11 19:56:11 2026 GMT
-OK   bundle-21edfa0ca581bad6 : vérifié ; invocationId 454728c5-59a8-45e1-b972-549d343aadac ; jeton de la TSA : Nov 11 21:04:09 2026 GMT
-OK   bundle-29612bcf84d86900 : vérifié ; invocationId ee1d3cca-91b0-4e52-9f9e-66bde8628360 ; jeton de la TSA : Nov 11 21:04:06 2026 GMT
-OK   bundle-31d2e1652060907f : vérifié ; invocationId 2507cd26-f5b8-487f-bb90-6fa4d5d4d3cf ; jeton de la TSA : Nov 11 19:56:08 2026 GMT
-OK   bundle-35931dd7890c261e : vérifié ; invocationId 9dbf4a16-1b78-4dfb-9533-cfd0e6324ee8 ; jeton de la TSA : Nov 11 20:57:07 2026 GMT
-OK   bundle-70e9dabe611cc28d : vérifié ; invocationId b0e14893-06a2-4ea4-8a1b-0e67e4d30fe6 ; jeton de la TSA : Nov 11 20:57:10 2026 GMT
-OK   bundle-7c72a3dc051f8eae : vérifié ; invocationId d6970f74-15f3-4414-a66b-03a134913601 ; jeton de la TSA : Nov 11 19:49:08 2026 GMT
-OK   bundle-e86a49476ed2a210 : vérifié ; invocationId b9d4881e-af56-4950-ac1a-9e85e774ead8 ; jeton de la TSA : Nov 11 19:49:11 2026 GMT
+OK   bundle-1642c04fa77b53da : vérifié ; invocationId 576b7e61-391a-4a28-9d97-36ab54e9dec0 ; jeton de la TSA : Nov 15 20:32:09 2026 GMT
+OK   bundle-1827a53dfc2a6c5f : vérifié ; invocationId e45d0438-6ed2-44be-bedc-dcbb11e485cd ; jeton de la TSA : Nov 14 23:11:06 2026 GMT
+OK   bundle-3299b5a237b4fc1a : vérifié ; invocationId c9479fdb-6b6d-4a58-a072-1510a2b45b43 ; jeton de la TSA : Nov 15 20:32:06 2026 GMT
+OK   bundle-676863d00bd2c23d : vérifié ; invocationId 4bb7e150-670f-40a7-97d1-9391b5b8eefb ; jeton de la TSA : Nov 14 23:05:08 2026 GMT
+OK   bundle-abb68664f7632dcc : vérifié ; invocationId 36fbbebc-d459-4921-8e14-e07f11d67e0c ; jeton de la TSA : Nov 14 23:11:09 2026 GMT
+OK   bundle-d96c67c40067ac77 : vérifié ; invocationId 13b2cee0-5dcc-4113-af0d-1b8b4ea9b2fd ; jeton de la TSA : Nov 14 23:05:05 2026 GMT
+OK   bundle-df54a7331d9da699 : vérifié ; invocationId cdd6707c-9a3b-4337-b041-df1a0108de2d ; jeton de la TSA : Nov 15 20:39:07 2026 GMT
+OK   bundle-fea50d0f5cc04dae : vérifié ; invocationId c3d27e05-b4cd-487b-8980-7a40b3336ffc ; jeton de la TSA : Nov 15 20:39:09 2026 GMT
 bundles vérifiés : 8 sur 8
-OK   provenance 454728c5-59a8-45e1-b972-549d343aadac extraite d'un bundle vérifié
+OK   provenance c3d27e05-b4cd-487b-8980-7a40b3336ffc extraite d'un bundle vérifié
 ## politique, section 1 (provenance vérifiée)
 OK   _type https://in-toto.io/Statement/v1
 OK   predicateType https://slsa.dev/provenance/v1
@@ -28,7 +28,7 @@ OK   entrée sbuild-debian13 déclarée : {'sha256': '749d746cc9e1a9cfa8c80feac8
 OK   entrée outils-prefetch déclarée : {'sha256': '68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc'}
 OK   entrée fermeture-deb déclarée : {'sha256': 'bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290'}
 OK   entrée fermeture-sources déclarée : {'sha256': '50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21'}
-OK   entrée packaging déclarée : {'sha256': 'c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51'}
+OK   entrée packaging déclarée : {'sha256': 'f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f'}
 OK   entrée sample-app.git déclarée : {'sha1': '6391fd437f26696847041be3226bbbf633f55a2f'}
 ## digests des entrées transportées, recalculés
 OK   construire-deb : transporté 3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
@@ -36,7 +36,7 @@ OK   preparer-deb : transporté 588617b8382513c3aa5b2d79de8f45324ab6cfdc2b600966
 OK   outils-prefetch : transporté 68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
 OK   fermeture-deb : transporté bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
 OK   fermeture-sources : transporté 50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
-OK   packaging : transporté c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+OK   packaging : transporté f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
 OK   sbuild-debian13 : manifeste transporté seul, 749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
 ## commit
 OK   bundle git cohérent (git bundle verify, dans le dépôt cloné)
@@ -67,5 +67,5 @@ image de build : 2 couches ; couche du chroot (2e) sha256:1029232ead0c2c3d09d3c3
 chroot du domaine : /home/replay/s6b/trixie-amd64.tar, sha256 aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086
 OK   couche du chroot du domaine : sha256:1029232ead0c2c3d09d3c3fa7caab99ac7907857a88dc73f78ed6ae385a9d064, égale à celle de l'image de build déclarée
 ## heures du build
-finishedOn signé : 2026-11-11T21:03:37Z ; jeton de la TSA : Nov 11 21:04:09 2026 GMT
+finishedOn signé : 2026-11-15T20:38:15Z ; jeton de la TSA : Nov 15 20:39:09 2026 GMT
 ## bilan : 0 KO

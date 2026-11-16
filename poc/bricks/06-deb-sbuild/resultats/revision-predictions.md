@@ -621,3 +621,10 @@ Prochaine ligne : `s6b.sh transporter` (M2), sur accord nommé.
 - **M2 tenue** : 8 bundles horodatés de D, 7 entrées aux digests prédits (packaging `f0ed7a71…`), 402 Mo transportés.
 - Constat non prédit, sans écart : clé de Chains et chaîne de la TSA renouvelées par S5b (`688af09`, 13/11).
 Prochaine ligne : `s6b.sh verifier` (M3, arrêt si pas exactement 8 bundles vérifiés dont `c3d27e05`), sur accord nommé.
+
+## Carte, ligne 11 : `verifier` (note de 2026-11-16T16:30:53Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh verifier (M3) ? ». Du 16/11 16:30:47 au 16/11 16:30:53 UTC, code 0, 0 KO.
+- **Règle d'arrêt tenue et M3 tenue** : 8 bundles vérifiés hors réseau, dont `c3d27e05`, au jeton le plus récent.
+- Recette, entrées, commit, Go et chroot conformes.
+- `finishedOn` 2026-11-15T20:38:15Z : `rebuild` possible à partir de 2026-11-16T20:38:15Z.
+Prochaine ligne : `s6b.sh repetition` (M4, lien établi, non comptée), sur accord nommé.

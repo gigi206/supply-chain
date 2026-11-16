@@ -230,3 +230,23 @@ commande.
   ancres-là (M3).
 
 Le bundle git (`e1e6b713…`, 8,0 Ko) est identique à celui du 12/11.
+
+## Résultat de M3 (note de 2026-11-16T16:30:53Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh verifier (M3) ? ». Du 16/11 16:30:47 au 16/11 16:30:53 UTC, code 0, `bilan : 0 KO`. Journal
+`s6b-verifier.log` : ses dix lignes « jeton de la TSA » sont des heures d'horodatage, comme le 12/11, sans secret.
+
+**Règle d'arrêt tenue** : 8 bundles vérifiés sur 8, dont `c3d27e05`. On continue.
+
+**M3 tenue.**
+- 8 `invocationId` distincts : quatre paires de jetons à 3 s d'écart, une par PipelineRun qui a produit D.
+  - 14/11 : `13b2cee0` et `4bb7e150` (23:05:05 et 23:05:08Z) ; `e45d0438` et `36fbbebc` (23:11:06 et 23:11:09Z) ;
+  - 15/11 : `c9479fdb` et `576b7e61` (20:32:06 et 20:32:09Z) ; `cdd6707c` et **`c3d27e05`** (20:39:07 et 20:39:09Z).
+- Le jeton de `c3d27e05` est le plus récent des 8 ; dans chaque paire, le PipelineRun suit sa tâche, comme le 12/11.
+- Provenance `c3d27e05` extraite ; `_type`, `predicateType`, `builder.id`, `buildType` et sujet OK.
+- Entrées déclarées égales aux digests recalculés (M2) ; commit `6391fd43` présent, arbre propre.
+- 15 lignes clés trouvées (10 pour `preparer-deb`, 5 pour `construire-deb`).
+- Go : `go1.26.10` des deux côtés.
+- Couche du chroot du domaine : `1029232e…`, égale à celle de l'image déclarée.
+- **`finishedOn` signé : 2026-11-15T20:38:15Z** (dans la fourchette prédite, avant la fin de S4d3).
+
+**Délai** : `rebuild` possible à partir de **2026-11-16T20:38:15Z**.
