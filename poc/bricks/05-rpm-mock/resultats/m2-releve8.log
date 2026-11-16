@@ -1,0 +1,297 @@
+# m2.sh releve8, 2026-11-16T17:59:30Z
+## épingles lues dans s1.sh (non modifié) et golang des builds OBS (banc A2, archivé)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   golang de build-1/rocky_9/_buildenv : 1.25.9-1.el9_7
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : 21CB256AE16FC54C6E652949702D426D350D275D
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh
+OK   vault-BaseOS : repomd.xml signé par 21CB256AE16FC54C6E652949702D426D350D275D
+vault-BaseOS : repomd.xml sha256 fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (21469219 octets)
+vault-BaseOS : 2160 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par 21CB256AE16FC54C6E652949702D426D350D275D
+vault-AppStream : repomd.xml sha256 06f01d405f2d4743dd3fea4a3bf4e2ffada91b652b94d9458468064db15287d6
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (2315831 octets)
+vault-AppStream : 8708 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par 21CB256AE16FC54C6E652949702D426D350D275D
+vault-CRB : repomd.xml sha256 3936113ee8724d84af42f17f17ad50b67a1cb10e8db9bd246e8609deebdf134f
+OK   vault-CRB : primary (gz) conforme à repomd.xml (657804 octets)
+vault-CRB : 2653 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-AppStream plus une ligne) refusé
+## paquets de la source golang (sourcerpm golang-*) et fournisseurs de « golang », lus dans les primary signés
+OK   rpmvercmp : 9 témoins tenus (dans les deux sens)
+### vault-BaseOS : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+### vault-AppStream : 40 paquet(s) de la source golang ou fournisseur(s) de golang
+  go-toolset 0:1.25.3-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.3-1.el9_7.src.rpm
+  go-toolset 0:1.25.5-2.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.5-2.el9_7.src.rpm
+  go-toolset 0:1.25.7-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.7-1.el9_7.src.rpm
+  go-toolset 0:1.25.8-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.8-1.el9_7.src.rpm
+  go-toolset 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang 0:1.25.3-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.3-1.el9_7.src.rpm ; fournit golang
+  golang 0:1.25.5-2.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.5-2.el9_7.src.rpm ; fournit golang
+  golang 0:1.25.7-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.7-1.el9_7.src.rpm ; fournit golang
+  golang 0:1.25.8-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.8-1.el9_7.src.rpm ; fournit golang
+  golang 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm ; fournit golang
+  golang-bin 0:1.25.3-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.3-1.el9_7.src.rpm
+  golang-bin 0:1.25.5-2.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.5-2.el9_7.src.rpm
+  golang-bin 0:1.25.7-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.7-1.el9_7.src.rpm
+  golang-bin 0:1.25.8-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.8-1.el9_7.src.rpm
+  golang-bin 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-docs 0:1.25.3-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.3-1.el9_7.src.rpm
+  golang-docs 0:1.25.5-2.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.5-2.el9_7.src.rpm
+  golang-docs 0:1.25.7-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.7-1.el9_7.src.rpm
+  golang-docs 0:1.25.8-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.8-1.el9_7.src.rpm
+  golang-docs 0:1.25.9-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-misc 0:1.25.3-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.3-1.el9_7.src.rpm
+  golang-misc 0:1.25.5-2.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.5-2.el9_7.src.rpm
+  golang-misc 0:1.25.7-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.7-1.el9_7.src.rpm
+  golang-misc 0:1.25.8-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.8-1.el9_7.src.rpm
+  golang-misc 0:1.25.9-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-race 0:1.25.3-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.3-1.el9_7.src.rpm
+  golang-race 0:1.25.5-2.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.5-2.el9_7.src.rpm
+  golang-race 0:1.25.7-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.7-1.el9_7.src.rpm
+  golang-race 0:1.25.8-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.8-1.el9_7.src.rpm
+  golang-race 0:1.25.9-1.el9_7.x86_64 ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-src 0:1.25.3-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.3-1.el9_7.src.rpm
+  golang-src 0:1.25.5-2.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.5-2.el9_7.src.rpm
+  golang-src 0:1.25.7-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.7-1.el9_7.src.rpm
+  golang-src 0:1.25.8-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.8-1.el9_7.src.rpm
+  golang-src 0:1.25.9-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+  golang-tests 0:1.25.3-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.3-1.el9_7.src.rpm
+  golang-tests 0:1.25.5-2.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.5-2.el9_7.src.rpm
+  golang-tests 0:1.25.7-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.7-1.el9_7.src.rpm
+  golang-tests 0:1.25.8-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.8-1.el9_7.src.rpm
+  golang-tests 0:1.25.9-1.el9_7.noarch ; License: BSD and Public Domain ; sourcerpm golang-1.25.9-1.el9_7.src.rpm
+### vault-CRB : 0 paquet(s) de la source golang ou fournisseur(s) de golang
+## fournisseurs de « golang » (BuildRequires: golang >= 1.24 du spec), du plus haut au plus bas (rpmvercmp)
+  vault-AppStream golang 0:1.25.9-1.el9_7.x86_64
+  vault-AppStream golang 0:1.25.8-1.el9_7.x86_64
+  vault-AppStream golang 0:1.25.7-1.el9_7.x86_64
+  vault-AppStream golang 0:1.25.5-2.el9_7.x86_64
+  vault-AppStream golang 0:1.25.3-1.el9_7.x86_64
+plus haute version qui fournit golang : golang 0:1.25.9-1.el9_7.x86_64 (vault-AppStream)
+constructions du paquet golang : 5
+golang 1.25.9-1.el9_7 (builds OBS, banc A2) présent dans vault 9.7 : oui
+golang 1.25.9-1.el9_7 est la plus haute construction du paquet golang : oui
+## fichiers de licence des paquets de la source golang (filelists signés par la chaîne repomd.xml)
+OK   vault-AppStream : filelists (gz) conforme à repomd.xml (17319365 octets)
+vault-AppStream : 40 paquets de la source golang retrouvés dans le filelists, 72789 fichiers (dossiers exclus)
+### vault-AppStream
+golang 0:1.25.3-1.el9_7.x86_64 : 64 fichiers ; 2 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+  doc  /usr/share/doc/golang/LICENSE
+  doc  /usr/share/doc/golang/PATENTS
+golang 0:1.25.5-2.el9_7.x86_64 : 64 fichiers ; 2 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+  doc  /usr/share/doc/golang/LICENSE
+  doc  /usr/share/doc/golang/PATENTS
+golang 0:1.25.7-1.el9_7.x86_64 : 64 fichiers ; 2 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+  doc  /usr/share/doc/golang/LICENSE
+  doc  /usr/share/doc/golang/PATENTS
+golang 0:1.25.8-1.el9_7.x86_64 : 64 fichiers ; 2 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+  doc  /usr/share/doc/golang/LICENSE
+  doc  /usr/share/doc/golang/PATENTS
+golang 0:1.25.9-1.el9_7.x86_64 : 64 fichiers ; 2 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+  doc  /usr/share/doc/golang/LICENSE
+  doc  /usr/share/doc/golang/PATENTS
+golang-bin 0:1.25.3-1.el9_7.x86_64 : 26 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-bin 0:1.25.5-2.el9_7.x86_64 : 26 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-bin 0:1.25.7-1.el9_7.x86_64 : 26 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-bin 0:1.25.8-1.el9_7.x86_64 : 26 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-bin 0:1.25.9-1.el9_7.x86_64 : 26 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-docs 0:1.25.3-1.el9_7.noarch : 14 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-docs 0:1.25.5-2.el9_7.noarch : 14 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-docs 0:1.25.7-1.el9_7.noarch : 14 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-docs 0:1.25.8-1.el9_7.noarch : 14 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-docs 0:1.25.9-1.el9_7.noarch : 14 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-misc 0:1.25.3-1.el9_7.noarch : 21 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-misc 0:1.25.5-2.el9_7.noarch : 21 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-misc 0:1.25.7-1.el9_7.noarch : 21 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-misc 0:1.25.8-1.el9_7.noarch : 21 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-misc 0:1.25.9-1.el9_7.noarch : 21 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-race 0:1.25.3-1.el9_7.x86_64 : 2 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-race 0:1.25.5-2.el9_7.x86_64 : 2 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-race 0:1.25.7-1.el9_7.x86_64 : 2 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-race 0:1.25.8-1.el9_7.x86_64 : 2 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-race 0:1.25.9-1.el9_7.x86_64 : 2 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-src 0:1.25.3-1.el9_7.noarch : 5503 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 34 autres au nom de licence
+  nom  /usr/lib/golang/src/cmd/compile/internal/ssa/_gen/vendor/golang.org/x/tools/LICENSE
+  nom  /usr/lib/golang/src/cmd/compile/internal/ssa/_gen/vendor/golang.org/x/tools/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/google/pprof/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/google/pprof/third_party/svgpan/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/ianlancetaylor/demangle/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/arch/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/arch/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/build/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/build/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sync/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sync/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sys/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sys/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/telemetry/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/telemetry/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/term/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/term/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/text/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/text/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/tools/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/tools/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/rsc.io/markdown/LICENSE
+  nom  /usr/lib/golang/src/crypto/internal/boring/LICENSE
+  nom  /usr/lib/golang/src/vendor/github.com/golang-fips/openssl/v2/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/crypto/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/crypto/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/sys/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/sys/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/text/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/text/PATENTS
+golang-src 0:1.25.5-2.el9_7.noarch : 5501 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 34 autres au nom de licence
+  nom  /usr/lib/golang/src/cmd/compile/internal/ssa/_gen/vendor/golang.org/x/tools/LICENSE
+  nom  /usr/lib/golang/src/cmd/compile/internal/ssa/_gen/vendor/golang.org/x/tools/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/google/pprof/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/google/pprof/third_party/svgpan/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/ianlancetaylor/demangle/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/arch/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/arch/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/build/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/build/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sync/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sync/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sys/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sys/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/telemetry/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/telemetry/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/term/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/term/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/text/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/text/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/tools/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/tools/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/rsc.io/markdown/LICENSE
+  nom  /usr/lib/golang/src/crypto/internal/boring/LICENSE
+  nom  /usr/lib/golang/src/vendor/github.com/golang-fips/openssl/v2/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/crypto/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/crypto/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/sys/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/sys/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/text/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/text/PATENTS
+golang-src 0:1.25.7-1.el9_7.noarch : 5501 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 34 autres au nom de licence
+  nom  /usr/lib/golang/src/cmd/compile/internal/ssa/_gen/vendor/golang.org/x/tools/LICENSE
+  nom  /usr/lib/golang/src/cmd/compile/internal/ssa/_gen/vendor/golang.org/x/tools/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/google/pprof/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/google/pprof/third_party/svgpan/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/ianlancetaylor/demangle/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/arch/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/arch/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/build/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/build/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sync/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sync/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sys/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sys/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/telemetry/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/telemetry/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/term/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/term/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/text/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/text/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/tools/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/tools/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/rsc.io/markdown/LICENSE
+  nom  /usr/lib/golang/src/crypto/internal/boring/LICENSE
+  nom  /usr/lib/golang/src/vendor/github.com/golang-fips/openssl/v2/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/crypto/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/crypto/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/sys/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/sys/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/text/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/text/PATENTS
+golang-src 0:1.25.8-1.el9_7.noarch : 5505 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 34 autres au nom de licence
+  nom  /usr/lib/golang/src/cmd/compile/internal/ssa/_gen/vendor/golang.org/x/tools/LICENSE
+  nom  /usr/lib/golang/src/cmd/compile/internal/ssa/_gen/vendor/golang.org/x/tools/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/google/pprof/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/google/pprof/third_party/svgpan/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/ianlancetaylor/demangle/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/arch/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/arch/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/build/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/build/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sync/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sync/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sys/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sys/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/telemetry/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/telemetry/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/term/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/term/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/text/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/text/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/tools/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/tools/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/rsc.io/markdown/LICENSE
+  nom  /usr/lib/golang/src/crypto/internal/boring/LICENSE
+  nom  /usr/lib/golang/src/vendor/github.com/golang-fips/openssl/v2/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/crypto/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/crypto/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/sys/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/sys/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/text/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/text/PATENTS
+golang-src 0:1.25.9-1.el9_7.noarch : 5516 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 34 autres au nom de licence
+  nom  /usr/lib/golang/src/cmd/compile/internal/ssa/_gen/vendor/golang.org/x/tools/LICENSE
+  nom  /usr/lib/golang/src/cmd/compile/internal/ssa/_gen/vendor/golang.org/x/tools/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/google/pprof/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/google/pprof/third_party/svgpan/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/github.com/ianlancetaylor/demangle/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/arch/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/arch/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/build/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/build/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/mod/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sync/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sync/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sys/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/sys/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/telemetry/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/telemetry/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/term/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/term/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/text/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/text/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/tools/LICENSE
+  nom  /usr/lib/golang/src/cmd/vendor/golang.org/x/tools/PATENTS
+  nom  /usr/lib/golang/src/cmd/vendor/rsc.io/markdown/LICENSE
+  nom  /usr/lib/golang/src/crypto/internal/boring/LICENSE
+  nom  /usr/lib/golang/src/vendor/github.com/golang-fips/openssl/v2/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/crypto/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/crypto/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/net/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/sys/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/sys/PATENTS
+  nom  /usr/lib/golang/src/vendor/golang.org/x/text/LICENSE
+  nom  /usr/lib/golang/src/vendor/golang.org/x/text/PATENTS
+golang-tests 0:1.25.3-1.el9_7.noarch : 8934 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-tests 0:1.25.5-2.el9_7.noarch : 8922 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-tests 0:1.25.7-1.el9_7.noarch : 8923 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-tests 0:1.25.8-1.el9_7.noarch : 8923 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+golang-tests 0:1.25.9-1.el9_7.noarch : 8926 fichiers ; 0 sous /usr/share/licenses ou /usr/share/doc ; 0 autres au nom de licence
+fichiers effacés (clé, métadonnées)

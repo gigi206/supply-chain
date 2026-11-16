@@ -342,3 +342,9 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - les fichiers de licence de ces paquets, lus dans le filelists signé par la même chaîne.
 - Banc hors réseau, `gpg` réel et clés d'essai jetables : neuf cas au code attendu ([journal](resultats/m2-releve8-essai-local.log)). Prédictions G1 à G9 ([détail](resultats/m2-predictions.md)).
 - Temps passé : 4,04 h à HEAD 075ef5a, même méthode ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées ; décision avec toi à 5 pw.
+
+**Passage de `releve8`, le 16/11/2026 à 17:59:30 UTC (« Oui » à « Je lance m2.sh releve8 ? »)** (écrit à 18:00:29 UTC) : code 0 ([journal](resultats/m2-releve8.log)), G1 à G7 et G9 tenues, G8 non tenue pour le chemin ([détail](resultats/m2-predictions.md)).
+- vault 9.7 garde cinq constructions de golang, toutes dans AppStream ; la plus haute est `1.25.9-1.el9_7`, celle des builds OBS.
+- Les 40 paquets de la source golang portent `License: BSD and Public Domain` ; ni `BSD` ni `Public Domain` n'est un identifiant de la liste de reuse 6.2.0 (base de Q2).
+- La `LICENSE` et le `PATENTS` de Go sont dans le paquet `golang`, sous `/usr/share/doc/golang/` et non `/usr/share/licenses/` (base de Q1) ; texte non lu ; sa présence dans le buildroot de mock n'est pas mesurée (aucun `tsflags` ni `nodocs` dans le `dnf.conf` de `rocky-9.tpl`, défauts de dnf non lus).
+- Non prévu : `golang-src` porte `golang-fips/openssl` et `crypto/internal/boring` ; leur liaison dans le binaire n'est pas mesurée.

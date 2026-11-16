@@ -619,3 +619,28 @@ Non couverts : les vrais formats des métadonnées de Rocky (aucun primary ni fi
 - **le texte des fichiers de licence** : aucun rpm n'est téléchargé, seuls les chemins sont lus ;
 - **la normalisation SPDX** : `fedora-license-data` n'a aucune ligne au doc 04 ni dans `tools/health/projects.tsv` (`grep`), et n'est pas lu ; le tag est relevé brut ;
 - un équivalent rpm de `Static-Built-Using`, et toute conclusion de conformité juridique.
+
+## Passage de `releve8`, le 16/11/2026 à 17:59:30 UTC (« Oui » à « Je lance m2.sh releve8 ? »), code 0 (écrit à 18:00:29 UTC)
+
+Fin à 17:59:47 UTC (`chrono.tsv`). Journal : [m2-releve8.log](m2-releve8.log), 297 lignes ; témoin altéré refusé ; fichiers effacés (seule l'archive `mock.tar.gz` reste sous `~/.cache/supply-chain-poc/05/m2/`).
+
+| # | Résultat |
+|---|---|
+| G1 | **Tenue.** Clé à l'empreinte `21CB256AE16FC54C6E652949702D426D350D275D`. Les trois `repomd.xml` sont signés par elle, aux mêmes sha256 que le 12/11 ([m2-releve7.log](m2-releve7.log)) : BaseOS `fa6d5054…`, AppStream `06f01d40…`, CRB `3936113e…`. Primary de mêmes tailles et mêmes comptes (2160, 8708, 2653 paquets) |
+| G2 | **Tenue.** Une seule entrée `filelists` dans le `repomd.xml` d'AppStream, en `.gz`, 17 319 365 octets, conforme à sa somme ; les 40 paquets de la source golang y sont, 72 789 fichiers hors dossiers |
+| G3 | **Tenue.** Aucun paquet de la source golang ni fournisseur de `golang` dans BaseOS ni dans CRB |
+| G4 | **Tenue.** `golang 1.25.9-1.el9_7` est présent dans AppStream de vault 9.7 |
+| G5 | **Tenue.** `1.25.9-1.el9_7` est la plus haute des cinq constructions du paquet `golang`, et ce paquet est le seul fournisseur de `golang` |
+| G6 | **Tenue.** Cinq constructions : `1.25.3-1`, `1.25.5-2`, `1.25.7-1`, `1.25.8-1`, `1.25.9-1` (`.el9_7`), chacune en huit paquets : `go-toolset`, `golang`, `golang-bin`, `golang-docs`, `golang-misc`, `golang-race`, `golang-src`, `golang-tests` |
+| G7 | **Tenue.** Les 40 paquets portent le même tag `License: BSD and Public Domain` |
+| G8 | **Non tenue pour le chemin.** La `LICENSE` et le `PATENTS` de Go sont bien dans le paquet `golang`, pas dans `golang-src`, mais sous **`/usr/share/doc/golang/`**, pas sous `/usr/share/licenses/golang/`, dans les cinq constructions. Le filelists ne dit pas si rpm les marque `%license` ou `%doc`. `golang-src` porte 34 autres fichiers au nom de licence (`LICENSE` et `PATENTS`), les mêmes chemins dans les cinq constructions : 22 sous `src/cmd/vendor`, 9 sous `src/vendor` (dont `github.com/golang-fips/openssl/v2/LICENSE`), 2 sous `src/cmd/compile/internal/ssa/_gen/vendor`, 1 `src/crypto/internal/boring/LICENSE` |
+| G9 | **Tenue.** Témoin refusé, fichiers effacés, code 0 |
+
+**Ce que cela dit, sans décision** :
+- **Version** : dans vault 9.7, la plus haute construction de golang est celle des builds OBS, `1.25.9-1.el9_7`. Que mock la prenne reste à mesurer par le premier verrou réel : priorités, modules et `extras` ne sont pas lus.
+- **Q2** : le tag de la 9.7 est `BSD and Public Domain`. Ni `BSD` ni `Public Domain` (ni `Public-Domain`) ne figure parmi les 699 lignes de `reuse supported-licenses` (reuse 6.2.0, épinglé par mise, lu le 16/11 hors réseau), où `BSD-3-Clause` figure ; l'origine de cette forme n'est pas lue. Rien ici ne dit comment le traduire, ni s'il diffère de l'expression retenue pour le deb (non comparé).
+- **Q1** : la notice de Go à copier serait `/usr/share/doc/golang/LICENSE` (et `PATENTS`) du paquet `golang`. Son texte n'est pas lu : aucun rpm n'est téléchargé. Qu'elle soit présente dans le buildroot de mock n'est pas acquis : une installation sans documentation l'écarterait. Le `dnf.conf` de `rocky-9.tpl` archivé par `releve6` n'a aucune ligne `tsflags` ni `nodocs` (`grep` de [m2-releve6.log](m2-releve6.log)) ; les défauts de dnf et de mock ne sont pas lus.
+- **Non prévu** : `golang-src` contient `src/vendor/github.com/golang-fips/openssl/v2/` et `src/crypto/internal/boring/`. Que l'un ou l'autre soit lié dans un binaire construit avec `CGO_ENABLED=0` n'est pas mesuré. Le `golang-1.24-src` de Debian n'est pas comparé sur ce point. À relever avant de comparer les licences du rpm et du deb.
+- Q1 et Q2 restent tes décisions, avant le premier build de la 05.
+
+**Note du 2026-11-16 (2026-11-16T18:02:21Z) sur l'additif de `releve8`** : la ligne G7 de l'additif (commit 1d90dfd) dit « une forme ancienne de Fedora, pas une expression SPDX ». L'origine Fedora n'a jamais été lue ; seul compte le constat du passage ci-dessus (identifiants absents de la liste de reuse 6.2.0). La ligne n'est pas réécrite.

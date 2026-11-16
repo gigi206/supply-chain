@@ -87,6 +87,8 @@
 #               éventuel après « . », « _ » ou « - »).
 #               Aucun rpm téléchargé, aucune normalisation SPDX. Fichiers effacés à la fin, sauf après un KO.
 #               Prédictions : resultats/m2-predictions.md, section releve8. Banc hors réseau : resultats/m2-releve8-essai-local.sh.
+#               Lancé le 16/11/2026 à 17:59:30 UTC (« Oui » à « Je lance m2.sh releve8 ? »), code 0 : G1 à G7 et G9 tenues, G8
+#               non tenue pour le chemin (LICENSE de Go sous /usr/share/doc/golang/) ; golang 1.25.9-1.el9_7 le plus haut (m2-releve8.log).
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le
