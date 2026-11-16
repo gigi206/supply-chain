@@ -527,3 +527,9 @@ les lectures faites. **L1 à L7 tenues** (détail dans `s6a-service-predictions.
 `039949f9`, aucun scan de D, aucune alerte de scan ni notification depuis 2026-11-15T20:39:34Z. **U13 tenue jusqu'à 16:04:21Z.**
 Échéance pour `fraicheur` : 2026-11-17T13:16:51Z.
 Prochaine ligne : `S6A_SEC=1 s6a.sh periodique` (L8, rien d'écrit), sur accord nommé.
+
+## Carte, ligne 10 : `S6A_SEC=1 periodique` (note de 2026-11-16T16:06:10Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance S6A_SEC=1 s6a.sh periodique (L8, rien d'écrit) ? ». Le 16/11 à 16:05:44 UTC, code 0, rien d'écrit
+dans le cluster ni dans Zot ; **L8 tenue** (gabarit égal sur le CronJob existant, avertissement de kubectl annoncé). Lignes
+« S6a periodique » et « fait » dans `chrono.tsv` ; journal renommé en `s6a-periodique-sec.log`.
+Prochaine ligne : `s6a.sh periodique` (L9, L10 : cluster et Zot, premier scan de D ; refusé de 09:00 à 12:59 UTC), sur accord nommé.

@@ -1,9 +1,10 @@
-# s6a.sh periodique, 2026-11-14T20:58:42Z
+# s6a.sh periodique, 2026-11-16T16:05:44Z
 ## préalables
 OK   s6a-scanner-deb.patch appliqué et commité
-OK   builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e présent dans Zot
+OK   builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e présent dans Zot
 ## rendu, dry-run serveur, comparaison au CronJob de l'image
 limites de revocation (limites.tsv) : requêtes 10m et 32Mi, limites 500m et 256Mi
+Warning: resource cronjobs/scan-sample-app-deb is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
 OK   gabarit du Job du deb égal à celui de scan-sample-app, hors image, nom, dépôt et NATURE
 OK   NATURE dans analyser : deb
 OK   horaire, fuseau, concurrence : 15 11 * * * Etc/UTC Forbid

@@ -546,3 +546,14 @@ code 0 relevé juste après la commande, « toutes les lectures faites » ([jour
 | L7 | Échéance 2026-11-17T13:16:51Z | Tenue |
 
 `fraicheur` doit donc passer avant le 17/11 à 13:16:51 UTC ; `grafana` avant le 17/11 à 09:30 UTC.
+
+## Résultat de L8 (note de 2026-11-16T16:06:10Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance S6A_SEC=1 s6a.sh periodique (L8, rien d'écrit) ? ». À 230412e, le 16/11 à 16:05:44 UTC (début et
+fin dans la même seconde d'après `date -u`), code 0, `bilan : tout OK`, « S6A_SEC=1 : rien d'écrit » ; journal renommé en
+[`s6a-periodique-sec.log`](s6a-periodique-sec.log) (version du 14/11 dans git).
+- **L8 tenue** : correctif appliqué et commité ; D présent dans Zot ; limites de `revocation` 10m, 32Mi, 500m, 256Mi ; gabarit du
+  Job du deb, ramené à l'image, égal à celui de `scan-sample-app` ; `NATURE=deb` ; `15 11 * * * Etc/UTC Forbid` ; image à
+  `30 9 * * *`. Avertissement de kubectl, annoncé : `last-applied-configuration` absente du CronJob créé par `--server-side` ;
+  sans écart.
+- `s6a-periodique.log` (version du 14/11) reste supprimé dans l'arbre, non commité, jusqu'à `periodique` ; arrêt avant :
+  `git restore poc/bricks/06-deb-sbuild/resultats/s6a-periodique.log`.
