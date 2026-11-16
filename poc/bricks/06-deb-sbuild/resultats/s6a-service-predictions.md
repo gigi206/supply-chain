@@ -662,3 +662,8 @@ de PipelineRun dans `builds` ; seul `rattrapage-deb` le pourrait. Rien d'écrit 
 deb ne réussit aucun passage ; chaque passage réussi la repousse.
 **Contrôles à sec faits.** `bash -n s6a.sh`, code 0 ; diffs et recherches ci-dessus. Rien lu dans le cluster, dans Zot ni sur
 `sc-stockage`.
+
+## Note de 2026-11-16T16:58:08Z : titre de l'additif de la ligne 12 (rien n'est réécrit)
+Relevé par le conseiller. Le titre dit « préparé à partir de 2026-11-16T16:41:27Z » : cette heure est celle de l'écriture dans ce
+fichier (`date -u` de la commande d'insertion), pas celle du début de la préparation, qui n'a pas été relevée. Lire « écrit à
+2026-11-16T16:41:27Z ».
