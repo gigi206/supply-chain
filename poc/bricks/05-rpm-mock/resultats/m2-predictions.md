@@ -773,3 +773,25 @@ Fin à 19:23:08 UTC (`chrono.tsv`). Journal : [m2-releve9.log](m2-releve9.log), 
 
 Le journal des témoins ([m2-releve9-temoins.log](m2-releve9-temoins.log), 18:24:47 UTC) date d'avant le complément : il cite le lecteur à 178 lignes (`ffce621e…`). Les lignes ajoutées viennent après le contrôle où `basesystem` s'arrête, et ne tournent pas sur ce témoin.
 
+
+## Décision Q1 du propriétaire (note du 2026-11-16, écrit à 2026-11-16T21:25:14Z ; rien n'est réécrit)
+
+Une recommandation, retouchée sur relecture du conseiller, a été présentée le 16/11/2026 avec la question « Notice de Go portée par le packaging au %license du rpm ? »
+Réponse : « Oui, portée ».
+
+**Décision Q1 : la notice de la bibliothèque standard de Go ira au `%license` du rpm, portée par le packaging, pas copiée du
+buildroot.** C'est le pendant de la décision 2 du deb (notices en `Comment:` de `debian/copyright`).
+
+Points de la recommandation présentée, que la réponse ne tranche pas :
+- contenu proposé : le texte de la `LICENSE` et du `PATENTS` de Go (sha256 `911f8f57…` et `96f408bf…`, égaux dans Go 1.24.7 de
+  `mise.toml` et dans le rpm `golang` 1.25.9-1.el9_7, `releve9`), et la notice X11 de `runtime/memmove_amd64.s`. Cet en-tête est
+  lu dans les copies locales de Go 1.24.7 et 1.26.10, pas dans 1.25.9 ; sa liaison est à contrôler au premier build par
+  `x11-fichiers` sur le binaire du rpm (mesurée liée pour le deb, Go 1.24.4, [x11-fichiers.log](../../13a-licences/resultats/x11-fichiers.log)) ;
+- forme : un fichier écrit depuis le spec, ou un `Source1` qui toucherait `sources.sh` et `s1.sh`. `rpmbuild` et `rpmspec` sont
+  absents de l'hôte (`command -v`) : l'endroit où éprouver la forme avant le premier build reste à trouver ; critère : les sha256
+  attendus du fichier produit ;
+- contrôle prévu au premier verrou : l'empreinte de la `LICENSE` dans l'en-tête du rpm `golang` verrouillé, comparée au texte
+  porté. Le spec n'épingle pas golang (`>= 1.24`) et rien n'y joue le rôle de `Static-Built-Using` ;
+- `Release` à passer à 2 : le banc OBS a construit un 1.0.0-1 sur le spec `e1281b3d`.
+
+Rien n'est modifié : `poc/packaging/` attend aussi Q2.
