@@ -63,3 +63,10 @@ changelog du spec, est datée du 16/11/2026 ; l'entrée 1.0.0-1 garde sa date. L
 celles du commit de sample-app » ne vaut donc plus pour l'entrée de tête du rpm (pour le deb, voir le commentaire de `SDE_DEB` dans
 [`sources.sh`](sources.sh)). La copie du spec dans le cache attend un nouveau passage de
 `mise run packaging:sources`.
+
+## Note du 2026-11-16, suite (écrit à 2026-11-16T22:01:54Z ; rien n'est réécrit)
+
+`mise run packaging:sources` a été repassé le 16/11/2026 à 22:01:20 UTC (prédiction N1 de la brique 05,
+[détail](../bricks/05-rpm-mock/resultats/m2-predictions.md)) : la copie du spec dans le cache est à jour (sha256 `918a83f5…`) ;
+l'archive rpm, l'orig et le paquet source Debian 1.0.0-2 ont les mêmes sommes qu'avant. La phrase « La copie du spec dans le cache
+attend un nouveau passage » de la note précédente ne vaut plus.

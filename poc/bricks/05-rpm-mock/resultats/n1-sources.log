@@ -1,0 +1,25 @@
+# sources.sh (prédiction N1 de la 05, après le portage de Q1 au spec), 2026-11-16T22:01:20Z, HEAD 3e5f7f0, « Oui, lance-le »
+[packaging:sources] $ poc/packaging/sources.sh
+sample-app au commit 3da431dbdf327a05f0d7a7fecad860413578eafa, SOURCE_DATE_EPOCH=1793229566 (2026-10-28T23:19:26Z)
+debian/changelog 1.0.0-2, SOURCE_DATE_EPOCH=1794693332 (2026-11-14T21:55:32Z) : orig et paquet source Debian
+## Modules Go (vendor/)
+go: downloading github.com/go-chi/chi/v5 v5.2.3
+all modules verified
+go : go version go1.24.7 linux/amd64
+  github.com/go-chi/chi/v5 v5.2.3
+  github.com/go-chi/chi/v5
+## marked (web/node_modules/marked)
+  https://registry.npmjs.org/marked/-/marked-16.4.1.tgz : intégrité conforme au lockfile
+## Archives
+07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb  sample-app-1.0.0.tar.gz
+1591a05bd1d42241ec4ad501e0c01af61368c4de0e3e374c8df0a7e7ad5b2ffa  sample-app_1.0.0.orig.tar.gz
+ee2a6b8ef65f2464d4cae5ea7e79b3ec796c01f9efcc53c27bec128695221002  sample-app_1.0.0-2.dsc
+0cc3d47e9c283ff5cefa7c3dd247a9495e05faaee3aed4001159e81de08a4371  sample-app_1.0.0-2.debian.tar.xz
+918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6  sample-app.spec
+# fin 2026-11-16T22:01:21Z, code 0
+## Contrôle N1 (copie du cache gardée avant le passage)
+tenue     quatre lignes hors spec inchangées
+tenue     ligne du spec : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6  sample-app.spec
+tenue     copie du spec égale au spec du dépôt
+tenue     SHA256SUMS vérifié sur le cache
+# bilan N1 : tenue

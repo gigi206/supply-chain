@@ -883,3 +883,15 @@ Prédictions pour la suite, écrites avant tout lancement (aucun n'est accordé)
   le clamp des mtime ne joue pas : à noter, sans conclure d'avance.
 - N6 (premier verrou) : l'empreinte de la `LICENSE` dans l'en-tête du rpm `golang` verrouillé égale `911f8f57…` (contrôle déjà
   prévu par la note Q1).
+
+## Résultat de N1 (note du 2026-11-16, écrit à 2026-11-16T22:01:54Z ; rien n'est réécrit)
+
+Lancement accordé le 16/11/2026 (question « Je lance n1-sources.sh ? », réponse « Oui, lance-le »), de 22:01:20 à 22:01:21 UTC
+(`chrono.tsv`), HEAD 3e5f7f0 : [script](n1-sources.sh) (copié tel quel après le passage depuis le scratchpad ; il garde d'abord
+une copie du cache hors du dépôt, puis lance `mise run packaging:sources`), [journal](n1-sources.log). Code 0 ; **N1 tenue** :
+les quatre lignes de `SHA256SUMS` hors spec (archive rpm `07521c1e…`, orig `1591a05b…`, `.dsc` `ee2a6b8e…`, `.debian.tar.xz`
+`0cc3d47e…` de 1.0.0-2) égales à celles d'avant le passage, et à celles du passage du 14/11/2026
+(`poc/bricks/06-deb-sbuild/resultats/revision-sources-option1.log`) ; ligne du spec `918a83f5…` ; copie du spec égale au spec du
+dépôt ; `sha256sum -c` tenu sur le cache. Le réseau a servi au module chi (`go mod verify`) et à marked (sha512 du lockfile),
+comme d'habitude. Le script n'est pas rejouable tel quel : ses gardes s'arrêtent sur le journal existant. N2 à N6 attendent le
+premier build de la 05, sur accords à part.
