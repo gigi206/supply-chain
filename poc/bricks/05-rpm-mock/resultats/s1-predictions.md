@@ -477,3 +477,26 @@ correctif `extras` ne les touche pas.
 
 Suite, chaque point sur accord nommé : `amorce` ; `hote` de nouveau sous un nouveau préfixe (HB1 à HB8, HX1, HX2), `racine` (lire
 `rpm` dans sa liste), `image`, `essais`, `verrou`.
+
+## Étape `amorce` : résultat (note du 2026-11-16, écrite à 2026-11-16T23:39:29Z ; rien n'est réécrit)
+
+Question : « Je lance amorce ? ». Réponse : « Oui, lance amorce ». Lancée le 16/11/2026 à 23:37:36 UTC, finie à 23:37:48 UTC
+(`date -u` autour de la commande, et `chrono.tsv`). Journal : [`s1-amorce.log`](s1-amorce.log), sha256 `8703ac81…`.
+
+| | Mesure | Verdict |
+|---|---|---|
+| AM1 | Deux lignes « copié dans Zot », `ed654c69…` puis `ee90dc0e…`, cache `telechargements/oci/amont/rockylinux/rockylinux` | Tenue |
+| AM2 | « digest de l'amorce 9.8 dans Zot » et « digest du bootstrap 9.7 dans Zot » : OK, égaux aux digests épinglés ; aucune KO | Tenue |
+| AM3 | Aucun « i/o timeout » ; l'étape va au bout | Tenue |
+| AM4 | 12 s entre « 05 S1 amorce » et « 05 S1 amorce fait » | Tenue |
+
+- **Code de retour non affiché** : la commande lisait `PIPESTATUS` sous zsh, où cette variable n'existe pas. Le code se déduit
+  de la structure du script : `s1.sh` tourne sous `set -euo pipefail`, et `lancer` n'écrit la ligne « fait » de `chrono.tsv` qu'après
+  le pipeline de l'étape. Un KO aurait donc arrêté le script avant cette ligne, qui est présente.
+- **Taille** : le cache OCI local occupe 167M selon `du -sh`, lu juste après le passage. Cette mesure n'est pas archivée (ni
+  dans le journal ni dans les assertions de ce script). La place prise dans Zot n'a pas été relevée.
+- **Signatures** : non relues par l'étape, comme prévu ; aucun nouveau relevé depuis le 05/11.
+- Écritures définitives faites dans Zot : `amont/rockylinux/rockylinux@sha256:ed654c69…` et `@sha256:ee90dc0e…`.
+
+Suite, chaque point sur accord nommé : `hote` de nouveau sous un nouveau préfixe (HB1 à HB8, HX1, HX2), `racine` (lire `rpm`
+dans sa liste), `image`, `essais`, `verrou`.
