@@ -533,3 +533,9 @@ Prochaine ligne : `S6A_SEC=1 s6a.sh periodique` (L8, rien d'écrit), sur accord 
 dans le cluster ni dans Zot ; **L8 tenue** (gabarit égal sur le CronJob existant, avertissement de kubectl annoncé). Lignes
 « S6a periodique » et « fait » dans `chrono.tsv` ; journal renommé en `s6a-periodique-sec.log`.
 Prochaine ligne : `s6a.sh periodique` (L9, L10 : cluster et Zot, premier scan de D ; refusé de 09:00 à 12:59 UTC), sur accord nommé.
+
+## Carte, ligne 10 : `periodique` (note de 2026-11-16T16:09:03Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6a.sh periodique (L9, L10 : cluster et Zot, premier scan de D) ? ». Du 16/11 16:06:34 au 16/11
+16:08:35 UTC, code 0, `bilan : tout OK`. **L9 et L10 tenues** : CronJob du deb mis à jour sur D ; premier scan de D publié
+(`ca8946f4…`, referrers 0 puis 1) et vérifié sur l'hôte ; deb 1.0.0-2 `f66bbeb2` extrait ; 67 vulnérabilités, 0 KEV.
+Prochaine ligne : `s6a.sh fraicheur` (L11, `sc-stockage`, avant 2026-11-17T13:16:51Z), sur accord nommé.

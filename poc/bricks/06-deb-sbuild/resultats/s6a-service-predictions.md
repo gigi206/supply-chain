@@ -557,3 +557,19 @@ fin dans la même seconde d'après `date -u`), code 0, `bilan : tout OK`, « S6A
   sans écart.
 - `s6a-periodique.log` (version du 14/11) reste supprimé dans l'arbre, non commité, jusqu'à `periodique` ; arrêt avant :
   `git restore poc/bricks/06-deb-sbuild/resultats/s6a-periodique.log`.
+
+## Résultats de L9 et L10 (note de 2026-11-16T16:09:03Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6a.sh periodique (L9, L10 : cluster et Zot, premier scan de D) ? ». À 58fc939, en arrière-plan, du
+16/11 16:06:34 au 16/11 16:08:35 UTC, code 0 relevé par la même commande, `bilan : tout OK` ([journal](s6a-periodique.log),
+[bundle](s6a-periodique.bundle.json) ; tous deux réécrits, versions du 14/11 dans git).
+- **L9 tenue** : hors fenêtre (16 h UTC), aucun pod actif ; `scanner.sh` de `scan-config` à `88e7bfe8…` ; CronJob
+  `scan-sample-app-deb` mis à jour (`serverside-applied`) ; job `s6a-manuel` réussi en 121 s ; place libre la plus basse sur
+  sc-confiance : 8 702 Mo ; `DEB|sample-app_1.0.0-2_amd64.deb, sha256 f66bbeb2…, 1953492 octets` ; `ARTEFACT|deb, 2 PURL
+  versionnées` ; referrers de D : 0 avant, 1 après (`sha256:ca8946f41c7e9a12303be362425e33e9e7359117b6ec171b0331fe307ea5a986`) ;
+  sujet D ; bundle vérifié sur l'hôte par la clé du scanner.
+- **L10 tenue** : 67 vulnérabilités, 62 sur `pkg:golang/stdlib@1.24.4` et 5 sur `pkg:golang/github.com/go-chi/chi@v5.2.3#v5`
+  (lues dans le prédicat du bundle) ; **0 KEV** ; `malicious` vide. Base Grype du 16/11 (`e6aa5a3c…`, construite à 06:30:54 UTC),
+  `scannedAt` 16:08:24Z. Mêmes nombres que le 14/11 sur `039949f9`.
+- Six lignes contenant le motif jeton|token (étape du jeton du scanner), masquées à l'écran, laissées dans le journal comme le 14/11.
+- Le CronJob du deb vise désormais D ; la série suivie par `ScanEnRetard` reste celle de `039949f9` jusqu'à `fraicheur`
+  (échéance 2026-11-17T13:16:51Z).
