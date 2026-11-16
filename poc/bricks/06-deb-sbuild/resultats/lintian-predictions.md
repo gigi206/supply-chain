@@ -133,3 +133,25 @@ arrêtée à la première entrée de plus de 12 mois après elle ; témoins nég
 (`-0000`) comptées illisibles, sans trace ; changelog vide : `KO`, code 1. `debian/control` (awk) : adresses réduites à leur
 domaine. Expressions jq passées sur des JSON fabriqués (fusionneurs, période des MR, tags, suites) ; témoin négatif : JSON de forme
 inattendue, `KO`, code 1. Aucune lecture réseau faite à sec : les URL et la forme des réponses ne sont pas éprouvées.
+
+### Résultats de la commande 0 (écrits à 2026-11-16T17:08:23Z)
+
+Lancée sur « Oui, lance-le » (réponse à « Je lance sante-lintian.sh salsa debian (lectures publiques) ? »), de
+2026-11-16T17:07:31Z à 17:07:42Z, **code 0**, aucune ligne `KO` : [`sante-lintian-salsa.log`](sante-lintian-salsa.log),
+[`sante-lintian-debian.log`](sante-lintian-debian.log). Fenêtre des commits : depuis 2026-08-18.
+
+| # | Mesure | Verdict |
+|---|---|---|
+| Z1 | Projet `lintian/lintian` (créé le 10/04/2018), branche `master`, dernière activité le 14/11/2026 ; 8 tags lus, le plus récent `2.144.0` du 14/11/2026, tous annotés. **Champ `archived` : `null`** (absent de la réponse anonyme), donc « non archivé » n'est pas mesuré par ce champ ; indice seulement : un tag et des commits du 14/11/2026 | **Écart de forme** : prédiction tenue sauf la mesure directe de l'archivage |
+| Z2 | 108 commits, du 22/08 au 14/11/2026 ; 14 auteurs, dont un à 58 commits ; adresses debian.org ou personnelles pour les 12 auteurs affichés : employeurs non établis | Tenue |
+| Z3 | 100 MR fusionnées entre le 22/05 et le 14/11/2026, dont 52 dans la fenêtre ; fusionneurs : **nilesh 71, pollo 28, noahm 1** (deux comptes pour 99 fusions sur 100) ; signature du tag `2.144.0` : HTTP 404, aucune rapportée par l'API, rien n'en est déduit | Relevé (non prédit) |
+| Z4 | `SECURITY.md` : HTTP 404 ; Scorecard n/d | Tenue |
+| Z5 | `2.122.0` dans `trixie` ; `2.122.0+deb13u1` dans `trixie-proposed-updates` (non employée, contenu non lu) ; `2.143.0` dans `forky` ; `2.144.0` dans `sid`. Entrée `2.122.0` du changelog : 28/03/2025. 13 entrées sur 6 mois, 24 sur 12 mois, **2 signataires distincts** sur l'une et l'autre fenêtre ; 30 entrées lues, 0 illisible. Maintainer : « Debian Lintian Maintainers » (debian.org) ; 3 Uploaders | Tenue |
+| Z6 | Security tracker : 6 entrées CVE (la plus récente CVE-2017-8829) et 2 TEMP ; rubrique « Open issues » absente, « Resolved issues » présente | Relevé |
+| Z7 | Aucun critère « Risqué » : release du 14/11/2026, 13 releases en 6 mois, activité continue, 3 Uploaders déclarés et 2 signataires des entrées du changelog. Critères qui manquent : Scorecard n/d, employeurs non établis, **bus factor de 2** (2 signataires des entrées du changelog sur 12 mois, 2 comptes pour 99 des 100 MR fusionnées lues), SECURITY.md absent (non bloquant : outil de distro ; rubrique « Open issues » absente de la page du security tracker). Archivage déduit, non mesuré (Z1). Version visée 2.122.0 : contrôles Y1 et Y3 et verrou à venir, non lancés | **Tenue, sauf la mesure directe de l'archivage : « À surveiller, hors chemin critique »**, porté au doc 04 (§4) |
+
+Bus factor de 2 : le §1 classe ce cas en « À surveiller », pas en verdict limite (le cas d'échec ci-dessus visait un seul
+signataire ou une seule personne pour presque toutes les fusions). « Hors chemin critique » est mon classement (Z7), alors que
+sbuild et mmdebstrap sont au chemin critique dans `projects.tsv` : à contredire par le propriétaire s'il le juge autrement. lintian est ajouté à `tools/health/projects.tsv`.
+Prochaine commande de l'étape : `lintian.sh prealables` (commande 1), sur accord nommé.
+

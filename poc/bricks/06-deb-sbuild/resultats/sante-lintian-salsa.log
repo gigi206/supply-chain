@@ -1,0 +1,36 @@
+# sante-lintian.sh salsa, 2026-11-16T17:07:32Z
+## salsa.debian.org, lintian/lintian (fenêtre des commits : depuis 2026-08-18T00:00:00Z)
+nom lintian/lintian, archivé null, branche master, dernière activité 2026-11-14, créé 2018-04-10
+## derniers tags
+  2.144.0 : commit du 2026-11-14, tag créé 2026-11-14, annoté true
+  2.143.0 : commit du 2026-10-24, tag créé 2026-10-24, annoté true
+  2.142.0 : commit du 2026-10-09, tag créé 2026-10-09, annoté true
+  2.141.0 : commit du 2026-09-12, tag créé 2026-09-12, annoté true
+  2.140.1 : commit du 2026-09-09, tag créé 2026-09-09, annoté true
+  2.140.0 : commit du 2026-09-04, tag créé 2026-09-04, annoté true
+  2.139.0 : commit du 2026-08-04, tag créé 2026-08-04, annoté true
+  2.138.0 : commit du 2026-07-12, tag créé 2026-07-12, annoté true
+signature du tag 2.144.0 : aucune rapportée par l'API, HTTP 404 (404 ne prouve pas l'absence de signature GPG)
+## commits de master depuis 2026-08-18T00:00:00Z
+commits : 108
+plus récent : 2026-11-14, plus ancien : 2026-08-22
+auteurs (nom, domaine de l'adresse), robots compris, nommés tels quels :
+       58 Nilesh Patra	debian.org
+       14 Louis-Philippe Véronneau	debian.org
+       12 Sylvestre Ledru	debian.org
+        7 Lucas Nussbaum	debian.org
+        5 Nicholas Guriev	guriev.su
+        2 Soren Stoutner	debian.org
+        2 Rafael Laboissière	laboissiere.net
+        2 Lena Voytek	voytek.dev
+        1 Sébastien Villemot	debian.org
+        1 Subin Siby	subinsb.com
+        1 Scott Talbert	techie.net
+        1 Noah Meyerhans	debian.org
+auteurs distincts : 14
+## 100 MR fusionnées, les plus récemment mises à jour
+MR lues : 100 ; fusionnées entre 2026-05-22 et 2026-11-14 ; fusionnées depuis 2026-08-18T00:00:00Z : 52
+fusionneurs : nilesh 71, pollo 28, noahm 1
+## SECURITY.md à la racine de master
+SECURITY.md : HTTP 404 (404 = absent)
+## Scorecard : n/d (projet hors GitHub)

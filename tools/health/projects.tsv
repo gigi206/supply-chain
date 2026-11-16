@@ -65,6 +65,7 @@ tekton-lint	IBM/tekton-lint	posture-ci	oui
 Forgejo	-	sources	oui
 sbuild	-	packaging	oui
 mmdebstrap	-	packaging	oui
+lintian	-	packaging	non
 StageX	-	construction	non
 Cilium	cilium/cilium	réseau	oui
 kube-router (amont)	cloudnativelabs/kube-router	réseau	oui

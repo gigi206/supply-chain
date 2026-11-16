@@ -1,0 +1,48 @@
+# sante-lintian.sh debian, 2026-11-16T17:07:38Z
+## sources.debian.org, versions de lintian et suites
+  2.144.0 : sid
+  2.143.0 : forky
+  2.122.0+deb13u1 : trixie-proposed-updates
+  2.122.0 : trixie
+  2.116.3+deb12u1 : bookworm
+  2.104.0 : bullseye
+  2.15.0 : buster
+  2.5.50.4 : stretch
+  2.5.50~bpo8+1 : jessie-backports
+  2.5.50~bpo7+1 : wheezy-backports-sloppy
+  2.5.30+deb8u4 : jessie, jessie-kfreebsd
+  2.5.30+deb8u2~bpo70+1 : wheezy-backports
+version employée 2.122.0, suites : trixie
+version de sid : 2.144.0
+## debian/changelog de 2.144.0
+  2.144.0 (unstable) : 2026-11-14, Nilesh Patra (debian.org)
+  2.143.0 (unstable) : 2026-10-24, Nilesh Patra (debian.org)
+  2.142.0 (unstable) : 2026-10-09, Louis-Philippe Véronneau (debian.org)
+  2.141.0 (unstable) : 2026-09-12, Louis-Philippe Véronneau (debian.org)
+  2.140.1 (unstable) : 2026-09-09, Louis-Philippe Véronneau (debian.org)
+  2.140.0 (unstable) : 2026-09-04, Louis-Philippe Véronneau (debian.org)
+  2.139.0 (unstable) : 2026-08-04, Louis-Philippe Véronneau (debian.org)
+  2.138.0 (unstable) : 2026-07-12, Nilesh Patra (debian.org)
+  2.137.1 (unstable) : 2026-06-26, Nilesh Patra (debian.org)
+  2.137.0 (unstable) : 2026-06-25, Nilesh Patra (debian.org)
+  2.136.2 (unstable) : 2026-06-01, Nilesh Patra (debian.org)
+  2.136.1 (unstable) : 2026-05-25, Nilesh Patra (debian.org)
+entrée de la version employée 2.122.0 : 2025-03-28, Louis-Philippe Véronneau (debian.org)
+entrées sur 6 mois : 13, signataires distincts : 2
+entrées sur 12 mois : 24, signataires distincts : 2
+entrées lues : 30, illisibles : 0
+## debian/control de 2.144.0 : Maintainer et Uploaders
+  Maintainer: Debian Lintian Maintainers <…@debian.org>
+  Uploaders:
+   Bastien Roucariès <…@debian.org>,
+   Nilesh Patra <…@debian.org>,
+   Noah Meyerhans <…@debian.org>
+## security-tracker.debian.org, paquet source lintian
+entrées CVE : 6 ; entrées TEMP : 2 (ouvertes et résolues confondues)
+rubriques : « Open issues » absente ; « Resolved issues » présente
+  CVE-2004-1000
+  CVE-2009-4013
+  CVE-2009-4014
+  CVE-2009-4015
+  CVE-2013-1429
+  CVE-2017-8829
