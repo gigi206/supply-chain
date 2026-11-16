@@ -191,3 +191,24 @@ Lancée sur « Oui » (réponse à « Je lance lintian.sh installer (hors résea
 `dpkg --audit` vide. **Y4 tenue** : premier `chroot`, premier dpkg et scripts de maintenance dans l'espace de noms, sans incident
 relevé. Prochaine commande : `lintian.sh juger` (hors réseau), sur accord nommé.
 
+### Résultat de la commande 5, `juger` (écrit à 2026-11-16T17:20:49Z)
+
+Lancée sur « Oui » (réponse à « Je lance lintian.sh juger (hors réseau) ? »), de 2026-11-16T17:20:10Z à 17:20:17Z, **code 0**,
+`bilan : tout OK` : [`lintian-juger.log`](lintian-juger.log).
+
+| # | Mesure | Verdict |
+|---|---|---|
+| Y5 | `lintian -I` sur 1.0.0-1 : code 0 ; **une** ligne `I: sample-app source: missing-static-built-using-field-for-golang-package (in section for sample-app) [debian/control:10]` | **Tenue** : le témoin porte le tag |
+| Y6 | `lintian -I` sur 1.0.0-2 : code 0 ; **aucune** ligne du tag | **Tenue** : le tag disparaît avec `Static-Built-Using: ${misc:Static-Built-Using}` |
+| Y7 | `lintian` sans `-I` sur les deux `.dsc` : code 0, aucune ligne de sortie, donc aucune du tag | Tenue |
+| Y8 | Règle `BuiltUsing.pm` (sha256 `5070adf2…`) et fichier `.tag` (`fae231ae…`) trouvés, lignes relues (`satisfies('golang-go \| golang-any')`, littéral `${misc:Static-Built-Using}`) ; sévérité `info` ; `debian/control` de 1.0.0-2 égal au blob de HEAD (dernier commit `593cee4`) ; 0 `Static-Built-Using` dans celui de 1.0.0-1, 1 littéral dans celui de 1.0.0-2 ; quatre codes de lintian à 0 ; une seule ligne nomme le tag, celle de Y5 | Tenue |
+
+Autres tags, relevés tels quels (aucun `E:` ni `W:`), présents sur les deux révisions, chacun à décider à part, aucune décision
+prise : `debian-rules-parses-dpkg-parsechangelog [debian/rules:10]`, `debian-watch-file-is-missing`,
+`missing-xs-go-import-path-for-golang-package` (tous `I:`). Sortie d'erreur de chaque appel : une ligne, « running with root
+privileges is not recommended! » (root projeté dans l'espace de noms).
+
+**Étape lintian (étape 6 de la séquence d'après S5b) faite : Y1 à Y8 tenues.** Le jugement porte sur le `.dsc` `ee2a6b8e…` de
+`sources.sh`, rattaché à D par le `debian/control` inchangé depuis `593cee4`, pas sur le `.dsc` de D (`b284bd60…`, absent de
+l'hôte). Le chroot est présent sous `~/.cache/supply-chain-poc/06/lintian/chroot` (`test -d`, 2026-11-16T17:22:27Z) ; rien au niveau système.
+

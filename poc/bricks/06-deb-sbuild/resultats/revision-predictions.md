@@ -644,3 +644,10 @@ Préparé pendant l'attente de M5, après « j'ai besoin que tu avances » ; rel
   relue, réappliquée par aucune étape depuis S5.
 Rien lancé, rien lu dans le cluster, dans Zot ni sur `sc-stockage`.
 Prochaine ligne : `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild` (M5, lien coupé), pas avant 2026-11-16T20:38:15Z, sur accord nommé.
+
+**Note du 2026-11-16 (2026-11-16T17:20:49Z) : étape lintian faite, hors des lignes de la carte.** Relevé de santé (lintian « À surveiller, hors
+chemin critique » au doc 04), puis `lintian.sh` prealables à juger, chacune sur accord nommé, de 17:07:31 à 17:20:17 UTC, codes 0 :
+Y1 à Y8 tenues ([`lintian-predictions.md`](lintian-predictions.md)). Le tag `missing-static-built-using-field-for-golang-package`
+sort sur 1.0.0-1 et plus sur 1.0.0-2. Les lignes 11 (M5 à M8) et 12 restent ; prochaine : `ATTENTE_HORS_LIGNE=300 s6b.sh rebuild`
+(M5), pas avant 2026-11-16T20:38:15Z, sur accord nommé.
+

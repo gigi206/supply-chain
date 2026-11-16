@@ -1,0 +1,41 @@
+# lintian.sh juger, 2026-11-16T17:20:10Z
+OK   lintian installé dans la racine : 2.122.0
+## règle et tag relus dans le lintian installé
+OK   fichiers de la règle et du tag : 2
+/usr/share/lintian/lib/Lintian/Check/Languages/Golang/BuiltUsing.pm : sha256 5070adf213d142a8a2406e5d47ab80f110e63e21ce919efc118c10d8a8579c6a
+  40:      ->satisfies('golang-go | golang-any');
+  51:            'missing-static-built-using-field-for-golang-package',
+  55:          if $installable_fields->value('Static-Built-Using')
+  56:          !~ m{ \$ [{] misc:Static-Built-Using [}] }x
+/usr/share/lintian/tags/m/missing-static-built-using-field-for-golang-package.tag : sha256 fae231ae2d2f8e1c037bf6356e6ae35e436f8d73de31ad553009d3286fb54a9a
+OK   sévérité du tag : info
+## sources copiées dans la racine ; debian/control
+OK   debian/control de 1.0.0-2 égal à celui de HEAD (poc/packaging/debian/control) : oui
+dernier commit de poc/packaging/debian/control : 593cee4 2026-11-14T22:55:57+01:00
+OK   Static-Built-Using dans debian/control de 1.0.0-1 : 0
+OK   littéral dans debian/control de 1.0.0-2 : 1
+## lintian (hors réseau, root projeté)
+### lintian -I /tmp/s1/sample-app_1.0.0-1.dsc : code 0, 4 ligne(s), 1 ligne(s) d'erreur
+  I: sample-app source: debian-rules-parses-dpkg-parsechangelog [debian/rules:10]
+  I: sample-app source: debian-watch-file-is-missing
+  I: sample-app source: missing-static-built-using-field-for-golang-package (in section for sample-app) [debian/control:10]
+  I: sample-app source: missing-xs-go-import-path-for-golang-package
+  err : running with root privileges is not recommended!
+OK   code de lintian (0 ou 2) : admis
+### lintian /tmp/s1/sample-app_1.0.0-1.dsc : code 0, 0 ligne(s), 1 ligne(s) d'erreur
+  err : running with root privileges is not recommended!
+OK   code de lintian (0 ou 2) : admis
+### lintian -I /tmp/s2/sample-app_1.0.0-2.dsc : code 0, 3 ligne(s), 1 ligne(s) d'erreur
+  I: sample-app source: debian-rules-parses-dpkg-parsechangelog [debian/rules:10]
+  I: sample-app source: debian-watch-file-is-missing
+  I: sample-app source: missing-xs-go-import-path-for-golang-package
+  err : running with root privileges is not recommended!
+OK   code de lintian (0 ou 2) : admis
+### lintian /tmp/s2/sample-app_1.0.0-2.dsc : code 0, 0 ligne(s), 1 ligne(s) d'erreur
+  err : running with root privileges is not recommended!
+OK   code de lintian (0 ou 2) : admis
+OK   Y5 : tag sur 1.0.0-1 avec -I (témoin) : 1
+OK   Y6 : tag sur 1.0.0-2 avec -I : 0
+OK   Y7 : tag sans -I (1.0.0-1, 1.0.0-2) : 0, 0
+OK   tag sous une autre forme (toute ligne qui le nomme, avec -I) : 1
+bilan : tout OK
