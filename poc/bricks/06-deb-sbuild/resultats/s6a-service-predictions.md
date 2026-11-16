@@ -482,3 +482,51 @@ Le correctif n'est pas appliqué : son application est un accord à part.
 « Oui, applique-le » à « J'applique rejeu-s6.patch à rejeu.sh et je commite ? ». `git apply` à 21:19:37 UTC ; `bash -n` et
 shellcheck (`-S warning`) sans avertissement ; réciproque applicable ; `rejeu.sh` identique, octet pour octet, à la copie vérifiée à
 sec. **Pas encore rejoué** : R1 à R4 seront jugées au prochain rejeu de zéro, sur accord nommé.
+
+## Additif de la révision 1.0.0-2, ligne 10 de la cascade (préparé à partir de 2026-11-16T15:58:44Z, après « Oui, prépare-le ») : NON LANCÉ
+
+Deb D (`60f25f5c`, S4d3 du 15/11) au lieu de `039949f9`. Relevé d'avant : note de 2026-11-16T15:55:25Z de
+[`revision-predictions.md`](revision-predictions.md). Chaque commande sur accord nommé, code relevé juste après, arrêt au premier
+code non nul ; `s6a.sh` ne prend qu'une étape par appel.
+
+1. `poc/bricks/06-deb-sbuild/lecture-u13.sh` (nouveau, lecture seule : CronJob et Jobs par l'API, referrers dans Zot en anonyme,
+   Prometheus et journal du récepteur sur `sc-stockage` ; aucun secret lu ; journal `lecture-u13.log`). Une lecture ratée est
+   écrite « LECTURE RATÉE » et rend le code 1 : une section vide n'est jamais lue comme « rien ».
+2. `S6A_SEC=1 mise exec -- poc/bricks/06-deb-sbuild/s6a.sh periodique` (rien d'écrit) ; journal renommé ensuite en
+   `s6a-periodique-sec.log`, comme le 14/11, pour que `grafana` ne le prenne pas pour le vrai. Ce passage écrase la version suivie de
+   `s6a-periodique.log` (14/11), et le renommage la laisse supprimée dans l'arbre jusqu'à la commande 3 ; arrêt entre 2 et 3 :
+   `git restore poc/bricks/06-deb-sbuild/resultats/s6a-periodique.log`. Les versions du 14/11 des deux fichiers restent dans git.
+3. `mise exec -- poc/bricks/06-deb-sbuild/s6a.sh periodique` (cluster et Zot ; refusé de 09:00 à 12:59 UTC).
+4. `mise exec -- poc/bricks/06-deb-sbuild/s6a.sh fraicheur` (`sc-stockage`), avant l'échéance de L7.
+5. `mise exec -- poc/bricks/06-deb-sbuild/s6a.sh grafana` (lectures seules), avant le passage planifié de l'image du lendemain à
+   09:30 UTC.
+6. `JOURNAL=poc/bricks/06-deb-sbuild/resultats/lecture-u13-apres.log poc/bricks/06-deb-sbuild/lecture-u13.sh` (lecture seule,
+   même fenêtre depuis 2026-11-15T20:39:34Z) : U13 jugée jusqu'à la fin de l'étape 10 (L13).
+
+| # | Étape | Prédiction | Confiance |
+|---|---|---|---|
+| L1 | `lecture-u13` | CronJob `scan-sample-app-deb` : `15 11 * * * Etc/UTC`, non suspendu, dernier passage planifié `2026-11-16T11:15:00Z`, dernier succès le 16/11 entre 11:15 et 12:45 UTC ; cible `039949f9` seule | Moyenne : passages des 15/11 et 16/11 jamais relevés |
+| L2 | `lecture-u13` | Jobs planifiés du deb des 15/11 et 16/11 réussis (1 succès, 0 échec chacun), à côté de ceux de `scan-sample-app` | Moyenne, comme L1 |
+| L3 | `lecture-u13` | Referrers de scan dans `builds/scan/sample-app-deb` : `039949f9`, HTTP 200, trois dates (14/11 21:01:35Z par `periodique`, puis une le 15/11 et une le 16/11, entre 11:15 et 12:45 UTC) ; D : aucun referrer de scan (refus `scan.scan_present` de la porte de S5 le 16/11), code HTTP non prédit | Moyenne pour `039949f9`, haute pour D |
+| L4 | `lecture-u13` | `ScanEnRetard` et `ScanBientotRefuse` en santé `ok` et `inactive` | Haute si L3 tient |
+| L5 | `lecture-u13` | Série du deb égale à la date la plus récente de L3 ; deux valeurs distinctes dans la fenêtre, qui commence après le passage du 15/11 : celle du 15/11 dès le début, puis celle du 16/11. La valeur du 14/11 (1794690095) n'y apparaîtrait que si le passage du 15/11 avait échoué. Séries de l'image et de la base datées du 16/11 | Haute si L3 tient |
+| L6 | `lecture-u13` | Aucune ligne `ALERTS` de scan dans la fenêtre depuis 2026-11-15T20:39:34Z, aucune notification de scan au récepteur : **U13 tenue jusqu'à la lecture** | Moyenne, comme L1 |
+| L7 | `lecture-u13` | Échéance (série du deb plus 26 h) le 17/11 entre 13:15 et 14:45 UTC | Haute si L3 tient |
+| L8 | `periodique`, `S6A_SEC=1` | Correctif appliqué et commité, D présent dans Zot ; limites de `revocation` 10m, 32Mi, 500m, 256Mi ; gabarit du Job du deb, ramené à l'image, égal à celui de `scan-sample-app` ; `NATURE=deb` ; `15 11 * * * Etc/UTC Forbid` ; image à `30 9 * * *` ; « rien d'écrit », code 0 | Moyenne : premier `kubectl apply --dry-run=server` (apply côté client) sur un CronJob déjà créé par `--server-side` ; un avertissement de kubectl est possible, sans écart |
+| L9 | `periodique` | Hors fenêtre, aucun pod actif ; `scanner.sh` de `scan-config` à `88e7bfe8…` (inchangé depuis le 14/11) ; CronJob mis à jour ; job `s6a-manuel` réussi avant 1800 s (125 s le 14/11) ; `DEB|sample-app_1.0.0-2_amd64.deb, sha256 f66bbeb2…` ; `ARTEFACT|deb, 2 PURL versionnées` ; referrers de D : 0 avant, 1 après ; sujet D ; bundle vérifié sur l'hôte avec la clé du scanner | Haute pour le nom et le sha256 ; moyenne pour 2 PURL (même binaire Go attendu, seul le packaging change) |
+| L10 | `periodique` | Prédicat : vulnérabilités de `pkg:golang/stdlib@1.24.4` et de `chi v5.2.3`, 0 KEV, `malicious` vide ; nombre non prédit (base plus récente que le 14/11) | Moyenne pour 0 KEV |
+| L11 | `fraicheur` | `s6a-deb.conf` réécrit sur D ; `fraicheur-scan.py` installé identique (`6a08cc6e…`) ; `Result` à `success` ; trois séries dans Prometheus égales aux lectures de l'hôte sous 90 s, celle du deb à la date du referrer de L9 | Haute pour les séries, moyenne pour le délai |
+| L12 | `grafana` | Comme Q10, avec `DEB|sample-app_1.0.0-2_amd64.deb, sha256 f66bbeb2…` ; aucun passage planifié depuis `periodique` | Haute si l'étape passe avant 09:30 UTC le 17/11 |
+| L13 | `lecture-u13` après `fraicheur` | CronJob ciblant D seul, dernier passage planifié toujours `2026-11-16T11:15:00Z` ; D : un referrer de scan, celui de L9 ; série du deb à sa date ; `ScanEnRetard` et `ScanBientotRefuse` `inactive` ; aucune ligne `ALERTS` de scan ni notification de scan dans toute la fenêtre : **U13 tenue de l'étape 8 à l'étape 10** ; échéance 26 h après L9 | Haute si L6, L9 et L11 tiennent |
+
+**Effets.** Le CronJob du deb scanne D à partir du 17/11 à 11:15 UTC, et plus `039949f9`. La porte de la ligne 12 attend alors le
+scan de D `ok`. `ScanEnRetard` suit D après `fraicheur` ; son état après `fraicheur` n'est mesuré par aucune étape.
+**Cas d'échec.** `periodique` en KO après la mise à jour du CronJob, ou `fraicheur` refusée ou en KO : plus rien ne rafraîchit la
+série de `039949f9`, et `ScanEnRetard` sonnera à l'échéance de L7, sauf réparation avant. Un KO de `periodique` avant toute
+écriture (préalables, écart de L8) ne change rien. `grafana` passée après 09:30 UTC le 17/11 : refus voulu, pas un défaut.
+**Portes déjà jouées.** Après `periodique`, D porte un scan : les portes de `s4d3.sh` et de `s5.sh`, qui attendent le scan du deb
+refusé, ne repasseront plus telles quelles tant que Zot garde ce referrer (même constat que la note de 2026-11-14T21:08:39Z).
+**Contrôles à sec faits.** `bash -n` et shellcheck (`-S warning`) de `lecture-u13.sh`, sans avertissement. Script entier passé hors
+réseau, `kubectl`, `curl` et `ssh` remplacés par des simulations : réponses normales (code 0), `"manifests": null` (0 referrer,
+code 0), lectures en échec (une ligne « LECTURE RATÉE » par lecture, code 1) ; requêtes envoyées par ssh relues après décodage.
+Rien lu dans le cluster, dans Zot ni sur `sc-stockage`.

@@ -512,3 +512,11 @@ Relecture hors ligne, à f9a7938, relue par le conseiller. Rien lancé, rien lu 
   - messages périmés, sans effet : `039949f9` aux l. 746 et 749.
 Prochaine ligne : additif de prédictions de la ligne 10 dans `s6a-service-predictions.md` (lecture seule de U13, `S6A_SEC=1
 periodique`, puis `periodique`, `fraicheur`, `grafana`), sur accord ; puis chaque lancement sur accord nommé.
+
+## Carte, ligne 10 : additif de prédictions préparé (note de 2026-11-16T16:02:49Z ; rien n'est réécrit)
+« Oui, prépare-le » à « Je prépare l'additif de prédictions de la ligne 10 ? ». Additif L1 à L13 dans
+[`s6a-service-predictions.md`](s6a-service-predictions.md), relu par le conseiller ; nouveau script de lecture seule
+[`lecture-u13.sh`](../lecture-u13.sh) (U13 lue avant `periodique` et après `fraicheur`, une lecture ratée rend le code 1), essayé
+hors réseau avec des commandes simulées. Six commandes, chacune sur accord nommé : `lecture-u13`, `S6A_SEC=1 periodique`,
+`periodique`, `fraicheur`, `grafana`, `lecture-u13` après. Rien lancé.
+Prochaine ligne : `lecture-u13.sh` (L1 à L7), sur accord nommé.
