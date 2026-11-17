@@ -89,3 +89,16 @@ Code 0 ([journal](m4a-releve.log), `890f96c8…`). Rien écrit dans le cluster n
 | PO2 | Les quatre de la 08c égales au fichier rendu en `Deny` | Moyenne : trois égales à ce rendu près à `releve` ; la quatrième jamais comparée (`h5_deny` exige qu'aucune ne reste en `Audit`, lecture) |
 | PO3 | Noms : 9 dans le dépôt, 9 en service, aucun en service hors du dépôt, aucun absent | Haute : mesuré à `releve` (9 noms, tous rangés dans le dépôt) |
 | PO4 | Code 0, rien écrit dans le cluster ni dans Zot | Haute : uniquement des `get` |
+
+## Résultat de `politiques` (17/11/2026, de 21:10:42 à 21:10:43 UTC, « Oui, lance-le » ; note écrite à 21:11:07 UTC)
+
+Code 0 ([journal](m4a-politiques.log), `f38fc773…`), lecture seule. La ligne de la quatrième politique de la 08c contient le motif masqué : lue sous masque, elle commence par « égal » et compte 0 écart.
+
+| # | Résultat |
+|---|---|
+| PO1 | **Tenue.** Les cinq ValidatingPolicy de la 08 sont égales au dépôt, `stepactions-interdites` comprise. |
+| PO2 | **Tenue.** Les quatre de la 08c sont égales au fichier rendu comme par `h5_deny` : l'écart de R3 est exactement la bascule `Audit` vers `Deny`, et rien d'autre. |
+| PO3 | **Tenue.** 9 noms dans le dépôt, 9 en service, aucun hors du dépôt, aucun absent. |
+| PO4 | **Tenue.** Code 0. |
+
+**Lacune de `releve` comblée.** Les neuf politiques d'admission de Kyverno en service sont celles du dépôt, celles de la 08c en `Deny`. Avec `releve`, l'état en service dont M4 dépend est relevé, sauf gabarits et déclencheurs (hors de M4). `verrou` et `publier` attendent la carte de M4b.

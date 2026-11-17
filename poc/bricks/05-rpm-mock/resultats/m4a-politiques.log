@@ -1,0 +1,14 @@
+# m4a.sh politiques, 2026-11-17T21:10:42Z
+## ValidatingPolicy de la 08 (admission.yaml), énumérées par yq
+égal : ValidatingPolicy tekton-references (08) (spec, 0 écart(s))
+égal : ValidatingPolicy pods-isolation (08) (spec, 0 écart(s))
+égal : ValidatingPolicy zone-confiance (08) (spec, 0 écart(s))
+égal : ValidatingPolicy zone-build (08) (spec, 0 écart(s))
+égal : ValidatingPolicy stepactions-interdites (08) (spec, 0 écart(s))
+## ValidatingPolicy de la 08c (durcissement.yaml rendu comme par h5_deny), énumérées par yq
+égal : ValidatingPolicy limites-obligatoires (08c, rendu Deny) (spec, 0 écart(s))
+égal : ValidatingPolicy images-zot-par-digest (08c, rendu Deny) (spec, 0 écart(s))
+égal : ValidatingPolicy espace-default-interdit (08c, rendu Deny) (spec, 0 écart(s))
+égal : ValidatingPolicy jeton-compte-default (08c, rendu Deny) (spec, 0 écart(s))
+## noms en service contre noms du dépôt
+dépôt : 9 ; en service : 9 ; en service hors du dépôt :  ; dans le dépôt, absentes en service : 
