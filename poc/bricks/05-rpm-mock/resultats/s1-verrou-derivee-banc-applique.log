@@ -1,0 +1,175 @@
+# banc-verrou-derivee.sh, 2026-11-17T15:18:06Z, python3 3.13.12
+# s1.sh du dépôt 2b0a3b7b9bdd0252a6700e084095006077d0f98f8fa9c2436af6908434d153e9 ; copie modifiée 199b4ff2b6c1c13d8ebe63f93879a2e109360715957fae51673333097cd50b45
+## A : insertions seules
+OK   lignes retirées : 0
+OK   blocs insérés : 2
+OK   copie sans les blocs insérés égale au dépôt
+     en-tête inséré : 6 lignes ; bloc inséré : 119 lignes
+## B : syntaxe et shellcheck
+OK   bash -n de la copie
+     remarques shellcheck : dépôt 17, copie 20
+     diff shellcheck : 2c2
+     diff shellcheck : <       9 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+     diff shellcheck : ---
+     diff shellcheck : >      12 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+OK   remarques shellcheck SC1112 (guillemet typographique) dans la copie : 0
+OK   remarques shellcheck de niveau error dans la copie : 0
+     extraits écrits : 9 variables
+     f-attendu.sh : attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)" >&2; exit 1; }; }
+     f-champ.sh : champ() { sed -n "s/^$2[[:space:]]*:[[:space:]]*//p" "$T/$1.log" | head -1; }   # journal libellé : valeur
+     f-dans.sh : dans() { # nom libellé : script sh sur l'entrée standard, exécuté dans le pod ; sortie dans $T/<libellé>.log, puis affichée
+     f-dans.sh :   local rc=0
+## C : configuration dérivée, partie hôte
+OK   C code (set -euo pipefail) : 0
+     OK   configuration dérivée : racine, bootstrap_image et bootstrap_image_ready changés, rien d'autre : 6
+     écart prévu : < config_opts['root'] = 'poc-rocky-9.7-x86_64'
+     écart prévu : > config_opts['root'] = 'poc-rocky-9.7-derivee-x86_64'
+     écart prévu : < config_opts['bootstrap_image'] = 'sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2'
+     écart prévu : < config_opts['bootstrap_image_ready'] = False
+     écart prévu : > config_opts['bootstrap_image'] = 'sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6'
+     écart prévu : > config_opts['bootstrap_image_ready'] = True
+     configuration dérivée : sha256 78645df78c3d47b90fd9617844058105b752146402e5a5288aa0abc66e73d2d8
+     fin atteinte
+OK   C fin atteinte (diff sans arrêt) : fin atteinte
+OK   C configuration de base = sha256 de l'étape image (s1-image.log) : a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31
+OK   C six lignes d'écart affichées : 6
+OK   configuration dérivée égale au calcul indépendant
+## D : SONDE_CFG_DERIVEE avec doublures, et contrôles de l'hôte
+OK   marqueurs @ restants : 0
+OK   image dérivée nommée par digest (pull et inspect) : 2
+OK   sh -n de SONDE_CFG_DERIVEE rendue
+OK   /etc/mock et /w restants hors banc : 0
+OK   D1 code : 0
+     configuration de base, image du pod : sha256 a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31
+     configuration dérivée livrée : sha256 78645df78c3d47b90fd9617844058105b752146402e5a5288aa0abc66e73d2d8
+     mock --debug-config : rc 0
+     configuration lue par mock : config_opts['root'] = 'poc-rocky-9.7-derivee-x86_64'
+     configuration lue par mock : config_opts['bootstrap_image'] = 'sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6'
+     configuration lue par mock : config_opts['bootstrap_image_ready'] = True
+     podman pull, image dérivée : rc 0 en 0 s
+     image dérivée, inspect : sha256:0 linux/amd64
+OK   D1 aucune commande diff dans la sonde (absente de l'image d'essai) : 0
+OK   D1 lignes de --debug-config relevées : 3
+OK   D1 pull : 1
+     OK   configuration de base du pod égale à MOCK_CFG de s1.sh : sha256 a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31
+     OK   configuration dérivée livrée dans le pod : sha256 78645df78c3d47b90fd9617844058105b752146402e5a5288aa0abc66e73d2d8
+     OK   podman pull de l'image dérivée par le pod : rc 0
+     suite atteinte
+OK   D1 contrôles de l'hôte : trois OK : 3
+OK   D1 contrôles de l'hôte : suite atteinte : suite atteinte
+OK   D2 code : 0
+     configuration de base, image du pod : sha256 a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31
+     configuration dérivée livrée : sha256 78645df78c3d47b90fd9617844058105b752146402e5a5288aa0abc66e73d2d8
+     mock --debug-config : rc 0
+     configuration lue par mock : config_opts['root'] = 'poc-rocky-9.7-derivee-x86_64'
+     configuration lue par mock : config_opts['bootstrap_image'] = 'sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6'
+     configuration lue par mock : config_opts['bootstrap_image_ready'] = True
+     podman pull, image dérivée : rc 125 en 0 s
+     doublure : pull refusé
+     Error: doublure : image absente
+OK   D2 pull refusé affiché : 1
+     OK   configuration de base du pod égale à MOCK_CFG de s1.sh : sha256 a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31
+     OK   configuration dérivée livrée dans le pod : sha256 78645df78c3d47b90fd9617844058105b752146402e5a5288aa0abc66e73d2d8
+     KO   podman pull de l'image dérivée par le pod : rc 125 (attendu : rc 0)
+     pod retiré (doublure)
+OK   D2 arrêt : KO du pull, pod retiré, suite non atteinte : 1 1 0
+OK   D3 configuration livrée altérée : arrêt : 1 0
+OK   doublure mock jamais appelée autrement (D1, D2) : 0
+## E : SONDE_VERROU, SONDE_REPLI et SONDE_BOOT rendues
+OK   marqueurs @ restants (SONDE_VERROU) : 0
+OK   configuration prête absente : 0
+OK   --no-cleanup-after : 1
+OK   libellé image dérivée : 1
+OK   lignes changées contre verrou : 10
+     2c2
+     < echo "isolation : simple ; configuration : poc-rocky-9.7-pret-x86_64"
+     ---
+     > echo "isolation : simple ; configuration : poc-rocky-9.7-derivee-x86_64"
+     4c4
+     < mock -r poc-rocky-9.7-pret-x86_64 --debug-config > /w/verrou-debug-config.log 2>&1; rd=$?; echo "mock --debug-config : rc $rd"
+     ---
+     > mock -r poc-rocky-9.7-derivee-x86_64 --debug-config > /w/verrou-debug-config.log 2>&1; rd=$?; echo "mock --debug-config : rc $rd"
+     19,20c19,20
+     < mock -r poc-rocky-9.7-pret-x86_64 --isolation=simple --resultdir=/w/res-verrou --buildsrpm --spec /w/src/sample-app.spec --sources /w/src > /w/verrou-srpm.log 2>&1
+     < r=$?; echo "mock --buildsrpm (image prête) : rc $r en $(($(date +%s) - t)) s"
+     ---
+     > mock -r poc-rocky-9.7-derivee-x86_64 --isolation=simple --resultdir=/w/res-verrou --buildsrpm --spec /w/src/sample-app.spec --sources /w/src > /w/verrou-srpm.log 2>&1
+     > r=$?; echo "mock --buildsrpm (image dérivée) : rc $r en $(($(date +%s) - t)) s"
+     25c25
+     < mock -r poc-rocky-9.7-pret-x86_64 --isolation=simple --resultdir=/w/res-verrou --calculate-build-dependencies "$s" > /w/verrou-calc.log 2>&1
+     ---
+     > mock -r poc-rocky-9.7-derivee-x86_64 --isolation=simple --resultdir=/w/res-verrou --calculate-build-dependencies --no-cleanup-after "$s" > /w/verrou-calc.log 2>&1
+OK   sh -n de SONDE_VERROU rendue
+OK   SONDE_REPLI code : 0
+     res-verrou/root.log : 2 ligne(s) de repli sans image
+     verrou-srpm.log : 0 ligne(s) de repli sans image
+     verrou-calc.log : 1 ligne(s) de repli sans image
+OK   SONDE_REPLI 2, 0 puis 1 : res-verrou/root.log : 2 ligne(s) de repli sans image|verrou-srpm.log : 0 ligne(s) de repli sans image|verrou-calc.log : 1 ligne(s) de repli sans image|
+OK   SONDE_REPLI fichier absent : 1
+OK   SONDE_REPLI : chemins du pod (/w/) : 1
+OK   SONDE_BOOT : ni brut ni rockylinux:9.7, hors fichiers internes /w/$2.brut : 0
+OK   SONDE_BOOT : fichiers internes /w/$2.brut (jamais affichés) : 2
+OK   SONDE_BOOT : marqueurs @ : 0
+OK   SONDE_BOOT : bootstrap de la configuration dérivée : 2
+OK   SONDE_BOOT : image dérivée par digest (pull, mount, umount) : 3
+     rendu : > set -- /w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap*/root
+     rendu : > echo "bootstrap préparé par mock : $# chemin(s) pour /w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap*/root ; retenu : $1"
+     rendu : > t=$(date +%s); podman pull sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 > /w/pull-derivee.log 2>&1; r=$?
+     rendu : > echo "podman pull de l'image dérivée : rc $r en $(($(date +%s) - t)) s"
+     rendu : >   m=$(podman image mount sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 2>/w/mount-derivee.err); r=$?; echo "podman image mount : rc $r"
+     rendu : >   if [ $r = 0 ]; then liste "$m" boot-image "image dérivée" && i=1; podman image umount sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 >/dev/null 2>&1
+     rendu : >   else tail -n 3 /w/mount-derivee.err; fi
+     rendu : > else tail -n 5 /w/pull-derivee.log; fi
+     rendu : >   comm -23 /w/boot-image.txt /w/boot-mock.txt | sed "s/^/seulement dans l'image dérivée : /"
+     rendu : >   echo "comparaison non faite (bootstrap de mock lu : $a ; image dérivée lue : $i)"
+     rendu : >   [ $i = 0 ] || sed "s/^/image dérivée, liste : /" /w/boot-image.txt
+     rendu : > true
+OK   sh -n de SONDE_BOOT rendue
+OK   E1 code : 0
+     bootstrap préparé par mock : 1 chemin(s) pour /w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap*/root ; retenu : /w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root
+     bootstrap de mock : rpm -qa rc 0, 3 ligne(s), stderr 0 ligne(s)
+     podman pull de l'image dérivée : rc 0 en 0 s
+     podman image mount : rc 0
+     image dérivée : rpm -qa rc 0, 3 ligne(s), stderr 0 ligne(s)
+     lignes communes : 3
+     capacité de /w : 599879200 kB ; utilisés : 505479924 kB
+OK   E1 aucune ligne « seulement » : 0
+OK   E1 lignes communes : 3
+OK   E1 libellés : 1 1
+OK   E2 code : 0
+OK   E2 pull refusé, comparaison non faite : 1 1
+OK   E2 liste du bootstrap seule : 3
+## F : résumé et comparaison du verrou
+OK   F1 résumé sur s1-verrou_brut.json : 0
+OK   F1 rpm du buildroot : 1
+OK   F2 comparaison à soi-même : 0
+     bootstrap, pull_digest égal au digest de boot_image : non (sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2)
+     options de configuration différentes de verrou_brut : aucune
+     rpm du buildroot (nom, epoch, version, release, arch, sigmd5, url) : ici 222, verrou_brut 222 ; communs 222 ; seulement ici 0 ; seulement dans verrou_brut 0
+OK   F2 pull_digest d'un autre bootstrap signalé : 1
+OK   F2 222 communs, aucun écart : 1
+OK   F2 options identiques : 1
+OK   F3 comparaison de la variante : 0
+     bootstrap, pull_digest égal au digest de boot_image : oui
+     options de configuration différentes de verrou_brut : bootstrap_image, bootstrap_image_ready
+     rpm du buildroot (nom, epoch, version, release, arch, sigmd5, url) : ici 222, verrou_brut 222 ; communs 221 ; seulement ici 1 ; seulement dans verrou_brut 1
+     seulement ici : ('alternatives', None, '1.24', '2.el9.banc', 'x86_64', '5832caf6730301817da8e513d9fca84f', 'https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/a/alternatives-1.24-2.el9.x86_64.rpm')
+     seulement dans verrou_brut : ('alternatives', None, '1.24', '2.el9', 'x86_64', '5832caf6730301817da8e513d9fca84f', 'https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/a/alternatives-1.24-2.el9.x86_64.rpm')
+OK   F3 pull_digest égal : 1
+OK   F3 options différentes : 1
+OK   F3 un écart de chaque côté : 1 1 1
+OK   JSON cassé : échec signalé, étape poursuivie : comparaison avec verrou_brut en échec : rc 1
+OK   résumé et comparaison non fatals dans la copie : 2
+OK   ordre : configuration, pod, livraison, contrôle, sonde, repli, SONDE_BOOT, journaux, résumé, comparaison, retrait
+## G : étape connue de lancer
+OK   fonction etape_verrou_derivee : 1
+OK   nom du pod conforme (minuscules, chiffres, tirets) : 1
+OK   fonctions etape_ : celles du dépôt plus une : 9
+## H : commandes dans l'image d'essai, dnf-3 et builddep dans l'image dérivée
+OK   racine.tar (image d'essai), sha256 de l'étape racine : d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+OK   commandes de SONDE_CFG_DERIVEE et SONDE_REPLI absentes de /usr/bin : 
+OK   diff absent de l'image d'essai (raison du contrôle par sha256) : 0
+OK   boot-racine.tar (image dérivée), sha256 de boot_racine : 8ae17f92b27377fff20009d0a88740b1bf9045d533f0506949d6e209c970f1f2
+OK   image dérivée : /usr/bin/dnf-3 (dnf4_command de mock) : 1
+OK   image dérivée : greffon builddep : 1
+# bilan : tenu, fin 2026-11-17T15:18:09Z

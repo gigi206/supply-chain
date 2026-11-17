@@ -1827,3 +1827,22 @@ il réécrirait `s1-verrou.log` et `s1-verrou-mock.log`, déjà commités.
 
 Suite : appliquer `s1-verrou-derivee.patch` à `s1.sh` sur accord, puis écrire les prédictions et demander l'accord de lancement.
 Rien n'est lancé.
+
+## Étape `verrou_derivee` : `s1-verrou-derivee.patch` appliqué au dépôt (note du 2026-11-17, écrite à 2026-11-17T15:18:48Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « J'applique s1-verrou-derivee.patch à s1.sh ? », réponse « Oui, applique-le ».
+
+- `git apply` de [`../s1-verrou-derivee.patch`](../s1-verrou-derivee.patch) à 15:18:00 UTC (`date -u` avant et après, code 0).
+  `s1.sh` passe de `2b0a3b7b…` à `199b4ff2…`, la copie bancée.
+- Banc repassé sur le fichier du dépôt à 15:18:06 UTC : tenu, 71 OK ([journal](s1-verrou-derivee-banc-applique.log)). Le banc
+  compare le fichier à l'ancien `s1.sh` (`2b0a3b7b…`, tiré de `HEAD`), placé dans un arbre de travail du scratchpad (`<avant>`
+  dans le journal) avec un lien vers `resultats/`. Hors des deux premières lignes, il diffère du journal de la copie
+  ([`s1-verrou-derivee-banc.log`](s1-verrou-derivee-banc.log)) par 2 lignes : la ligne « utilisés » du `df` de la section E
+  (dossier du banc, sur l'hôte) et l'heure de fin.
+- Deux lignes datées ajoutées ensuite à l'en-tête, sous la description de `verrou_derivee` : « Correctif appliqué au dépôt le
+  17/11/2026 à 15:18:00 UTC (« Oui, applique-le »), sha256 égal à la copie bancée (199b4ff2…) ; non lancé. ». `s1.sh` vaut alors
+  `049fccad…`.
+- Contrôles sur ce fichier : `bash -n` passe ; shellcheck : 20 remarques, aucune de niveau warning ou au-dessus ; banc N3/N4 à
+  15:18:19 UTC, python3 3.13.12 : tenu, 35 OK ([journal](s1-verrou-derivee-banc-n34-applique.log)).
+
+Suite : prédictions de `verrou_derivee`, écrites et commitées avant tout passage, puis accord de lancement. Rien n'est lancé.
