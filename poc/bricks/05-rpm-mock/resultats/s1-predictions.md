@@ -2258,3 +2258,21 @@ avant ce commit ; trois corrections en sont venues (garde des tags, mesure de la
 
 Suite : appliquer `s1-fermeture.patch` à `s1.sh`, sur accord ; puis prédictions des trois étapes, commitées avant tout passage ;
 puis un accord par étape. Rien n'est lancé.
+
+## `s1-fermeture.patch` appliqué à `s1.sh` (note du 2026-11-17, écrite à 2026-11-17T17:09:53Z ; rien n'est réécrit), NON LANCÉ
+
+Décision du propriétaire : question « J'applique s1-fermeture.patch à s1.sh ? », réponse « Oui, applique-le ».
+- `git apply` de [`../s1-fermeture.patch`](../s1-fermeture.patch) à 17:08:38 UTC (`date -u` avant et après, code 0) : `s1.sh`
+  passe de `8554910f…` à `7cd2edd0…`, la copie bancée.
+- Banc repassé sur le fichier du dépôt, lancé à 17:08:51 UTC : tenu, 82 OK ([journal](s1-fermeture-banc-applique.log)). Il
+  compare ce fichier à l'ancien `s1.sh` (`8554910f…`, tiré de `HEAD`), placé avec le verrou, `closure.sh` et `mise.toml` dans
+  un arbre de travail du scratchpad (`<avant>` dans le journal). Écart au journal de la copie : heures et `df` de l'hôte
+  seulement.
+- Deux lignes datées ajoutées ensuite à l'en-tête de `s1.sh`, après l'entrée `restauration` : « Correctif appliqué au dépôt le
+  17/11/2026 à 17:08:38 UTC (« Oui, applique-le »), sha256 égal à la copie bancée (7cd2edd0…) ; non lancé. ». `s1.sh` vaut
+  alors `4c3adb53…`.
+- N3/N4 ([`s1-n34-banc.sh`](s1-n34-banc.sh)) sur ce fichier final, lancé à 17:09:29 UTC, python3 3.13.12 : tenu, 35 OK
+  ([journal](s1-fermeture-banc-n34-applique.log)).
+
+Suite : prédictions de `collecte`, `fermeture` et `restauration`, écrites et commitées avant tout passage, puis un accord par
+étape (`fermeture` écrit dans Zot, définitivement). Rien n'est lancé.
