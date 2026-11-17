@@ -1682,3 +1682,24 @@ différé d'un passage à l'autre, mais l'archive factice aussi.
 - LB2 ou LB4 en écart : pas d'accord d'écriture proposé avant explication.
 
 Suite : accord de lancement du passage local, puis accord d'écriture dans Zot (`boot_image`). Rien n'est écrit dans Zot.
+
+## Passage local de `boot_image` : résultat (note du 2026-11-17, écrite à 2026-11-17T14:51:32Z ; rien n'est réécrit)
+
+Passage sur accord « Oui, lance-le », le 17/11/2026 de 14:50:42 à 14:50:49 UTC (`date -u`), code 0. Journal :
+[`s1-boot-image-local.log`](s1-boot-image-local.log). Registre crane en loopback, disque `~/.cache/supply-chain-poc/05/banc-boot-image`
+(94 Mo, laissé en place) ; rien dans Zot.
+
+| # | Résultat |
+|---|---|
+| LB1 | **Tenue.** `s1.sh` `2b0a3b7b…` ; archive de 258 129 920 octets, `8ae17f92…` ; registre prêt. |
+| LB2 | **Tenue.** Aux deux passages : sha256 de l'archive égal à celui de `boot_racine` ; une couche `22495746…` de 97 742 593 octets (dans la fourchette de 60 à 140 Mo) ; les deux annotations attendues ; `linux/amd64`. |
+| LB3 | **Tenue.** Même digest d'image aux deux passages : `sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6`. |
+| LB4 | **Tenue.** Manifeste, config et couche OCI ; « created 0001-01-01T00:00:00Z ; history 1 ; diff_ids 1 ». |
+| LB5 | **Tenue.** 5 s puis 2 s ; registre local de 94 Mo. |
+| LB6 | **Tenue.** Code 0, aucun « KO », aucun « auth_zot appelé ». |
+
+**Prédiction pour l'écriture dans Zot** : avec la même archive et le même `crane`, le digest attendu est `f0ccf105…`, comme à
+`image`, où le loopback et Zot ont donné le même digest. Ce n'est pas encore mesuré avec Zot.
+
+Suite : relevé « avant » du dépôt `essais-05/rocky9-bootstrap` dans Zot (lecture seule), puis accord d'écriture (`boot_image`,
+tag `:s1`). Rien n'est écrit dans Zot.
