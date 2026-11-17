@@ -2875,3 +2875,50 @@ lance-le ». Lancée le 17/11/2026 de 20:14:37 à 20:18:18 UTC (`date -u` avant 
 - Aucune ligne `http(s)://` dans les trois journaux de mock.
 
 Suite : accord de lancement de `m3_comparaison` (hôte seul, sans réseau). Rien d'autre n'est lancé.
+
+## Étape `m3_comparaison` passée ; M3 (note du 2026-11-17, écrite à 2026-11-17T20:23:56Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « Je lance m3_comparaison (hôte seul, sans réseau) ? », réponse « Oui, lance-le ». Lancée
+le 17/11/2026 à 20:21:03 UTC (`date -u` avant et après, même seconde ; `chrono.tsv`), code 0, `s1.sh` `06c2da46…`
+([journal](s1-m3_comparaison.log)).
+
+| # | Tenue ? | Mesure |
+|---|---|---|
+| CP1 | Oui | Fichiers rpm « 2 2 », lignes NEVRA « 2 2 » ; src.rpm `c802e60a…` et rpm `864d55f4…` dans les deux builds (fichiers rapatriés sur l'hôte) ; NEVRA égaux ; « écarts du critère : 0 » ; code 0 |
+| CP2 | Oui | sha256 d'`hermetique` retrouvés une fois dans chaque build ; paquets du buildroot : 222, sans écart avec les 222 du verrou (nom, version, release, arch, sigmd5), dans chaque build ; mock de la fermeture et de l'image égaux (`af027935…`) |
+
+**Confrontation des prédictions du README (05/11/2026, 22:21 UTC)** :
+- n° 1, « M3 donne deux rpm identiques avec les macros d'OBS, sans autre réglage » : **tenue**. Les deux builds donnent les
+  mêmes octets. Aucun réglage n'a été ajouté au-delà des quatre macros d'OBS du verrou et du mode hermétique.
+- n° 5, « Build hors ligne en moins de 5 min » : **tenue**. mock a pris 78 s et 81 s ; les étapes entières, 208 s et 221 s.
+
+**Écart de lignes des journaux de mock** (3 620 contre 3 619) : une ligne de dnf, « Last metadata expiration check »,
+n'apparaît qu'au build 1. Les autres différences, une fois les chemins `b1`/`b2` et les heures normalisés, sont des noms
+temporaires (tag `mock-bootstrap-…`, `rpm-tmp.*`), des durées, des débits et la mémoire libre. Ce relevé a été fait pour cette
+note sur les deux journaux archivés, par un diff ; il n'est pas archivé à part.
+
+**Conclusion tirée de la mesure** : le critère de M3, « Mêmes NEVRA, même sha256 pour le rpm et le src.rpm », est mesuré et
+tenu. **M3 est tenu.** Les deux `--hermetic-build` sont partis de deux restaurations par digest de la fermeture de M2, dans deux
+pods distincts, sous `/w/b1` et `/w/b2`. Dans les deux pods, les quatre témoins (DNS, adresse publique, Zot, API) n'ont reçu
+aucune réponse avant mock. Les journaux de mock ne contiennent aucune URL. diffoscope n'a pas été nécessaire.
+
+**Réserves** :
+- Les témoins ont été joués avant mock, pas pendant. Pendant le build, la coupure repose sur `construction-rpm-sans-sortie`,
+  dont l'effet est mesuré par ces témoins et, dans la 08, sans fenêtre au démarrage. « Aucune URL dans les journaux » ne veut
+  pas dire « rien tenté ».
+- « Sans réseau » vaut pour le réseau du pod. Le canal `kubectl exec` reste ouvert : la fermeture et les sources sont entrées
+  par lui, et les rpm en sont sortis.
+- Les deux builds partagent la même image d'essai, le même noyau d'invité (6.18.56), le même jour et le même chemin de build
+  dans le chroot (`/builddir`, lecture). Seuls les chemins hors du chroot diffèrent.
+- Les sources de sample-app et l'image d'essai sont hors fermeture.
+- Les trois réserves de M2 demeurent : déduplication sur une seule fermeture, configuration produite par `s1.sh`, digest du
+  bootstrap injecté au lancement.
+
+**Relevé utile** : le même rpm binaire `864d55f4…` est sorti de quatre constructions. Celle d'`essais` avait un bootstrap brut et
+des dépôts en ligne ; celle d'`hermetique`, le réseau ouvert ; les deux de M3, la fermeture restaurée et le réseau du pod coupé.
+
+**Laissés en place** :
+- `$T/m3`, avec les deux arbres restaurés, leurs deux tars, les rpm rapatriés et les cibles ;
+- la NetworkPolicy `construction-rpm-sans-sortie`.
+
+Suite : M4 (tâches signées de prefetch et de build dans la pipeline), à préparer sur accord. Rien n'est lancé.

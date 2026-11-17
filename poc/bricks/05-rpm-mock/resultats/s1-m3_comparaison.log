@@ -1,0 +1,47 @@
+# s1.sh m3_comparaison, 2026-11-17T20:21:03Z
+OK   verrou de référence (fermeture restaurée 1), sha256 : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+build 1 : sample-app-1.0.0-2.el9.src.rpm c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128
+build 1 : sample-app-1.0.0-2.el9.x86_64.rpm 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+build 2 : sample-app-1.0.0-2.el9.src.rpm c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128
+build 2 : sample-app-1.0.0-2.el9.x86_64.rpm 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+## critère de M3 (build 1 contre build 2)
+OK   fichiers rpm par build : 2 2
+OK   lignes NEVRA lues par build : 2 2
+OK   rpm et src.rpm (nom et sha256), build 2 contre build 1 : sample-app-1.0.0-2.el9.src.rpm c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128 sample-app-1.0.0-2.el9.x86_64.rpm 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+OK   NEVRA, build 2 contre build 1 : sample-app-1.0.0-2.el9.src.rpm sample-app-1.0.0-2.el9.x86_64 sample-app-1.0.0-2.el9.x86_64.rpm sample-app-1.0.0-2.el9.x86_64
+## relevés à part (sans effet sur le code)
+relevé : sha256 864d55f486f4… d'hermetique (17/11, 16:20 UTC) retrouvé dans le build 1 : 1 fois ; build 2 : 1 fois
+relevé : sha256 c802e60a511c… d'hermetique (17/11, 16:20 UTC) retrouvé dans le build 1 : 1 fois ; build 2 : 1 fois
+relevé, build 1 : paquets du buildroot (rpm --root) 222, verrou 222 ; lignes d'écart (nom, version, release, arch, sigmd5) : 0
+relevé, build 1 : lignes http(s):// (sortie, root.log, build.log) : 0 0 0
+relevé, build 1 : mock de la fermeture : mock-6.9-1.el9.noarch af027935b9b929602b33e5d49ab089d5093c9e9f5882c10c063f89742f5f4941 ; mock de l'image : mock-6.9-1.el9.noarch af027935b9b929602b33e5d49ab089d5093c9e9f5882c10c063f89742f5f4941 ; égaux
+     témoin DNS dl.rockylinux.org (10 s) : rc 124
+     témoin TCP public 199.232.170.132:443 (10 s) : rc 124 
+     témoin TCP Zot 192.168.161.13:5000 (10 s) : rc 124 
+     témoin TCP API 10.43.0.1:443 (10 s) : rc 124 
+     mock --hermetic-build : rc 0 en 78 s
+     lignes « Using container image: dir: » : sortie 1 ; root.log 1
+     lignes « Checking image digest: 18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af » : sortie 1 ; root.log 1
+     lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+     lignes « Expected digest for image » : sortie 0 ; root.log 0
+     lignes « Not updating bootstrap chroot » : sortie 1 ; root.log 1
+     lignes « installroot.{1,4}/w/b1/mock-h/ » : sortie 0 ; root.log 4
+     lignes « No space left on device » : sortie 0 ; root.log 0
+     installed_pkgs.log : 222 ligne(s)
+relevé, build 2 : paquets du buildroot (rpm --root) 222, verrou 222 ; lignes d'écart (nom, version, release, arch, sigmd5) : 0
+relevé, build 2 : lignes http(s):// (sortie, root.log, build.log) : 0 0 0
+relevé, build 2 : mock de la fermeture : mock-6.9-1.el9.noarch af027935b9b929602b33e5d49ab089d5093c9e9f5882c10c063f89742f5f4941 ; mock de l'image : mock-6.9-1.el9.noarch af027935b9b929602b33e5d49ab089d5093c9e9f5882c10c063f89742f5f4941 ; égaux
+     témoin DNS dl.rockylinux.org (10 s) : rc 124
+     témoin TCP public 199.232.170.132:443 (10 s) : rc 124 
+     témoin TCP Zot 192.168.161.13:5000 (10 s) : rc 124 
+     témoin TCP API 10.43.0.1:443 (10 s) : rc 124 
+     mock --hermetic-build : rc 0 en 81 s
+     lignes « Using container image: dir: » : sortie 1 ; root.log 1
+     lignes « Checking image digest: 18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af » : sortie 1 ; root.log 1
+     lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+     lignes « Expected digest for image » : sortie 0 ; root.log 0
+     lignes « Not updating bootstrap chroot » : sortie 1 ; root.log 1
+     lignes « installroot.{1,4}/w/b2/mock-h/ » : sortie 0 ; root.log 4
+     lignes « No space left on device » : sortie 0 ; root.log 0
+     installed_pkgs.log : 222 ligne(s)
+écarts du critère : 0

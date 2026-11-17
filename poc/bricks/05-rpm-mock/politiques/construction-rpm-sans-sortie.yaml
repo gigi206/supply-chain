@@ -8,6 +8,7 @@
 # depuis un pod Kata privilégié refusée (INVALID_SOURCE_IP), aucune fenêtre au démarrage ; la limite de l'en-tête de
 # construction-sans-sortie (contournement par usurpation) a été écrite sous kube-router.
 # PROPOSITION, NON POSÉE (17/11/2026) : posée par s1.sh m3_reseau, sur accord ; reste posée ensuite, comme celle de la 06.
+# Additif du 17/11/2026, 20:07:12 UTC : POSÉE dans le cluster par s1.sh m3_reseau (« Oui, lance-le ») ; elle y reste.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
