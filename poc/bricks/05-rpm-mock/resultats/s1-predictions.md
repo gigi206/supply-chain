@@ -2414,3 +2414,33 @@ ensuite). Le même digest est écrit sur l'hôte, dans
 
 Suite : accord de lancement de `restauration` (lecture seule dans Zot) ; l'additif de l'ADR 0001 viendra après R1. Rien n'est
 lancé.
+
+## Étape `restauration` passée (note du 2026-11-17, écrite à 2026-11-17T17:55:16Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « Je lance restauration (lecture seule dans Zot) ? », réponse « Oui ». Lancée le 17/11/2026
+de 17:53:00 à 17:53:01 UTC (`date -u` avant et après, `chrono.tsv`), code 0, `s1.sh` `4c3adb53…`
+([journal](s1-restauration.log)).
+
+| # | Tenue ? | Mesure |
+|---|---|---|
+| R1 | Oui | `closure.sh pull` par digest (`sha256:f235a98b…`) dans un dossier vidé juste avant (`rm -rf`, lecture du code) ; « OK   arbre égal à la liste : 235 fichiers, 319 086 430 octets » (chaque fichier comparé à la liste de collecte : chemin, taille et sha256, lecture du code) ; code 0, en moins de 5 min |
+
+**Lecture** :
+- Durée de moins de 2 s pour 319 086 430 octets (deux `date -u`, à 17:53:00 et 17:53:01). `ORAS_CACHE` n'est pas défini
+  dans l'environnement de `mise exec` et n'apparaît nulle part sous `poc/`, `tools/` ni dans `mise.toml` (relu après le
+  passage, vu à l'écran, non archivé) : rien n'indique un cache local d'oras. Le débit n'est pas mesuré à part.
+- Inodes et liens relus : toujours « illisible » (F8 reste non mesurée).
+- Le dossier restauré est sur l'hôte, sous `$T/mf/restauree` (235 fichiers, 319 086 430 octets par `du -sb`, vu à l'écran, non
+  archivé).
+
+**Preuve de M2** (« fermeture restaurable par digest ; déduplication mesurée ») :
+- Fermeture restaurable par digest : tenue (R1), pour une fermeture qui contient les rpm du verrou, leur `repodata`, le verrou,
+  l'image de bootstrap dérivée en dossier `dir:` et le rpm de mock.
+- Déduplication : F5 et F6 mesurées sur une seule fermeture (225 861 632 octets de plus au premier envoi, compatible avec une
+  config et une couche de l'image non stockées une seconde fois ; 253 952 au second) ; mécanisme non relevé (F8).
+  Dire si cela suffit pour « déduplication mesurée » revient au propriétaire.
+- Le reste du contenu de M2 (configuration de mock versionnée, macros d'OBS) n'est pas réévalué dans cette note. **M2 n'est
+  pas déclaré passé.**
+- Aucun build n'a été fait à partir de la fermeture restaurée ; le build sans réseau reste à mesurer (M3).
+
+Suite : décision du propriétaire sur la déduplication. Rien n'est lancé.

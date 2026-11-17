@@ -1,0 +1,5 @@
+# s1.sh restauration, 2026-11-17T17:53:00Z
+restaurée depuis sc-stockage.poc.test:5000/deps/sample-app/mock-buildroot-lock@sha256:f235a98b46d82b2d295cd39e869eb07344938e8896fc4f7465171687e9c48417, dans un dossier vide
+OK   arbre égal à la liste : 235 fichiers, 319086430 octets
+blob 22495746e288… : inode et liens sous essais-05/rocky9-bootstrap puis deps/sample-app/mock-buildroot-lock : illisible illisible
+blob 7bf628be885b… : inode et liens sous essais-05/rocky9-bootstrap puis deps/sample-app/mock-buildroot-lock : illisible illisible
