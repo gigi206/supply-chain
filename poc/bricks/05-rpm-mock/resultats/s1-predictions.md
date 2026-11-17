@@ -1508,3 +1508,73 @@ Décision du propriétaire : question « J'applique s1-derivee.patch (copie ee61
 
 Suite : prédictions des trois étapes, écrites et commitées avant tout passage, puis un accord par lancement (`hote97`, puis
 `boot_racine`, puis `boot_image` après un passage en loopback avec la vraie archive). Rien n'est lancé, rien n'est écrit dans Zot.
+
+## Image dérivée : prédictions de `hote97`, `boot_racine` et `boot_image` (note du 2026-11-17, écrite à 2026-11-17T14:29:22Z, avant tout passage ; rien n'est réécrit), NON LANCÉ
+
+Commandes prévues, depuis la racine du dépôt, chacune sur son accord nommé :
+`env -u PREFIXE -u ISOLATION DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/s1.sh hote97`, puis `… boot_racine`,
+puis `… boot_image`. `s1.sh` vaut `2b0a3b7b…`. Journaux prévus : `s1-hote97.log`, `s1-boot_racine.log`, `s1-boot_image.log`.
+`boot_image` ne sera proposé qu'après un passage en loopback avec la vraie archive ; le script de ce passage reste à écrire, avec
+ses propres prédictions.
+
+**Appuis** (mesures archivées) :
+- `hote` du 17/11/2026 à 08:30:27 UTC ([`s1-3-hote.log`](s1-3-hote.log), lignes 23 à 30) : les quatre `repomd.xml` de vault 9.7
+  sont signés par `21CB256A…350D275D` ; sha256 BaseOS `fa6d5054…`, AppStream `06f01d40…`, CRB `3936113e…`, extras `54ec0c53…`.
+  L'étape entière a duré 15 s (`chrono.tsv`).
+- `verrou_brut` ([`s1-verrou_brut.log`](s1-verrou_brut.log)) : `rockylinux:9.7` brut, 147 lignes `rpm -qa`, stderr 0 ; bootstrap
+  de mock, 153 lignes ; 143 communes ; dix lignes seulement dans le bootstrap, quatre seulement dans l'image, aucune `gpg-pubkey`
+  parmi elles ; `podman pull` et `podman image mount` de l'image brute `rc 0` ; « capacité de /w : 3059832 kB ». `--buildsrpm`,
+  qui comprend l'installation de dnf et du greffon dans le bootstrap depuis vault 9.7, a pris 67 s.
+- `racine` ([`s1-racine.log`](s1-racine.log)) : dans une racine neuve, `dnf --installroot` avec `gpgcheck=1`, puis
+  `rpm --root … -K` : « 199 OK sur 199 » (ligne 210). Cela suppose la clé dans la base rpm de la racine : c'est une déduction.
+  Installation de 201 paquets en 5694 s, cause inconnue (P7 non tenue).
+- `image` ([`s1-image.log`](s1-image.log)) : image d'essai `99790c13…`, couche de la racine 140 611 406 octets ; 11 s entre
+  « 05 S1 image » et « fait » (`chrono.tsv`).
+- Banc de `s1-derivee.patch` ([`s1-derivee-banc-applique.log`](s1-derivee-banc-applique.log)) : `dnf-3` présent et `/usr/bin/dnf`
+  absent dans `racine.tar` ; plateforme et annotations posées par `crane` 0.20.6 sur une archive factice.
+- **Jamais exécuté** : le `dnf-3` de l'image d'essai (`python3-dnf-4.14.0-34.el9_8`). `racine` a lancé le dnf de l'amorce 9.8 ;
+  à `essais`, mock lance `/usr/bin/dnf-3` dans le bootstrap (`systemd-nspawn -D …-bootstrap…`, [`s1-essais.log`](s1-essais.log),
+  lignes 106 et 116), donc le dnf de `rockylinux:9.7`. `repo_gpgcheck=1` n'a donc jamais tourné dans cette image.
+- Préalables relevés par leur nom le 17/11, avant cette note (`test -s`, sans lister `$T`) : clé de Rocky, trousseau, les quatre
+  `v97-<dépôt>.repomd.xml` d'`hote` (sha256 égaux aux valeurs ci-dessus), `docker/config.json` et `image.digest` sont présents.
+
+| # | Prédiction | Confiance et raison |
+|---|---|---|
+| DH1 | `hote97` : « OK   empreinte de la clé de Rocky (relevée par hote) : 21CB256AE16FC54C6E652949702D426D350D275D » | Haute : même fichier que `hote` du 17/11 |
+| DH2 | Pour BaseOS, AppStream, CRB et extras : `repomd.xml` signé par la clé primaire, primary « contrôlé par repomd.xml », « repomd.xml égal au relevé de hote : oui » ; sha256 égaux à ceux d'`hote` ci-dessus | Haute : vault 9.7 est figé, relevé du matin même |
+| DH3 | Dix lignes « OK » et aucune « KO » ; chaque paquet dans un seul dépôt, sans pari sur lequel ; `derivee.sha256` écrit, dix lignes | Moyenne à haute : mock les a installés depuis ces quatre dépôts, les seuls actifs de sa configuration (lecture) |
+| DH4 | « requires de python3-dnf-plugins-core : N entrée(s) », N au moins 1, dont au moins une entrée `python3-dnf` ; pas de pari sur l'opérateur ni la version | Moyenne : le contenu des `Requires` n'est pas lu |
+| DH5 | Moins de 120 s entre « 05 S1 hote97 » et « 05 S1 hote97 fait » | Moyenne : 15 s pour `hote` ; le primary d'AppStream est gros |
+| DR1 | `boot_racine` : pod `s1-05-boot-racine` prêt, image `…/essais-05/mock-rocky9@sha256:99790c13…` ; trois livraisons sans erreur ; première ligne de la sonde « dnf-3 : 4.14.0 … » | Haute pour le pod (mêmes gestes que `verrou_brut`) ; moyenne pour la ligne de version, dont le format n'est pas relevé |
+| DR2 | `podman pull` `rc 0`, `podman image mount` `rc 0` ; « copie de la racine de rockylinux:9.7 : rc 0 », taille entre 100 000 et 500 000 kB | Haute pour les codes (mêmes gestes que `SONDE_BOOT`) ; faible pour la taille, non relevée |
+| DR3 | « dépôts de la racine, écartés » : au moins un fichier `.repo` ; « racine avant : rpm -qa 147 ligne(s), stderr 0 ligne(s) » | Haute : même image, même requête ; la base est lue par `--root` et non sur une copie par `--dbpath` |
+| DR4 | `gpg-pubkey` avant et après : **pas de pari**. Après, la clé `350d275d` est là si dnf l'importe ou si l'image l'avait | `racine` suggère un import dans la racine (DR7) ; `verrou_brut` n'en montre aucun ajout dans le bootstrap de mock, mais les 143 lignes communes ne sont pas archivées |
+| DR5 | « makecache : rc 0 » ; sur l'hôte, quatre lignes « OK   repomd … lu par dnf dans le pod = repomd vérifié sur l'hôte » | Moyenne : mêmes url, vault figé, contrôle tenu à `racine` ; mais le `dnf-3` de l'image d'essai et son `repo_gpgcheck=1` n'ont jamais tourné |
+| DR6 | « installation : rc 0 » ; transaction : six paquets sous « Installing » et quatre sous « Upgrading », rien d'autre ; résumé « Install  6 Packages » et « Upgrade  4 Packages » | Moyenne : c'est ce qu'a fait mock, mais ici avec le dnf de 9.8 de l'image d'essai en `--installroot` et des NEVRA exacts (montée de version non lue) |
+| DR7 | Dix lignes `rpm <fichier> <sha256>` ; « rpm -K : 10 OK sur 10 » ; sur l'hôte « OK   rpm téléchargés conformes aux dix de hote97 : 10 sur 10, 10 téléchargé(s) » | Moyenne : suit DR6 ; `rpm -K` dépend de la clé dans la racine (DR4), tenu à `racine` |
+| DR8 | « seulement dans la racine dérivée » : exactement les dix lignes de `verrou_brut` (mêmes chaînes, `sigpgp=(none)`, clé d'en-tête `702d426d350d275d`), plus au plus une ligne `gpg-pubkey` ; « seulement dans rockylinux:9.7 brut » : exactement les quatre lignes de `verrou_brut` ; communes 143 ; liste après de 153 lignes, ou 154 avec `gpg-pubkey` | Moyenne : décision « Dix lignes » ; dépend de DR6 |
+| DR9 | « requires du greffon installé » : au moins une ligne `python3-dnf`, cohérente avec DH4 | Moyenne |
+| DR10 | « restes de /w dans la racine : 0 » ; nombre d'entrées de `var/cache/dnf` : pas de pari | Haute pour `/w` (banc, D1 et D2) |
+| DR11 | « archive racine dérivée : rc 0 », taille entre 0,8 et 1,5 fois la copie de DR2 ; sur l'hôte « OK   archive racine dérivée rapatriée » ; `boot-racine.sha256` posé | Moyenne : `tar` et `du` ne comptent pas pareil |
+| DR12 | Installation en moins de 300 s ; moins de 15 min entre « 05 S1 boot_racine » et « fait » | Faible : 67 s pour l'équivalent dans mock, mais 5694 s inexpliquées à `racine` |
+| DR13 | « capacité de /w : 3059832 kB » ; « utilisés » sous 1 500 000 kB ; aucun « No space left on device » | Moyenne : capacité mesurée à `verrou_brut` ; image tirée, copie, cache et archive |
+| DR14 | Sonde complète, « (code de l'exec : 0) » ; « pod s1-05-boot-racine supprimé » une fois | Haute. La sonde finit par `true` : le code 0 seul ne prouve rien |
+| DI1 | `boot_image` : « OK   archive racine dérivée, sha256 égal à celui de boot_racine » | Haute |
+| DI2 | `crane append` et `crane mutate` sans erreur vers Zot, sans nouvelle authentification (`$T/docker/config.json` existe) | Haute : mêmes commandes et même compte qu'`image` ; `**` donne `create` à `poc-ecriture` (lecture de la configuration commitée) |
+| DI3 | Une couche, de taille inférieure à l'archive ; deux annotations, `base.name` = `sc-stockage.poc.test:5000/amont/rockylinux/rockylinux` et `base.digest` = `sha256:ee90dc0e…` ; « config : os linux ; architecture amd64 » | Haute : banc G, sur une archive factice |
+| DI4 | Digest d'image non prédit ; égal à celui du passage en loopback avec la même archive | Moyenne : à `image`, le banc en loopback et Zot ont donné le même digest (`99790c13…`), sans `crane mutate -a`. Au banc, les digests de G ont différé d'un passage à l'autre, mais l'archive factice différait aussi : que `-a` redonne le même digest pour la même archive n'est pas mesuré, le passage en loopback le montrera |
+| DI5 | Moins de 60 s entre « 05 S1 boot_image » et « fait » | Moyenne : 11 s pour `image` et 361 Mo |
+
+**Ce que ferait un écart** :
+- Si DR5 tient mal (makecache en échec, ou repomd différent), la sonde s'arrête ou l'hôte refuse : pas d'archive, pod retiré,
+  accord dépensé ; la décision revient au propriétaire.
+- Si DH3 tient mal (paquet absent, deux empreintes), `hote97` s'arrête : rien n'est construit, et la décision revient au propriétaire.
+- Si DR6 ou DR7 tient mal (autre transaction, rpm en trop ou en moins), l'archive ne sort pas du pod : les journaux montrent la
+  transaction, et la décision revient au propriétaire.
+- DR8 n'arrête rien : la liste complète est archivée, et l'écart éventuel (`gpg-pubkey` compris) sera présenté avant l'accord
+  d'écriture dans Zot.
+
+**Relance** : `lancer` écrit le journal par `tee` et l'écrase. Une relance après échec prendra un autre `PREFIXE`, comme
+`s1-3` pour `hote` ; ce `PREFIXE` est aussi le tag Zot de `boot_image`.
+
+Suite : accord de lancement de `hote97`. Rien n'est lancé, rien n'est écrit dans Zot.
