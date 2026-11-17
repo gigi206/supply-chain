@@ -46,3 +46,17 @@ Accords demandés : `prealables` (hôte seul, hors ligne) et `essai` (un pod d'e
 | E9 | V2 (V1 et `--no-database`) : deux copies égales, trois fichiers de moins (bases sqlite) | Faible : de même |
 | E10 | Pod supprimé à la fin, avec son volume éphémère (une PVC et son volume) ; rien écrit dans Zot | Haute |
 | E11 | Durée d'un passage sous 300 s | Moyenne : 61 s de téléchargement en M2, sous Kata |
+
+## Résultat de `prealables` (17/11/2026, de 21:33:55 à 21:34:01 UTC, « Oui, lance-le » ; note écrite à 21:34:23 UTC)
+
+Code 0 ([journal](m4b-prealables.log), `95bcad00…`), hôte seul, hors ligne.
+
+| # | Résultat |
+|---|---|
+| PA1 | **Tenue.** Verrou `b6d0f8f1…`. |
+| PA2 | **Tenue.** BaseOS, AppStream, CRB et extras de vault 9.7 : `repomd.xml` signé par `21CB256A…`, `primary.xml.gz` égal à `repomd.xml`, primary décompressé égal à celui du cache de `s1.sh`. |
+| PA3 | **Tenue.** 222 lignes, 0 URL absente, 0 doublon ; collecte : 222 rpm, 0 écart de sha256 ou de taille. |
+| PA4 | **Tenue.** [`m4b-liste.txt`](m4b-liste.txt) écrite : 222 lignes, 219 543 349 octets, égal à la somme des tailles des 222 rpm de la collecte (219 543 349, relevé à 21:34:23 UTC) ; sha256 `95541ee8…`. |
+| PA5 | **Tenue.** Sonde, pas de prefetch et comparaisons passent `sh -n` (dash). |
+
+La liste qui sera inscrite dans le gabarit est fixée : `95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910`. Suite : `essai`, sur accord nommé.

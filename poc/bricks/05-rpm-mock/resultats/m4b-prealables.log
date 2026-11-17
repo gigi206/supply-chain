@@ -1,0 +1,19 @@
+# m4b.sh prealables, 2026-11-17T21:33:55Z
+OK   verrou de verrou_derivee (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+## primary de vault 9.7 du cache de s1.sh, revérifiés
+OK   baseos97 : signataire de repomd.xml (clé primaire) : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   baseos97 : 992a27c23b8d59070d247f034b8c646230cb24a07e95d7cdb189e56a56d56829-primary.xml.gz égal à repomd.xml : True ; primary décompressé égal à celui du cache : True
+OK   appstream97 : signataire de repomd.xml (clé primaire) : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   appstream97 : dec99744f47487c005ffc02acc95b323c0152abf25c394cf8c0dc646b43ff0b6-primary.xml.gz égal à repomd.xml : True ; primary décompressé égal à celui du cache : True
+OK   crb97 : signataire de repomd.xml (clé primaire) : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   crb97 : e6eee4aeeb1479f2d62a35bfcfb0d86010f6306a58b6cb264fafbc31e6f9c200-primary.xml.gz égal à repomd.xml : True ; primary décompressé égal à celui du cache : True
+OK   extras97 : signataire de repomd.xml (clé primaire) : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   extras97 : 907a3d0bdea528ef0add6dfa8b2d85a12e02ca709c20fbd42a340b777dbaaf45-primary.xml.gz égal à repomd.xml : True ; primary décompressé égal à celui du cache : True
+## liste des rpm du verrou, tirée des primary
+OK   liste : 222 lignes ; 0 URL absente(s) des primary ; 0 nom(s) en double ; collecte : 222 rpm, 0 écart(s) de sha256 ou de taille
+liste archivée : resultats/m4b-liste.txt
+liste : 222 lignes, 219543349 octets, sha256 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+## scripts du pod (syntaxe)
+OK   pas de prefetch, sh -n : ok
+OK   comparaisons, sh -n : ok
+OK   sonde, sh -n : ok
