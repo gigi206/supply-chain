@@ -71,3 +71,29 @@ Chaque point est marqué « vérifié dans le dépôt », « mesuré » (journal
 ## Question posée
 
 Les images (point B). Le conflit D3 (point A), la portée (point C), les transpositions et le relevé de l'état en service (point 11) viendront après.
+
+## Note datée du 17/11/2026, 20:47:02 UTC : décision « Option 1 », correction d'une citation, et question sur D3 (a)
+
+**Décision du propriétaire** (réponse reçue avant 20:43:53 UTC, heure exacte non relevée) : « Option 1 ». Ce n'est un accord pour aucune mesure ni aucune écriture.
+- M4 prend les deux images d'essai par digest, telles quelles : `essais-05/mock-rocky9@sha256:99790c13…` pour l'outillage, `essais-05/rocky9-bootstrap@sha256:f0ccf105…` pour le bootstrap (`image_digest` `18d64b03…`).
+- **Dettes inscrites** : provenance des deux images hors de la plateforme ; racines installées avec réseau ; rejeu de zéro non réglé, à trancher avant M5.
+
+**Correction : le refus du 10/11/2026 a été cité au-delà de son texte.** Le texte commité (README de la 06, additif de 23:52 UTC le 10/11/2026) dit seulement : « (c) est refusé : pas d'image d'outils construite avec le réseau ». Le point A de cette carte lui prête un objet, « une tâche privilégiée ouverte sur Internet dans `trusted_tasks` », et la recommandation du point B pose sa condition sur cette lecture. Cet objet venait de mes notes de travail, pas du dépôt. Le texte commité au-dessus n'est pas réécrit.
+- Conséquence : le choix « Option 1 » est consigné tel quel. Il retient des images dont les racines ont été installées avec réseau, ce que la carte indiquait (option 1 : « relève du levier refusé »). La réponse ne dit pas comment le refus du 10/11/2026 se lit désormais ; je ne le tranche pas.
+
+**`prefetch-rpm` : runtime à décider.** Rien dans la réponse ne le fixe.
+- Précédents vérifiés dans le dépôt : `prefetch-gomod` et `prefetch-deb` (signée, en service depuis S4a de la 06) tournent sous runc, conformes à Pod Security `restricted`, `runAsNonRoot`, UID 65532 pour `prefetch-deb`, avec une sortie vers des adresses publiques. Les tâches privilégiées de la liste revue (`construire-image`, `construire-builder`, `construire-deb`) n'ont aucune sortie réseau : aucune n'est à la fois privilégiée et ouverte sur Internet (vérifié dans les commentaires de `taches.yml`).
+- En S1 et en M2, les gestes de la voie 2 (téléchargement, `rpm -K`, `createrepo_c`, `skopeo copy`) ont tourné en pod Kata privilégié, root. Les faire tourner sous runc, sans root, avec l'image d'outillage est à mesurer dans un pod d'essai.
+
+**Question suivante : le point A, conflit avec D3 (a).** D3 (a) place la résolution, `--calculate-build-dependencies`, dans Tekton en M4. Mock y a toujours tourné en pod Kata privilégié (D1 a), et la résolution lit vault 9.7 sur Internet.
+- **Option 1, verrou résolu hors de la plateforme** :
+  - le verrou archivé (`b6d0f8f1…`, 222 rpm, calculé par `verrou_derivee`) est repris tel quel, sans nouvelle résolution ;
+  - il est publié par l'hôte avec `sample-app.spec`, dans un artefact de packaging rpm sous `entrees/`, sur le modèle de `packaging-deb` (S4c de la 06). C'est une écriture définitive dans Zot, et l'artefact reste hors du jugement de la porte, comme `packaging-deb` ;
+  - la configuration de mock n'y entre pas a priori : `--hermetic-build` impose sa propre configuration et relit les options du verrou (relevés du 12/11/2026, lecture) ;
+  - transport de la liste vers `prefetch-rpm` à concevoir ; précédent : décision A de S4b de la 06, la liste inscrite par l'hôte dans le gabarit de la pipeline avant signature ;
+  - D3 (a) se lirait « résolution hors de Tekton, récupération dans Tekton ». Limite : mettre le verrou à jour demande un passage hors de la plateforme, comme `go.sum`.
+- **Option 2, D3 (a) à la lettre** : une tâche de résolution dans la pipeline, Kata privilégié, avec une sortie vers vault 9.7 et Zot.
+  - Ce serait la première tâche de la liste revue à la fois privilégiée et ouverte sur Internet (vérifié, voir ci-dessus).
+  - `prefetch-rpm-sortie` sélectionne par nom de tâche : la tâche de résolution porte ce nom, ou il faut une sortie de plus et une modification du `NotIn` de `builds-sans-internet` (08c), c'est-à-dire deux changements du cluster.
+  - Elle demande un pod d'essai et un cycle de signature de plus.
+- **Recommandation** : l'option 1. Elle tient la preuve de M4 (sujet rpm signé, fermeture dans `resolvedDependencies`) au moindre coût, sans résolution neuve ni changement du cluster, et garde la liste revue sans tâche privilégiée ouverte sur Internet. Ce dernier argument est le mien : le refus du 10/11/2026 ne le dit pas. Le prix est une lecture de D3 (a) moins stricte que son texte, et un verrou mis à jour hors de la plateforme.
