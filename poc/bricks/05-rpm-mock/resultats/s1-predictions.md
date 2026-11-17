@@ -2749,3 +2749,28 @@ Journaux attendus : `s1-<étape>.log`, plus `s1-m3_build1-mock.log` et `s1-m3_bu
 - Toute relance se fait sous un autre `PREFIXE`, pour ne réécrire aucun journal archivé.
 
 Suite : accord de lancement de `m3_temoin`. Rien n'est posé ni lancé.
+
+## Étape `m3_temoin` passée (note du 2026-11-17, écrite à 2026-11-17T20:06:43Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « Je lance m3_temoin (lecture seule, un pod retiré à la fin) ? », réponse « Oui,
+lance-le ». Lancée le 17/11/2026 de 20:05:54 à 20:06:12 UTC (`date -u` avant et après, `chrono.tsv`), code 0, `s1.sh`
+`06c2da46…` ([journal](s1-m3_temoin.log)).
+
+| # | Tenue ? | Mesure |
+|---|---|---|
+| TP1 | Oui | Cibles lues sur l'hôte : public `199.232.170.132` (`dl.rockylinux.org`), Zot `192.168.161.13`, API `10.43.0.1` ; pod `s1-05-m3-temoin` prêt au label `prefetch-rpm` |
+| TP2 | Oui | Codes DNS 0, public 0, Zot 0 : « OK   témoin positif » ; cibles écrites dans `$T/m3-cibles` (relues après le passage, vues à l'écran, non archivées) ; code 0 ; pod supprimé |
+| TP3 | Oui | Code de l'API : 124 |
+
+**Lecture** :
+- Dans l'image d'essai, `getent` sous `timeout` et `bash` par `/dev/tcp` répondent 0 quand la sortie est autorisée. Ils
+  rendent 124 quand elle ne l'est pas : l'API, que `prefetch-rpm-sortie` n'autorise pas, ne répond pas dans les 10 s, sans
+  refus actif.
+- L'adresse publique est celle que l'hôte a résolue, et le pod l'a jointe sur 443 : la cible des builds est donc une adresse
+  joignable quand la sortie est permise.
+- Aucune ligne `jq: error` dans le journal (cette étape n'en lance pas).
+- `kubectl get pod` après le passage : « NotFound » à 20:06:21 UTC (vu à l'écran, non archivé).
+- Rien n'est écrit dans le cluster, sauf le pod, retiré.
+
+Suite : accord de lancement de `m3_reseau`, qui **pose `construction-rpm-sans-sortie` dans le cluster** ; elle y restera. Rien
+d'autre n'est lancé.

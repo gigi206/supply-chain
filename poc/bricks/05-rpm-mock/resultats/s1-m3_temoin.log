@@ -1,0 +1,12 @@
+# s1.sh m3_temoin, 2026-11-17T20:05:54Z
+cibles des témoins (lues sur l'hôte) : public dl.rockylinux.org 199.232.170.132 ; Zot et API 192.168.161.13 10.43.0.1
+### s1-05-m3-temoin (kata, uid 0, privilégié, label tekton.dev/task=prefetch-rpm) : prêt
+     témoin DNS dl.rockylinux.org (10 s) : rc 0
+     témoin TCP public 199.232.170.132:443 (10 s) : rc 0 
+     témoin TCP Zot 192.168.161.13:5000 (10 s) : rc 0 
+     témoin TCP API 10.43.0.1:443 (10 s) : rc 124 
+     (code de l'exec : 0)
+pod s1-05-m3-temoin supprimé
+OK   témoin positif (label prefetch-rpm), codes DNS, public, Zot : 0 0 0
+témoin positif, code API (non autorisée par prefetch-rpm-sortie ; relevé, sans pari) : 124
+cibles écrites pour m3_build1 et m3_build2 : 199.232.170.132 192.168.161.13 10.43.0.1
