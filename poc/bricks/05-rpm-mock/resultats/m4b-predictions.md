@@ -109,3 +109,11 @@ Suite : choisir la variante de `createrepo_c` et confirmer `rpm -K` avant d'écr
 2. **Le script à signer n'a pas tourné entier** : le pas de prefetch a tourné avec `createrepo_c` par défaut ; V1 n'a tourné que dans les comparaisons, sur des copies en liens durs. Le pas final est à rejouer entier dans le pod runc.
 - Les deux demandent un script modifié, donc un accord chacun ; la mesure de mock d'abord.
 - Pour le script final et la carte de `taches` : retirer le repli par l'identifiant court (`gpg` est dans l'image épinglée) ; déclarer l'image de bootstrap en `*_ARTIFACT_INPUTS` ; rejouer la section d'envoi de `publier-fermeture` sur les vrais noms de fichiers.
+
+## Note datée du 17/11/2026, 21:46:41 UTC : décision « V2 »
+
+**Décision du propriétaire** (réponse reçue avant 21:46:41 UTC, heure exacte non relevée) : « V2 ». Ce n'était pas ma recommandation (V1). Ce n'est un accord pour aucune mesure ni aucune écriture.
+- La tâche signée régénère `repodata` avec : rpm datés à l'époque 0, `createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database`. Ces réglages restent ensemble (correction 1 de la note précédente).
+- `repodata` de la fermeture de la plateforme : quatre fichiers, sans les trois bases sqlite. Mesuré à l'essai : `repomd.xml` `239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164` aux deux copies.
+- Écart avec la fermeture de M3 : les trois bases sqlite en moins, en plus des dates fixées.
+- **Mesure qui bloque `taches`, ajustée à V2** : un build hermétique par mock, sous Kata, sur un arbre restauré de M3 dont `repodata` est régénéré avec V2. Attendus : `repomd.xml` `239a5a71…`, rpm `864d55f4…`, src.rpm `c802e60a…`. Puis le pas final rejoué entier dans le pod runc. Chacun demande un script modifié et un accord.
