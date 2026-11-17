@@ -588,3 +588,25 @@ Il s'agit de métadonnées, pas d'une résolution par dnf.
 préfixe neuf, pour ne pas écraser `s1-racine.log`. Le pod resté en place est supprimé par le `pod_demarrer` suivant.
 
 Suite, chaque point sur accord nommé : `racine`, `image`, `essais`, `verrou`.
+
+### Correctif des prédictions de `racine` (note du 2026-11-17, écrite à 2026-11-17T08:43:12Z, avant tout passage ; rien n'est réécrit)
+
+Deux phrases de la section précédente sont corrigées. Les deux erreurs ont été relevées par le conseiller, à la relecture qui a
+suivi le commit.
+
+- **RC8 ne pouvait pas tenir telle qu'écrite.** `RACINE` crée `/w/cache` (`mkdir -p /w/aucun /w/racine /w/cache`) avant la ligne
+  « caches : », qui ne teste que l'existence du dossier. `/w/cache` y figure donc dans tous les cas.
+  - RC8 devient : P6 est soutenue si `/w/racine/w/cache` figure dans la ligne « caches : ».
+  - Le journal ne dira pas si `/w/cache` est resté vide : les lignes « rpm <dépôt> … » ne donnent pas de chemin.
+- **« Seules quatre choses arrêtent l'étape » est trop fort.** Sous `set -euo pipefail`, d'autres arrêts sont lus dans le code :
+  - la garde d'entrée sur les fichiers de `$T` (« lancer d'abord l'étape hote ») ;
+  - `kubectl delete` et `kubectl create` dans `pod_demarrer`, dont un refus réel d'admission (c'est la mesure de RC1) ;
+  - chaque `livrer` ;
+  - le `kubectl exec … cat /w/racine.tar` du rapatriement.
+
+  Cette liste vient de la lecture du code ; elle n'est pas donnée comme exhaustive. La conclusion ne change pas : un code 0 ne
+  prouve pas P5.
+- **Le pod reste aussi en place** quand le rapatriement échoue ou que l'`attendu` sur l'archive échoue. Un `exec` qui échoue
+  n'écrit pas de ligne « KO », seulement l'erreur de kubectl.
+- **Lecture du journal :** les lignes venues du pod y sont décalées de cinq espaces par `dans`. La ligne « (code de l'exec : N) »
+  sera relevée dans les notes du résultat.
