@@ -1,0 +1,23 @@
+code de releve : 0
+OK   code 0
+OK   écart de valeur détecté
+OK   champ en service seulement détecté
+OK   objet égal reconnu
+OK   objet absent signalé
+OK   clé changée détectée
+OK   aucune clé affichée (journal)
+OK   aucune clé affichée (contenu AUTRE)
+OK   ConfigMap : clé changée
+OK   ConfigMap : clé égale
+OK   ConfigMap : fichier 07a comparé
+OK   ConfigMap : clé attendue absente
+OK   ConfigMap : clé non comparée, nom seul
+OK   config-defaults égal
+OK   feature-flags
+OK   noms des NetworkPolicy
+OK   ImageValidatingPolicy
+OK   Zot présent
+OK   Zot refus = non concluant
+OK   Zot not found = absent
+OK   chrono.tsv du banc écrit (fin)
+bilan : 21 OK, 0 KO

@@ -142,3 +142,13 @@ Les images (point B). Le conflit D3 (point A), la portée (point C), les transpo
 Il ne vaudrait accord pour aucune mesure ni aucune écriture : chaque jalon sera préparé à sec, avec ses prédictions commitées avant tout lancement.
 
 **Recommandation** (relue par le conseiller) : ce découpage. Il suit l'ordre qui a tenu pour le deb (S4c, S4b, S4d1), chaque jalon ne dépend que du précédent, et la preuve de M4 tombe à la fin de M4c sans toucher à la porte ni au cluster.
+
+## Note datée du 17/11/2026, 21:05:37 UTC : décision « Oui, ce découpage », M4a préparé à sec
+
+**Décision du propriétaire** (réponse reçue avant 20:56:00 UTC, heure exacte non relevée) : « Oui, ce découpage ». Ce n'est un accord pour aucune mesure ni aucune écriture. Elle couvre, comme annoncé dans la note précédente :
+1. l'ordre M4a, M4b, M4c, avec le relevé de l'état en service en tête de M4a ;
+2. les deux écarts avec la ligne M4 du tableau des jalons (`builds/sample-app-rpm` ; sujet = manifeste qui porte le rpm) ;
+3. porte, déclencheur et rattrapage hors de M4, avec la condition « aucun déclencheur ni rattrapage rpm avant la porte étendue » ;
+4. la pipeline `sample-app-rpm` à part, et `publier-fermeture` et `publier-image` inchangées tant que leurs points tiennent.
+
+**M4a préparé à sec** : [`m4a.sh`](../m4a.sh) (`92f5e8c7…`), étapes `releve` (lecture seule), `verrou` et `publier` ; [prédictions](m4a-predictions.md) R1 à R11, V1 à V4, P0 à P2 ; banc de `releve` 21 OK ([script](m4a-banc.sh), [journal](m4a-banc.log)). `verrou` et `publier` attendent la carte de M4b, qui fixera ce que `prefetch-rpm` lira. Accord demandé : `releve` seul. Rien lancé.

@@ -1,0 +1,47 @@
+# Brique 05, M4a : prédictions (17/11/2026, écrites à 21:05:37 UTC, avant tout lancement)
+
+Script : [`../m4a.sh`](../m4a.sh) (`92f5e8c7…`). Découpage décidé le 17/11/2026 (« Oui, ce découpage ») ; verrou hors de la plateforme (« Hors plateforme ») ; images d'essai (« Option 1 ») ([carte](m4-carte.md)).
+
+Rien n'est lancé. Accord demandé maintenant : `releve` seul (lecture seule).
+
+**`verrou` et `publier` attendent la carte de M4b.** `verrou` fixe le digest de l'artefact, et son contenu n'est pas arrêté : le verrou porte `url` et `sigmd5`, ni sha256 ni taille, alors que `prefetch-deb` s'appuie sur un sha256 et une taille fixés par la pipeline ; la fermeture de M2 contient aussi des fichiers hors du verrou (rpm de mock, `repodata`). Ce que `prefetch-rpm` lira se décide dans la carte de M4b. La liste de la collecte de M2 (`s1-collecte.log`) est un candidat à joindre, non examiné.
+
+## Vérifié à sec, hors cluster et hors Zot
+
+- `bash -n` passe ; shellcheck 0.11.0 ne relève que SC2154 (variables de `commun.sh`) et SC2015 (`attendu`), mêmes types que `s4c.sh` de la 06.
+- **Banc de `releve`** ([script](m4a-banc.sh), [journal](m4a-banc.log)) : la vraie étape, lancée par `lancer`, contre un faux `kubectl` et un faux `oras` ; 21 OK, 0 KO. Mesuré sur le banc : écart de valeur, champ en service seulement, objet absent et clé changée signalés ; aucune clé affichée (ni par chemin, ni par contenu) ; ConfigMap `porte` comparée clé par clé, fichiers de la 07a compris ; un refus de Zot (401) donne « NON CONCLUANT », seul un « not found » donne « absent » ; journal et `chrono.tsv` dans le banc.
+- Non archivé : les onze sélections `yq` rendent chacune un seul document du bon type, nom et namespace ; le contrôle du verrou passe sur `s1-verrou_derivee.json` et refuse un `pull_digest` faux ; le gabarit de la `VerificationPolicy` est rendu avec une clé factice.
+- Non archivé : la poussée de l'artefact dans deux layouts OCI locaux, faite dans un dossier d'essai du scratchpad avec les mêmes deux fichiers : même digest aux deux poussées, `sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8` ; fichiers tirés égaux (`sample-app.spec` `918a83f5…`, verrou `b6d0f8f1…`). Cette valeur n'est pas archivée ailleurs que dans ce texte.
+
+## `releve` (lecture seule)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| R1 | `construction-rpm-sans-sortie` : « égal », 0 écart | Haute : posée depuis ce fichier à 20:07:12 UTC, `spec` sans valeur par défaut connue |
+| R2 | `prefetch-rpm-sortie` et `builds-sans-internet` : « égal » | Moyenne : posées depuis le dépôt le 16/11 (`rpm_appliquer`) ; défauts éventuels de Cilium non lus |
+| R3 | Les sept `ValidatingPolicy` (08 et 08c) : aucun écart « dans le dépôt seulement » ni de valeur ; des champs « en service seulement » sont possibles | Faible : défauts de Kyverno 1.19.2 non lus, aucun relevé champ par champ de ces objets archivé |
+| R4 | `VerificationPolicy taches-plateforme` : « égal » | Moyenne : la fin de ligne de la clé rendue peut différer de celle posée |
+| R5 | ConfigMap `porte` : les neuf clés tirées de fichiers de politique (08 et 07a) présentes et égales au dépôt | Moyenne : derniers commits de `porte.rego` et `taches.yml` le 11/11 ; mise à jour en service depuis non relevée |
+| R6 | Aucune ImageValidatingPolicy ne vise `essais-05/*` | Moyenne : lecture du dépôt seulement |
+| R7 | Zot, en anonyme : fermeture applicative `50dc73f7…` présente | Haute : `publier-fermeture` la relit en lecture anonyme |
+| R8 | Zot, en anonyme : images `99790c13…` et `f0ccf105…` présentes | Faible : la lecture anonyme de `essais-05/` par l'hôte n'a jamais été mesurée (`s1.sh`) ; un refus donnerait « NON CONCLUANT », un résultat et non une panne |
+| R9 | Zot : `entrees/sample-app/packaging-rpm:m4a` non lu (absent) | Haute |
+| R10 | `config-defaults` égal à `tekton-defauts.yaml` (08c) ; `feature-flags` avec `trusted-resources-verification-no-match-policy=fail` | Moyenne : posés par la 08c et la 08 (lecture du dépôt seulement) |
+| R11 | `releve` sort en code 0 et n'écrit rien dans le cluster ni dans Zot | Haute : uniquement des `get` et des `manifest fetch` |
+
+## `verrou` (hôte, hors ligne ; attend la carte de M4b)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| V1 | sha256 du verrou `b6d0f8f1…` | Haute |
+| V2 | 222 rpm, 222 nom.arch distincts, aucune URL hors de vault 9.7, `pull_digest` `f0ccf105…`, `image_digest` `18d64b03…`, `bootstrap_image_ready` vrai | Haute (essayé à sec) |
+| V3 | `poc/packaging/verrou-rpm.json` écrit, sha256 `b6d0f8f1…` | Haute |
+| V4 | Deux poussées locales au même digest, `sha256:41c639b7…` | Haute (essayé à sec, mêmes fichiers) |
+
+## `publier` (Zot, accord à part ; attend la carte de M4b)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| P0 | Verrou du dépôt inchangé depuis `verrou` | Haute |
+| P1 | Deux poussées dans Zot au même digest, égal à V4 | Haute : même forme que `packaging-deb` (C5 de S4c) |
+| P2 | Fichiers tirés par digest égaux au dépôt | Haute |
