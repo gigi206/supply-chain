@@ -214,3 +214,10 @@ Pod `s1-05-m3-v2` supprimé ; rien écrit dans Zot ; arbres `$T/m3/restauree-v2`
 - FN4 et FN6 tenues : `PREFETCH_FINAL` peut servir de base au script de la tâche `prefetch-rpm` ; prochaine étape, la carte de `taches`.
 - FN4 non tenue : l'index V2 ne serait pas reproductible d'une exécution de la tâche à l'autre ; arrêt, décision avec le propriétaire avant toute tâche signée.
 - Non couvert : la liste reçue en paramètre de Tekton, le workspace de Tekton (ici un volume éphémère), `publier-fermeture`, la tâche signée.
+
+## Note datée du 17/11/2026, écrite à 22:27:10 UTC : trois corrections à la note de préparation de `final`, avant tout passage
+
+Relecture du conseiller. Le texte commité reste ; il se lit avec ces corrections.
+- « les dix refus de `PREFETCH` inchangés » : ils sont **neuf** (`createrepo_c` absent, sha256, taille, doublon, HTTP 404, signature, empreinte, identifiant court, manifeste ; [journal](m4b-final-banc.log), section C). Les deux autres refus de la section C (`gpg` absent, `createrepo_c` en échec) sont nouveaux.
+- « `SORTIE=/workspace/sortie` (racine du volume) » : c'est la racine du **montage**, qui est le sous-dossier `fermeture` du volume (`subPath`), comme pour l'essai.
+- FN9, « rien écrit dans Zot » : l'étape ne le mesure pas. Les pods de `final` joignent Zot (lecture anonyme de l'image de bootstrap), à la différence du pod de `m4b_mock_v2`, dont le témoin Zot était fermé. FN9 se lit : code 0 ; rien écrit dans Zot **(lecture : aucune commande d'écriture vers un registre dans les scripts du pod, `skopeo copy` vers un dossier `dir:` ; aucun identifiant de Zot monté, `automountServiceAccountToken: false`)**.
