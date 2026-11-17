@@ -39,6 +39,12 @@
 #               isolation ISOLATION (simple par défaut) ; verrou archivé (resultats/s1-verrou.json) et résumé ; rien poussé
 #               Corrigé à sec le 12/11/2026 à partir de 15:18:25 UTC, NON LANCÉ (relevé releve3 de M2) : le résumé affiche pull_digest et
 #               architecture en plus d'image_digest, qui est un sha256 de RootFS et Config et ne peut valoir le digest du registre.
+#   pods        Durée de vie et place (../s1-duree.patch, préparé à sec le 17/11/2026, NON APPLIQUÉ ; décisions du propriétaire
+#               « Oui, 12 h » et « Oui, ajoute df ») : le conteneur des pods de racine, essais et verrou attend sleep 43200
+#               au lieu de 10800 (racine a duré 5818 s ; un pod arrêté en plein travail perd /w, restartPolicy Never) ; SONDE
+#               lit la capacité de /w par df -k, car sous Kata les options de montage de /w ne portent pas de size=
+#               Correctif appliqué au dépôt le 17/11/2026 à 11:04:44 UTC (« Oui, applique-le »), sha256 égal à la copie bancée
+#               (a61fa50e…) ; non lancé.
 # Les replis (stockage vfs, mock non root, bootstrap sans image) ne sont pas lancés ici : chacun demande sa prédiction et un accord.
 # Retrait : Zot n'autorise pas la suppression ; dépôts amont/rockylinux/rockylinux et essais-05/mock-rocky9 définitifs.
 #
@@ -87,7 +93,7 @@ pod_spec() { # nom image : pod de builds Kata privilégié, root, label prefetch
       tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
       securityContext: {runAsNonRoot: false, runAsUser: 0, runAsGroup: 0, seccompProfile: {type: "RuntimeDefault"}},
       volumes: [{name: "w", emptyDir: {medium: "Memory", sizeLimit: $t}}],
-      containers: [{name: "s1", image: $i, command: ["sleep", "10800"], securityContext: $sc,
+      containers: [{name: "s1", image: $i, command: ["sleep", "43200"], securityContext: $sc,
         resources: {requests: $l, limits: $l}, volumeMounts: [{name: "w", mountPath: "/w"}]}]}}' > "$T/$1.json"
 }
 
@@ -388,6 +394,7 @@ SONDE='set -u
 echo "uid : $(id -u)"
 grep -E "^(CapEff|CapBnd|NoNewPrivs|Seccomp):" /proc/self/status
 awk "\$2 == \"/\" || \$2 == \"/w\" {print \"montage \" \$2 \" : \" \$3 \" \" \$4}" /proc/mounts
+df -k /w | awk "NR == 2 {print \"capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
 rpm -q mock mock-core-configs podman skopeo systemd-container distribution-gpg-keys 2>&1 | sed "s/^/version : /"
 grep -h -E "gpgkey" /etc/mock/templates/rocky-9.tpl | sort -u | head -n 5 | sed "s/^/gpgkey du modèle : /"
 for k in /usr/share/distribution-gpg-keys/rocky/*; do

@@ -838,3 +838,28 @@ Rien n'est appliqué à `s1.sh`. Rien n'est lancé.
 
 Suite, chaque point sur accord nommé : appliquer le correctif (une ligne datée à l'en-tête de `s1.sh`) et le commiter ; puis
 `essais`, puis `verrou`.
+
+## Correctif durée de vie et place appliqué au dépôt (note du 2026-11-17, écrite à 2026-11-17T11:05:52Z ; rien n'est réécrit)
+
+Question : « J'applique le correctif durée de vie et place à s1.sh et je le commite ? ». Réponse : « Oui, applique-le ».
+
+- `git apply` de [`s1-duree.patch`](../s1-duree.patch) le 17/11/2026 à 11:04:44 UTC (`date -u` autour de la commande, la même
+  seconde avant et après), sur `f6730b0`. `s1.sh` passe de `ad16fc99…` à `a61fa50e…`, le sha256 de la copie bancée.
+  `git apply -R --check` passe juste après.
+- **Banc de durée repassé sur le fichier du dépôt avant la ligne datée**, le 17/11/2026 de 11:04:51 à 11:04:53 UTC : 30 OK, 0 KO
+  ([journal](s1-duree-banc-applique.log)). Hors des deux lignes d'en-tête et du bilan, son journal est identique à celui de la
+  copie. Le banc lit le `s1.sh` d'avant (`ad16fc99…`) et `s1-image-banc-config.py` dans un dossier de base sous `~/.cache`,
+  extraits de `f6730b0`.
+- Une ligne datée est ensuite ajoutée à l'en-tête de `s1.sh` (deux lignes de commentaire), sans rien réécrire. `s1.sh` vaut
+  désormais `5ccba38e…`. Le correctif ne s'applique donc plus dans un sens ni dans l'autre ; son fichier reste comme trace.
+  - Elle portait d'abord 11:05:01, l'heure de l'édition, et non celle de `git apply`. Elle a été corrigée à 11:04:44 avant tout
+    commit. Un banc N3/N4 passé sur ce premier état (`69c62726…`, 11:05:02 UTC) a donné 35 OK, 0 KO ; il n'est pas archivé.
+- **Sur le fichier final** :
+  - `bash -n` passe ;
+  - shellcheck 0.11.0 ne relève aucun avertissement et compte toujours 13 remarques ;
+  - le banc N3/N4, le 17/11/2026 de 11:05:15 à 11:05:16 UTC, donne 35 OK, 0 KO ([journal](s1-duree-banc-n34-applique.log)). Hors
+    en-tête et bilan, le journal est identique à celui de la copie.
+  - Par rapport à `ad16fc99…`, seules trois lignes hors commentaire changent : le `sleep` (retiré, puis ajouté) et la ligne `df`.
+- Rien n'est lancé. Le pod de `racine` déjà passé avait `sleep 10800`. P11 (corrigée), P11b et P13 attendent `essais`.
+
+Suite, chaque point sur accord nommé : push ; prédictions d'`essais` relues et complétées si besoin, puis `essais` ; `verrou`.
