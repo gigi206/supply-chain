@@ -1602,3 +1602,40 @@ poc/bricks/05-rpm-mock/s1.sh hote97`, `s1.sh` à `2b0a3b7b…`. Journal : [`s1-h
 - Ce résultat ne change pas la décision « Dix lignes », prise sur l'état mesuré à `verrou_brut`.
 
 Suite : accord de lancement de `boot_racine` (pod, rien poussé). Rien n'est écrit dans Zot.
+
+## Étape `boot_racine` : résultat (note du 2026-11-17, écrite à 2026-11-17T14:46:52Z ; rien n'est réécrit)
+
+Passage sur accord « Oui, lance boot_racine », le 17/11/2026 de 14:31:54 à 14:45:36 UTC (`date -u` du lancement et
+[`chrono.tsv`](chrono.tsv)), code 0. Commande : `env -u PREFIXE -u ISOLATION DISTRO=rke2 KUBECONFIG=… mise exec --
+poc/bricks/05-rpm-mock/s1.sh boot_racine`, `s1.sh` à `2b0a3b7b…`. Journal : [`s1-boot_racine.log`](s1-boot_racine.log).
+
+**L'archive de la racine dérivée est construite et rapatriée** : 258 129 920 octets, sha256 `8ae17f92…`, dans `$T/boot-racine.tar`
+(hors du dépôt), avec `boot-racine.sha256`. Rien n'est écrit dans Zot.
+
+| # | Résultat |
+|---|---|
+| DR1 | **Tenue.** Pod prêt, image `99790c13…` ; « dnf-3 : 4.14.0 ». Premier passage du `dnf-3` de l'image d'essai. |
+| DR2 | **Tenue.** Pull `rc 0` en 7 s, mount `rc 0`, copie `rc 0`, 243 672 kB. |
+| DR3 | **Tenue.** Quatre `.repo` écartés (`rocky-addons`, `rocky-devel`, `rocky-extras`, `rocky`) ; 147 lignes avant, stderr 0. |
+| DR4 | **Tranchée** (pas de pari) : `gpg-pubkey-350d275d-6279464b` est déjà dans l'image brute, avant comme après ; dnf n'ajoute pas de ligne. Elle fait partie des 143 lignes communes, ce qui explique aussi son absence des différences de `verrou_brut`. |
+| DR5 | **Tenue.** `makecache` `rc 0` en 16 s ; quatre « OK   repomd … » sur l'hôte. `repo_gpgcheck=1` a tourné dans cette image pour la première fois. |
+| DR6 | **Tenue.** `rc 0` ; six paquets sous « Installing » et quatre sous « Upgrading », tous depuis `baseos97`, rien d'autre ; « Install  6 Packages », « Upgrade  4 Packages ». Un `dnf install` d'un NEVRA exact fait donc la montée de version d'un paquet présent (mesuré une fois). |
+| DR7 | **Tenue.** Dix rpm, conformes aux dix de `hote97` (fichiers et sha256) ; « rpm -K : 10 OK sur 10 ». |
+| DR8 | **Tenue.** Les dix lignes « seulement dans la racine dérivée » et les quatre « seulement dans rockylinux:9.7 brut » sont, chaîne pour chaîne, celles de `verrou_brut` (signature d'en-tête comprise) ; 143 communes ; 153 lignes après, sans ligne `gpg-pubkey` de plus (DR4). La liste complète est archivée (153 lignes « racine dérivée, liste »). |
+| DR9 | **Tenue.** `python3-dnf >= 4.11.0` dans les `Requires` du paquet installé, comme dans le primary (DH4), plus `config(…)` et cinq `rpmlib(…)` que le primary ne liste pas. |
+| DR10 | **Tenue** pour `/w` : 0. `var/cache/dnf` : 0 entrée (pas de pari). |
+| DR11 | **Tenue.** 258 129 920 octets, 1,03 fois la copie ; « OK   archive racine dérivée rapatriée ». |
+| DR12 | **Non tenue pour l'installation** : 761 s, au-dessus des 300 s prédites. **Tenue pour l'étape** : 822 s, sous 15 min. |
+| DR13 | **Tenue.** Capacité 3 059 832 kB ; 744 284 kB utilisés ; aucun « No space left on device ». |
+| DR14 | **Tenue.** « (code de l'exec : 0) » ; pod supprimé une fois. |
+
+**Observation, sans cause** : 761 s pour installer dix paquets (environ 2 Mo d'après la transaction), contre 16 s pour
+`makecache`. À `racine`, 201 paquets avaient pris 5694 s, cause inconnue. Ici, la même lenteur se voit avec un autre dépôt
+(vault 9.7) et peu de paquets ; qu'elle soit sans lien avec le volume téléchargé est une hypothèse. La cause n'est pas lue ;
+le journal complet de dnf n'est pas archivé.
+
+**Ce que cela apprend** : la racine dérivée est exactement « `rockylinux:9.7` plus les dix lignes » de la décision ; la question
+`gpg-pubkey` ne se pose plus.
+
+Suite : prédictions puis passage local de `boot_image` avec cette archive (registre crane en loopback, deux passages pour
+comparer les digests), puis accord d'écriture dans Zot. Rien n'est écrit dans Zot.

@@ -1,0 +1,239 @@
+# s1.sh boot_racine, 2026-11-17T14:31:54Z
+image du pod : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771 ; base : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+paquets demandés : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+### s1-05-boot-racine (kata, uid 0, privilégié, label tekton.dev/task=prefetch-rpm) : prêt
+     dnf-3 : 4.14.0 ; rpm : RPM version 4.16.1.3
+     podman pull de rockylinux:9.7 : rc 0 en 7 s
+     podman image mount : rc 0
+     copie de la racine de rockylinux:9.7 : rc 0, 243672 kB
+     dépôts de la racine, écartés (reposdir=/w/aucun) : rocky-addons.repo rocky-devel.repo rocky-extras.repo rocky.repo 
+     racine avant : rpm -qa 147 ligne(s), stderr 0 ligne(s)
+     gpg-pubkey avant : gpg-pubkey-350d275d-6279464b 
+     makecache : rc 0 en 16 s
+     caches : /w/cache97 /w/boot-racine/w/cache97 
+     repomd baseos97 : sha256 fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+     repomd appstream97 : sha256 06f01d405f2d4743dd3fea4a3bf4e2ffada91b652b94d9458468064db15287d6
+     repomd crb97 : sha256 3936113ee8724d84af42f17f17ad50b67a1cb10e8db9bd246e8609deebdf134f
+     repomd extras97 : sha256 54ec0c5362c12097f0eb495aff9b4618171f6a67c458d8da4aaa69adc23c40c1
+     installation : rc 0 en 761 s
+     transaction :  Package                    Arch     Version                   Repository  Size
+     transaction : Installing:
+     transaction :  dbus-libs                  x86_64   1:1.12.20-8.el9           baseos97   151 k
+     transaction :  python3-dateutil           noarch   1:2.9.0.post0-1.el9_7     baseos97   290 k
+     transaction :  python3-dbus               x86_64   1.2.18-2.el9.0.1          baseos97   131 k
+     transaction :  python3-dnf-plugins-core   noarch   4.3.0-24.el9_7            baseos97   245 k
+     transaction :  python3-six                noarch   1.15.0-9.el9              baseos97    36 k
+     transaction :  python3-systemd            x86_64   234-19.el9                baseos97    82 k
+     transaction : Upgrading:
+     transaction :  dnf                        noarch   4.14.0-31.el9.rocky.0.1   baseos97   466 k
+     transaction :  dnf-data                   noarch   4.14.0-31.el9.rocky.0.1   baseos97    36 k
+     transaction :  python3-dnf                noarch   4.14.0-31.el9.rocky.0.1   baseos97   412 k
+     transaction :  yum                        noarch   4.14.0-31.el9.rocky.0.1   baseos97    90 k
+     résumé de la transaction : Install  6 Packages
+     résumé de la transaction : Upgrade  4 Packages
+     rpm dbus-libs-1.12.20-8.el9.x86_64.rpm ab81c1e16482f333aa285db120051b099b56661d4620f0f1af05f8e69126e97b
+     rpm dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm b2381a62f9974c4da89169f3531587a5513656b9692c40fb687e56fd29798bb6
+     rpm dnf-data-4.14.0-31.el9.rocky.0.1.noarch.rpm 8bb408b00fd787c19b717aa90311a5efd6a41863111ed989469f4899e2066904
+     rpm python3-dateutil-2.9.0.post0-1.el9_7.noarch.rpm 1825dd1546532526d71f83acf473b2e9726074c2b18f146800d2972086df2dc8
+     rpm python3-dbus-1.2.18-2.el9.0.1.x86_64.rpm f432c1bbcacfba197cd5d93a530c635691967f86ce76266cf253df57c933f987
+     rpm python3-dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm 415035e84912af52be5596ebd06775c2f4d07e33b00fe8d1aa6488927deba45c
+     rpm python3-dnf-plugins-core-4.3.0-24.el9_7.noarch.rpm 3da2880ea5da6191bebb5f5fcdb66a807b04a58237011046d91c84db456d58bf
+     rpm python3-six-1.15.0-9.el9.noarch.rpm 752fc8b137a10cedd07c59478bd0822830d7502b7ce6d5cbb5c5f8cb5b4f1f1c
+     rpm python3-systemd-234-19.el9.x86_64.rpm 4206bba0157aba914a7ea3b722f341fe5fad58fa80647181d52ace65a33ce8e8
+     rpm yum-4.14.0-31.el9.rocky.0.1.noarch.rpm bb4d1ddb75fdd38ae8bad8bc70da357792d51607cf7de129c471acfcbbdc24e6
+     rpm -K : 10 OK sur 10
+     gpg-pubkey après : gpg-pubkey-350d275d-6279464b 
+     racine dérivée : rpm -qa 153 ligne(s), stderr 0 ligne(s)
+     seulement dans la racine dérivée : dbus-libs.x86_64 1:1.12.20-8.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Oct 31 09:06:34 2023, Key ID 702d426d350d275d
+     seulement dans la racine dérivée : dnf-data.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:36 2025, Key ID 702d426d350d275d
+     seulement dans la racine dérivée : dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:38 2025, Key ID 702d426d350d275d
+     seulement dans la racine dérivée : python3-dateutil.noarch 1:2.9.0.post0-1.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 18:09:01 2025, Key ID 702d426d350d275d
+     seulement dans la racine dérivée : python3-dbus.x86_64 0:1.2.18-2.el9.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Sat May  4 04:33:27 2024, Key ID 702d426d350d275d
+     seulement dans la racine dérivée : python3-dnf-plugins-core.noarch 0:4.3.0-24.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 22:03:52 2025, Key ID 702d426d350d275d
+     seulement dans la racine dérivée : python3-dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:34 2025, Key ID 702d426d350d275d
+     seulement dans la racine dérivée : python3-six.noarch 0:1.15.0-9.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed May 11 11:12:53 2022, Key ID 702d426d350d275d
+     seulement dans la racine dérivée : python3-systemd.x86_64 0:234-19.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  4 21:08:59 2024, Key ID 702d426d350d275d
+     seulement dans la racine dérivée : yum.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:44 2025, Key ID 702d426d350d275d
+     seulement dans rockylinux:9.7 brut : dnf-data.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:06:36 2025, Key ID 702d426d350d275d
+     seulement dans rockylinux:9.7 brut : dnf.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:06:36 2025, Key ID 702d426d350d275d
+     seulement dans rockylinux:9.7 brut : python3-dnf.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:06:36 2025, Key ID 702d426d350d275d
+     seulement dans rockylinux:9.7 brut : yum.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:06:36 2025, Key ID 702d426d350d275d
+     lignes communes : 143
+     racine dérivée, liste : alternatives.x86_64 0:1.24-2.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat Apr 26 00:06:00 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : attr.x86_64 0:2.5.1-3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed May 25 21:18:48 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : audit-libs.x86_64 0:3.1.5-7.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat Nov  1 21:14:48 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : basesystem.noarch 0:11-13.el9.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Thu Feb 29 17:37:22 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : bash.x86_64 0:5.1.8-9.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Apr 30 11:39:22 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : binutils-gold.x86_64 0:2.35.2-67.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu Oct 30 21:57:37 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : binutils.x86_64 0:2.35.2-67.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu Oct 30 21:57:37 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : bzip2-libs.x86_64 0:1.0.8-10.el9_5 sigpgp=(none) rsaheader=RSA/SHA256, Tue Feb  4 12:49:42 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : ca-certificates.noarch 0:2025.2.80_v9.0.305-91.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Nov 21 00:28:14 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : coreutils-single.x86_64 0:8.32-39.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri May  2 08:36:54 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : cracklib-dicts.x86_64 0:2.9.6-27.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue May 31 17:44:29 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : cracklib.x86_64 0:2.9.6-27.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue May 31 17:44:28 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : crypto-policies-scripts.noarch 0:20250905-1.git377cc42.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 04:20:29 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : crypto-policies.noarch 0:20250905-1.git377cc42.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 04:20:29 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : curl-minimal.x86_64 0:7.76.1-34.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 01:41:31 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : cyrus-sasl-lib.x86_64 0:2.1.27-21.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Apr 17 05:21:50 2023, Key ID 702d426d350d275d
+     racine dérivée, liste : dbus-libs.x86_64 1:1.12.20-8.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Oct 31 09:06:34 2023, Key ID 702d426d350d275d
+     racine dérivée, liste : dnf-data.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:36 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:38 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : elfutils-debuginfod-client.x86_64 0:0.193-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu Oct 30 18:51:10 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : elfutils-default-yama-scope.noarch 0:0.193-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu Oct 30 18:51:11 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : elfutils-libelf.x86_64 0:0.193-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu Oct 30 18:51:10 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : elfutils-libs.x86_64 0:0.193-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu Oct 30 18:51:13 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : expat.x86_64 0:2.5.0-5.el9_6 sigpgp=(none) rsaheader=RSA/SHA256, Tue May 13 19:22:23 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : file-libs.x86_64 0:5.39-16.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Apr 16 01:05:47 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : filesystem.x86_64 0:3.16-5.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Nov  3 01:31:43 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : findutils.x86_64 1:4.8.0-7.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov  5 02:48:22 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : gawk.x86_64 0:5.1.0-6.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Jun 13 01:33:50 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : gdbm-libs.x86_64 1:1.23-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Nov  3 11:36:35 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : glib2.x86_64 0:2.68.4-18.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 20:21:53 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : glibc-common.x86_64 0:2.34-231.el9_7.2 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 23:55:33 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : glibc-minimal-langpack.x86_64 0:2.34-231.el9_7.2 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 23:55:26 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : glibc.x86_64 0:2.34-231.el9_7.2 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 23:55:42 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : gmp.x86_64 1:6.2.0-13.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Nov  3 21:50:03 2023, Key ID 702d426d350d275d
+     racine dérivée, liste : gnupg2.x86_64 0:2.3.3-4.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat Oct 28 08:43:35 2023, Key ID 702d426d350d275d
+     racine dérivée, liste : gnutls.x86_64 0:3.8.3-9.el9.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Thu Nov  6 03:52:05 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : gpg-pubkey.(none) 0:350d275d-6279464b sigpgp=(none) rsaheader=(none)
+     racine dérivée, liste : gpgme.x86_64 0:1.15.1-6.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri May 13 15:40:59 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : grep.x86_64 0:3.6-5.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 14:54:02 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : gzip.x86_64 0:1.12-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Oct 30 00:20:10 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : hostname.x86_64 0:3.23-6.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 12:29:05 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : ima-evm-utils.x86_64 0:1.6.2-2.el9.rocky.0.2 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 00:02:44 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : iputils.x86_64 0:20210202-15.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu Nov  6 17:19:49 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : json-c.x86_64 0:0.14-11.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu May 26 11:40:23 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : keyutils-libs.x86_64 0:1.6.3-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Apr 17 21:32:22 2023, Key ID 702d426d350d275d
+     racine dérivée, liste : keyutils.x86_64 0:1.6.3-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Apr 17 21:32:22 2023, Key ID 702d426d350d275d
+     racine dérivée, liste : krb5-libs.x86_64 0:1.21.1-8.el9_6 sigpgp=(none) rsaheader=RSA/SHA256, Tue Jun 24 19:58:44 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : less.x86_64 0:590-6.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 06:44:50 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libacl.x86_64 0:2.3.1-4.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Apr  9 17:20:09 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : libarchive.x86_64 0:3.5.3-6.el9_6 sigpgp=(none) rsaheader=RSA/SHA256, Wed Aug 20 09:59:25 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libassuan.x86_64 0:2.5.5-3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 12:29:38 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libattr.x86_64 0:2.5.1-3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed May 25 21:18:48 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libblkid.x86_64 0:2.37.4-21.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat May  3 06:31:02 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libcap-ng.x86_64 0:0.8.2-7.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 12:20:18 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libcap.x86_64 0:2.48-10.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 07:31:43 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libcom_err.x86_64 0:1.46.5-8.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 08:42:46 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libcomps.x86_64 0:0.1.18-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Jun 14 00:00:15 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libcurl-minimal.x86_64 0:7.76.1-34.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 01:41:31 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libdb.x86_64 0:5.3.28-57.el9_6 sigpgp=(none) rsaheader=RSA/SHA256, Tue Jun 24 18:11:48 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libdnf.x86_64 0:0.69.0-16.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:03:10 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libeconf.x86_64 0:0.4.1-4.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Nov  3 21:20:39 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : libevent.x86_64 0:2.1.12-8.el9_4 sigpgp=(none) rsaheader=RSA/SHA256, Tue Sep  3 22:26:30 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : libfdisk.x86_64 0:2.37.4-21.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat May  3 06:31:02 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libffi.x86_64 0:3.4.2-8.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Oct 29 09:32:24 2023, Key ID 702d426d350d275d
+     racine dérivée, liste : libgcc.x86_64 0:11.5.0-11.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Oct 28 22:11:57 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libgcrypt.x86_64 0:1.10.0-11.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov  5 17:19:17 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : libgomp.x86_64 0:11.5.0-11.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Oct 28 22:11:51 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libgpg-error.x86_64 0:1.42-5.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu May 26 03:56:16 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libidn2.x86_64 0:2.3.0-7.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 12:20:27 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libksba.x86_64 0:1.5.1-7.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov  5 13:05:49 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : libmodulemd.x86_64 0:2.13.0-2.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu May 26 04:30:32 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libmount.x86_64 0:2.37.4-21.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat May  3 06:31:02 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libnghttp2.x86_64 0:1.43.0-6.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Nov  3 11:50:59 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : libpwquality.x86_64 0:1.4.4-8.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed May 25 21:11:57 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : librepo.x86_64 0:1.14.5-3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 02:34:17 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libreport-filesystem.noarch 0:2.15.2-6.el9.rocky.0.2 sigpgp=(none) rsaheader=RSA/SHA256, Mon Jun  6 17:21:58 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libselinux.x86_64 0:3.6-3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed Apr 23 22:48:21 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libsemanage.x86_64 0:3.6-5.el9_6 sigpgp=(none) rsaheader=RSA/SHA256, Wed Apr 23 23:01:18 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libsepol.x86_64 0:3.6-3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 04:05:42 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libsigsegv.x86_64 0:2.13-4.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat May 14 23:01:08 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libsmartcols.x86_64 0:2.37.4-21.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat May  3 06:31:02 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libsolv.x86_64 0:0.7.24-3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Nov  3 11:28:19 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : libstdc++.x86_64 0:11.5.0-11.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Oct 28 22:11:51 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libtasn1.x86_64 0:4.16.0-9.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May  5 01:10:43 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libtool-ltdl.x86_64 0:2.4.6-46.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  4 19:57:50 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : libunistring.x86_64 0:0.9.10-15.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 12:24:07 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libusbx.x86_64 0:1.0.26-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Oct 30 00:50:07 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libuser.x86_64 0:0.63-17.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat Nov  1 21:47:59 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libutempter.x86_64 0:1.2.1-6.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 12:22:25 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libuuid.x86_64 0:2.37.4-21.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat May  3 06:31:00 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libverto.x86_64 0:0.3.2-3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 12:19:30 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libxcrypt.x86_64 0:4.4.18-3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu May 26 05:15:11 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libxml2.x86_64 0:2.9.13-12.el9_6 sigpgp=(none) rsaheader=RSA/SHA256, Thu Aug  7 14:50:06 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : libyaml.x86_64 0:0.2.5-7.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu May 26 11:33:25 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : libzstd.x86_64 0:1.5.5-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat Apr 26 20:19:13 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : lua-libs.x86_64 0:5.4.4-4.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed Oct 18 05:41:43 2023, Key ID 702d426d350d275d
+     racine dérivée, liste : lz4-libs.x86_64 0:1.9.3-5.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 12:18:16 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : mpfr.x86_64 0:4.1.0-7.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu May 26 03:11:57 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : ncurses-base.noarch 0:6.2-12.20210508.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:17:05 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : ncurses-libs.x86_64 0:6.2-12.20210508.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:17:04 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : nettle.x86_64 0:3.10.1-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May  5 00:37:42 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : npth.x86_64 0:1.6-8.el9 sigpgp=(none) rsaheader=RSA/SHA256, Thu May 26 12:17:28 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : openldap.x86_64 0:2.6.8-4.el9.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Sat May 10 04:02:50 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : openssl-fips-provider.x86_64 1:3.5.1-4.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Thu Nov 13 17:19:55 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : openssl-libs.x86_64 1:3.5.1-4.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Thu Nov 13 17:19:55 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : openssl.x86_64 1:3.5.1-4.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Thu Nov 13 17:19:57 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : p11-kit-trust.x86_64 0:0.25.3-3.el9_5 sigpgp=(none) rsaheader=RSA/SHA256, Tue Dec 17 20:13:13 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : p11-kit.x86_64 0:0.25.3-3.el9_5 sigpgp=(none) rsaheader=RSA/SHA256, Tue Dec 17 20:13:13 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : pam.x86_64 0:1.5.1-26.el9_6 sigpgp=(none) rsaheader=RSA/SHA256, Wed Sep  3 14:47:56 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : passwd.x86_64 0:0.80-12.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun May 15 00:03:53 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : pcre.x86_64 0:8.44-4.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Nov  3 21:42:41 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : pcre2-syntax.noarch 0:10.40-6.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov  5 13:50:43 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : pcre2.x86_64 0:10.40-6.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov  5 13:50:43 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : popt.x86_64 0:1.18-8.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 12:31:10 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-dateutil.noarch 1:2.9.0.post0-1.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 18:09:01 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-dbus.x86_64 0:1.2.18-2.el9.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Sat May  4 04:33:27 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-dnf-plugins-core.noarch 0:4.3.0-24.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 22:03:52 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:34 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-gpg.x86_64 0:1.15.1-6.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri May 13 15:40:58 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-hawkey.x86_64 0:0.69.0-16.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:03:09 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-libcomps.x86_64 0:0.1.18-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Jun 14 00:00:16 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-libdnf.x86_64 0:0.69.0-16.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:03:10 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-libs.x86_64 0:3.9.23-2.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 23:20:11 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-pip-wheel.noarch 0:21.3.1-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Nov  3 16:18:41 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-rpm.x86_64 0:4.16.1.3-39.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 01:46:55 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-setuptools-wheel.noarch 0:53.0.0-15.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat Nov  1 06:52:27 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-six.noarch 0:1.15.0-9.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed May 11 11:12:53 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : python3-systemd.x86_64 0:234-19.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  4 21:08:59 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : python3.x86_64 0:3.9.23-2.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 23:20:09 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : readline.x86_64 0:8.1-4.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 12:20:39 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : rocky-gpg-keys.noarch 0:9.7-1.3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Oct 28 17:21:05 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : rocky-release.noarch 0:9.7-1.3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Oct 28 17:21:05 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : rocky-repos.noarch 0:9.7-1.3.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Oct 28 17:21:05 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : rootfiles.noarch 0:8.1-35.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Nov  2 17:07:06 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : rpm-build-libs.x86_64 0:4.16.1.3-39.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 01:46:56 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : rpm-libs.x86_64 0:4.16.1.3-39.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 01:46:57 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : rpm-sign-libs.x86_64 0:4.16.1.3-39.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 01:46:50 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : rpm.x86_64 0:4.16.1.3-39.el9 sigpgp=(none) rsaheader=RSA/SHA256, Fri Oct 31 01:46:54 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : sed.x86_64 0:4.8-9.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon May 16 14:50:13 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : setup.noarch 0:2.13.7-10.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sun Apr  7 20:15:55 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : shadow-utils.x86_64 2:4.9-15.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed Nov  5 21:12:09 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : sqlite-libs.x86_64 0:3.34.1-9.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 18:04:03 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : systemd-libs.x86_64 0:252-55.el9_7.2.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 19:41:50 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : tar.x86_64 2:1.34-7.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed Nov  6 16:23:10 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : tpm2-tss.x86_64 0:3.2.3-1.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  4 19:40:50 2024, Key ID 702d426d350d275d
+     racine dérivée, liste : tzdata.noarch 0:2025b-2.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed Nov  5 21:46:38 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : usermode.x86_64 0:1.114-7.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 11:21:36 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : util-linux-core.x86_64 0:2.37.4-21.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat May  3 06:30:59 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : util-linux.x86_64 0:2.37.4-21.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat May  3 06:30:59 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : vim-minimal.x86_64 2:8.2.2637-23.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 20:11:43 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : xz-libs.x86_64 0:5.2.5-8.el9_0 sigpgp=(none) rsaheader=RSA/SHA256, Wed Jun 15 06:27:06 2022, Key ID 702d426d350d275d
+     racine dérivée, liste : yum.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:44 2025, Key ID 702d426d350d275d
+     racine dérivée, liste : zlib.x86_64 0:1.2.11-40.el9 sigpgp=(none) rsaheader=RSA/SHA256, Sat Oct 28 09:18:19 2023, Key ID 702d426d350d275d
+     requires du greffon installé : config(python3-dnf-plugins-core) = 4.3.0-24.el9_7
+     requires du greffon installé : python(abi) = 3.9
+     requires du greffon installé : python3-dateutil
+     requires du greffon installé : python3-dbus
+     requires du greffon installé : python3-dnf >= 4.11.0
+     requires du greffon installé : python3-hawkey >= 0.64.0
+     requires du greffon installé : python3-systemd
+     requires du greffon installé : rpmlib(CompressedFileNames) <= 3.0.4-1
+     requires du greffon installé : rpmlib(FileDigests) <= 4.6.0-1
+     requires du greffon installé : rpmlib(PartialHardlinkSets) <= 4.0.4-1
+     requires du greffon installé : rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+     requires du greffon installé : rpmlib(PayloadIsZstd) <= 5.4.18-1
+     restes de /w dans la racine : 0
+     var/cache/dnf de la racine : 0 entrée(s), gardées
+     archive racine dérivée : rc 0, 258129920 octets, sha256 8ae17f92b27377fff20009d0a88740b1bf9045d533f0506949d6e209c970f1f2
+     capacité de /w : 3059832 kB ; utilisés : 744284 kB
+     (code de l'exec : 0)
+OK   repomd baseos97 lu par dnf dans le pod = repomd vérifié sur l'hôte : fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+OK   repomd appstream97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 06f01d405f2d4743dd3fea4a3bf4e2ffada91b652b94d9458468064db15287d6
+OK   repomd crb97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 3936113ee8724d84af42f17f17ad50b67a1cb10e8db9bd246e8609deebdf134f
+OK   repomd extras97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 54ec0c5362c12097f0eb495aff9b4618171f6a67c458d8da4aaa69adc23c40c1
+OK   rpm -K : 10 OK sur 10
+OK   rpm téléchargés conformes aux dix de hote97 : 10 sur 10, 10 téléchargé(s)
+OK   archive racine dérivée rapatriée : 8ae17f92b27377fff20009d0a88740b1bf9045d533f0506949d6e209c970f1f2
+pod s1-05-boot-racine supprimé
