@@ -1,0 +1,6 @@
+# s1.sh m3_restauration, 2026-11-17T20:08:17Z
+OK   digest écrit par l'étape fermeture : sha256:f235a98b46d82b2d295cd39e869eb07344938e8896fc4f7465171687e9c48417
+restauration 1 depuis sc-stockage.poc.test:5000/deps/sample-app/mock-buildroot-lock@sha256:f235a98b46d82b2d295cd39e869eb07344938e8896fc4f7465171687e9c48417, dans un dossier vide
+OK   arbre égal à la liste : 235 fichiers, 319086430 octets
+restauration 2 depuis sc-stockage.poc.test:5000/deps/sample-app/mock-buildroot-lock@sha256:f235a98b46d82b2d295cd39e869eb07344938e8896fc4f7465171687e9c48417, dans un dossier vide
+OK   arbre égal à la liste : 235 fichiers, 319086430 octets

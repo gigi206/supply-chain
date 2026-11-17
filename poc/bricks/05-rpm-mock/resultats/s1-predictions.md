@@ -2798,3 +2798,19 @@ Décision du propriétaire : question « Je lance m3_reseau, qui pose constructi
 - L'en-tête du fichier de la politique dit toujours « PROPOSITION, NON POSÉE » : il reste tel quel, cette note fait foi.
 
 Suite : accord de lancement de `m3_restauration` (lecture seule dans Zot). Rien d'autre n'est lancé.
+
+## Étape `m3_restauration` passée (note du 2026-11-17, écrite à 2026-11-17T20:08:42Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « Je lance m3_restauration (lecture seule dans Zot) ? », réponse « Oui, lance-le ».
+Lancée le 17/11/2026 de 20:08:17 à 20:08:21 UTC (`date -u` avant et après, `chrono.tsv`), code 0, `s1.sh` `06c2da46…`
+([journal](s1-m3_restauration.log)).
+
+| # | Tenue ? | Mesure |
+|---|---|---|
+| RS1 | Oui | Digest de `fermeture.digest` égal à `FERMETURE_DIGEST` (`sha256:f235a98b…`) ; deux pulls par digest, chacun dans un dossier vidé juste avant (lecture du code) ; deux « OK   arbre égal à la liste : 235 fichiers, 319086430 octets » ; code 0 en moins de 5 s pour les deux |
+
+**Lecture** : les deux arbres sont restaurés sur l'hôte, sous `$T/m3/restauree-1` et `$T/m3/restauree-2`. Chaque fichier est
+comparé à la liste de `collecte` : chemin, taille et sha256 (lecture du code). Rien n'est écrit dans Zot ni dans le cluster.
+
+Suite : accord de lancement de `m3_build1`. C'est le premier pod au label `construire-rpm` : il mesurera l'effet de la
+politique (témoins), puis le build sans réseau. Rien d'autre n'est lancé.
