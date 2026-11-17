@@ -610,3 +610,54 @@ suivi le commit.
   n'écrit pas de ligne « KO », seulement l'erreur de kubectl.
 - **Lecture du journal :** les lignes venues du pod y sont décalées de cinq espaces par `dans`. La ligne « (code de l'exec : N) »
   sera relevée dans les notes du résultat.
+
+## Étape `racine` : résultat (note du 2026-11-17, écrite à 2026-11-17T10:24:24Z ; rien n'est réécrit)
+
+Question : « Je lance racine ? ». Réponse : « Oui, lance racine ». Commande : `DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/s1.sh
+racine </dev/null`, sur `942f72d`, en arrière-plan, sous `bash -c`. Elle a tourné du 17/11/2026 08:44:02 à 10:21:00 UTC (`date -u`
+autour de la commande, et `chrono.tsv`). Journal : [`s1-racine.log`](s1-racine.log), sha256 `e79aa829…`, 225 lignes, aucune KO.
+Le code de retour 0 a été lu par `PIPESTATUS` dans un fichier du scratchpad : il n'est pas archivé. La ligne « fait » de `chrono.tsv`
+le corrobore. La sortie à l'écran est égale au journal.
+
+| | Mesure (lignes du journal) | Verdict |
+|---|---|---|
+| RC1 | « ### s1-05-racine (kata, uid 0, privilégié, label tekton.dev/task=prefetch-rpm) : prêt » | Tenue |
+| RC2 | « makecache : rc 0 en 56 s » ; trois sommes de repomd non vides | Tenue. Le journal montre seulement `makecache` rc 0 avec `repo_gpgcheck=1` configuré : `makecache.log` est perdu avec le pod |
+| RC3 | OK pour baseos98 (`abac8b17…`) et appstream98 (`a3ca4230…`) | Tenue |
+| RC4 | OK pour epel9 (`8190707a…`), le même repomd qu'à `hote` 08:30:27 | Tenue, malgré une confiance faible |
+| RC5 | « installation : rc 0 en 5694 s » ; cinq lignes « installé : », aucune « absent » ; systemd-container `252-67.el9_8.6.rocky.0.1` | Tenue |
+| RC6 | « OK   sha256 des rpm conformes aux primary vérifiés : 199 sur 199 » (baseos98 169, appstream98 21, epel9 9), sans écart ; « rpm -K : 199 OK sur 199 » | Tenue |
+| RC7 | « rpm baseos98 rpm-4.16.1.3-40.el9.x86_64.rpm … » ; `./usr/bin/rpm` et `./usr/bin/rpm2cpio` dans l'archive | Tenue : la précondition de N3 et N4 est remplie |
+| RC8 | « caches : /w/cache /w/racine/w/cache » | P6 soutenue (forme corrigée). Le journal ne dit pas si `/w/cache` est resté vide |
+| RC9 / P7 | 361 758 720 octets (moins de 400 Mo comme de 400 Mio) ; OK « archive racine rapatriée », même sha256 `d7433a05…` | **Taille non tenue** (sous la fourchette) ; rapatriement tenu |
+
+P5 est tenue sur ces lignes : les quatre paquets sont installés, avec leurs dépendances, et systemd-container est tiré.
+
+**Relecture de l'archive sur l'hôte** ([`s1-racine-tar.log`](s1-racine-tar.log), le 17/11/2026 à 10:23:32 UTC) : `tar -tf` rc 0,
+13 341 entrées. La taille est un multiple de 10 240 et les 1 024 derniers octets sont nuls. C'est compatible avec une archive close,
+sans le prouver. Le sha256 est le même. `mock`, `podman`, `rpm` et `rpm2cpio` sont présents sous `./usr/bin/`.
+- Deux passages précédents, à 10:21:13 puis 10:21:27 UTC, ont donné les mêmes nombres sans les deux contrôles de fin. Le premier
+  n'a été qu'affiché, et le second a été écrasé : ni l'un ni l'autre n'est archivé.
+
+**Non prédit** :
+- **L'installation a duré 5694 s**, soit environ 1 h 35, sur 1 h 37 d'étape. La cause est inconnue : `install.log` a disparu avec le
+  pod.
+- **201 paquets sont installés pour 199 rpm téléchargés.** L'écart n'est pas expliqué ; `nevra.txt` n'a pas été rapatrié.
+- Invité Kata : noyau 6.18.56, 3 vCPU, 6 119 664 kB ; dnf 4.14.0 ; rpm 4.16.1.3.
+
+**Lectures hors du script pendant le passage** (après la question « ça en est où ? », vers 10:20 UTC) : un `kubectl get pod` et
+deux `kubectl exec` en lecture seule dans `s1-05-racine`, sans rien modifier. Valeurs vues seulement à l'écran, **non archivées** :
+- `/w` était un tmpfs de 3,0G, et non de 4 Gio ;
+- 643M occupés avant l'archive ;
+- `/w/cache` vide ;
+- `install.log` finissait par « Complete! ».
+
+**À traiter avant `essais`** (ne concerne pas `image`, qui ne lance pas de pod) :
+- **P11** suppose 4 Gio de tmpfs (`TMPFS=4Gi`). La valeur vue à l'écran, non archivée, était de 3,0G. Une étape devra la mesurer
+  avant que P11 soit corrigée.
+- **Durée de vie des pods** : chaque pod attend `sleep 10800`. `racine` en a pris 5818 s, de 08:44:02 à 10:21:00. Si mock télécharge
+  au même rythme, le pod d'`essais` peut s'arrêter en plein travail. C'est une décision du propriétaire.
+
+Rien n'a été écrit dans Zot. Le pod est supprimé. L'archive est sous `~/.cache`.
+
+Suite, chaque point sur accord nommé : `image`, `essais`, `verrou`.

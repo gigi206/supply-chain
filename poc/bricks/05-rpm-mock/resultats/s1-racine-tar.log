@@ -1,0 +1,11 @@
+# tar -tf sur l’archive racine rapatriée (hôte), 2026-11-17T10:23:32Z
+tar -tf : rc 0
+entrées : 13341
+taille : 361758720 octets ; reste de la division par 10240 : 0
+octets non nuls dans les 1024 derniers : 0
+sha256 : d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+présent : ./usr/bin/mock
+présent : ./usr/bin/podman
+présent : ./usr/bin/rpm
+présent : ./usr/bin/rpm2cpio
+# fin 2026-11-17T10:23:32Z

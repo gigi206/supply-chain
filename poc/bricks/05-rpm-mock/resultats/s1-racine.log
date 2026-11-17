@@ -1,0 +1,225 @@
+# s1.sh racine, 2026-11-17T08:44:02Z
+### s1-05-racine (kata, uid 0, privilégié, label tekton.dev/task=prefetch-rpm) : prêt
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; /w : tmpfs
+     dnf : 4.14.0 ; rpm : RPM version 4.16.1.3
+     makecache : rc 0 en 56 s
+     caches : /w/cache /w/racine/w/cache 
+     repomd baseos98 : sha256 abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+     repomd appstream98 : sha256 a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+     repomd epel9 : sha256 8190707a6102a679e2407ad880945e376ac119ea27d55b9acb10574d117265b5
+     installation : rc 0 en 5694 s
+     rpm appstream98 aardvark-dns-1.17.1-1.el9_8.x86_64.rpm 0b622b806408e82381b8c83a90f74452364483278f0c701bf20bb6d2d6d586e5
+     rpm appstream98 conmon-2.2.1-2.el9_8.x86_64.rpm 937c0f2ca23239ac0f16d5f1840dbe5130258cb256cb5329c97c42d60f9573d0
+     rpm appstream98 containers-common-5.8-1.el9.x86_64.rpm ca38bed452f780a64a18a14269a3c8bf1fd72c257c4bf738f43424acd07ff80f
+     rpm appstream98 createrepo_c-0.20.1-4.el9.x86_64.rpm 6a12a9566e616076539a7b0eb6c64bae763cd8798e123564ecb467026c434670
+     rpm appstream98 createrepo_c-libs-0.20.1-4.el9.x86_64.rpm b43ab57f35a9cb00fe376ce2f182f38bd74ca610b2252fc8671b60787f472637
+     rpm appstream98 crun-1.27-1.el9_7.x86_64.rpm cd6f649d64489e9424eb65e2b6104a5af47e18e283cb86c8404b9e4e645c0a9d
+     rpm appstream98 fuse-overlayfs-1.16-1.el9_7.x86_64.rpm 32477f8572f098b41680e8b5b6cffea6db954afd3fc055b15c52c28412478d29
+     rpm appstream98 fuse3-3.10.2-9.el9.x86_64.rpm 8a988c30e93b16df00fcf9b67df680fbe79c24a73857976c17ff0117cbf0e3ec
+     rpm appstream98 fuse3-libs-3.10.2-9.el9.x86_64.rpm 53288648d76449d1bef5e7cbf93d008f1ed77fba45f51a3ea33c61952c589aa9
+     rpm appstream98 libslirp-4.4.0-8.el9.x86_64.rpm 0282bb34fc3b3e987068ef397ef9f23ad6bbbac4a9b13b4e8d599245c2f94e47
+     rpm appstream98 netavark-1.17.2-1.el9.x86_64.rpm 35927d6bfe02126a51f967d9ebd5c3373933120776e5d9c35fffba7eddc8864c
+     rpm appstream98 passt-0^20251210.gd04c480-7.el9_8.x86_64.rpm 6c44b3360c14355256f07e7ce2d38d6e1d8f7da71d18f2e75ac0e171bc4d2b7d
+     rpm appstream98 podman-5.8.2-8.el9_8.x86_64.rpm 561d6e4d506fa31ba549257787da32ebe9fb37590ad69a7eb3f694556fde4382
+     rpm appstream98 python3-babel-2.9.1-2.el9.noarch.rpm c55826bfc863379eb10d24d0c587c7e194af00d30a51f7968c52c229a66e4ac8
+     rpm appstream98 python3-distro-1.5.0-7.el9.noarch.rpm cd390e4162f7675ec2af86c265300555b6eba149a04c3fbd8a4bfd0ae7161f80
+     rpm appstream98 python3-jinja2-2.11.3-8.el9_5.noarch.rpm 614c6a8c726785841abd211d19efc1ec08e2cda1852c7b159f366e32718dcda0
+     rpm appstream98 python3-markupsafe-1.1.1-12.el9.x86_64.rpm 84a34118418d2c0554c2add71d7368dbdeb2f99977697b93b62c8db8bb66e879
+     rpm appstream98 python3-pytz-2021.1-5.el9.noarch.rpm 27b4b5390532fd9fcc571914fae871f4a6bac097e2fd5cb93026bdbaaa5a0910
+     rpm appstream98 skopeo-1.22.2-9.el9_8.x86_64.rpm c6cca7fea115d74cfa5c86fa63acae7a6840c5da77bc78a9fb9e4194b2052afd
+     rpm appstream98 slirp4netns-1.3.3-1.el9.x86_64.rpm 561151f23c69273355e79c75b75f0005a79f895af4ee2e85db1bdbefd7e24a1c
+     rpm appstream98 yajl-2.1.0-25.el9.x86_64.rpm c6299ca593a774d2e40b6866dfd427ebbce654fe519b694d15067beaef2eaf9b
+     rpm baseos98 acl-2.4.0-1.el9_8.x86_64.rpm ec46754c9646187acea06332851f70a6714769c7cee332504862b8027cf07ff0
+     rpm baseos98 alternatives-1.24-2.el9.x86_64.rpm f86eaeb883bf10655478306b8aafbb5f14f1b1e37270b177ad59d600a4a86a9e
+     rpm baseos98 attr-2.6.0-1.el9_8.x86_64.rpm d23df955aee6f893dec80bb51cbb844dd8153b80d941f8febe072a3c523b0334
+     rpm baseos98 audit-libs-3.1.5-8.el9.x86_64.rpm 4c22958e01fa6f44140d4afb92418fd012f3dab04a9cbf441b9d931e94422ff7
+     rpm baseos98 basesystem-11-13.el9.0.1.noarch.rpm 9f707e8d1046381c9b4a4df6a6674327df6ffe0298d48e1750972212c97aafad
+     rpm baseos98 bash-5.1.8-9.el9.x86_64.rpm 2c1cfef019e5fecfe00d7a1cde3e34456871b447debb4b32c9aacd8045d3e1f6
+     rpm baseos98 bzip2-libs-1.0.8-11.el9.x86_64.rpm 5fb0a15f1406a01d120dd468ee90a46fc76c10cecffe4750596e3f734eac4571
+     rpm baseos98 ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.noarch.rpm 337922dcc4454005814427f9222d7634ddea3369e36237c6a36b72dfabb45d77
+     rpm baseos98 coreutils-8.32-41.el9_8.1.x86_64.rpm db8cf9b01d7a5302ab618ece248a6ab5a21f3a8b6d7fbf7fabe1a54332ece664
+     rpm baseos98 coreutils-common-8.32-41.el9_8.1.x86_64.rpm 112fe1d5bd1026374254feb3118a2dd49b727d5ba21305e9a67c33c36f86e822
+     rpm baseos98 cracklib-2.9.6-28.el9.x86_64.rpm bdbb75ee38932342f05008bcef9e1ce85bae5a037a0b4b1a697cda0c096e8012
+     rpm baseos98 cracklib-dicts-2.9.6-28.el9.x86_64.rpm 568f1036a8982ccdd2acf8c07846c94b95dbd6b148096fb969b5a7caaf3a495c
+     rpm baseos98 crypto-policies-20260224-1.gitea0f072.el9.noarch.rpm c2126b5911e11a930f109596b6d523acaadc3a080234a3f7ea8a21a753740557
+     rpm baseos98 curl-7.76.1-40.el9_8.9.x86_64.rpm e365f35785f91d5cef0f89acd3b8bde34f3298ad438361fdefa25a80b5361a8b
+     rpm baseos98 cyrus-sasl-lib-2.1.27-22.el9_7.x86_64.rpm dce77bdef6637955b07de109615d76659cb15dd22a73ace9ceb828840aec3bd6
+     rpm baseos98 dbus-1.12.20-8.el9.x86_64.rpm f9ab612861c66de02ad73a0ffb56b2f83b71de2326ea595ffeac47eea517e18f
+     rpm baseos98 dbus-broker-28-9.el9_8.x86_64.rpm fc1775336f65da4c997c0dd832065d679b13a603ab7679c826c9ac3a08bb4c6d
+     rpm baseos98 dbus-common-1.12.20-8.el9.noarch.rpm 1dd8709f43f63277d6305b2ef572cb091ef748ce1588a0bafc95866c397335b9
+     rpm baseos98 dnf-data-4.14.0-34.el9_8.rocky.0.1.noarch.rpm 72247bf8189efe2c18b07a9b449fdda36392096745b54bc0f62f3883c9de65ae
+     rpm baseos98 elfutils-default-yama-scope-0.194-1.el9.rocky.0.1.noarch.rpm a30c820cd8a9077ab8cc4e84ca3bdfe56e3593834a0102fd386528a7dc1a9cd1
+     rpm baseos98 elfutils-libelf-0.194-1.el9.rocky.0.1.x86_64.rpm 0409e21273c5ad14f92b4f4b81feddce2e87835607c2793df39588e78cd872b6
+     rpm baseos98 elfutils-libs-0.194-1.el9.rocky.0.1.x86_64.rpm de8ae102768bbfae4341c0e180e77f65d8b6c08936f57e029c1acd00e9d72210
+     rpm baseos98 expat-2.5.0-6.el9_8.7.x86_64.rpm ebbffb9bff8d91fdd5664ab86b12c9b727fa481fd8221b341df819065211267c
+     rpm baseos98 file-libs-5.39-17.el9.x86_64.rpm 13a48d2be00b4708ca97d815b56ca693a4fcc57060a08991c8eb2b6e0c8356ba
+     rpm baseos98 filesystem-3.16-5.el9.x86_64.rpm cabe98453b9517158c5a045cfec0418b747c874da2717d183f4296f240bdf8d9
+     rpm baseos98 findutils-4.8.0-7.el9.x86_64.rpm 1c9c28792695c61ced41da9337f323111973ba7eea938c3c11944532e384a662
+     rpm baseos98 fuse-common-3.10.2-9.el9.x86_64.rpm 9e778d03985d8927d56daf33728ba17e67e92a697dcc71bbaf372893b646265a
+     rpm baseos98 gawk-5.1.0-6.el9_8.1.x86_64.rpm 2c4c15df252662181879eb632346f80ee4fea8bfe0c6b540192ed8e9b7491ae1
+     rpm baseos98 gdbm-libs-1.23-1.el9.x86_64.rpm bb36dd4e2083f62f26f9e942dd88f72bdbf5a8b67404833ddbbf1a1d6d8bd29f
+     rpm baseos98 glib2-2.68.4-19.el9_8.10.x86_64.rpm 953fe80bbd71428254d5950c4c4adfa19bce99477dd77a7dffe5a6c1054634c7
+     rpm baseos98 glibc-2.34-284.el9_8.4.x86_64.rpm a348c954cd30a72d19fe0f2e2b0f8506483fa0610fb47ebe9c2e59a00743b8d7
+     rpm baseos98 glibc-common-2.34-284.el9_8.4.x86_64.rpm d3409874fdd0172f2b615517f9b63dabc7b2c9a94cbaabf16a9a787de51db0bb
+     rpm baseos98 glibc-minimal-langpack-2.34-284.el9_8.4.x86_64.rpm 655c8d8593421e643961fd0f716fe92d5d56fe6901a8188988a026755590dd6c
+     rpm baseos98 gmp-6.2.0-13.el9.x86_64.rpm ca72ae69218b96c43c82bdc35dd1078300692714db76d21c7f7dedd8268af799
+     rpm baseos98 gnupg2-2.3.3-5.el9_7.x86_64.rpm 47ecef51db73418e387d06247eb44e440f62d65e193673f3d2712d73bc569fa4
+     rpm baseos98 gnutls-3.8.10-9.el9_8.x86_64.rpm bc8438893114e74271ce3a6a6d3b9107662bed475de472137ab92fc667d1753b
+     rpm baseos98 gpgme-1.15.1-6.el9.x86_64.rpm b1f03906b959728fcd17854010d6e1d64cfd42e418a72add2e4bc9cb8b3b1b8d
+     rpm baseos98 grep-3.6-5.el9.x86_64.rpm 9c1beaec9264e08459f9097c9bd58aa6118293df47d6f07f8054054cc7c40544
+     rpm baseos98 gzip-1.12-2.el9_8.x86_64.rpm 49f379593425ecfc94b07df6021fb2e87ba14980edf01371f3ff3e85954e469a
+     rpm baseos98 ima-evm-utils-1.6.2-2.el9.rocky.0.2.x86_64.rpm 9be067d68286a37a4f5b318933efa6dca5a547c1abc6594d2582343c49bc403c
+     rpm baseos98 iptables-libs-1.8.10-11.el9_5.x86_64.rpm 3d9571eeda3a537660d7955bec839c59ec48a59423f49b23e52972a859fceda3
+     rpm baseos98 jansson-2.14-1.el9.0.1.x86_64.rpm 930f3518fb038f6ef27bd3a0cc0960825a7294c94ea213c7707df942699a8f92
+     rpm baseos98 json-c-0.14-11.el9.x86_64.rpm e2e487e4b6d48595612b0785963f0a4294e5dbea8500284ff0df4571afe79c8f
+     rpm baseos98 keyutils-1.6.3-1.el9.x86_64.rpm 1419a90e2ae9546603c2f04d9a7548f80322ff4574c5e77d9be52e51acb98abc
+     rpm baseos98 keyutils-libs-1.6.3-1.el9.x86_64.rpm 347a9d44e0271c1ff6f511fe493e736b3d36fde683360ccc51c852ab91810b16
+     rpm baseos98 kmod-28-11.el9.x86_64.rpm d60b35d04b0f9aec792047990fa6c6ad7b57e8531dfa307ce1987301567fb2a0
+     rpm baseos98 kmod-libs-28-11.el9.x86_64.rpm f994cf4f4d1bea1b5ce9b3f1eb7ec01eba9562cdaa3c7af9fd58fe8771720916
+     rpm baseos98 krb5-libs-1.21.1-10.el9_8.1.x86_64.rpm 58f13ecb5aec8ac94c339f0aa7b14f6b2e57d1a6c7a0ca092f9db4a6c7dcd49e
+     rpm baseos98 libacl-2.4.0-1.el9_8.x86_64.rpm 05e7c03ad5ec358bc850ce3c7ff8164ad3d30a12f4623b2d26d277e1cfffb7f6
+     rpm baseos98 libarchive-3.5.3-11.el9_8.x86_64.rpm 032be918057d604e19d47f7684f2d5318020bcbfe7ba1d7fd1cc66d811468d69
+     rpm baseos98 libassuan-2.5.5-3.el9.x86_64.rpm 5d5e555c9c4dfbd293acdc0ae739b41e635a2239a2c41ce11aafedd1d1ed54f4
+     rpm baseos98 libattr-2.6.0-1.el9_8.x86_64.rpm 015dbf4fe00714a4332aaffc18eb8980c205c8e864314c808ea08bd607f8020e
+     rpm baseos98 libblkid-2.37.4-25.el9.x86_64.rpm 16723cf2603ec80a3e655301d58a256b50e6503a381b238d73c67b7ff1f8acc4
+     rpm baseos98 libbrotli-1.0.9-10.el9_8.1.x86_64.rpm ce72c3ec1513fe852bb654ab141f4014286e09a0ab09c7dd7d79805af1f42200
+     rpm baseos98 libcap-2.48-10.el9_7.1.x86_64.rpm e6152b9a1d44f9903d4e6c16dc778b40566b0cd66dcbbeac5b21fa84c3a38246
+     rpm baseos98 libcap-ng-0.8.2-7.el9.x86_64.rpm eb8a42e8ac59905dfa2aa1530e4fb7a0b994ff4ae5ee79dd4557f972f1316ae8
+     rpm baseos98 libcom_err-1.46.5-8.el9.x86_64.rpm efe6cf30cec41b29ebd8cbcdff587566a4567156420d9166d7cf1e8a365c9c4b
+     rpm baseos98 libcomps-0.1.18-1.el9.x86_64.rpm 1714940a5678ee506f21fe9ca5ad1e8b8feb17807e063d5e3fc156fb09ba3bc3
+     rpm baseos98 libcurl-7.76.1-40.el9_8.9.x86_64.rpm 2f7f20988ad47d37947e9cdd65939352121852a114d0c42f0e6ed790e8536a99
+     rpm baseos98 libdb-5.3.28-57.el9_6.x86_64.rpm d1eddd3b0bbbc9ff5e0b6e985093ae0f09f9b4a11257d871e83542654d5400bc
+     rpm baseos98 libdnf-0.69.0-18.el9.rocky.0.1.x86_64.rpm cf5c640a3f5060618ac34e20cf446e5455f0a4ce90cd27e19b3983fe6213551c
+     rpm baseos98 libeconf-0.4.1-7.el9_8.x86_64.rpm cf817dde9b9cdfefdb0d48bf6d953c3d8e86bacc8778cffd22ef752c47c2a19b
+     rpm baseos98 libevent-2.1.13-1.el9_8.x86_64.rpm 3f5dec4cb901f21e0cd20bdca2a7a30cf2cc1973faa79896c19676dcb75e563b
+     rpm baseos98 libfdisk-2.37.4-25.el9.x86_64.rpm 126b1ef3ed3f179a830dd1c1cf0c346279168b178ea99cc83f19c243e248692d
+     rpm baseos98 libffi-3.4.2-8.el9.x86_64.rpm 1bdb4b3b047169bc728c2612b71c31b79bb6f823f50134629bf650dcbf21565a
+     rpm baseos98 libgcc-11.5.0-14.el9.x86_64.rpm 18bf29de0a554f8f8fccce443801a53a2e9fc7277f6a50c6768707716c9793d9
+     rpm baseos98 libgcrypt-1.10.0-13.el9_8.x86_64.rpm 7f1640e5c53049dfcc180ae98973855d660eae40636312f844eb8f356246a20e
+     rpm baseos98 libgomp-11.5.0-14.el9.x86_64.rpm 3ca3c560177dbfc8378787247e23e2bdf8bae1402190ac69a7082836edb4e60f
+     rpm baseos98 libgpg-error-1.42-5.el9.x86_64.rpm 7d48fb4ca1e935a491cb02a85abdd5b91b329168962c1b11ca434c2b80c079fa
+     rpm baseos98 libidn2-2.3.0-7.el9.x86_64.rpm be32d8ba7ff8cf790c15d89c5ea18747d7fcc0126782a0e80f15901bb9889b31
+     rpm baseos98 libksba-1.5.1-7.el9.x86_64.rpm 889bd55e123a02abe8afc82da4de3f8d6688bfee71148e2032673fbfe83b3445
+     rpm baseos98 libmnl-1.0.4-16.el9_4.x86_64.rpm de67327a302fe3ec5a33d26f600e6450c9b4de408013fe5ca7747cade407131f
+     rpm baseos98 libmodulemd-2.13.0-2.el9.x86_64.rpm c26a812e5a8757489a7e8c01426a5d65e3b4c7f05394d38ecb5eeddff670ecbe
+     rpm baseos98 libmount-2.37.4-25.el9.x86_64.rpm 1523f0e3f959a026500edeb514e19f57108b7dbd1dd5775e60f52ebfe6ac08c8
+     rpm baseos98 libnetfilter_conntrack-1.0.9-1.el9.x86_64.rpm 162fdb1bfe7217bd77f06c19ccf45b274136b434101838ddcafff638fd83cf62
+     rpm baseos98 libnfnetlink-1.0.1-23.el9_5.x86_64.rpm 1ed133b3c950dc1827b7b6139dbe29a59c351679a9a40dcb2c4114e76b810d34
+     rpm baseos98 libnftnl-1.2.6-4.el9_4.x86_64.rpm 53eb14c0ee34f68341db9a096520b4f86b554a109a28f1c9154b07331d8ce3c0
+     rpm baseos98 libnghttp2-1.43.0-6.el9_8.2.x86_64.rpm ee018918e2ce36f0e1c1857b7f999bd472ab3538466b039f19452b8f0f9ab21c
+     rpm baseos98 libpsl-0.21.1-5.el9.x86_64.rpm 30553c652451362ebf346a98ff45fa2417dc25a9a644401b4d86d9000c0346a9
+     rpm baseos98 libpwquality-1.4.4-8.el9.x86_64.rpm d572dfa42d099b58e29fc0c1431c80e1baa4d0555265f79b1a346ebe99ac9ae1
+     rpm baseos98 librepo-1.19.0-1.el9.x86_64.rpm be1d0d67d5ba79c4c78f1345978b1b737deb3f4d99efb246461f008a1528d28b
+     rpm baseos98 libreport-filesystem-2.15.2-6.el9.rocky.0.2.noarch.rpm 60952dd5abd60750912b1b20aa161f03be7d7bff43714500c9ac867d8fdd10bf
+     rpm baseos98 libseccomp-2.5.2-2.el9.x86_64.rpm c5043228059ffb4e2ef855671909b22bd42784907979a27d25ca9f5163408ad1
+     rpm baseos98 libselinux-3.6-3.el9.x86_64.rpm 52f36acacd851901745f7729b7bce31ef7e5fa0fa250a0ce653d4e76dce02664
+     rpm baseos98 libsemanage-3.6-5.el9_6.x86_64.rpm e860232d6250dc38958018f06133f748a7bc93d4439df4a760d30ed889b38455
+     rpm baseos98 libsepol-3.6-3.el9.x86_64.rpm f2f2f1461334547ba64c41ed7666dc3b8014d5a636edc7d22cfeab9689c1f8be
+     rpm baseos98 libsigsegv-2.13-4.el9.x86_64.rpm a80701bd3f67994493b1a14e043d9212032c86fd24374c309cf2b7006900f4da
+     rpm baseos98 libsmartcols-2.37.4-25.el9.x86_64.rpm be4488628bb31823ee6642d546f005ccf7216969644c80e21c32325ba3b87243
+     rpm baseos98 libsolv-0.7.24-6.el9_8.x86_64.rpm b9ed42466502f415e5f3297d78fef14e7a3de412e6243f89735bfa246e077f93
+     rpm baseos98 libssh-0.10.4-19.el9_8.x86_64.rpm 7861a0af920045bd7e5d4212129d266d2eb78f228e31a75936c8171b0bec9271
+     rpm baseos98 libssh-config-0.10.4-19.el9_8.noarch.rpm 887be601839e2d5342a922222c6ec6b0657e3488c9014d2a81145cdaaa414b9e
+     rpm baseos98 libstdc++-11.5.0-14.el9.x86_64.rpm 6080972cc2696fede7a0538f0ecfb4d98c2dbb826cfa076d052e5c71034e447c
+     rpm baseos98 libtasn1-4.16.0-10.el9_8.x86_64.rpm c8be3c9ad78268e5fcf4cc7368dcaf803108e674e5704d69934e73b9680f0b28
+     rpm baseos98 libtool-ltdl-2.4.6-46.el9.x86_64.rpm 2225f18e23d3b4b9e886c1048c93c23c74c32753cb74112812db1f2a688eed53
+     rpm baseos98 libunistring-0.9.10-15.el9.x86_64.rpm 7e8b90a282ec310de6766619056296bdf666f3040f22cff211cd52710b39ece5
+     rpm baseos98 libuser-0.63-17.el9.x86_64.rpm a07bda42467d1af5b7ef7ad384d08effb16c3885cd7b829b8f25fe60a08af947
+     rpm baseos98 libutempter-1.2.1-6.el9.x86_64.rpm 146dca82c8f1df8135ae7d5cc4aa4af35e02e60f1f61143badc9c5f7ff5029b9
+     rpm baseos98 libuuid-2.37.4-25.el9.x86_64.rpm afc71c4a219f1d7940f45b55d33f9db7937a8e78b3f471172c7c787bb9dd8e66
+     rpm baseos98 libverto-0.3.2-3.el9.x86_64.rpm f430f1b95b7467c461c7a745eba07beab00306984f2f21ecfcc04f37100405d1
+     rpm baseos98 libxcrypt-4.4.18-3.el9.x86_64.rpm e3c178ed2e04ac25699d5af612fad51694a23f5d544b72cab2f65d35b8db5f28
+     rpm baseos98 libxml2-2.9.13-14.el9_8.5.x86_64.rpm 2ac1255af0695965f75b5ed7bd2df42b9de8972c2a386e4975cfa699ae988e36
+     rpm baseos98 libyaml-0.2.5-7.el9.x86_64.rpm 8e132d6f32d0bbca9abebc1b62443e1e7fddf873e02d9c1084dce50a87740b09
+     rpm baseos98 libzstd-1.5.5-1.el9.x86_64.rpm c5c8b675cfad29fee013a84a2f70bcb958f400b654ff63455bb80597daae86ab
+     rpm baseos98 lua-libs-5.4.4-4.el9.x86_64.rpm 164f78bdc4b37210c54752761d48a229c935824503d5c591c020e447318a1749
+     rpm baseos98 lz4-libs-1.9.3-5.el9.x86_64.rpm 60f82f4c3f76a543ab247acb37cb439d9de9e40c410ac2f315d6805717d6283e
+     rpm baseos98 mpfr-4.1.0-10.el9.x86_64.rpm 4fed42bddadf9e8da35a2767c91100b6630ec3236dce101a8345e801e34baa4e
+     rpm baseos98 ncurses-base-6.2-12.20210508.el9.noarch.rpm 2116eef9fcf217ba902c7e4d682a4c6fa182dc6d106e8d573d65461f0989bb05
+     rpm baseos98 ncurses-libs-6.2-12.20210508.el9.x86_64.rpm 7f2d8058b975c753388a7180e167c9c610060e6d20bd2212f39d5e7a7d850561
+     rpm baseos98 nettle-3.10.1-1.el9.x86_64.rpm 25182aead477d29ed365a0d0663e91ffa54710e617615ea2b91c7abd9d56b4fd
+     rpm baseos98 nftables-1.0.9-9.el9_8.x86_64.rpm a09d489f6e6f3a4c7724377264b04245476f1f12132632b995bb765f2d104e99
+     rpm baseos98 npth-1.6-8.el9.x86_64.rpm a96a4af76f58645fe34c526c684a45a5a97642c1836bfb3a91ef29520cb21324
+     rpm baseos98 openldap-2.6.8-4.el9.0.1.x86_64.rpm d8b53def51bfdc720f0e5be117498148bb22543e0627fd1f10b7ac3f11fea09a
+     rpm baseos98 openssl-3.5.8-2.el9_8.x86_64.rpm 524e93f217053275befb4cdb4a58299018436564e4a42a65192c0dbf1772f102
+     rpm baseos98 openssl-fips-provider-3.5.8-2.el9_8.x86_64.rpm dfe1cad44079845366a4945b13b3bb78ee47eb554cbbbd59a4d82250f7095ec6
+     rpm baseos98 openssl-libs-3.5.8-2.el9_8.x86_64.rpm c09800fee571b3b4d7e34b652272e6ab7e52a4718fd5ddf2c2181ac438d89ab4
+     rpm baseos98 p11-kit-0.26.4-1.el9_8.x86_64.rpm 1a1fe3ea461295cfdffa8eba7167012a40c75e4ae7ae59e29d7e12d30bb67f5e
+     rpm baseos98 p11-kit-trust-0.26.4-1.el9_8.x86_64.rpm ecfe8f98ead310fa65c61c854c347262ce8d51ab5f15c37b54bd34c410cecefd
+     rpm baseos98 pam-1.5.1-28.el9_8.1.x86_64.rpm 5182eec4d9a58c3958ab91ee8879d762d5c813a8f8fbebc6a75f62463e5675cc
+     rpm baseos98 passwd-0.80-12.el9.x86_64.rpm 384c9c8bb73500e55cf4b1aa68644c857a80cf85f0015e7ac453cec66e0eb439
+     rpm baseos98 pcre-8.44-4.el9.x86_64.rpm d167b64017c547bd39280de99875a7a32a4f869431d9c6fdad46d98ee9480c43
+     rpm baseos98 pcre2-10.40-7.el9_8.x86_64.rpm dc350245c7781a0ac2ffce92e088a22c3741bf967ce7c551d0420cea9ae085eb
+     rpm baseos98 pcre2-syntax-10.40-7.el9_8.noarch.rpm aaff0127ff9456106ca5b4139f93881e75c16502499d378021fba649730ee174
+     rpm baseos98 pigz-2.8-1.el9.x86_64.rpm df4dca9b8f7c2800589297627fef42867d71e31bdde56d964883a046a7864980
+     rpm baseos98 popt-1.18-8.el9.x86_64.rpm 4306e6bb950191170669ccbfe904bf943a94736e910179f9b0db962148fe4bcf
+     rpm baseos98 procps-ng-3.3.17-14.el9.x86_64.rpm feb7c39d75f2f7dbf8a261e0d32ca43788ef6a0bcaa2e0f21a09c46659531e8c
+     rpm baseos98 publicsuffix-list-dafsa-20210518-3.el9.noarch.rpm e21742695de260517bfa5340aaab1360d936b20cd9896ab79ed74e74a0949eb2
+     rpm baseos98 python3-3.9.25-7.el9_8.6.x86_64.rpm 9d58b1b8c839be1a439511605d2570a817a98413408ff3da00adbcf6b8d9e997
+     rpm baseos98 python3-chardet-4.0.0-5.el9.noarch.rpm 4e008edccf057f53fae0f3ea62c40d9487cb3e6272a347a39bd27d2b67c0ade9
+     rpm baseos98 python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch.rpm 701bb87cb986ae06efe67d6ef9a1a05439c1caefe51739b26548d89d944606fd
+     rpm baseos98 python3-gpg-1.15.1-6.el9.x86_64.rpm 72188c95aa7428a19161e7cc893cbae63a6a197c525615c993691c2f26ebc259
+     rpm baseos98 python3-hawkey-0.69.0-18.el9.rocky.0.1.x86_64.rpm 87cc3b0fdaecc06e94b65bef96e4bd1794d2649d9dbb88866d9b4a3cd0dc33da
+     rpm baseos98 python3-idna-2.10-8.el9_8.noarch.rpm f50ba5314f98c47d4cd2dad041084a0a181181b352f5a7c98b3871e13518911a
+     rpm baseos98 python3-libcomps-0.1.18-1.el9.x86_64.rpm 11340835e8dd98ea9e9f3bf4e4b5f0c3c43a8aa60c7703ae7923b6c45c05aa05
+     rpm baseos98 python3-libdnf-0.69.0-18.el9.rocky.0.1.x86_64.rpm 6de09f4db0a242f2e6534f89600eedfcec92dc28995d17635d8a35b16b931096
+     rpm baseos98 python3-libs-3.9.25-7.el9_8.6.x86_64.rpm 0d4f8fa8b74e8a7462b73a01344c7ce2f689c3c118856f5d8389e9a8b1defa57
+     rpm baseos98 python3-pip-wheel-21.3.1-2.el9_8.rocky.0.1.noarch.rpm 19fc45a6478f005563edfdc26e454f4d120a12ba5b60645d9f7ecbf57de3fb2d
+     rpm baseos98 python3-pysocks-1.7.1-12.el9.0.1.noarch.rpm da293d125ee6128f6ae63d48f88febd4ff073dbc346977d4a9ef1b284c96c09f
+     rpm baseos98 python3-requests-2.25.1-10.el9_6.noarch.rpm e1c43b90f6fc34222185c4c8bc94ed18ece17577db0256750869b11f6eb4a187
+     rpm baseos98 python3-rpm-4.16.1.3-40.el9.x86_64.rpm b47e984fa4ec5468a8856334564eed644e9e27ff2dfa04ce7e7b263d9d101227
+     rpm baseos98 python3-setuptools-53.0.0-15.el9.noarch.rpm 22be8d1a2f5976077e2ac33420a4cb4f0fceb5f97235059b89042eb939691b83
+     rpm baseos98 python3-setuptools-wheel-53.0.0-15.el9.noarch.rpm 9f77e9d42709dca0a92b6e1edc76a84406ec2b808cbebb4d570eff3dc51b886e
+     rpm baseos98 python3-six-1.15.0-9.el9.noarch.rpm 752fc8b137a10cedd07c59478bd0822830d7502b7ce6d5cbb5c5f8cb5b4f1f1c
+     rpm baseos98 python3-urllib3-1.26.5-8.el9_8.2.noarch.rpm b51c431b0c5e6f014ea73280bfd8d178a1e3dc5906cd5056fc7a3e360a34a5b7
+     rpm baseos98 readline-8.1-4.el9.x86_64.rpm b85f5cffef627afe640cf7405845cb45956d66ef5a06e7c48dc7da47a7191674
+     rpm baseos98 rocky-gpg-keys-9.8-1.2.el9.noarch.rpm 42b553360b45570683084a47bf929a8cb68a98b43e5300c4461a0af349789574
+     rpm baseos98 rocky-release-9.8-1.2.el9.noarch.rpm 847f7d31b99683faf068d7af75c7d05bc51703d2b753adeaa1c851d894e7f0ea
+     rpm baseos98 rocky-repos-9.8-1.2.el9.noarch.rpm add43a8e5382026bb58e7b67fc442356e0e8138b700a790bc8bb765b34c5bc2a
+     rpm baseos98 rpm-4.16.1.3-40.el9.x86_64.rpm 5a6be9d462199f8fd149667f71b243ded18ff0297c73893f845b413b4d075cbf
+     rpm baseos98 rpm-build-libs-4.16.1.3-40.el9.x86_64.rpm 65382d2f65219f732a1951853d0c1ab8630ac3b819b42d4c2d2b957aafb95e75
+     rpm baseos98 rpm-libs-4.16.1.3-40.el9.x86_64.rpm 20b6df9f44648b6958ac8c3ca6eb2597a93753ccda4eb06cd2220a170f39a376
+     rpm baseos98 rpm-sign-libs-4.16.1.3-40.el9.x86_64.rpm fcbeb250428a86904039da560ff00b81c73f22dd77ab82f3f8fa4a6341266e04
+     rpm baseos98 sed-4.8-10.el9_8.x86_64.rpm 8cdc4f22b8b9be0ec13c4ff14181652081456f1bac5b2e354b3ade826394b94e
+     rpm baseos98 setup-2.13.7-10.el9.noarch.rpm 7a8a464a72c41f39eb4d4c47d33bd889b36d5c1d9eeb293c7d0a03b1b594743c
+     rpm baseos98 shadow-utils-4.9-16.el9.x86_64.rpm a357f6a74421df1d9aaf1fa6c71bae6f5d82d5e2334e624f0c3479c0f4ddfeb6
+     rpm baseos98 shadow-utils-subid-4.9-16.el9.x86_64.rpm 9ccb728e83910880e031544751fd8ef043766c1a0655784e0ff8375eddc13504
+     rpm baseos98 sqlite-libs-3.34.1-11.el9_8.x86_64.rpm 7150f09994a94181f9c6d3fce29abf922c20ae3d90683d2f0e535fa72ec04876
+     rpm baseos98 systemd-252-67.el9_8.6.rocky.0.1.x86_64.rpm ccc3ceac309c0829ec7a6c03cc22a95f131041098e58b82dca823b6327c6f166
+     rpm baseos98 systemd-container-252-67.el9_8.6.rocky.0.1.x86_64.rpm 31fe02dcca83ea9207f5d886d9479e131a39e1c34aa08f7d36283ee048d16a10
+     rpm baseos98 systemd-libs-252-67.el9_8.6.rocky.0.1.x86_64.rpm 323d37ea3cdb339955f875a3686580dd668db33c781306e49744a18751b543ae
+     rpm baseos98 systemd-pam-252-67.el9_8.6.rocky.0.1.x86_64.rpm fd5022a6892543d143fff8c5b143775c51666966c10120d2ab26ecbe795f4ad6
+     rpm baseos98 systemd-rpm-macros-252-67.el9_8.6.rocky.0.1.noarch.rpm 8a2be045005e4317db4c38a1c4e120d7f27f3485682d0d5e945b8a3741017d39
+     rpm baseos98 tar-1.34-13.el9_8.x86_64.rpm 61d7dfb8258648db7c23baae3b9cd578056d4762a2ab4b4e5c8f28316c4db1a7
+     rpm baseos98 tpm2-tss-3.2.3-1.el9.x86_64.rpm 943b2d0a196739af7ffb0a9d73a914fa0b94c192f91417f3d1a197198e4ecc88
+     rpm baseos98 tzdata-2026f-1.el9_8.noarch.rpm e7b667d0803c25fee4dc9ced528249aa2d26a438a7b63430b92a343aeb031d30
+     rpm baseos98 usermode-1.114-7.el9.x86_64.rpm 182abde6c24869f0b7b75ad2fafff0400d4e4871c11f3e4791f8e6bba5fdd996
+     rpm baseos98 util-linux-2.37.4-25.el9.x86_64.rpm f7fa828340b7a98271b735bd126a03232bf8571275ffe034ccc2cfd6174526f1
+     rpm baseos98 util-linux-core-2.37.4-25.el9.x86_64.rpm d0a349517a568014cef239ddc66095a604af6b7ea89eacecb4174b40a3671cf5
+     rpm baseos98 xz-libs-5.2.5-8.el9_8.1.x86_64.rpm 9448b78049827ff885b8fae8a4d56d6fe4a800edea89e62eefe8822b8e0d361c
+     rpm baseos98 zlib-1.2.11-40.el9.x86_64.rpm fcd8ca717c72aeb30ea69b4f892dc021e507d8835e7b03aff501cb094db083ea
+     rpm epel9 distribution-gpg-keys-1.123-1.el9.noarch.rpm c19e17c6c7a2ea43c7828a15c1af30aafda672c871e18672edf62ba26b96ea0c
+     rpm epel9 iptables-legacy-1.8.10-11.1.el9.x86_64.rpm 0763c43bb02af90f102f81e21accea6d963de235d3fd089852bea28d9cfc3008
+     rpm epel9 iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm cc5b752bd2bd4cb3c959ef9598f65164a3aba85c86ab8934a886de1659d44603
+     rpm epel9 mock-6.9-1.el9.noarch.rpm a5043350d6d3efd92340f6d6fb221d720f6029ee8a9a8d09210d58f17752ba1e
+     rpm epel9 mock-core-configs-45.2-1.el9.noarch.rpm 84f19c05198b84454bd8f82bf791b3f82c4a7a9c7c4e35a29b7556d50908ccf6
+     rpm epel9 mock-filesystem-6.9-1.el9.noarch.rpm b3f459048743ef5387d8aa33ecab0341b955becbaba5a2ada9068810e9e44ad0
+     rpm epel9 python3-backoff-2.2.1-1.el9.noarch.rpm 6a0f7e7b84479c323a08d1ddca1ecdd673f58a2c77441b3df931016641aa8235
+     rpm epel9 python3-pyroute2-0.5.14-3.el9.noarch.rpm a009a671a5fb1afe6d678d385cc3007c9379f929971c0e1999ab02081b2edb21
+     rpm epel9 python3-templated-dictionary-1.5-1.el9.noarch.rpm 6f9604cf2dc765b46e881bbd77ee300b1f0cfc5775086c590dddb09c5c60d2df
+     rpm -K : 199 OK sur 199
+     paquets installés : 201
+     installé : mock-0:6.9-1.el9.noarch
+     installé : mock-core-configs-0:45.2-1.el9.noarch
+     installé : podman-6:5.8.2-8.el9_8.x86_64
+     installé : skopeo-2:1.22.2-9.el9_8.x86_64
+     installé : systemd-container-0:252-67.el9_8.6.rocky.0.1.x86_64
+     archive racine : 361758720 octets, sha256 d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+     (code de l'exec : 0)
+OK   repomd baseos98 lu par dnf dans le pod = repomd vérifié sur l'hôte : abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+OK   repomd appstream98 lu par dnf dans le pod = repomd vérifié sur l'hôte : a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+OK   repomd epel9 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8190707a6102a679e2407ad880945e376ac119ea27d55b9acb10574d117265b5
+paquets contrôlés : appstream98 21, baseos98 169, epel9 9
+OK   sha256 des rpm conformes aux primary vérifiés : 199 sur 199
+OK   archive racine rapatriée : d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+pod s1-05-racine supprimé
