@@ -1,0 +1,47 @@
+# kyverno-120-selection.sh, 2026-11-17T19:06:29Z
+## releases (lecture publique)
+v1.20.0 publiée 2026-11-12T09:32:42Z, préversion false
+v1.20.0-rc.5 publiée 2026-11-11T14:23:35Z, préversion true
+v1.20.0-rc.4 publiée 2026-11-10T18:21:33Z, préversion true
+OK   v1.20.0 préversion : false
+épinglé au dépôt : "aqua:kyverno/kyverno" = "1.19.2"
+## commit edd8b239e393 (sélection de l'attestation la plus récente pour l'ImageValidatingPolicy)
+titre : fix(imageverify): extract newest attestation for ImageValidatingPolicy (#18049)
+OK   présent dans v1.20.0 (compare v1.20.0...edd8b239e393) : behind
+OK   absent de v1.19.2 (compare v1.19.2...edd8b239e393) : diverged
+## pkg/image/verifiers/ivpol/cosign/timestamp.go
+KO   timestamp.go à v1.19.2 : obtenu « {"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/contents#get-repository-content","status":"404"}absent », attendu « absent »
+blob à v1.20.0 : 46b9ee05d32e6544ef25c57744b9f939657bf75e
+OK   fonction selectNewestAttestation
+OK   1. date vérifiée du bundle, si tous les candidats en ont une
+OK   2. sinon date de l'énoncé signé, si tous en ont une
+OK   3. sinon refus (« unable to determine newest »)
+OK   à date égale : départage par les octets du contenu
+OK   clés de date de l'énoncé : finishedOn
+OK   clés lues aussi sous runDetails.metadata
+OK   date RFC 3161 du bundle seulement avec un TrustedMaterial
+OK   mentions de PipelineRun (aucun filtre par type d'exécution) : 0
+## pkg/image/verifiers/ivpol/cosign/verifier.go
+blob à v1.19.2 : 54ce02b619fcec83d5cd9cf55604cc064ffcd7da
+blob à v1.20.0 : aab58bae5f03a36da03e1daa4fed82e5bb823f93
+OK   appels de selectNewestAttestation à v1.19.2 : 0
+OK   appels de selectNewestAttestation à v1.20.0 (par attestor, puis entre attestors) : 2
+KO   TrustedMaterial nil sur le chemin rapide des attestors à clé (commentaire du code) (motif absent : it is nil when checkOptions took the skipSigstoreInfra fast path for key/cert attestors)
+## fonctions CEL de l'ImageValidatingPolicy (pkg/cel/libs/imageverify/lib.go)
+v1.19.2 : extractPayload getImageData verifyAttestationSignatures verifyImageSignatures 
+v1.20.0 : extractPayload getImageData verifyAttestationSignatures verifyImageSignatures 
+OK   extractPayload à v1.20.0 : (image, attestation) → une valeur : []*cel.Type{cel.StringType, cel.StringType},
+## sdk (imagedataloader) : une provenance par type de prédicat
+v1.19.2 : github.com/kyverno/sdk v0.0.0-20261008171927-5a61cbc9e077
+OK   v1.19.2 : AddVerifiedIntotoPayloads écrase par type : 1
+v1.20.0 : github.com/kyverno/sdk v0.0.0-20261104161951-ec436f305bf4
+OK   v1.20.0 : AddVerifiedIntotoPayloads écrase par type : 1
+## PR 18010 (même idée, autre moteur)
+fichiers : pkg/engine/internal/imageverifier.go pkg/engine/internal/utils.go pkg/engine/internal/utils_test.go 
+OK   fichiers hors de pkg/engine/ : 0
+OK   fusion de 18010 dans v1.20.0 : behind
+OK   fusion de 18010 absente de v1.19.2 : diverged
+## nos politiques (dépôt)
+OK   déclarations ClusterPolicy dans la 08 et le banc kyverno-seul : 0
+ImageValidatingPolicy : 4 déclarations
+## bilan : KO présent
