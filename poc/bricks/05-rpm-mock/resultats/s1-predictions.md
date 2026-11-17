@@ -760,3 +760,81 @@ réécrit. Aucun pod lancé. La place prise dans Zot n'a pas été relevée.
 
 Suite, chaque point sur accord nommé : avant `essais`, la taille du tmpfs (P11) et la durée de vie des pods (`sleep 10800`) ;
 puis `essais`, puis `verrou`.
+
+## Correctif durée de vie et place, préparé à sec (note du 2026-11-17, écrite à 2026-11-17T11:02:05Z ; rien n'est réécrit ; NON APPLIQUÉ)
+
+Deux décisions du propriétaire, prises le 17/11/2026 :
+- Question : « Je passe le sleep des pods de 10800 à 43200 s (12 h) ? ». Réponse : « Oui, 12 h ».
+- Question : « J'ajoute aussi la ligne df -k /w en tête de SONDE, dans ce même correctif ? ». Réponse : « Oui, ajoute df ».
+
+**Correctif** : [`../s1-duree.patch`](../s1-duree.patch), une ligne retirée et six ajoutées. Copie modifiée de `s1.sh` :
+sha256 `a61fa50e…`, écrite par [`s1-duree-modifier.py`](s1-duree-modifier.py) à partir de `ad16fc99…`.
+- `pod_spec` : `command: ["sleep", "43200"]` au lieu de `["sleep", "10800"]`, pour les pods de `racine`, `essais` et `verrou`.
+- `SONDE`, juste après la ligne des montages : `df -k /w`, qui affiche « capacité de /w : … kB ; utilisés : … kB ».
+- Quatre lignes d'en-tête, marquées NON APPLIQUÉ, citent les deux décisions.
+
+**Pourquoi la durée de vie**
+- Le pod est en `restartPolicy: "Never"` : c'est lu dans `s1.sh` et cela figure dans le JSON du banc. À la fin du `sleep`, le
+  conteneur s'arrête sans être relancé, et le tmpfs `/w` de l'invité Kata disparaît avec lui. C'est le comportement attendu de
+  Kubernetes, non mesuré ici.
+- Seul rythme mesuré : `racine` a installé 199 rpm en 5694 s ([`s1-racine.log`](s1-racine.log)), soit 28,6 s par rpm, cause
+  inconnue. À ce rythme, 10 800 s couvrent environ 377 rpm, et 43 200 s environ 1 509. Que mock suive ce rythme est une
+  hypothèse. Le nombre de paquets du buildroot n'est mesuré nulle part.
+- Une borne trop longue ne coûte que si le script est interrompu. Le pod resté en place demande alors 6 Gi, plus 320 Mi
+  d'overhead de la RuntimeClass `kata`. L'allouable de `sc-build` est de 10 189 584 Ki, soit 9,72 Gio. Ces deux valeurs ont été
+  lues par `kubectl` le 17/11, **non archivées**. Par le seul calcul sur les requêtes, un second pod ne serait pas planifié :
+  `pod_demarrer` finirait en KO visible.
+
+**Pourquoi la ligne `df`**
+- Mesure archivée dans la 06 ([`s1-essais.log`](../../06-deb-sbuild/resultats/s1-essais.log), 10/11/2026, `aa0f54f6…`), avec la
+  même spec de volume (`TMPFS=4Gi`, `sizeLimit: $t` dans le `s1.sh` de `15fd899`, relu le 17/11) :
+  - sous Kata, deux pods montrent `/w` en « tmpfs rw,relatime », sans `size=` (lignes 10 et 34) ;
+  - sous runc, le même volume montre « size=4194304k » (ligne 49).
+- Le 3,0G vu à l'écran pendant `racine` est compatible avec la moitié des
+  6 119 664 kB de `MemTotal` de l'invité ([`s1-racine.log`](s1-racine.log), ligne « invité »), soit 3 059 832 kB. C'est la taille
+  par défaut d'un tmpfs d'après la documentation du noyau, non relue ici : c'est une **hypothèse**. Le 3,0G venait de
+  `df -h /w`, lancé par `kubectl exec` (transcript de la session) ; sa sortie n'est pas archivée. Le `df` de coreutils est dans
+  l'image : la ligne « rpm baseos98 coreutils-8.32-41.el9_8.1.x86_64.rpm … » figure dans [`s1-racine.log`](s1-racine.log).
+- La ligne des montages de `SONDE` ne lit que les options de montage. Sous Kata, elle n'aurait donc pas donné la capacité.
+- La ligne `df` est lue avant mock. P9 et P10, et les durées de mock, gardent leur sens. La phrase « `SONDE` reste inchangée » de
+  la note N3/N4 ne vaut plus, une fois ce correctif appliqué, que pour ce qui suit cette ligne.
+
+**Bancs, hors cluster, hors Zot et hors réseau**
+- [`s1-duree-banc.sh`](s1-duree-banc.sh) sur la copie `a61fa50e…`, le 17/11/2026 de 10:57:45 à 10:57:47 UTC : **30 OK, 0 KO**
+  ([journal](s1-duree-banc.log)) :
+  - le diff ne change que les lignes voulues ;
+  - le JSON de `pod_spec` ne diffère que par la commande ; `restartPolicy` reste `Never`, et le volume `/w` reste inchangé ;
+  - `MOCK_CFG` et `STOCKAGE`, `etape_image`, `SONDE_N34`, `SONDE_VERROU`, `etape_essais` et `etape_verrou` sont identiques
+    octet pour octet ; `SONDE` est identique une fois la ligne `df` retirée ;
+  - la couche de configuration rejouée depuis la copie redonne `f5710d47…`. L'image `99790c13…` déjà dans Zot n'est donc pas à
+    repousser ;
+  - `bash -n` passe, et shellcheck 0.11.0 donne 13 remarques dans les deux fichiers ;
+  - la ligne `df`, lancée par `sh` sur le tmpfs `/dev/shm` de l'hôte à la place de `/w`, affiche les mêmes nombres que `df -k`.
+- Banc N3/N4 ([`s1-n34-banc.sh`](s1-n34-banc.sh)) sur la même copie, le 17/11/2026 à 10:57:58 UTC : **35 OK, 0 KO**
+  ([journal](s1-duree-banc-n34.log)). Hors en-tête et bilan, le journal est identique à celui du 16/11 sur `ad16fc99…`
+  ([`s1-extras-banc-n34-applique.log`](s1-extras-banc-n34-applique.log)).
+- Le banc `extras` n'est pas repassé : son contrôle des lignes changées ne vise que le diff `extras`. Ce qu'il vérifie dans
+  `MOCK_CFG` et `SONDE` est couvert par l'identité octet pour octet ci-dessus.
+- **Passages antérieurs**, sur une première copie `54e68c47…` (sleep seul, avant « Oui, ajoute df ») :
+  - premier passage du banc, à 10:55:57 UTC : 24 OK et un seul KO, dû au banc ([journal](s1-duree-banc-premier-passage.log)). Il comptait
+    `10800` dans toute la copie, y compris dans la ligne d'en-tête « au lieu de 10800 ». Le contrôle ne porte désormais que sur
+    les lignes hors commentaire. Ce journal a été produit par une version antérieure du banc, non archivée ;
+  - les passages suivants sur cette copie (25 OK pour le banc de durée, 35 OK pour le banc N3/N4, à 10:56:12 UTC) ne sont pas
+    archivés. Cette copie a été abandonnée.
+
+**P11 corrigée** (l'ancienne ligne reste dans le tableau ; elle supposait 4 Gio de tmpfs) :
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| P11 (corrigée) | La ligne `df` donne une capacité de `/w` entre 3 040 871 et 3 145 728 kB (ce que `df -h` arrondit à « 3,0G »), probablement 3 059 832 kB, et non 4 194 304 kB | Moyenne : 3,0G vu à l'écran, non archivé ; la moitié de `MemTotal` est une hypothèse |
+| P11b | `/w` ne se remplit pas : aucune ligne « No space left on device » dans `s1-essais.log` ni dans `s1-essais-mock.log`, et le code de l'exec de la sonde n'est pas 137 | Faible : aucune mesure du buildroot |
+| P13 | La sonde finit sur « (code de l'exec : 0) », et la ligne « fait » d'`essais` est écrite dans `chrono.tsv` moins de 43 200 s après sa ligne de début | Moyenne : un seul rythme mesuré, celui de `racine` |
+
+Chemin KO de P13, d'après la lecture du code : si le pod s'arrêtait avant la fin, la ligne des journaux de mock (484) finit par
+`|| true` et ne bloque pas. Le premier `livrer` qui suit échouerait en revanche sous `set -euo pipefail`, et l'étape s'arrêterait
+sans ligne « fait ».
+
+Rien n'est appliqué à `s1.sh`. Rien n'est lancé.
+
+Suite, chaque point sur accord nommé : appliquer le correctif (une ligne datée à l'en-tête de `s1.sh`) et le commiter ; puis
+`essais`, puis `verrou`.

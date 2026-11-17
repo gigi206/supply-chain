@@ -1,0 +1,40 @@
+# banc-duree.sh, 2026-11-17T10:57:45Z, jq-1.8.1
+# s1.sh du dépôt ad16fc9909308b2e8f2703114ed0e37e67b73095b9f3b32128890bd4d81a3e63 ; copie modifiée a61fa50ee41dff7bfda6215079e55076a37f5ae6ee226b6d1c80701fb6cf17f0
+## A : lignes changées
+OK   lignes retirées : 1
+OK   lignes ajoutées : 6
+OK   ligne retirée : 1
+OK   ligne ajoutée hors en-tête : 1
+OK   lignes ajoutées en commentaire : 4
+OK   ligne df ajoutée : 1
+OK   occurrences de 10800 hors commentaires dans la copie : 0
+## B : pod_spec
+OK   commande avant : ["sleep","10800"]
+OK   commande après : ["sleep","43200"]
+OK   reste du pod identique : deed0b758c1534d524f42cf691469de9b01079c54651f4883a73b534c34492e3
+OK   restartPolicy après : Never
+OK   volume /w après : [{"emptyDir":{"medium":"Memory","sizeLimit":"4Gi"},"name":"w"}]
+## C : blocs inchangés
+OK   MOCK_CFG et STOCKAGE identique : 1000 caractères
+OK   etape_image identique : 1768 caractères
+OK   SONDE_N34 identique : 1543 caractères
+OK   SONDE_VERROU identique : 2430 caractères
+OK   etape_essais identique : 1253 caractères
+OK   etape_verrou identique : 2002 caractères
+OK   SONDE identique hors la ligne df : 3023 caractères
+OK   ligne df juste après la ligne des montages
+## D : couche de configuration de l'image
+OK   garde de sha256 de banc-config.py : 1
+OK   banc-config.py adapté : une seule ligne change : 2
+OK   couche-config.tar rejouée depuis la copie : f5710d475bc0e83b67701a96b5aa3dbd01fe971d2d68f097358019c72ba52560
+## E : bash -n et shellcheck
+OK   bash -n de la copie
+OK   version de shellcheck : 0.11.0
+OK   shellcheck -S warning de la copie : code : 0
+OK   remarques shellcheck (tous niveaux), dépôt puis copie : 13 13
+## F : ligne df sous sh
+OK   ligne df dans la copie : 1
+OK   /dev/shm est un tmpfs : tmpfs
+sortie : capacité de /w : 32123936 kB ; utilisés : 180 kB
+OK   sortie de la ligne df : capacité de /w : 32123936 kB ; utilisés : 180 kB
+# bilan : tenu, fin 2026-11-17T10:57:47Z
