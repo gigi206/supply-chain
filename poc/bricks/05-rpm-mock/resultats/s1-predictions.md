@@ -2774,3 +2774,27 @@ lance-le ». Lancée le 17/11/2026 de 20:05:54 à 20:06:12 UTC (`date -u` avant 
 
 Suite : accord de lancement de `m3_reseau`, qui **pose `construction-rpm-sans-sortie` dans le cluster** ; elle y restera. Rien
 d'autre n'est lancé.
+
+## Étape `m3_reseau` passée (note du 2026-11-17, écrite à 2026-11-17T20:07:47Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « Je lance m3_reseau, qui pose construction-rpm-sans-sortie dans le cluster ? », réponse
+« Oui, lance-le ». Lancée le 17/11/2026 à 20:07:12 UTC (`date -u` avant et après, même seconde ; `chrono.tsv`), code 0,
+`s1.sh` `06c2da46…` ([journal](s1-m3_reseau.log)). **Écriture dans le cluster** : NetworkPolicy
+`builds/construction-rpm-sans-sortie` créée ; elle reste posée.
+
+| # | Tenue ? | Mesure |
+|---|---|---|
+| PR1 | Oui | Politique du dépôt lue par le vrai `kubectl create --dry-run=client -o json`, égale à l'attendu (namespace, nom, sélecteur `construire-rpm`, types `Egress` et `Ingress`, aucune règle) ; admise en dry-run serveur ; « created » |
+| PR2 | Oui | Relue dans le cluster : sélecteur, types et règles vides conformes ; « politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : » vide ; aucune ligne `jq: error` dans le journal ; code 0 |
+
+**Lecture** :
+- Politiques de `builds` relevées (sans pari) : quatre NetworkPolicy (`builder-sans-sortie`, `construction-deb-sans-sortie`,
+  `construction-rpm-sans-sortie`, `construction-sans-sortie`) et quatre CiliumNetworkPolicy (`builds-sans-internet`,
+  `prefetch-deb-sortie`, `prefetch-rpm-sortie`, `prefetch-sortie`). L'évaluateur `selecteurs.jq` de la 08 ne trouve aucune
+  autorisation pour le label `construire-rpm`.
+- `prefetch-deb-sortie` figure dans le cluster ; cette relecture ne dit pas depuis quand.
+- Ce passage mesure la pose et la lecture de la politique, pas son effet. L'effet se mesurera aux témoins de `m3_build1`, dans
+  un pod au label `construire-rpm`.
+- L'en-tête du fichier de la politique dit toujours « PROPOSITION, NON POSÉE » : il reste tel quel, cette note fait foi.
+
+Suite : accord de lancement de `m3_restauration` (lecture seule dans Zot). Rien d'autre n'est lancé.
