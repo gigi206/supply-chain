@@ -1,0 +1,12 @@
+# relecture sur l'hôte de l'image d'essai (lecture seule), 2026-11-17T10:43:30Z, crane 0.20.6
+crane digest du tag :s1 : rc 0
+OK   digest du tag :s1 (IM4) : sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+OK   contenu de image.digest : sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+manifeste : application/vnd.oci.image.manifest.v1+json ; config application/vnd.oci.image.config.v1+json sha256:d3002ab075686a9355bca64963934f6b80bc657ae17d5ca49c1dcd674762b672 ; couches application/vnd.oci.image.layer.v1.tar+gzip
+couche sha256:e48fc4d689daa5ec7af47350d996f93d76a138ff7267aed6972feefe3e4526bd 140611406 octets
+couche sha256:fd00cdb1ac39ed07d03836b05bd7c24cf435e68a2b29d63403e5dfc4610ac157 825 octets
+OK   digest de config : sha256:d3002ab075686a9355bca64963934f6b80bc657ae17d5ca49c1dcd674762b672
+config : os linux ; architecture amd64 ; Env PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root ; created 0001-01-01T00:00:00Z ; history 2
+OK   config (banc) : os linux ; architecture amd64 ; Env PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root ; created 0001-01-01T00:00:00Z ; history 2
+tags du dépôt : s1
+# fin, 2026-11-17T10:43:32Z

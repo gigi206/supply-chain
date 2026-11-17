@@ -1,0 +1,6 @@
+# s1.sh image, 2026-11-17T10:43:08Z
+OK   configuration prête : racine et bootstrap_image_ready changés, rien d'autre : 4
+configuration de mock : sha256 a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31
+couche sha256:e48fc4d689daa5ec7af47350d996f93d76a138ff7267aed6972feefe3e4526bd 140611406 octets
+couche sha256:fd00cdb1ac39ed07d03836b05bd7c24cf435e68a2b29d63403e5dfc4610ac157 825 octets
+image d'essai : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771

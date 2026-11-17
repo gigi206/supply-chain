@@ -727,3 +727,36 @@ calcul borné à `05ac074` redonne 46 commits et 4,93 h. Jusqu'à `b70f384`, on 
 estimées. Le seuil de décision est à 5 pw. Le temps des passages eux-mêmes n'est pas compté par cette méthode.
 
 Suite, chaque point sur accord nommé : `image`, puis `essais` (avant lui : taille du tmpfs, durée de vie des pods), puis `verrou`.
+
+## Étape `image` : résultat (note du 2026-11-17, écrite à 2026-11-17T10:45:04Z ; rien n'est réécrit)
+
+Question : « Je lance image ? ». Réponse : « Oui, lance image ». Commande : `env -u PREFIXE DISTRO=rke2 mise exec --
+poc/bricks/05-rpm-mock/s1.sh image </dev/null`, sur `02e51dd`, en arrière-plan, sous `bash -c`. Elle a tourné le 17/11/2026, de
+10:43:08 à 10:43:19 UTC (`date -u` autour de la commande, et `chrono.tsv`). Journal : [`s1-image.log`](s1-image.log), sha256
+`53edf4bf…`, six lignes, égal à la sortie écrite dans un fichier du scratchpad. Le code 0 a été lu par `PIPESTATUS` dans ce même
+scratchpad, non archivé ; la ligne « fait » de `chrono.tsv` le corrobore.
+
+| | Mesure | Verdict |
+|---|---|---|
+| IM1 | Six lignes ; « OK   configuration prête … : 4 » ; « configuration de mock : sha256 a8e5f2bc… » ; deux lignes « couche » ; « image d'essai : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13… » | Tenue |
+| IM2 | Le journal ne contient que les six lignes attendues, dont les lignes « couche » et « image d'essai » écrites après `append` et `mutate` ; la ligne « fait » de `chrono.tsv` est présente | Tenue |
+| IM3 | `e48fc4d6…` 140 611 406 octets, puis `fd00cdb1…` 825 octets, dans cet ordre | Tenue : digests et tailles égaux au banc |
+| IM4 | Digest `99790c13…`, égal au banc ; `$T/image.digest` le contient (relecture) | Tenue |
+| IM5 | 11 s entre « 05 S1 image » et « 05 S1 image fait » | Tenue |
+
+**Relecture sur l'hôte**, annoncée avant le passage ([journal](s1-image-relecture.log), [script](s1-image-relecture.sh)), le
+17/11/2026 de 10:43:30 à 10:43:32 UTC, en lecture seule, avec le fichier d'authentification d'`amorce` désigné par son nom :
+- le tag `:s1` résout en `99790c13…`, et `$T/image.digest` contient la même valeur ;
+- le manifeste est OCI, et sa config `d3002ab0…` est égale à celle du banc ;
+- config : `os` linux, `architecture` amd64, `Env` `PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root`, `created` à
+  `0001-01-01T00:00:00Z`, deux entrées d'`history`, comme au banc ;
+- `:s1` est le seul tag du dépôt.
+
+Le banc en loopback (10:36 UTC) et Zot (10:43 UTC) donnent le même digest d'image : deux registres, sept minutes d'écart, le même
+crane 0.20.6 et la même `racine.tar`. Rien d'autre n'est mesuré.
+
+Écrit dans Zot : dépôt `essais-05/mock-rocky9`, tag `:s1`. Le dépôt et ses blobs ne peuvent pas être supprimés ; le tag peut être
+réécrit. Aucun pod lancé. La place prise dans Zot n'a pas été relevée.
+
+Suite, chaque point sur accord nommé : avant `essais`, la taille du tmpfs (P11) et la durée de vie des pods (`sleep 10800`) ;
+puis `essais`, puis `verrou`.
