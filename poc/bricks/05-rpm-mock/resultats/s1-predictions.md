@@ -1381,3 +1381,40 @@ visible.
 
 Suite : la construction de l'image dérivée est une nouvelle étape, avec son correctif, ses prédictions et deux accords, l'un
 pour la construction et l'autre pour l'écriture dans Zot.
+
+## Image dérivée : décision « Dix lignes » (note du 2026-11-17, écrite à 2026-11-17T13:53:33Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « L'image dérivée reprend-elle les dix lignes mesurées ou les six ajouts seuls ? »,
+réponse « Dix lignes », lue avant 13:53:33 UTC. Recommandation présentée : dix ; le conseiller, consulté, recommande aussi dix.
+
+**Lectures de code faites avant la question** (mock 6.9, non mesurées) :
+- Dans le bootstrap, mock lance une seule commande de paquets : `dnf4_install_command`, soit
+  `install python3-dnf python3-dnf-plugins-core` (`config.py:379`, `buildroot.py:593` à `:595`). C'est la commande vue à
+  `essais` ([`s1-essais.log`](s1-essais.log), ligne 116).
+- `mock.py:777` met `update_before_build = False` pour le bootstrap. Le « Start: dnf4 update » de
+  [`s1-verrou_brut-mock.log`](s1-verrou_brut-mock.log) (ligne 464) porte sur le buildroot : il suit « Start: chroot init »
+  (ligne 449), sans « (bootstrap) ».
+- Avec une image prête, `_init_pkg_management` sort tout de suite (`buildroot.py:590` et `:591`) : le dnf de l'image est
+  celui qui tourne.
+
+**Non lus** : la cause exacte des quatre mises à jour (dnf qui prend la version de vault en installant `python3-dnf`, ou une
+exigence du greffon) ; les `Requires` de `python3-dnf-plugins-core` ; le dépôt d'origine de chacun des dix paquets.
+
+**Pourquoi dix** : c'est le seul état où le calcul a abouti, sur un seul passage (`verrou_brut`). Les six ajouts seuls
+associeraient le dnf d'origine (`4.14.0-31.el9`) au greffon, ce qui n'a jamais tourné. Les dix lignes sont la référence, pas
+forcément le nécessaire. Aucun argument de sécurité n'est retenu pour `rocky.0.1` : son changelog n'est pas lu.
+
+**L'image dérivée** : `rockylinux:9.7` (`sha256:ee90dc0e…`, depuis Zot) plus ces dix paquets, aux versions exactes de
+[`s1-verrou_brut.log`](s1-verrou_brut.log), toutes signées en en-tête par la clé `702d426d350d275d` :
+- six ajouts : `dbus-libs-1:1.12.20-8.el9.x86_64`, `python3-dateutil-1:2.9.0.post0-1.el9_7.noarch`,
+  `python3-dbus-1.2.18-2.el9.0.1.x86_64`, `python3-dnf-plugins-core-4.3.0-24.el9_7.noarch`, `python3-six-1.15.0-9.el9.noarch`,
+  `python3-systemd-234-19.el9.x86_64` ;
+- quatre mises à jour vers `4.14.0-31.el9.rocky.0.1` : `dnf`, `dnf-data`, `python3-dnf`, `yum`.
+
+**À porter dans l'étape de construction** (nouvelle étape, préparée à sec, avec correctif, banc, prédictions et deux accords) :
+- épingler les dix versions exactes et vérifier leur signature d'en-tête ;
+- prédire que la liste `rpm -qa` de l'image dérivée a les mêmes différences avec `rockylinux:9.7` brut que le bootstrap de
+  `verrou_brut` (153 lignes, 143 communes) ;
+- archiver `rpm -q --requires python3-dnf-plugins-core`, qui répondra à la question des `Requires` sans téléchargement à part.
+
+Suite : préparation à sec de l'étape de construction. Rien n'est lancé, rien n'est écrit dans Zot.

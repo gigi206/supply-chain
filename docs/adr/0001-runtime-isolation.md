@@ -318,3 +318,6 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 - mock installe lui-même `builddep` dans le bootstrap, et `--calculate-build-dependencies` écrit un verrou en 26 s : 222 rpm, tous adressés dans vault 9.7. Ce verrou est inutilisable en mode hermétique, qui exige une image prête (lecture de code).
 - Par rapport à `rockylinux:9.7` brut, mock ajoute six paquets et en met quatre à jour (famille dnf). Ces dix lignes sont la référence de l'image dérivée ; le choix entre les six ajouts seuls et les dix reste au propriétaire.
 - **Conséquence pour cet ADR** : aucune ; l'isolation `simple` a tenu sur ce passage aussi.
+
+**Additif du 17/11/2026, 13:53 UTC : contenu de l'image dérivée décidé** ([détail](../../poc/bricks/05-rpm-mock/resultats/s1-predictions.md)). Décision du propriétaire « Dix lignes » : l'image de bootstrap dérivée reprend `rockylinux:9.7` plus les six paquets ajoutés par mock et les quatre mises à jour de dnf, aux versions mesurées à `verrou_brut`. Avec cette image marquée prête, mock n'installerait plus rien dans le bootstrap (lecture de code).
+- **Conséquence pour cet ADR** : aucune pour l'instant ; rien n'est construit.
