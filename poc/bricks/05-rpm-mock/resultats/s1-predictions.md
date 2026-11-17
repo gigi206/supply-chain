@@ -2373,3 +2373,44 @@ Décision du propriétaire : question « Je lance l'étape collecte ? », répon
 
 Suite : accord de lancement de `fermeture`, qui écrit dans Zot de façon définitive ; l'additif de l'ADR 0001 pour la fermeture
 viendra avec `restauration`. Rien n'est lancé.
+
+## Étape `fermeture` passée (note du 2026-11-17, écrite à 2026-11-17T17:49:34Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « Je lance fermeture, qui écrit dans Zot définitivement ? », réponse « Oui ». Lancée le
+17/11/2026 de 17:46:06 à 17:47:29 UTC (`date -u` avant et après ; `chrono.tsv` : 17:46:07 et 17:47:29), code 0, `s1.sh`
+`4c3adb53…` ([journal](s1-fermeture.log)). **Écriture définitive dans Zot** : fermeture
+`deps/sample-app/mock-buildroot-lock@sha256:f235a98b46d82b2d295cd39e869eb07344938e8896fc4f7465171687e9c48417`, envoyée sous les tags `s1` et `s1-bis` (deux envois en rc 0 ; tags non relus
+ensuite). Le même digest est écrit sur l'hôte, dans
+`$T/mf/fermeture.digest` (relu après le passage, vu à l'écran, non archivé).
+
+| # | Tenue ? | Mesure |
+|---|---|---|
+| F1 | Oui | « OK   arbre égal à la liste » (235 fichiers, 319 086 430 octets) ; catalogue lu (143 dépôts ; par `oras repo ls`, lecture du code) ; dépôt absent |
+| F2 | Oui | Config `7bf628be…` et couche `22495746…` sous `essais-05/rocky9-bootstrap` égales aux blobs du dossier `dir:` |
+| F3 | Oui | 5 055 672 320 octets libres, au-dessus de 2 × 319 086 430 = 638 172 860 |
+| F4 | Oui | Code 0 (un rc non nul d'un envoi aurait arrêté l'étape : lecture du code) ; même digest aux deux envois ; manifeste relu égal ; 235 couches, égales à la liste de collecte (titre, digest, taille) |
+| F5 | Oui | 225 861 632 octets de plus au premier envoi, entre 200 000 000 et 260 000 000, et sous 317 656 348 |
+| F6 | Oui | 253 952 octets de plus au second envoi, sous 5 000 000 |
+| F7 | Oui | Envoi 1 en 80 s, envoi 2 en 1 s ; code 0 |
+| F8 | Non mesurée | « illisible » pour les deux blobs sous les deux dépôts (refus de lecture ou chemin absent, non distingués) : ni confirmée ni réfutée |
+
+**Lecture** :
+- F5 : la croissance mesurée (225 861 632 octets) dépasse de 4 518 038 octets la part de la fermeture hors config et couche de
+  l'image (221 343 594), et reste sous la taille de la fermeture entière (319 086 430). Elle est compatible avec une config et une
+  couche de l'image non stockées une seconde fois. Ce n'est pas une preuve du mécanisme : `df` compte tout `/` de `sc-stockage`,
+  d'autres écritures ne sont pas exclues pendant les 80 s de l'envoi, et F8 n'a rien relevé. L'écart de 4 518 038 octets n'est
+  pas expliqué (arrondi aux blocs, métadonnées de Zot ou autres écritures : rien de mesuré).
+- F6 : un second envoi des mêmes fichiers sous un autre tag a ajouté 253 952 octets.
+- La place libre lue avant l'envoi (5 055 672 320 octets) est à lire avec la mesure du 16/11 à `prealables` (5 551 Mo), prise
+  avant `amorce`, `image` et `boot_image` ; les unités des deux relevés ne sont pas comparées ici.
+- Le catalogue compte 143 dépôts. Le relevé du 17/11 à 14:51:40 UTC, fait par crane, en comptait 142, avant que `boot_image`
+  ne crée `essais-05/rocky9-bootstrap`. Les deux relevés sont compatibles, mais la liste des dépôts n'a pas été comparée.
+- `oras repo tags` n'a toujours pas été joué contre Zot (dépôt absent au passage). Le dépôt existe désormais : une relance
+  sous un autre `PREFIXE` jouerait cette branche de la garde pour la première fois.
+- F8 reste le seul relevé prévu du mécanisme de partage ; un `stat` sous sudo, lancé par le propriétaire, pourrait le donner
+  (non demandé, ne bloque pas R1).
+- **M2 n'est pas passé** : il reste `restauration` (R1), un pull par digest dans un dossier vide. Dire si F5 et F6, sur une
+  seule fermeture, suffisent pour « déduplication mesurée » revient au propriétaire.
+
+Suite : accord de lancement de `restauration` (lecture seule dans Zot) ; l'additif de l'ADR 0001 viendra après R1. Rien n'est
+lancé.

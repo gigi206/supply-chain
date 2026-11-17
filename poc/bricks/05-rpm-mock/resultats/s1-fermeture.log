@@ -1,0 +1,16 @@
+# s1.sh fermeture, 2026-11-17T17:46:07Z
+OK   arbre égal à la liste : 235 fichiers, 319086430 octets
+catalogue de Zot : 143 dépôts ; deps/sample-app/mock-buildroot-lock absent
+OK   blobs de l'image sous essais-05/rocky9-bootstrap = blobs du dossier dir: : 22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99 7bf628be885bd8d1f02d62fe280703e185e2f6b6e049e6c5361d832f67b72698
+fermeture : 235 fichiers, 319086430 octets ; dont config et couches de l'image, relevées sous essais-05/rocky9-bootstrap : 97742836 octets ; manifeste de l'image : 628 octets
+/var/lib/zot avant l'envoi : utilisés 14965243904 octets, puis 14965243904 à une seconde lecture (0 octets de plus) ; libres 5055672320 octets
+envoi 1 (tag s1) : 80 s
+fermeture : sc-stockage.poc.test:5000/deps/sample-app/mock-buildroot-lock@sha256:f235a98b46d82b2d295cd39e869eb07344938e8896fc4f7465171687e9c48417
+envoi 2 (tag s1-bis) : 1 s
+/var/lib/zot, utilisés : envoi 1 : 225861632 octets de plus ; envoi 2 : 253952 octets de plus
+OK   digest du second envoi : sha256:f235a98b46d82b2d295cd39e869eb07344938e8896fc4f7465171687e9c48417
+OK   digest du manifeste relu : sha256:f235a98b46d82b2d295cd39e869eb07344938e8896fc4f7465171687e9c48417
+OK   couches du manifeste : 235
+OK   couches (titre, digest, taille) = liste de collecte : 7c779f5d25c6e61d1084302d0292713c2d457addf262add0571c5dad66bfa889
+blob 22495746e288… : inode et liens sous essais-05/rocky9-bootstrap puis deps/sample-app/mock-buildroot-lock : illisible illisible
+blob 7bf628be885b… : inode et liens sous essais-05/rocky9-bootstrap puis deps/sample-app/mock-buildroot-lock : illisible illisible
