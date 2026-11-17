@@ -661,3 +661,69 @@ deux `kubectl exec` en lecture seule dans `s1-05-racine`, sans rien modifier. Va
 Rien n'a été écrit dans Zot. Le pod est supprimé. L'archive est sous `~/.cache`.
 
 Suite, chaque point sur accord nommé : `image`, `essais`, `verrou`.
+
+## Étape `image` : prédictions (note du 2026-11-17, écrite à 2026-11-17T10:41:00Z, avant tout passage ; rien n'est réécrit)
+
+L'étape assemble l'image d'essai sans rien exécuter. Elle écrit deux configurations de mock et `storage.conf` dans une couche, puis
+`crane append` empile `racine.tar` et cette couche sur une base vide OCI, et `crane mutate` pose la plateforme et `Env`. Le tag est
+`essais-05/mock-rocky9:s1` et le digest va dans `$T/image.digest`, qu'`essais` et `verrou` lisent. Ce qui est écrit dans Zot
+ne peut pas être supprimé ; seul le tag peut être réécrit. L'étape ne lance aucun pod. Journal prévu : `s1-image.log`, absent à l'écriture de cette note.
+
+**Ce que le code ne contrôle pas** (lecture de [`s1.sh`](../s1.sh), lignes 363 à 385) :
+- La garde ne teste que la présence de `$T/racine.tar` (`-s`), pas son sha256. Le script qui écrit cette note l'a recalculé :
+  `d7433a05…`, égal à celui de `racine`.
+- `$T/docker/config.json`, écrit par `amorce`, existe : l'étape ne refait pas l'authentification et l'envoi se fait sous le compte
+  écrit par `amorce` (`auth_zot`, compte `poc-ecriture` par défaut, lecture de code).
+- Le journal ne montre ni la plateforme ni `Env`.
+
+**Droit d'écriture**, lecture de code seulement : dans [`zot.json`](../../08-trust-plane/stockage/zot.json) du dépôt, `**` donne
+`read`, `create` et `update` à `poc-ecriture`. Les autres motifs (`builds/**`, `builds/fermetures/**`, `builds/scan/**`,
+`vulndb/**`, `horodatage/**`) ne couvrent pas `essais-05/`. La configuration déployée n'est pas relue. Le dépôt
+`essais-05/mock-rocky9` n'existait pas le 17/11/2026 à 10:32:01 UTC ([relevé](s1-image-zot-avant.log), sortie brute : `date -u`,
+`crane ls` en `NAME_UNKNOWN`, son code 1, le nombre de lignes de `crane catalog`, `date -u`).
+
+**Banc local** ([journal](s1-image-essai-local.log), [script](s1-image-banc.sh), [extraction](s1-image-banc-config.py)), le 17/11/2026
+de 10:36:14 à 10:36:21 UTC, sans Zot ni cluster :
+- la couche de configuration est rejouée deux fois à partir du texte d'`etape_image` ; même sha256 `f5710d47…`, 10 240 octets ;
+- `racine.tar` vaut `d7433a05…` ;
+- `rocky-9.tpl` de la racine est égal à celui de l'archive amont de mock 6.9-1 gardée par M2 (`28c04ee8…`) ;
+- les commandes `crane append` puis `crane mutate` d'`etape_image`, contre un `crane registry serve` en loopback (stockage sous
+  `~/.cache`), donnent les valeurs reprises ci-dessous.
+
+Les noms des fichiers archivés diffèrent de ceux du scratchpad : `banc-image.sh` devient `s1-image-banc.sh`, et `banc-config.py`
+devient `s1-image-banc-config.py`. Le contenu n'est pas modifié ; dans le journal seul, `$HOME` est remplacé par `~`.
+
+**Précédent de la 06** : mêmes commandes crane ([`s1.sh` de la 06](../../06-deb-sbuild/s1.sh), lignes 225 à 227). Deux passages à
+trois jours d'écart ont donné le même digest d'image `d8041f9c…` ([s1b-image.log](../../06-deb-sbuild/resultats/s1b-image.log),
+[s1r-image.log](../../06-deb-sbuild/resultats/s1r-image.log)). L'étape a duré 25, 19 et 25 s (`chrono.tsv` de la 06).
+
+| | Prédiction | Confiance |
+|---|---|---|
+| IM1 | Le journal compte six lignes : l'en-tête ; « OK   configuration prête : racine et bootstrap_image_ready changés, rien d'autre : 4 » ; « configuration de mock : sha256 a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31 » ; deux lignes « couche » ; « image d'essai : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:… » | Haute pour les lignes 2 et 3 (banc) ; moyenne-haute pour le reste, qui suppose IM2 |
+| IM2 | `crane append` et `crane mutate` passent contre Zot, sans « i/o timeout » ni refus d'accès | Moyenne-haute : précédent de la 06 (couches de 132 253 685 et 348 928 080 octets) ; droit lu dans le code, pas dans la configuration déployée |
+| IM3 | Couches, dans cet ordre : `sha256:e48fc4d689daa5ec7af47350d996f93d76a138ff7267aed6972feefe3e4526bd` 140 611 406 octets (racine), puis `sha256:fd00cdb1ac39ed07d03836b05bd7c24cf435e68a2b29d63403e5dfc4610ac157` 825 octets (configuration) | Haute : même crane 0.20.6, mêmes entrées ; couche de la 06 identique d'un passage à l'autre |
+| IM4 | Digest de l'image : `sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771`, le même que le banc ; `$T/image.digest` le contient | Moyenne-haute : la 06 montre un digest stable ; Zot est supposé garder le manifeste tel quel |
+| IM5 | Moins de 60 s entre « 05 S1 image » et « 05 S1 image fait » dans `chrono.tsv` | Moyenne : 7 s au banc en loopback, 19 à 25 s pour la 06 vers Zot |
+
+**Relecture sur l'hôte annoncée avant le passage**, archivée ensuite dans `s1-image-relecture.log`, en lecture seule :
+- `crane digest` du tag `:s1` égal à IM4 ;
+- `crane config` : `os` linux, `architecture` amd64, `Env` exactement `PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root`,
+  `created` à `0001-01-01T00:00:00Z`, deux entrées d'`history`, comme au banc ;
+- `crane manifest` : types de médias OCI, comme au banc ;
+- contenu de `$T/image.digest`.
+
+**En cas d'échec** :
+- Si `append` échoue, des blobs peuvent rester dans Zot, sans tag.
+- Si `append` passe et que `mutate` échoue, il reste un tag `:s1` sans les ajouts de `mutate`. Ce que `append` seul pose comme
+  plateforme n'a pas été lu. Le dépôt ne peut pas être supprimé, mais le tag peut être réécrit.
+- Dans les deux cas, l'étape s'arrête (`exit 1`) avant `image.digest`. Un rejeu sous le même préfixe réécrirait le tag (droit
+  `update`) et écraserait `s1-image.log`. Il se fera donc sous un autre préfixe, ou l'écrasement sera noté.
+
+**Place** : le banc occupe 135 Mo sous `~/.cache`. `prealables` a relevé 5551 Mo libres pour Zot ; l'étape ne mesure pas la place
+prise dans Zot.
+
+**Effort** : relevé refait par la même méthode, [`temps-05-1211.log`](temps-05-1211.log). La méthode lit la date d'auteur : le même
+calcul borné à `05ac074` redonne 46 commits et 4,93 h. Jusqu'à `b70f384`, on compte 70 commits et 7,97 h de commits, pour 2,5 pw
+estimées. Le seuil de décision est à 5 pw. Le temps des passages eux-mêmes n'est pas compté par cette méthode.
+
+Suite, chaque point sur accord nommé : `image`, puis `essais` (avant lui : taille du tmpfs, durée de vie des pods), puis `verrou`.

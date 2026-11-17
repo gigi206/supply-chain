@@ -1,0 +1,23 @@
+# banc-image.sh, 2026-11-17T10:36:14Z, crane 0.20.6, tar (GNU tar) 1.35
+OK   sha256 de s1.sh : ad16fc9909308b2e8f2703114ed0e37e67b73095b9f3b32128890bd4d81a3e63
+## A : couche de configuration rejouée à sec (banc-config.sh, extrait de etape_image par banc-config.py)
+OK   configuration prête : racine et bootstrap_image_ready changés, rien d'autre : 4
+configuration de mock : sha256 a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31
+couche-config.tar : sha256 f5710d475bc0e83b67701a96b5aa3dbd01fe971d2d68f097358019c72ba52560, 10240 octets
+configuration prête : sha256 0fc0b59ae434303098cb5c2785adf94b2851b93056425ecfa6f1a63aa6a176af
+storage.conf : sha256 0d58dc2b87a8fc12582dd81e39be8f97e238a52f339c2b55a4fa00f813cbed39
+OK   couche-config.tar rejouée une seconde fois : f5710d475bc0e83b67701a96b5aa3dbd01fe971d2d68f097358019c72ba52560
+## B : entrée et modèle de mock
+OK   sha256 de racine.tar (étape racine) : d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+OK   sha256 de l'archive amont de mock (m2) : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+OK   rocky-9.tpl de la racine égal à celui de mock-6.9-1 (archive m2) : 28c04ee83bf180a0a900d715731b7f1218aeb38740afd6ddacb0ba78f79c4829
+## C : append puis mutate contre un registre crane local (127.0.0.1:5905, disque ~/.cache/supply-chain-poc/05/banc-image)
+registre local : prêt (http)
+crane append : rc 0 en 6 s
+crane mutate : rc 0
+couche sha256:e48fc4d689daa5ec7af47350d996f93d76a138ff7267aed6972feefe3e4526bd 140611406 octets
+couche sha256:fd00cdb1ac39ed07d03836b05bd7c24cf435e68a2b29d63403e5dfc4610ac157 825 octets
+manifeste : application/vnd.oci.image.manifest.v1+json ; config application/vnd.oci.image.config.v1+json sha256:d3002ab075686a9355bca64963934f6b80bc657ae17d5ca49c1dcd674762b672 ; couches application/vnd.oci.image.layer.v1.tar+gzip
+config : os linux ; architecture amd64 ; Env PATH=/usr/sbin:/usr/bin:/sbin:/bin HOME=/root ; created 0001-01-01T00:00:00Z ; history 2
+image d'essai (banc) : essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+place du registre local : 135 Mo

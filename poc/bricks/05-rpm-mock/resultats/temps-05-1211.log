@@ -19,3 +19,6 @@ premier commit : 2026-11-05T22:24:04Z 196ee34 ; dernier : 2026-11-16T18:26:07Z 6
 # nouveau relevé, même méthode, 2026-11-16T19:23:32Z à HEAD 05ac074 (avant le commit du second passage de releve9) ; les relevés ci-dessus ne sont pas réécrits
 premier commit : 2026-11-05T22:24:04Z 196ee34 ; dernier : 2026-11-16T18:46:35Z 05ac074
 46 commits ; 4.93 h (écarts <= 1 h)
+# nouveau relevé, même méthode, 2026-11-17T10:35:01Z à HEAD b70f384 (avant le commit des prédictions d'image) ; les relevés ci-dessus ne sont pas réécrits
+premier commit : 2026-11-05T22:24:04Z 196ee34 ; dernier : 2026-11-17T10:24:33Z b70f384
+70 commits ; 7.97 h (écarts <= 1 h)
