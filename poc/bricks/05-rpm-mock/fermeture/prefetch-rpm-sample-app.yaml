@@ -1,0 +1,65 @@
+# Brique 05, M4b, étape taches : pipeline de la plateforme qui produit la fermeture rpm de sample-app (rpm du buildroot, repodata,
+# image de bootstrap) et la publie sous builds/fermetures/. Signée par la clé des tâches et publiée en bundle
+# (tekton/pipelines/prefetch-rpm-sample-app) ; ses deux tâches sont tirées de leurs bundles signés de la liste revue :
+# prefetch-rpm (neuve) et publier-fermeture (brique 03, inchangée). Toutes les entrées sont fixées ici et couvertes par la
+# signature : liste des 222 rpm (resultats/m4b-liste.txt, tirée par l'hôte des primary de vault 9.7 vérifiés), source et dossier
+# dir: de l'image de bootstrap (tirés du verrou), empreinte de la clé de Rocky, repomd.xml attendu (décision « Oui »), dépôt de la
+# fermeture. Le créateur du PipelineRun ne fournit que le workspace. prefetch-rpm y est liée par le sous-dossier fermeture (elle
+# écrit fermeture/depot/), publier-fermeture à la racine (elle publie fermeture/) ; aucune tâche existante n'est modifiée.
+# @PREFETCH_RPM@, @PUBLIER_FERMETURE@, @LISTE@, @SOURCE@, @DOSSIER@, @EMPREINTE@, @REPOMD@, @DEPOT_FERMETURE@ : m4b.sh.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: prefetch-rpm-sample-app
+spec:
+  workspaces:
+  - name: sortie
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: prefetch
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PREFETCH_RPM@
+      - name: name
+        value: prefetch-rpm
+      - name: kind
+        value: task
+    params:
+    - name: liste
+      value: |
+@LISTE@
+    - name: source
+      value: "@SOURCE@"
+    - name: dossier
+      value: "@DOSSIER@"
+    - name: empreinte
+      value: "@EMPREINTE@"
+    - name: repomd
+      value: "@REPOMD@"
+    workspaces:
+    - name: sortie
+      workspace: sortie
+      subPath: fermeture
+  - name: publier
+    runAfter: [prefetch]
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PUBLIER_FERMETURE@
+      - name: name
+        value: publier-fermeture
+      - name: kind
+        value: task
+    params:
+    - name: depot
+      value: @DEPOT_FERMETURE@
+    workspaces:
+    - name: sortie
+      workspace: sortie

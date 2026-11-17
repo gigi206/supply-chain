@@ -1,0 +1,22 @@
+OK   nominal, passage p1 (3 rpm, 2 fichiers de repodata, 3 du dossier dir:) (code 0)
+OK   gpg absent : identifiant court seul (PATH sans gpg) (code 0)
+OK   sha256 faux refusé (code 1)
+OK   taille fausse refusée (code 1)
+OK   nom en double refusé (code 1)
+OK   fichier absent du dépôt (HTTP 404) refusé (code 1)
+OK   signature d'un rpm refusée (code 1)
+OK   empreinte gpg fausse refusée (code 1)
+OK   identifiant court faux refusé (code 1)
+OK   manifeste différent refusé (code 1)
+OK   createrepo_c absent refusé (code 1)
+OK   sonde : outil absent signalé sans arrêt
+OK   sonde : clé absente signalée sans arrêt (pas de /etc/pki sur l'hôte)
+OK   sonde : lecture du manifeste, première forme
+OK   sonde : lecture du manifeste, seconde forme
+OK   sonde : options de createrepo_c relevées
+OK   p1 et p2 égaux hors repodata
+OK   repodata par défaut différents
+OK   aide de createrepo_c relevée
+OK   V1 : deux copies, repodata égaux
+OK   V2 : deux copies, repodata égaux, sans base sqlite
+bilan : 21 OK, 0 KO

@@ -243,3 +243,92 @@ Recoupement hors script, à la relecture (non archivé autrement que par ce text
 **Ce que cela établit** : deux exécutions du pas final, chacune dans un pod neuf avec son volume, sans root, sous runc, donnent la même fermeture au fichier près, `repodata` compris, et cet index est celui que mock a accepté en hermétique (`m4b_mock_v2`). `PREFETCH_FINAL` peut servir de base au script de la tâche `prefetch-rpm`.
 
 **Ce que cela n'établit pas** : la liste reçue en paramètre de Tekton, le workspace de Tekton, `publier-fermeture` et la tâche signée ; qu'un build parte de cette fermeture (sans `verrou.json` ni `outils/`) ; rien écrit dans Zot (non mesuré).
+
+## Note datée du 17/11/2026, écrite à 22:54:34 UTC : `prealables_taches` et `essai_tache` préparées à sec (« Oui, prépare-les »), NON LANCÉES
+
+**Fichiers**
+- Gabarit de la tâche [`../fermeture/prefetch-rpm.yaml`](../fermeture/prefetch-rpm.yaml) :
+  - image d'outillage par digest, runc, UID 65532, `runAsNonRoot`, capacités retirées, `/tmp` en `emptyDir`, CA du PoC ;
+  - 2 CPU et 2 Gi en demandes et en limites ;
+  - seule variable d'environnement : `HOME` ;
+  - paramètres `liste`, `source`, `dossier`, `empreinte`, `repomd`, écrits dans le script par substitution de Tekton, jamais lus dans une variable : l'`env` du `podTemplate` l'emporterait (carte de `taches`, point 3) ;
+  - résultat `BOOTSTRAP_ARTIFACT_INPUTS`.
+- Gabarit de la pipeline [`../fermeture/prefetch-rpm-sample-app.yaml`](../fermeture/prefetch-rpm-sample-app.yaml) : `prefetch-rpm` sous le `subPath` `fermeture`, puis `publier-fermeture` à la racine ; dépôt `builds/fermetures/sample-app-rpm`.
+- [`../m4b.sh`](../m4b.sh) passe de `bf927e5b…` à `d2b5fd7d…`, par insertions seules (14 lignes d'en-tête, 165 de code), comme `final`.
+- **Script de la tâche contre `PREFETCH_FINAL`** : une ligne retirée (la clé réglable pour le banc) et 29 ajoutées. Le détail :
+  - en-tête de 13 lignes : heredoc de la liste et affectations par substitution ;
+  - 13 lignes de contrôles des entrées :
+    - source au digest de 64 caractères ;
+    - dossier cohérent avec la source ;
+    - empreinte en 40 majuscules hexadécimales ;
+    - `repomd` de 64 caractères ;
+    - chaque ligne de la liste : URL sous vault 9.7, sans « .. », jeu de caractères limité, sha256, taille, trois champs ;
+  - chemin fixe de la clé ;
+  - comparaison de `repomd.xml` à l'attendu, avant la copie de l'image ;
+  - écriture du résultat.
+
+**Étapes**
+- `prealables_taches` (hôte, plus une lecture sur sc-stockage) :
+  - gabarits rendus, avec des références factices des tâches, puis relus champ par champ ;
+  - écarts du script contre `PREFETCH_FINAL` ;
+  - script substitué comme Tekton le fera : aucune référence `$(params.…)`, `$(workspaces.…)` ni `$(results.…)` restante, liste du heredoc égale à la liste ;
+  - section d'envoi de `publier-fermeture`, version signée, jouée deux fois en layout OCI local. L'arbre a les 230 vrais noms de `final` : 226 fichiers réels, en liens durs depuis la fermeture restaurée de M3 et contrôlés par sha256 et taille, plus 4 fichiers de `repodata` factices ;
+  - `df` de `/var/lib/zot`.
+- `essai_tache` (pod d'essai, rien dans Zot) : le script substitué, tel qu'il sera signé, joué dans un pod neuf runc au label `prefetch-rpm`. Contrôles :
+  - `repomd.xml`, résultat, arbre égal à celui de `final` ;
+  - puis le même script avec un `repomd` attendu faux, dans un sous-dossier neuf : refus attendu avant la copie de l'image ;
+  - retrait du pod et de sa PVC relu.
+
+**Banc** ([script](m4b-taches-banc.sh), [journal](m4b-taches-banc.log)) : tenu, 40 OK, 0 KO.
+- A : insertions seules ; shellcheck, seulement des SC2016 de plus (`printf` et `echo` sans expansion voulue).
+- B : la vraie fonction `etape_prealables_taches`, avec les vrais gabarits et le vrai `publier-fermeture` signé. yq, jq et oras de l'hôte sur des layouts locaux, sur des données du banc :
+  - nominal : 22 lignes OK, deux layouts, titres à « : » et « @ » ;
+  - fichier restauré différent : refusé ;
+  - variable d'environnement de plus dans la tâche : refusée.
+- C : le script rendu et substitué par les fonctions de l'étape, joué par dash avec de faux outils sur le `PATH` de l'image :
+  - nominal : résultat exact, arbre égal à la référence ;
+  - **la vraie liste des 222 rpm passe tous les contrôles** (arrêt au premier téléchargement, faux 404) ;
+  - `repomd` attendu faux refusé, sans dossier `dir:` ni résultat ;
+  - dix entrées invalides refusées ; `gpg` absent refusé.
+- D : la vraie fonction `etape_essai_tache`, avec un faux `kubectl` :
+  - nominal : 14 lignes OK ;
+  - code 1 pour un script en échec (pod laissé), un arbre différent, un retrait en échec, une PVC restante.
+- Premier passage ([journal](m4b-taches-banc-passage1.log)) : un défaut de l'étape, trouvé et corrigé. yq ajoute une ligne vide à la fin du script extrait, qui comptait comme 30e ligne ajoutée ; elle est retirée à l'extraction.
+- Non-régression sur la copie :
+  - banc de l'essai ([journal](m4b-taches-banc-essai.log)) : 21 OK ;
+  - banc de `final` ([journal](m4b-taches-banc-final.log)) : 49 OK et 2 KO. Les deux KO sont dans ses sections A et B, qui comptent les lignes insérées par `final` seul et ses SC2016 ; ses sections C et D sont toutes tenues.
+- Non couvert : Tekton lui-même (substitution réelle, chemin du résultat, workspace en PVC, conteneurs d'initialisation, admission d'un pod de TaskRun), `publier-fermeture` dans son pod sous 512 Mi, et la taille du script substitué (environ 45 Ko) dans un pod de Tekton.
+- Relevé à la préparation, non archivé autrement que par ce texte : les 226 fichiers de l'arbre de `final` hors `repodata` sont dans la fermeture restaurée de M3, aux mêmes sha256 et tailles.
+
+**Prédictions de `prealables_taches`**
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| PT1 | Liste `95541ee8…` ; source `…rocky9-bootstrap@sha256:f0ccf105…`, dossier `sc-stockage.poc.test@sha256:f0ccf105…` | Haute |
+| PT2 | Gabarits rendus sans variable restante ; tous les contrôles de la tâche et de la pipeline tenus | Haute (banc, mêmes gabarits) |
+| PT3 | Script de la tâche : 1 ligne retirée, 29 ajoutées ; `dash -n` | Haute (banc) |
+| PT4 | Script substitué : aucune référence de Tekton restante ; liste du heredoc égale ; environ 45 Ko | Haute |
+| PT5 | Arbre : 226 fichiers réels conformes, 4 factices | Haute (relevé à la préparation) |
+| PT6 | Section d'envoi : deux poussées au même digest, 230 couches aux titres distincts, égaux aux chemins de `final` préfixés par `depot/`, dont 4 à « : » et « @ » | Haute : forme mesurée au banc avec le même oras ; jamais sur 318 Mo |
+| PT7 | `/var/lib/zot` : entre 4,5 et 5,1 Go libres | Moyenne : 5 055 672 320 octets libres à la fermeture de M2 ; aucune écriture de M3 ni de M4 depuis, d'après les journaux de la brique ; le système de fichiers peut porter autre chose (non relevé) |
+| PT8 | Code 0, sous 120 s | Moyenne : deux layouts de 318 Mo |
+
+**Prédictions de `essai_tache`**
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| ET1 | Scripts nominal et refusé : trois lignes d'écart (workspace, résultat, `repomd`) | Haute (banc) |
+| ET2 | Pod admis en dry-run serveur, prêt sous runc, sans `runtimeClassName` | Haute (`final`) |
+| ET3 | Nominal : 222 rpm téléchargés et contrôlés ; empreinte conforme ; `rpm -K` 222 sur 222 ; `repomd.xml` `239a5a71…`, contrôle passé ; manifeste `f0ccf105…` ; 230 fichiers ; code 0 ; sous 120 s | Haute : mêmes gestes que `final`, plus des contrôles d'entrée que la vraie liste passe au banc ; la clé de l'image au chemin fixe a été lue à l'essai (ES3) |
+| ET4 | Résultat : `{"uri":"oci://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap","digest":"sha256:f0ccf105…"}` | Haute |
+| ET5 | Arbre égal à celui de `final` (liste `fc556539…`) | Haute |
+| ET6 | Cas refusé : code 1, « repomd.xml différent de l'attendu », ni dossier `dir:` ni résultat | Haute : `createrepo_c` réel donne `239a5a71…` (ET3) |
+| ET7 | Retrait du pod code 0, PVC retirée, aucun objet restant | Haute (FN7) |
+| ET8 | Rien écrit dans Zot | Lecture : aucune écriture vers un registre dans le script, aucun identifiant de Zot monté |
+
+**Ce que chaque issue permet**
+- PT et ET tenues : le script de `prefetch-rpm` est essayé tel qu'il sera signé. Viennent ensuite `verrou` et `publier` de M4a (ordre consigné), puis `taches`, chacune sur son accord.
+- PT6 non tenue : `publier-fermeture` ne publierait pas cette fermeture telle quelle ; décision au propriétaire avant toute signature.
+- ET3 ou ET6 non tenues : pas de signature ; correction du gabarit, puis nouveau passage.
+
+Accords demandés : `prealables_taches`, puis `essai_tache`, un chacun.

@@ -24,6 +24,20 @@
 #               imprimé en entier ; côté hôte : repomd.xml de chaque passage égal à celui de l'essai, arbre entier (repodata
 #               compris : chemin, taille, sha256) égal entre les deux passages et archivé, retrait de chaque pod relu (code de
 #               kubectl, pods et PVC au nom du pod). N'écrit rien dans Zot.
+#   prealables_taches  ajoutée le 17/11/2026 sur « Oui, prépare-les » (carte de taches, décision « Oui » sur repomd.xml), NON
+#               LANCÉE ; hôte, plus une lecture sur sc-stockage : gabarits fermeture/prefetch-rpm.yaml et
+#               fermeture/prefetch-rpm-sample-app.yaml rendus (références des tâches factices) et relus ; script de la tâche comparé
+#               à PREFETCH_FINAL (écarts attendus seulement), puis substitué comme Tekton le fera (paramètres de la pipeline rendue,
+#               workspace, résultat) : aucune référence de Tekton restante, liste du heredoc égale à resultats/m4b-liste.txt ;
+#               section d'envoi de publier-fermeture (version signée) jouée deux fois sur l'hôte, en layout OCI local, sur un arbre
+#               aux 230 vrais noms de resultats/m4b-final-arbre.txt (226 fichiers réels, en liens durs depuis la fermeture
+#               restaurée de M3, contrôlés par sha256 ; 4 de repodata factices) : même digest, 230 couches aux titres attendus ;
+#               espace de /var/lib/zot relevé (df, sans sudo). N'écrit rien dans Zot ni dans le cluster.
+#   essai_tache ajoutée de même, NON LANCÉE ; cluster, pod d'essai, rien dans Zot : le script substitué de la tâche, tel qu'il sera
+#               signé, joué dans un pod neuf de l'essai (runc, UID 65532, label prefetch-rpm), workspace à /workspace/sortie ;
+#               code 0, repomd.xml égal à l'attendu, résultat BOOTSTRAP_ARTIFACT_INPUTS relu, arbre égal à celui de final ; puis
+#               le même script avec un repomd.xml attendu faux, dans un sous-dossier neuf : refus attendu avant la copie de
+#               l'image ; retrait du pod et de sa PVC relus.
 # Usage (racine du dépôt) : DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/m4b.sh <étape>…
 # (journal : resultats/m4b-<étape>.log)
 set -euo pipefail
@@ -406,6 +420,171 @@ etape_final() { # deux pods neufs, un par passage ; le pas final entier dans cha
   else
     cp "$T/m4b-final-p1-arbre.txt" "$ARBRE_REF" && echo "arbre archivé : resultats/${ARBRE_REF##*/}"
   fi
+}
+
+# Brique 05, M4b, étape taches : préalables et pod d'essai de la tâche prefetch-rpm (carte du 17/11/2026, décision « Oui »).
+TACHES=$h05/fermeture
+PUBLIER_SIGNEE=$here/politique/taches/publier-fermeture.signee.yaml
+DEPOT_FERMETURE=$REG/builds/fermetures/sample-app-rpm
+RESTAUREE=$T1/m3/restauree-1/depot   # fermeture de M2 restaurée en M3 : 226 des 230 fichiers de final, mêmes sha256
+FACTICE=sha256:$(printf '0%.0s' {1..64})
+remplacer() { # source destination clé=valeur… : @CLE@ remplacées hors des commentaires ; LISTE = fichier indenté (s4b.sh de la 06)
+  python3 -I - "$@" <<'FIN'
+import sys
+src, dst, *kv = sys.argv[1:]
+paires = [a.split('=', 1) for a in kv]
+r = []
+for ligne in open(src, encoding='utf-8').read().split('\n'):
+    if not ligne.lstrip().startswith('#'):   # les commentaires citent les variables : non rendus
+        for k, v in paires:
+            if k == 'LISTE':
+                v = open(v, encoding='utf-8').read().rstrip('\n')
+            ligne = ligne.replace(f'@{k}@', v)
+    r.append(ligne)
+open(dst, 'w', encoding='utf-8').write('\n'.join(r))
+FIN
+  ! grep -n '@[A-Z_]*@' "$2" | grep -v '^[0-9]*:#' || { echo "KO   variable non rendue dans ${2##*/}" >&2; exit 1; }
+}
+rendre_taches() { # référence-prefetch-rpm référence-publier-fermeture source dossier : gabarits rendus sous $T
+  sed 's/^/        /' "$LISTE" > "$T/liste-indentee.txt"
+  remplacer "$TACHES/prefetch-rpm.yaml" "$T/prefetch-rpm.yaml" "IMAGE=$IMAGE"
+  remplacer "$TACHES/prefetch-rpm-sample-app.yaml" "$T/prefetch-rpm-sample-app.yaml" "PREFETCH_RPM=$1" "PUBLIER_FERMETURE=$2" \
+    "LISTE=$T/liste-indentee.txt" "SOURCE=$3" "DOSSIER=$4" "EMPREINTE=$FP_ROCKY" "REPOMD=$REPOMD_V2" "DEPOT_FERMETURE=$DEPOT_FERMETURE"
+}
+substituer() { # tâche-rendue pipeline-rendue chemin-du-workspace chemin-du-résultat sortie [repomd] : script du pas, comme Tekton
+  python3 -I - "$@" <<'FIN'
+import json, subprocess, sys
+tache, pipe, ws, res, out = sys.argv[1:6]
+y = lambda f, q: json.loads(subprocess.run(['yq', '-o=json', q, f], capture_output=True, text=True, check=True).stdout)
+s = y(tache, '.spec.steps[0].script')
+p = {x['name']: x['value'] for x in y(pipe, '.spec.tasks[0].params')}
+if len(sys.argv) > 6:
+    p['repomd'] = sys.argv[6]   # cas refusé de essai_tache seulement
+assert sorted(p) == ['dossier', 'empreinte', 'liste', 'repomd', 'source'], sorted(p)
+for k, v in p.items():
+    s = s.replace('$(params.' + k + ')', v)
+s = s.replace('$(workspaces.sortie.path)', ws).replace('$(results.BOOTSTRAP_ARTIFACT_INPUTS.path)', res)
+assert not any(m in s for m in ('$(params.', '$(workspaces.', '$(results.', '$(context.')), 'référence de Tekton restante'
+open(out, 'w', encoding='utf-8').write(s)
+FIN
+}
+extraire() { # nom-de-variable : corps d'un script heredoc de ce fichier (PREFETCH_FINAL…)
+  awk -v n="$1" '$0 == n "=$(cat <<'"'"'SH'"'"'" {b = 1; next} b && $0 == "SH" {exit} b' "${BASH_SOURCE[0]}"
+}
+
+etape_prealables_taches() {
+  attendu "liste des rpm (sha256)" "$(sha256sum < "$LISTE" | cut -c1-64)" "$LISTE_SHA"
+  local src dos x n a d1 d2
+  src=$(jq -r '.config.bootstrap_image' "$VERROU_SRC"); dos=${src%%:*}@$(jq -r '.bootstrap.pull_digest' "$VERROU_SRC")   # config.py:844-846
+  echo "source du bootstrap : $src ; dossier dir: : $dos"
+  echo "## gabarits rendus (références des tâches factices)"
+  rendre_taches "$REG/tekton/tasks/prefetch-rpm@$FACTICE" "$REG/tekton/tasks/publier-fermeture@$FACTICE" "$src" "$dos"
+  attendu "tâche : nom, image" "$(yq '.metadata.name + " " + .spec.steps[0].image' "$T/prefetch-rpm.yaml")" "prefetch-rpm $IMAGE"
+  attendu "tâche : paramètres" "$(yq -o=json -I=0 '[.spec.params[].name]' "$T/prefetch-rpm.yaml")" '["liste","source","dossier","empreinte","repomd"]'
+  attendu "tâche : UID, runAsNonRoot, capacités, élévation" \
+    "$(yq '.spec.stepTemplate.securityContext | [.runAsUser, .runAsNonRoot, .capabilities.drop[0], .allowPrivilegeEscalation] | join(" ")' "$T/prefetch-rpm.yaml")" "65532 true ALL false"
+  attendu "tâche : ressources (demandes, limites)" \
+    "$(yq -o=json -I=0 '.spec.steps[0].computeResources' "$T/prefetch-rpm.yaml")" '{"requests":{"cpu":"2","memory":"2Gi"},"limits":{"cpu":"2","memory":"2Gi"}}'
+  attendu "tâche : variables d'environnement du pas" "$(yq -o=json -I=0 '.spec.steps[0].env' "$T/prefetch-rpm.yaml")" '[{"name":"HOME","value":"/tmp"}]'
+  attendu "pipeline : liste rendue identique à la liste" \
+    "$(yq '.spec.tasks[0].params[] | select(.name == "liste") | .value' "$T/prefetch-rpm-sample-app.yaml" | sed '/^$/d' | cmp -s - "$LISTE" && echo identique || echo différente)" identique
+  attendu "pipeline : source, dossier, empreinte, repomd" \
+    "$(yq '[.spec.tasks[0].params[] | select(.name != "liste") | .value] | join(" ")' "$T/prefetch-rpm-sample-app.yaml")" "$src $dos $FP_ROCKY $REPOMD_V2"
+  attendu "pipeline : subPath de prefetch, racine pour publier" \
+    "$(yq -o=json -I=0 '[.spec.tasks[].workspaces[0].subPath]' "$T/prefetch-rpm-sample-app.yaml")" '["fermeture",null]'
+  attendu "pipeline : tâches, dépôt de la fermeture" \
+    "$(yq '[.spec.tasks[].taskRef.params[] | select(.name == "name") | .value] + [.spec.tasks[1].params[0].value] | join(" ")' "$T/prefetch-rpm-sample-app.yaml")" \
+    "prefetch-rpm publier-fermeture $DEPOT_FERMETURE"
+  echo "## script de la tâche contre PREFETCH_FINAL (étape final)"
+  yq '.spec.steps[0].script' "$T/prefetch-rpm.yaml" | sed '${/^$/d}' > "$T/script-tache.sh"   # yq ajoute une ligne vide finale
+  extraire PREFETCH_FINAL > "$T/prefetch-final.sh"
+  diff "$T/prefetch-final.sh" "$T/script-tache.sh" > "$T/diff-script.txt" || true
+  sed 's/^/     /' "$T/diff-script.txt"
+  attendu "ligne retirée de PREFETCH_FINAL (la clé réglable)" "$(grep '^<' "$T/diff-script.txt" | cut -c3- | sed 's/ .*//' | paste -sd' ')" 'K=${CLE_ROCKY:-/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9}'
+  attendu "lignes ajoutées (en-tête 13, contrôles 13, clé 1, repomd.xml 1, résultat 1)" "$(grep -c '^>' "$T/diff-script.txt")" 29
+  attendu "script de la tâche, dash -n" "$(sh -n "$T/script-tache.sh" && echo ok)" ok
+  echo "## script substitué comme par Tekton"
+  substituer "$T/prefetch-rpm.yaml" "$T/prefetch-rpm-sample-app.yaml" /workspace/sortie /tmp/resultat-bootstrap.json "$T/script-essai.sh"
+  attendu "script substitué, dash -n" "$(sh -n "$T/script-essai.sh" && echo ok)" ok
+  attendu "liste du heredoc égale à la liste" \
+    "$(awk '$0 == "cat > /tmp/liste <<'"'"'FIN_LISTE'"'"'" {b = 1; next} $0 == "FIN_LISTE" {exit} b' "$T/script-essai.sh" | sed '/^$/d' | cmp -s - "$LISTE" && echo égale || echo différente)" égale
+  echo "script substitué : $(wc -c < "$T/script-essai.sh") octets, sha256 $(sha256sum < "$T/script-essai.sh" | cut -c1-64)"
+  echo "## publier-fermeture : section d'envoi (version signée) sur les 230 vrais noms"
+  x=$T/pf; rm -rf -- "${x:?}"; mkdir -p "$x/a/fermeture/depot"
+  n=0; a=0
+  while read -r f s h; do
+    mkdir -p "$x/a/fermeture/depot/$(dirname "$f")"
+    case $f in
+      repodata/*) printf 'repodata factice : %s\n' "$f" > "$x/a/fermeture/depot/$f"; a=$((a + 1)) ;;
+      *) [ "$(sha256sum < "$RESTAUREE/$f" | cut -c1-64) $(stat -c %s "$RESTAUREE/$f")" = "$h $s" ] \
+           || { echo "KO   fichier de la fermeture restaurée différent de final : $f" >&2; exit 1; }
+         ln "$RESTAUREE/$f" "$x/a/fermeture/depot/$f"; n=$((n + 1)) ;;
+    esac
+  done < "$ARBRE_REF"
+  attendu "arbre : fichiers réels (liens durs, sha256 et taille de final), factices de repodata" "$n $a" "226 4"
+  cp -al "$x/a" "$x/b"
+  for d in a b; do
+    { echo 'set -eu'; echo "f=$x/$d/fermeture"
+      yq '.spec.steps[0].script' "$PUBLIER_SIGNEE" | sed -n '/^cd "\$f"$/,/^  --annotation/p' | sed "s#/layout/f:#$x/$d/layout:#"
+      echo 'echo "$d"'; } > "$x/$d/publier.sh"
+  done
+  attendu "section extraite : cd, boucle find, oras push" "$(grep -c '^cd "$f"$\|find . -type f\|oras push' "$x/a/publier.sh")" 3
+  d1=$(sh "$x/a/publier.sh" 2>&1 | tail -n 1); d2=$(sh "$x/b/publier.sh" 2>&1 | tail -n 1)
+  attendu "digest du manifeste, layout local" "$d1" "$(jq -r '.manifests[0].digest' "$x/a/layout/index.json")"
+  attendu "seconde poussée, autre copie : même digest" "$d2" "$d1"
+  jq -r '.layers[].annotations["org.opencontainers.image.title"]' "$x/a/layout/blobs/sha256/${d1#sha256:}" | LC_ALL=C sort > "$x/titres.txt"
+  attendu "couches : nombre, titres distincts" "$(wc -l < "$x/titres.txt") $(sort -u "$x/titres.txt" | wc -l)" "230 230"
+  attendu "titres égaux aux chemins de final, préfixés par depot/" \
+    "$(sed 's#^#depot/#' "$ARBRE_REF" | cut -d' ' -f1 | LC_ALL=C sort | cmp -s - "$x/titres.txt" && echo égaux || echo différents)" égaux
+  attendu "titres à « : » et « @ » (dossier dir:)" "$(grep -c -F "depot/$dos/" "$x/titres.txt")" 4
+  echo "manifeste local : $d1 ; layout : $(du -sb "$x/a/layout" | cut -f1) octets ; oras de l'hôte : $(oras version 2>/dev/null | head -n 1)"
+  echo "## espace de /var/lib/zot (lecture sur sc-stockage, sans sudo)"
+  sur sc-stockage 'df -B1 --output=used,avail /var/lib/zot | tail -n 1' < /dev/null | awk '{print "utilisés " $1 " octets ; libres " $2 " octets"}'
+}
+
+etape_essai_tache() { # pod d'essai : le script substitué de la tâche, tel qu'il sera signé ; puis le cas refusé (repomd.xml faux)
+  attendu "liste des rpm (sha256)" "$(sha256sum < "$LISTE" | cut -c1-64)" "$LISTE_SHA"
+  local src dos rc POD=m4b-05-essai-tache faux=0000000000000000000000000000000000000000000000000000000000000000
+  src=$(jq -r '.config.bootstrap_image' "$VERROU_SRC"); dos=${src%%:*}@$(jq -r '.bootstrap.pull_digest' "$VERROU_SRC")
+  rendre_taches "$REG/tekton/tasks/prefetch-rpm@$FACTICE" "$REG/tekton/tasks/publier-fermeture@$FACTICE" "$src" "$dos"
+  substituer "$T/prefetch-rpm.yaml" "$T/prefetch-rpm-sample-app.yaml" /workspace/sortie /tmp/resultat-bootstrap.json "$T/script-essai.sh"
+  substituer "$T/prefetch-rpm.yaml" "$T/prefetch-rpm-sample-app.yaml" /workspace/sortie/refus /tmp/resultat-refus.json "$T/script-refus.sh" "$faux"
+  attendu "scripts : nominal et refusé, seuls écarts le workspace, le résultat et repomd" \
+    "$(diff "$T/script-essai.sh" "$T/script-refus.sh" | grep -c '^>')" 3
+  echo "script substitué : sha256 $(sha256sum < "$T/script-essai.sh" | cut -c1-64)"
+  pod_spec
+  if kubectl create --dry-run=server -f "$T/$POD.json" < /dev/null > "$T/admis-$POD.out" 2>&1; then echo "OK   $POD admis en dry-run serveur"
+  else echo "KO   $POD refusé à l'admission : $(head -c 300 "$T/admis-$POD.out" | tr '\n' ' ')" >&2; exit 1; fi
+  kubectl delete pod -n builds "$POD" --ignore-not-found --wait=true < /dev/null > /dev/null
+  kubectl create -f "$T/$POD.json" < /dev/null > /dev/null
+  if ! kubectl wait -n builds "pod/$POD" --for=condition=Ready --timeout=300s < /dev/null > /dev/null; then
+    kubectl get pod -n builds "$POD" -o json < /dev/null | jq -r '"phase \(.status.phase) ; \([.status.containerStatuses[]?.state
+      | to_entries[0] | "\(.key) \(.value.reason // "")"] | join(", "))"' >&2   # raisons, jamais les messages
+    echo "KO   $POD non prêt" >&2; exit 1
+  fi
+  echo "### $POD (runc, uid 65532, label tekton.dev/task=$LABEL) : prêt sur $(kubectl get pod -n builds "$POD" -o jsonpath='{.spec.nodeName}' < /dev/null), runtimeClassName « $(kubectl get pod -n builds "$POD" -o jsonpath='{.spec.runtimeClassName}' < /dev/null) »"
+  echo "## script de la tâche, nominal"
+  rc=0; { printf 't0=$(date +%%s)\n'; cat "$T/script-essai.sh"; printf 'echo "durée du pas : $(($(date +%%s) - t0)) s"\n'; } | dans m4b-essai-tache || rc=$?
+  [ "$rc" = 0 ] || { echo "KO   script de la tâche en échec ; pod laissé pour lecture : $POD" >&2; exit 1; }
+  attendu "repomd.xml V2" "$(grep -m 1 '^repodata V2 : repomd.xml ' "$T/m4b-essai-tache.log" | cut -d' ' -f5)" "$REPOMD_V2"
+  attendu "résultat BOOTSTRAP_ARTIFACT_INPUTS" "$(kubectl exec -n builds "$POD" -- cat /tmp/resultat-bootstrap.json < /dev/null)" \
+    "{\"uri\":\"oci://${src%@*}\",\"digest\":\"${src##*@}\"}"
+  rc=0; printf 'export SORTIE=/workspace/sortie\n%s\n' "$ARBRE" | kubectl exec -i -n builds "$POD" -- sh -s > "$T/m4b-essai-tache-arbre.txt" 2> "$T/m4b-essai-tache-arbre.err" || rc=$?
+  attendu "arbre relevé (code de l'exec)" "$rc" 0
+  attendu "arbre égal à celui de final" "$([ "$(sha256sum < "$T/m4b-essai-tache-arbre.txt")" = "$(sha256sum < "$ARBRE_REF")" ] && echo égal || echo différent)" égal
+  echo "## même script, repomd.xml attendu faux, workspace neuf (refus attendu avant la copie de l'image)"
+  rc=0; dans m4b-essai-tache-refus < "$T/script-refus.sh" || rc=$?
+  attendu "cas refusé : code" "$rc" 1
+  attendu "cas refusé : message" "$(grep -c '^KO   repomd.xml différent de l.attendu (fixé par la pipeline)$' "$T/m4b-essai-tache-refus.log")" 1
+  attendu "cas refusé : ni dossier dir:, ni résultat" \
+    "$(kubectl exec -n builds "$POD" -- sh -c "ls -A /workspace/sortie/refus/depot | grep -c -F '$dos' ; ls /tmp/resultat-refus.json 2>/dev/null | wc -l" < /dev/null | paste -sd' ')" "0 0"
+  rc=0; kubectl delete pod -n builds "$POD" --wait=true --timeout=180s < /dev/null > /dev/null || rc=$?
+  attendu "retrait du pod (code de kubectl)" "$rc" 0
+  rc=0; kubectl wait -n builds --for=delete "pvc/$POD-w" --timeout=180s < /dev/null > /dev/null 2>&1 || rc=$?   # PVC du volume éphémère
+  attendu "PVC $POD-w retirée (code de kubectl wait)" "$rc" 0
+  rc=0; kubectl get pods,pvc -n builds -o name < /dev/null > "$T/m4b-essai-tache-objets.txt" 2>&1 || rc=$?
+  attendu "objets de builds relus (code de kubectl)" "$rc" 0
+  attendu "pods et PVC restants au nom de $POD" "$(grep -c -F "$POD" "$T/m4b-essai-tache-objets.txt" || true)" 0
 }
 
 lancer m4b "05 M4b" "$@"

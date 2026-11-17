@@ -1,0 +1,49 @@
+# m4b-taches-banc.sh, 2026-11-17T22:49:34Z ; m4b.sh avant bf927e5b0925f77c3fda16f7762800e8f300e639d07cb8f93bc75353b8281963 ; copie 950b8f3a0e03df882b12e0f78f9c896ee501cba7eb1305b1dcdd5c33789f5fb8
+# gabarits : prefetch-rpm.yaml 58dd19044689f83fda39866262e6a56e44e7326060eebc7cd3dc22ac7d2581c6 ; prefetch-rpm-sample-app.yaml ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+## A : insertions seules, syntaxe, shellcheck
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+OK   lignes insérées (en-tête 14, bloc 165) : 179
+OK   bash -n : ok
+OK   shellcheck : écarts (SC2016 seulement) : < SC2016 > SC2016
+OK   données : arbre de référence (fichiers) : 230
+## B : vraie fonction etape_prealables_taches
+KO   nominal : code 1, attendu 0 ; sortie :      >  OK   ligne retirée de PREFETCH_FINAL (la clé réglable) : K=${CLE_ROCKY:-/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9} KO   lignes ajoutées (en-tête 13, contrôles 13, clé 1, repomd.xml 1, résultat 1) : 30 (attendu : 29) 
+KO   nominal : lignes OK de l'étape : 11 (attendu : 22)
+KO   nominal : diff du script contre PREFETCH_FINAL archivé dans la sortie : 30 (attendu : 29)
+KO   nominal : couches à titres « @ » et « : » : 0 (attendu : 1)
+ls: impossible d'accéder à '~/.cache/supply-chain-poc/05/banc-m4b-taches-1/W1/m4b-05/pf/a/layout' : Aucun fichier ou répertoire de ce type
+ls: impossible d'accéder à '~/.cache/supply-chain-poc/05/banc-m4b-taches-1/W1/m4b-05/pf/b/layout' : Aucun fichier ou répertoire de ce type
+KO   nominal : deux layouts distincts : 0 (attendu : 2)
+OK   nominal : référence de la tâche dans la pipeline rendue (factice) : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:0000000000000000000000000000000000000000000000000000000000000000
+KO   fichier restauré différent de final : refusé : code 1, attendu 1 ; sortie :      >  OK   ligne retirée de PREFETCH_FINAL (la clé réglable) : K=${CLE_ROCKY:-/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9} KO   lignes ajoutées (en-tête 13, contrôles 13, clé 1, repomd.xml 1, résultat 1) : 30 (attendu : 29) 
+OK   variable d'environnement de plus dans la tâche : refusée (code 1)
+## C : script de la tâche (rendu, substitué), par dash
+OK   nominal (code 0)
+OK   nominal : résultat BOOTSTRAP_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap","digest":"sha256:659f7e41827e76690689ec414bf5796252f555ba52b34ecadabf1056cfe325f9"}
+OK   nominal : arbre égal à la référence : égal
+OK   vraie liste (222 lignes) : contrôles passés, arrêt au premier téléchargement (code 1)
+OK   vraie liste : aucun refus de contrôle : 0
+OK   repomd.xml attendu faux : refusé (code 1)
+OK   repomd.xml faux : ni dossier dir:, ni résultat : 0 0
+OK   source sans digest : refusée (code 1)
+OK   digest de la source trop court : refusé (code 1)
+OK   dossier incohérent : refusé (code 1)
+OK   empreinte en minuscules : refusée (code 1)
+OK   repomd attendu mal formé : refusé (code 1)
+OK   URL hors de vault 9.7 : refusée (code 1)
+OK   URL avec « .. » : refusée (code 1)
+OK   sha256 mal formé : refusé (code 1)
+OK   taille mal formée : refusée (code 1)
+OK   ligne à quatre champs : refusée (code 1)
+OK   gpg absent : refusé (code 1)
+## D : vraie fonction etape_essai_tache, faux kubectl
+OK   nominal (code 0)
+OK   nominal : lignes OK de l'étape : 14
+OK   nominal : pods créés : 1
+OK   script en échec : refusé, pod laissé (code 1)
+OK   script en échec : pod laissé (faux cluster) : m4b-05-essai-tache
+OK   arbre différent de la référence : refusé (code 1)
+OK   retrait du pod en échec : refusé (code 1)
+OK   PVC restante : refusée (code 1)
+# bilan : NON TENU, 34 OK, 6 KO, fin 2026-11-17T22:51:01Z
