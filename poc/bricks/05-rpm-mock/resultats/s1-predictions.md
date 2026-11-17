@@ -2854,3 +2854,24 @@ fermeture restaurée par digest.
 
 Un seul build est fait : le critère de M3 (deux builds identiques) attend `m3_build2` et `m3_comparaison`. Suite : accord de
 lancement de `m3_build2`. Rien d'autre n'est lancé.
+
+## Étape `m3_build2` passée (note du 2026-11-17, écrite à 2026-11-17T20:18:53Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « Je lance m3_build2 (même chose sous /w/b2, depuis la restauration 2) ? », réponse « Oui,
+lance-le ». Lancée le 17/11/2026 de 20:14:37 à 20:18:18 UTC (`date -u` avant et après, `chrono.tsv`), code 0, `s1.sh`
+`06c2da46…` ([journal](s1-m3_build2.log), [journaux de mock](s1-m3_build2-mock.log)).
+
+| # | Tenue ? | Mesure |
+|---|---|---|
+| BD10 | Oui | Comme BD1 à BD9, sous `/w/b2`, depuis la fermeture restaurée 2 : pod `s1-05-m3-2` au label `construire-rpm` ; témoins « 124 124 124 124 » ; tar en 5 morceaux ; fermeture revérifiée (235) ; `mock --hermetic-build` rc 0 en 81 s ; src.rpm `c802e60a…` et rpm `864d55f4…` ; `/w` : 312 268 puis 1 456 500 kB ; 3 619 lignes de journaux de mock ; pod supprimé (`kubectl get pod` : « NotFound » à 20:18:25 UTC, vu à l'écran, non archivé) ; code 0 en 221 s |
+
+**Lecture** :
+- Les 222 lignes « paquet » (nom, version, release, arch, sigmd5) du buildroot sont identiques à celles du build 1 (comparaison
+  faite pour cette note).
+- Les sha256 relevés dans la sonde sont égaux d'un build à l'autre. La mesure du critère de M3 revient à `m3_comparaison` :
+  fichiers rapatriés sur l'hôte, NEVRA, et relevés à part.
+- Les journaux de mock comptent 3 619 lignes, contre 3 620 au build 1. L'écart n'est pas analysé ici ; aucun pari n'était
+  écrit sur ce nombre.
+- Aucune ligne `http(s)://` dans les trois journaux de mock.
+
+Suite : accord de lancement de `m3_comparaison` (hôte seul, sans réseau). Rien d'autre n'est lancé.
