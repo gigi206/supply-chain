@@ -2473,3 +2473,92 @@ avec trois réserves écrites :
 M1 n'est pas réévalué ici.
 
 Suite : M3 (deux `--hermetic-build` sans réseau depuis la fermeture restaurée), à préparer à sec sur accord. Rien n'est lancé.
+
+## M3 : étapes `m3_restauration`, `m3_build1`, `m3_build2` et `m3_comparaison` préparées à sec (note du 2026-11-17, écrite à 2026-11-17T19:33:10Z ; rien n'est réécrit), NON APPLIQUÉ
+
+Préparées sur « Continue », après le push de `8f54da2`. Le conseiller a relu l'approche avant l'écriture, puis le correctif
+avant ce commit. Trois corrections en sont venues : critère NEVRA qui pouvait passer à vide, provenance séparée du critère,
+lectures de mock rattachées à l'archive des sources. Correctif [`../s1-m3.patch`](../s1-m3.patch) (`2281cdf4…`) : insertions
+seules dans `s1.sh` (`4c3adb53…`), copie `60bcceaa…`. Quatre étapes, un accord chacune, sur le modèle de la 06 S3
+([`s3.sh`](../../06-deb-sbuild/s3.sh)).
+
+- **`m3_restauration`** (lecture dans Zot) : deux pulls par digest de la fermeture de M2 (`FERMETURE_DIGEST` =
+  `sha256:f235a98b…`, comparé d'abord à `$T/mf/fermeture.digest`), chacun dans un dossier neuf (`$T/m3/restauree-1` et `-2`),
+  chacun comparé à la liste de `collecte` (chemin, taille, sha256). `$T/mf` n'est pas touché.
+- **`m3_build1` et `m3_build2`** : un pod par build (`s1-05-m3-1`, `s1-05-m3-2`), Kata privilégié, root, image d'essai, comme
+  `hermetique`, mais **sans label**.
+  - La spec est admise en dry-run serveur avant toute création. L'absence du label `tekton.dev/task` est relue dans le
+    cluster ; s'il est présent, le pod est retiré.
+  - La fermeture restaurée n passe dans le pod par `copier`, repris de la 06 : tar fait sur l'hôte, morceaux de 64 Mio, taille
+    relue après chaque morceau, sha256 comparé dans le pod. Ce mode de copie a passé 194 109 440 octets en 3 morceaux dans la
+    06 ([journal](../../06-deb-sbuild/resultats/s3-builds.log)). Le tar est supprimé du pod après déballage.
+  - Dans le pod, avant mock : chaque fichier de la fermeture est revérifié contre la liste de `collecte`, ni plus ni moins de
+    fichiers ; le verrou et le manifeste du dossier `dir:` sont relus ; les sources livrées sont contrôlées.
+  - Tout ce qui entre dans mock vient de la fermeture restaurée : verrou, dépôt et dossier `dir:`. Ni `$T/m2`, ni `voie2`, ni
+    `resultats/s1-verrou_derivee.json` ne servent d'entrée (contrôle de structure du banc). Le verrou de la fermeture est
+    comparé à `VERROU_DERIVEE_SHA`.
+  - `mock --hermetic-build` reprend la forme d'`hermetique`, mais tous les chemins hors du chroot sont propres au build :
+    `/w/b1` ou `/w/b2` pour la fermeture, `basedir`, `cache_topdir` et `resultdir`. `--no-cleanup-after` est gardé, pour
+    relire les paquets du buildroot par `rpm --root` (nom, version, release, arch, sigmd5) et pour que `df` mesure le pic.
+  - La sonde relève les rpm (NEVRA, sha256, BUILDHOST, BUILDTIME). Elle archive en entier, sous le masque jeton/token, la
+    sortie de mock, `root.log`, `build.log` et `installed_pkgs.log`. Les rpm sont rapatriés et leurs sha256 comparés à ceux
+    du pod. Le pod est retiré. Rien n'est écrit dans Zot.
+- **`m3_comparaison`** (hôte seul, sans réseau). Seul le critère de M3 est compté en écarts : deux rpm par build, deux NEVRA
+  lus par build, puis sha256 et NEVRA du rpm et du src.rpm, build 2 contre build 1. Le reste est relevé à part, sans effet sur
+  le code : paquets du buildroot contre les 222 du verrou, lignes `http(s)://` des journaux (affichées), mock de la fermeture
+  contre celui de l'image, égalité avec le rpm (`864d55f4…`) et le src.rpm (`c802e60a…`) d'`hermetique`. En cas d'écart,
+  diffoscope est une installation à demander.
+
+**Lecture de « sans réseau »** (à trancher par le propriétaire) :
+- Un pod de `builds` sans label tombe sous `builds-sans-internet` de la 08c, qui ne refuse que les adresses publiques. D'après
+  son en-tête (lecture), Zot, le DNS, l'API de RKE2, OpenBao et les services du cluster restent joignables.
+- Témoins de la sonde : DNS de `dl.rockylinux.org`, TCP vers `dl.rockylinux.org:443` (10 s) et TCP vers Zot sur 5000. Si
+  l'adresse publique répond, l'étape s'arrête avant mock. Le refus ne sera attribuable à la politique que si le DNS et Zot
+  répondent (rc 0) ; sinon, il faudra écrire « non attribuable ».
+- Dans mock, `rpmbuild` tourne par défaut sans réseau propre (`rpmbuild_networking` à False, `config.py:98` ; espace réseau
+  privé, `backend.py:63`) : lecture, non mesurée.
+- Ce qui sera mesurable : « aucune adresse publique joignable pendant le build », pas « aucun réseau ». Couper aussi Zot et le
+  DNS demanderait une politique ou un `unshare -n` : seconde variable, non préparée.
+
+**Bornes, écrites avant tout passage** :
+- « Deux répertoires différents » : les chemins hors du chroot diffèrent (`/w/b1`, `/w/b2`), et les deux builds tournent dans
+  deux pods. Dans le chroot, le chemin de build est le même : `chroothome` vaut `/builddir` (`config.py:79`, lecture).
+- Les sources de sample-app et l'image d'essai sont hors fermeture. Le mock exécuté est celui de l'image ; il est seulement
+  comparé, par NEVRA et `SHA256HEADER`, au rpm de mock de la fermeture.
+- Sur l'archive des sources de mock 6.9-1 (`3c034916…`, relue par le banc, section I) :
+  - `installed_pkgs.log` est écrit dans le `resultdir` (`plugins/package_state.py:70`, activé par défaut, `config.py:210`) ;
+  - `--installroot` et le chemin sont passés en deux arguments (`package_manager.py:238`). Le motif de la sonde,
+    `installroot.{1,4}<chemin>/mock-h/`, couvre cette forme et la forme `--installroot=` du greffon de verrou (banc, section
+    C), comme MH4 l'avait demandé ;
+  - c'est une lecture : aucun `root.log` réel n'a encore montré la ligne.
+- `s1-hermetique-mock.log` ne contient aucune ligne `http(s)://`. Ce n'est pas une preuve, car seules les queues y sont
+  archivées : les URL de M3 sont donc affichées, sans attendu.
+- La place de `/w` (3,0G vu à l'écran avant `essais`, non archivé, P11) n'a été mesurée que pour un seul build (1 456 532 kB, MH9) : d'où un pod par
+  build.
+
+**Bancs** :
+- Banc ([script](s1-m3-banc.sh), `055351b9…`, [journal](s1-m3-banc.log)), lancé à 19:31:23 UTC : tenu, 58 OK. Il tourne hors
+  cluster et hors Zot. `m3_restauration` y joue contre un registre crane local, avec le vrai `closure.sh` et le vrai oras
+  1.3.6. Un faux kubectl joue le pod dans un dossier local, avec de faux bash (témoins), getent, mock et rpm. La copie y passe
+  en morceaux de 1 Mio.
+  - Mesuré : deux restaurations conformes. Sont refusés : un digest différent avant tout pull ; une adresse publique
+    joignable (mock non lancé, pod retiré) ; un label présent dans le cluster (sonde non jouée, pod retiré) ; une spec refusée
+    en dry-run (aucune création) ; une fermeture changée sur l'hôte (aucun appel à kubectl).
+  - En comparaison : un rpm altéré compte un écart, et des NEVRA illisibles aussi, même aux deux builds (pas d'égalité à
+    vide). Un paquet manquant au buildroot est relevé sans écart.
+  - Le libellé « capacité de /w » de la sonde est réécrit par le faux kubectl, d'où le chemin du banc dans son journal ; aucun
+    contrôle ne lit ce libellé.
+- N3/N4 ([`s1-n34-banc.sh`](s1-n34-banc.sh)) sur la copie finale, à 19:31:42 UTC : tenu, 35 OK
+  ([journal](s1-m3-banc-n34.log)).
+- Trois passages antérieurs, scripts du banc non archivés, tous sur la première copie (`127bc5dd…`) :
+  - à 19:25:13 UTC, non tenu ([journal](s1-m3-banc-passage1.log)) : défaut du banc seul, la section G cherchait les
+    fonctions sans commentaire après l'accolade ;
+  - à 19:25:37 UTC, non tenu ([journal](s1-m3-banc-passage2.log)) : défaut du banc seul, le mot `pod_demarrer` était trouvé
+    dans un commentaire ;
+  - à 19:25:57 UTC, tenu, 48 OK, avant la relecture du correctif ; journal écrasé par le passage suivant, non archivé (vu à
+    l'écran), comme le N3/N4 de 19:26:17 UTC (35 OK).
+- Non couvert : vrai pod Kata, vraie politique Cilium, vrai mock et vrai rpm, exec Kata à 64 Mio (mesurée dans la 06), droits
+  de lecture déployés de Zot.
+
+Suite : la lecture de « sans réseau » revient au propriétaire. Viendront ensuite l'application sur accord, les prédictions,
+puis un lancement par étape. Rien n'est appliqué ni lancé.
