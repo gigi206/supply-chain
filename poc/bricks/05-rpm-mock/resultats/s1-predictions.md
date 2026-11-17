@@ -2665,3 +2665,87 @@ Décision du propriétaire : question « J'applique s1-m3-2.patch à s1.sh ? »,
 
 Suite : prédictions des six étapes de M3, écrites et commitées avant tout passage, puis un accord par étape (`m3_reseau` pose
 une politique dans le cluster). Rien n'est posé ni lancé.
+
+## M3 : prédictions des six étapes (note du 2026-11-17, écrite à 2026-11-17T20:03:44Z, avant tout passage ; rien n'est réécrit), NON LANCÉ
+
+`s1.sh` vaut `06c2da46…`. Commandes prévues, depuis la racine du dépôt, une par accord nommé, `date -u` avant et après, code
+par `PIPESTATUS`, sortie dans un fichier : `env -u PREFIXE -u ISOLATION DISTRO=rke2 KUBECONFIG=… mise exec --
+poc/bricks/05-rpm-mock/s1.sh <étape> </dev/null`. **Ordre proposé** :
+1. `m3_temoin` : il ne laisse rien dans le cluster, et son échec rend la pose inutile ;
+2. `m3_reseau` : écriture dans le cluster ;
+3. `m3_restauration` ;
+4. `m3_build1` ;
+5. `m3_build2` ;
+6. `m3_comparaison`.
+
+Journaux attendus : `s1-<étape>.log`, plus `s1-m3_build1-mock.log` et `s1-m3_build2-mock.log` ; aucun n'existe.
+
+**Appuis mesurés** :
+- `hermetique` ([`s1-hermetique.log`](s1-hermetique.log)), réseau présent : mock rc 0 en 47 s. Sur `/w`, 3 059 832 kB de
+  capacité, 312 300 kB utilisés avant mock et 1 456 532 kB après. src.rpm `c802e60a…` et rpm `864d55f4…`, `BUILDHOST
+  reproducible`, `BUILDTIME 1794787200` ; le rpm est égal à celui d'`essais` (MH8).
+- `restauration` : 235 fichiers, 319 086 430 octets, en moins de 2 s.
+  - Le tar de `$T/mf/restauree`, fait sur l'hôte le 17/11 avant ce commit, compte 319 283 200 octets, soit 5 morceaux de
+    64 Mio (vu à l'écran, non archivé).
+- Brique 06 :
+  - copie par `kubectl exec` en morceaux sous une NetworkPolicy sans règle (commit `1459e3f`) : 227 266 560 octets, de
+    l'en-tête de l'essai à 18:25:55 UTC jusqu'au script dans le pod à 18:26:41 UTC ;
+  - même témoin TCP refusé par Cilium : « rc 124 » ([`s3-builds.log`](../../06-deb-sbuild/resultats/s3-builds.log)).
+- Brique 08 sous Cilium ([`kata-reseau.log`](../../08-trust-plane/resultats/kata-reseau.log)) : avec une NetworkPolicy, Zot et
+  l'API `10.43.0.1:443` sont fermés, et aucune fenêtre n'apparaît au démarrage d'un pod Kata en 3 essais. **Aucun précédent
+  archivé pour un DNS coupé.**
+- `voie2` : un pod au label `prefetch-rpm` a joint `dl.rockylinux.org` en 443 (222 téléchargements) et Zot (skopeo).
+- Le mock de l'image vient du rpm `mock-6.9-1.el9.noarch.rpm` `a5043350…` ([`s1-racine.log`](s1-racine.log)), le même
+  fichier que celui de la fermeture.
+
+**Jamais joué en vrai** (chacun arrête avant la pose ou avant mock) :
+- la forme JSON du vrai `kubectl create --dry-run=client -o json` ;
+- l'admission d'un pod Kata privilégié au label `construire-rpm` ;
+- la résolution de `dl.rockylinux.org` sur l'hôte ;
+- l'exec sous la nouvelle politique ;
+- mock sans DNS ni Zot.
+
+| # | Prédiction | Confiance et raison |
+|---|---|---|
+| TP1 | `m3_temoin` : cibles lues sur l'hôte, trois adresses IPv4 (publique, `192.168.161.13`, ClusterIP du service `kubernetes`) ; pod `s1-05-m3-temoin` prêt au label `prefetch-rpm` | Moyenne à haute : résolution de l'hôte jamais jouée par le script ; pod de même forme que ceux de S1 |
+| TP2 | Codes du témoin positif : DNS 0, public 0, Zot 0 (« OK   témoin positif ») ; cibles écrites dans `$T/m3-cibles` ; code 0, pod retiré | Moyenne à haute : `voie2` a joint les deux sous ce label ; l'adresse publique est celle de l'hôte, pas celle que résout le pod (même nom, CDN possible) |
+| TP3 | Code de l'API au témoin positif : 124 | Moyenne : `prefetch-rpm-sortie` n'autorise pas l'API, et un refus de Cilium est une perte de paquet ; relevé sans arrêt |
+| PR1 | `m3_reseau` : politique du dépôt lue par `--dry-run=client` égale à l'attendu ; admise en dry-run serveur ; posée | Moyenne : la forme du JSON du vrai kubectl n'a pas été jouée (le banc l'a convertie par helm) ; un écart arrête avant la pose |
+| PR2 | Relecture : `construction-rpm-sans-sortie` trouvée, sélecteur, types et règles vides conformes ; aucune politique de `builds` n'autorise de trafic au label ; code 0 | Haute : politiques de `builds` connues (06, 08, 08c, 05) ; aucune ne sélectionne `construire-rpm` avec une règle |
+| RS1 | `m3_restauration` : digest de `fermeture.digest` égal à `FERMETURE_DIGEST` ; deux pulls rc 0 ; deux « OK   arbre égal à la liste : 235 fichiers, 319086430 octets » ; code 0 en moins de 1 min | Haute : même geste que `restauration` (moins de 2 s) |
+| BD1 | `m3_build1` : fermeture et verrou conformes sur l'hôte ; politique relue (PR2) ; cibles relues ; spec admise en dry-run serveur ; pod prêt ; label `construire-rpm` relu | Moyenne à haute : admission d'un pod privilégié à ce label jamais jouée (même forme que ceux de S1, autre label) |
+| BD2 | Les quatre témoins échouent : public, Zot et API en 124 ; DNS en 2 ou en 124 ; « OK   témoins : … injoignables » | Moyenne : 124 pour un TCP refusé par Cilium (06) ; DNS coupé jamais relevé, et le code dépend de quel délai tombe le premier, celui du résolveur ou celui de `timeout` |
+| BD3 | Copie du tar en 5 morceaux, sha256 conforme ; fiche des sommes en 1 morceau ; déballage rc 0 ; les trois livraisons de sources passent | Moyenne à haute : même procédé dans la 06, sous une politique sans règle |
+| BD4 | Sonde : « fermeture revérifiée dans le pod : rc 0 ; fichiers 235 ; lignes de la liste 235 » ; verrou `b6d0f8f1…` ; manifeste `f0ccf105…` ; sources rc 0 ; mock de la fermeture et de l'image : `mock-6.9-1.el9.noarch`, même `SHA256HEADER` (64 hexadécimaux) | Haute : même rpm de mock des deux côtés (`a5043350…`) |
+| BD5 | **`mock --hermetic-build` rc 0 sans aucun réseau**, en moins de 2 min | Moyenne : `hermetique` a passé en 47 s, réseau présent ; le dépôt est local et l'image vient du dossier `dir:` ; `rpmbuild` sans réseau par défaut (lecture). Rien ne prouve que mock, podman ou dnf ne tente pas un accès réseau dont l'échec serait bloquant. C'est la confrontation de la prédiction 5 du README (05/11), sans nouveau seuil |
+| BD6 | Lignes comptées comme à `hermetique` : « Using container image: dir: » et « Checking image digest: 18d64b03… » à 1 dans la sortie et dans `root.log` ; repli, écart de digest et « No space left on device » à 0 | Moyenne à haute : même verrou, même image, même forme de commande |
+| BD7 | `installed_pkgs.log` présent ; 222 lignes « paquet » relues par `rpm --root` | Moyenne : présence lue dans le code ; le buildroot pourrait contenir un paquet de plus ou de moins que le verrou (aucun relevé de `rpm -qa` du buildroot hermétique) |
+| BD8 | Deux rpm : `sample-app-1.0.0-2.el9.src.rpm` `c802e60a…` et `sample-app-1.0.0-2.el9.x86_64.rpm` `864d55f4…`, `BUILDHOST reproducible`, `BUILDTIME 1794787200` ; rapatriés, sha256 égaux à la sonde | Moyenne à haute : MH8 a tenu entre deux bootstraps et deux sources de dépôt ; seuls les chemins hors chroot et le réseau changent ici |
+| BD9 | `/w` : moins de 400 000 kB utilisés avant mock, entre 1 300 000 et 2 600 000 après ; journaux de mock archivés (quatre fichiers) ; pod retiré ; code 0 ; étape en moins de 10 min (environ 40 s de témoins compris) | Moyenne : copie et déballage ajoutent un tar effacé ensuite ; dans la 06, 46 s entre l'en-tête de l'essai et le script dans le pod, copie de 227 Mo comprise |
+| BD10 | `m3_build2` : comme BD1 à BD9, chemins sous `/w/b2`, mêmes sha256 des deux rpm | Moyenne à haute si `m3_build1` tient |
+| CP1 | `m3_comparaison` : fichiers rpm « 2 2 », lignes NEVRA « 2 2 », sha256 et NEVRA du build 2 égaux à ceux du build 1 ; « écarts du critère : 0 » ; code 0 | Moyenne à haute : confrontation de la prédiction 1 du README (05/11), « deux rpm identiques avec les macros d'OBS, sans autre réglage » |
+| CP2 | Relevés : les sha256 d'`hermetique` retrouvés une fois dans chaque build ; paquets du buildroot sans écart avec le verrou ; mock de la fermeture et de l'image égaux | Moyenne : suit BD7 et BD8 |
+
+**Pas de pari** :
+- le nombre de lignes `installroot`, motif jamais vu dans un vrai `root.log` ;
+- les lignes `http(s)://` des journaux de mock, affichées sans attendu ;
+- la liste exacte des politiques de `builds` dans le cluster ;
+- l'adresse publique résolue par l'hôte.
+
+**Règles de lecture** :
+- L'invariant attend une liste vide. Une erreur de jq rendrait aussi une liste vide : il faut donc zéro ligne `jq: error` dans
+  les journaux de `m3_reseau` et des builds, sinon l'invariant est « non établi ».
+- Si `SHA256HEADER` rend `(none)` des deux côtés, l'égalité du mock ne dit rien.
+- Les témoins ne valent qu'avant mock (voir les bornes de la seconde version).
+
+**Ce que ferait un écart** :
+- TP2 non tenue : aucune cible n'est écrite, et ni la pose ni les builds ne sont lancés avant analyse.
+- PR1 non tenue : rien n'est posé.
+- PR2 non tenue : la politique, déjà posée, reste en place, car elle ne fait que couper. Aucun build n'est lancé avant analyse ;
+  son retrait éventuel, un `kubectl delete` par son nom, demande un accord.
+- BD2 non tenue (un témoin à 0, ou un code hors de 1, 2 et 124) : pod retiré, mock non lancé. Analyse avant toute relance.
+- BD5 non tenue : les journaux de mock entiers sont archivés ; analyse, puis décision du propriétaire.
+- Rpm différents entre les deux builds (CP1 non tenue) : diffoscope est une installation à demander au propriétaire.
+- Toute relance se fait sous un autre `PREFIXE`, pour ne réécrire aucun journal archivé.
+
+Suite : accord de lancement de `m3_temoin`. Rien n'est posé ni lancé.
