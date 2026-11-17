@@ -1846,3 +1846,57 @@ Décision du propriétaire : question « J'applique s1-verrou-derivee.patch à s
   15:18:19 UTC, python3 3.13.12 : tenu, 35 OK ([journal](s1-verrou-derivee-banc-n34-applique.log)).
 
 Suite : prédictions de `verrou_derivee`, écrites et commitées avant tout passage, puis accord de lancement. Rien n'est lancé.
+
+## Étape `verrou_derivee` : prédictions (note du 2026-11-17, écrite à 2026-11-17T15:24:09Z, avant tout passage ; rien n'est réécrit), NON LANCÉ
+
+Commande prévue, depuis la racine du dépôt, sur accord nommé, `date -u` avant et après, code par `PIPESTATUS`, sortie dans un
+fichier : `env -u PREFIXE -u ISOLATION DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/s1.sh verrou_derivee
+</dev/null` (isolation `simple`, la seule qui a construit à `essais`). `s1.sh` vaut `049fccad…`. Journaux attendus :
+`s1-verrou_derivee.log`, `s1-verrou_derivee-mock.log`, `s1-verrou_derivee.json`. Relance après échec : autre `PREFIXE`, pour
+que rien d'archivé ne soit réécrit.
+
+Entrées vérifiées par leur nom avant d'écrire, sans lister le dossier de travail : `image.digest` (`99790c13…`),
+`boot-image.digest` (`f0ccf105…`) et `SHA256SUMS.s1` sont présents, de même que les sources de `sample-app` (`test -s`).
+
+**Appuis mesurés** :
+- `verrou` ([`s1-verrou.log`](s1-verrou.log)) : la même sonde avec `rockylinux:9.7` brut marqué prêt. `--buildsrpm` `rc 0` en
+  50 s ; « Not updating bootstrap chroot, bootstrap_image_ready=True » avec un compte cumulé de 1 après chaque appel ; le calcul
+  échoue en 6 s sur « builddep command missing ». Le journal du calcul y liste encore `python3-dnf-4.14.0-31.el9` et
+  `yum-4.14.0-31.el9`, alors que vault 9.7 offre `rocky.0.1` : indice, non preuve, que mock ne met pas à jour un bootstrap prêt.
+- `verrou_brut` ([`s1-verrou_brut.log`](s1-verrou_brut.log)) : image brute non prête. `--buildsrpm` en 67 s, calcul `rc 0` en
+  26 s ; verrou 1.1.0 avec 222 rpm, tous sous vault 9.7, signature `None` partout. Le bootstrap de mock a 153 paquets : les 147
+  de l'image brute moins quatre, plus dix, soit exactement les dix lignes de l'image dérivée.
+- `boot_racine` ([`s1-boot_racine.log`](s1-boot_racine.log)) : la racine dérivée a 153 paquets, les mêmes que ce bootstrap.
+- Section H du banc : `dnf-3` et `builddep.py` sont dans l'image dérivée.
+- `essais` : `podman pull` de l'image brute depuis Zot par un pod, `rc 0` en 7 s.
+
+| # | Prédiction | Confiance et raison |
+|---|---|---|
+| VD1 | Sur l'hôte, avant le pod : « OK   configuration dérivée : … rien d'autre : 6 » ; six lignes « écart prévu » ; « configuration dérivée : sha256 78645df78c3d47b90fd9617844058105b752146402e5a5288aa0abc66e73d2d8 » | Haute : valeur calculée par le banc (section C) avec les mêmes entrées, y compris le digest de `boot_image` |
+| VD2 | Pod `s1-05-verrou-derivee` prêt ; les cinq livraisons passent | Haute : mêmes gestes qu'à `verrou` et `verrou_brut` ; la livraison sous `/etc/mock` est neuve, mais le pod est root |
+| VD3 | `SONDE_CFG_DERIVEE` : configuration de base `sha256 a8e5f2bc…`, configuration livrée `sha256 78645df7…`, puis les deux « OK » de l'hôte ; `mock --debug-config : rc 0` ; trois lignes « configuration lue par mock » (`root`, `bootstrap_image` sur `essais-05/rocky9-bootstrap@sha256:f0ccf105…`, `bootstrap_image_ready = True`), aucune pour `bootstrap_image_fallback` ni `bootstrap_image_assert_digest` | Haute pour les sha256 (banc C, `s1-image.log`) ; moyenne pour les trois lignes : `--debug-config` n'écrit que les clés différentes du défaut (lecture), et `root` n'a jamais été relevé |
+| VD4 | « podman pull, image dérivée : rc 0 en N s », N inférieur à 60 ; « OK   podman pull de l'image dérivée par le pod : rc 0 » ; inspect : `sha256:f0ccf105…` et `linux/amd64` | Moyenne : lecture anonyme de `essais-05/` jamais mesurée ; la configuration commitée de Zot la donne sur `**`, la configuration déployée n'est pas relue. `.Digest` d'une image tirée par digest non mesuré |
+| VD5 | `SONDE_VERROU` : sources `rc 0` ; « configuration : config_opts['bootstrap_image_ready'] = True » ; options qui annulent « prête » : 0 ; `mock --buildsrpm (image dérivée) : rc 0` ; src.rpm `sample-app-1.0.0-2.el9.src.rpm`, `c802e60a…` (quatrième fois) | Haute : tenu à `verrou` avec la même sonde et une image prête |
+| VD6 | `root.log` : « Not updating bootstrap chroot, bootstrap_image_ready=True », compte cumulé de 1 après `--buildsrpm` comme après le calcul ; aucune ligne « Bootstrap image not marked ready » ni « Package management in bootstrap » | Haute : motif mesuré à `verrou` (`buildroot.py:1193`) |
+| VD7 | `mock --calculate-build-dependencies : rc 0` ; un seul `buildroot_lock.json` ; aucune ligne « builddep command missing » | Moyenne à haute : `builddep.py` et `dnf-3` sont lus dans l'image dérivée (section H) ; le calcul n'a jamais tourné sur un bootstrap que mock n'a pas lui-même préparé |
+| VD8 | La fin de `verrou-calc.log` archivée liste, sous « Buildroot is handled by package management downloaded with a bootstrap image », exactement `rpm-4.16.1.3-39.el9.x86_64`, `python3-dnf-4.14.0-31.el9.rocky.0.1.noarch`, `python3-dnf-plugins-core-4.3.0-24.el9_7.noarch` et `yum-4.14.0-31.el9.rocky.0.1.noarch`, la liste de `verrou_brut` ([`s1-verrou_brut-mock.log`](s1-verrou_brut-mock.log), lignes 459 à 463) | Moyenne à haute : mêmes versions dans l'image dérivée ; la façon dont mock établit cette liste n'est pas lue |
+| VD9 | `SONDE_REPLI` : « 0 ligne(s) de repli sans image » pour `res-verrou/root.log`, `verrou-srpm.log` et `verrou-calc.log` | Moyenne à haute : le repli peut venir du pull, du contrôle d'architecture ou de la copie, qui passent par le même `_fallback` (`buildroot.py:276-302`, lecture) ; le pull du pod (VD4) et la ligne `linux/amd64` de l'inspect couvrent les deux premiers |
+| VD10 | `SONDE_BOOT` : « 1 chemin(s) », chemin retenu `/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root` ; deux listes de 153 lignes, `rpm -qa rc 0`, « stderr 0 ligne(s) » ; aucune ligne « seulement dans … » ; « lignes communes : 153 » ; pull `rc 0` | Haute pour 153 (`boot_racine`) ; moyenne à haute pour l'absence d'écart : mock ne touche pas au bootstrap d'une image prête (`buildroot.py:590`, lecture) et ne fait pas de mise à jour du bootstrap (`mock.py:777`, lecture) ; indice mesuré à `verrou` (appuis). C'est la mesure principale de l'étape |
+| VD11 | Résumé du verrou : version 1.1.0 ; les mêmes sept options recopiées ; `bootstrap_image` enregistré = `sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf105…` ; `bootstrap_image_ready` enregistré `True` ; macros recopiées ; champs du bootstrap `architecture, id, image_digest, pull_digest` ; architecture `amd64` | Haute : même greffon qu'à `verrou_brut`, seules les valeurs posées changent |
+| VD12 | `image_digest` différent de celui de `verrou_brut` (`fdd27347…`). **Pas de pari sur sa valeur** : c'est un sha256 de RootFS et Config | Haute pour « différent » (couche et config différentes) ; valeur imprévisible |
+| VD13 | Comparaison : « bootstrap, pull_digest égal au digest de boot_image : oui » ; « options de configuration différentes de verrou_brut : bootstrap_image, bootstrap_image_ready » ; « ici 222, verrou_brut 222 ; communs 222 ; seulement ici 0 ; seulement dans verrou_brut 0 » | Moyenne à haute : mêmes dépôts figés de vault 9.7, même spec et même dnf (les mêmes versions que dans le bootstrap de `verrou_brut`) ; une résolution différente n'est pas exclue par la lecture |
+| VD14 | Résumé : « rpm avec url : 222 sur 222 », mêmes préfixes sous vault 9.7 ; « valeurs distinctes de signature : 1 ; None » | Haute si VD13 tient : mesuré à `verrou_brut` |
+| VD15 | Fin : « journaux de mock : … lignes » ; « pod s1-05-verrou-derivee supprimé » ; code 0 ; capacité de `/w` à 3 059 832 kB ; durée totale de moins de 10 min (101 s pour `verrou_brut`) ; aucune écriture dans Zot, aucun appel à `auth_zot` | Moyenne pour la durée ; haute pour le reste (lecture de l'étape : seuls le pod et `resultats/` sont écrits) |
+
+| VD16 | Place : « capacité de /w : 3059832 kB » ; « utilisés » entre 1 400 000 et 2 600 000 kB (1 850 684 kB à `verrou_brut`) ; aucune ligne « No space left on device » | Moyenne : l'image dérivée tirée est plus grosse que la brute, mais mock n'installe plus rien dans le bootstrap ; `df` compte aussi le stockage de podman |
+| VD17 | Intégrité : le sha256 de `s1-verrou_derivee.json` est égal à celui de la ligne « verrou : buildroot_lock.json … sha256 » de la sonde | Haute : tenu à `verrou_brut` ; c'est le seul contrôle du filtre `jeton\|token` sur le verrou |
+
+**Ce que ferait un écart** :
+- VD4 non tenue : l'étape s'arrête avant mock. La cause est lue dans les cinq lignes du journal de pull, et aucun changement de
+  la configuration de Zot n'est fait sans accord.
+- VD7 non tenue : la fin de `verrou-calc.log` est lue avant toute relance ; pas de relance sans analyse.
+- VD10 en écart (le bootstrap diffère de l'image) : l'image dérivée ne suffit pas à rendre mock passif. Décision avec le
+  propriétaire avant M2.
+- VD13 en écart : les dix premières différences sont dans le journal ; elles sont analysées avant M2.
+
+Suite : accord de lancement (« verrou_derivee »). Rien n'est lancé.
