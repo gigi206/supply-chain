@@ -1,0 +1,7 @@
+# s1-m2-tailles.py, 2026-11-17T16:11:27Z, python3 3.13.12, verrou b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+paquets du verrou : 222 ; trouvés dans les primary : 222
+absents : []
+taille des rpm (package) : 219543349 octets
+taille installée : 749249076 octets
+types de somme : ['sha256']
+code 0

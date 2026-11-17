@@ -2053,3 +2053,64 @@ Décision du propriétaire : question « J'applique s1-m2.patch à s1.sh ? », r
 
 Suite : prédictions de `voie2` et de `hermetique`, écrites et commitées avant tout passage, puis un accord par étape. Rien n'est
 lancé.
+
+## Étapes `voie2` et `hermetique` : prédictions (note du 2026-11-17, écrite à 2026-11-17T16:12:07Z, avant tout passage ; rien n'est réécrit), NON LANCÉ
+
+Commandes prévues, depuis la racine du dépôt, une par accord nommé, `date -u` avant et après, code par `PIPESTATUS`, sortie dans
+un fichier : `env -u PREFIXE -u ISOLATION DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/s1.sh voie2 </dev/null`,
+puis la même avec `hermetique`, dans les 12 h (sommeil du pod). `s1.sh` vaut `8554910f…`. Journaux attendus : `s1-voie2.log`,
+`s1-hermetique.log`, `s1-hermetique-mock.log`. **`voie2` laisse un pod privilégié en place** jusqu'à `hermetique`, ou jusqu'à 12 h.
+Relance après échec : `voie2` d'abord, sous un autre `PREFIXE`, pour que rien d'archivé ne soit réécrit.
+
+Ces deux étapes mesurent la voie 2 et le mécanisme de `--hermetic-build`, **réseau présent**. Elles ne prouvent pas
+l'hermétisme (M3), et la fermeture dans Zot reste hors de cette partie : même toutes tenues, elles ne font pas « M2 passé ».
+
+**Appuis mesurés** :
+- `verrou_derivee` ([`s1-verrou_derivee.log`](s1-verrou_derivee.log)) : `podman pull` anonyme de l'image dérivée par un pod en
+  8 s ; « Not updating bootstrap chroot, bootstrap_image_ready=True » dans `root.log` (`buildroot.py:1193`) ; `--buildsrpm` en
+  42 s, src.rpm `c802e60a…` ; calcul en 34 s ; 1 767 372 kB utilisés sur 3 059 832 kB à la fin.
+- `boot_racine` ([`s1-boot_racine.log`](s1-boot_racine.log)) : `rpm -K` avec la seule clé de Rocky, 10 OK sur 10, sur des rpm
+  de vault 9.7.
+- `essais` ([`s1-essais.log`](s1-essais.log)) : src.rpm `c802e60a…` ; un seul rpm binaire,
+  `sample-app-1.0.0-2.el9.x86_64.rpm` `864d55f4…`.
+- Hôte : 222 rpm dans le verrou, 219 543 349 octets au total et 749 249 076 octets installés, sommés dans les primary de vault
+  9.7 vérifiés par `hote97` à 14:30, relus sans nouveau contrôle ([script](s1-m2-tailles.py), [journal](s1-m2-tailles.log)) ;
+  couche ajoutée de l'image dérivée : 97 742 593 octets ([`s1-boot_image.log`](s1-boot_image.log)).
+- Banc ([`s1-m2-banc-applique.log`](s1-m2-banc-applique.log)) : `m2_preparer` accepte le vrai verrou ; outils des sondes
+  présents dans l'image d'essai ; `hermetic-build.cfg` de l'image égal à celui du tag.
+
+| # | Prédiction | Confiance et raison |
+|---|---|---|
+| MV1 | Sur l'hôte : « OK » pour le sha256 du verrou d'entrée (`b6d0f8f1…`), l'empreinte de la clé (`21CB256A…`), puis les cinq « OK » de `m2_preparer` et « OK   verrou : 222 paquets » ; « bootstrap : docker://…/essais-05/rocky9-bootstrap@sha256:f0ccf105… vers dir:<dépôt>/sc-stockage.poc.test@sha256:f0ccf105… » | Haute : même fonction, même verrou au banc (section C) |
+| MV2 | Pod `s1-05-m2` prêt ; les sept livraisons passent ; « verrou livré : sha256 b6d0f8f1… » | Haute : mêmes gestes qu'aux étapes précédentes |
+| MV3 | 222 téléchargements en HTTP 200 ; « téléchargement : 222 fichiers en N s », N < 300 | Moyenne : vault 9.7 a servi les rpm de mock dans un pod au même label (`verrou_brut`), mais `curl` est sans `-L` : une redirection donnerait un KO (pas un faux OK) |
+| MV4 | « rpm -K : rc 0, 222 OK sur 222 » | Moyenne à haute : 10 sur 10 à `boot_racine`, mêmes dépôts et même clé ; 222 rpm jamais contrôlés ainsi |
+| MV5 | « OK   nom, version, release, arch et sigmd5 des 222 rpm égaux au verrou » | Moyenne à haute : le sigmd5 du verrou vient de `rpm -qa` du buildroot (`installed_packages.py`, lecture), l'en-tête du fichier est le même |
+| MV6 | `createrepo_c --compatibility : rc 0` en moins de 60 s ; `repomd.xml` présent, sha256 affiché | Moyenne : l'option existe en 0.20.1 (lecture de l'amont, `releve4`) ; jamais lancé dans l'image |
+| MV7 | `skopeo copy --preserve-digests : rc 0` ; « OK   manifeste copié : sha256:f0ccf105… » ; l'hôte le relit et laisse le pod | Moyenne : lecture anonyme mesurée pour podman, pas pour skopeo ; CA lu par la même bibliothèque (lecture) ; option lue dans l'amont |
+| MV8 | `df` final de `voie2` : utilisés entre 300 000 et 600 000 kB | Moyenne : 214 400 kB de rpm, plus l'image copiée (la couche dérivée de 95 452 kB et la couche de base, non relevée) |
+| MV9 | Code 0 ; « pod s1-05-m2 laissé pour l'étape hermetique » ; durée totale de moins de 10 min ; aucune écriture dans Zot | Moyenne pour la durée, haute pour le reste |
+| MH1 | Sur l'hôte : porte de `voie2` OK, pod `Running` ; dans le pod : verrou `b6d0f8f1…`, `repomd.xml` égal à celui de `voie2`, manifeste du dossier `dir:` `f0ccf105…` | Haute si MV7 tient et si `hermetique` part dans les 12 h |
+| MH2 | Sources `rc 0` ; `df` avant mock égal, à 2 000 kB près, à celui de la fin de `voie2` | Haute |
+| MH3 | `mock --hermetic-build : rc 0` | Moyenne : jamais lancé ; inconnues lues mais non mesurées : `podman pull` d'un chemin `dir:` qui contient « : » et « @ », dépôt `file:///` monté dans le bootstrap (`package_manager.py:509`), dnf sans `--releasever`, forme `--spec`/`--sources` jamais jouée ici |
+| MH4 | Au moins une ligne, dans la sortie ou dans `root.log`, pour « Using container image: dir: », « Pulling image: dir: », « Tagging container image as mock-bootstrap- », « Checking image digest: 18d64b03… », « Calculating … image OCI digest », l'architecture, « Not updating bootstrap chroot » et « --installroot=/w/mock-h/ ». **Pas de pari sur les nombres** : `rebuild_generic` passe deux fois (src.rpm, puis rebuild) | Moyenne à haute si MH3 ; le digest affirmé repose sur `RootFS` et `Config`, que la copie par digest garde (lecture) |
+| MH5 | Zéro ligne « falling back to chroot installation », « Expected digest for image » et « No space left on device », dans les deux fichiers | Moyenne à haute : repli interdit en mode hermétique (`config.py:868`) ; un écart de digest arrêterait mock |
+| MH6 | Résultats : `sample-app-1.0.0-2.el9.src.rpm` de sha256 `c802e60a…` (cinquième fois) et un seul rpm binaire, `sample-app-1.0.0-2.el9.x86_64.rpm` | Moyenne : ce n'est pas le fichier des quatre relevés précédents, pris juste après `--buildsrpm`. Le rebuild reconstruit le src.rpm (`backend.py:285`) et le recopie dans le même dossier de résultats (`:756-757`, `:762-771`), par-dessus le premier (lecture) : on mesure ce second fichier, jamais relevé. Même spec, mêmes sources, même rpm-build de vault 9.7 |
+| MH7 | `BUILDHOST reproducible` pour les deux rpm ; même `BUILDTIME` pour les deux | Moyenne à haute : les macros sont recopiées par le verrou et réappliquées (`releve2`, lecture) |
+| MH8 | Le rpm binaire a le sha256 de celui d'`essais`, `864d55f4…` | Moyenne à faible : mêmes 222 paquets, mêmes macros, même spec et mêmes sources ; la reproductibilité du rpm n'a jamais été mesurée (c'est M3) |
+| MH9 | `df` après mock, buildroot gardé : utilisés entre 1 300 000 et 2 600 000 kB, sous la capacité de 3 059 832 kB | Moyenne : 1 767 372 kB à `verrou_derivee`, où l'image dérivée restait dans le stockage de podman (tirée par son nom avant mock). Ici, mock retire son tag après la copie (`buildroot.py:303`, `podman.py:239-247`) et rien d'autre ne la nomme : elle ne devrait plus compter (lecture). Moins aussi le cache de dnf ; plus le dépôt hors ligne (214 400 kB), l'image copiée et la construction |
+| MH10 | Journaux de mock archivés ; « pod s1-05-m2 supprimé » ; code 0 ; durée de moins de 15 min ; aucune écriture dans Zot | Moyenne pour la durée, haute pour le reste |
+
+**Pas de pari** : le nombre d'entrées de `/var/lib/mock` ; les nombres de lignes de MH4 ; la valeur de `BUILDTIME`.
+
+**Ce que ferait un écart** :
+- MV3 à MV7 non tenue : `voie2` s'arrête en KO et retire le pod. La cause est lue dans le journal ; aucune relance sans analyse.
+- MV7 tenue mais MH1 non tenue : pod perdu ou dépôt changé ; `voie2` est à refaire, sous un autre `PREFIXE`.
+- MH3 non tenue : les fins de `hermetique.log` et de `root.log` sont lues avant toute relance. Si la forme `--spec`/`--sources`
+  est en cause, le repli est un src.rpm rapatrié puis livré, par un correctif à part.
+- MH9 non tenue (place) : décision avec le propriétaire (mémoire du pod, nettoyage entre `voie2` et mock).
+
+Suite : accord de lancement de `voie2`. Rien n'est lancé.
+
+*Note du 2026-11-17, écrite à 2026-11-17T16:12:07Z* : les tailles citées dans la note de préparation de ces étapes (219 543 349 et 749 249 076
+octets), vues alors seulement à l'écran, sont archivées depuis ce commit ([journal](s1-m2-tailles.log)) ; valeurs inchangées.
