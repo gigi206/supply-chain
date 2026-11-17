@@ -2276,3 +2276,68 @@ Décision du propriétaire : question « J'applique s1-fermeture.patch à s1.sh 
 
 Suite : prédictions de `collecte`, `fermeture` et `restauration`, écrites et commitées avant tout passage, puis un accord par
 étape (`fermeture` écrit dans Zot, définitivement). Rien n'est lancé.
+
+## Étapes `collecte`, `fermeture` et `restauration` : prédictions (note du 2026-11-17, écrite à 2026-11-17T17:16:20Z, avant tout passage ; rien n'est réécrit), NON LANCÉ
+
+Commandes prévues, depuis la racine du dépôt, une par accord nommé, `date -u` avant et après, code par `PIPESTATUS`, sortie dans
+un fichier : `env -u PREFIXE -u ISOLATION DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/s1.sh collecte </dev/null`,
+puis la même avec `fermeture`, puis avec `restauration`. `s1.sh` vaut `4c3adb53…`. Journaux attendus : `s1-collecte.log`,
+`s1-fermeture.log`, `s1-restauration.log` (aucun n'existe). Tags de la fermeture : `s1` et `s1-bis`. **`fermeture` écrit dans
+Zot de façon définitive** : Zot n'autorise pas la suppression.
+
+**Appuis mesurés** :
+- `voie2` ([`s1-voie2.log`](s1-voie2.log)) : 222 rpm téléchargés en 40 s, `rpm -K` 222 OK, `createrepo_c` en 1 s, `skopeo copy`
+  en 1 s, manifeste `f0ccf105…` ; 312 296 kB utilisés sous `/w` à la fin.
+- `boot_image` ([`s1-boot_image.log`](s1-boot_image.log)) et banc local ([`s1-boot-image-local.log`](s1-boot-image-local.log)) :
+  une seule couche, de 97 742 593 octets.
+- Tailles du verrou ([journal](s1-m2-tailles.log)) : 219 543 349 octets de rpm. Rpm de mock : 258 845 octets (primary d'EPEL
+  du dernier `hote`, relu le 17/11 avant ce commit ; vu à l'écran, non archivé ailleurs que dans ce texte) ; verrou : 111 561 octets ([`s1-verrou_derivee.json`](s1-verrou_derivee.json), taille du fichier commité).
+- Banc du dépôt ([`s1-fermeture-banc-applique.log`](s1-fermeture-banc-applique.log)) : 82 OK, dont l'envoi et la restauration
+  des chemins à « : » et « @ » par le vrai `closure.sh` et oras 1.3.6, contre un registre local.
+- Zot : 5 551 Mo libres sous `/` de `sc-stockage` à `prealables` ([`s1-prealables.log`](s1-prealables.log), 16/11, 22:49 UTC),
+  avant `amorce`, `image` et `boot_image` ; `/var/lib/zot` est sous `/`. `dedupe: true` dans la configuration versionnée.
+
+| # | Prédiction | Confiance et raison |
+|---|---|---|
+| C1 | Sur l'hôte : « OK » pour le sha256 du verrou, les empreintes des clés de Rocky et d'EPEL, et « rpm de mock dans le primary d'EPEL du dernier passage de hote : sha256 a5043350… » ; les cinq « OK » de `m2_preparer` | Haute : verrou, clé de Rocky et `m2_preparer` comme à `voie2` ; primary d'EPEL lu au banc ; l'empreinte d'EPEL comparée à `$T/fp-epel` n'a été jouée ni à `voie2` ni au banc, mais ce fichier existe et vaut l'empreinte que `gpg --show-keys` donne pour la clé livrée (`FF8AD134…`, relu le 17/11 avant ce commit) |
+| C2 | Pod `s1-05-mf` prêt ; `mf-voie2` reproduit `voie2` : 222 téléchargements, `rpm -K` 222 OK, en-têtes égaux, `createrepo_c` rc 0, « OK   manifeste copié : sha256:f0ccf105… » | Haute : même script, mêmes dépôts figés (vault 9.7) |
+| C3 | `mf-collecte` : rpm de mock en HTTP 200, sha256 `a5043350…`, « rpm -K du rpm de mock (seule clé d EPEL) : rc 0 ; digests signatures OK » | Moyenne : `racine` a tiré d'EPEL (`dl.fedoraproject.org`, `baseurl` de `EPEL9`) dans un pod au même label ; mais EPEL bouge, et 6.9-1 pourrait en avoir été retiré depuis 08:30. Un 404 ou une redirection (`curl` est sans `-L`) donnerait un KO, pas un faux OK |
+| C4 | « autres entrées que fichiers et dossiers : 0 » ; « fichiers de la fermeture : N », N entre 230 et 240 (222 rpm, `repodata`, quatre fichiers d'image, verrou, rpm de mock) | Moyenne : le nombre de fichiers de `repodata` n'a jamais été relevé |
+| C5 | Rapatriement par tar sans erreur ; pod retiré | Moyenne à haute : un rapatriement de 258 Mo a passé à `boot_racine` ; ici, environ 320 Mo |
+| C6 | Sur l'hôte : « rpm du verrou trouvés dans les primary de vault 9.7 vérifiés par hote97 : 222 sur 222 », puis « OK   fermeture conforme » ; classe `image` : 4 fichiers (manifeste, `version`, config, couche) | Moyenne : la liste exacte des fichiers écrits par skopeo et le type de somme de `repomd.xml` n'ont jamais été relevés ; un écart donnerait un KO avant toute écriture dans Zot |
+| C7 | Total de la fermeture entre 317 656 348 et 320 050 000 octets | Moyenne à haute. Borne basse : 219 543 349 (rpm) + 97 742 593 (couche) + 258 845 (rpm de mock) + 111 561 (verrou), sans la config, le manifeste, `version` ni `repodata`. Borne haute : `voie2` a mesuré 312 296 kB (319 791 104 octets) utilisés sous `/w`, qui contenaient déjà les rpm, `repodata`, l'image et le verrou, plus d'autres fichiers ; s'y ajoute le rpm de mock |
+| C8 | Code 0 ; durée de moins de 15 min ; aucune écriture dans Zot | Moyenne pour la durée, haute pour le reste |
+| F1 | « OK   arbre égal à la liste » avant l'envoi ; catalogue lu ; « deps/sample-app/mock-buildroot-lock absent » | Haute : aucune étape du dépôt git ne nomme ce dépôt avant celle-ci (lecture du dépôt git, pas de Zot) ; lecture de `oras repo ls` contre Zot jamais jouée (un échec arrêterait l'étape avant l'envoi) |
+| F2 | « OK   blobs de l'image sous essais-05/rocky9-bootstrap = blobs du dossier dir: » | Haute : copie par digest (`--preserve-digests`) |
+| F3 | Place libre de Zot au-dessus du double de la fermeture | Haute : 5 551 Mo le 16/11, moins les images poussées depuis |
+| F4 | Deux envois en rc 0 ; même digest ; manifeste relu égal ; couches égales à la liste (titre, digest, taille) | Haute : mêmes gestes qu'au banc, et qu'à la 06 S2 |
+| F5 | Croissance de `/var/lib/zot` au premier envoi entre 200 000 000 et 260 000 000 octets ; sans partage des blobs de l'image, elle serait d'au moins 317 656 348 octets (borne basse de C7) | Moyenne : les blobs de l'image sont déjà sous `essais-05` ; le partage entre dépôts par `dedupe` est lu, pas mesuré ; d'autres écritures sur `/` peuvent fausser le compte |
+| F6 | Croissance au second envoi de moins de 5 000 000 octets | Moyenne à haute : mêmes blobs, seul le tag change ; même bruit possible |
+| F7 | Durée de l'envoi 1 de moins de 5 min, de l'envoi 2 de moins de 1 min ; code 0 | Moyenne : `boot_image` a poussé 97 Mo en 10 s environ, mais par crane |
+| F8 | Si `stat` est lisible et la disposition supposée exacte : même inode sous les deux dépôts et au moins deux liens, pour la config et la couche | Faible : partage par liens durs lu, jamais relevé ; « illisible » ne réfute rien |
+| R1 | Pull par digest rc 0 ; « OK   arbre égal à la liste » pour tous les fichiers de la liste ; code 0 en moins de 5 min | Haute si F4 tient : mêmes gestes qu'au banc |
+
+**Pas de pari** :
+- la lisibilité de `stat` sans sudo sous `/var/lib/zot`, la disposition des blobs (supposée) et donc les inodes et liens ;
+- le sha256 de `repomd.xml` (aucune égalité attendue avec `86ddcef1…`) ;
+- le nombre de dépôts du catalogue et la dérive entre les deux lectures de place d'avant l'envoi.
+
+**Ce que ferait un écart** :
+- C3 à C6 non tenue : `collecte` s'arrête en KO, avant toute écriture dans Zot ; la cause est lue dans le journal, sans relance
+  avant analyse. Un 404 sur le rpm de mock appelle une décision du propriétaire, sans source de rechange improvisée.
+- F1 à F3 non tenue : rien n'est envoyé.
+- Échec après un premier envoi réussi : `fermeture.digest` est déjà écrit ; la relance se fait sous un autre `PREFIXE`, car la
+  garde refuserait le tag `s1`.
+- Seconde lecture de place d'avant l'envoi illisible : la croissance du premier envoi s'affiche « illisible », même si la
+  première lecture était bonne ; F5 est alors non mesurée.
+- F5 hors bornes : aucune conclusion sur la déduplication sans relevé des liens ; la décision revient au propriétaire.
+- Toute relance de `collecte` ou de `restauration` se fait sous un autre `PREFIXE`, pour ne réécrire aucun journal archivé.
+- Une fois `fermeture` passée, `collecte` ne se relance plus : elle efface `$T/mf`, donc `fermeture.digest` et la liste
+  attendue, et un nouveau `repodata` donnerait un autre digest.
+- Les deux lectures de place d'avant l'envoi sont à une seconde d'écart environ : elles ne bornent pas la dérive de `/` sur la
+  durée d'un envoi.
+
+Ce que M2 demande, « fermeture restaurable par digest ; déduplication mesurée », sera jugé après R1. Dire si F5 et F6, sur une
+seule fermeture, suffisent pour « déduplication mesurée » revient au propriétaire.
+
+Suite : accord de lancement de `collecte`. Rien n'est lancé.
