@@ -1244,3 +1244,61 @@ Décision du propriétaire : question « J'applique s1-verrou-brut-2.patch (copi
 
 Suite : prédictions de `verrou_brut`, écrites et commitées avant tout passage, puis accord de lancement. Rien n'est lancé, rien
 n'est écrit dans Zot.
+
+## Étape `verrou_brut` : prédictions (note du 2026-11-17, écrite à 2026-11-17T13:32:29Z, avant tout passage ; rien n'est réécrit), NON LANCÉ
+
+Commande prévue, depuis la racine du dépôt, sur accord nommé :
+`env -u PREFIXE DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/s1.sh verrou_brut`, avec `ISOLATION` non posée (`simple`,
+la seule isolation qui a construit à `essais`). `s1.sh` vaut `139aab3c…`.
+
+**Lecture de code utilisée** (mock 6.9, archive `3c034916…`), **non mesurée** :
+- `buildroot.py:277` à `:303` : mock tire l'image, la copie dans le bootstrap, puis retire l'étiquette temporaire par
+  `podman rmi` (`podman.py:239` à `:247`). Le commentaire de `untag` dit que l'image disparaît s'il n'en reste « aucune autre
+  étiquette ». Que la référence par digest compte comme un nom, ou non, n'est pas lu. `essais` montre la ligne « Removing image
+  mock-bootstrap-… » ([`s1-essais.log`](s1-essais.log), ligne 96), mais rien n'y a relu l'image ensuite.
+- `buildroot_lock.py:105` à `:113` : si l'image a disparu, `inspect_hermetic_metadata` (`podman.py:262` à `:272`) lève
+  `subprocess.CalledProcessError`, pas `PodmanError`. Seule `PodmanError` est attrapée (`:112`) : le crochet `postdeps`
+  échouerait avant l'écriture du JSON (`:115` et `:116`). `call_hooks` n'attrape rien (`plugin.py:72` à `:81`). En tête de
+  `mock.py`, une exception de ce type donne le code 1 et `log.exception` (`:1174` à `:1176`) ; le texte exact de la trace n'est
+  pas lu. La sortie d'erreur de podman est capturée (`stderr=subprocess.PIPE`) sans être journalisée : en (b) ci-dessous, la
+  cause de l'échec de podman ne sera pas archivée.
+- `podman.py:267` écrit « Reading image … from … » juste avant cet `inspect` : c'est le repère qu'il a été atteint.
+- `get_oci_digest` (`podman.py:200` à `:206`) interroge `self.image`, la référence, et non `image_id`, qui vaut `None` dans
+  l'objet neuf du greffon.
+- `installed_packages.py` : `gpg-pubkey` est exclu de la liste. Les adresses viennent de
+  `dnf --installroot=<buildroot> repoquery -q --location`, et un paquet sans adresse fait lever « Can't get location for … »,
+  une `mockbuild.exception.Error` que `mock.py` journalise par `log.error`. Les dépôts lus par ce dnf seraient ceux de la
+  configuration de mock (baseurl de vault 9.7) : c'est une lecture, pas une mesure.
+- Le champ `signature` du verrou garde les 8 derniers caractères de `%{sigpgp:pgpsig}`, ou `null` si la valeur est « (none) ».
+- `buildroot_lock.py:38` : l'état s'appelle « Generating the buildroot lockfile: buildroot_lock.json ». mock affiche ses états
+  en « Start: … » (lignes « Start: build setup … » de [`s1-verrou.log`](s1-verrou.log)).
+
+| # | Prédiction | Confiance et raison |
+|---|---|---|
+| VB1 | Pod `s1-05-verrou-brut` prêt ; sources livrées, `rc 0` ; `mock --debug-config : rc 0` | Haute : mêmes gestes qu'`essais` et `verrou`, tenus |
+| VB2 | « configuration : bootstrap_image_ready absent de --debug-config, donc valeur par défaut (False) » ; « options bootstrap_* qui annulent « prête », posées : 0 » | Moyenne : `--debug-config` n'écrit que les clés qui diffèrent du défaut (`mock.py:603` à `:620`), et `False` est le défaut |
+| VB3 | `mock --buildsrpm (image brute) : rc 0` ; src.rpm `sample-app-1.0.0-2.el9.src.rpm`, sha256 `c802e60a…` (troisième fois) | Haute : tenu à `essais` en `simple` avec la même configuration, et à `verrou` |
+| VB4 | Après `--buildsrpm`, `root.log` porte au moins une ligne « Bootstrap image not marked ready » et aucune « Not updating bootstrap chroot » | Haute : mesuré à `essais` avec la même configuration ([`s1-essais.log`](s1-essais.log), lignes 98 et 113 ; `buildroot.py:1176`). Le compte cumulé après le calcul n'est pas prédit (deux lectures possibles, note de `verrou`) |
+| VB5 | Le calcul atteint l'écriture du verrou : une ligne « Start: Generating the buildroot lockfile: buildroot_lock.json » dans la fin de `verrou-calc.log` archivée (`s1-verrou_brut-mock.log`) ; aucune ligne « builddep command missing » | Moyenne. Preuve indirecte que `builddep` sera là : à `essais`, `simple` a fait `--rebuild : rc 0` (ligne 137), `rebuild` appelle `builddep` (lecture), et son absence a fait échouer `verrou`. La commande d'installation du greffon (ligne 116 d'`essais`) est celle du passage `nspawn`, qui a échoué : elle ne prouve pas l'installation |
+| VB6 | **Pas de pari sur la branche finale du calcul.** (a) L'image survit au `rmi` : `rc 0`, un seul `buildroot_lock.json`. (b) Elle a disparu : `rc` non nul (1 d'après la lecture), « Reading image » présent, puis une trace dans la fin de `verrou-calc.log` ; la ligne brute fait foi, aucun texte n'est prédit. (c) Une adresse manque : `rc` non nul, une ligne « Can't get location for … », « Reading image » absent. Dans les trois cas, « aucun verrou produit » hors de (a). Une autre cause est notée telle quelle | Faible : le sort d'une image tirée par digest, après `podman rmi` de son étiquette, n'est ni lu ni mesuré ; (c) est jugée moins probable que (a) et (b), sans chiffre |
+| VB7 | Branche (a) : « version du verrou : 1.1.0 » ; les sept options de V13 ; « bootstrap_image enregistré » égal à `$BOOT` (`sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ee90dc0e…`) ; « bootstrap_image_ready enregistré : False » ; « macros recopiées : oui » | Haute pour la version, `False` et les macros (code lu) ; moyenne pour la liste des sept |
+| VB8 | Branche (a) : « bootstrap, champs : architecture, id, image_digest, pull_digest » ; `pull_digest` `sha256:ee90dc0e…` ; architecture `amd64` ; `image_digest` est un sha256 différent de `pull_digest` | Moyenne : clés de la requête de `podman.py:266` plus `image_digest` ; `.Digest` d'une image tirée par digest non mesuré |
+| VB9 | Branche (a) : « rpm du buildroot : N », N entre 150 et 400 (V5) ; « rpm avec url : N sur N » ; préfixes des url sous `dl.rockylinux.org/vault/rocky/9.7/`, aucun sous `/extras/` | Moyenne : dépôts de la configuration lus, pas la requête réelle |
+| VB10 | Branche (a) : signatures. **Pas de pari** entre `350d275d` partout et `None` partout : cela dépend de la présence de l'étiquette `SIGPGP` dans les rpm de Rocky, que `SONDE_BOOT` affiche à côté de `RSAHEADER`. Aucune autre valeur | Faible : type de signature des rpm de Rocky 9 non lu |
+| VB11 | Branche (a) : intégrité. Le sha256 de `s1-verrou_brut.json` est égal à celui de la ligne « verrou : buildroot_lock.json … sha256 » de la sonde | Haute : aucun mot filtré attendu dans un verrou ; c'est le seul contrôle du filtre `jeton\|token` |
+| VB12 | `SONDE_BOOT`, dans toutes les branches où le bootstrap existe : « 1 chemin(s) », chemin retenu `/w/mock/poc-rocky-9.7-x86_64-bootstrap/root` ; les deux listes lues, `rpm -qa rc 0`, « stderr 0 ligne(s) », chacune avec plus de 100 lignes ; podman pull `rc 0`. Elle suppose que `var/lib/rpm` est un vrai dossier dans les deux racines : un échec silencieux se verrait par « 0 ligne(s) » avec `rc 0` | Moyenne : chemin par analogie avec `…-pret-x86_64-bootstrap/root` (journaux de `verrou`) ; `--no-cleanup-after` lu dans le code, pas mesuré ; nombre de paquets d'une image Rocky non relevé, seuil de 100 choisi large |
+| VB13 | « seulement dans le bootstrap de mock » : `python3-dnf-plugins-core.noarch` en fait partie, et au moins l'une de ses deux étiquettes de signature porte `Key ID 702d426d350d275d`. « seulement dans rockylinux:9.7 brut » : aucune ligne (rien de retiré ni de mis à jour) | Moyenne pour la présence du greffon ; faible pour « aucune ligne » : une mise à jour de `python3-dnf`, tirée par les dépendances, n'est pas exclue |
+| VB14 | Durées : `--buildsrpm` entre 20 et 300 s (53 s à `essais`, 50 s à `verrou`) ; `--calculate-build-dependencies` entre 10 et 300 s (`--rebuild` de 43 s à `essais`) | Moyenne |
+| VB15 | Place : « capacité de /w : 3059832 kB » (comme `essais`) ; « utilisés » entre 800 000 et 2 500 000 kB ; aucune ligne « No space left on device » | Moyenne : 1034 Mo mesurés par `du` à `essais` après un build complet ; ici sans build, mais avec un second pull ; `du` et `df` ne comptent pas pareil |
+| VB16 | Sondes complètes : les deux `dans` finissent par « (code de l'exec : 0) » ; « journaux de mock : … lignes » ; « pod s1-05-verrou-brut supprimé ». Les sondes finissent par `true` : le code 0 seul ne prouve rien | Moyenne |
+
+Observation sans prédiction : la durée du second `podman pull` de `SONDE_BOOT`, comparée aux 7 s d'`essais`, pourra indiquer si
+l'image était encore là après le `rmi` de mock. Ce ne sera qu'un indice.
+
+Ce que la mesure apportera pour la suite :
+- La liste de `SONDE_BOOT` (VB12, VB13) sort dans toutes les branches où le bootstrap existe. Elle donne les paquets à épingler
+  dans l'image dérivée.
+- En (b) ou (c), l'image dérivée suivrait le même chemin de code ; elle ne suffirait donc pas non plus, d'après la lecture. La
+  décision reviendrait au propriétaire.
+- La coupure de la référence au port du registre (`config.py:844`) ne joue qu'en mode hermétique : elle reste hors de cette
+  mesure.
