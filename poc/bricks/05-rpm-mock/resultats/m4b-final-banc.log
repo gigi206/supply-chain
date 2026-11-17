@@ -1,0 +1,83 @@
+# m4b-final-banc.sh, 2026-11-17T22:21:19Z ; m4b.sh avant 6da65a328b4fba5d2f81153025a591134fc7f54984a785a331e1a5e023dbc993 ; copie bf927e5b0925f77c3fda16f7762800e8f300e639d07cb8f93bc75353b8281963
+## A : insertions seules ; PREFETCH_FINAL contre PREFETCH
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 3
+OK   lignes insérées (en-tête 7, scripts 65, fonction 48) : 120
+     3c3
+     < for o in curl rpm createrepo_c skopeo sha256sum stat; do command -v "$o" >/dev/null 2>&1 || ko "$o absent de l'image"; done
+     ---
+     > for o in curl rpm createrepo_c skopeo sha256sum stat gpg; do command -v "$o" >/dev/null 2>&1 || ko "$o absent de l'image"; done
+     21,27c21,23
+     < if command -v gpg >/dev/null 2>&1; then
+     <   fp=$(gpg --batch --with-colons --show-keys "$K" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}')
+     <   [ "$fp" = "$FP_ROCKY" ] || ko "empreinte de la clé de l'image : $fp"
+     <   echo "clé de Rocky de l'image : empreinte conforme (gpg)"
+     < else
+     <   echo "gpg absent de l'image : empreinte contrôlée par l'identifiant court de rpm seulement"
+     < fi
+     ---
+     > fp=$(gpg --batch --with-colons --show-keys "$K" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}')
+     > [ "$fp" = "$FP_ROCKY" ] || ko "empreinte de la clé de l'image : $fp"
+     > echo "clé de Rocky de l'image : empreinte conforme (gpg)"
+     37,38c33,38
+     < t=$(date +%s); createrepo_c --compatibility "$D" > /tmp/createrepo.log 2>&1 </dev/null || { tail -n 5 /tmp/createrepo.log; ko "createrepo_c"; }
+     < echo "createrepo_c --compatibility : en $(($(date +%s) - t)) s ; repomd.xml $(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64)"
+     ---
+     > find "$D" -maxdepth 1 -name "*.rpm" -exec touch -h -d @0 {} + || ko "dates des rpm"
+     > t=$(date +%s)
+     > createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database "$D" > /tmp/createrepo.log 2>&1 </dev/null \
+     >   || { tail -n 20 /tmp/createrepo.log; ko "createrepo_c V2"; }
+     > echo "repodata V2 : repomd.xml $(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64) ; fichiers $(ls "$D/repodata" | wc -l) ; en $(($(date +%s) - t)) s"
+     > sed "s/^/repomd.xml V2 : /" "$D/repodata/repomd.xml"
+OK   PREFETCH : lignes retirées : 10
+OK   PREFETCH : lignes retirées hors gpg et createrepo_c : 0
+OK   PREFETCH_FINAL : lignes ajoutées : 10
+OK   PREFETCH_FINAL : lignes ajoutées hors gpg, dates, createrepo_c et repomd.xml : 0
+OK   PREFETCH_FINAL : outils, gpg compris : 1
+OK   PREFETCH_FINAL : plus aucun « gpg absent » : 0
+OK   PREFETCH_FINAL : contrôle de l'identifiant court gardé : 1
+OK   options de createrepo_c : PREFETCH_FINAL, BLOC_V2 de s1.sh : createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database | createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database
+OK   options de createrepo_c : variante V2 de COMPARE : 1
+OK   PREFETCH_FINAL : rpm datés à 0 avant createrepo_c : find "$D" -m|createrepo_c
+## B : syntaxe et shellcheck
+OK   bash -n : ok
+OK   dash -n PREFETCH_FINAL et ARBRE : ok
+OK   shellcheck : écarts (SC2016 seulement) : < SC2016 > SC2016
+OK   shellcheck : SC2016, avant et copie (un de plus) : 2 3
+## C : PREFETCH_FINAL par dash
+OK   nominal : 222 rpm, repodata V2 de 4 fichiers, dossier dir: de 4 fichiers (code 0)
+OK   nominal : repomd.xml imprimé en entier (lignes préfixées) : 223
+OK   nominal : ligne repodata V2 : repodata V2 : repomd.xml 7cb77f4dd9e4e85af4e03b481095cff1b483de857f041b1726a975b018e5513e fichiers 4
+OK   nominal : nom avec « + » téléchargé (%2B) : 1
+OK   gpg absent : refusé (repli retiré) (code 1)
+OK   createrepo_c en échec : refusé, fin de son journal imprimée (code 1)
+OK   createrepo_c en échec : message : ok
+OK   createrepo_c absent : refusé (code 1)
+OK   sha256 faux refusé (code 1)
+OK   taille fausse refusée (code 1)
+OK   nom en double refusé (code 1)
+OK   fichier absent du dépôt (HTTP 404) refusé (code 1)
+OK   signature d'un rpm refusée (code 1)
+OK   empreinte gpg fausse refusée (code 1)
+OK   identifiant court faux refusé (code 1)
+OK   manifeste différent refusé (code 1)
+## D : vraie fonction etape_final, faux kubectl
+OK   copie jouable : trois lignes remplacées : 3
+OK   nominal : deux pods, arbres égaux, arbre archivé (code 0)
+OK   nominal : lignes OK de l'étape : 19
+OK   nominal : arbre archivé, fichiers : 230
+OK   nominal : arbre archivé, repodata : 4
+OK   nominal : pods et PVC restants (faux cluster) : 0
+OK   nominal : pods créés, noms : m4b-05-final-p1.json m4b-05-final-p2.json
+OK   nominal : spec du pod p1 (label, uid, subPath, image) : prefetch-rpm 65532 fermeture sha256:99790c13
+OK   nominal : journaux distincts de ceux de l'essai : 0
+OK   nominal rejoué : arbre égal à celui archivé (code 0)
+OK   repomd.xml différent de l'attendu : refusé (code 1)
+OK   arbres p1 et p2 différents : refusé (code 1)
+OK   retrait du pod en échec : refusé (code 1)
+OK   PVC restante : refusé (code 1)
+OK   passage en échec : refusé, pod laissé (code 1)
+OK   passage en échec : pod laissé (faux cluster) : m4b-05-final-p1
+OK   liste différente de celle de prealables : refusé (code 1)
+OK   arbre archivé différent : refusé (code 1)
+# bilan : tenu, 51 OK, 0 KO, fin 2026-11-17T22:23:07Z

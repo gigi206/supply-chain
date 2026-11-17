@@ -1,0 +1,88 @@
+# m4b-final-banc.sh, 2026-11-17T22:19:31Z ; m4b.sh avant 6da65a328b4fba5d2f81153025a591134fc7f54984a785a331e1a5e023dbc993 ; copie bf927e5b0925f77c3fda16f7762800e8f300e639d07cb8f93bc75353b8281963
+## A : insertions seules ; PREFETCH_FINAL contre PREFETCH
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 3
+KO   lignes insérées (en-tête 7, scripts 65, fonction 50) : 120 (attendu : 122)
+     3c3
+     < for o in curl rpm createrepo_c skopeo sha256sum stat; do command -v "$o" >/dev/null 2>&1 || ko "$o absent de l'image"; done
+     ---
+     > for o in curl rpm createrepo_c skopeo sha256sum stat gpg; do command -v "$o" >/dev/null 2>&1 || ko "$o absent de l'image"; done
+     21,27c21,23
+     < if command -v gpg >/dev/null 2>&1; then
+     <   fp=$(gpg --batch --with-colons --show-keys "$K" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}')
+     <   [ "$fp" = "$FP_ROCKY" ] || ko "empreinte de la clé de l'image : $fp"
+     <   echo "clé de Rocky de l'image : empreinte conforme (gpg)"
+     < else
+     <   echo "gpg absent de l'image : empreinte contrôlée par l'identifiant court de rpm seulement"
+     < fi
+     ---
+     > fp=$(gpg --batch --with-colons --show-keys "$K" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}')
+     > [ "$fp" = "$FP_ROCKY" ] || ko "empreinte de la clé de l'image : $fp"
+     > echo "clé de Rocky de l'image : empreinte conforme (gpg)"
+     37,38c33,38
+     < t=$(date +%s); createrepo_c --compatibility "$D" > /tmp/createrepo.log 2>&1 </dev/null || { tail -n 5 /tmp/createrepo.log; ko "createrepo_c"; }
+     < echo "createrepo_c --compatibility : en $(($(date +%s) - t)) s ; repomd.xml $(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64)"
+     ---
+     > find "$D" -maxdepth 1 -name "*.rpm" -exec touch -h -d @0 {} + || ko "dates des rpm"
+     > t=$(date +%s)
+     > createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database "$D" > /tmp/createrepo.log 2>&1 </dev/null \
+     >   || { tail -n 20 /tmp/createrepo.log; ko "createrepo_c V2"; }
+     > echo "repodata V2 : repomd.xml $(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64) ; fichiers $(ls "$D/repodata" | wc -l) ; en $(($(date +%s) - t)) s"
+     > sed "s/^/repomd.xml V2 : /" "$D/repodata/repomd.xml"
+OK   PREFETCH : lignes retirées : 10
+KO   PREFETCH : lignes retirées hors gpg et createrepo_c : 1 (attendu : 0)
+OK   PREFETCH_FINAL : lignes ajoutées : 10
+OK   PREFETCH_FINAL : lignes ajoutées hors gpg, dates, createrepo_c et repomd.xml : 0
+OK   PREFETCH_FINAL : outils, gpg compris : 1
+OK   PREFETCH_FINAL : plus aucun « gpg absent » : 0
+OK   PREFETCH_FINAL : contrôle de l'identifiant court gardé : 1
+OK   options de createrepo_c : PREFETCH_FINAL, BLOC_V2 de s1.sh : createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database | createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database
+OK   options de createrepo_c : variante V2 de COMPARE : 1
+OK   PREFETCH_FINAL : rpm datés à 0 avant createrepo_c : find "$D" -m|createrepo_c
+## B : syntaxe et shellcheck
+OK   bash -n : ok
+OK   dash -n PREFETCH_FINAL et ARBRE : ok
+OK   shellcheck : écarts (SC2016 seulement) : < SC2016 > SC2016
+OK   shellcheck : SC2016, avant et copie (un de plus) : 2 3
+## C : PREFETCH_FINAL par dash
+KO   nominal : 222 rpm, repodata V2 de 4 fichiers, dossier dir: de 4 fichiers : code 127, attendu 0 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+/tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/8e4ef563-ec63-44dd-b5a2-5f0729c4e8b2/scratchpad/m4final/m4b-final-banc.sh: line 128: ~/.cache/supply-chain-poc/05/banc-m4b-final-1/cas/18/sortie/depot/repodata/repomd.xml: No such file or directory
+KO   nominal : repomd.xml imprimé en entier (lignes préfixées) : 0 (attendu : )
+/tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/8e4ef563-ec63-44dd-b5a2-5f0729c4e8b2/scratchpad/m4final/m4b-final-banc.sh: line 129: ~/.cache/supply-chain-poc/05/banc-m4b-final-1/cas/18/sortie/depot/repodata/repomd.xml: No such file or directory
+KO   nominal : ligne repodata V2 :  (attendu : repodata V2 : repomd.xml  fichiers 4)
+ls: impossible d'accéder à '~/.cache/supply-chain-poc/05/banc-m4b-final-1/cas/18/sortie/depot' : Aucun fichier ou répertoire de ce type
+KO   nominal : nom avec « + » téléchargé (%2B) : 0 (attendu : 1)
+KO   gpg absent : refusé (repli retiré) : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   createrepo_c en échec : refusé, fin de son journal imprimée : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   createrepo_c en échec : message : absent (attendu : ok)
+KO   createrepo_c absent : refusé : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   sha256 faux refusé : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   taille fausse refusée : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   nom en double refusé : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   fichier absent du dépôt (HTTP 404) refusé : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   signature d'un rpm refusée : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   empreinte gpg fausse refusée : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   identifiant court faux refusé : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   manifeste différent refusé : code 127, attendu 1 ; sortie : env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+## D : vraie fonction etape_final, faux kubectl
+OK   copie jouable : trois lignes remplacées : 3
+KO   nominal : deux pods, arbres égaux, arbre archivé : code 127, attendu 0 ; sortie : ### m4b-05-final-p1 (runc, uid 65532, label tekton.dev/task=prefetch-rpm) : prêt sur noeud-banc, runtimeClassName «  » env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   nominal : lignes OK de l'étape : 2 (attendu : 19)
+/tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/8e4ef563-ec63-44dd-b5a2-5f0729c4e8b2/scratchpad/m4final/m4b-final-banc.sh: line 210: ~/.cache/supply-chain-poc/05/banc-m4b-final-1/R1/m4b-final-arbre.txt: No such file or directory
+KO   nominal : arbre archivé, fichiers :  (attendu : 230)
+grep: ~/.cache/supply-chain-poc/05/banc-m4b-final-1/R1/m4b-final-arbre.txt: No such file or directory
+KO   nominal : arbre archivé, repodata :  (attendu : 4)
+KO   nominal : pods et PVC restants (faux cluster) : 2 (attendu : 0)
+KO   nominal : pods créés, noms : m4b-05-final-p1.json (attendu : m4b-05-final-p1.json m4b-05-final-p2.json)
+OK   nominal : spec du pod p1 (label, uid, subPath, image) : prefetch-rpm 65532 fermeture sha256:99790c13
+OK   nominal : journaux distincts de ceux de l'essai : 0
+KO   nominal rejoué : arbre égal à celui archivé : code 127, attendu 0 ; sortie : ### m4b-05-final-p1 (runc, uid 65532, label tekton.dev/task=prefetch-rpm) : prêt sur noeud-banc, runtimeClassName «  » env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   repomd.xml différent de l'attendu : refusé : code 127, attendu 1 ; sortie : ### m4b-05-final-p1 (runc, uid 65532, label tekton.dev/task=prefetch-rpm) : prêt sur noeud-banc, runtimeClassName «  » env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   arbres p1 et p2 différents : refusé : code 127, attendu 1 ; sortie : ### m4b-05-final-p1 (runc, uid 65532, label tekton.dev/task=prefetch-rpm) : prêt sur noeud-banc, runtimeClassName «  » env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   retrait du pod en échec : refusé : code 127, attendu 1 ; sortie : ### m4b-05-final-p1 (runc, uid 65532, label tekton.dev/task=prefetch-rpm) : prêt sur noeud-banc, runtimeClassName «  » env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   PVC restante : refusé : code 127, attendu 1 ; sortie : ### m4b-05-final-p1 (runc, uid 65532, label tekton.dev/task=prefetch-rpm) : prêt sur noeud-banc, runtimeClassName «  » env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+KO   passage en échec : refusé, pod laissé : code 127, attendu 1 ; sortie : ### m4b-05-final-p1 (runc, uid 65532, label tekton.dev/task=prefetch-rpm) : prêt sur noeud-banc, runtimeClassName «  » env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+OK   passage en échec : pod laissé (faux cluster) : m4b-05-final-p1
+OK   liste différente de celle de prealables : refusé (code 1)
+KO   arbre archivé différent : refusé : code 127, attendu 1 ; sortie : ### m4b-05-final-p1 (runc, uid 65532, label tekton.dev/task=prefetch-rpm) : prêt sur noeud-banc, runtimeClassName «  » env: 'dash' : Aucun fichier ou répertoire de ce type env: utilisez -[v]S pour passer des options dans les lignes shebang 
+# bilan : NON TENU, 20 OK, 31 KO, fin 2026-11-17T22:19:38Z

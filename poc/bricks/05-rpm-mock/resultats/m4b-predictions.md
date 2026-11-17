@@ -180,3 +180,37 @@ Passage du 17/11/2026 de 22:07:42 à 22:11:10 UTC, code 0, « écarts : 0 », au
 **Ce que cela n'établit pas** : ce build part de la fermeture de M3 (`verrou.json`, `outils/`) ; la fermeture de la plateforme n'aura ni l'un ni l'autre. Le pas final de `prefetch-rpm` n'a pas encore été rejoué entier avec V2.
 
 Pod `s1-05-m3-v2` supprimé ; rien écrit dans Zot ; arbres `$T/m3/restauree-v2` et `$T/m3/build-v2` laissés.
+
+## Note datée du 17/11/2026, écrite à 22:24:18 UTC : étape `final` préparée à sec (« Oui, prépare-le »), NON LANCÉE
+
+**Script** : [`../m4b.sh`](../m4b.sh) passe de `6da65a32…` à `bf927e5b…`, par insertions seules (trois blocs : 7 lignes d'en-tête, 65 de scripts, 48 de fonction), comme l'étape `politiques` de `m4a.sh` (« Oui, complète-le », puis un accord de lancement). `PREFETCH` reste le script mesuré à l'essai ; le pas final est un script distinct, `PREFETCH_FINAL`.
+- `PREFETCH_FINAL` = `PREFETCH` avec trois changements, et eux seuls (diff archivé au journal du banc) : `gpg` obligatoire (repli sur l'identifiant court seul retiré ; contrôle de l'identifiant court après import gardé) ; rpm datés à l'époque 0 puis `createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database` (mêmes options que `BLOC_V2` de `s1.sh` et la variante V2 de l'essai), fin de son journal imprimée en cas d'échec ; ligne « repodata V2 » (sha256 de `repomd.xml`, nombre de fichiers, durée) et `repomd.xml` imprimé en entier. La valeur attendue de `repomd.xml` n'est pas dans le script du pod : elle reste côté hôte (`REPOMD_V2`) ; la mettre ou non dans le gabarit signé relève de la carte de `taches`.
+- Étape `final` : liste des rpm contrôlée (`95541ee8…`) ; **un pod neuf par passage** (`m4b-05-final-p1`, puis `-p2`), chacun avec son volume éphémère, spec de l'essai (runc, UID 65532, label `prefetch-rpm`, volume sous `subPath`, CA du PoC) ; `SORTIE=/workspace/sortie` (racine du volume, comme le workspace de la tâche) ; dans chaque pod : `PREFETCH_FINAL` entier, puis `repomd.xml` comparé à `239a5a71…` sur l'hôte, arbre relevé (chemin, taille, sha256 de chaque fichier, `repodata` compris), retrait du pod (code de `kubectl`), attente de la suppression de la PVC `<pod>-w` (code de `kubectl wait`), pods et PVC relus. Puis arbres p1 et p2 comparés, 230 fichiers attendus, arbre archivé sous `resultats/m4b-final-arbre.txt` (référence pour l'étape `comparaison`). Journaux sous des noms distincts de ceux de l'essai. Un passage en échec laisse son pod pour lecture.
+
+**Banc** ([script](m4b-final-banc.sh), [journal](m4b-final-banc.log)) : tenu, 51 OK, 0 KO.
+- A : insertions seules contre `6da65a32…` ; lignes retirées de `PREFETCH` et ajoutées à `PREFETCH_FINAL` (10 et 10) limitées à `gpg`, aux dates et à `createrepo_c` ; options égales à celles de `BLOC_V2` et de la variante V2 ; rpm datés avant `createrepo_c`.
+- B : `bash -n`, `dash -n` ; shellcheck : un SC2016 de plus (le `printf` de la durée, sans expansion voulue).
+- C : `PREFETCH_FINAL` joué par dash, `PATH` restreint aux outils de base de l'image et à de faux outils ; le faux `createrepo_c` exige les options exactes, des rpm datés à 0 et aucun dossier dans le dépôt. Nominal (222 rpm, nom avec « + », 4 fichiers de `repodata`, `repomd.xml` imprimé ligne à ligne, 230 fichiers) ; `gpg` absent désormais refusé ; `createrepo_c` en échec refusé avec la fin de son journal ; les dix refus de `PREFETCH` inchangés.
+- D : la vraie fonction `etape_final` de la copie (vrais `attendu`, `pod_spec`, `dans`), avec un faux `kubectl` qui joue les scripts du pod par dash dans un dossier par pod : nominal en code 0 (19 lignes OK, deux pods créés puis retirés avec leur PVC, arbre archivé de 230 lignes dont 4 de `repodata`), rejoué en code 0 (arbre égal à l'archivé) ; code 1 pour `repomd.xml` différent, arbres p1 et p2 différents, retrait en échec, PVC restante, passage en échec (pod laissé), liste différente, arbre archivé différent. Le verrou du banc est le vrai, avec l'image de bootstrap mise au digest du faux manifeste.
+- Non-régression : le banc de l'essai ([journal](m4b-final-banc-essai.log)) sur le fichier modifié : 21 OK, 0 KO.
+- Deux passages antérieurs, non tenus par défauts du banc seul, archivés ([1](m4b-final-banc-passage1.log), [2](m4b-final-banc-passage2.log)) : `dash` absent du `PATH` restreint ; nombre de lignes de fonction faux (50 pour 48) ; motif oubliant la ligne `[ "$fp" = … ]`, réindentée ; verrou réel au digest de la vraie image, que le faux manifeste ne peut pas avoir. Chemins du dossier personnel écrits `~` à l'archivage de ces deux journaux, comme le fait `lancer`.
+- Non couvert par le banc : vrais pods, réseau, rpm, `createrepo_c` et admission (mesurés à l'essai, sauf l'admission de deux pods successifs).
+
+**Prédictions de `final`** (écrites avant tout passage)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| FN1 | Liste `95541ee8…` ; source du bootstrap `…rocky9-bootstrap@sha256:f0ccf105…` | Haute (prealables, essai) |
+| FN2 | Pour chaque passage : pod admis en dry-run serveur, prêt sur un nœud `zone=build`, sans `runtimeClassName` ; liste livrée égale | Haute : même spec qu'à l'essai, autre nom |
+| FN3 | Pour chaque passage : 222 rpm téléchargés et contrôlés ; empreinte de la clé conforme par `gpg` ; `rpm -K` 222 OK sur 222 | Haute : deux fois à l'essai |
+| FN4 | Pour chaque passage : `repodata` V2, `repomd.xml` `239a5a71…`, 4 fichiers | Haute : même valeur mesurée dans trois dossiers et deux environnements (essai, deux copies sous runc ; `m4b_mock_v2` sous Kata). Différences avec ces mesures : `createrepo_c` tourne ici sur les fichiers téléchargés et non sur des copies en liens durs, et avant la copie de l'image (aucun dossier `dir:` dans le dépôt) ; il ne lit que les rpm (lecture, non vérifié) |
+| FN5 | Pour chaque passage : `skopeo copy` anonyme, manifeste `f0ccf105…` | Haute (essai) |
+| FN6 | Pour chaque passage : 230 fichiers (222 rpm, 4 de `repodata`, 4 du dossier `dir:`) ; arbres p1 et p2 égaux, `repodata` compris ; arbre archivé | Haute, si FN4 tient : hors `repodata`, égalité mesurée à l'essai (226 fichiers) |
+| FN7 | Pour chaque passage : retrait du pod code 0 ; PVC retirée dans les 180 s ; aucun pod ni PVC au nom du pod | Moyenne : la suppression de la PVC du volume éphémère n'a été relue qu'une fois, 3 min 40 s après l'essai (E10) ; jamais attendue |
+| FN8 | Durée d'un passage sous 120 s | Haute : 26 et 29 s à l'essai |
+| FN9 | Code 0 ; rien écrit dans Zot | Haute, si FN1 à FN7 tiennent |
+
+**Ce que chaque issue permet**
+- FN4 et FN6 tenues : `PREFETCH_FINAL` peut servir de base au script de la tâche `prefetch-rpm` ; prochaine étape, la carte de `taches`.
+- FN4 non tenue : l'index V2 ne serait pas reproductible d'une exécution de la tâche à l'autre ; arrêt, décision avec le propriétaire avant toute tâche signée.
+- Non couvert : la liste reçue en paramètre de Tekton, le workspace de Tekton (ici un volume éphémère), `publier-fermeture`, la tâche signée.

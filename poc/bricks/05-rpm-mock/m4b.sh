@@ -17,6 +17,13 @@
 #               Une sonde, qui ne s'arrête sur aucun écart, passe avant les passages : écriture sur le volume, outils de l'image,
 #               clé de Rocky, options de createrepo_c, lecture anonyme de l'image de bootstrap sous les deux formes de CA.
 #               N'écrit rien dans Zot. Non couvert par l'essai : la liste reçue en paramètre de Tekton (ici, un fichier livré).
+#   final       ajoutée le 17/11/2026 sur « Oui, prépare-le » (décision « V2 »), NON LANCÉE : le pas de prefetch final, joué
+#               entier (PREFETCH_FINAL, script distinct ; PREFETCH reste celui mesuré à l'essai), dans deux pods neufs (un par
+#               passage, chacun avec son volume éphémère), montages et label de l'essai : gpg obligatoire (repli sur l'identifiant
+#               court retiré, contrôle de l'identifiant court gardé), rpm datés à 0 puis createrepo_c en variante V2, repomd.xml
+#               imprimé en entier ; côté hôte : repomd.xml de chaque passage égal à celui de l'essai, arbre entier (repodata
+#               compris : chemin, taille, sha256) égal entre les deux passages et archivé, retrait de chaque pod relu (code de
+#               kubectl, pods et PVC au nom du pod). N'écrit rien dans Zot.
 # Usage (racine du dépôt) : DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/m4b.sh <étape>…
 # (journal : resultats/m4b-<étape>.log)
 set -euo pipefail
@@ -162,6 +169,71 @@ echo "attendu : ${SOURCE##*@}"
 SH
 )
 
+# Pas de prefetch final (décision « V2 » du 17/11/2026), base du script de la tâche prefetch-rpm : PREFETCH avec trois changements
+# seulement. 1. gpg obligatoire : plus de repli sur l'identifiant court seul (contrôle de l'identifiant court gardé). 2. rpm datés à
+# l'époque 0 puis createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database (variante V2 de l'essai et de
+# m4b_mock_v2), fin de son journal imprimée en cas d'échec. 3. repomd.xml imprimé en entier et nombre de fichiers de repodata.
+# Entrées et sorties : celles de PREFETCH. La valeur attendue de repomd.xml reste côté hôte.
+PREFETCH_FINAL=$(cat <<'SH'
+set -u
+ko() { echo "KO   $*" >&2; exit 1; }
+for o in curl rpm createrepo_c skopeo sha256sum stat gpg; do command -v "$o" >/dev/null 2>&1 || ko "$o absent de l'image"; done
+D=$SORTIE/depot
+mkdir -p "$D" || ko "dossier $D non créé"
+[ -z "$(ls -A "$D")" ] || ko "dossier $D non vide"
+n=0
+while read -r url sha taille; do
+  [ -n "$url" ] || continue
+  f=$D/${url##*/}
+  [ ! -e "$f" ] || ko "nom en double : ${url##*/}"
+  h=$(curl -sS --proto =https --max-time 120 -o "$f" -w "%{http_code}" "$(printf %s "$url" | sed "s/+/%2B/g")") || ko "curl en échec : $url"
+  [ "$h" = 200 ] || ko "HTTP $h : $url"
+  [ "$(sha256sum < "$f" | cut -c1-64)" = "$sha" ] || ko "sha256 différent : ${url##*/}"
+  [ "$(stat -c %s "$f")" = "$taille" ] || ko "taille différente : ${url##*/}"
+  n=$((n + 1))
+done < "$LISTE_FICHIER"
+echo "téléchargés et contrôlés (sha256, taille) : $n"
+K=${CLE_ROCKY:-/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9}   # réglable pour le banc seulement
+[ -s "$K" ] || ko "clé de Rocky absente de l'image : $K"
+fp=$(gpg --batch --with-colons --show-keys "$K" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}')
+[ "$fp" = "$FP_ROCKY" ] || ko "empreinte de la clé de l'image : $fp"
+echo "clé de Rocky de l'image : empreinte conforme (gpg)"
+B=/tmp/rpmdb-$$
+rpm --dbpath "$B" --initdb </dev/null || ko "rpmdb vide non créée"
+rpm --dbpath "$B" --import "$K" </dev/null || ko "clé de Rocky non importée"
+v=$(rpm --dbpath "$B" -q gpg-pubkey --qf '%{VERSION}\n' </dev/null)
+[ "$v" = "$(printf %s "$FP_ROCKY" | tail -c 8 | tr 'A-F' 'a-f')" ] || ko "identifiant court de la clé importée : $v"
+r=0; rpm --dbpath "$B" -K "$D"/*.rpm > /tmp/k.log 2>&1 </dev/null || r=$?
+k=$(grep -c ': digests signatures OK$' /tmp/k.log)
+echo "rpm -K : rc $r, $k OK sur $n"
+[ "$r" = 0 ] && [ "$k" = "$n" ] || ko "signatures des rpm"
+find "$D" -maxdepth 1 -name "*.rpm" -exec touch -h -d @0 {} + || ko "dates des rpm"
+t=$(date +%s)
+createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database "$D" > /tmp/createrepo.log 2>&1 </dev/null \
+  || { tail -n 20 /tmp/createrepo.log; ko "createrepo_c V2"; }
+echo "repodata V2 : repomd.xml $(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64) ; fichiers $(ls "$D/repodata" | wc -l) ; en $(($(date +%s) - t)) s"
+sed "s/^/repomd.xml V2 : /" "$D/repodata/repomd.xml"
+t=$(date +%s)
+skopeo copy --preserve-digests --src-cert-dir /etc/ca-poc "docker://$SOURCE" "dir:$D/$DOSSIER" > /tmp/skopeo.log 2>&1 </dev/null \
+  || { tail -n 5 /tmp/skopeo.log; ko "skopeo copy"; }
+m=sha256:$(sha256sum < "$D/$DOSSIER/manifest.json" | cut -c1-64)
+[ "$m" = "${SOURCE##*@}" ] || ko "manifeste copié : $m"
+echo "skopeo copy --preserve-digests : en $(($(date +%s) - t)) s ; manifeste $m"
+echo "fermeture : $(find "$D" -type f | wc -l) fichiers, $(du -sb "$D" | cut -f1) octets"
+SH
+)
+
+# Arbre de la fermeture après le pas final, repodata compris : « chemin taille sha256 » par fichier, trié. Hors tâche.
+ARBRE=$(cat <<'SH'
+set -u
+cd "$SORTIE/depot" || exit 1
+find . -type f -printf '%P %s\n' | sort | while read -r f s; do echo "$f $s $(sha256sum < "$f" | cut -c1-64)"; done
+SH
+)
+REPOMD_V2=239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164   # essai de M4b (deux copies) et m4b_mock_v2 (f14ec28)
+LISTE_SHA=95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910   # resultats/m4b-liste.txt (prealables, c29cd30)
+ARBRE_REF=$R/m4b-final-arbre.txt
+
 etape_prealables() {
   attendu "verrou de verrou_derivee (sha256)" "$(sha256sum < "$VERROU_SRC" | cut -d' ' -f1)" "$VERROU_SHA"
   echo "## primary de vault 9.7 du cache de s1.sh, revérifiés"
@@ -286,6 +358,54 @@ etape_essai() {
   echo "## comparaisons"
   dans m4b-comparaisons <<<"$COMPARE" || true
   kubectl delete pod -n builds "$POD" --wait=false < /dev/null > /dev/null && echo "pod $POD supprimé (volume éphémère avec lui)"
+}
+
+etape_final() { # deux pods neufs, un par passage ; le pas final entier dans chacun ; arbres comparés sur l'hôte ; retraits relus
+  [ -s "$LISTE" ] || { echo "KO   étape prealables à lancer d'abord (liste absente)" >&2; exit 1; }
+  attendu "liste des rpm (sha256)" "$(sha256sum < "$LISTE" | cut -c1-64)" "$LISTE_SHA"
+  local src dos rc p POD
+  src=$(jq -r '.config.bootstrap_image' "$VERROU_SRC"); dos=${src%%:*}@$(jq -r '.bootstrap.pull_digest' "$VERROU_SRC")   # config.py:844-846
+  echo "source du bootstrap : $src ; dossier dir: : $dos"
+  for p in p1 p2; do
+    POD=m4b-05-final-$p
+    echo "## passage $p : pod neuf $POD"
+    pod_spec
+    if kubectl create --dry-run=server -f "$T/$POD.json" < /dev/null > "$T/admis-$POD.out" 2>&1; then echo "OK   $POD admis en dry-run serveur"
+    else echo "KO   $POD refusé à l'admission : $(head -c 300 "$T/admis-$POD.out" | tr '\n' ' ')" >&2; exit 1; fi
+    kubectl delete pod -n builds "$POD" --ignore-not-found --wait=true < /dev/null > /dev/null
+    kubectl create -f "$T/$POD.json" < /dev/null > /dev/null
+    if ! kubectl wait -n builds "pod/$POD" --for=condition=Ready --timeout=300s < /dev/null > /dev/null; then
+      kubectl get pod -n builds "$POD" -o json < /dev/null | jq -r '"phase \(.status.phase) ; \([.status.containerStatuses[]?.state
+        | to_entries[0] | "\(.key) \(.value.reason // "")"] | join(", "))"' >&2   # raisons, jamais les messages
+      echo "KO   $POD non prêt" >&2; exit 1
+    fi
+    echo "### $POD (runc, uid 65532, label tekton.dev/task=$LABEL) : prêt sur $(kubectl get pod -n builds "$POD" -o jsonpath='{.spec.nodeName}' < /dev/null), runtimeClassName « $(kubectl get pod -n builds "$POD" -o jsonpath='{.spec.runtimeClassName}' < /dev/null) »"
+    kubectl exec -i -n builds "$POD" -- sh -c 'cat > /tmp/liste.txt' < "$LISTE"
+    attendu "$p : liste livrée (sha256)" "$(kubectl exec -i -n builds "$POD" -- sha256sum /tmp/liste.txt < /dev/null | cut -c1-64)" "$LISTE_SHA"
+    rc=0
+    { printf 'export SORTIE=/workspace/sortie LISTE_FICHIER=/tmp/liste.txt SOURCE=%q DOSSIER=%q FP_ROCKY=%s\n' "$src" "$dos" "$FP_ROCKY"
+      printf 't0=$(date +%%s)\n%s\necho "durée du passage : $(($(date +%%s) - t0)) s"\n' "$PREFETCH_FINAL"; } | dans "m4b-final-$p" || rc=$?
+    [ "$rc" = 0 ] || { echo "KO   passage $p en échec ; pod laissé pour lecture : $POD" >&2; exit 1; }
+    attendu "$p : repomd.xml V2" "$(grep -m 1 '^repodata V2 : repomd.xml ' "$T/m4b-final-$p.log" | cut -d' ' -f5)" "$REPOMD_V2"
+    rc=0; printf 'export SORTIE=/workspace/sortie\n%s\n' "$ARBRE" | kubectl exec -i -n builds "$POD" -- sh -s > "$T/m4b-final-$p-arbre.txt" 2> "$T/m4b-final-$p-arbre.err" || rc=$?
+    attendu "$p : arbre relevé (code de l'exec)" "$rc" 0
+    echo "$p : arbre de $(wc -l < "$T/m4b-final-$p-arbre.txt") fichiers, dont repodata $(grep -c '^repodata/' "$T/m4b-final-$p-arbre.txt"), sha256 de la liste $(sha256sum < "$T/m4b-final-$p-arbre.txt" | cut -c1-64)"
+    rc=0; kubectl delete pod -n builds "$POD" --wait=true --timeout=180s < /dev/null > /dev/null || rc=$?
+    attendu "$p : retrait du pod (code de kubectl)" "$rc" 0
+    rc=0; kubectl wait -n builds --for=delete "pvc/$POD-w" --timeout=180s < /dev/null > /dev/null 2>&1 || rc=$?   # PVC du volume éphémère : <pod>-<volume>
+    attendu "$p : PVC $POD-w retirée (code de kubectl wait)" "$rc" 0
+    rc=0; kubectl get pods,pvc -n builds -o name < /dev/null > "$T/m4b-final-$p-objets.txt" 2>&1 || rc=$?
+    attendu "$p : objets de builds relus (code de kubectl)" "$rc" 0
+    attendu "$p : pods et PVC restants au nom de $POD" "$(grep -c -F "$POD" "$T/m4b-final-$p-objets.txt" || true)" 0
+  done
+  echo "## arbres des deux passages (repodata compris)"
+  attendu "arbres p1 et p2 égaux" "$([ "$(sha256sum < "$T/m4b-final-p1-arbre.txt")" = "$(sha256sum < "$T/m4b-final-p2-arbre.txt")" ] && echo égaux || echo différents)" égaux
+  attendu "arbre : fichiers (222 rpm, 4 de repodata, 4 du dossier dir:)" "$(wc -l < "$T/m4b-final-p1-arbre.txt")" 230
+  if [ -e "$ARBRE_REF" ]; then
+    attendu "arbre égal à celui archivé" "$([ "$(sha256sum < "$T/m4b-final-p1-arbre.txt")" = "$(sha256sum < "$ARBRE_REF")" ] && echo égal || echo différent)" égal
+  else
+    cp "$T/m4b-final-p1-arbre.txt" "$ARBRE_REF" && echo "arbre archivé : resultats/${ARBRE_REF##*/}"
+  fi
 }
 
 lancer m4b "05 M4b" "$@"
