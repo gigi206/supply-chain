@@ -160,3 +160,23 @@ Suite : choisir la variante de `createrepo_c` et confirmer `rpm -K` avant d'écr
 - Banc N3/N4 sur le fichier du dépôt : 35 OK ([journal](s1-m4b-v2-banc-n34-applique.log)).
 - Dossiers de banc laissés : `~/.cache/supply-chain-poc/05/banc-m4v2-4`, `banc-m4v2-m3-4`, `banc-n34-m4v2-4`.
 - Rien n'est lancé. MV1 à MV7 sont inchangées ; le lancement de `m4b_mock_v2` demande son propre accord.
+
+## Note datée du 17/11/2026, écrite à 22:11:49 UTC : `m4b_mock_v2` passée (« Oui, lance-le »)
+
+Passage du 17/11/2026 de 22:07:42 à 22:11:10 UTC, code 0, « écarts : 0 », aucune ligne KO ([journal](s1-m4b_mock_v2.log), [journaux de mock](s1-m3_buildv2-mock.log)). `s1.sh` = `362af7ef…`.
+
+| # | Mesure | Verdict |
+|---|---|---|
+| MV1 | Copie en liens durs de 235 fichiers, arbre égal à la liste ; point d'insertion unique ; sonde composée de la sonde de M3 et de `BLOC_V2` seuls (593 caractères de plus) | Tenue |
+| MV2 | Politiques de `builds` relues, aucune n'autorise de trafic au label `construire-rpm` ; témoins DNS, public, Zot, API : 124 124 124 124 | Tenue |
+| MV3 | Fermeture revérifiée dans le pod : rc 0, 235 fichiers, 235 lignes de liste | Tenue |
+| MV4 | `repodata` V2 dans le pod : `repomd.xml` `239a5a71…`, 4 fichiers (`repomd.xml`, primary, filelists, other ; aucune base sqlite), imprimé en entier au journal : révision 0, horodatages 0 | Tenue |
+| MV5 | `mock --hermetic-build` rc 0 sur ces `repodata` | Tenue |
+| MV6 | src.rpm `c802e60a…` et rpm `864d55f4…`, égaux à M3 ; 222 paquets au buildroot, lignes « paquet » égales à celles de `s1-m3_build1.log` | Tenue |
+| MV7 | 0 ligne http ou https dans la sortie de mock, `root.log` et `build.log` ; « écarts : 0 », code 0 | Tenue |
+
+**Ce que cela établit** : mock accepte, en hermétique et sous Kata, un index produit par la variante V2 de `createrepo_c`, et le `repomd.xml` obtenu dans ce pod (tmpfs, root, Kata) est celui des deux copies de l'essai (volume, UID 65532, runc). Le rpm et le src.rpm ne changent pas.
+
+**Ce que cela n'établit pas** : ce build part de la fermeture de M3 (`verrou.json`, `outils/`) ; la fermeture de la plateforme n'aura ni l'un ni l'autre. Le pas final de `prefetch-rpm` n'a pas encore été rejoué entier avec V2.
+
+Pod `s1-05-m3-v2` supprimé ; rien écrit dans Zot ; arbres `$T/m3/restauree-v2` et `$T/m3/build-v2` laissés.
