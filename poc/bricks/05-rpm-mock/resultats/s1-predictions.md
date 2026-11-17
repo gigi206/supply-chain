@@ -863,3 +863,80 @@ Question : « J'applique le correctif durée de vie et place à s1.sh et je le c
 - Rien n'est lancé. Le pod de `racine` déjà passé avait `sleep 10800`. P11 (corrigée), P11b et P13 attendent `essais`.
 
 Suite, chaque point sur accord nommé : push ; prédictions d'`essais` relues et complétées si besoin, puis `essais` ; `verrou`.
+
+## Étape `essais` : prédictions complétées (note du 2026-11-17, écrite à 2026-11-17T11:49:12Z, avant tout passage ; rien n'est réécrit), NON LANCÉ
+
+Relecture faite avant la question de lancement, sans toucher au cluster, à Zot ni au réseau. Elle complète P8 à P13, EX1 et A1 à
+A7 ; aucune de ces lignes n'est réécrite. État : `s1.sh` vaut `5ccba38e…` ; `$T/image.digest` contient `sha256:99790c13…` ;
+`s1-essais.log`, `s1-essais-mock.log` et `s1-verrou.json` n'existent pas encore.
+
+**Lectures faites pour cette note.** C'est une lecture du code de mock 6.9, dans l'archive `m2` (sha256 `3c034916…`, celle du
+banc de `image`), et de `racine.tar`, membre par membre :
+- **Le code lu est celui installé dans l'image.** Dans `racine.tar`, `mockbuild/config.py` et `mockbuild/uid.py` sont égaux
+  octet pour octet à ceux de l'archive. `./usr/libexec/mock/mock` ne diffère de `py/mock.py` que par la ligne 94
+  (`_MOCK_NVR = "mock-6.9-1.el9"`), que le spec réécrit à l'installation (`mock.spec:267`). Les numéros de ligne cités valent pour
+  les deux.
+- **mock refuse root.** `rootcheck` (`mock.py:630` à `:636`, appelée en `:686`) lève une erreur si l'uid vaut 0 et qu'aucune de
+  `SUDO_UID`, `USERHELPER_UID` ou `PKEXEC_UID` n'est posée.
+  - Le spec construit mock sans polkit par défaut (`mock.spec:3`, `%bcond_with polkit`). `/usr/bin/mock` est alors un lien vers
+    `consolehelper` (`mock.spec:217` à `:221`).
+  - Dans `racine.tar`, `./usr/bin/mock` pointe vers `consolehelper`, et `./usr/sbin/userhelper` est setuid root.
+  - `./etc/pam.d/mock` et `./etc/security/console.apps/mock` sont égaux octet pour octet à ceux de l'archive amont. La pile
+    d'authentification PAM de mock commence par `auth sufficient pam_rootok.so`.
+  - polkit n'est pas dans la liste de `racine`, usermode y est (`usermode-1.114-7.el9`).
+- `groupcheck` (`mock.py:640` à `:654`) reçoit deux fois le même gid : `chrootgid`, le gid du groupe `mock` (`config.py:85` ;
+  135 dans le `/etc/group` de la racine), repris par `reload_uidmanager` (`uid.py:54` à `:56`). La configuration de S1 ne fixe
+  pas `chrootgid`. D'après cette lecture, ce contrôle ne devrait donc pas échouer.
+- **Non lu** : que `userhelper`, appelé par root, pose `USERHELPER_UID`. Le source d'usermode n'a pas été relu. Le binaire
+  `userhelper` de la racine contient bien la chaîne `USERHELPER_UID` ; c'est une lecture de binaire, qui ne prouve pas le cas
+  root. C'est ce point qui décide P12.
+- **Non lu non plus** : ce que mock fait ensuite avec un uid non privilégié qui vaut 0. `unprivUid` prend la valeur de
+  `USERHELPER_UID` (`uid.py:36`), et `chrootuid` celle de `os.getuid()` (`config.py:83`). L'usage de ces valeurs dans le chroot
+  n'est pas lu. « Au plus un avertissement » (P12) reste donc une prédiction.
+- `bootstrap_image_fallback` vaut `True` par défaut (`config.py:110`). Si podman échoue, mock peut donc se rabattre sur un
+  bootstrap installé depuis les dépôts. **P8 se lit sur les lignes podman de la sonde, et non sur le succès de mock.**
+- `root_cache_enable` vaut `True` par défaut (`config.py:176`). mock écrit donc une archive pigz du buildroot sous
+  `/w/mock-cache/<racine>/root_cache/` (`config.py:177` à `:181`), qui s'ajoute à la place prise sous `/w`. Le `dnf.conf` du
+  modèle porte aussi `keepcache=1` (`rocky-9.tpl:11`) : les rpm téléchargés restent dans le cache, sous `/w/mock-cache`.
+- Le modèle `rocky-9.tpl` installe d'abord 21 noms de paquets (`chroot_setup_cmd`). Le nombre de rpm du buildroot, dépendances
+  comprises, n'est mesuré nulle part. Toutes ses `gpgkey` visent
+  `file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9`.
+- Zot : `08-trust-plane/stockage/zot.json` accorde la lecture anonyme (`anonymousPolicy` `read`) sur `**`. C'est le fichier du
+  dépôt ; la configuration en service n'est pas relue. Le `podman pull` de la sonde n'a aucun identifiant et repose sur ce point.
+- Mesure de la 06 sous Kata, sur un pod privilégié en uid 1000 (`06-deb-sbuild/resultats/s1-essais.log`, lignes 4 à 10,
+  10/11/2026) : `CapEff` 0, `CapBnd` `000001ffffffffff`, `NoNewPrivs` 0, `Seccomp` 0, `/` en virtiofs, `/w` en tmpfs sans
+  `size=`.
+- Sources livrées : `sha256sum -c` des deux lignes de `SHA256SUMS` du cache de packaging donne deux OK sur l'hôte, ce jour (non
+  archivé). Le changelog du spec est daté du « Mon Nov 16 2026 », pour la release `1.0.0-2`.
+
+**Défaut de la sonde, relevé à la relecture et non corrigé.** La garde des mirrorlist ne lit pas le code de
+`mock --debug-config`. Si cette commande échoue, son journal ne contient aucun `mirrorlist` : `n` vaut 0 et la sonde continue.
+EX1 couvre ce cas par ses quatre baseurl de vault 9.7, et E4 l'exige aussi.
+
+**Prédictions complémentaires.** Aucune ne remplace une ligne déjà écrite ; E5, E7 et E8 précisent P8, P12 et P10 :
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| E1 | En tête de la sonde : `uid : 0` ; `CapEff` égal à `CapBnd`, soit `000001ffffffffff` ; `NoNewPrivs` 0 ; `Seccomp` 0 ; `montage / : virtiofs …` ; `montage /w : tmpfs rw,relatime`, sans `size=` | Moyenne : mesuré dans la 06 en uid 1000 ; `CapEff` en uid 0 non mesuré |
+| E2 | Six lignes « version : » : `mock-6.9-1.el9.noarch`, `mock-core-configs-45.2-1.el9.noarch`, `podman-5.8.2-8.el9_8.x86_64`, `skopeo-1.22.2-9.el9_8.x86_64`, `systemd-container-252-67.el9_8.6.rocky.0.1.x86_64`, `distribution-gpg-keys-1.123-1.el9.noarch` | Haute : liste de `racine`, même `racine.tar` dans l'image |
+| E3 | Une seule ligne « gpgkey du modèle », vers `distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9` ; la ligne « clé RPM-GPG-KEY-Rocky-9 » donne `21CB256AE16FC54C6E652949702D426D350D275D` | Haute pour la gpgkey (modèle lu) ; moyenne pour l'empreinte (contenu de distribution-gpg-keys non lu) |
+| E4 | `mock --debug-config : rc 0`, avec les quatre baseurl d'EX1 | Moyenne : dépend de E7 |
+| E5 (P8 précisée) | `stockage : overlay sous /w/containers` ; `podman pull du bootstrap : rc 0`, en moins de 300 s ; `podman image mount : rc 0 ; os-release : VERSION_ID="9.7"` | Faible, comme P8 |
+| E6 | `sources livrées : rc 0`, avec deux OK | Haute |
+| E7 (P12 précisée) | mock passe l'entrée par consolehelper. La preuve positive est E4 (`rc 0`), et aucune ligne « mock will not run from the root account » n'apparaît. Chemin KO : E4 donne un rc non nul, puis les deux `--buildsrpm` échouent en quelques secondes. Un refus de mock afficherait ce message dans le `tail` de `mock-<isolation>-srpm.log` ; un échec de consolehelper ou de PAM ne l'afficherait pas | Moyenne : `userhelper` non lu ; la suite, avec un uid 0, non lue |
+| E8 (P10 précisée, durées) | Pour `simple` : `--buildsrpm` entre 600 et 10 800 s, et `--rebuild` entre 300 et 3 600 s. La borne « moins de 5 minutes » de P10 n'est donc pas attendue. Pour `nspawn`, aucune borne : P9 le dit en échec | Faible : un seul rythme mesuré, celui de `racine` (28,6 s par rpm, cause inconnue) ; nombre de rpm du buildroot non mesuré |
+| E9 | « place de /w après simple » entre 800 et 2 900 Mo. Elle est lue après le `--rebuild` et avant le scrub, et compte le buildroot, le cache de racine, les rpm gardés par `keepcache`, le bootstrap et le stockage de podman | Faible |
+| E10 | `scrub <isolation> : rc 0` pour chaque isolation | Moyenne |
+| E11 | Sonde complète : la ligne « scrub simple : rc … » est présente, avant « (code de l'exec : … ) ». `SONDE` finit par `true` : le code 0 de P13 ne suffit donc pas à dire que la sonde est allée au bout | Moyenne |
+
+**Commande prévue** : `env -u PREFIXE DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/s1.sh essais </dev/null`, sur le commit de
+cette note. Elle tournera en arrière-plan sous `bash -c`, entre deux `date -u`, avec le code lu par `PIPESTATUS`. Journaux
+attendus : `resultats/s1-essais.log` et `resultats/s1-essais-mock.log`.
+
+**Aucun délai de garde dans `SONDE`.** Un nspawn qui pend n'est borné que par les 12 h du pod. Le lancement en arrière-plan ne
+signale que sa fin : aucun réveil n'est prévu en cours de route. Pendant le passage, le suivi se fait à la demande, en lecture
+seule, sur la sortie de la sonde (`$T/essais.log`, désigné par son nom) et sur `chrono.tsv`. Si une lecture montre que cette
+sortie n'a pas bougé depuis plus de 4 h, au-delà de la borne haute d'E8, c'est rapporté au propriétaire. Rien n'est arrêté sans
+son accord.
+
+Suite, chaque point sur accord nommé : `essais` (« Je lance essais ? »), puis `verrou`, avec ses prédictions et son propre accord.
