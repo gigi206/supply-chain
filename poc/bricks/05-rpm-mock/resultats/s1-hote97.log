@@ -1,0 +1,41 @@
+# s1.sh hote97, 2026-11-17T14:30:07Z
+OK   empreinte de la clé de Rocky (relevée par hote) : 21CB256AE16FC54C6E652949702D426D350D275D
+## dépôts de vault 9.7, vérifiés sur l'hôte
+baseos97 : repomd.xml signé, signataire 21CB256AE16FC54C6E652949702D426D350D275D
+OK   baseos97 : signataire de repomd.xml (clé primaire) : 21CB256AE16FC54C6E652949702D426D350D275D
+baseos97 : repomd.xml sha256 fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+OK   baseos97 : 992a27c23b8d59070d247f034b8c646230cb24a07e95d7cdb189e56a56d56829-primary.xml.gz contrôlé par repomd.xml : 992a27c23b8d59070d247f034b8c646230cb24a07e95d7cdb189e56a56d56829
+baseos97 : repomd.xml égal au relevé de hote : oui
+appstream97 : repomd.xml signé, signataire 21CB256AE16FC54C6E652949702D426D350D275D
+OK   appstream97 : signataire de repomd.xml (clé primaire) : 21CB256AE16FC54C6E652949702D426D350D275D
+appstream97 : repomd.xml sha256 06f01d405f2d4743dd3fea4a3bf4e2ffada91b652b94d9458468064db15287d6
+OK   appstream97 : dec99744f47487c005ffc02acc95b323c0152abf25c394cf8c0dc646b43ff0b6-primary.xml.gz contrôlé par repomd.xml : dec99744f47487c005ffc02acc95b323c0152abf25c394cf8c0dc646b43ff0b6
+appstream97 : repomd.xml égal au relevé de hote : oui
+crb97 : repomd.xml signé, signataire 21CB256AE16FC54C6E652949702D426D350D275D
+OK   crb97 : signataire de repomd.xml (clé primaire) : 21CB256AE16FC54C6E652949702D426D350D275D
+crb97 : repomd.xml sha256 3936113ee8724d84af42f17f17ad50b67a1cb10e8db9bd246e8609deebdf134f
+OK   crb97 : e6eee4aeeb1479f2d62a35bfcfb0d86010f6306a58b6cb264fafbc31e6f9c200-primary.xml.gz contrôlé par repomd.xml : e6eee4aeeb1479f2d62a35bfcfb0d86010f6306a58b6cb264fafbc31e6f9c200
+crb97 : repomd.xml égal au relevé de hote : oui
+extras97 : repomd.xml signé, signataire 21CB256AE16FC54C6E652949702D426D350D275D
+OK   extras97 : signataire de repomd.xml (clé primaire) : 21CB256AE16FC54C6E652949702D426D350D275D
+extras97 : repomd.xml sha256 54ec0c5362c12097f0eb495aff9b4618171f6a67c458d8da4aaa69adc23c40c1
+OK   extras97 : 907a3d0bdea528ef0add6dfa8b2d85a12e02ca709c20fbd42a340b777dbaaf45-primary.xml.gz contrôlé par repomd.xml : 907a3d0bdea528ef0add6dfa8b2d85a12e02ca709c20fbd42a340b777dbaaf45
+extras97 : repomd.xml égal au relevé de hote : oui
+## les dix paquets de l'image dérivée
+OK   dbus-libs-1:1.12.20-8.el9.x86_64 dans baseos97 : sha256 ab81c1e16482f333aa285db120051b099b56661d4620f0f1af05f8e69126e97b (Packages/d/dbus-libs-1.12.20-8.el9.x86_64.rpm)
+OK   python3-dateutil-1:2.9.0.post0-1.el9_7.noarch dans baseos97 : sha256 1825dd1546532526d71f83acf473b2e9726074c2b18f146800d2972086df2dc8 (Packages/p/python3-dateutil-2.9.0.post0-1.el9_7.noarch.rpm)
+OK   python3-dbus-0:1.2.18-2.el9.0.1.x86_64 dans baseos97 : sha256 f432c1bbcacfba197cd5d93a530c635691967f86ce76266cf253df57c933f987 (Packages/p/python3-dbus-1.2.18-2.el9.0.1.x86_64.rpm)
+OK   python3-dnf-plugins-core-0:4.3.0-24.el9_7.noarch dans baseos97 : sha256 3da2880ea5da6191bebb5f5fcdb66a807b04a58237011046d91c84db456d58bf (Packages/p/python3-dnf-plugins-core-4.3.0-24.el9_7.noarch.rpm)
+OK   python3-six-0:1.15.0-9.el9.noarch dans baseos97 : sha256 752fc8b137a10cedd07c59478bd0822830d7502b7ce6d5cbb5c5f8cb5b4f1f1c (Packages/p/python3-six-1.15.0-9.el9.noarch.rpm)
+OK   python3-systemd-0:234-19.el9.x86_64 dans baseos97 : sha256 4206bba0157aba914a7ea3b722f341fe5fad58fa80647181d52ace65a33ce8e8 (Packages/p/python3-systemd-234-19.el9.x86_64.rpm)
+OK   dnf-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 b2381a62f9974c4da89169f3531587a5513656b9692c40fb687e56fd29798bb6 (Packages/d/dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+OK   dnf-data-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 8bb408b00fd787c19b717aa90311a5efd6a41863111ed989469f4899e2066904 (Packages/d/dnf-data-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+OK   python3-dnf-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 415035e84912af52be5596ebd06775c2f4d07e33b00fe8d1aa6488927deba45c (Packages/p/python3-dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+OK   yum-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 bb4d1ddb75fdd38ae8bad8bc70da357792d51607cf7de129c471acfcbbdc24e6 (Packages/y/yum-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+requires de python3-dnf-plugins-core : 6 entrée(s)
+requires de python3-dnf-plugins-core, baseos97 : python(abi) EQ 0:3.9
+requires de python3-dnf-plugins-core, baseos97 : python3-dateutil
+requires de python3-dnf-plugins-core, baseos97 : python3-dbus
+requires de python3-dnf-plugins-core, baseos97 : python3-dnf GE 0:4.11.0
+requires de python3-dnf-plugins-core, baseos97 : python3-hawkey GE 0:0.64.0
+requires de python3-dnf-plugins-core, baseos97 : python3-systemd

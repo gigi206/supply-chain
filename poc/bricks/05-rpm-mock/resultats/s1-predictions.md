@@ -1578,3 +1578,27 @@ ses propres prédictions.
 `s1-3` pour `hote` ; ce `PREFIXE` est aussi le tag Zot de `boot_image`.
 
 Suite : accord de lancement de `hote97`. Rien n'est lancé, rien n'est écrit dans Zot.
+
+## Étape `hote97` : résultat (note du 2026-11-17, écrite à 2026-11-17T14:30:53Z ; rien n'est réécrit)
+
+Passage sur accord « Oui, lance hote97 », le 17/11/2026 de 14:30:07 à 14:30:14 UTC (`date -u` du lancement et
+[`chrono.tsv`](chrono.tsv)), code 0. Commande : `env -u PREFIXE -u ISOLATION DISTRO=rke2 KUBECONFIG=… mise exec --
+poc/bricks/05-rpm-mock/s1.sh hote97`, `s1.sh` à `2b0a3b7b…`. Journal : [`s1-hote97.log`](s1-hote97.log).
+
+| # | Résultat |
+|---|---|
+| DH1 | **Tenue.** Empreinte `21CB256A…350D275D`. |
+| DH2 | **Tenue.** Quatre `repomd.xml` signés par la clé primaire, quatre primary contrôlés par leur `repomd.xml`, quatre « égal au relevé de hote : oui » ; sha256 `fa6d5054…`, `06f01d40…`, `3936113e…`, `54ec0c53…`, ceux d'`hote` à 08:30:27 UTC. |
+| DH3 | **Tenue.** Dix lignes « OK », aucune « KO » ; les dix paquets sont tous dans `baseos97`, chacun une seule fois (aucun pari n'était fait sur le dépôt) ; `derivee.sha256` écrit, dix lignes. |
+| DH4 | **Tenue.** Six entrées : `python(abi) = 3.9`, `python3-dateutil`, `python3-dbus`, `python3-dnf >= 4.11.0`, `python3-hawkey >= 0.64.0`, `python3-systemd`. |
+| DH5 | **Tenue.** 7 s. |
+
+**Ce que cela apprend** :
+- **Les `Requires` du greffon sont lus.** Pour l'entrée `python3-dnf`, `>= 4.11.0` est satisfait par le `4.14.0-31.el9` de
+  l'image brute. Cette entrée n'explique donc pas les quatre montées de version vues à `verrou_brut`. `python3-hawkey >= 0.64.0`
+  n'est pas comparé : la version de `python3-hawkey` dans l'image n'est pas relevée. La cause des quatre montées reste non lue.
+- Trois des six paquets ajoutés sont des `Requires` directs du greffon (`python3-dateutil`, `python3-dbus`, `python3-systemd`).
+  Que `dbus-libs` et `python3-six` viennent par ces paquets est une hypothèse, non lue.
+- Ce résultat ne change pas la décision « Dix lignes », prise sur l'état mesuré à `verrou_brut`.
+
+Suite : accord de lancement de `boot_racine` (pod, rien poussé). Rien n'est écrit dans Zot.
