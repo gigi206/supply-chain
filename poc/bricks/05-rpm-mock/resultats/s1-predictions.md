@@ -2444,3 +2444,32 @@ de 17:53:00 à 17:53:01 UTC (`date -u` avant et après, `chrono.tsv`), code 0, `
 - Aucun build n'a été fait à partir de la fermeture restaurée ; le build sans réseau reste à mesurer (M3).
 
 Suite : décision du propriétaire sur la déduplication. Rien n'est lancé.
+
+## Décision du propriétaire sur la déduplication ; M2 (note du 2026-11-17, écrite à 2026-11-17T18:18:04Z ; rien n'est réécrit)
+
+Question « Pour la déduplication de M2 : F5 et F6 vous suffisent-elles ? » (choix proposés : « Oui, ça suffit » ou un relevé
+`stat` sous sudo lancé par le propriétaire), réponse « Oui ». **Décision : F5 et F6, mesurées sur une seule fermeture, valent
+« déduplication mesurée » pour M2.** Le mécanisme de partage reste non relevé (F8).
+
+**Contenu de M2 relu** (README, table des jalons) :
+
+| Élément | Où c'est | Nature |
+|---|---|---|
+| Configuration de mock versionnée, D2 (a) | `s1.sh` (dépôt git) : `baseurl` fixes sur vault 9.7 ; les 222 URL du verrou sont sous `vault/rocky/9.7/` | Lecture du dépôt et du verrou commité |
+| Digest du bootstrap | Injecté au lancement dans la configuration `poc-rocky-9.7-derivee-x86_64`, depuis `$T/boot-image.digest`, hors dépôt (absent de `s1.sh` : lecture du code) ; versionné par le verrou commité : `bootstrap_image` = `essais-05/rocky9-bootstrap@sha256:f0ccf105…`, `bootstrap_image_ready` vrai | Mesuré à `verrou_derivee` (VD1 à VD17) |
+| Macros d'OBS | Les quatre macros dans `s1.sh`, aux mêmes valeurs que dans [`poc.prjconf`](../../../benchmarks/obs/projets/poc.prjconf) du banc OBS, et recopiées dans le verrou ([`s1-verrou_derivee.json`](s1-verrou_derivee.json)) | Lecture ; leur effet sur le rpm relève de M3 |
+| Verrou calculé | `verrou_derivee` : 222 rpm | Mesuré |
+| Signatures des rpm vérifiées | `collecte` : `rpm -K` 222 OK (seule clé de Rocky ; « OK » compte les lignes terminées par « digests signatures OK » : lecture du code), rpm de mock vérifié par la seule clé d'EPEL | Mesuré |
+| Fermeture dans Zot, avec le rpm de mock et l'image de bootstrap | `deps/sample-app/mock-buildroot-lock@sha256:f235a98b…` | Mesuré (`fermeture`, F1 à F7) |
+
+**Preuve attendue de M2** : fermeture restaurable par digest (R1, tenue) ; déduplication mesurée (F5 et F6, retenues par le
+propriétaire). Le propriétaire a tranché la déduplication, pas le jalon. **Conclusion tirée de cette relecture : M2 est tenu**,
+avec trois réserves écrites :
+- déduplication sur une seule fermeture, mécanisme de partage non relevé ;
+- la « configuration versionnée » est un texte produit par `s1.sh`, pas un fichier `.cfg` à part ;
+- le digest du bootstrap n'est pas écrit dans le dépôt de la configuration : il est injecté au lancement, et versionné seulement
+  par le verrou commité et les journaux.
+
+M1 n'est pas réévalué ici.
+
+Suite : M3 (deux `--hermetic-build` sans réseau depuis la fermeture restaurée), à préparer à sec sur accord. Rien n'est lancé.
