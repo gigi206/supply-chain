@@ -2341,3 +2341,35 @@ Ce que M2 demande, « fermeture restaurable par digest ; déduplication mesurée
 seule fermeture, suffisent pour « déduplication mesurée » revient au propriétaire.
 
 Suite : accord de lancement de `collecte`. Rien n'est lancé.
+
+## Étape `collecte` passée (note du 2026-11-17, écrite à 2026-11-17T17:26:11Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « Je lance l'étape collecte ? », réponse « Oui, lance collecte ». Lancée le 17/11/2026 de
+17:21:34 à 17:23:47 UTC (`date -u` avant et après, `chrono.tsv`), code 0, `s1.sh` `4c3adb53…`
+([journal](s1-collecte.log)). Aucune écriture dans Zot (lecture du code : l'étape n'appelle ni oras, ni crane, ni
+`closure.sh`) ; pod `s1-05-mf` retiré (absent à une relecture qui a suivi, vue à l'écran, non archivée).
+
+| # | Tenue ? | Mesure |
+|---|---|---|
+| C1 | Oui | Verrou, clés de Rocky et d'EPEL (`FF8AD134…`, égale à `fp-epel`), rpm de mock dans le primary d'EPEL de `hote`, cinq « OK » de `m2_preparer` |
+| C2 | Oui | 222 rpm en 61 s (40 s à `voie2`), `rpm -K` 222 OK, en-têtes égaux au verrou, `createrepo_c` rc 0 en 1 s, manifeste copié `f0ccf105…` |
+| C3 | Oui | Rpm de mock téléchargé (le code HTTP n'est pas affiché : un code autre que 200 aurait donné un KO), sha256 `a5043350…`, `rpm -K` avec la seule clé d'EPEL : rc 0, « digests signatures OK » |
+| C4 | Oui | 235 fichiers (222 rpm, 7 de `repodata`, 4 d'image, verrou, rpm de mock), aucune autre entrée |
+| C5 | Oui | Rapatriement par tar : aucune ligne de succès propre, mais « liste du pod égale » dans la ligne « OK   fermeture conforme » ; pod retiré |
+| C6 | Oui | 222 rpm sur 222 trouvés dans les primary de vault 9.7 et égaux : sha256 (mesuré) et taille (contrôle du code, non affiché) ; « OK   fermeture conforme » ; classe `image` : 4 fichiers (manifeste, `version`, config, couche) |
+| C7 | Oui | 319 086 430 octets, entre 317 656 348 et 320 050 000 ; `repodata` : 1 429 178 octets ; image : 97 743 497 octets |
+| C8 | Oui | Code 0 en 2 min 13 s ; aucune écriture dans Zot (lecture du code ; rien n'a été relu dans Zot) |
+
+**Lecture** :
+- `repomd.xml` vaut `108f954a…`, et non `86ddcef1…` comme à `voie2` : c'était sans pari. La fermeture n'est donc pas, à l'octet
+  près, le dépôt du build `hermetique` de 16:20. Le manifeste de l'image (`f0ccf105…`) et le verrou (`b6d0f8f1…`) sont égaux des
+  deux côtés. Pour les rpm, `voie2` n'a archivé aucun sha256 : sont mesurés des deux côtés `rpm -K` 222 OK, en-têtes et
+  `sigmd5` égaux au verrou, mêmes URL de vault 9.7 ; l'égalité octet pour octet avec les rpm du build de 16:20 n'est pas mesurée.
+- La fermeture est sur l'hôte, sous `$T/mf/fermeture`, avec sa liste attendue (235 lignes, sha256 `7c779f5d…`), que `fermeture`
+  et `restauration` relisent.
+- Repères pour lire F5 (pas une nouvelle prédiction ; les bornes de F5 ne changent pas) : fermeture hors config et couche de
+  l'image, 221 343 594 octets ; config et couche, 97 742 836 octets ; total, 319 086 430 octets.
+- Ce qui reste de M2 : l'écriture dans Zot (`fermeture`, définitive), puis `restauration`. **M2 n'est pas passé.**
+
+Suite : accord de lancement de `fermeture`, qui écrit dans Zot de façon définitive ; l'additif de l'ADR 0001 pour la fermeture
+viendra avec `restauration`. Rien n'est lancé.
