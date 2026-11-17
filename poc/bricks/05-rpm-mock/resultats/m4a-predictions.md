@@ -73,3 +73,19 @@ Code 0 ([journal](m4a-releve.log), `890f96c8…`). Rien écrit dans le cluster n
 **Autres constats**
 - NetworkPolicy de `builds` : `builder-sans-sortie`, `construction-deb-sans-sortie`, `construction-rpm-sans-sortie`, `construction-sans-sortie`. CiliumNetworkPolicy : `builds-sans-internet`, `prefetch-deb-sortie`, `prefetch-rpm-sortie`, `prefetch-sortie`.
 - ConfigMap `porte` : cinq autres clés, non comparées par construction (`ca-poc.crt`, `chains.pub`, `scanner.pub`, `tsa-racine-confiance.json`, `vsa.pub`).
+
+## Étape `politiques`, complément de `releve` : préparée et prédite (17/11/2026, 21:09:27 UTC, « Oui, complète-le »)
+
+`m4a.sh` modifié (`fb23b869…`) : nouvelle étape `politiques`, lecture seule, journal à part (`m4a-politiques.log` ; celui de `releve` n'est pas réécrit).
+- Les ValidatingPolicy de `admission.yaml` (08) et de `durcissement.yaml` (08c) sont énumérées par `yq` (sans séparateur de documents, option `-N`, essayée), et non plus écrites à la main : la lacune venait de là.
+- Celles de la 08c sont comparées au fichier rendu comme par `h5_deny` (même `sed`, `Audit` remplacé par `Deny`), ce qui sépare la bascule connue d'une vraie dérive.
+- L'ensemble des noms en service est confronté à celui du dépôt.
+- Banc ([script](m4a-banc-politiques.sh), [journal](m4a-banc-politiques.log)), faux `kubectl` : 7 OK, 0 KO (5 et 4 politiques comparées, écart injecté signalé, 08c égale une fois rendue, nom intrus et nom absent signalés, aucun appel imprévu).
+- `bash -n` passe ; shellcheck : SC2154 et SC2015 seulement, comme avant.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| PO1 | Les cinq ValidatingPolicy de la 08 égales, `stepactions-interdites` comprise | Moyenne : quatre égales à `releve` ; `stepactions-interdites` jamais comparée |
+| PO2 | Les quatre de la 08c égales au fichier rendu en `Deny` | Moyenne : trois égales à ce rendu près à `releve` ; la quatrième jamais comparée (`h5_deny` exige qu'aucune ne reste en `Audit`, lecture) |
+| PO3 | Noms : 9 dans le dépôt, 9 en service, aucun en service hors du dépôt, aucun absent | Haute : mesuré à `releve` (9 noms, tous rangés dans le dépôt) |
+| PO4 | Code 0, rien écrit dans le cluster ni dans Zot | Haute : uniquement des `get` |

@@ -12,6 +12,10 @@
 #            digest, artefact de M4a absent (seul un « not found » vaut absent). N'écrit rien. Aucun secret lu ; aucun événement
 #            affiché ; aucune clé affichée. Gabarits et déclencheurs non relevés : hors de M4 (décision du 17/11/2026).
 #            verrou et publier attendent la carte de M4b : ce que prefetch-rpm lira (le verrou n'a ni sha256 ni taille).
+#   politiques  lecture seule, complément de releve (ajouté le 17/11/2026, « Oui, complète-le ») : toutes les ValidatingPolicy de
+#            admission.yaml (08) et de durcissement.yaml (08c), énumérées par yq et non plus écrites à la main ; celles de la 08c
+#            comparées au fichier rendu comme par l'étape h5_deny de durcissement.sh (Audit remplacé par Deny, même sed) ;
+#            ensemble des noms en service confronté à celui du dépôt. Journal à part : celui de releve n'est pas réécrit.
 #   verrou   hôte seul, hors ligne : verrou contrôlé (sha256, 222 rpm, bootstrap), copié sous poc/packaging/verrou-rpm.json
 #            s'il est absent (sinon comparé) ; artefact poussé deux fois dans deux layouts OCI locaux, même digest attendu
 #   publier  écriture dans Zot (compte poc-ecriture, comme packaging-deb), sur accord nommé : deux poussées, digest égal à celui
@@ -176,6 +180,25 @@ PY
   zot_lire "image de bootstrap (pull_digest du verrou)" "$BOOTSTRAP" présent
   zot_lire "fermeture applicative de S4b (06)" "$SOURCES" présent
   zot_lire "artefact de packaging rpm, avant M4a" "$DEPOT:m4a" absent
+}
+
+etape_politiques() {
+  local a=$here/politique/admission.yaml c=$repo/poc/bricks/08c-durcissement/politiques/kyverno/durcissement.yaml n
+  # rendu de la 08c comme par h5_deny (regles_deny, durcissement.sh) : même sed, sur le même fichier
+  sed 's/^  validationActions: \[Audit\]$/  validationActions: [Deny]/' "$c" > "$T/durcissement-deny.yaml"
+  echo "## ValidatingPolicy de la 08 (admission.yaml), énumérées par yq"
+  for n in $(yq -N -r 'select(.kind == "ValidatingPolicy") | .metadata.name' "$a"); do
+    comparer "ValidatingPolicy $n (08)" "$a" ".kind == \"ValidatingPolicy\" and .metadata.name == \"$n\""
+  done
+  echo "## ValidatingPolicy de la 08c (durcissement.yaml rendu comme par h5_deny), énumérées par yq"
+  for n in $(yq -N -r 'select(.kind == "ValidatingPolicy") | .metadata.name' "$T/durcissement-deny.yaml"); do
+    comparer "ValidatingPolicy $n (08c, rendu Deny)" "$T/durcissement-deny.yaml" ".kind == \"ValidatingPolicy\" and .metadata.name == \"$n\""
+  done
+  echo "## noms en service contre noms du dépôt"
+  { yq -N -r 'select(.kind == "ValidatingPolicy") | .metadata.name' "$a"; yq -N -r 'select(.kind == "ValidatingPolicy") | .metadata.name' "$c"; } \
+    | sort > "$T/noms-depot"
+  kubectl get validatingpolicies.policies.kyverno.io -o json < /dev/null | jq -r '.items[].metadata.name' | sort > "$T/noms-service"
+  echo "dépôt : $(wc -l < "$T/noms-depot") ; en service : $(wc -l < "$T/noms-service") ; en service hors du dépôt : $(comm -13 "$T/noms-depot" "$T/noms-service" | paste -sd' ') ; dans le dépôt, absentes en service : $(comm -23 "$T/noms-depot" "$T/noms-service" | paste -sd' ')"
 }
 
 etape_verrou() {
