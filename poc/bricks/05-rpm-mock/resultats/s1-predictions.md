@@ -2177,3 +2177,84 @@ sont. Le pod est retiré (`kubectl get pod`, non archivé : plus rien à 16:21:3
 Suite, sans décision : préparer à sec la fermeture de M2 (poussée dans Zot sous `deps/sample-app/mock-buildroot-lock`, avec le
 rpm de mock et l'image de bootstrap, restauration par digest, déduplication), avec un accord à part pour l'écriture dans Zot.
 Pour M3, la sonde devra archiver `root.log` entier, `installed_pkgs.log` et la sortie entière de mock. Rien n'est lancé.
+
+## Fermeture de M2 : étapes `collecte`, `fermeture` et `restauration` préparées à sec (note du 2026-11-17, écrite à 2026-11-17T16:53:20Z ; rien n'est réécrit), NON APPLIQUÉ
+
+Préparées sur « continue », après le push de `c836f9f`. Le conseiller a relu l'approche avant l'écriture, puis le correctif
+avant ce commit ; trois corrections en sont venues (garde des tags, mesure de la place, compte des écarts du banc). Correctif
+[`../s1-fermeture.patch`](../s1-fermeture.patch) (`dcfba247…`) : insertions seules dans `s1.sh` (`8554910f…`), copie
+`7cd2edd0…`. Trois étapes, trois accords, comme la 06 S2.
+
+- **`collecte`** (pod `s1-05-mf`, aucune écriture dans Zot). Le pod de `voie2` est retiré et `voie2` n'a archivé aucun sha256
+  par rpm : rien ne relie des fichiers à pousser aux 222 « OK » de `rpm -K`. `collecte` rejoue donc `VOIE2_M2` tel quel, dans un
+  autre pod et un autre dossier (`$T/mf`, journal `mf-voie2`) ; `m2-voie2.log` et `$T/m2` ne sont pas touchés.
+  - Le rpm de mock 6.9-1 est retéléchargé d'EPEL. Sa porte est le sha256 épinglé `a5043350…`, relevé à `racine`. Le banc le
+    retrouve dans le primary d'EPEL du dernier passage de `hote` (17/11, 08:30 UTC) (« rpm de mock dans le vrai primary d'EPEL
+    du dernier hote », [journal](s1-fermeture-banc.log)) ; EPEL a pu bouger depuis, et un 404 serait un KO suivi d'une décision.
+  - `rpm -K` du rpm de mock se fait avec la seule clé d'EPEL, dans une rpmdb à part : les 222 restent contrôlés par la seule clé
+    de Rocky. Le rpm est rangé sous `outils/`, hors du dépôt que lit mock.
+  - La fermeture est assemblée sous `/w/fermeture` : `depot/` (rpm du verrou, `repodata`, dossier `dir:` de l'image),
+    `verrou.json` et `outils/`. Elle est listée avec les sha256 et tailles, puis rapatriée par tar.
+  - Contrôles sur l'hôte : liste exacte des fichiers, ni plus ni moins ; sha256 et taille de chaque rpm égaux au primary de
+    vault 9.7 vérifié par `hote97` ; fichiers de `repodata` égaux à `repomd.xml` ; blobs du dossier `dir:` égaux à leur nom ;
+    manifeste égal au digest de `boot_image` ; verrou `b6d0f8f1…` ; liste du pod égale à l'arbre rapatrié. Le pod est retiré.
+- **`fermeture`** (écriture dans Zot, **définitive**, compte `poc-ecriture`). Elle reprend celle de la 06 S2 : `closure.sh` de la
+  03, un fichier par couche, deux envois sous `$PREFIXE` et `$PREFIXE-bis`, même digest attendu. Écarts :
+  - fermeture recontrôlée avant l'envoi ;
+  - garde des tags fondée sur une lecture réussie : catalogue de Zot lu, puis tags du dépôt s'il y figure ; une lecture en
+    échec, ou un tag déjà présent, arrête l'étape avant tout envoi (lecture de `zot.json` versionné : `poc-ecriture` a le droit
+    `update`, un tag existant serait donc déplacé) ;
+  - digest écrit dès le premier envoi ; couches comparées avec leur taille ; config et couches de l'image relevées sous
+    `essais-05/rocky9-bootstrap` ;
+  - place utilisée de `/var/lib/zot` (`df` en octets sur `sc-stockage`, sans sudo) : deux lectures avant l'envoi, pour voir la
+    dérive, puis une après chaque envoi ; sans seuil ; une lecture illisible après l'envoi s'affiche « illisible » sans arrêter
+    l'étape ;
+  - inode et nombre de liens de la config et des couches de l'image sous les deux dépôts (`stat` sans sudo) : relevé brut, sans
+    pari. La disposition `/var/lib/zot/<dépôt>/blobs/sha256/<hex>` et le stockage par liens durs sont supposés, jamais relevés
+    sur `sc-stockage` ; « illisible » couvre aussi bien un refus qu'un chemin absent.
+- **`restauration`** : pull par digest dans un dossier vide ; liste, taille et sha256 de chaque fichier comparés à la liste de
+  `collecte`. Elle relit les inodes et liens : ce relevé-là est rejouable, contrairement à la croissance de Zot au premier envoi.
+- **Droits** : `deps/**` relève de la règle `**` de la configuration versionnée de Zot (`08-trust-plane/stockage/zot.json`) :
+  lecture anonyme, `poc-ecriture` lit, crée et met à jour. C'est une lecture du fichier versionné ; la configuration déployée
+  n'est pas relue.
+
+**Bancs** :
+- Banc ([script](s1-fermeture-banc.sh), `99b9cbd9…`, [journal](s1-fermeture-banc.log)), lancé à 16:48:18 UTC : tenu, 82 OK. Il
+  tourne hors cluster et hors Zot, contre un registre crane local en loopback, avec le vrai `closure.sh` et le vrai oras 1.3.6.
+  - Mesuré : les chemins du dossier `dir:`, qui contiennent « : » et « @ », passent l'envoi d'oras et reviennent à l'identique
+    par `oras pull`.
+  - Mesuré aussi : deux envois donnent le même digest. Sont refusés avant tout envoi : un tag déjà présent (dépôt lu), un
+    catalogue illisible (registre injoignable) et une fermeture changée depuis `collecte`. Une place illisible après l'envoi
+    s'affiche sans arrêter l'étape.
+  - Les contrôles de l'hôte refusent treize écarts sur une doublure ; sur les vrais primary de vault 9.7, les 222 emplacements
+    du verrou sont trouvés.
+- Deux passages antérieurs, scripts non archivés :
+  - à 16:39:16 UTC, non tenu, à cause de deux défauts du banc seul ([journal](s1-fermeture-banc-passage1.log)) : le dossier du
+    registre local n'était pas créé, d'où toute la section E en échec, et le libellé « capacité de /w » était pris pour un
+    chemin ;
+  - à 16:40:09 UTC, tenu, 76 OK ([journal](s1-fermeture-banc-passage2.log)), sur la première copie (`bc252237…`), avant la
+    relecture du correctif.
+- N3/N4 ([`s1-n34-banc.sh`](s1-n34-banc.sh)) sur la copie finale, à 16:48:56 UTC : tenu, 35 OK ([journal](s1-fermeture-banc-n34.log)).
+- Non couvert : vrai pod, vrais rpm et vrai `rpm -K`, `createrepo_c`, `skopeo`, kubectl, réseau, Zot (droits déployés,
+  déduplication, droits de lecture et disposition des blobs sous `/var/lib/zot`) ; `oras repo ls` et `oras repo tags` n'ont
+  jamais été joués contre Zot (un échec arrête l'étape avant tout envoi).
+
+**Ce que le passage pourra établir, et pas plus** :
+- Fermeture restaurable par digest : c'est la mesure de `restauration`.
+- Déduplication : il n'existe qu'une fermeture, comme pour la 06 S2. On pourra mesurer :
+  - au second envoi, le même digest et la croissance de Zot ;
+  - le digest de chaque couche, égal au sha256 du fichier (et, pour les rpm, à celui du primary) ;
+  - au premier envoi, la croissance de Zot comparée aux octets de la fermeture, dont ceux de l'image, déjà présents sous
+    `essais-05/rocky9-bootstrap` ;
+  - les inodes et liens des blobs de l'image sous les deux dépôts, si `stat` est permis sans sudo.
+
+  Le `df` porte sur tout le système de fichiers : d'autres écritures ne sont pas exclues. Dire si cela suffit pour
+  « déduplication mesurée », donc pour M2, revient au propriétaire.
+- `repomd.xml` sera relevé sans pari d'égalité avec `86ddcef1…` : la fermeture poussée n'est pas, à l'octet près, le dépôt du
+  build de 16:20. Construire depuis la fermeture restaurée relève de M3.
+- `voie2` n'a relevé que `manifest.json` dans le dossier `dir:` : la liste exacte des fichiers écrits par skopeo n'est pas
+  connue, ni le type de somme de `repomd.xml`. La liste « ni plus ni moins » peut donc donner un KO à `collecte`, avant toute
+  écriture dans Zot.
+
+Suite : appliquer `s1-fermeture.patch` à `s1.sh`, sur accord ; puis prédictions des trois étapes, commitées avant tout passage ;
+puis un accord par étape. Rien n'est lancé.

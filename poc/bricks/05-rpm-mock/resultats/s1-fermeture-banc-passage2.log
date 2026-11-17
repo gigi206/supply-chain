@@ -1,0 +1,136 @@
+# banc-fermeture.sh, 2026-11-17T16:40:09Z, python3 3.13.12, Version: 1.3.6, crane 0.20.6
+# s1.sh du dépôt 8554910f02a5e250bc22b208d9d6c0b8da2e39803fd5c661750c4e98514a1e95 ; copie modifiée bc2522379774f0731eac03c147fb4a33d97c3eab7d3a925e48569d28f8d5ba99 ; closure.sh 297aa2c21de183d16377112e06aef73290af4f6af32cce35797462dc94fb4c7e
+## A : insertions seules
+OK   lignes retirées : 0
+OK   blocs insérés : 2
+OK   copie sans les blocs insérés égale au dépôt
+     en-tête inséré : 15 lignes ; bloc inséré : 250 lignes
+## B : syntaxe et shellcheck
+OK   bash -n de la copie
+     remarques shellcheck : dépôt 25, copie 26
+     diff shellcheck : 2c2
+     diff shellcheck : <      16 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+     diff shellcheck : ---
+     diff shellcheck : >      17 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+OK   remarques shellcheck de niveau warning ou error dans la copie : 0
+## C : primary_somme et SONDE_COLLECTE
+OK   fragments extraits (10 variables, 9 fonctions, VOIE2_M2), absents : 
+OK   rpm de mock dans le vrai primary d'EPEL du dernier hote : sha256 a5043350d6d3efd92340f6d6fb221d720f6029ee8a9a8d09210d58f17752ba1e
+OK   emplacement inconnu dans le primary d'EPEL : absent
+OK   sonde extraite : première et dernière lignes : set -u|df -k /w | awk "NR == 2 {print \"capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
+OK   rendu : marque @…@ et /w restants (libellé « capacité de /w » mis à part) : 0
+     rpm -K du rpm de mock (seule clé d EPEL) : rc 0 ; digests signatures OK
+     OK   rpm de mock : mock-6.9-1.el9.noarch.rpm sha256 eabb766b587e0491d5f3055c3fd1199215619f2133fc3b6bf3ef87b46b8cb483
+     fichier depot/bash-5.1.8-9.el9.x86_64.rpm 4968c0f1f468a6fe387238b7217e7af4c555b213fa609f1052ffd3d8792b0448 31
+     fichier depot/libstdc++-11.5.0-5.el9_5.x86_64.rpm a65bd1edd352739f84eb6063f55dd36438b6298635cb75210754a39af20e083b 39
+     fichier depot/repodata/repomd.xml 92b1fc7b34b24722c692f6abacf2a0dfc7b7f1bda4ac31f36351f324e30c5064 10
+     fichier depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/manifest.json aa4f4741b3ea2a74959efa6580556e9c58c2783565c0a4a582477177224cd355 10
+     fichier depot/zlib-1.2.11-41.el9.x86_64.rpm aa57c7c34813e8b103c1059d949a15a2c9357acced15b307d45938b0d2116a8c 33
+     fichier outils/mock-6.9-1.el9.noarch.rpm eabb766b587e0491d5f3055c3fd1199215619f2133fc3b6bf3ef87b46b8cb483 24
+     fichier verrou.json eb6a868622c698dcfd7fc8cd4929cfbeb99cbb2ebd3e55475a89ae0cb8a54012 7
+     autres entrées que fichiers et dossiers : 0
+     fichiers de la fermeture : 7 ; octets : 154
+     capacité de /w : 599879200 kB ; utilisés : 505550424 kB
+OK   nominal : code : 0
+OK   nominal : URL demandée : https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/Packages/m/mock-6.9-1.el9.noarch.rpm
+OK   nominal : rpmdb à part et seule clé d'EPEL : 3 1 1
+OK   nominal : porte : 1
+OK   nominal : dépôt déplacé sous fermeture, rpmdb et k.log laissés : parti ./depot/bash-5.1.8-9.el9.x86_64.rpm ./depot/libstdc++-11.5.0-5.el9_5.x86_64.rpm ./depot/repodata/repomd.xml ./depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/manifest.json ./depot/zlib-1.2.11-41.el9.x86_64.rpm ./outils/mock-6.9-1.el9.noarch.rpm ./verrou.json
+OK   nominal : lignes fichier (chemin, sha256, taille) égales à un relevé de l'hôte : fichier depot/bash-5.1.8-9.el9.x86_64.rpm 4968c0f1f468a6fe387238b7217e7af4c555b213fa609f1052ffd3d8792b0448 31
+fichier depot/libstdc++-11.5.0-5.el9_5.x86_64.rpm a65bd1edd352739f84eb6063f55dd36438b6298635cb75210754a39af20e083b 39
+fichier depot/repodata/repomd.xml 92b1fc7b34b24722c692f6abacf2a0dfc7b7f1bda4ac31f36351f324e30c5064 10
+fichier depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/manifest.json aa4f4741b3ea2a74959efa6580556e9c58c2783565c0a4a582477177224cd355 10
+fichier depot/zlib-1.2.11-41.el9.x86_64.rpm aa57c7c34813e8b103c1059d949a15a2c9357acced15b307d45938b0d2116a8c 33
+fichier outils/mock-6.9-1.el9.noarch.rpm eabb766b587e0491d5f3055c3fd1199215619f2133fc3b6bf3ef87b46b8cb483 24
+fichier verrou.json eb6a868622c698dcfd7fc8cd4929cfbeb99cbb2ebd3e55475a89ae0cb8a54012 7
+OK   nominal : compte et autres entrées : 1 1
+     OK   rpm de mock (porte de collecte) : mock-6.9-1.el9.noarch.rpm sha256 eabb766b587e0491d5f3055c3fd1199215619f2133fc3b6bf3ef87b46b8cb483
+     porte passée
+OK   porte de etape_collecte, nominal : porte passée
+OK   cas http404 : code 1, KO   HTTP 404 : https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/Packages/m/mock-6.9-1.el9.noarch.rpm
+OK   porte de etape_collecte, cas http404 : pod retiré, porte non passée : 1 0
+OK   cas sha : code 1, KO   rpm de mock : sha256 5e15cd3bff2caabf7bbc4a1b5bc13f61f2f875c3578ad07344c5b5cae131ecf3, attendu eabb766b58
+OK   porte de etape_collecte, cas sha : pod retiré, porte non passée : 1 0
+OK   cas signature : code 1, KO   signature du rpm de mock
+OK   porte de etape_collecte, cas signature : pod retiré, porte non passée : 1 0
+OK   cas sansdepot : code 1, KO   dépôt de voie2 absent
+OK   porte de etape_collecte, cas sansdepot : pod retiré, porte non passée : 1 0
+## D : fermeture_controle
+OK   liste.tsv du vrai verrou (m2_preparer de la copie) : code et paquets : 0 222
+     rpm du verrou trouvés dans les primary de vault 9.7 vérifiés par hote97 : 222 sur 222
+     dossier dir: : manifeste sha256:d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7163 ; config et 1 couche(s)
+     OK   fermeture conforme : 231 fichiers, 124786 octets ; sha256 des rpm égaux aux primary, repodata égal à repomd.xml, blobs égaux à leur nom, manifeste, verrou et rpm de mock épinglés ; liste du pod égale
+     classe rpm : 222 fichier(s), 12447 octets
+     classe repodata : 3 fichier(s), 447 octets
+     classe image : 4 fichier(s), 307 octets
+     classe verrou : 1 fichier(s), 111561 octets
+     classe outils : 1 fichier(s), 24 octets
+     version du dossier dir: : sha256 c08ff8b68add15153b4fa2ca4ab4e70a6068f4d28286145b60636da0b374c9a4
+OK   nominal : code : 0
+OK   nominal : rpm trouvés dans les primary : 1
+OK   nominal : liste attendue (222 rpm, 3 repodata, 4 image, verrou, mock) : 231
+OK   nominal : liste attendue égale à la liste du pod (sha256 des deux listes) : ed5b9af50c4b3405cfa2901316da1b6cc458bb6458c695eb9950bc19e75b4eb6
+OK   nominal : classes : classe rpm : 222 fichier(s)|classe repodata : 3 fichier(s)|classe image : 4 fichier(s)|classe verrou : 1 fichier(s)|classe outils : 1 fichier(s)
+OK   refusé : fichier en trop (KO   fichier en trop : depot/intrus.rpm)
+OK   refusé : rpm manquant (KO   fichier manquant : depot/bash-5.1.8-9.el9.x86_64.rpm)
+OK   refusé : rpm altéré (KO   depot/zlib-1.2.11-40.el9.x86_64.rpm : sha256 843f4f7ed0066911…, 51 octets (attendu 791ef57007)
+OK   refusé : blob différent de son nom (KO   depot/sc-stockage.poc.test@sha256:d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7)
+OK   refusé : manifeste changé (KO   manifeste du dossier dir: absent ou différent de sha256:d74b390e16795f1d25abcf67c9f044e88b2054)
+OK   refusé : repodata altéré (KO   depot/repodata/a1-primary.xml.gz : sha256 68b4787c3d65eb96…, 13 octets (attendu 2920f3b64f9f4)
+OK   refusé : lien symbolique (KO   entrée qui n'est pas un fichier régulier : lien)
+OK   refusé : liste du pod différente (KO   liste du pod différente de l'arbre rapatrié (231 et 231 fichiers, 2 écart(s)))
+OK   refusé : emplacement de repomd refusé (KO   repomd.xml : emplacement refusé '../b2')
+OK   refusé : verrou d'un autre sha256 (KO   verrou.json : sha256 b6d0f8f15c33c8de…, 111561 octets (attendu 0000000000000000…, None octe)
+OK   refusé : rpm de mock d'un autre sha256 (KO   outils/mock-6.9-1.el9.noarch.rpm : sha256 eabb766b587e0491…, 24 octets (attendu 0000000000000)
+OK   refusé : dossier dir: avec le port (KO   dossier dir: refusé : sc-stockage.poc.test:5000@sha256:d74b390e16795f1d25abcf67c9f044e88b20549)
+OK   refusé : rpm absent des primary (KO   depot/alternatives-1.24-2.el9.x86_64.rpm : absent des primary de vault 9.7)
+OK   vrais primary de vault 9.7 (hote97) : 222 emplacements trouvés, contenus factices refusés : 1 1 1
+OK   comparer, nominal : 0 1
+OK   comparer, cas trop : code et motif : 1 1
+OK   comparer, cas manque : code et motif : 1 1
+OK   comparer, cas altere : code et motif : 1 1
+OK   comparer, cas lien : code et motif : 1 1
+## E : fermeture et restauration contre un registre local
+OK   registre local prêt (http, 127.0.0.1:5909)
+OK   fermeture du banc (image du registre local en dossier dir:) : construire : 0 231
+     OK   arbre égal à la liste : 231 fichiers, 125345 octets
+     tags sous deps/sample-app/mock-buildroot-lock avant l'envoi : 0
+     OK   blobs de l'image sous essais-05/rocky9-bootstrap = blobs du dossier dir: : 5240ce9d7fbac027bdb62a11ee94a17a55a235f21857eacf96c07d30e4b55154 8f40e7787a777d904c1e75a291b843d85ea66ca7406b25650d184b8fa44d5f1c
+     fermeture : 231 fichiers, 125345 octets ; dont manifeste, config et couches de l'image, déjà dans Zot : 833 octets
+     /var/lib/zot avant l'envoi : utilisés 1000000 octets ; libres 999999999999 octets
+     envoi 1 (tag banc) : 0 s
+     envoi 2 (tag banc-bis) : 0 s
+     fermeture : sc-stockage.poc.test:5000/deps/sample-app/mock-buildroot-lock@sha256:378c866f528d49075bd4e040a1cbca59da74fa6daab1245da49259ed4b489639
+     /var/lib/zot, utilisés : envoi 1 : 1000 octets de plus ; envoi 2 : 1000 octets de plus
+     OK   digest du second envoi : sha256:378c866f528d49075bd4e040a1cbca59da74fa6daab1245da49259ed4b489639
+     OK   digest du manifeste relu : sha256:378c866f528d49075bd4e040a1cbca59da74fa6daab1245da49259ed4b489639
+     OK   couches du manifeste : 231
+     OK   couches (titre, digest, taille) = liste de collecte : 59bad1d556f5769770b48d800f1e8a12b2d6b8894c9edcbdf5594f2591a8314b
+OK   fermeture : code : 0
+OK   fermeture : tags avant, place lue trois fois : 1 3
+OK   fermeture : commande de place : sc-stockage df -B1 --output=used,avail /var/lib/zot | tail -n 1
+OK   fermeture : portes : 5
+OK   fermeture : tags du registre local : banc banc-bis
+OK   fermeture : digest écrit : sha256:378c866f528d49075bd4e040a1cbca59da74fa6daab1245da49259ed4b489639
+OK   fermeture : titre d'une couche du dossier dir: (« : » et « @ » gardés) : 1
+OK   fermeture rejouée sous le même tag : refusée avant envoi : 1 1 0
+OK   fermeture changée depuis collecte : refusée avant envoi : 1 1 0
+OK   aucun tag banc2 créé : banc banc-bis
+     restaurée depuis sc-stockage.poc.test:5000/deps/sample-app/mock-buildroot-lock@sha256:378c866f528d49075bd4e040a1cbca59da74fa6daab1245da49259ed4b489639, dans un dossier vide
+     OK   arbre égal à la liste : 231 fichiers, 125345 octets
+OK   restauration : code et conformité : 0 1
+OK   restauration : dossier dir: recréé sous son nom : présent
+OK   restauration rejouée : dossier vidé puis conforme : 0 1
+## F : structure
+OK   trois étapes définies une fois
+OK   collecte n écrit pas dans Zot (ni oras, ni closure, ni auth_zot, ni crane)
+OK   collecte retire le pod sur ses trois échecs et à la fin
+OK   collecte ne touche ni $T/m2 ni m2-voie2 ni POD_M2
+OK   porte voie2 de collecte égale à celle de etape_voie2 (libellé du journal mis à part)
+OK   fermeture et restauration sans kubectl
+OK   fermeture pousse deux fois, restauration jamais
+OK   nom du pod conforme (DNS-1123, 63 au plus) et distinct de POD_M2
+## G : image d'essai
+OK   racine.tar (image d'essai), sha256 de l'étape racine : d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+OK   commandes de SONDE_COLLECTE absentes de /usr/bin : 
+# bilan : tenu, fin 2026-11-17T16:40:34Z

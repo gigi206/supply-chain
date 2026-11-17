@@ -1,0 +1,306 @@
+--- a/poc/bricks/05-rpm-mock/s1.sh
++++ b/poc/bricks/05-rpm-mock/s1.sh
+@@ -89,6 +89,24 @@
+ #               poussé ; pod retiré
+ #               Correctif appliqué au dépôt le 17/11/2026 à 16:02:02 UTC (« Oui, applique-le »), sha256 égal à la copie bancée
+ #               (8c60bca2…) ; non lancé.
++#   collecte    (../s1-fermeture.patch, préparé à sec le 17/11/2026, NON APPLIQUÉ ; fermeture de M2) : pod s1-05-mf (image
++#               d'essai, pod_spec inchangé) ; VOIE2_M2 rejoué tel quel (dossier $T/mf, journal mf-voie2) ; puis rpm de mock
++#               6.9-1 téléchargé d'EPEL, sha256 épinglé (relevé à racine), rpm -K avec la seule clé d'EPEL dans une rpmdb à
++#               part ; fermeture assemblée sous /w/fermeture (depot/ : rpm du verrou, repodata et dossier dir: de l'image ;
++#               verrou.json ; outils/ : rpm de mock), listée avec ses sha256, rapatriée sur l'hôte par tar ; sur l'hôte : liste
++#               exacte des fichiers, sha256 de chaque rpm égal au primary de vault 9.7 vérifié par hote97, repodata égal à
++#               repomd.xml, blobs du dossier dir: égaux à leur nom, manifeste égal au digest de boot_image, verrou épinglé,
++#               liste du pod égale à celle de l'hôte ; pod retiré ; rien écrit dans Zot
++#   fermeture   écriture dans Zot (compte poc-ecriture), définitive : catalogue de Zot lu, puis tags du dépôt
++#               deps/sample-app/mock-buildroot-lock s'il y figure ; tags $PREFIXE et $PREFIXE-bis absents, sinon rien n'est
++#               envoyé ; fermeture recontrôlée ; closure.sh de la brique 03 (un fichier par couche), poussée deux fois : même
++#               digest attendu, écrit dès le premier envoi ; couches comparées à la liste (titre, digest, taille) ; config et
++#               couches de l'image relevées sous essais-05/rocky9-bootstrap ; place utilisée de /var/lib/zot (df en octets sur
++#               sc-stockage, deux lectures avant, une après chaque envoi), sans seuil, « illisible » sans arrêt après l'envoi
++#               (d'autres écritures ne sont pas exclues) ; inode et liens des blobs de l'image sous les deux dépôts (stat sans
++#               sudo, « illisible » si refusé), sans pari
++#   restauration lecture dans Zot : pull par digest dans un dossier vide, liste, taille et sha256 de chaque fichier comparés à
++#               la liste de collecte ; inode et liens des blobs de l'image relus (relevé rejouable)
+ # Les replis (stockage vfs, mock non root, bootstrap sans image) ne sont pas lancés ici : chacun demande sa prédiction et un accord.
+ # Retrait : Zot n'autorise pas la suppression ; dépôts amont/rockylinux/rockylinux et essais-05/mock-rocky9 définitifs.
+ #
+@@ -1212,4 +1230,278 @@
+   pod_retirer "$n"
+ }
+ 
++# Étapes collecte, fermeture et restauration (s1-fermeture.patch, préparées à sec le 17/11/2026, NON APPLIQUÉES) : voir
++# l'en-tête. collecte rejoue VOIE2_M2 tel quel dans un autre pod et un autre dossier ($T/mf, journal mf-voie2) : m2-voie2.log
++# et $T/m2 ne sont pas touchés. fermeture et restauration reprennent etape_fermeture et etape_restauration de la 06 (s2.sh) ;
++# écarts : fermeture recontrôlée avant l'envoi, tags relevés avant, couches comparées avec leur taille, df de Zot.
++POD_MF=s1-05-mf
++DEPOT_FERMETURE=deps/sample-app/mock-buildroot-lock   # nom du jalon M2 (README) et du doc 02
++CLOSURE=$here/../03-deps-closure/closure.sh
++MOCK_CHEMIN=Packages/m/mock-6.9-1.el9.noarch.rpm                                   # sous EPEL9 ; s1-racine.log, « rpm epel9 »
++MOCK_SHA=a5043350d6d3efd92340f6d6fb221d720f6029ee8a9a8d09210d58f17752ba1e
++
++primary_somme() { # primary.xml href : « type valeur » de la somme du paquet à cet emplacement, ou « absent »
++  python3 -I - "$1" "$2" <<'PY'
++import sys, xml.etree.ElementTree as E
++C = '{http://linux.duke.edu/metadata/common}'; r = 'absent'
++for _, e in E.iterparse(sys.argv[1]):
++    if e.tag == C + 'package':
++        if e.find(C + 'location').get('href') == sys.argv[2]:
++            c = e.find(C + 'checksum'); r = f"{c.get('type')} {c.text}"
++        e.clear()
++print(r)
++PY
++}
++
++fermeture_controle() { # construire <arbre> <liste.tsv> <T> <vault> <dossier dir:> <digest> <sha du verrou> <rpm de mock> <sha>
++  # <liste du pod> <liste attendue à écrire> | comparer <arbre> <liste attendue> : KO sur tout écart, code 1
++  python3 -I - "$@" <<'PY'
++import hashlib, json, os, re, sys, xml.etree.ElementTree as E
++def sha(p):
++    h = hashlib.sha256()
++    with open(p, 'rb') as f:
++        for b in iter(lambda: f.read(1 << 20), b''): h.update(b)
++    return h.hexdigest()
++def arbre(d):  # fichiers réguliers, et toute autre entrée (lien, fichier spécial), en chemins relatifs
++    fic, autres = [], []
++    for r, ds, fs in os.walk(d):
++        autres += [os.path.relpath(os.path.join(r, x), d) for x in ds if os.path.islink(os.path.join(r, x))]
++        for x in fs:
++            p = os.path.join(r, x)
++            (fic if os.path.isfile(p) and not os.path.islink(p) else autres).append(os.path.relpath(p, d))
++    return sorted(fic), sorted(autres)
++def fin(ko, ok):
++    for m in ko[:20]: print('KO  ', m)
++    if ko: print(f'KO   {len(ko)} écart(s)'); sys.exit(1)
++    print(ok)
++def reel(d, fic): return {x: (sha(os.path.join(d, x)), os.path.getsize(os.path.join(d, x))) for x in fic}
++mode = sys.argv[1]
++if mode == 'comparer':
++    d, att = sys.argv[2:4]; a = {}
++    for l in open(att, encoding='utf-8'):
++        p, h, s = l.rstrip('\n').rsplit(' ', 2); a[p] = (h, int(s))
++    fic, autres = arbre(d)
++    ko = [f"entrée qui n'est pas un fichier régulier : {x}" for x in autres]
++    ko += [f'fichier en trop : {x}' for x in sorted(set(fic) - set(a))] + [f'fichier manquant : {x}' for x in sorted(set(a) - set(fic))]
++    v = reel(d, sorted(set(fic) & set(a)))
++    ko += [f'{x} : sha256 {v[x][0][:16]}…, {v[x][1]} octets (attendu {a[x][0][:16]}…, {a[x][1]} octets)' for x in v if v[x] != a[x]]
++    fin(ko, f'OK   arbre égal à la liste : {len(a)} fichiers, {sum(s for _, s in a.values())} octets')
++    sys.exit(0)
++assert mode == 'construire', mode
++d, tsv, prim, vault, dos, bd, vsha, mnom, msha, lpod, sortie = sys.argv[2:13]
++ko, att, cl = [], {}, {}   # chemin : (sha256 attendu ou None, taille attendue ou None) ; chemin : classe
++C = '{http://linux.duke.edu/metadata/common}'; RM = '{http://linux.duke.edu/metadata/repo}'
++P = {}
++for n in ('baseos97', 'appstream97', 'crb97'):
++    for _, e in E.iterparse(f'{prim}/{n}.primary.xml'):
++        if e.tag == C + 'package':
++            c = e.find(C + 'checksum'); P[(n, e.find(C + 'location').get('href'))] = (c.get('type'), c.text, int(e.find(C + 'size').get('package')))
++            e.clear()
++DEP = {'BaseOS': 'baseos97', 'AppStream': 'appstream97', 'CRB': 'crb97'}
++L = [l.rstrip('\n').split('\t') for l in open(tsv, encoding='utf-8')]
++t = 0
++for c in L:
++    u = c[5]; f = 'depot/' + u.rsplit('/', 1)[1]; cl[f] = 'rpm'; att[f] = (None, None)
++    dep, _, href = u[len(vault) + 1:].partition('/x86_64/os/')
++    k = (DEP.get(dep), href)
++    if not u.startswith(vault + '/') or k not in P: ko.append(f'{f} : absent des primary de vault 9.7'); continue
++    if P[k][0] != 'sha256': ko.append(f'{f} : somme {P[k][0]} dans le primary'); continue
++    att[f] = (P[k][1], P[k][2]); t += 1
++print(f'rpm du verrou trouvés dans les primary de vault 9.7 vérifiés par hote97 : {t} sur {len(L)}')
++rp = os.path.join(d, 'depot/repodata/repomd.xml'); att['depot/repodata/repomd.xml'] = (None, None); cl['depot/repodata/repomd.xml'] = 'repodata'
++if os.path.isfile(rp) and not os.path.islink(rp):
++    for x in E.parse(rp).getroot().findall(RM + 'data'):
++        c = x.find(RM + 'checksum'); h = x.find(RM + 'location').get('href'); s = x.find(RM + 'size')
++        if not re.fullmatch(r'repodata/[A-Za-z0-9._-]+', h or ''): ko.append(f'repomd.xml : emplacement refusé {h!r}'); continue
++        if c.get('type') != 'sha256': ko.append(f'repomd.xml : somme {c.get("type")} pour {h}')
++        att['depot/' + h] = (c.text if c.get('type') == 'sha256' else None, int(s.text) if s is not None else None); cl['depot/' + h] = 'repodata'
++else: ko.append('depot/repodata/repomd.xml absent')
++if not re.fullmatch(r'sha256:[0-9a-f]{64}', bd) or dos != 'sc-stockage.poc.test@' + bd: ko.append(f'dossier dir: refusé : {dos}')
++mp = os.path.join(d, 'depot', dos, 'manifest.json')
++for x in ('manifest.json', 'version'): att[f'depot/{dos}/{x}'] = (bd[7:] if x == 'manifest.json' else None, None); cl[f'depot/{dos}/{x}'] = 'image'
++if os.path.isfile(mp) and not os.path.islink(mp) and 'sha256:' + sha(mp) == bd:
++    m = json.load(open(mp, encoding='utf-8'))
++    for b in [m['config']] + m['layers']:
++        g = b['digest']
++        if not re.fullmatch(r'sha256:[0-9a-f]{64}', g): ko.append(f'manifeste : digest refusé {g!r}'); continue
++        att[f'depot/{dos}/{g[7:]}'] = (g[7:], b['size']); cl[f'depot/{dos}/{g[7:]}'] = 'image'
++    print(f'dossier dir: : manifeste {bd} ; config et {len(m["layers"])} couche(s)')
++else: ko.append(f'manifeste du dossier dir: absent ou différent de {bd}')
++att['verrou.json'] = (vsha, None); cl['verrou.json'] = 'verrou'
++att[f'outils/{mnom}'] = (msha, None); cl[f'outils/{mnom}'] = 'outils'
++fic, autres = arbre(d)
++ko += [f"entrée qui n'est pas un fichier régulier : {x}" for x in autres]
++ko += [f'fichier en trop : {x}' for x in sorted(set(fic) - set(att))] + [f'fichier manquant : {x}' for x in sorted(set(att) - set(fic))]
++v = reel(d, fic)
++for x in sorted(set(fic) & set(att)):
++    h, s = att[x]
++    if (h is not None and v[x][0] != h) or (s is not None and v[x][1] != s):
++        ko.append(f'{x} : sha256 {v[x][0][:16]}…, {v[x][1]} octets (attendu {(h or "-")[:16]}…, {s} octets)')
++pod = {}
++for l in open(lpod, encoding='utf-8'):
++    z = l.rstrip('\n').split(' ')
++    if len(z) != 4 or z[0] != 'fichier': ko.append(f'liste du pod : ligne illisible {l.strip()[:60]!r}'); continue
++    pod[z[1]] = (z[2], int(z[3]))
++if pod != v: ko.append(f'liste du pod différente de l\'arbre rapatrié ({len(pod)} et {len(v)} fichiers, {len(set(pod.items()) ^ set(v.items()))} écart(s))')
++fin(ko, f'OK   fermeture conforme : {len(v)} fichiers, {sum(s for _, s in v.values())} octets ; sha256 des rpm égaux aux primary, '
++        'repodata égal à repomd.xml, blobs égaux à leur nom, manifeste, verrou et rpm de mock épinglés ; liste du pod égale')
++for k in ('rpm', 'repodata', 'image', 'verrou', 'outils'):
++    z = [x for x in v if cl[x] == k]; print(f'classe {k} : {len(z)} fichier(s), {sum(v[x][1] for x in z)} octets')
++print(f'version du dossier dir: : sha256 {v["depot/" + dos + "/version"][0]}')
++with open(sortie, 'w', encoding='utf-8') as o:
++    for x in sorted(v): o.write(f'{x} {v[x][0]} {v[x][1]}\n')
++PY
++}
++
++SONDE_COLLECTE='set -u
++export LC_ALL=C
++F=/w/fermeture; E=/w/rpmdb-epel
++ko() { echo "KO   $*"; exit 1; }
++for o in curl rpm tar find stat sort sha256sum; do command -v $o >/dev/null 2>&1 || ko "$o absent de l image"; done
++[ -d /w/voie2/depot ] || ko "dépôt de voie2 absent"
++rm -rf "$F" "$E"; mkdir -p "$F/outils" "$E"
++h=$(curl -sS --proto =https --max-time 300 -o "$F/outils/@MOCK_NOM@" -w "%{http_code}" "@MOCK_URL@") || ko "curl en échec : @MOCK_URL@"
++[ "$h" = 200 ] || ko "HTTP $h : @MOCK_URL@"
++s=$(sha256sum < "$F/outils/@MOCK_NOM@" | cut -c1-64)
++[ "$s" = "@MOCK_SHA@" ] || ko "rpm de mock : sha256 $s, attendu @MOCK_SHA@"
++rpm --dbpath "$E" --initdb </dev/null || ko "rpmdb à part non créée"
++rpm --dbpath "$E" --import /w/cles/RPM-GPG-KEY-EPEL-9 </dev/null || ko "clé d EPEL non importée"
++k=$(rpm --dbpath "$E" -K "$F/outils/@MOCK_NOM@" 2>&1 </dev/null); r=$?
++echo "rpm -K du rpm de mock (seule clé d EPEL) : rc $r ; ${k##*: }"
++[ "$r" = 0 ] && [ "${k##*: }" = "digests signatures OK" ] || ko "signature du rpm de mock"
++echo "OK   rpm de mock : @MOCK_NOM@ sha256 $s"
++mv /w/voie2/depot "$F/depot" || ko "dépôt de voie2 non déplacé"
++cp /w/verrou.json "$F/verrou.json" || ko "verrou non copié"
++(cd "$F" && find . -type f -printf "%P\n" | sort | while IFS= read -r f; do echo "fichier $f $(sha256sum < "$f" | cut -c1-64) $(stat -c %s "$f")"; done) > /w/fermeture.liste
++cat /w/fermeture.liste
++echo "autres entrées que fichiers et dossiers : $(find "$F" ! -type f ! -type d | wc -l)"
++echo "fichiers de la fermeture : $(wc -l < /w/fermeture.liste) ; octets : $(awk "{s += \$4} END {print s}" /w/fermeture.liste)"
++df -k /w | awk "NR == 2 {print \"capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
++'
++
++etape_collecte() {
++  local d bd n=$POD_MF o=$T/mf fp fe src dos
++  d=$(cat "$T/image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape image" >&2; exit 1; }
++  bd=$(cat "$T/boot-image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape boot_image" >&2; exit 1; }
++  [[ $bd =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "KO   digest de boot_image illisible : $bd" >&2; exit 1; }
++  attendu "verrou d'entrée resultats/s1-verrou_derivee.json, sha256" "$(sha256sum < "$R/s1-verrou_derivee.json" | cut -c1-64)" \
++    "$VERROU_DERIVEE_SHA"
++  [ -s "$T/hote/RPM-GPG-KEY-Rocky-9" ] && [ -s "$T/hote/RPM-GPG-KEY-EPEL-9" ] && [ -s "$T/fp-epel" ] \
++    || { echo "KO   clés absentes : lancer d'abord l'étape hote" >&2; exit 1; }
++  fp=$(gpg --batch --with-colons --show-keys "$T/hote/RPM-GPG-KEY-Rocky-9" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}')
++  attendu "empreinte de la clé de Rocky livrée" "$fp" "$FP_ROCKY"
++  fe=$(gpg --batch --with-colons --show-keys "$T/hote/RPM-GPG-KEY-EPEL-9" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}')
++  attendu "empreinte de la clé d'EPEL livrée (comparée par hote à la page publiée)" "$fe" "$(cat "$T/fp-epel")"
++  attendu "rpm de mock dans le primary d'EPEL du dernier passage de hote" "$(primary_somme "$T/epel9.primary.xml" "$MOCK_CHEMIN")" \
++    "sha256 $MOCK_SHA"
++  rm -rf -- "${o:?}"
++  m2_preparer "$R/s1-verrou_derivee.json" "$o" "$bd"
++  src=$(jq -r '.config.bootstrap_image' "$R/s1-verrou_derivee.json"); dos=${src%%:*}@$bd
++  echo "image : $REG/$DEPOT_ESSAI@$d ; pod : $n"
++  pod_spec "$n" "$REG/$DEPOT_ESSAI@$d"
++  pod_demarrer "$n"
++  livrer "$n" "/etc/containers/certs.d/$REG/ca.crt" "$P/ca-poc.crt"
++  livrer "$n" /w/cles/RPM-GPG-KEY-Rocky-9 "$T/hote/RPM-GPG-KEY-Rocky-9"
++  livrer "$n" /w/cles/RPM-GPG-KEY-EPEL-9 "$T/hote/RPM-GPG-KEY-EPEL-9"
++  livrer "$n" /w/voie2/liste.tsv "$o/liste.tsv"
++  livrer "$n" /w/verrou.json "$R/s1-verrou_derivee.json"
++  dans "$n" mf-voie2 < "$o/voie2.sh"
++  ( attendu "verrou relu dans le pod" "$(champ mf-voie2 'verrou livré')" "sha256 $VERROU_DERIVEE_SHA"
++    attendu "manifeste copié (dernière porte de voie2)" "$(champ mf-voie2 'OK   manifeste copié')" "$bd" ) \
++    || { pod_retirer "$n"; exit 1; }
++  sed -e "s|@MOCK_URL@|$EPEL9/$MOCK_CHEMIN|g" -e "s|@MOCK_NOM@|${MOCK_CHEMIN##*/}|g" -e "s|@MOCK_SHA@|$MOCK_SHA|g" \
++    <<<"$SONDE_COLLECTE" | dans "$n" mf-collecte
++  ( attendu "rpm de mock (porte de collecte)" "$(champ mf-collecte 'OK   rpm de mock')" "${MOCK_CHEMIN##*/} sha256 $MOCK_SHA"
++    [ -n "$(champ mf-collecte 'fichiers de la fermeture')" ] || { echo "KO   liste de la fermeture absente" >&2; exit 1; } ) \
++    || { pod_retirer "$n"; exit 1; }
++  mkdir -p "$o/fermeture"
++  kubectl exec -n builds "$n" -- tar -C /w/fermeture -cf - . </dev/null | tar -xf - -C "$o/fermeture" \
++    || { pod_retirer "$n"; echo "KO   rapatriement de la fermeture" >&2; exit 1; }
++  pod_retirer "$n"
++  sed -n 's/^fichier /fichier /p' "$T/mf-collecte.log" > "$o/liste-pod.txt"
++  fermeture_controle construire "$o/fermeture" "$o/liste.tsv" "$T" "$VAULT97" "$dos" "$bd" "$VERROU_DERIVEE_SHA" \
++    "${MOCK_CHEMIN##*/}" "$MOCK_SHA" "$o/liste-pod.txt" "$o/fermeture.attendue" || { echo "KO   fermeture non conforme" >&2; exit 1; }
++  echo "liste attendue : $(wc -l < "$o/fermeture.attendue") lignes, sha256 $(sha256sum < "$o/fermeture.attendue" | cut -c1-64)"
++}
++
++oras_zot() { echo "--registry-config $T/zot.json --ca-file $P/ca-poc.crt"; }   # comme la 06 ; chemins sans espace (contrôlé)
++zot_place() { # utilisés et libres, en octets, du système de fichiers de /var/lib/zot (sans sudo) ; « illisible illisible » sinon
++  local u a
++  read -r u a < <(sur sc-stockage 'df -B1 --output=used,avail /var/lib/zot | tail -n 1' </dev/null 2>/dev/null) || true
++  if [[ ${u:-} =~ ^[0-9]+$ && ${a:-} =~ ^[0-9]+$ ]]; then echo "$u $a"; else echo "illisible illisible"; fi
++}
++de_plus() { if [[ $1 =~ ^[0-9]+$ && $2 =~ ^[0-9]+$ ]]; then echo "$(($2 - $1)) octets de plus"; else echo "illisible"; fi; }
++zot_liens() { # dossier-dir: liste-attendue : inode et nombre de liens de la config et des couches de l'image sous $DEPOT_DERIVE
++  # puis sous $DEPOT_FERMETURE (stat sans sudo sur sc-stockage, rejouable ; « illisible » si refusé) ; n'arrête rien, aucun pari
++  local h c
++  for h in $(awk -v p="depot/$1/" 'index($1, p) == 1 { f = substr($1, length(p) + 1); if (f ~ /^[0-9a-f]+$/ && length(f) == 64) print f }' "$2" | sort); do
++    # shellcheck disable=SC2029  # $h et les dépôts sont développés ici, à dessein ; \$d l'est sur sc-stockage
++    c=$(sur sc-stockage "for d in $DEPOT_DERIVE $DEPOT_FERMETURE; do stat -c '%i %h' /var/lib/zot/\$d/blobs/sha256/$h 2>/dev/null || echo illisible; done | paste -sd ' '" </dev/null 2>/dev/null) || c=
++    echo "blob ${h:0:12}… : inode et liens sous $DEPOT_DERIVE puis $DEPOT_FERMETURE : ${c:-illisible}"
++  done
++  true
++}
++
++etape_fermeture() {
++  local o=$T/mf bd dos cat tags img tot im mi u0 a0 v0 u1 u2 r1 r2 d t
++  [ -s "$o/fermeture.attendue" ] && [ -d "$o/fermeture" ] || { echo "KO   lancer d'abord l'étape collecte" >&2; exit 1; }
++  case "$T$P" in *' '*) echo "KO   chemin avec espace" >&2; exit 1 ;; esac
++  bd=$(cat "$T/boot-image.digest"); dos=sc-stockage.poc.test@$bd
++  fermeture_controle comparer "$o/fermeture" "$o/fermeture.attendue" || { echo "KO   fermeture changée depuis collecte" >&2; exit 1; }
++  auth_zot "$T/zot.json"
++  # Garde des tags : une liste vide doit venir d'une lecture réussie (catalogue lu ; tags lus si le dépôt y figure)
++  # shellcheck disable=SC2046
++  cat=$(oras repo ls $(oras_zot) "$REG_HOTE") || { echo "KO   catalogue de Zot illisible : rien n'est envoyé" >&2; exit 1; }
++  if grep -q -x -F -e "$DEPOT_FERMETURE" <<<"$cat"; then
++    # shellcheck disable=SC2046
++    tags=$(oras repo tags $(oras_zot) "$REG_HOTE/$DEPOT_FERMETURE") || { echo "KO   tags de $DEPOT_FERMETURE illisibles : rien n'est envoyé" >&2; exit 1; }
++    echo "catalogue de Zot : $(grep -c . <<<"$cat" || true) dépôts ; $DEPOT_FERMETURE présent, $(grep -c . <<<"$tags" || true) tag(s)"
++  else
++    tags=; echo "catalogue de Zot : $(grep -c . <<<"$cat" || true) dépôts ; $DEPOT_FERMETURE absent"
++  fi
++  ! grep -q -x -e "$PREFIXE" -e "$PREFIXE-bis" <<<"$tags" || { echo "KO   tag $PREFIXE ou $PREFIXE-bis déjà présent" >&2; exit 1; }
++  img=$(zot crane manifest "$REG_HOTE/$DEPOT_DERIVE@$bd" | jq -r '[.config.digest, .layers[].digest | ltrimstr("sha256:")] | sort | join(" ")')
++  attendu "blobs de l'image sous $DEPOT_DERIVE = blobs du dossier dir:" "$img" "$(awk -v p="depot/$dos/" \
++    'index($1, p) == 1 { f = substr($1, length(p) + 1); if (f ~ /^[0-9a-f]+$/ && length(f) == 64) print f }' "$o/fermeture.attendue" | sort | paste -sd ' ')"
++  tot=$(awk '{s += $3} END {print s}' "$o/fermeture.attendue")
++  im=$(awk -v p="depot/$dos/" 'index($1, p) == 1 { f = substr($1, length(p) + 1); if (f ~ /^[0-9a-f]+$/ && length(f) == 64) s += $3 } END {print s + 0}' "$o/fermeture.attendue")
++  mi=$(awk -v p="depot/$dos/manifest.json" '$1 == p {print $3}' "$o/fermeture.attendue")
++  echo "fermeture : $(wc -l < "$o/fermeture.attendue") fichiers, $tot octets ; dont config et couches de l'image, relevées sous $DEPOT_DERIVE : $im octets ; manifeste de l'image : ${mi:-?} octets"
++  read -r u0 a0 < <(zot_place); read -r v0 _ < <(zot_place)
++  [[ $u0 =~ ^[0-9]+$ && $a0 =~ ^[0-9]+$ ]] || { echo "KO   place de Zot illisible : rien n'est envoyé" >&2; exit 1; }
++  echo "/var/lib/zot avant l'envoi : utilisés $u0 octets, puis $v0 à une seconde lecture ($(de_plus "$u0" "$v0")) ; libres $a0 octets"
++  [ "$a0" -gt $((2 * tot)) ] || { echo "KO   place libre de Zot sous le double de la fermeture : rien n'est envoyé" >&2; exit 1; }
++  t=$(date +%s); r1=$(ORAS_OPTS=$(oras_zot) "$CLOSURE" push "$o/fermeture" "$REG_HOTE/$DEPOT_FERMETURE:$PREFIXE")
++  echo "envoi 1 (tag $PREFIXE) : $(($(date +%s) - t)) s"
++  d=${r1#*@}; [[ $d =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "KO   digest de la fermeture illisible : $d" >&2; exit 1; }
++  echo "$d" > "$o/fermeture.digest"; echo "fermeture : ${r1/$REG_HOTE/$REG}"
++  read -r u1 _ < <(zot_place)
++  t=$(date +%s); r2=$(ORAS_OPTS=$(oras_zot) "$CLOSURE" push "$o/fermeture" "$REG_HOTE/$DEPOT_FERMETURE:$PREFIXE-bis")
++  echo "envoi 2 (tag $PREFIXE-bis) : $(($(date +%s) - t)) s"; read -r u2 _ < <(zot_place)
++  echo "/var/lib/zot, utilisés : envoi 1 : $(de_plus "$v0" "$u1") ; envoi 2 : $(de_plus "$u1" "$u2")"
++  attendu "digest du second envoi" "${r2#*@}" "$d"
++  # shellcheck disable=SC2046
++  oras manifest fetch $(oras_zot) "$REG_HOTE/$DEPOT_FERMETURE@$d" > "$o/manifest.json"
++  attendu "digest du manifeste relu" "sha256:$(sha256sum < "$o/manifest.json" | cut -c1-64)" "$d"
++  attendu "couches du manifeste" "$(jq '.layers | length' "$o/manifest.json")" "$(wc -l < "$o/fermeture.attendue")"
++  attendu "couches (titre, digest, taille) = liste de collecte" \
++    "$(jq -r '.layers[] | "\(.annotations["org.opencontainers.image.title"]) \(.digest | ltrimstr("sha256:")) \(.size)"' "$o/manifest.json" \
++      | sort | sha256sum | cut -c1-64)" "$(sort "$o/fermeture.attendue" | sha256sum | cut -c1-64)"
++  zot_liens "$dos" "$o/fermeture.attendue"
++}
++
++etape_restauration() {
++  local o=$T/mf d bd
++  d=$(cat "$o/fermeture.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape fermeture" >&2; exit 1; }
++  [[ $d =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "KO   digest de la fermeture illisible : $d" >&2; exit 1; }
++  case "$T$P" in *' '*) echo "KO   chemin avec espace" >&2; exit 1 ;; esac
++  bd=$(cat "$T/boot-image.digest")
++  auth_zot "$T/zot.json"
++  rm -rf -- "${o:?}/restauree"
++  ORAS_OPTS=$(oras_zot) "$CLOSURE" pull "$REG_HOTE/$DEPOT_FERMETURE@$d" "$o/restauree"
++  echo "restaurée depuis $REG/$DEPOT_FERMETURE@$d, dans un dossier vide"
++  fermeture_controle comparer "$o/restauree" "$o/fermeture.attendue" || { echo "KO   fermeture restaurée différente" >&2; exit 1; }
++  zot_liens "sc-stockage.poc.test@$bd" "$o/fermeture.attendue"
++}
++
+ lancer "$PREFIXE" "05 S1" "$@"

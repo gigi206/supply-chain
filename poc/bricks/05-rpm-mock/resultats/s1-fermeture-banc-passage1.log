@@ -1,0 +1,363 @@
+# banc-fermeture.sh, 2026-11-17T16:39:16Z, python3 3.13.12, Version: 1.3.6, crane 0.20.6
+# s1.sh du dépôt 8554910f02a5e250bc22b208d9d6c0b8da2e39803fd5c661750c4e98514a1e95 ; copie modifiée bc2522379774f0731eac03c147fb4a33d97c3eab7d3a925e48569d28f8d5ba99 ; closure.sh 297aa2c21de183d16377112e06aef73290af4f6af32cce35797462dc94fb4c7e
+## A : insertions seules
+OK   lignes retirées : 0
+OK   blocs insérés : 2
+OK   copie sans les blocs insérés égale au dépôt
+     en-tête inséré : 15 lignes ; bloc inséré : 250 lignes
+## B : syntaxe et shellcheck
+OK   bash -n de la copie
+     remarques shellcheck : dépôt 25, copie 26
+     diff shellcheck : 2c2
+     diff shellcheck : <      16 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+     diff shellcheck : ---
+     diff shellcheck : >      17 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+OK   remarques shellcheck de niveau warning ou error dans la copie : 0
+## C : primary_somme et SONDE_COLLECTE
+OK   fragments extraits (10 variables, 9 fonctions, VOIE2_M2), absents : 
+OK   rpm de mock dans le vrai primary d'EPEL du dernier hote : sha256 a5043350d6d3efd92340f6d6fb221d720f6029ee8a9a8d09210d58f17752ba1e
+OK   emplacement inconnu dans le primary d'EPEL : absent
+OK   sonde extraite : première et dernière lignes : set -u|df -k /w | awk "NR == 2 {print \"capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
+KO   rendu : marque @…@ et /w restants : 1 (attendu : 0)
+     rpm -K du rpm de mock (seule clé d EPEL) : rc 0 ; digests signatures OK
+     OK   rpm de mock : mock-6.9-1.el9.noarch.rpm sha256 eabb766b587e0491d5f3055c3fd1199215619f2133fc3b6bf3ef87b46b8cb483
+     fichier depot/bash-5.1.8-9.el9.x86_64.rpm 4968c0f1f468a6fe387238b7217e7af4c555b213fa609f1052ffd3d8792b0448 31
+     fichier depot/libstdc++-11.5.0-5.el9_5.x86_64.rpm a65bd1edd352739f84eb6063f55dd36438b6298635cb75210754a39af20e083b 39
+     fichier depot/repodata/repomd.xml 92b1fc7b34b24722c692f6abacf2a0dfc7b7f1bda4ac31f36351f324e30c5064 10
+     fichier depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/manifest.json aa4f4741b3ea2a74959efa6580556e9c58c2783565c0a4a582477177224cd355 10
+     fichier depot/zlib-1.2.11-41.el9.x86_64.rpm aa57c7c34813e8b103c1059d949a15a2c9357acced15b307d45938b0d2116a8c 33
+     fichier outils/mock-6.9-1.el9.noarch.rpm eabb766b587e0491d5f3055c3fd1199215619f2133fc3b6bf3ef87b46b8cb483 24
+     fichier verrou.json eb6a868622c698dcfd7fc8cd4929cfbeb99cbb2ebd3e55475a89ae0cb8a54012 7
+     autres entrées que fichiers et dossiers : 0
+     fichiers de la fermeture : 7 ; octets : 154
+     capacité de /w : 599879200 kB ; utilisés : 505545920 kB
+OK   nominal : code : 0
+OK   nominal : URL demandée : https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/Packages/m/mock-6.9-1.el9.noarch.rpm
+OK   nominal : rpmdb à part et seule clé d'EPEL : 3 1 1
+OK   nominal : porte : 1
+OK   nominal : dépôt déplacé sous fermeture, rpmdb et k.log laissés : parti ./depot/bash-5.1.8-9.el9.x86_64.rpm ./depot/libstdc++-11.5.0-5.el9_5.x86_64.rpm ./depot/repodata/repomd.xml ./depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/manifest.json ./depot/zlib-1.2.11-41.el9.x86_64.rpm ./outils/mock-6.9-1.el9.noarch.rpm ./verrou.json
+OK   nominal : lignes fichier (chemin, sha256, taille) égales à un relevé de l'hôte : fichier depot/bash-5.1.8-9.el9.x86_64.rpm 4968c0f1f468a6fe387238b7217e7af4c555b213fa609f1052ffd3d8792b0448 31
+fichier depot/libstdc++-11.5.0-5.el9_5.x86_64.rpm a65bd1edd352739f84eb6063f55dd36438b6298635cb75210754a39af20e083b 39
+fichier depot/repodata/repomd.xml 92b1fc7b34b24722c692f6abacf2a0dfc7b7f1bda4ac31f36351f324e30c5064 10
+fichier depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/manifest.json aa4f4741b3ea2a74959efa6580556e9c58c2783565c0a4a582477177224cd355 10
+fichier depot/zlib-1.2.11-41.el9.x86_64.rpm aa57c7c34813e8b103c1059d949a15a2c9357acced15b307d45938b0d2116a8c 33
+fichier outils/mock-6.9-1.el9.noarch.rpm eabb766b587e0491d5f3055c3fd1199215619f2133fc3b6bf3ef87b46b8cb483 24
+fichier verrou.json eb6a868622c698dcfd7fc8cd4929cfbeb99cbb2ebd3e55475a89ae0cb8a54012 7
+OK   nominal : compte et autres entrées : 1 1
+     OK   rpm de mock (porte de collecte) : mock-6.9-1.el9.noarch.rpm sha256 eabb766b587e0491d5f3055c3fd1199215619f2133fc3b6bf3ef87b46b8cb483
+     porte passée
+OK   porte de etape_collecte, nominal : porte passée
+OK   cas http404 : code 1, KO   HTTP 404 : https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/Packages/m/mock-6.9-1.el9.noarch.rpm
+OK   porte de etape_collecte, cas http404 : pod retiré, porte non passée : 1 0
+OK   cas sha : code 1, KO   rpm de mock : sha256 5e15cd3bff2caabf7bbc4a1b5bc13f61f2f875c3578ad07344c5b5cae131ecf3, attendu eabb766b58
+OK   porte de etape_collecte, cas sha : pod retiré, porte non passée : 1 0
+OK   cas signature : code 1, KO   signature du rpm de mock
+OK   porte de etape_collecte, cas signature : pod retiré, porte non passée : 1 0
+OK   cas sansdepot : code 1, KO   dépôt de voie2 absent
+OK   porte de etape_collecte, cas sansdepot : pod retiré, porte non passée : 1 0
+## D : fermeture_controle
+OK   liste.tsv du vrai verrou (m2_preparer de la copie) : code et paquets : 0 222
+     rpm du verrou trouvés dans les primary de vault 9.7 vérifiés par hote97 : 222 sur 222
+     dossier dir: : manifeste sha256:d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7163 ; config et 1 couche(s)
+     OK   fermeture conforme : 231 fichiers, 124786 octets ; sha256 des rpm égaux aux primary, repodata égal à repomd.xml, blobs égaux à leur nom, manifeste, verrou et rpm de mock épinglés ; liste du pod égale
+     classe rpm : 222 fichier(s), 12447 octets
+     classe repodata : 3 fichier(s), 447 octets
+     classe image : 4 fichier(s), 307 octets
+     classe verrou : 1 fichier(s), 111561 octets
+     classe outils : 1 fichier(s), 24 octets
+     version du dossier dir: : sha256 c08ff8b68add15153b4fa2ca4ab4e70a6068f4d28286145b60636da0b374c9a4
+OK   nominal : code : 0
+OK   nominal : rpm trouvés dans les primary : 1
+OK   nominal : liste attendue (222 rpm, 3 repodata, 4 image, verrou, mock) : 231
+OK   nominal : liste attendue égale à la liste du pod : depot/alternatives-1.24-2.el9.x86_64.rpm 237d44fe61a6a20512526f2888df507bd04f83dfa05f8e438213a09c2cef051e 54
+depot/annobin-12.98-1.el9.x86_64.rpm 6abf4cb782fa62af0ee7c503ddc3cd37d9c469e27af72198b06c20b366ae19c8 50
+depot/audit-libs-3.1.5-7.el9.x86_64.rpm 7951dea4c7a37c257080b23dcd2fae01d28ff9585c9fac0e887c984786ad1ae2 53
+depot/basesystem-11-13.el9.0.1.noarch.rpm 27cbb0c58858c24e456393fb07edaedeea67afe4936aab0f6969d51968343f28 55
+depot/bash-5.1.8-9.el9.x86_64.rpm a63f159e6739cf651f16a446e18d175ec022f5e9dcf2cd70a1c7888a1b64e7f2 47
+depot/binutils-2.35.2-67.el9_7.1.x86_64.rpm 303a6f0992557962999ab0db2769ccef6ed7f50fd49f1dc7a2126200072a3b97 57
+depot/binutils-gold-2.35.2-67.el9_7.1.x86_64.rpm 2f2e3bd9ebcbb08ab8972965325e78e663fe22515716710127b7ca63b0977225 62
+depot/bzip2-1.0.8-10.el9_5.x86_64.rpm a4aabd3a8f52ce5cdebad2cfab8150b11bb4100dc964ab1f4188d762fc9301f9 51
+depot/bzip2-libs-1.0.8-10.el9_5.x86_64.rpm 73a8fb4c40dd78b4bf27409a40436ab61d7bf223d42b66c9c20c699d0bc7247e 56
+depot/ca-certificates-2025.2.80_v9.0.305-91.el9.noarch.rpm f9d06f0ad911c6d662c9b0a1e35e24989418c7b0ba3a85bc5c29b10f73a33c21 72
+depot/coreutils-8.32-39.el9.x86_64.rpm 9cc0a209cd8baedafadcce6a55a967e823bcf219222cdee231e5d850f7ef17e3 52
+depot/coreutils-common-8.32-39.el9.x86_64.rpm e44084a4f8262160016f0389410e7bafa0b729070970342a4ecff9e0d087643a 59
+depot/cpio-2.13-16.el9.x86_64.rpm 0603bb7a9f9a2945919c4176a774d58bb4425b1929865a76a8ad5b286345d915 47
+depot/cpp-11.5.0-11.el9.x86_64.rpm f6c4acfed16995e84c24646dd209323a712d0301fe6559e52bac0292b21fb2cd 48
+depot/cracklib-2.9.6-27.el9.x86_64.rpm 30a9ea6cbd97cff9baaef3c6cf7d7979c51510d4519cc0c17e5b671f0b18d284 52
+depot/cracklib-dicts-2.9.6-27.el9.x86_64.rpm 94fa5c4fb5628ef60f2f5e142f9042c0f64df8a46674bf0841c752d98224c3b9 58
+depot/crypto-policies-20250905-1.git377cc42.el9.noarch.rpm bdfafe63e1646661d95473e2103b15968b027b7cbe4e8b9ea4acca27d0e2a8b4 72
+depot/curl-7.76.1-35.el9_7.3.x86_64.rpm 6484074f5514e89f8c01cf6aabfe2e10b0f03862adc6a26360a25cf5d7cf8135 53
+depot/cyrus-sasl-lib-2.1.27-22.el9_7.x86_64.rpm 6de5accba40f08cefa15240a943d00debf11b02f1bc0db0924270e200b656240 61
+depot/debugedit-5.0-11.el9.x86_64.rpm 4fbd44f53c158c4328093090e0118be6961bd96b8604d4e2de790849a59d1060 51
+depot/diffutils-3.7-12.el9.x86_64.rpm 42adc1390088a30c213c9ff0e8ac18dd0928565a10e72a87184daa9708dd7bae 51
+depot/dwz-0.16-1.el9.x86_64.rpm d4f97f35eea51b778eae5e71d7136c58c4718c5e254566c5b878ea49559bd072 45
+depot/ed-1.14.2-12.el9.x86_64.rpm a329d57ddedd7a9ec937239d928a6bae7dced4d6d38a7b4d1ae4ad2a87e62e78 47
+depot/efi-srpm-macros-6-4.el9.noarch.rpm ce498e6371ee5bd46d39fdfe74d8deaf6af78812654e83ef56339ce988e0abe1 54
+depot/elfutils-0.193-1.el9.rocky.0.1.x86_64.rpm 555e285647fe1a4c7e482aab5ee980fdf507811d618cc7bbcda4a9c63718decf 61
+depot/elfutils-debuginfod-client-0.193-1.el9.rocky.0.1.x86_64.rpm cb0ea4c32bb813364ae01d9893196ba5344efd2b67147d1a37044a33504f2835 79
+depot/elfutils-default-yama-scope-0.193-1.el9.rocky.0.1.noarch.rpm fde9b4a595030fd67d861ba4c9718a279465b2f36143586e06ecdad8093440aa 80
+depot/elfutils-libelf-0.193-1.el9.rocky.0.1.x86_64.rpm 14d6611142bf9d03ffad01d7a9f1f6862fe2e7223d9d87dd8dcf158346fb281f 68
+depot/elfutils-libs-0.193-1.el9.rocky.0.1.x86_64.rpm 769b8e03a6906cdc78b2008b160d3b90963fcf1752c8bf214f63131dccdd68aa 66
+depot/file-5.39-16.el9.x86_64.rpm acbcc3a88fc02eb057ba38e74b39074306dc0d9d42236885290324d92919e73d 47
+depot/file-libs-5.39-16.el9.x86_64.rpm 5df5d01f9b3e4c676dd4ef07a2579977ec9c72a44fe312fceae308ff616d7440 52
+depot/filesystem-3.16-5.el9.x86_64.rpm c3e37b47168e3318c99a73651585fb76ec31ba8ccff6c00b4c66820fc362d157 52
+depot/findutils-4.8.0-7.el9.x86_64.rpm 0e2af0a66f18c202238e3c8d59b8f0a3c1111ae665430a9268d0e6b93337ca5b 52
+depot/fonts-srpm-macros-2.0.5-7.el9.1.noarch.rpm 373f6a999554c4075249dce92fd90d4b84c7aa6048e45fcf232b5c21a6d8f14c 62
+depot/gawk-5.1.0-6.el9.x86_64.rpm d18527fc964927170b98cbd7dc1970449b1e114a19ab2ef78396c26b524903c3 47
+depot/gcc-11.5.0-11.el9.x86_64.rpm 181eb9bba2b59e3f4c5f0eb295970cb93146af8104a99f54367b32e95526f192 48
+depot/gcc-plugin-annobin-11.5.0-11.el9.x86_64.rpm 88f6347c1aab1e501fa58d64e04c5d729ff5375f49358d39cc4a0ae13bfc6a8e 63
+depot/gdb-minimal-16.3-2.el9.x86_64.rpm 57b6de25d3be25f2a2489eced4a02a81ac4e0800da4c94cd7b8de85beef4a51f 53
+depot/gdbm-libs-1.23-1.el9.x86_64.rpm 7fdb7cd63a7d592fd4bacd4d9135a837d725a58e142389582959b7ce63df3a0e 51
+depot/ghc-srpm-macros-1.5.0-6.el9.noarch.rpm af6fb587abd5db9b3bf5a1f1d0def3042af14545d64fc6be8912aa5ced58d542 58
+depot/glibc-2.34-231.el9_7.10.x86_64.rpm bcb5bd2a979b4e77ceca314f694a19c956d62f4d29d3da59dd12d7ae4eff949a 54
+depot/glibc-common-2.34-231.el9_7.10.x86_64.rpm 5219830031bc3927639fc9288b9b25d5d3bf99b9f203bc2df7aea75ab1f27b83 61
+depot/glibc-devel-2.34-231.el9_7.10.x86_64.rpm 7fe8db56840441f342e5be933f128f0b66415f47572d47b4c50e6a8854195bfe 60
+depot/glibc-gconv-extra-2.34-231.el9_7.10.x86_64.rpm 9a7bbadb30f1ae76ae4491a649fe7f6f7049c7d1d064b42e24ae654b7ac13b4c 66
+depot/glibc-headers-2.34-231.el9_7.10.x86_64.rpm 5a788abf3defc3975e076b78a9572341acda1d3da6c60b23894e7d243b0ffb65 62
+depot/glibc-minimal-langpack-2.34-231.el9_7.10.x86_64.rpm 64d6078818502b83f7db936b420d00dfbf205ea215286851576a3b2394dbe40f 71
+depot/gmp-6.2.0-13.el9.x86_64.rpm 3ce9d00a95f3e4cd14e4912d32bb3b8613bca8476da2a47fd7716a26b0c8bdc0 47
+depot/go-srpm-macros-3.6.0-14.el9_7.noarch.rpm 9db74303f5887bcbe4b152e4227ed6499af74f97ed68498b4284901ef7b2f2fb 60
+depot/golang-1.25.9-1.el9_7.x86_64.rpm ebe8b82d34c2658adc12e32ef34fea9d6f93a303bd64b449c6c859aa4154450e 52
+depot/golang-bin-1.25.9-1.el9_7.x86_64.rpm 7d010ca27d53464f1d67b9604d2036ea32d974bcd4b0e22de2d2b0e606d1e108 56
+depot/golang-race-1.25.9-1.el9_7.x86_64.rpm 3f6a1b01e42c4533c2e8c110d9c8d6e93b496f9f0da68f30d91650bd3b271069 57
+depot/golang-src-1.25.9-1.el9_7.noarch.rpm 246277871f29bd33ee46ccb358d59814e29989aab4add23745cfb442d6a0ccdb 56
+depot/grep-3.6-5.el9.x86_64.rpm de8978b44d29e0e3be27b3da6d9cdcdcefbb024a6bcd611d91e2aafd45188a51 45
+depot/groff-base-1.22.4-10.el9.0.1.x86_64.rpm 7f173fad10515f42b03feb8d424a2c8f52fecb9bd7fe1c8f7b26141a33b0bf04 59
+depot/gzip-1.12-1.el9.x86_64.rpm 382f11c36ef3ed2aa46211db278bbb87afb539b94ed09457ad67f298ecb0b0f7 46
+depot/info-6.7-15.el9.x86_64.rpm 1eb89ccb01e6a628c4eaa34d444fb9b780f802bc0c5f049f1611977fd5bcede3 46
+depot/json-c-0.14-11.el9.x86_64.rpm ea6b5fa7b527cbe4a138f52d6a8202b0c81906039af6fb4eb5b35237763ea858 49
+depot/kernel-headers-5.14.0-611.55.1.el9_7.x86_64.rpm b2f31baea92e4d0f322862b4b0b4b5ebae5892768f7056aa69ce33524ca52000 67
+depot/kernel-srpm-macros-1.0-14.el9.noarch.rpm 2ceb348a41a63e3e60dc8f07ac716eda048bc4b06e00e3df3de4fdaa1320045c 60
+depot/keyutils-libs-1.6.3-1.el9.x86_64.rpm 480573e4f360ebd883d75d6f2585c4e693c2aa0c00cc32d464cb17575e535909 56
+depot/krb5-libs-1.21.1-9.el9_7.x86_64.rpm bb5f0fd0e360bd938b1e8b18215da87499a00be90dd7fd5ccc19ebdfb8883c7a 55
+depot/libacl-2.3.1-4.el9.x86_64.rpm 6477f7d12f21f915bf8d45993467993df3c4c0fbc4aab84816b1648cbd27c2ab 49
+depot/libarchive-3.5.3-9.el9_7.x86_64.rpm 0b46bd3ab1d2221f41d780ae9baba870e20f205141fd2bc37ed09ba4ad44247b 55
+depot/libattr-2.5.1-3.el9.x86_64.rpm e3a9c5f8099c3182295fa10c751b037422003f6aa743ea25470e2ca074473933 50
+depot/libblkid-2.37.4-21.el9_7.x86_64.rpm b0b843fc14deef9c38ff2cdf6287dfde72ee8791210b17657c1cdd9d84d88372 55
+depot/libbrotli-1.0.9-9.el9_7.x86_64.rpm fea6d636df62e7691accc86af7030bc6a557b7daacab944d4e188b1781fb2c68 54
+depot/libcap-2.48-10.el9_7.1.x86_64.rpm 937c763f7eeabb76ea0e36b0ce73c1741508b556c48dae8a51534f4380f91d4a 53
+depot/libcap-ng-0.8.2-7.el9.x86_64.rpm f3ea4cc17be616ba14ca2a84a6d0375ac5379df53486a321c2b2c6c06176efb6 52
+depot/libcom_err-1.46.5-8.el9.x86_64.rpm 01769a023296449b932542e19252e13dbcd82c10883934c957bbed53e1670716 54
+depot/libcurl-7.76.1-35.el9_7.3.x86_64.rpm 1a9272c69cc1b896d1383a6d6b5a85be7c1f84a4c8026149d85632d682aca3d9 56
+depot/libdb-5.3.28-57.el9_6.x86_64.rpm 1214a41442cbbf6fa4e11ed028200c137461a51cc7c54cac7fc3ae0edda543c6 52
+depot/libeconf-0.4.1-4.el9.x86_64.rpm 256febf7bd3ce1540a2f7fbb44518acb2b27b9305685505b1c30e7b67a2d25be 51
+depot/libedit-3.1-38.20210216cvs.el9.x86_64.rpm abd16ad4ab6d2e4681bea6184844e449e9863c554c05ea35cdf6b68a62e7abeb 61
+depot/libevent-2.1.12-8.el9_4.x86_64.rpm c8e69d33792df672e7414b42576f0dd2ae8252680fe628acdccb28107c1e5daf 54
+depot/libfdisk-2.37.4-21.el9_7.x86_64.rpm b9af95d1c25161c41fcbf48b8821fd95427dc4c8550a039adc1e965e49a016d3 55
+depot/libffi-3.4.2-8.el9.x86_64.rpm cade11c87ded444da8eafac217fe034cdf0449a375ac8b833ac79b9278b65076 49
+depot/libgcc-11.5.0-11.el9.x86_64.rpm fdcabbef34a6c1a41ad0d7dd115e38b9b769bfd10f4263c72a6cc8c05e73b463 51
+depot/libgcrypt-1.10.0-11.el9.x86_64.rpm 564989c20bf447747cd0bcfc15dedc76364c0036aa54fd2b63946b544d954108 54
+depot/libgomp-11.5.0-11.el9.x86_64.rpm 0aeb5d11e66550b33308ecbf417d8add2ae2ddba5cc58c69d921c7d1b32169fc 52
+depot/libgpg-error-1.42-5.el9.x86_64.rpm 96b57a6adb6c68893fc223bcb576e54fa031eb181a21b7151419880c6f1ac767 54
+depot/libidn2-2.3.0-7.el9.x86_64.rpm a7adc700ac963356b2711096e9f8525dcd50641865fd7203a6afabf4b547f348 50
+depot/libmount-2.37.4-21.el9_7.x86_64.rpm 34d2827137e046740e887058077808ea99255ff0a8b1da26aa8cab92b8832b65 55
+depot/libmpc-1.2.1-4.el9.x86_64.rpm de902bf1cd003df1413ee4fb1d8d0af23f6259b192ccb051b8b3fb9d89bf48a6 49
+depot/libnghttp2-1.43.0-6.el9_7.1.x86_64.rpm 65c1f894c1b3e0a20aae3da4d39a418fcdf55eed25278607b4a099e73f4a7a8d 58
+depot/libpkgconf-1.7.3-10.el9.x86_64.rpm a7d8e0a0bc26d00dbb5065f7f8037ec76a50e5048a37e5478ad2bb5e541dcc3a 54
+depot/libpsl-0.21.1-5.el9.x86_64.rpm d4505caebedad62de12f4b85dc58424531fdd409d3985380ca4b53330d8b1e18 50
+depot/libpwquality-1.4.4-8.el9.x86_64.rpm eebd5d7318db96fcc7a9abec97bb4817d0ef3235acae7a301116541ebff21032 55
+depot/libselinux-3.6-3.el9.x86_64.rpm 0564bd8a9bd778d948f7393068eac72ef8ae69a5314e2697ae188647665a6fd0 51
+depot/libsemanage-3.6-5.el9_6.x86_64.rpm dc8ab359c4ca56b486bffb513b8655cb7ccddb130a16155ee6d3c935a4584918 54
+depot/libsepol-3.6-3.el9.x86_64.rpm 96600c2e2353b30c5cb731cfb2d5467d6e68b4b8b4d3e886edbd702f45f8ec27 49
+depot/libsigsegv-2.13-4.el9.x86_64.rpm 712cd56110f230e66d5a024411d3071ee92df877ed4acc71a34373bf3513e431 52
+depot/libsmartcols-2.37.4-21.el9_7.x86_64.rpm b3bc8c3934338bba294f29e7421bc5137550cac3784fd7b621f30bc8a6f559b9 59
+depot/libssh-0.10.4-17.el9_7.x86_64.rpm 947b65e601c5725a5ef3563d2e7d4a57823fce62e3d61efc50a47e4e0c95cc1e 53
+depot/libssh-config-0.10.4-17.el9_7.noarch.rpm 18d480fd8e9f610b01d011c008db7cb22ace8656e672e819d05cd37f065995e4 60
+depot/libstdc++-11.5.0-11.el9.x86_64.rpm 4836e90419467f6cfd22f0d520ec85c044ca9e70483f51c64361d9439951fe59 54
+depot/libtasn1-4.16.0-9.el9.x86_64.rpm c3bf928230e15d0e3c3cb5bd597369f76e25bddef9d05db8a133e66c8b859f5d 52
+depot/libtool-ltdl-2.4.6-46.el9.x86_64.rpm 2429f6df24ba4c5cab0c2279b813125d9b96704990ed7ebc6c7ab399d7e5d141 56
+depot/libunistring-0.9.10-15.el9.x86_64.rpm e62d5594687bf14147499fb2c58c6f175d8769c2caebdbaf593c82f61cf3846e 57
+depot/libutempter-1.2.1-6.el9.x86_64.rpm 87f39c256b964036fb3759a809a59b4220309afc9d269a2bba31f94431011e3d 54
+depot/libuuid-2.37.4-21.el9_7.x86_64.rpm 4231ffed86c7d00183d59c43b82b8b3d72a6f9a088459da78876741699e68ef4 54
+depot/libverto-0.3.2-3.el9.x86_64.rpm 24ba843308cf12f91ff0cad05742a98e27f56eee7756ac48389bc75e7251602f 51
+depot/libxcrypt-4.4.18-3.el9.x86_64.rpm aef4929deb84f4d807c881291e595648734c8db9bf45bbb6b4a28bc742f33175 53
+depot/libxcrypt-devel-4.4.18-3.el9.x86_64.rpm 0ab2dfb9642885668748cbca840aa8eff99e1fd47ce0f7c24bc99b7c5b5c093e 59
+depot/libxml2-2.9.13-14.el9_7.x86_64.rpm bc5de9afc3223360c207d6deeda11f3799a538d3b85cb2c7122628f3b8607cbf 54
+depot/libzstd-1.5.5-1.el9.x86_64.rpm ca30b658512983d2ec3f91da7fb4c57142be9f2f8e65e914d6c6586c523a91cc 50
+depot/llvm-filesystem-20.1.8-3.el9.x86_64.rpm 96f471db43322cc555f84116b3c27464f20e36f6b3fdccd560b30f90df5f45f3 59
+depot/llvm-libs-20.1.8-3.el9.x86_64.rpm eeb99c143051f2f489362965d6486cb7fe69fce54ee1d70a8e0a67865f3742dc 53
+depot/lua-libs-5.4.4-4.el9.x86_64.rpm 934d30691956d3cbfb4afce6bf2825f7c1c20c06b529b43ddb347b96ad729d7d 51
+depot/lua-srpm-macros-1-6.el9.noarch.rpm 8a6427bd66e75ec1ca7f4f37ed0d434fe68dae4f4484c291d8d6ba61b4dd8560 54
+depot/lz4-libs-1.9.3-5.el9.x86_64.rpm 1d4db1b2b741630fc7dc31f06ce87bf919092b6fb37fed7eef3ed816cd5dacce 51
+depot/make-4.3-8.el9.x86_64.rpm 2e1fda595db74e17291a1a74a905987bfe9e4aa5c5781440b98884957446c3a1 45
+depot/mpfr-4.1.0-7.el9.x86_64.rpm e7457c26ff91fcea288d5415f366aad5102783954563b4899b18a203d36031bf 47
+depot/ncurses-6.2-12.20210508.el9.x86_64.rpm 9ad4320e4b963c5da8b4e5e3fe922bf7e81ae0c0dde48398dc0e65c6ceb2a1b8 58
+depot/ncurses-base-6.2-12.20210508.el9.noarch.rpm ffedc24ad21a6c6459d3f23a99dfe30502018900b6cef792fa7619ada27c49f2 63
+depot/ncurses-libs-6.2-12.20210508.el9.x86_64.rpm 3dc83672be01c87d2699258484fb60ba32419409ac9c93262aba4b94698d3f22 63
+depot/nodejs-16.20.2-8.el9_4.x86_64.rpm 38af0ad33b31794ed88cebe13e1ca5094edcba216a453f77e9869a5a3ac87ec7 53
+depot/nodejs-libs-16.20.2-8.el9_4.x86_64.rpm bc17a23ad79f4e628d7219d04253211bacf6e719528afd720f27e8c22fe6d71a 58
+depot/ocaml-srpm-macros-6-6.el9.noarch.rpm 1abf0a16aedeae29b79542f655d235b3e97b79ab3cc17de26c468c9d7b5a38b0 56
+depot/openblas-srpm-macros-2-11.el9.noarch.rpm 6be6a99f686b87da8b373c05ff44322352d23b0f49e3bd74642052616b8438c3 60
+depot/openldap-2.6.8-4.el9.0.1.x86_64.rpm 4504d8919bc8ddf4ce6cf8840747c737a0b833ba7035da8197efbb85944ba859 55
+depot/openssl-3.5.1-7.el9_7.x86_64.rpm 1fcef994f616f0d72043eba58b63a598014cb8b20f938535ef98a5bde978f5ce 52
+depot/openssl-devel-3.5.1-7.el9_7.x86_64.rpm 958f1a8e60872dd4a4614629bfbda587ea4029867a93698605d21db9e7af4207 58
+depot/openssl-fips-provider-3.5.1-7.el9_7.x86_64.rpm a333110f7bb7f31ff67a51f2f7fd2d4b5f3dca45df5a52479d90b86ebee734a2 66
+depot/openssl-libs-3.5.1-7.el9_7.x86_64.rpm 1a99f177d811327b5314ec7dfd8bf1e9da91145c106ad64415de4f93f34d9547 57
+depot/p11-kit-0.25.3-3.el9_5.x86_64.rpm a459599a479517881b7e3f78763086a069ae5eb2bb82d763d40ebfcb5c8e6884 53
+depot/p11-kit-trust-0.25.3-3.el9_5.x86_64.rpm 2773618a577517e84b070c8a16932ff9fbbe751b1f7e334795e21ca83504b261 59
+depot/pam-1.5.1-26.el9_6.x86_64.rpm 4467062163bc384b5e52675351b2926b1d8fe88c900367ad090331db99be5cb7 49
+depot/patch-2.7.6-16.el9.x86_64.rpm ee0814148320a6974836ee3b0c78b22217ea45195a7d110d9a3b158c319504c6 49
+depot/pcre-8.44-4.el9.x86_64.rpm 9bf8bf1b15776f1eda34c8f23aeeb25a1aed97b6c65f5f3de1aa3be67bea2100 46
+depot/pcre2-10.40-6.el9.x86_64.rpm 57079e877357709dedaf98ffc6e12bc34e79d078833970ad863e0a90fda81484 48
+depot/pcre2-syntax-10.40-6.el9.noarch.rpm efd5bdd78e4dbddb9cd3ebc7f02f196559dd6c4ac27b76ca4cbb05aa06a045ed 55
+depot/perl-AutoLoader-5.74-481.1.el9_6.noarch.rpm 5e2229c995f1e1c429b5f58a1cffea295e49905cb9ec57746a95fdc2c3c1eeae 63
+depot/perl-B-1.80-481.1.el9_6.x86_64.rpm fd96618175569608e9bdb046bc59289d3a2174d86364e08b1d9b1163dfeeca8d 54
+depot/perl-Carp-1.50-460.el9.0.1.noarch.rpm 39c439735916a169f28119cbc501bd7acdfec9a78bafa7e386cd2214ec7afc54 57
+depot/perl-Class-Struct-0.66-481.1.el9_6.noarch.rpm b5a8adfd475224845fff9a1b701fd7220872317eb79c17c4e8505ba98101370e 65
+depot/perl-Data-Dumper-2.174-462.el9.x86_64.rpm c6435750e103d301510daf7987b470cdb80484b43daa4eec2ac537d3e130f517 61
+depot/perl-Digest-1.19-4.el9.0.1.noarch.rpm 98162f6707bebd38e97edbba5acc229f59b0885f1cd228fa2dad7776dee2e839 57
+depot/perl-Digest-MD5-2.58-4.el9.x86_64.rpm 364d940975efade9530498f83b6d72d27e644d7fef3f7ebacc53e8228b18a937 57
+depot/perl-Encode-3.08-462.el9.x86_64.rpm 4c19234ef9f60219f1e37b7f2eb9e7e9e884b531f92de164e5b3bbc4cc441a70 55
+depot/perl-Errno-1.30-481.1.el9_6.x86_64.rpm c6dff6e8babf46bd6fd64c4de83fcccf9d33c243f77c2a0278131279e032e0a9 58
+depot/perl-Exporter-5.74-461.el9.noarch.rpm 502c203804ef807477f910197cb96fdfbe6ec1c98842e24740833bf8c24c277b 57
+depot/perl-Fcntl-1.13-481.1.el9_6.x86_64.rpm 599854fc8bc52ef7631297681277fd69c5b9b64d8387fa3e45d0e6855cb5d8d4 58
+depot/perl-File-Basename-2.85-481.1.el9_6.noarch.rpm fd54c1c5e43e68fd1b6ab9621fc9870f7953e11d1316d4f338bca45b80a340a2 66
+depot/perl-File-Path-2.18-4.el9.noarch.rpm f991cad56e0ba592a1613ad560495364a5c3404ac573de92d4d9e464f507ac97 56
+depot/perl-File-Temp-0.231.100-4.el9.noarch.rpm 165c2e712a0793a3f100430618cff0464de66efc06689639c7b22f24d9b05da1 61
+depot/perl-File-stat-1.09-481.1.el9_6.noarch.rpm 72a55f4f6f65c94a7e9a1bb1844824a8628a8f123cee8aadb79e383e7b7c21c3 62
+depot/perl-FileHandle-2.03-481.1.el9_6.noarch.rpm 9ba80dc8c864b570010b56f26ceab409224f464b9b6e2d3d6860a83bf02feb8b 63
+depot/perl-Getopt-Long-2.52-4.el9.noarch.rpm dcec5f6a9208b5bd5e05a5f67366c493adb0cdc4159335e3e201b732c3442fa5 58
+depot/perl-Getopt-Std-1.12-481.1.el9_6.noarch.rpm ca136b6b5c8a74d30db4f594c24d22249f25e14d6ac9c829a632a8e629ed7b63 63
+depot/perl-HTTP-Tiny-0.076-462.el9.noarch.rpm bac3444db8bf3674fd2dd5e149c7dab12f419daa696db1a8f50776b44cc575b1 59
+depot/perl-IO-1.43-481.1.el9_6.x86_64.rpm 97b83d94bf57cbfbd1829d510c2360c5789cec235897bd1c0afbaece03514466 55
+depot/perl-IO-Socket-IP-0.41-5.el9.noarch.rpm f4b06338a286c954efcf199d60aa08739cdc6fb91678f9adb42be84562af05ab 59
+depot/perl-IO-Socket-SSL-2.073-2.el9.noarch.rpm 374b8335a1ac3a3342158637e235801f634f3937fbf164a87852b3a38974d38c 61
+depot/perl-IPC-Open3-1.21-481.1.el9_6.noarch.rpm 6b046d41301021cb4e9d707212b4a566e04162e6c2c0e73cca0e2cf2f9b43376 62
+depot/perl-MIME-Base64-3.16-4.el9.x86_64.rpm 346bbe9605802620b7bcc7a420d4f6223a4e97f489e23e1216c80d5e69e83c76 58
+depot/perl-Mozilla-CA-20200520-6.el9.noarch.rpm 11a7d0e01b0c1d793f165e22619b08509f50b5ac3e8109c06e11e9379abc0140 61
+depot/perl-Net-SSLeay-1.94-3.el9.x86_64.rpm 118881c2e014b49d477028d34ceb5c9a03a2298a79df5ec4c35d5e6ae4f40604 57
+depot/perl-POSIX-1.94-481.1.el9_6.x86_64.rpm 21f25b4732ebd48832ab0bc7d3170ef4d61592c6c69f388b9f37d11faef4c80b 58
+depot/perl-PathTools-3.78-461.el9.x86_64.rpm eea42230b9e18846226c26be40a64fe8fe6e69cd2b4faab0d6e6cebd67ce499c 58
+depot/perl-Pod-Escapes-1.07-460.el9.0.1.noarch.rpm 6eeffcf6b870ea8a9a15185c93b944d43619f7e605232d329316c51a789c9710 64
+depot/perl-Pod-Perldoc-3.28.01-461.el9.noarch.rpm a09eff225dbe711fadf12d701c8142194e45d120661f8a768ffb8039aaa627f0 63
+depot/perl-Pod-Simple-3.42-4.el9.noarch.rpm b5d53d56e332c299614a4f75ed7b48559c4ff085523cd0b710f1822a858bd9de 57
+depot/perl-Pod-Usage-2.01-4.el9.noarch.rpm e19562a9604c000e9f244a571d0faaee0c09c9769fceabf3ef4f4e7a69a664f3 56
+depot/perl-Scalar-List-Utils-1.56-462.el9.x86_64.rpm d909b940083025323ccdf626cb1911e1eb775277880e6a53d9d3c461f56eb8e6 66
+depot/perl-SelectSaver-1.02-481.1.el9_6.noarch.rpm 017d8a2017b2cf9d5a434356fcc72ff276f302979bc227feacbc404adb90a833 64
+depot/perl-Socket-2.031-4.el9.x86_64.rpm de6838a840573493efeac031a2556978191d3eb65736e617f836dbe85a02ef65 54
+depot/perl-Storable-3.21-460.el9.x86_64.rpm e520891596d516a6c1fbd635ab43f11cf4694ae1983b7302620615b1f566794d 57
+depot/perl-Symbol-1.08-481.1.el9_6.noarch.rpm 4a238c0dbe235706daee622535656a4065a0deb05eddeed3e51ef340f7fb7a5c 59
+depot/perl-Term-ANSIColor-5.01-461.el9.0.1.noarch.rpm c75b566ee613c1a56f36c1a8a32f864516150ccccf15ae903521195bb6c0b760 67
+depot/perl-Term-Cap-1.17-460.el9.0.1.noarch.rpm 2e73b5a13475ab7905c13cea07d6af849475def4af80a3eac573735f015a68a0 61
+depot/perl-Text-ParseWords-3.30-460.el9.noarch.rpm 887e9c83df2e982648479be6988d06b3865c9336267158d4b207a038ca3fd964 64
+depot/perl-Text-Tabs+Wrap-2013.0523-460.el9.0.1.noarch.rpm 5bcaaf97beec69fa4ce98f0456e94982055630dcd70b41256e4da69ecdd437bf 72
+depot/perl-Time-Local-1.300-7.el9.noarch.rpm cb567c1692fefe7b1417861e5dc4887d7f88e7f272832d8a03d7ff37337e64f2 58
+depot/perl-URI-5.09-3.el9.0.1.noarch.rpm dbd1b1090e72911caaffd905010ad640902d6f5a0493b6b44b550470cbc9b883 54
+depot/perl-base-2.27-481.1.el9_6.noarch.rpm a2aa6a8972bb1d25d2d2008195bc500d00a0d9341d44f14d34e93f54b79342d5 57
+depot/perl-constant-1.33-461.el9.0.1.noarch.rpm 1f0d3ad4f63b2c8159d430e91d0e785b62f9a4fc9fa9c0b9cccae65af822b4e9 61
+depot/perl-if-0.60.800-481.1.el9_6.noarch.rpm e093b39be7e3dfd162fcb518fe46875888901bb15c1ecd2025490d62f90846c6 59
+depot/perl-interpreter-5.32.1-481.1.el9_6.x86_64.rpm 87786c72d498d47e9be43e052c02e2b25ff2266be26deb2f69b41a231cb93f0e 66
+depot/perl-libnet-3.13-4.el9.noarch.rpm 262925eb2cdf4ca7d58690611206cfb80825b4e26f26a14756a66b4eef6644c7 53
+depot/perl-libs-5.32.1-481.1.el9_6.x86_64.rpm 90e022f9c9b41750cf0e1dd53974ceb2bfd1ff220c0ff5a9daa00dec1e0c0ee5 59
+depot/perl-mro-1.23-481.1.el9_6.x86_64.rpm 348cd597127b9de958d522f2b2b86ba3181132fd34c3be6fd6ce6928ee3c91d6 56
+depot/perl-overload-1.31-481.1.el9_6.noarch.rpm 9ed90840d691f2ad1dee96f53250a07c48fa4e2f3130c301e15d22e85818c32f 61
+depot/perl-overloading-0.02-481.1.el9_6.noarch.rpm e90a49766ba4fc009ec89d715aca9c4212ad7f50c170ef9d9c42054f1bed821a 64
+depot/perl-parent-0.238-460.el9.noarch.rpm ca3c587a7d2c8382d2f71342009b73b09b51cf72049e9f199fa1930194493b7e 56
+depot/perl-podlators-4.14-460.el9.0.1.noarch.rpm 4f0dee4fd3d568a2e5e95f99cba3d9db1c8c3e080312cbd96c2f4d9e061dcec8 62
+depot/perl-srpm-macros-1-41.el9.noarch.rpm 39b9f0bc015c9184799dc820d433bab9f0ebfa3ec54b57a796623d86ef0cfe33 56
+depot/perl-subs-1.03-481.1.el9_6.noarch.rpm cd7810f61d8d372550baa305104b402e13270cac9a23a125c71d0ede8d0456d7 57
+depot/perl-vars-1.05-481.1.el9_6.noarch.rpm f5e497efa526c7919c484adf23a3b9743282016d287c5c6eec4ac3c5ad926eba 57
+depot/pkgconf-1.7.3-10.el9.x86_64.rpm 89e6794fd4f78539c5c11866b476bb187a2ffb9a950f3798a088645debb5d2e5 51
+depot/pkgconf-m4-1.7.3-10.el9.noarch.rpm 41feb31c6ac5bab4b1a039badcc0ad50835457f9eeccb1e8bb143b427c959a0f 54
+depot/pkgconf-pkg-config-1.7.3-10.el9.x86_64.rpm d5710cf0a48a3c9cdf617c7fb766aede8504b1618fa3ec3356c4363c2471714f 62
+depot/popt-1.18-8.el9.x86_64.rpm 3be192236261e84b9fd52db080510e0177661477971162d24b9f9e6db2a1fb0c 46
+depot/publicsuffix-list-dafsa-20210518-3.el9.noarch.rpm 51f66bbeaa1bf44640383d2da8f034c6db442dc01bf3a386d4e77cb020dc9d52 69
+depot/pyproject-srpm-macros-1.16.2-1.el9.noarch.rpm ea7ad83ed6531ca8f771ee50f269cc7b1f4e33c44c6fd6ec260db2eab138785b 65
+depot/python-srpm-macros-3.9-54.el9.noarch.rpm 211136af4a283cddd32e4ee334712920213d026c5bce22f245d6acaa734a31f4 60
+depot/qt5-srpm-macros-5.15.9-1.el9.noarch.rpm ac441f5df7f3da10f52c1f615d998e6a5fb2e21560b0c7d3cb1e7f443a355366 59
+depot/readline-8.1-4.el9.x86_64.rpm fdf7ddc2e95b14880b6b4ce8ee7b25424312661a84050ca3f4169bfd9026321c 49
+depot/redhat-rpm-config-210-1.el9.noarch.rpm 28cb2c232de0097fd4d1ae46f542dfa216fa9a642f8a8c9c4cb20a4380e2d1c9 58
+depot/repodata/a1-primary.xml.gz 2920f3b64f9f4095942dc1be32712eae87da663702dd64b4f08bac8300619c42 11
+depot/repodata/b2-primary.xml.gz 17fe02c3554e9ae7ca1ed854bda10dc9a3f09fd4c53c4ff9702bd532e430e451 11
+depot/repodata/repomd.xml 83795b767903c87895e3b74115243feddd809df58c075d49027ea20c36a6a7b0 425
+depot/rocky-gpg-keys-9.7-1.7.el9.noarch.rpm 4e9f944c73aa71b911eab7dd76126d7f29fc8d78fa09f909d5c2da6b8d0c1382 57
+depot/rocky-release-9.7-1.7.el9.noarch.rpm 00c2d3c62660fd1a7af73de24f6a3987d5295e54631e1ed3133af605b4f86f28 56
+depot/rocky-repos-9.7-1.7.el9.noarch.rpm bcfd8f1d86ba81dc23d02fa1e194ece550496ef54988d935cde471cb697cdc28 54
+depot/rpm-4.16.1.3-39.el9.x86_64.rpm fbb5d66ac3527bbc89739848cb5a4d30197ff97f7ee3598897bb7b8e5384c0a9 50
+depot/rpm-build-4.16.1.3-39.el9.x86_64.rpm a9c25cc18aeba74c9cd9ff00e740acafb874275f3473bb0c3a157e3c42b77484 56
+depot/rpm-build-libs-4.16.1.3-39.el9.x86_64.rpm a583c55ff7609c69f002740f3d78b694584e1b02d98d960ac48198066f17afe6 61
+depot/rpm-libs-4.16.1.3-39.el9.x86_64.rpm e48df7e781f3ac0319c0be6ad41b40d2c7869a071e8ccfa42fe97b123fea38f4 55
+depot/rust-srpm-macros-17-4.el9.noarch.rpm ed836b72e29ac857a2f2a93653ceb28d1dce9c907ad2f55ed4f0747ada872ffd 56
+depot/sc-stockage.poc.test@sha256:d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7163/086d42a4b9ce2cae902bcccfe08a5e881f96619e39280723416ca7f46d19101f 086d42a4b9ce2cae902bcccfe08a5e881f96619e39280723416ca7f46d19101f 20
+depot/sc-stockage.poc.test@sha256:d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7163/473c502eb42efcc54faa92741ca589fcae857d19e9f8e124cb108249f1a86201 473c502eb42efcc54faa92741ca589fcae857d19e9f8e124cb108249f1a86201 14
+depot/sc-stockage.poc.test@sha256:d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7163/manifest.json d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7163 240
+depot/sc-stockage.poc.test@sha256:d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7163/version c08ff8b68add15153b4fa2ca4ab4e70a6068f4d28286145b60636da0b374c9a4 33
+depot/sed-4.8-9.el9.x86_64.rpm e4845badf08b7ba9a45d3f96ad0c821050d2963573ac5f00844fcfb8e0ef39f9 44
+depot/setup-2.13.7-10.el9.noarch.rpm a33bcd322a7370fff9a161824d644fde8276bd85fdd2fde22d286f30ec72fc59 50
+depot/shadow-utils-4.9-15.el9.x86_64.rpm a6960c0dc8b4abbeeadb988f9a84d588c343626701e1a4d25e17994688e1fd26 54
+depot/sqlite-libs-3.34.1-9.el9_7.x86_64.rpm 1ee32c6a643d74cda070ed6d5e37f4dfe89552f40d39f37ea534013a97318d72 57
+depot/systemd-libs-252-55.el9_7.9.rocky.0.1.x86_64.rpm 1fa4662e24932ac2561b6160668bb854b9fc9167c8d7681c861c8ae25d9da440 68
+depot/tar-1.34-9.el9_7.x86_64.rpm 4e5ea502f77448f8271dce14202b1e8b535f7b1f819a9efc5a959b417f1976a8 47
+depot/tzdata-2026a-1.el9_7.noarch.rpm 5fae763fa76c57ec59004e7562996b8dfa40b44cc1cd5d20a334abc779973cf8 51
+depot/unzip-6.0-59.el9.x86_64.rpm 61e7190422018cdb7cd09cfc9bd72f6979138512a668602700019ba1c53614ce 47
+depot/util-linux-2.37.4-21.el9_7.x86_64.rpm c23128e4a8877997dd207235d81a51801ee94a511bcf6f986c1d0f970817e8fc 57
+depot/util-linux-core-2.37.4-21.el9_7.x86_64.rpm 24c7dae2c1847844786570dc2cd7c7c09d1b79b8f159c692aec3c112a62e3ed5 62
+depot/which-2.21-30.el9_6.x86_64.rpm be9602f24908b74a3ac593e7b59b200c8132994f0749f2125c2887f9803dcb79 50
+depot/xz-5.2.5-8.el9_0.x86_64.rpm d32dab68775067459d71f65b45b01daa97b6bef8a741113d0850d61e52be2bd0 47
+depot/xz-libs-5.2.5-8.el9_0.x86_64.rpm de5cc24c789622a28f1e2ef8da6d05049e761f8ece8357abae68ba927d680781 52
+depot/zip-3.0-35.el9.x86_64.rpm be330609997a0880492702b1445506785f2a0c930bfa7075f69d3c0997c847ce 45
+depot/zlib-1.2.11-40.el9.x86_64.rpm 791ef570073c1abcb7671ca1ad69a8ed35462d8f9582dca2128f823bc70f4aab 49
+depot/zstd-1.5.5-1.el9.x86_64.rpm df04f94b600009b0ed7c5e96dfd8f92adeba4d8b4d338140fd6ff7974b7f2e2b 47
+outils/mock-6.9-1.el9.noarch.rpm eabb766b587e0491d5f3055c3fd1199215619f2133fc3b6bf3ef87b46b8cb483 24
+verrou.json b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f 111561
+OK   nominal : classes : classe rpm : 222 fichier(s)|classe repodata : 3 fichier(s)|classe image : 4 fichier(s)|classe verrou : 1 fichier(s)|classe outils : 1 fichier(s)
+OK   refusé : fichier en trop (KO   fichier en trop : depot/intrus.rpm)
+OK   refusé : rpm manquant (KO   fichier manquant : depot/bash-5.1.8-9.el9.x86_64.rpm)
+OK   refusé : rpm altéré (KO   depot/zlib-1.2.11-40.el9.x86_64.rpm : sha256 843f4f7ed0066911…, 51 octets (attendu 791ef57007)
+OK   refusé : blob différent de son nom (KO   depot/sc-stockage.poc.test@sha256:d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7)
+OK   refusé : manifeste changé (KO   manifeste du dossier dir: absent ou différent de sha256:d74b390e16795f1d25abcf67c9f044e88b2054)
+OK   refusé : repodata altéré (KO   depot/repodata/a1-primary.xml.gz : sha256 68b4787c3d65eb96…, 13 octets (attendu 2920f3b64f9f4)
+OK   refusé : lien symbolique (KO   entrée qui n'est pas un fichier régulier : lien)
+OK   refusé : liste du pod différente (KO   liste du pod différente de l'arbre rapatrié (231 et 231 fichiers, 2 écart(s)))
+OK   refusé : emplacement de repomd refusé (KO   repomd.xml : emplacement refusé '../b2')
+OK   refusé : verrou d'un autre sha256 (KO   verrou.json : sha256 b6d0f8f15c33c8de…, 111561 octets (attendu 0000000000000000…, None octe)
+OK   refusé : rpm de mock d'un autre sha256 (KO   outils/mock-6.9-1.el9.noarch.rpm : sha256 eabb766b587e0491…, 24 octets (attendu 0000000000000)
+OK   refusé : dossier dir: avec le port (KO   dossier dir: refusé : sc-stockage.poc.test:5000@sha256:d74b390e16795f1d25abcf67c9f044e88b20549)
+OK   refusé : rpm absent des primary (KO   depot/alternatives-1.24-2.el9.x86_64.rpm : absent des primary de vault 9.7)
+OK   vrais primary de vault 9.7 (hote97) : 222 emplacements trouvés, contenus factices refusés : 1 1 1
+OK   comparer, nominal : 0 1
+OK   comparer, cas trop : code et motif : 1 1
+OK   comparer, cas manque : code et motif : 1 1
+OK   comparer, cas altere : code et motif : 1 1
+OK   comparer, cas lien : code et motif : 1 1
+## E : fermeture et restauration contre un registre local
+OK   registre local prêt (http, 127.0.0.1:5909)
+KO   crane append
+2026/11/17 17:39:39 HEAD request failed, falling back on GET: HEAD http://127.0.0.1:5909/v2/essais-05/rocky9-bootstrap/manifests/banc: unexpected status code 404 Not Found (HEAD responses have no body, use GET for details)
+Error: GET http://127.0.0.1:5909/v2/essais-05/rocky9-bootstrap/manifests/banc: NAME_UNKNOWN: Unknown name
+Error: fetching manifest 127.0.0.1:5909/essais-05/rocky9-bootstrap@: parsing reference "127.0.0.1:5909/essais-05/rocky9-bootstrap@": could not parse reference: 127.0.0.1:5909/essais-05/rocky9-bootstrap@
+<ferm>/banc-fermeture.sh: line 223: ~/.cache/supply-chain-poc/05/banc-fermeture/T/mf/fermeture.attendue: No such file or directory
+KO   fermeture du banc (image du registre local en dossier dir:) : construire : 1  (attendu : 0 231)
+     KO   lancer d'abord l'étape collecte
+KO   fermeture : code : 1 (attendu : 0)
+KO   fermeture : tags avant, place lue trois fois : 0 0 (attendu : 1 3)
+KO   fermeture : commande de place :  (attendu : sc-stockage df -B1 --output=used,avail /var/lib/zot | tail -n 1)
+KO   fermeture : portes : 0 (attendu : 5)
+Error response from registry: name unknown: Unknown name
+KO   fermeture : tags du registre local :  (attendu : banc banc-bis)
+cat: ~/.cache/supply-chain-poc/05/banc-fermeture/T/mf/fermeture.digest: No such file or directory
+OK   fermeture : digest écrit : 
+jq: error: Could not open file ~/.cache/supply-chain-poc/05/banc-fermeture/T/mf/manifest.json: No such file or directory
+KO   fermeture : titre d'une couche du dossier dir: (« : » et « @ » gardés) :  (attendu : 1)
+KO   fermeture rejouée sous le même tag : refusée avant envoi : 1 0 0 (attendu : 1 1 0)
+KO   fermeture changée depuis collecte : refusée avant envoi : 1 0 0 (attendu : 1 1 0)
+Error response from registry: name unknown: Unknown name
+KO   aucun tag banc2 créé :  (attendu : banc banc-bis)
+     KO   lancer d'abord l'étape fermeture
+KO   restauration : code et conformité : 1 0 (attendu : 0 1)
+KO   restauration : dossier dir: recréé sous son nom :  (attendu : présent)
+<ferm>/banc-fermeture.sh: line 260: ~/.cache/supply-chain-poc/05/banc-fermeture/T/mf/restauree/verrou.json: No such file or directory
+KO   restauration rejouée : dossier vidé puis conforme : 1 0 (attendu : 0 1)
+## F : structure
+OK   trois étapes définies une fois
+OK   collecte n écrit pas dans Zot (ni oras, ni closure, ni auth_zot, ni crane)
+OK   collecte retire le pod sur ses trois échecs et à la fin
+OK   collecte ne touche ni $T/m2 ni m2-voie2 ni POD_M2
+OK   porte voie2 de collecte égale à celle de etape_voie2 (libellé du journal mis à part)
+OK   fermeture et restauration sans kubectl
+OK   fermeture pousse deux fois, restauration jamais
+OK   nom du pod conforme (DNS-1123, 63 au plus) et distinct de POD_M2
+## G : image d'essai
+OK   racine.tar (image d'essai), sha256 de l'étape racine : d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+OK   commandes de SONDE_COLLECTE absentes de /usr/bin : 
+# bilan : NON TENU, fin 2026-11-17T16:39:40Z
