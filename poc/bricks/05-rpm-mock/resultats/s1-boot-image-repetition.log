@@ -1,0 +1,29 @@
+2026-11-17T14:49:29Z
+# banc-boot-image.sh, 2026-11-17T14:49:29Z, crane 0.20.6
+OK   sha256 de s1.sh : 2b0a3b7b9bdd0252a6700e084095006077d0f98f8fa9c2436af6908434d153e9
+archive de boot_racine : 10240 octets, sha256 attendu cae69cd4dd5e4ca3dbdf59eadbc5c2e6d35a0b934a7959aadea084a94a175391
+registre local : prêt (http)
+## passage 1 (tag banc1)
+OK   archive racine dérivée, sha256 égal à celui de boot_racine : cae69cd4dd5e4ca3dbdf59eadbc5c2e6d35a0b934a7959aadea084a94a175391
+archive racine dérivée : 10240 octets
+couche sha256:1035c37e56e2ae482d53b6e64f02e60d4380f09ca97ea697dc16e363ade2c4fd 334 octets
+annotation org.opencontainers.image.base.digest = sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+annotation org.opencontainers.image.base.name = sc-stockage.poc.test:5000/amont/rockylinux/rockylinux
+config : os linux ; architecture amd64
+image de bootstrap dérivée : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:1a0c3bfec3ee48d73a281e9b9941d0d87ec0eece87530f2a986592ae03327b66
+durée : 0 s
+## passage 2 (tag banc2, même archive)
+OK   archive racine dérivée, sha256 égal à celui de boot_racine : cae69cd4dd5e4ca3dbdf59eadbc5c2e6d35a0b934a7959aadea084a94a175391
+archive racine dérivée : 10240 octets
+couche sha256:1035c37e56e2ae482d53b6e64f02e60d4380f09ca97ea697dc16e363ade2c4fd 334 octets
+annotation org.opencontainers.image.base.digest = sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+annotation org.opencontainers.image.base.name = sc-stockage.poc.test:5000/amont/rockylinux/rockylinux
+config : os linux ; architecture amd64
+image de bootstrap dérivée : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:1a0c3bfec3ee48d73a281e9b9941d0d87ec0eece87530f2a986592ae03327b66
+durée : 0 s
+digest 1 : sha256:1a0c3bfec3ee48d73a281e9b9941d0d87ec0eece87530f2a986592ae03327b66 ; digest 2 : sha256:1a0c3bfec3ee48d73a281e9b9941d0d87ec0eece87530f2a986592ae03327b66 ; égaux : oui
+manifeste : application/vnd.oci.image.manifest.v1+json ; config application/vnd.oci.image.config.v1+json ; couches application/vnd.oci.image.layer.v1.tar+gzip
+config : os linux ; architecture amd64 ; created 0001-01-01T00:00:00Z ; history 1 ; diff_ids 1
+place du registre local : 1 Mo
+code 0
+2026-11-17T14:49:29Z

@@ -1639,3 +1639,46 @@ le journal complet de dnf n'est pas archivé.
 
 Suite : prédictions puis passage local de `boot_image` avec cette archive (registre crane en loopback, deux passages pour
 comparer les digests), puis accord d'écriture dans Zot. Rien n'est écrit dans Zot.
+
+## Passage local de `boot_image` : prédictions (note du 2026-11-17, écrite à 2026-11-17T14:50:14Z, avant tout passage ; rien n'est réécrit), NON LANCÉ
+
+Script : [`s1-boot-image-banc.sh`](s1-boot-image-banc.sh), sha256 `233dca6e…`. Écrit à sec pendant `boot_racine` sous le nom
+`banc-boot-image.sh`, il a été changé avant d'être archivé, après relecture : l'archive était liée par un lien symbolique, et le
+`stat -c %s` de `etape_boot_image` aurait affiché la taille du lien (vérifié : 132 octets pour un lien vers un fichier de 5 000) ;
+elle est maintenant liée par un lien dur (même système de fichiers, `/home`). S'y sont ajoutés trois arguments facultatifs
+(dossier `T`, dossier du banc, adresse ; les défauts sont ceux du vrai passage) et une garde qui refuse une adresse déjà prise.
+Le script extrait `etape_boot_image` de `s1.sh` (`2b0a3b7b…`) et la joue deux fois contre un `crane registry serve` en loopback
+(`127.0.0.1:5907`, disque `~/.cache/supply-chain-poc/05/banc-boot-image`, absent avant), avec la vraie archive de `boot_racine`,
+sans Zot, sans cluster, sans authentification. Rien n'est écrit dans les fichiers de `$T`.
+
+**Répétition**, le 17/11/2026 à 14:49:29 UTC, sur une archive factice de 10 240 octets (dossier
+`~/.cache/supply-chain-poc/05/repetition-boot-image`, adresse `127.0.0.1:5908`) : code 0, deux passages, même digest d'image avec
+`mutate -a` (« égaux : oui »), manifeste et config OCI, « created 0001-01-01T00:00:00Z ; history 1 ; diff_ids 1 »
+([journal](s1-boot-image-repetition.log)).
+
+Commande prévue, depuis la racine du dépôt, sur accord nommé, `date -u` avant et après, code par `PIPESTATUS`, sortie dans un
+fichier : `bash -c "date -u …; bash poc/bricks/05-rpm-mock/resultats/s1-boot-image-banc.sh $PWD </dev/null; echo code …; date -u …"`.
+Journal prévu : `resultats/s1-boot-image-local.log` (`$HOME` remplacé par `~`). Relance après échec : autre dossier de banc et
+autre nom de journal ; `banc-boot-image` n'est pas supprimé sans demande.
+
+**Appuis** : répétition ci-dessus ; banc local de l'étape `image` ([`s1-image-essai-local.log`](s1-image-essai-local.log)) : `crane append` en 6 s pour
+`racine.tar` (361 758 720 octets), couche compressée de 140 611 406 octets (rapport 0,39) ; manifeste et config OCI ; « created
+0001-01-01T00:00:00Z » ; le même digest qu'ensuite dans Zot. Résultat de `boot_racine` : archive de 258 129 920 octets,
+`8ae17f92…`. Banc G de `s1-derivee.patch` : annotations et plateforme posées sur une archive factice ; les digests de G ont
+différé d'un passage à l'autre, mais l'archive factice aussi.
+
+| # | Prédiction | Confiance et raison |
+|---|---|---|
+| LB1 | « OK   sha256 de s1.sh : 2b0a3b7b… » ; archive de 258 129 920 octets, sha256 attendu `8ae17f92…` ; « registre local : prêt (http) » | Haute |
+| LB2 | Chacun des deux passages : « OK   archive racine dérivée, sha256 égal à celui de boot_racine : 8ae17f92… » ; « archive racine dérivée : 258129920 octets » ; une seule ligne « couche », de 60 à 140 Mo ; deux annotations, `base.digest` = `sha256:ee90dc0e…` et `base.name` = `sc-stockage.poc.test:5000/amont/rockylinux/rockylinux` ; « config : os linux ; architecture amd64 » ; une ligne « image de bootstrap dérivée : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:… » | Haute pour la forme (banc G) ; faible pour la taille de la couche (rapport de 0,39 à `image`, contenu différent) |
+| LB3 | « égaux : oui » : même digest d'image aux deux passages | Moyenne à haute : tenu à la répétition avec `mutate -a`, sur une archive factice de 10 240 octets ; `image` a donné le même digest en loopback et dans Zot |
+| LB4 | Manifeste `application/vnd.oci.image.manifest.v1+json`, config `application/vnd.oci.image.config.v1+json`, couches `application/vnd.oci.image.layer.v1.tar+gzip` ; config : « created 0001-01-01T00:00:00Z », « history 1 », « diff_ids 1 » | Haute : valeurs de la répétition, mêmes types et même `created` qu'à `image` |
+| LB5 | Chaque passage en moins de 60 s ; place du registre local entre 60 et 150 Mo (la couche n'est stockée qu'une fois) | Moyenne : 6 s pour 361 Mo à `image` ; dédoublonnage des blobs par digest non vérifié pour ce registre |
+| LB6 | Le script finit sans « KO », code 0 ; aucun « auth_zot appelé » | Haute |
+
+**Ce que ferait un écart** :
+- Si LB3 donne « non », le digest dans Zot ne pourra pas être prédit par ce passage : je le dirai avant de demander l'accord
+  d'écriture, et la cause sera cherchée par la comparaison des deux manifestes et des deux configs.
+- LB2 ou LB4 en écart : pas d'accord d'écriture proposé avant explication.
+
+Suite : accord de lancement du passage local, puis accord d'écriture dans Zot (`boot_image`). Rien n'est écrit dans Zot.
