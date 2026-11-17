@@ -1,0 +1,555 @@
+# banc-derivee.sh, 2026-11-17T14:20:05Z, python3 3.13.12
+# s1.sh du dépôt 139aab3ccf4758a8325984354c3b1c928ceb82705f8d177017ad3a487433cecc ; copie modifiée ee611aac9f037bc0db02cc46e4c21cadff2e12537e67b2a61ab5d3bc3e8498fa
+## A : insertions seules
+OK   lignes retirées : 0
+OK   blocs insérés : 3
+OK   copie sans les blocs insérés égale au dépôt
+     lignes insérées : en-tête 10, variables 7, étapes 206
+## B : syntaxe et shellcheck
+OK   bash -n de la copie
+     remarques shellcheck : dépôt 15, copie 17
+     diff shellcheck : 1,2c1,2
+     diff shellcheck : <       1 note: Double quote to prevent globbing and word splitting. [SC2086]
+     diff shellcheck : <       8 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+     diff shellcheck : ---
+     diff shellcheck : >       2 note: Double quote to prevent globbing and word splitting. [SC2086]
+     diff shellcheck : >       9 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+OK   remarques shellcheck SC1112 (guillemet typographique) dans la copie : 0
+OK   remarques shellcheck de niveau warning ou plus dans la copie : 0
+## C : hote97, dix paquets dans des primary fictifs
+OK   entrées de DERIVEE : 10
+OK   DERIVEE égal aux dix lignes « seulement dans le bootstrap de mock » de s1-verrou_brut.log : 10 sur 10
+OK   boucle des dépôts de hote97 : noms : baseos97 appstream97 crb97 extras97 
+### C1 : nominal
+OK   C1 code : 0
+     OK   dbus-libs-1:1.12.20-8.el9.x86_64 dans baseos97, crb97 : sha256 2fe853cc3f10ba05fa5a0a045f6e56a76754da4a82a0c0b8b704ef32be515eeb (Packages/d/dbus-libs-1.12.20-8.el9.x86_64.rpm)
+     OK   python3-dateutil-1:2.9.0.post0-1.el9_7.noarch dans appstream97 : sha256 bebb24f35999bde40e419d36003542437b7b1f89fde7fcc0a25b6b9fc859997c (Packages/p/python3-dateutil-2.9.0.post0-1.el9_7.noarch.rpm)
+     OK   python3-dbus-0:1.2.18-2.el9.0.1.x86_64 dans baseos97 : sha256 f9e43d151c84d0fcb3182a713daa78c6ea33424276e0b2a1440fe823ebfb1c78 (Packages/p/python3-dbus-1.2.18-2.el9.0.1.x86_64.rpm)
+     OK   python3-dnf-plugins-core-0:4.3.0-24.el9_7.noarch dans appstream97 : sha256 5b3af9d4344c4b625c72c43148d134d500509307c91c73c8f2edcc0ac9dc5d19 (Packages/p/python3-dnf-plugins-core-4.3.0-24.el9_7.noarch.rpm)
+     OK   python3-six-0:1.15.0-9.el9.noarch dans baseos97 : sha256 71468943b0a8fa7a84c2386ef3d549138ebf755bad7efd351af77afceba21669 (Packages/p/python3-six-1.15.0-9.el9.noarch.rpm)
+     OK   python3-systemd-0:234-19.el9.x86_64 dans appstream97 : sha256 d527f958118fa5bd036a1c109ff8bc1293ce23b54431b04fc4d51ba690082e45 (Packages/p/python3-systemd-234-19.el9.x86_64.rpm)
+     OK   dnf-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 d857c618c888aaf3ca30b0509e48858b9bffc33a7b2b4dc4b199b6da4fea1fff (Packages/d/dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   dnf-data-0:4.14.0-31.el9.rocky.0.1.noarch dans appstream97 : sha256 3fb51b48dd9a80a174127796c5cbf09acd86c1adb3d71c897c031743e89bc0ea (Packages/d/dnf-data-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   python3-dnf-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 610daaa1b4f14c22dceb99e3cc1fc3ea01536501b6c9447d79b60e706b105d3a (Packages/p/python3-dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   yum-0:4.14.0-31.el9.rocky.0.1.noarch dans appstream97 : sha256 0e23ef0694b4d94f37a5cfbaa4282e11f88fd383c497706f9b8957f910785538 (Packages/y/yum-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     requires de python3-dnf-plugins-core : 3 entrée(s)
+     requires de python3-dnf-plugins-core, appstream97 : python3-dnf GE 0:4.4.3
+     requires de python3-dnf-plugins-core, appstream97 : python(abi) EQ 0:3.9
+     requires de python3-dnf-plugins-core, appstream97 : /usr/bin/python3
+OK   C1 lignes OK : 10
+OK   C1 dbus-libs dans deux dépôts, même empreinte : 1
+OK   C1 derivee.sha256 : lignes à trois champs : 10
+OK   C1 nom de fichier sans epoch : 1
+OK   C1 requires lus (provides exclus) : 3 entrée(s)
+OK   C1 requires de python3-dnf : 1
+OK   C1 requires sans version : 1
+### C2 : python3-six absent
+     OK   dbus-libs-1:1.12.20-8.el9.x86_64 dans baseos97, crb97 : sha256 2fe853cc3f10ba05fa5a0a045f6e56a76754da4a82a0c0b8b704ef32be515eeb (Packages/d/dbus-libs-1.12.20-8.el9.x86_64.rpm)
+     OK   python3-dateutil-1:2.9.0.post0-1.el9_7.noarch dans appstream97 : sha256 bebb24f35999bde40e419d36003542437b7b1f89fde7fcc0a25b6b9fc859997c (Packages/p/python3-dateutil-2.9.0.post0-1.el9_7.noarch.rpm)
+     OK   python3-dbus-0:1.2.18-2.el9.0.1.x86_64 dans baseos97 : sha256 f9e43d151c84d0fcb3182a713daa78c6ea33424276e0b2a1440fe823ebfb1c78 (Packages/p/python3-dbus-1.2.18-2.el9.0.1.x86_64.rpm)
+     OK   python3-dnf-plugins-core-0:4.3.0-24.el9_7.noarch dans appstream97 : sha256 5b3af9d4344c4b625c72c43148d134d500509307c91c73c8f2edcc0ac9dc5d19 (Packages/p/python3-dnf-plugins-core-4.3.0-24.el9_7.noarch.rpm)
+     KO   python3-six-0:1.15.0-9.el9.noarch : 0 candidat(s), 0 empreinte(s) distincte(s)
+     OK   python3-systemd-0:234-19.el9.x86_64 dans appstream97 : sha256 d527f958118fa5bd036a1c109ff8bc1293ce23b54431b04fc4d51ba690082e45 (Packages/p/python3-systemd-234-19.el9.x86_64.rpm)
+     OK   dnf-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 d857c618c888aaf3ca30b0509e48858b9bffc33a7b2b4dc4b199b6da4fea1fff (Packages/d/dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   dnf-data-0:4.14.0-31.el9.rocky.0.1.noarch dans appstream97 : sha256 3fb51b48dd9a80a174127796c5cbf09acd86c1adb3d71c897c031743e89bc0ea (Packages/d/dnf-data-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   python3-dnf-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 610daaa1b4f14c22dceb99e3cc1fc3ea01536501b6c9447d79b60e706b105d3a (Packages/p/python3-dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   yum-0:4.14.0-31.el9.rocky.0.1.noarch dans appstream97 : sha256 0e23ef0694b4d94f37a5cfbaa4282e11f88fd383c497706f9b8957f910785538 (Packages/y/yum-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     requires de python3-dnf-plugins-core : 3 entrée(s)
+     requires de python3-dnf-plugins-core, appstream97 : python3-dnf GE 0:4.4.3
+     requires de python3-dnf-plugins-core, appstream97 : python(abi) EQ 0:3.9
+     requires de python3-dnf-plugins-core, appstream97 : /usr/bin/python3
+OK   C2 code : 1
+OK   C2 ligne KO : 1
+OK   C2 ancien derivee.sha256 retiré : retiré
+### C3 : deux empreintes pour dbus-libs
+     KO   dbus-libs-1:1.12.20-8.el9.x86_64 : 2 candidat(s), 2 empreinte(s) distincte(s)
+     OK   python3-dateutil-1:2.9.0.post0-1.el9_7.noarch dans appstream97 : sha256 bebb24f35999bde40e419d36003542437b7b1f89fde7fcc0a25b6b9fc859997c (Packages/p/python3-dateutil-2.9.0.post0-1.el9_7.noarch.rpm)
+     OK   python3-dbus-0:1.2.18-2.el9.0.1.x86_64 dans baseos97 : sha256 f9e43d151c84d0fcb3182a713daa78c6ea33424276e0b2a1440fe823ebfb1c78 (Packages/p/python3-dbus-1.2.18-2.el9.0.1.x86_64.rpm)
+     OK   python3-dnf-plugins-core-0:4.3.0-24.el9_7.noarch dans appstream97 : sha256 5b3af9d4344c4b625c72c43148d134d500509307c91c73c8f2edcc0ac9dc5d19 (Packages/p/python3-dnf-plugins-core-4.3.0-24.el9_7.noarch.rpm)
+     OK   python3-six-0:1.15.0-9.el9.noarch dans baseos97 : sha256 71468943b0a8fa7a84c2386ef3d549138ebf755bad7efd351af77afceba21669 (Packages/p/python3-six-1.15.0-9.el9.noarch.rpm)
+     OK   python3-systemd-0:234-19.el9.x86_64 dans appstream97 : sha256 d527f958118fa5bd036a1c109ff8bc1293ce23b54431b04fc4d51ba690082e45 (Packages/p/python3-systemd-234-19.el9.x86_64.rpm)
+     OK   dnf-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 d857c618c888aaf3ca30b0509e48858b9bffc33a7b2b4dc4b199b6da4fea1fff (Packages/d/dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   dnf-data-0:4.14.0-31.el9.rocky.0.1.noarch dans appstream97 : sha256 3fb51b48dd9a80a174127796c5cbf09acd86c1adb3d71c897c031743e89bc0ea (Packages/d/dnf-data-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   python3-dnf-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 610daaa1b4f14c22dceb99e3cc1fc3ea01536501b6c9447d79b60e706b105d3a (Packages/p/python3-dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   yum-0:4.14.0-31.el9.rocky.0.1.noarch dans appstream97 : sha256 0e23ef0694b4d94f37a5cfbaa4282e11f88fd383c497706f9b8957f910785538 (Packages/y/yum-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     requires de python3-dnf-plugins-core : 3 entrée(s)
+     requires de python3-dnf-plugins-core, appstream97 : python3-dnf GE 0:4.4.3
+     requires de python3-dnf-plugins-core, appstream97 : python(abi) EQ 0:3.9
+     requires de python3-dnf-plugins-core, appstream97 : /usr/bin/python3
+OK   C3 code : 1
+OK   C3 ligne KO : 1
+### C4 : yum en x86_64 seulement
+     OK   dbus-libs-1:1.12.20-8.el9.x86_64 dans baseos97, crb97 : sha256 2fe853cc3f10ba05fa5a0a045f6e56a76754da4a82a0c0b8b704ef32be515eeb (Packages/d/dbus-libs-1.12.20-8.el9.x86_64.rpm)
+     OK   python3-dateutil-1:2.9.0.post0-1.el9_7.noarch dans appstream97 : sha256 bebb24f35999bde40e419d36003542437b7b1f89fde7fcc0a25b6b9fc859997c (Packages/p/python3-dateutil-2.9.0.post0-1.el9_7.noarch.rpm)
+     OK   python3-dbus-0:1.2.18-2.el9.0.1.x86_64 dans baseos97 : sha256 f9e43d151c84d0fcb3182a713daa78c6ea33424276e0b2a1440fe823ebfb1c78 (Packages/p/python3-dbus-1.2.18-2.el9.0.1.x86_64.rpm)
+     OK   python3-dnf-plugins-core-0:4.3.0-24.el9_7.noarch dans appstream97 : sha256 5b3af9d4344c4b625c72c43148d134d500509307c91c73c8f2edcc0ac9dc5d19 (Packages/p/python3-dnf-plugins-core-4.3.0-24.el9_7.noarch.rpm)
+     OK   python3-six-0:1.15.0-9.el9.noarch dans baseos97 : sha256 71468943b0a8fa7a84c2386ef3d549138ebf755bad7efd351af77afceba21669 (Packages/p/python3-six-1.15.0-9.el9.noarch.rpm)
+     OK   python3-systemd-0:234-19.el9.x86_64 dans appstream97 : sha256 d527f958118fa5bd036a1c109ff8bc1293ce23b54431b04fc4d51ba690082e45 (Packages/p/python3-systemd-234-19.el9.x86_64.rpm)
+     OK   dnf-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 d857c618c888aaf3ca30b0509e48858b9bffc33a7b2b4dc4b199b6da4fea1fff (Packages/d/dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   dnf-data-0:4.14.0-31.el9.rocky.0.1.noarch dans appstream97 : sha256 3fb51b48dd9a80a174127796c5cbf09acd86c1adb3d71c897c031743e89bc0ea (Packages/d/dnf-data-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     OK   python3-dnf-0:4.14.0-31.el9.rocky.0.1.noarch dans baseos97 : sha256 610daaa1b4f14c22dceb99e3cc1fc3ea01536501b6c9447d79b60e706b105d3a (Packages/p/python3-dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm)
+     KO   yum-0:4.14.0-31.el9.rocky.0.1.noarch : 0 candidat(s), 0 empreinte(s) distincte(s)
+     requires de python3-dnf-plugins-core : 3 entrée(s)
+     requires de python3-dnf-plugins-core, appstream97 : python3-dnf GE 0:4.4.3
+     requires de python3-dnf-plugins-core, appstream97 : python(abi) EQ 0:3.9
+     requires de python3-dnf-plugins-core, appstream97 : /usr/bin/python3
+OK   C4 code : 1
+OK   C4 ligne KO : 1
+## D : SONDE_DERIVEE avec doublures
+OK   paquets demandés (epoch 0 retirée) : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+OK   marqueurs @ restants : 0
+OK   /w restant hors banc (libellés et $R/w exclus) : 0
+OK   sh -n de la sonde rendue
+OK   appels de dnf sans -3 dans la sonde (début de commande) : 0
+### D1 : nominal (cache sous /w)
+OK   d1 : code : 0
+     dnf-3 : 4.14.0 (doublure) ; rpm : RPM version 4.16.1.3 (doublure)
+     podman pull de rockylinux:9.7 : rc 0 en 0 s
+     podman image mount : rc 0
+     copie de la racine de rockylinux:9.7 : rc 0, 16 kB
+     dépôts de la racine, écartés (reposdir=<banc>/w/aucun) : rocky-extras.repo rocky.repo 
+     racine avant : rpm -qa 3 ligne(s), stderr 1 ligne(s)
+     gpg-pubkey avant : 
+     makecache : rc 0 en 0 s
+     caches : <banc>/w/cache97 
+     repomd baseos97 : sha256 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+     repomd appstream97 : sha256 4413d2438e8dc3a35684d9e175fc488e9ce87e2a581c89ba3d67077846ed6faf
+     repomd crb97 : sha256 8a38351f2373157617f92cfaabcac4817a19e38f1f6e6281c7d1d73785dfa5c6
+     repomd extras97 : sha256 8eb8da58efa421dd4112b2f6c2f0351c0e84d46eb1df1b993aee99257fddace7
+     installation : rc 0 en 0 s
+     transaction :  Package   Arch   Version   Repository   Size
+     transaction : Installing:
+     transaction :  dbus-libs-1:1.12.20-8.el9.x86_64   banc   baseos97   1 k
+     transaction :  python3-dateutil-1:2.9.0.post0-1.el9_7.noarch   banc   baseos97   1 k
+     transaction :  python3-dbus-1.2.18-2.el9.0.1.x86_64   banc   baseos97   1 k
+     transaction :  python3-dnf-plugins-core-4.3.0-24.el9_7.noarch   banc   baseos97   1 k
+     transaction :  python3-six-1.15.0-9.el9.noarch   banc   baseos97   1 k
+     transaction :  python3-systemd-234-19.el9.x86_64   banc   baseos97   1 k
+     transaction :  dnf-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     transaction :  dnf-data-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     transaction :  python3-dnf-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     transaction :  yum-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     résumé de la transaction : Install  10 Packages
+     rpm dbus-libs-1.12.20-8.el9.x86_64.rpm 2fe853cc3f10ba05fa5a0a045f6e56a76754da4a82a0c0b8b704ef32be515eeb
+     rpm dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm d857c618c888aaf3ca30b0509e48858b9bffc33a7b2b4dc4b199b6da4fea1fff
+     rpm dnf-data-4.14.0-31.el9.rocky.0.1.noarch.rpm 3fb51b48dd9a80a174127796c5cbf09acd86c1adb3d71c897c031743e89bc0ea
+     rpm python3-dateutil-2.9.0.post0-1.el9_7.noarch.rpm bebb24f35999bde40e419d36003542437b7b1f89fde7fcc0a25b6b9fc859997c
+     rpm python3-dbus-1.2.18-2.el9.0.1.x86_64.rpm f9e43d151c84d0fcb3182a713daa78c6ea33424276e0b2a1440fe823ebfb1c78
+     rpm python3-dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm 610daaa1b4f14c22dceb99e3cc1fc3ea01536501b6c9447d79b60e706b105d3a
+     rpm python3-dnf-plugins-core-4.3.0-24.el9_7.noarch.rpm 5b3af9d4344c4b625c72c43148d134d500509307c91c73c8f2edcc0ac9dc5d19
+     rpm python3-six-1.15.0-9.el9.noarch.rpm 71468943b0a8fa7a84c2386ef3d549138ebf755bad7efd351af77afceba21669
+     rpm python3-systemd-234-19.el9.x86_64.rpm d527f958118fa5bd036a1c109ff8bc1293ce23b54431b04fc4d51ba690082e45
+     rpm yum-4.14.0-31.el9.rocky.0.1.noarch.rpm 0e23ef0694b4d94f37a5cfbaa4282e11f88fd383c497706f9b8957f910785538
+     rpm -K : 10 OK sur 10
+     gpg-pubkey après : gpg-pubkey-350d275d-6279464b 
+     racine dérivée : rpm -qa 4 ligne(s), stderr 1 ligne(s)
+     seulement dans la racine dérivée : dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=banc
+     seulement dans la racine dérivée : python3-six.noarch 0:1.15.0-9.el9 sigpgp=(none) rsaheader=banc
+     seulement dans rockylinux:9.7 brut : dnf.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=banc
+     lignes communes : 2
+     racine dérivée, liste : bash.x86_64 0:5.1.8-9.el9 sigpgp=(none) rsaheader=banc
+     racine dérivée, liste : dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=banc
+     racine dérivée, liste : python3-six.noarch 0:1.15.0-9.el9 sigpgp=(none) rsaheader=banc
+     racine dérivée, liste : rpm.x86_64 0:4.16.1.3-39.el9 sigpgp=(none) rsaheader=banc
+     requires du greffon installé : python3-dnf >= 4.4.3 (doublure)
+     restes de /w dans la racine : 0
+     var/cache/dnf de la racine : 1 entrée(s), gardées
+     archive racine dérivée : rc 0, 40960 octets, sha256 81e872ed32e2b4500773903c6c8e655273a393432ad8fe608283f721b57f859d
+     capacité de /w : 32123936 kB ; utilisés : 3993004 kB
+OK   d1 copie de la racine : 1
+OK   d1 dépôts de la racine affichés : 1
+OK   d1 liste avant, stderr à part : 1
+OK   d1 gpg-pubkey avant, après : 2
+OK   d1 repomd lus : 4
+OK   d1 repomd baseos97 = contenu de la doublure : 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+OK   d1 transaction affichée (en-tête, Installing, dix lignes) : 12
+OK   d1 résumé : 1
+OK   d1 rpm téléchargés : 10
+OK   d1 rpm -K : 10 OK sur 10
+OK   d1 liste après, stderr à part : 1
+OK   d1 seulement dans la racine dérivée : 2
+OK   d1 seulement dans l'image brute : 1
+OK   d1 lignes communes : 2
+OK   d1 liste complète : 4
+OK   d1 avertissement absent des listes : 0
+OK   d1 requires du greffon : 1
+OK   d1 restes de /w : 0
+OK   d1 archive : sha256 annoncé = fichier : 81e872ed32e2b4500773903c6c8e655273a393432ad8fe608283f721b57f859d
+OK   d1 archive : usr/bin/x présent : 1
+OK   d1 archive : pas de ./w : 0
+OK   d1 archive : var/cache/dnf de la base gardé : 1 1
+OK   d1 df en dernière ligne : 1
+OK   d1 montage jamais écrit : intact
+### D2 : cache dans la racine
+OK   d2 : code : 0
+     dnf-3 : 4.14.0 (doublure) ; rpm : RPM version 4.16.1.3 (doublure)
+     podman pull de rockylinux:9.7 : rc 0 en 0 s
+     podman image mount : rc 0
+     copie de la racine de rockylinux:9.7 : rc 0, 16 kB
+     dépôts de la racine, écartés (reposdir=<banc>/w/aucun) : rocky-extras.repo rocky.repo 
+     racine avant : rpm -qa 3 ligne(s), stderr 1 ligne(s)
+     gpg-pubkey avant : 
+     makecache : rc 0 en 0 s
+     caches : <banc>/w/cache97 <banc>/w/boot-racine/w/cache97 
+     repomd baseos97 : sha256 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+     repomd appstream97 : sha256 4413d2438e8dc3a35684d9e175fc488e9ce87e2a581c89ba3d67077846ed6faf
+     repomd crb97 : sha256 8a38351f2373157617f92cfaabcac4817a19e38f1f6e6281c7d1d73785dfa5c6
+     repomd extras97 : sha256 8eb8da58efa421dd4112b2f6c2f0351c0e84d46eb1df1b993aee99257fddace7
+     installation : rc 0 en 0 s
+     transaction :  Package   Arch   Version   Repository   Size
+     transaction : Installing:
+     transaction :  dbus-libs-1:1.12.20-8.el9.x86_64   banc   baseos97   1 k
+     transaction :  python3-dateutil-1:2.9.0.post0-1.el9_7.noarch   banc   baseos97   1 k
+     transaction :  python3-dbus-1.2.18-2.el9.0.1.x86_64   banc   baseos97   1 k
+     transaction :  python3-dnf-plugins-core-4.3.0-24.el9_7.noarch   banc   baseos97   1 k
+     transaction :  python3-six-1.15.0-9.el9.noarch   banc   baseos97   1 k
+     transaction :  python3-systemd-234-19.el9.x86_64   banc   baseos97   1 k
+     transaction :  dnf-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     transaction :  dnf-data-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     transaction :  python3-dnf-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     transaction :  yum-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     résumé de la transaction : Install  10 Packages
+     rpm dbus-libs-1.12.20-8.el9.x86_64.rpm 2fe853cc3f10ba05fa5a0a045f6e56a76754da4a82a0c0b8b704ef32be515eeb
+     rpm dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm d857c618c888aaf3ca30b0509e48858b9bffc33a7b2b4dc4b199b6da4fea1fff
+     rpm dnf-data-4.14.0-31.el9.rocky.0.1.noarch.rpm 3fb51b48dd9a80a174127796c5cbf09acd86c1adb3d71c897c031743e89bc0ea
+     rpm python3-dateutil-2.9.0.post0-1.el9_7.noarch.rpm bebb24f35999bde40e419d36003542437b7b1f89fde7fcc0a25b6b9fc859997c
+     rpm python3-dbus-1.2.18-2.el9.0.1.x86_64.rpm f9e43d151c84d0fcb3182a713daa78c6ea33424276e0b2a1440fe823ebfb1c78
+     rpm python3-dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm 610daaa1b4f14c22dceb99e3cc1fc3ea01536501b6c9447d79b60e706b105d3a
+     rpm python3-dnf-plugins-core-4.3.0-24.el9_7.noarch.rpm 5b3af9d4344c4b625c72c43148d134d500509307c91c73c8f2edcc0ac9dc5d19
+     rpm python3-six-1.15.0-9.el9.noarch.rpm 71468943b0a8fa7a84c2386ef3d549138ebf755bad7efd351af77afceba21669
+     rpm python3-systemd-234-19.el9.x86_64.rpm d527f958118fa5bd036a1c109ff8bc1293ce23b54431b04fc4d51ba690082e45
+     rpm yum-4.14.0-31.el9.rocky.0.1.noarch.rpm 0e23ef0694b4d94f37a5cfbaa4282e11f88fd383c497706f9b8957f910785538
+     rpm -K : 10 OK sur 10
+     gpg-pubkey après : gpg-pubkey-350d275d-6279464b 
+     racine dérivée : rpm -qa 4 ligne(s), stderr 1 ligne(s)
+     seulement dans la racine dérivée : dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=banc
+     seulement dans la racine dérivée : python3-six.noarch 0:1.15.0-9.el9 sigpgp=(none) rsaheader=banc
+     seulement dans rockylinux:9.7 brut : dnf.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=banc
+     lignes communes : 2
+     racine dérivée, liste : bash.x86_64 0:5.1.8-9.el9 sigpgp=(none) rsaheader=banc
+     racine dérivée, liste : dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=banc
+     racine dérivée, liste : python3-six.noarch 0:1.15.0-9.el9 sigpgp=(none) rsaheader=banc
+     racine dérivée, liste : rpm.x86_64 0:4.16.1.3-39.el9 sigpgp=(none) rsaheader=banc
+     requires du greffon installé : python3-dnf >= 4.4.3 (doublure)
+     restes de /w dans la racine : 0
+     var/cache/dnf de la racine : 1 entrée(s), gardées
+     archive racine dérivée : rc 0, 40960 octets, sha256 35a72f23de94d3a56a1c18a3ef548f750f7838c9224823e7ddf0476c0c83a7ad
+     capacité de /w : 32123936 kB ; utilisés : 3993008 kB
+OK   d2 copie de la racine : 1
+OK   d2 dépôts de la racine affichés : 1
+OK   d2 liste avant, stderr à part : 1
+OK   d2 gpg-pubkey avant, après : 2
+OK   d2 repomd lus : 4
+OK   d2 repomd baseos97 = contenu de la doublure : 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+OK   d2 transaction affichée (en-tête, Installing, dix lignes) : 12
+OK   d2 résumé : 1
+OK   d2 rpm téléchargés : 10
+OK   d2 rpm -K : 10 OK sur 10
+OK   d2 liste après, stderr à part : 1
+OK   d2 seulement dans la racine dérivée : 2
+OK   d2 seulement dans l'image brute : 1
+OK   d2 lignes communes : 2
+OK   d2 liste complète : 4
+OK   d2 avertissement absent des listes : 0
+OK   d2 requires du greffon : 1
+OK   d2 restes de /w : 0
+OK   d2 archive : sha256 annoncé = fichier : 35a72f23de94d3a56a1c18a3ef548f750f7838c9224823e7ddf0476c0c83a7ad
+OK   d2 archive : usr/bin/x présent : 1
+OK   d2 archive : pas de ./w : 0
+OK   d2 archive : var/cache/dnf de la base gardé : 1 1
+OK   d2 df en dernière ligne : 1
+OK   d2 montage jamais écrit : intact
+OK   D2 deux caches listés : 1
+### D3 : pull refusé
+OK   d3 : code : 0
+     dnf-3 : 4.14.0 (doublure) ; rpm : RPM version 4.16.1.3 (doublure)
+     podman pull de rockylinux:9.7 : rc 125 en 0 s
+     doublure : pull refusé
+OK   D3 pull en échec affiché : 1
+OK   D3 arrêt avant dnf (aucune archive) : 0
+### D4 : installation refusée
+OK   d4 : code : 0
+     dnf-3 : 4.14.0 (doublure) ; rpm : RPM version 4.16.1.3 (doublure)
+     podman pull de rockylinux:9.7 : rc 0 en 0 s
+     podman image mount : rc 0
+     copie de la racine de rockylinux:9.7 : rc 0, 16 kB
+     dépôts de la racine, écartés (reposdir=<banc>/w/aucun) : rocky-extras.repo rocky.repo 
+     racine avant : rpm -qa 3 ligne(s), stderr 1 ligne(s)
+     gpg-pubkey avant : 
+     makecache : rc 0 en 0 s
+     caches : <banc>/w/cache97 
+     repomd baseos97 : sha256 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+     repomd appstream97 : sha256 4413d2438e8dc3a35684d9e175fc488e9ce87e2a581c89ba3d67077846ed6faf
+     repomd crb97 : sha256 8a38351f2373157617f92cfaabcac4817a19e38f1f6e6281c7d1d73785dfa5c6
+     repomd extras97 : sha256 8eb8da58efa421dd4112b2f6c2f0351c0e84d46eb1df1b993aee99257fddace7
+     installation : rc 1 en 0 s
+     Error: Unable to find a match: banc
+OK   D4 installation en échec : 1
+OK   D4 erreur de dnf affichée : 1
+OK   D4 aucun rpm, aucune archive : 0
+### D5 : un rpm en trop
+OK   d5 : code : 0
+     dnf-3 : 4.14.0 (doublure) ; rpm : RPM version 4.16.1.3 (doublure)
+     podman pull de rockylinux:9.7 : rc 0 en 0 s
+     podman image mount : rc 0
+     copie de la racine de rockylinux:9.7 : rc 0, 16 kB
+     dépôts de la racine, écartés (reposdir=<banc>/w/aucun) : rocky-extras.repo rocky.repo 
+     racine avant : rpm -qa 3 ligne(s), stderr 1 ligne(s)
+     gpg-pubkey avant : 
+     makecache : rc 0 en 0 s
+     caches : <banc>/w/cache97 
+     repomd baseos97 : sha256 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+     repomd appstream97 : sha256 4413d2438e8dc3a35684d9e175fc488e9ce87e2a581c89ba3d67077846ed6faf
+     repomd crb97 : sha256 8a38351f2373157617f92cfaabcac4817a19e38f1f6e6281c7d1d73785dfa5c6
+     repomd extras97 : sha256 8eb8da58efa421dd4112b2f6c2f0351c0e84d46eb1df1b993aee99257fddace7
+     installation : rc 0 en 0 s
+     transaction :  Package   Arch   Version   Repository   Size
+     transaction : Installing:
+     transaction :  dbus-libs-1:1.12.20-8.el9.x86_64   banc   baseos97   1 k
+     transaction :  python3-dateutil-1:2.9.0.post0-1.el9_7.noarch   banc   baseos97   1 k
+     transaction :  python3-dbus-1.2.18-2.el9.0.1.x86_64   banc   baseos97   1 k
+     transaction :  python3-dnf-plugins-core-4.3.0-24.el9_7.noarch   banc   baseos97   1 k
+     transaction :  python3-six-1.15.0-9.el9.noarch   banc   baseos97   1 k
+     transaction :  python3-systemd-234-19.el9.x86_64   banc   baseos97   1 k
+     transaction :  dnf-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     transaction :  dnf-data-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     transaction :  python3-dnf-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     transaction :  yum-4.14.0-31.el9.rocky.0.1.noarch   banc   baseos97   1 k
+     résumé de la transaction : Install  10 Packages
+     rpm dbus-libs-1.12.20-8.el9.x86_64.rpm 2fe853cc3f10ba05fa5a0a045f6e56a76754da4a82a0c0b8b704ef32be515eeb
+     rpm dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm d857c618c888aaf3ca30b0509e48858b9bffc33a7b2b4dc4b199b6da4fea1fff
+     rpm dnf-data-4.14.0-31.el9.rocky.0.1.noarch.rpm 3fb51b48dd9a80a174127796c5cbf09acd86c1adb3d71c897c031743e89bc0ea
+     rpm intrus-1-1.el9.noarch.rpm 25b93f658aa87a1ecc1dac0d6ff88f759a5b0ea85b8801c39c2f2d12aa1379bb
+     rpm python3-dateutil-2.9.0.post0-1.el9_7.noarch.rpm bebb24f35999bde40e419d36003542437b7b1f89fde7fcc0a25b6b9fc859997c
+     rpm python3-dbus-1.2.18-2.el9.0.1.x86_64.rpm f9e43d151c84d0fcb3182a713daa78c6ea33424276e0b2a1440fe823ebfb1c78
+     rpm python3-dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm 610daaa1b4f14c22dceb99e3cc1fc3ea01536501b6c9447d79b60e706b105d3a
+     rpm python3-dnf-plugins-core-4.3.0-24.el9_7.noarch.rpm 5b3af9d4344c4b625c72c43148d134d500509307c91c73c8f2edcc0ac9dc5d19
+     rpm python3-six-1.15.0-9.el9.noarch.rpm 71468943b0a8fa7a84c2386ef3d549138ebf755bad7efd351af77afceba21669
+     rpm python3-systemd-234-19.el9.x86_64.rpm d527f958118fa5bd036a1c109ff8bc1293ce23b54431b04fc4d51ba690082e45
+     rpm yum-4.14.0-31.el9.rocky.0.1.noarch.rpm 0e23ef0694b4d94f37a5cfbaa4282e11f88fd383c497706f9b8957f910785538
+     rpm -K : 11 OK sur 11
+     gpg-pubkey après : gpg-pubkey-350d275d-6279464b 
+     racine dérivée : rpm -qa 4 ligne(s), stderr 1 ligne(s)
+     seulement dans la racine dérivée : dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=banc
+     seulement dans la racine dérivée : python3-six.noarch 0:1.15.0-9.el9 sigpgp=(none) rsaheader=banc
+     seulement dans rockylinux:9.7 brut : dnf.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=banc
+     lignes communes : 2
+     racine dérivée, liste : bash.x86_64 0:5.1.8-9.el9 sigpgp=(none) rsaheader=banc
+     racine dérivée, liste : dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=banc
+     racine dérivée, liste : python3-six.noarch 0:1.15.0-9.el9 sigpgp=(none) rsaheader=banc
+     racine dérivée, liste : rpm.x86_64 0:4.16.1.3-39.el9 sigpgp=(none) rsaheader=banc
+     requires du greffon installé : python3-dnf >= 4.4.3 (doublure)
+     restes de /w dans la racine : 0
+     var/cache/dnf de la racine : 1 entrée(s), gardées
+     archive racine dérivée : rc 0, 40960 octets, sha256 54cc1f35132e0ce0480a94020e0fa78c12841aff5ab115801a19e7c89ebdf9ed
+     capacité de /w : 32123936 kB ; utilisés : 3993092 kB
+OK   D5 rpm téléchargés : 11
+OK   D5 rpm -K : 11 OK sur 11
+OK   doublures jamais appelées hors du contrat (D1 à D5) : 0
+## E : controle_derivee
+     OK   rpm téléchargés conformes aux dix de hote97 : 10 sur 10, 10 téléchargé(s)
+OK   E1 conforme (sha256 de C1 contre rpm de D1) : 0 OK   rpm téléchargés conformes aux dix de hote97 : 10 sur 10, 10 téléchargé(s)
+     KO   rpm téléchargés conformes aux dix de hote97 : 10 sur 10, 11 téléchargé(s)
+          écart : non épinglé : intrus-1-1.el9.noarch.rpm
+OK   E2 rpm en trop : 1 1
+     KO   rpm téléchargés conformes aux dix de hote97 : 9 sur 10, 10 téléchargé(s)
+          écart : sha256 différent : dbus-libs-1.12.20-8.el9.x86_64.rpm
+OK   E3 empreinte fausse : 1 1
+     KO   rpm téléchargés conformes aux dix de hote97 : 9 sur 10, 9 téléchargé(s)
+          écart : absent : yum-4.14.0-31.el9.rocky.0.1.noarch.rpm
+OK   E4 rpm absent : 1 1
+     KO   rpm téléchargés conformes aux dix de hote97 : 9 sur 9, 9 téléchargé(s)
+OK   E5 neuf attendus, neuf vus : refusé (dix exigés) : 1
+## F : structure
+OK   fonction etape_hote97 : 1
+OK   fonction dnf97_conf : 1
+OK   fonction controle_derivee : 1
+OK   fonction etape_boot_racine : 1
+OK   fonction etape_boot_image : 1
+OK   nom du pod conforme (minuscules, chiffres, tirets) : 1
+OK   ordre de etape_boot_racine : pod, clé, sonde, repomd, rpm -K, contrôle, rapatriement, sha256, retrait
+OK   arrêts après pod_demarrer sans pod_retirer : 0
+     [main]
+     gpgcheck=1
+     install_weak_deps=0
+     best=1
+     keepcache=1
+     cachedir=/w/cache97
+     reposdir=/w/aucun
+     [baseos97]
+     name=Rocky 9.7 BaseOS (vault)
+     baseurl=https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/
+     repo_gpgcheck=1
+     gpgkey=file:///w/cles/RPM-GPG-KEY-Rocky-9
+     [appstream97]
+     name=Rocky 9.7 AppStream (vault)
+     baseurl=https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/
+     repo_gpgcheck=1
+     gpgkey=file:///w/cles/RPM-GPG-KEY-Rocky-9
+     [crb97]
+     name=Rocky 9.7 CRB (vault)
+     baseurl=https://dl.rockylinux.org/vault/rocky/9.7/CRB/x86_64/os/
+     repo_gpgcheck=1
+     gpgkey=file:///w/cles/RPM-GPG-KEY-Rocky-9
+     [extras97]
+     name=Rocky 9.7 extras (vault)
+     baseurl=https://dl.rockylinux.org/vault/rocky/9.7/extras/x86_64/os/
+     repo_gpgcheck=1
+     gpgkey=file:///w/cles/RPM-GPG-KEY-Rocky-9
+OK   dnf97.conf : sections : [main] [baseos97] [appstream97] [crb97] [extras97] 
+OK   dnf97.conf : baseurl de vault 9.7 : 4
+OK   dnf97.conf : ni mirrorlist ni metalink : 0
+OK   dnf97.conf : options de [main] : gpgcheck=1 install_weak_deps=0 best=1 keepcache=1 cachedir=/w/cache97 reposdir=/w/aucun 
+OK   dnf97.conf : repo_gpgcheck et clé par dépôt : 8
+OK   archive de mock 6.9-1 (M2) : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+OK   rocky-9.tpl : dépôts actifs = DEPOTS97 : baseos appstream crb extras 
+OK   rocky-9.tpl : best et weak deps comme dnf97.conf : 2
+OK   rocky-9.tpl : tsflags absent : 0
+## G : etape_boot_image contre un registre crane en loopback
+     crane 0.20.6
+OK   G2 empreinte fausse : code : 1
+     KO   archive racine dérivée, sha256 égal à celui de boot_racine : 92442a59620763e242db0d69436001291027449aa1516112be3cc26bb33242bf (attendu : 0000000000000000000000000000000000000000000000000000000000000000)
+OK   G2 arrêt avant crane (KO d'attendu, dépôt absent du catalogue) : 1 0
+OK   G code : 0
+     OK   archive racine dérivée, sha256 égal à celui de boot_racine : 92442a59620763e242db0d69436001291027449aa1516112be3cc26bb33242bf
+     archive racine dérivée : 10240 octets
+     couche sha256:28205c3914ad934ec68dec934bf5dd9eacbdbebb7eb457a9da13608b5c53282c 362 octets
+     annotation org.opencontainers.image.base.digest = sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+     annotation org.opencontainers.image.base.name = sc-stockage.poc.test:5000/amont/rockylinux/rockylinux
+     config : os linux ; architecture amd64
+     image de bootstrap dérivée : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:70f4d3997e00bd415618961910a3cf76dfc9fd4bf499cc06a9f4e97f89106d29
+OK   G une couche : 1
+OK   G annotation base.digest : 1
+OK   G annotation base.name : 1
+OK   G plateforme : 1
+OK   G digest écrit et affiché : 1
+OK   G auth_zot non appelé (config docker présente) : 0
+## H : etape_boot_racine avec doublures
+### H1 : nominal (journal et archive de D1)
+     image du pod : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:1 ; base : exemple.test/r@sha256:0
+     paquets demandés : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+     pod_spec s1-05-boot-racine
+     pod_demarrer s1-05-boot-racine
+     livrer /etc/containers/certs.d/sc-stockage.poc.test:5000/ca.crt
+     livrer /w/cles/RPM-GPG-KEY-Rocky-9
+     livrer /w/dnf97.conf
+          (sonde rejouée depuis d1.log)
+     OK   repomd baseos97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+     OK   repomd appstream97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 4413d2438e8dc3a35684d9e175fc488e9ce87e2a581c89ba3d67077846ed6faf
+     OK   repomd crb97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8a38351f2373157617f92cfaabcac4817a19e38f1f6e6281c7d1d73785dfa5c6
+     OK   repomd extras97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8eb8da58efa421dd4112b2f6c2f0351c0e84d46eb1df1b993aee99257fddace7
+     OK   rpm -K : 10 OK sur 10
+     OK   rpm téléchargés conformes aux dix de hote97 : 10 sur 10, 10 téléchargé(s)
+     OK   archive racine dérivée rapatriée : 81e872ed32e2b4500773903c6c8e655273a393432ad8fe608283f721b57f859d
+     pod s1-05-boot-racine supprimé
+OK   h1 code : 0
+OK   h1 pod retiré une fois : 1
+OK   h1 archive et sha256 posés, égaux : 81e872ed32e2b4500773903c6c8e655273a393432ad8fe608283f721b57f859d posé
+OK   H1 archive = celle de D1 : 81e872ed32e2b4500773903c6c8e655273a393432ad8fe608283f721b57f859d
+OK   H1 sonde envoyée sans marqueur : 0
+OK   H1 paquets dans la sonde envoyée : 1
+OK   H1 dnf97.conf livré et posé : 1 1
+### H2 : repomd de crb97 différent
+     image du pod : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:1 ; base : exemple.test/r@sha256:0
+     paquets demandés : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+     pod_spec s1-05-boot-racine
+     pod_demarrer s1-05-boot-racine
+     livrer /etc/containers/certs.d/sc-stockage.poc.test:5000/ca.crt
+     livrer /w/cles/RPM-GPG-KEY-Rocky-9
+     livrer /w/dnf97.conf
+          (sonde rejouée depuis d1.log)
+     OK   repomd baseos97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+     OK   repomd appstream97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 4413d2438e8dc3a35684d9e175fc488e9ce87e2a581c89ba3d67077846ed6faf
+     KO   repomd crb97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8a38351f2373157617f92cfaabcac4817a19e38f1f6e6281c7d1d73785dfa5c6 (attendu : 0)
+     pod s1-05-boot-racine supprimé
+OK   h2 code : 1
+OK   h2 pod retiré une fois : 1
+OK   h2 aucune archive laissée : 0
+OK   H2 KO du repomd : 1
+### H3 : un rpm en trop (journal de D5, rpm -K ramené à 10 pour atteindre le contrôle)
+     image du pod : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:1 ; base : exemple.test/r@sha256:0
+     paquets demandés : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+     pod_spec s1-05-boot-racine
+     pod_demarrer s1-05-boot-racine
+     livrer /etc/containers/certs.d/sc-stockage.poc.test:5000/ca.crt
+     livrer /w/cles/RPM-GPG-KEY-Rocky-9
+     livrer /w/dnf97.conf
+          (sonde rejouée depuis h3.log)
+     OK   repomd baseos97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+     OK   repomd appstream97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 4413d2438e8dc3a35684d9e175fc488e9ce87e2a581c89ba3d67077846ed6faf
+     OK   repomd crb97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8a38351f2373157617f92cfaabcac4817a19e38f1f6e6281c7d1d73785dfa5c6
+     OK   repomd extras97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8eb8da58efa421dd4112b2f6c2f0351c0e84d46eb1df1b993aee99257fddace7
+     OK   rpm -K : 10 OK sur 10
+     KO   rpm téléchargés conformes aux dix de hote97 : 10 sur 10, 11 téléchargé(s)
+          écart : non épinglé : intrus-1-1.el9.noarch.rpm
+     pod s1-05-boot-racine supprimé
+     KO   rpm téléchargés différents des dix épinglés : archive non rapatriée
+OK   h3 code : 1
+OK   h3 pod retiré une fois : 1
+OK   h3 aucune archive laissée : 0
+OK   H3 contrôle en écart : 2
+### H3b : rpm -K à 11 sur 11 (journal de D5 brut)
+     image du pod : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:1 ; base : exemple.test/r@sha256:0
+     paquets demandés : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+     pod_spec s1-05-boot-racine
+     pod_demarrer s1-05-boot-racine
+     livrer /etc/containers/certs.d/sc-stockage.poc.test:5000/ca.crt
+     livrer /w/cles/RPM-GPG-KEY-Rocky-9
+     livrer /w/dnf97.conf
+          (sonde rejouée depuis d5.log)
+     OK   repomd baseos97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+     OK   repomd appstream97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 4413d2438e8dc3a35684d9e175fc488e9ce87e2a581c89ba3d67077846ed6faf
+     OK   repomd crb97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8a38351f2373157617f92cfaabcac4817a19e38f1f6e6281c7d1d73785dfa5c6
+     OK   repomd extras97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8eb8da58efa421dd4112b2f6c2f0351c0e84d46eb1df1b993aee99257fddace7
+     KO   rpm -K : 11 OK sur 11 (attendu : 10 OK sur 10)
+     pod s1-05-boot-racine supprimé
+OK   h3b code : 1
+OK   h3b pod retiré une fois : 1
+OK   h3b aucune archive laissée : 0
+### H4 : ligne d'archive absente
+     image du pod : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:1 ; base : exemple.test/r@sha256:0
+     paquets demandés : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+     pod_spec s1-05-boot-racine
+     pod_demarrer s1-05-boot-racine
+     livrer /etc/containers/certs.d/sc-stockage.poc.test:5000/ca.crt
+     livrer /w/cles/RPM-GPG-KEY-Rocky-9
+     livrer /w/dnf97.conf
+          (sonde rejouée depuis h4.log)
+     OK   repomd baseos97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+     OK   repomd appstream97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 4413d2438e8dc3a35684d9e175fc488e9ce87e2a581c89ba3d67077846ed6faf
+     OK   repomd crb97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8a38351f2373157617f92cfaabcac4817a19e38f1f6e6281c7d1d73785dfa5c6
+     OK   repomd extras97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8eb8da58efa421dd4112b2f6c2f0351c0e84d46eb1df1b993aee99257fddace7
+     OK   rpm -K : 10 OK sur 10
+     OK   rpm téléchargés conformes aux dix de hote97 : 10 sur 10, 10 téléchargé(s)
+     pod s1-05-boot-racine supprimé
+     KO   archive racine dérivée absente
+OK   h4 code : 1
+OK   h4 pod retiré une fois : 1
+OK   h4 aucune archive laissée : 0
+OK   H4 KO archive absente : 1
+### H5 : archive rapatriée corrompue (celle de D5 pour le journal de D1)
+     image du pod : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:1 ; base : exemple.test/r@sha256:0
+     paquets demandés : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+     pod_spec s1-05-boot-racine
+     pod_demarrer s1-05-boot-racine
+     livrer /etc/containers/certs.d/sc-stockage.poc.test:5000/ca.crt
+     livrer /w/cles/RPM-GPG-KEY-Rocky-9
+     livrer /w/dnf97.conf
+          (sonde rejouée depuis d1.log)
+     OK   repomd baseos97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 0d52f4e9f2c24902f617169a0f33cf69279c6317dfa2fa83d6f1fb91958b5e31
+     OK   repomd appstream97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 4413d2438e8dc3a35684d9e175fc488e9ce87e2a581c89ba3d67077846ed6faf
+     OK   repomd crb97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8a38351f2373157617f92cfaabcac4817a19e38f1f6e6281c7d1d73785dfa5c6
+     OK   repomd extras97 lu par dnf dans le pod = repomd vérifié sur l'hôte : 8eb8da58efa421dd4112b2f6c2f0351c0e84d46eb1df1b993aee99257fddace7
+     OK   rpm -K : 10 OK sur 10
+     OK   rpm téléchargés conformes aux dix de hote97 : 10 sur 10, 10 téléchargé(s)
+     KO   archive racine dérivée rapatriée : 54cc1f35132e0ce0480a94020e0fa78c12841aff5ab115801a19e7c89ebdf9ed (attendu : 81e872ed32e2b4500773903c6c8e655273a393432ad8fe608283f721b57f859d)
+     pod s1-05-boot-racine supprimé
+OK   h5 code : 1
+OK   h5 pod retiré une fois : 1
+OK   h5 aucune archive laissée : 0
+OK   H5 KO du sha256 : 1
+## I : commandes de la sonde dans l'image d'essai (racine.tar)
+OK   sha256 de racine.tar (étape racine) : d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+OK   commandes absentes de /usr/bin : aucune
+OK   /usr/bin/dnf absent (raison de dnf-3) : 0
+# bilan : tenu, fin 2026-11-17T14:20:09Z

@@ -1486,3 +1486,25 @@ en `--installroot` donne le même état que le dnf du bootstrap dans le chroot ;
 (`gpg-pubkey`) ; les `Requires` réels du greffon (lus par `hote97`).
 
 Suite : appliquer `s1-derivee.patch` à `s1.sh` sur accord. Rien n'est lancé, rien n'est écrit dans Zot.
+
+## Image dérivée : `s1-derivee.patch` appliqué au dépôt (note du 2026-11-17, écrite à 2026-11-17T14:21:24Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « J'applique s1-derivee.patch (copie ee611aac) à s1.sh ? », réponse « Oui, applique-le ».
+
+- `git apply` de [`../s1-derivee.patch`](../s1-derivee.patch) à 14:19:43 UTC (`date -u` avant et après, code 0). `s1.sh` passe de
+  `139aab3c…` à `ee611aac…`, la copie bancée.
+- Banc repassé sur le fichier du dépôt à 14:20:05 UTC : tenu, 151 OK ([journal](s1-derivee-banc-applique.log)). Le banc compare
+  le fichier à l'ancien `s1.sh` (`139aab3c…`), placé dans un arbre de travail du scratchpad (`<avant>` dans le journal) avec une
+  copie de `mise.toml` (même `crane` 0.20.6) et un lien vers `resultats/`. Hors des deux premières lignes, il diffère du journal
+  de la copie ([`s1-derivee-banc.log`](s1-derivee-banc.log)) par 17 lignes, toutes attendues : 3 lignes « utilisés » du `df` de
+  la section D (dossier du banc, sur l'hôte) ; 9 lignes d'empreintes des archives de D et H (la sonde lance `tar` sans
+  `--mtime` sur des fichiers que le banc recrée à chaque passage : cause probable, non vérifiée) ; 4 lignes de G (empreinte de
+  l'archive factice, couche et digest d'image ; cause probable, non vérifiée : heures des en-têtes `posix`) ; l'heure de fin.
+- Deux lignes datées ajoutées ensuite à l'en-tête, sous la description de `boot_image` : « Correctif appliqué au dépôt le
+  17/11/2026 à 14:19:43 UTC (« Oui, applique-le »), sha256 égal à la copie bancée (ee611aac…) ; non lancé. ». `s1.sh` vaut alors
+  `2b0a3b7b…`.
+- Contrôles sur ce fichier : `bash -n` passe ; shellcheck : 17 remarques, aucune de niveau warning ou au-dessus ; banc N3/N4 à
+  14:20:21 UTC, python3 3.13.12 : tenu, 35 OK ([journal](s1-derivee-banc-n34-applique.log)).
+
+Suite : prédictions des trois étapes, écrites et commitées avant tout passage, puis un accord par lancement (`hote97`, puis
+`boot_racine`, puis `boot_image` après un passage en loopback avec la vraie archive). Rien n'est lancé, rien n'est écrit dans Zot.
