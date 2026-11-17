@@ -76,3 +76,15 @@ Le transport de la liste (point 1). **Recommandation** (relue par le conseiller)
 - **Option 1, le retirer de la fermeture de la plateforme** : `prefetch-rpm` ne lit qu'une source figée, vault 9.7 (D2 a), et une clé, celle de Rocky. Coûts : la sonde de M3, qui relie le mock de l'image à un rpm archivé, n'a plus d'objet dans les builds de M4 ; après un rejeu de zéro, plus aucune fermeture n'archive le rpm de mock.
 - **Option 2, le garder, téléchargé depuis EPEL** : fidèle à la ligne M2. Coûts : chaque PipelineRun de la fermeture dépend d'une source qui change (mesuré ci-dessus), là où D2 (a) a choisi une source figée ; la clé d'EPEL et un second ancrage de sha256 (primary d'EPEL) entrent dans la pipeline. Avantage : tant qu'EPEL le sert, chaque fermeture le réarchive, rejeu compris.
 - **Recommandation** (relue par le conseiller) : l'option 1. La fermeture de la plateforme ne dépend alors que d'une source figée, comme D2 (a) l'a voulu, et le build ne lit pas ce rpm. L'image d'outillage, fixée par digest, porte mock, et la sonde de M3 a mesuré qu'il est le même que le rpm archivé dans `f235a98b…`. L'archivage voulu par le relevé amont reste à traiter avec la reconstruction de l'image et le rejeu de zéro, qui dépendent déjà d'EPEL, et pour `mock-core-configs` aussi.
+
+## Note datée du 17/11/2026, 21:22:30 UTC : décision « Le retirer »
+
+**Décision du propriétaire** (réponse reçue avant 21:22:30 UTC, heure exacte non relevée) : « Le retirer ». Ce n'est un accord pour aucune mesure ni aucune écriture.
+- Le rpm de mock n'entre pas dans la fermeture de la plateforme. `prefetch-rpm` ne lit qu'une source, vault 9.7, et n'a besoin que de la clé de Rocky.
+- La fermeture de la plateforme contiendra : les 222 rpm du verrou, `repodata` recalculé, l'image de bootstrap en dossier `dir:`. Ni verrou (« Option A »), ni rpm de mock. Écarts avec la fermeture de M2 (`f235a98b…`), qui contenait les deux.
+- La liste inscrite dans le gabarit compte donc 222 lignes.
+- Le rpm de mock reste archivé dans `f235a98b…`. L'archivage voulu par le relevé amont (mock et `mock-core-configs`) est à traiter avec la reconstruction de l'image d'outillage et le rejeu de zéro, avant M5.
+
+**Questions de conception de M4b closes.** Restent à mesurer dans le pod d'essai : le runtime (runc, sans root), `repodata` reproductible ou non et les options de `createrepo_c`, la lecture de l'image de bootstrap depuis `essais-05/` par `skopeo` dans un pod de la plateforme. Reste à décider en préparation, avec le conseiller : garder `rpm -K` en plus du sha256 fixé par fichier.
+
+**Suite proposée** : préparer à sec `prealables` (hôte) et `essai` (pod d'essai) de M4b, avec leurs prédictions.
