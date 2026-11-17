@@ -1703,3 +1703,10 @@ Passage sur accord « Oui, lance-le », le 17/11/2026 de 14:50:42 à 14:50:49 UT
 
 Suite : relevé « avant » du dépôt `essais-05/rocky9-bootstrap` dans Zot (lecture seule), puis accord d'écriture (`boot_image`,
 tag `:s1`). Rien n'est écrit dans Zot.
+
+**Relevé « avant » dans Zot** (note du 2026-11-17, écrite à 2026-11-17T14:51:53Z ; lecture seule) : le dépôt `essais-05/rocky9-bootstrap`
+n'existait pas le 17/11/2026 à 14:51:40 UTC ([relevé](s1-boot-image-zot-avant.log), sortie brute : `date -u`, `crane ls` en
+`NAME_UNKNOWN`, son code 1, le nombre de lignes de `crane catalog`, `date -u`). `crane catalog` compte 142 lignes, contre 141 au
+relevé d'`image` (10:32:01 UTC), avant que `essais-05/mock-rocky9` n'y soit écrit.
+
+Suite : accord d'écriture dans Zot (`boot_image`, `essais-05/rocky9-bootstrap:s1`, dépôt définitif), digest attendu `f0ccf105…`.
