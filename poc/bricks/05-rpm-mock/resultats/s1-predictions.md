@@ -2036,3 +2036,20 @@ Raisons, lues dans le code de mock 6.9 (archive `3c034916…`) :
 
 Suite : appliquer `s1-m2.patch` à `s1.sh`, sur accord ; puis écrire et commiter les prédictions des deux étapes avant tout
 lancement ; puis un accord par étape. Rien n'est lancé.
+
+## `s1-m2.patch` appliqué à `s1.sh` (note du 2026-11-17, écrite à 2026-11-17T16:02:59Z ; rien n'est réécrit), NON LANCÉ
+
+Décision du propriétaire : question « J'applique s1-m2.patch à s1.sh ? », réponse « Oui, applique-le ».
+- `git apply` de [`../s1-m2.patch`](../s1-m2.patch) à 16:02:02 UTC (`date -u` avant et après, code 0) : `s1.sh` passe de
+  `049fccad…` à `8c60bca2…`, la copie bancée.
+- Banc repassé sur le fichier du dépôt, lancé à 16:02:09 UTC : tenu, 71 OK ([journal](s1-m2-banc-applique.log)). Il compare
+  ce fichier à l'ancien `s1.sh` (`049fccad…`, tiré de `HEAD`), placé dans un arbre de travail du scratchpad (`<avant>` dans le
+  journal). Écarts au journal de la copie : heures, durées et `df` de l'hôte seulement.
+- Deux lignes datées ajoutées ensuite à l'en-tête de `s1.sh`, après l'entrée `hermetique` : « Correctif appliqué au dépôt le
+  17/11/2026 à 16:02:02 UTC (« Oui, applique-le »), sha256 égal à la copie bancée (8c60bca2…) ; non lancé. ». `s1.sh` vaut alors
+  `8554910f…`.
+- N3/N4 ([`s1-n34-banc.sh`](s1-n34-banc.sh)) sur ce fichier final, lancé à 16:02:28 UTC, python3 3.13.12 : tenu, 35 OK
+  ([journal](s1-m2-banc-n34-applique.log)).
+
+Suite : prédictions de `voie2` et de `hermetique`, écrites et commitées avant tout passage, puis un accord par étape. Rien n'est
+lancé.
