@@ -297,3 +297,9 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 - **Entrées** : un miroir partiel en lecture seule (virtiofs), préparé par une tâche runc restreinte.
 - **Mesures** : pic mémoire de l'invité d'environ 1,7 Gio sur 6, et image reproductible sur deux exécutions.
 - **Conséquence pour cet ADR** : le schéma « entrées préparées en runc, construction privilégiée sous Kata sans réseau, publication en runc » de la voie image (construire-image) s'applique aussi à une construction par mmdebstrap.
+
+**Additif du 17/11/2026, 12:13 UTC : mock dans un pod Kata privilégié et root** (brique 05, S1, étape `essais`, [résultat](../../poc/bricks/05-rpm-mock/resultats/s1-predictions.md)). Le 17/11/2026 de 12:06:56 à 12:09:00 UTC, mock 6.9 a construit sample-app dans un pod Kata privilégié, en uid 0, avec sortie vers vault 9.7.
+- **podman imbriqué** : stockage overlay sur le tmpfs `/w` de l'invité, image de bootstrap tirée de Zot et montée.
+- **Isolation** : `--isolation=nspawn` échoue en 5 s (« Failed to open system bus ») ; `--isolation=simple` produit le src.rpm et le rpm (53 s et 43 s).
+- **Limites** : un seul passage ; build non hermétique (dépendances lues sur vault 9.7 pendant l'essai) ; la cause de l'échec de nspawn n'est pas mesurée au-delà de son message.
+- **Conséquence pour cet ADR** : la voie A (mock en pod Kata privilégié) a fonctionné pour mock sur ce passage, avec l'isolation `simple`. Le verrou et le mode hermétique restent à mesurer (étape `verrou`, puis M2).

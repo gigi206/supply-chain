@@ -940,3 +940,53 @@ sortie n'a pas bougé depuis plus de 4 h, au-delà de la borne haute d'E8, c'est
 son accord.
 
 Suite, chaque point sur accord nommé : `essais` (« Je lance essais ? »), puis `verrou`, avec ses prédictions et son propre accord.
+
+## Étape `essais` : résultat (note du 2026-11-17, écrite à 2026-11-17T12:13:50Z ; rien n'est réécrit)
+
+Question : « Je lance essais ? ». Réponse : « Oui ». Commande : `env -u PREFIXE DISTRO=rke2 mise exec --
+poc/bricks/05-rpm-mock/s1.sh essais </dev/null`, avec `KUBECONFIG` posé à `~/.kube/supply-chain-poc.yaml` dans la même
+commande, sur `0c21d79`, en arrière-plan, sous `bash -c`. Elle a tourné le 17/11/2026 de 12:06:56 à 12:09:00 UTC, soit 124 s
+(`date -u` autour de la commande, et `chrono.tsv`). Journaux : [`s1-essais.log`](s1-essais.log), sha256 `f1ffdae0…`, 175 lignes,
+égal à la sortie écrite dans un fichier du scratchpad ; [`s1-essais-mock.log`](s1-essais-mock.log), `f2074b5c…`, 435 lignes
+(les 200 dernières lignes de chaque `build.log` et `root.log`). Le code 0 a été lu par `PIPESTATUS`, dans un fichier du
+scratchpad non archivé ; la ligne « fait » de `chrono.tsv` le corrobore.
+
+**En bref.** podman imbriqué fonctionne dans le pod Kata (P8). `nspawn` échoue, `simple` construit le src.rpm et le rpm de
+sample-app (P9, P10). N3 et N4 tiennent sur le rpm de `simple`. Deux prédictions ne tiennent pas : les durées d'E8, bien
+plus courtes que prévu, et la date de A5.
+
+| | Mesure | Verdict |
+|---|---|---|
+| P8, E5 | Lignes podman de la sonde : `stockage : overlay sous /w/containers` ; pull du bootstrap rc 0 en 7 s ; `image mount` rc 0, `VERSION_ID="9.7"`. Pour l'essai `nspawn`, la sortie de mock affichée dans `s1-essais.log` montre l'image tirée, montée par `podman image mount` et copiée dans le bootstrap. Pour `simple`, le début de `root.log` n'est pas archivé : que mock y ait employé l'image n'est pas lu | Tenues sur les lignes de la sonde ; emploi par mock lu pour `nspawn` seulement |
+| P9 | `mock nspawn --buildsrpm : rc 30 en 5 s`, avec « Failed to open system bus: No such file or directory » ; `simple` passe | Tenue |
+| P10 | src.rpm `sample-app-1.0.0-2.el9.src.rpm` (`c802e60a…`) et rpm `sample-app-1.0.0-2.el9.x86_64.rpm` (`864d55f4…`) produits ; `--rebuild` en 43 s, sous les 5 minutes. Le buildroot contient `golang-1.25.9-1.el9_7` et `nodejs-1:16.20.2-8.el9_4` ; le dépôt d'origine n'est pas dans les 200 lignes archivées de `root.log` | Tenue pour le build et la durée ; origine vault 9.7 compatible avec les versions, non lue |
+| P11 (corrigée) | `capacité de /w : 3059832 kB` | Tenue, à la valeur probable |
+| P11b | Aucune ligne « No space left on device » dans les deux journaux ; code de l'exec 0 | Tenue |
+| P12, E7 | mock lancé en root est accepté : `--debug-config` rc 0, les deux étapes de `simple` en rc 0, aucune ligne « mock will not run from the root account » dans les journaux archivés. Le passage par consolehelper reste une lecture de code. La sortie console de mock pour `simple` (`/w/mock-simple-*.log`) n'est pas archivée : un éventuel avertissement de mock n'est pas lu. Ceux des journaux archivés viennent de rpmbuild (macro dans un commentaire du spec, build-id absent du binaire) | Tenues pour l'acceptation ; « au plus un avertissement » non lu |
+| P13 | Sonde finie sur « (code de l'exec : 0) » ; ligne « fait » 124 s après le début | Tenue |
+| EX1, E4 | `mock --debug-config : rc 0` ; quatre baseurl de vault 9.7 (BaseOS, AppStream, CRB, `extras`) ; « mirrorlist restants … : 0 » ; les mirrorlist des dépôts de debug, de sources et des autres dépôts restent listés. Quatre baseurl mouvantes (`http://dl.rockylinux.org/pub/rocky/$releasever/<dépôt>/$basearch/os/`) sont aussi listées pour ces quatre dépôts : dans `rocky-9.tpl` (archive `m2`, lignes 33, 42, 51 et 60), ce sont des lignes `#baseurl=`, commentées, que le `grep -o` de la sonde ne distingue pas | Tenues |
+| E1 | `uid : 0` ; `CapEff` = `CapBnd` = `000001ffffffffff` ; `NoNewPrivs` 0 ; `Seccomp` 0 ; `/` en virtiofs ; `/w` en `tmpfs rw,relatime`, sans `size=` | Tenue |
+| E2 | Les six versions attendues | Tenue |
+| E3 | Une seule ligne « gpgkey du modèle » ; « clé RPM-GPG-KEY-Rocky-9 : 21CB256A…350D275D ». La sonde liste neuf clés sous `distribution-gpg-keys/rocky` | Tenue |
+| E6 | `sources livrées : rc 0`, deux OK | Tenue |
+| E8 | `simple --buildsrpm` en 53 s (borne basse prédite : 600 s) ; `--rebuild` en 43 s (borne basse : 300 s). Le `root.log` de `simple`, tronqué à ses 200 dernières lignes, liste au moins 137 paquets installés, d'une seule liste commencée avant la troncature | **Non tenue** : au rythme de `racine` (28,6 s par rpm), 137 paquets auraient pris environ 3 900 s ; mock en a mis 96 pour les deux étapes. La cause de la lenteur de `racine` reste inconnue |
+| E9 | `place de /w après simple : 1034 Mo` | Tenue (800 à 2 900 Mo) |
+| E10 | `scrub simple : rc 0`. Pour `nspawn`, aucune ligne : en cas d'échec, la sonde lance le scrub sans afficher son code (lecture de `SONDE`) | Tenue pour `simple` ; non mesurable pour `nspawn` |
+| E11 | « scrub simple : rc 0 » juste avant « (code de l'exec : 0) » | Tenue |
+| A1 | « OK   rpm simple rapatrié », sha256 égal à la sonde ; aucun rpm pour `nspawn` | Tenue pour `simple` |
+| A2 | `FILEDIGESTALGO` 8 | Tenue |
+| A3 (N3) | Six fichiers sous `/usr/share/licenses/sample-app/`, drapeaux 128 (bit 128 à 1), empreintes `074e6e32…`, `a2d51b75…`, `8e3a3f82…`, `911f8f57…`, `b55ad0c8…`, `96f408bf…`, toutes égales aux prédictions ; ligne du répertoire, drapeaux 0, sans empreinte | Tenue |
+| A4 (N4) | `memmove_amd64.s` PRÉSENT sous la forme `runtime/memmove_amd64.s` ; témoin `asm_amd64.s` présent, `asm_arm.s` absent ; les huit autres motifs absents ; `n34-binaire.py : rc 0` | Tenue |
+| A5 (N5) | `buildtime 1794787200` (16/11/2026 00:00:00 UTC) ; `changelogtime 1794830400` (16/11/2026 12:00:00 UTC) ; mtime : deux valeurs, 1793229566 (28/10/2026 23:19:26 UTC, archive des sources) et 1794787200. Le journal de mock porte quatre fois `setting SOURCE_DATE_EPOCH=1794787200` | **Non tenue** : `BUILDTIME` ≠ `CHANGELOGTIME`. `SOURCE_DATE_EPOCH` vaut minuit, pas midi ; `BUILDTIME` et le mtime max lui sont égaux, donc le clamp joue |
+| A6 | `nspawn` n'a rien construit | Sans objet |
+| A7 | Pas de mesure propre. Borne : l'étape entière a duré 124 s, dont 101 s de mock mesurées | Tenue par cette borne |
+
+**Ce qui n'est pas mesuré.** Le nombre exact de rpm du buildroot (seul le `root.log` de `simple` atteint la troncature à 200
+lignes ; le `build.log` de `simple` et le `root.log` de `nspawn` sont entiers) ; le dépôt
+d'origine de golang et de nodejs ; la cause de l'échec de `nspawn` au-delà du message affiché ; la cause de la lenteur de
+`racine`. Le rpm de `simple` est rapatrié sous `$T/rpm-simple`, hors du dépôt.
+
+Retiré : le pod `s1-05-essais`. La suppression est demandée en fin d'étape (`--wait=false`) ; un `kubectl get pod` à 12:13:04 UTC
+répond NotFound (vu à l'écran, non archivé). Rien n'est écrit dans Zot.
+
+Suite, chaque point sur accord nommé : `verrou`, avec ses prédictions et son propre accord (`ISOLATION=simple`, d'après P9).
