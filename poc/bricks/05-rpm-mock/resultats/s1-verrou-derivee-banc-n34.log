@@ -1,0 +1,71 @@
+# banc-n34.sh, 2026-11-17T15:15:35Z, python3 3.13.12, cpio (GNU cpio) 2.15
+# n34-binaire.py b88ce09912b6adb8e0bd55a5be81a5926d7e3db3173176d71cd7884a2a28e8a5 ; copie de s1.sh 199b4ff2b6c1c13d8ebe63f93879a2e109360715957fae51673333097cd50b45
+## A : n34-binaire.py
+OK   golang-NOTICES du spec contient runtime/memmove_amd64.s (raison de l'isolement)
+OK   A1 archive de GNU cpio (noms écrits sans ./, vérifié par cpio -t) : code 0, sortie égale aux lignes binaire à témoin négatif de x11-fichiers.log
+OK   A1 noms de GNU cpio sans ./
+OK   A1b archive réécrite lue par GNU cpio, noms en ./
+OK   A1b noms en ./ (forme supposée de rpm2cpio, non vérifiée) : code 0, sortie égale aux lignes binaire à témoin négatif de x11-fichiers.log
+OK   A2 noms sans ./ : code 0, sortie égale aux lignes binaire à témoin négatif de x11-fichiers.log
+OK   A3 isolement (NOTICES porte la chaîne, pas le binaire) : code 0, « motif X11       memmove_amd64.s        : absent  (forme runtime/memmove_amd64.s) ; occurrences : aucune »
+OK   A4 archive tronquée : code 1, « KO   archive tronquée dans usr/bin/sample-app »
+OK   A5 membre absent : code 1, « KO   usr/bin/sample-app absent de l'archive »
+OK   A6 magie fausse : code 1, « KO   en-tête cpio illisible à l'octet 0 »
+OK   A7 lien dur, données sur le dernier lien : code 1, « KO   usr/bin/sample-app vide dans l'archive (lien dur ?) »
+OK   A8 syntaxe acceptée par ast en version 3.9 (contrôle partiel : pas un python 3.9 réel)
+## B : SONDE_N34 (bash, rpm et rpm2cpio simulés)
+     ## nspawn
+     rpm binaire de sample-app (nspawn) : 1 fichier(s)
+     algorithme des empreintes de fichiers : 8
+     rpm -qp, fichiers : rc 0, 5 ligne(s)
+     licence : /usr/share/licenses/sample-app/golang-LICENSE ; drapeaux 128 ; bit 128 : 1 ; empreinte 911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad
+     licence : /usr/share/licenses/sample-app/golang-PATENTS ; drapeaux 130 ; bit 128 : 1 ; empreinte bbbb
+     licence, ligne illisible : x1 /usr/share/licenses/sample-app/illisible cccc
+     licence : /usr/share/licenses/sample-app ; drapeaux 0 ; bit 128 : 0 ; empreinte aucune
+     dates : buildtime 1763294400 ; changelogtime 1763294400
+     mtime des fichiers : 3 valeur(s) distincte(s), min 999999999, max 1763294400
+     rpm2cpio : rc 0, 5910016 octets
+     binaire : 5906320 octets, sha256 10d475d00dc2a14c09803ef861d8934312426fe2b3e723942b32486cc7b1c404
+     motif X11       memclr_arm.s           : absent  (forme runtime/memclr_arm.s) ; occurrences : aucune
+     motif X11       memmove_386.s          : absent  (forme runtime/memmove_386.s) ; occurrences : aucune
+     motif X11       memmove_amd64.s        : PRÉSENT (forme runtime/memmove_amd64.s) ; occurrences : ['runtime/memmove_amd64.s']
+     motif X11       memmove_arm.s          : absent  (forme runtime/memmove_arm.s) ; occurrences : aucune
+     motif X11       memmove_plan9_386.s    : absent  (forme runtime/memmove_plan9_386.s) ; occurrences : aucune
+     motif X11       memmove_plan9_amd64.s  : absent  (forme runtime/memmove_plan9_amd64.s) ; occurrences : aucune
+     motif X11       vlop_386.s             : absent  (forme runtime/vlop_386.s) ; occurrences : aucune
+     motif X11       vlop_arm.s             : absent  (forme runtime/vlop_arm.s) ; occurrences : aucune
+     motif X11       vlrt.go                : absent  (forme runtime/vlrt.go) ; occurrences : aucune
+     témoin positif  asm_amd64.s            : PRÉSENT (forme runtime/asm_amd64.s) ; occurrences : ['crypto/internal/fips140/nistec/p256_asm_amd64.s', 'reflect/asm_amd64.s', 'runtime/asm_amd64.s']
+     témoin négatif  asm_arm.s              : absent  (forme runtime/asm_arm.s) ; occurrences : aucune
+     n34-binaire.py : rc 0
+     ## simple
+     rpm binaire de sample-app (simple) : 2 fichier(s)
+     plusieurs rpm binaires : lecture non faite
+OK   B1 code 0
+OK   B1 « rpm binaire de sample-app (nspawn) : 1 fichier(s) »
+OK   B1 « algorithme des empreintes de fichiers : 8 »
+OK   B1 « rpm -qp, fichiers : rc 0, 5 ligne(s) »
+OK   B1 « licence : /usr/share/licenses/sample-app/golang-LICENSE ; drapeaux 128 ; bit 128 : 1 ; empreinte 911f8f57 »
+OK   B1 « licence : /usr/share/licenses/sample-app/golang-PATENTS ; drapeaux 130 ; bit 128 : 1 »
+OK   B1 « licence, ligne illisible : x1 /usr/share/licenses/sample-app/illisible cccc »
+OK   B1 « licence : /usr/share/licenses/sample-app ; drapeaux 0 ; bit 128 : 0 ; empreinte aucune »
+OK   B1 « dates : buildtime 1763294400 ; changelogtime 1763294400 »
+OK   B1 « mtime des fichiers : 3 valeur(s) distincte(s), min 999999999, max 1763294400 »
+OK   B1 « n34-binaire.py : rc 0 »
+OK   B1 « memmove_amd64.s        : PRÉSENT »
+OK   B1 « rpm binaire de sample-app (simple) : 2 fichier(s) »
+OK   B1 « plusieurs rpm binaires : lecture non faite »
+OK   B1 charge cpio effacée après lecture
+OK   B2 aucun rpm : code 0, « aucun » pour les deux isolations
+OK   B3 rpm2cpio en échec : code 0, rc 1 affichés, n34-binaire.py en KO sans arrêter la sonde
+## C : rapatrier_rpms (set -euo pipefail, kubectl simulé)
+     OK   rpm nspawn rapatrié : sample-app-1.0.0-2.el9.x86_64.rpm 618ea8d368338cc244f1120bffc14f45302dc6a69ee5119d329befac59df3105
+     ÉCART rpm simple rapatrié : sample-app-1.0.0-2.el9.x86_64.rpm b903f4f6f3b63397fb36d40803634752fb6b8e44dbde5d853e44ff4485bd8744 (sonde : 3a2908e33289c9b8e966d4e942d237ed8f95d6f60f08a99ecf6d132da38cc527)
+     fin atteinte
+OK   C1 code 0, fin atteinte
+OK   C1 nspawn : sha256 égal à la sonde
+OK   C1 simple : écart signalé, sans arrêt
+OK   C1 debuginfo ignoré
+OK   C1 copie à l'octet près
+OK   C2 pod absent : code 0, fin atteinte, rien copié (3 ligne(s))
+# bilan : tenu, fin 2026-11-17T15:15:36Z

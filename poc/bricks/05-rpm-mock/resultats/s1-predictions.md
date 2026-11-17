@@ -1733,3 +1733,97 @@ Non vérifié ici : la lecture de ce dépôt par le `podman` d'un pod. La config
 
 Suite : préparer à sec l'étape qui reprend `verrou` avec cette image (configuration jumelle : `bootstrap_image` = ce digest,
 `bootstrap_image_ready=True`), avec son correctif, son banc, ses prédictions et son accord.
+
+## Étape `verrou_derivee` préparée à sec (note du 2026-11-17, écrite à 2026-11-17T15:16:53Z ; rien n'est réécrit), NON APPLIQUÉ
+
+Préparation faite sur le message « continue » du propriétaire, qui suivait le message annonçant cette préparation comme
+prochaine étape. Rien n'est appliqué à `s1.sh`, rien n'est lancé, ni dans le cluster ni dans Zot.
+
+**Correctif** : [`../s1-verrou-derivee.patch`](../s1-verrou-derivee.patch) (sha256 `a0f1e66e…`), insertions seules (en-tête
+6 lignes, bloc 119 lignes), produit par [`s1-verrou-derivee-modifier.py`](s1-verrou-derivee-modifier.py) à partir de
+`s1.sh` `2b0a3b7b…` ; copie bancée `199b4ff2…`. Il ajoute une étape nouvelle, `verrou_derivee`. `verrou` n'est pas rejoué, car
+il réécrirait `s1-verrou.log` et `s1-verrou-mock.log`, déjà commités.
+- **Configuration** : l'image d'essai ne porte que `poc-rocky-9.7-x86_64` et `poc-rocky-9.7-pret-x86_64`, toutes deux sur
+  `rockylinux:9.7` brut. L'étape génère sur l'hôte, à partir de `MOCK_CFG`, une troisième configuration,
+  `poc-rocky-9.7-derivee-x86_64`. Trois lignes changent : la racine, `bootstrap_image` (`essais-05/rocky9-bootstrap@` suivi du
+  digest lu dans `boot-image.digest`, sans digest écrit en dur) et `bootstrap_image_ready=True`. Un écart autre que six lignes de
+  diff, compté sur l'hôte, arrête l'étape. La configuration est livrée sous `/etc/mock` du pod.
+- **Contrôles avant mock** (sonde `SONDE_CFG_DERIVEE`) :
+  - le pod affiche le sha256 de sa propre configuration de base et celui de la configuration livrée. Le contrôle se fait par
+    sha256 et non par `diff`, absent de l'image d'essai (`tar -tf` de `racine.tar`, section H du banc) ;
+  - il affiche les lignes `root` et `bootstrap_image*` de `mock --debug-config` ;
+  - il tire lui-même l'image dérivée par `podman pull`, avec son code et sa durée.
+
+  L'hôte arrête l'étape, et retire le pod, si la configuration de base diffère de `MOCK_CFG`, si la configuration livrée diffère
+  de celle générée, ou si le pull échoue. Raison de ce dernier arrêt : `bootstrap_image_fallback` vaut `True` par défaut
+  (`config.py:110`). Si le pull échouait, mock installerait le bootstrap sans image, et le calcul ne mesurerait plus l'image dérivée.
+- **Verrou** : `SONDE_VERROU` rendue pour la configuration dérivée, avec le libellé « (image dérivée) » et `--no-cleanup-after`
+  au calcul. Contre le rendu de `verrou`, cinq lignes changent. La sonde reste celle de `verrou`, inchangée dans `s1.sh`.
+- **Repli** : `SONDE_REPLI` compte les lignes « falling back to chroot installation » dans `res-verrou/root.log`,
+  `verrou-srpm.log` et `verrou-calc.log`.
+- **Bootstrap** : `SONDE_BOOT` rendue pour la configuration dérivée et l'image dérivée. Elle compare le `rpm -qa` du bootstrap
+  gardé par mock à celui de l'image dérivée montée. Les libellés « rockylinux:9.7 brut » y sont remplacés ; restent seulement
+  les noms de fichiers internes `/w/$2.brut`, jamais affichés.
+- **Archives** : journaux de mock, avec la fin de `verrou-srpm.log` en plus de celle de `verrou-calc.log`, dans
+  `resultats/<PREFIXE>-verrou_derivee-mock.log` ; verrou dans `resultats/<PREFIXE>-verrou_derivee.json`, puis deux résumés non
+  fatals :
+  - celui de `verrou_brut`, repris tel quel ;
+  - une comparaison avec [`s1-verrou_brut.json`](s1-verrou_brut.json) : `pull_digest` égal ou non au digest de `boot_image`,
+    options de configuration différentes, et rpm du buildroot comparés sur le nom, l'epoch, la version, la release, l'arch, le
+    `sigmd5` et l'url.
+
+**Lu pendant la préparation, sans lancement** (code de mock 6.9, lecture ; aucune de ces lectures n'est une mesure) :
+- avec une image prête, `_init_pkg_management` sort tout de suite (`buildroot.py:590-591`). « Prête » est annulée par
+  `module_enable`, `module_install`, `module_setup_commands` et `chroot_additional_packages`, et sinon `root.log` reçoit « Not
+  updating bootstrap chroot, bootstrap_image_ready=True » ;
+- l'image passe par `podman pull`, puis `podman tag`, puis le contrôle de digest, fait seulement si
+  `bootstrap_image_assert_digest` est posé (il ne l'est pas ici). Vient ensuite le contrôle d'architecture : `{{.OsArch}}` de
+  `podman version` contre `{{.Os}}/{{.Architecture}}` de l'image (`podman.py:62-93`). La copie se fait enfin par `tar`
+  depuis `podman image mount` (`buildroot.py:276-302`, `podman.py:224-238`). Rien n'est exécuté avec l'environnement de l'image ;
+  mock pose son propre `PATH` (`config.py:280`). Que l'image dérivée n'ait pas d'`Env` est une déduction : son `crane mutate` n'a
+  pas de `-e`. Sa config n'a pas été relue ;
+- le message de repli est un avertissement (`buildroot.py:307`) du logger `mockbuild.buildroot` : `getLog()` sans nom prend le nom
+  du module (`trace_decorator.py:18-29`). Ce logger est un enfant de `mockbuild`, qui reçoit le gestionnaire de `root.log`
+  (`buildroot.py:125` et `:692`). Le message irait donc aussi dans `root.log`, si ce gestionnaire est déjà attaché à ce moment ;
+  l'ordre des deux n'a pas été lu. D'où les trois fichiers de `SONDE_REPLI` ;
+- mock appelle `/usr/bin/dnf-3` dans le bootstrap (`dnf4_command`, `config.py:376`), comme le montre
+  [`s1-verrou_brut-mock.log`](s1-verrou_brut-mock.log). `./usr/bin/dnf-3` et
+  `./usr/lib/python3.9/site-packages/dnf-plugins/builddep.py` sont dans `boot-racine.tar` (`8ae17f92…`) : lu par `tar -tf`,
+  section H du banc ;
+- `--hermetic-build` (M2) n'est pas en jeu ici. `config.py:844` coupe `bootstrap_image` au premier « : » ; sur une référence
+  `hôte:5000/…@sha256:…`, ce point est à lire avant M2.
+
+**Banc** [`s1-verrou-derivee-banc.sh`](s1-verrou-derivee-banc.sh), sections A à H, ni cluster, ni Zot, ni réseau ; H lit
+`racine.tar` et `boot-racine.tar` par leur nom :
+- passage final le 17/11/2026 à 15:15:32 UTC, sur la copie `199b4ff2…`, python3 3.13.12 : tenu, 71 OK
+  ([journal](s1-verrou-derivee-banc.log)) ;
+  - la configuration de base rendue par le banc a le même sha256 que celle de l'étape `image` (`a8e5f2bc…`,
+    [`s1-image.log`](s1-image.log)) ;
+  - la configuration dérivée est égale à un calcul indépendant ;
+  - un pull refusé ou une configuration livrée altérée arrête l'étape, pod retiré ;
+  - les lignes de repli sont comptées dans les trois fichiers ;
+  - `SONDE_BOOT` ne donne aucun écart sur des listes égales ;
+  - la comparaison donne 222 rpm communs sur `s1-verrou_brut.json` comparé à lui-même, et un écart de chaque côté sur une variante ;
+  - les commandes des deux sondes neuves sont dans `/usr/bin` de l'image d'essai, sauf `diff`, qu'elles n'appellent pas.
+
+  shellcheck : 17 remarques sur le dépôt, 20 sur la copie (trois `SC2016` de plus), aucune de niveau error ;
+- N3/N4 ([`s1-n34-banc.sh`](s1-n34-banc.sh), inchangé) sur la même copie, à 15:15:35 UTC : tenu, 35 OK
+  ([journal](s1-verrou-derivee-banc-n34.log)) ;
+- passages précédents, archivés :
+  - à 15:07:58 UTC, sur la copie `2df6ba31…`, NON TENU, 2 KO, tous deux des défauts du banc : le rendu de référence de `verrou`
+    avait un saut de ligne final en moins, et le contrôle des libellés comptait les fichiers internes `/w/$2.brut`
+    ([journal](s1-verrou-derivee-banc-passage1.log)) ;
+  - à 15:08:16 UTC, même copie, banc corrigé : tenu, 65 OK ([journal](s1-verrou-derivee-banc-passage2.log)), et N3/N4 à
+    15:08:33 UTC : tenu, 35 OK ([journal](s1-verrou-derivee-banc-n34-passage1.log)). Un commentaire de la copie citait
+    `buildroot.py:306` au lieu de `:307` ; corrigé, d'où la copie `a37d833b…` ;
+  - à 15:10:18 UTC, copie `a37d833b…` : tenu, 65 OK ([journal](s1-verrou-derivee-banc-passage3.log)), et N3/N4 à 15:10:20 UTC :
+    tenu, 35 OK ([journal](s1-verrou-derivee-banc-n34-passage2.log)). La relecture a trouvé ensuite deux défauts de cette copie,
+    que le banc ne voyait pas : la sonde appelait `diff`, absent de l'image d'essai, et le commentaire disait que mock ne
+    signale le repli « que dans sa sortie », ce que la lecture de `trace_decorator.py` contredit. D'où la copie `199b4ff2…` et la
+    section H du banc.
+- Le banc et le modificateur archivés sont les versions finales ; les versions intermédiaires ne sont pas gardées.
+- **Bornes** : sur des doublures, sans vrai mock, vrai podman ni vrai rpm, sans kubectl et sans Zot. Restent non mesurés : la
+  lecture anonyme de `essais-05/` par le podman d'un pod, et le comportement de mock avec l'image prête.
+
+Suite : appliquer `s1-verrou-derivee.patch` à `s1.sh` sur accord, puis écrire les prédictions et demander l'accord de lancement.
+Rien n'est lancé.
