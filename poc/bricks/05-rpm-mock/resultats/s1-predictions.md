@@ -2646,3 +2646,22 @@ accord chacune.
 
 Suite : l'application de `s1-m3-2.patch` attend un accord. Viendront ensuite les prédictions, puis un lancement par étape. La
 pose de la politique (`m3_reseau`) a son propre accord. Rien n'est appliqué, posé ni lancé.
+
+## `s1-m3-2.patch` appliqué à `s1.sh` (note du 2026-11-17, écrite à 2026-11-17T19:55:29Z ; rien n'est réécrit), NON LANCÉ
+
+Décision du propriétaire : question « J'applique s1-m3-2.patch à s1.sh ? », réponse « Oui, applique-le ».
+- `git apply` de [`../s1-m3-2.patch`](../s1-m3-2.patch) à 19:53:32 UTC (`date -u` avant et après, code 0) : `s1.sh` passe de
+  `4c3adb53…` à `18c9d4ce…`, la copie bancée.
+- Banc repassé sur le fichier du dépôt, lancé à 19:54:23 UTC : tenu, 77 OK ([journal](s1-m3-2-banc-applique.log)). Il compare
+  ce fichier à l'ancien `s1.sh` (`4c3adb53…`, tiré de `HEAD`), placé avec les fichiers que lit le banc (verrou, `closure.sh`,
+  politiques de la 08, de la 06, de la 05 et de la 08c, `selecteurs.jq`, `mise.toml`, `mise.lock`) dans un arbre de travail du
+  scratchpad (`<avant>` dans le journal). Écarts au journal de la copie : heures, `df` de l'hôte, et taille du faux `root.log`
+  (le chemin du dossier du banc y est plus long).
+- Deux lignes datées ajoutées ensuite à l'en-tête de `s1.sh`, après l'entrée `m3_comparaison` : « Correctif appliqué au dépôt le
+  17/11/2026 à 19:53:32 UTC (« Oui, applique-le »), sha256 égal à la copie bancée (18c9d4ce…) ; non lancé ; politique
+  construction-rpm-sans-sortie NON POSÉE (m3_reseau, accord à part). ». `s1.sh` vaut alors `06c2da46…`.
+- N3/N4 ([`s1-n34-banc.sh`](s1-n34-banc.sh)) sur ce fichier final, lancé à 19:55:03 UTC : tenu, 35 OK
+  ([journal](s1-m3-2-banc-n34-applique.log)).
+
+Suite : prédictions des six étapes de M3, écrites et commitées avant tout passage, puis un accord par étape (`m3_reseau` pose
+une politique dans le cluster). Rien n'est posé ni lancé.
