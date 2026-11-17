@@ -96,3 +96,13 @@ Chaque écriture (Zot, cluster, `taches.yml`) a son accord nommé.
 - **Oui** : un paramètre de plus, `repomd` (`239a5a71…`), contrôlé par la tâche à la fin de son pas, avant `publier-fermeture`. Une fermeture dont l'index diffère de celui que mock a accepté n'est alors jamais publiée. Coût : tout changement de liste ou d'image demande un passage de `final` avant signature, pour mesurer la nouvelle valeur.
 - **Non** : contrôle sur l'hôte seulement, à l'étape `comparaison`, après publication. Une fermeture fausse resterait écrite dans Zot, sans retrait possible.
 - **Recommandation** (relue par le conseiller) : oui. `repodata` est le seul contenu de la fermeture qui n'est pas fixé par la liste. La valeur a été mesurée cinq fois, dans trois environnements (deux copies à l'essai, `m4b_mock_v2`, deux pods de `final`), et une écriture dans Zot ne se retire pas.
+
+## Note datée du 17/11/2026, 22:41:32 UTC : décision « Oui » sur `repomd.xml` attendu
+
+**Décision du propriétaire** (réponse lue avant 22:41:32 UTC, heure exacte non relevée) : « Oui ». Ce n'est un accord pour aucune mesure ni aucune écriture.
+- Le gabarit signé de `prefetch-rpm-sample-app` fixe un paramètre `repomd` de `prefetch-rpm`, valeur `239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164` (mesurée à l'essai, dans `m4b_mock_v2` et aux deux passages de `final`).
+- `prefetch-rpm` compare le sha256 de `repomd.xml` à ce paramètre à la fin de son pas, après `createrepo_c` et avant la fin de la tâche : un écart arrête la tâche, et `publier-fermeture` ne tourne pas. Le paramètre est contrôlé comme les autres (64 caractères hexadécimaux) et passe par substitution dans le script (point 3).
+- Coût consigné : tout changement de la liste ou de l'image d'outillage demande un passage de `final` avant signature, pour mesurer la nouvelle valeur.
+- Restent en défaut retenu sauf avis contraire : `rpm -K` gardé, paramètres par substitution plutôt que par variable, ressources de 2 CPU et 2 Gi. Le point 3 (`env` du `podTemplate`) reste à signaler au propriétaire, hors M4.
+
+**Suite proposée** : préparer à sec `prealables_taches` (hôte, hors ligne) et `essai_tache` (pod d'essai runc avec le script extrait du gabarit), avec un banc et leurs prédictions.
