@@ -1,0 +1,46 @@
+# m4a.sh releve, 2026-11-17T21:06:25Z
+## objets dont M4 dépend, dépôt contre service (aucun champ retiré de la comparaison)
+égal : NetworkPolicy builds/construction-rpm-sans-sortie (spec, 0 écart(s))
+égal : CiliumNetworkPolicy builds/prefetch-rpm-sortie (spec, 0 écart(s))
+égal : CiliumNetworkPolicy builds/builds-sans-internet (spec, 0 écart(s))
+égal : ValidatingPolicy tekton-references (08) (spec, 0 écart(s))
+égal : ValidatingPolicy pods-isolation (08) (spec, 0 écart(s))
+égal : ValidatingPolicy zone-confiance (08) (spec, 0 écart(s))
+égal : ValidatingPolicy zone-build (08) (spec, 0 écart(s))
+DIFFÉRENT : ValidatingPolicy limites-obligatoires (08c) (spec, 1 écart(s))
+     spec.validationActions[0] : dépôt "Audit" ; en service "Deny"
+DIFFÉRENT : ValidatingPolicy images-zot-par-digest (08c) (spec, 1 écart(s))
+     spec.validationActions[0] : dépôt "Audit" ; en service "Deny"
+DIFFÉRENT : ValidatingPolicy espace-default-interdit (08c) (spec, 1 écart(s))
+     spec.validationActions[0] : dépôt "Audit" ; en service "Deny"
+égal : VerificationPolicy builds/taches-plateforme (spec, 0 écart(s))
+## Tekton : default-container-resource-requirements (config-defaults) contre la 08c ; feature-flags
+égal : config-defaults, default-container-resource-requirements (service : {"default": {"limits": {"cpu": "1", "memory": "512Mi"}, "requests": {"cpu": "50m", "memory": "64Mi"}}})
+feature-flags : await-sidecar-readiness=true coschedule=workspaces disable-creds-init=false disable-inline-spec=pipeline,pipelinerun,taskrun enable-api-fields=beta enable-artifacts=false enable-cel-in-whenexpression=false enable-concise-resolver-syntax=false enable-informer-cache-transforms=true enable-kubernetes-sidecar=false enable-param-enum=false enable-provenance-in-status=true enable-step-actions=true enable-tekton-oci-bundles=false enable-termination-message-compression=false enable-wait-exponential-backoff=false enforce-nonfalsifiability=none keep-pod-on-cancel=false require-git-ssh-secret-known-hosts=false results-from=termination-message running-in-environment-with-injected-sidecars=true send-cloudevents-for-runs=true set-security-context=true set-security-context-read-only-root-filesystem=false trusted-resources-verification-no-match-policy=fail
+## NetworkPolicy et CiliumNetworkPolicy de builds (noms)
+networkpolicies : builder-sans-sortie construction-deb-sans-sortie construction-rpm-sans-sortie construction-sans-sortie
+ciliumnetworkpolicies : builds-sans-internet prefetch-deb-sortie prefetch-rpm-sortie prefetch-sortie
+## ConfigMap porte : sha256 de chaque clé tirée d'un fichier de politique du dépôt (08, 07a) ; autres clés : nom seul
+clé présente, non comparée : ca-poc.crt
+clé présente, non comparée : chains.pub
+égal : horodatage.sh (service dead62e63220… ; dépôt dead62e63220…)
+égal : policy-scan.yaml (service 9683068ab3a7… ; dépôt 9683068ab3a7…)
+égal : policy-trusted-task.yaml (service 6094974e1fc8… ; dépôt 6094974e1fc8…)
+égal : policy.yaml (service 4b66ea3fd084… ; dépôt 4b66ea3fd084…)
+égal : porte.rego (service f16c81acc094… ; dépôt f16c81acc094…)
+égal : scan-verifier.sh (service c851a12fd90f… ; dépôt c851a12fd90f…)
+égal : scan.rego (service a928fdc03ca5… ; dépôt a928fdc03ca5…)
+clé présente, non comparée : scanner.pub
+égal : taches.yml (service cdac17f17549… ; dépôt cdac17f17549…)
+clé présente, non comparée : tsa-racine-confiance.json
+clé présente, non comparée : vsa.pub
+égal : vsa.sh (service 06cae142e930… ; dépôt 06cae142e930…)
+## politiques d'admission en service (noms ; pour les ImageValidatingPolicy : globs et namespaces)
+validatingpolicies.policies.kyverno.io : -/espace-default-interdit -/images-zot-par-digest -/jeton-compte-default -/limites-obligatoires -/pods-isolation -/stepactions-interdites -/tekton-references -/zone-build -/zone-confiance
+clusterpolicies.kyverno.io : 
+policies.kyverno.io : 
+## Zot, lecture anonyme par l'adresse IP
+OK   image d'outillage de M3 : présent (sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771)
+OK   image de bootstrap (pull_digest du verrou) : présent (sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6)
+OK   fermeture applicative de S4b (06) : présent (sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21)
+OK   artefact de packaging rpm, avant M4a : absent (Error response from registry: failed to find "192.168.161.13:5000/entrees/sample-app/packaging-rpm:m4a": 192.168.161.13:5000/entrees/sample-app/packaging-rpm:m4)

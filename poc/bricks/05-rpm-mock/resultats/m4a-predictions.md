@@ -45,3 +45,31 @@ Rien n'est lancé. Accord demandé maintenant : `releve` seul (lecture seule).
 | P0 | Verrou du dépôt inchangé depuis `verrou` | Haute |
 | P1 | Deux poussées dans Zot au même digest, égal à V4 | Haute : même forme que `packaging-deb` (C5 de S4c) |
 | P2 | Fichiers tirés par digest égaux au dépôt | Haute |
+
+## Résultat de `releve` (17/11/2026, de 21:06:25 à 21:06:27 UTC, « Oui, lance-le » ; note écrite à 21:07:29 UTC)
+
+Code 0 ([journal](m4a-releve.log), `890f96c8…`). Rien écrit dans le cluster ni dans Zot (R11 : lecture du script, que des `get` et des `manifest fetch`). La liste des ValidatingPolicy en service contient le motif masqué : elle est lue sous masque, et décomptée sans afficher le nom en cause.
+
+| # | Résultat |
+|---|---|
+| R1 | **Tenue.** `construction-rpm-sans-sortie` égale, 0 écart. |
+| R2 | **Tenue.** `prefetch-rpm-sortie` et `builds-sans-internet` égales, 0 écart. |
+| R3 | **Non tenue.** Les quatre ValidatingPolicy comparées de la 08 sont égales. Les trois de la 08c comparées diffèrent d'un écart de valeur chacune : `spec.validationActions[0]`, `Audit` dans le dépôt, `Deny` en service. Origine lue dans le dépôt : l'étape `h5_deny` de `durcissement.sh` (08c) pose ces règles en `Deny` par `sed` sur ce même fichier (`regles_deny`, ligne 375) ; le fichier du dépôt reste en `Audit`. Ce n'est pas une dérive : ces règles refusent en service. |
+| R4 | **Tenue.** `VerificationPolicy taches-plateforme` égale, clé comprise (sha256 seul comparé). |
+| R5 | **Tenue.** Les neuf clés tirées de fichiers de politique (08 et 07a) sont présentes et égales au dépôt. |
+| R6 | **Tenue.** Aucune ligne ImageValidatingPolicy : aucune n'est en service (lecture du script : une erreur de `kubectl` aurait écrit « type absent »). |
+| R7 | **Tenue.** Fermeture applicative `50dc73f7…` présente en lecture anonyme. |
+| R8 | **Tenue.** Images `99790c13…` et `f0ccf105…` présentes en lecture anonyme : première mesure de cette lecture depuis l'hôte. |
+| R9 | **Tenue.** `packaging-rpm:m4a` absent (« failed to find »). |
+| R10 | **Tenue.** `config-defaults` égal à la 08c ; `trusted-resources-verification-no-match-policy=fail`. |
+| R11 | **Tenue.** Code 0. |
+
+**Lacune du relevé : deux ValidatingPolicy en service n'ont pas été comparées.**
+- En service, 9 ValidatingPolicy ; aucune ClusterPolicy ni Policy de Kyverno.
+- Les 9 se rangent toutes dans le dépôt : 5 dans `admission.yaml` (08), 4 dans `durcissement.yaml` (08c).
+- Le relevé n'en a comparé que 7. Manquent `stepactions-interdites` (08, `admission.yaml` ligne 178) et la quatrième de la 08c, dont le nom contient le motif masqué.
+- Cause : ma liste venait de lectures tronquées (`head`) des deux fichiers. Les deux règles touchent les pods et les tâches de M4 : la première refuse toute StepAction (README de la 08).
+
+**Autres constats**
+- NetworkPolicy de `builds` : `builder-sans-sortie`, `construction-deb-sans-sortie`, `construction-rpm-sans-sortie`, `construction-sans-sortie`. CiliumNetworkPolicy : `builds-sans-internet`, `prefetch-deb-sortie`, `prefetch-rpm-sortie`, `prefetch-sortie`.
+- ConfigMap `porte` : cinq autres clés, non comparées par construction (`ca-poc.crt`, `chains.pub`, `scanner.pub`, `tsa-racine-confiance.json`, `vsa.pub`).
