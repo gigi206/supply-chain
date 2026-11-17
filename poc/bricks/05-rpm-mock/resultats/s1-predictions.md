@@ -990,3 +990,67 @@ Retiré : le pod `s1-05-essais`. La suppression est demandée en fin d'étape (`
 répond NotFound (vu à l'écran, non archivé). Rien n'est écrit dans Zot.
 
 Suite, chaque point sur accord nommé : `verrou`, avec ses prédictions et son propre accord (`ISOLATION=simple`, d'après P9).
+
+## Étape `verrou` : prédictions (note du 2026-11-17, écrite à 2026-11-17T12:46:55Z, avant tout passage ; rien n'est réécrit), NON LANCÉ
+
+Relecture faite avant la question de lancement, sans toucher au cluster, à Zot ni au réseau. Elle complète V1 à V9 et EX2 ;
+aucune de ces lignes n'est réécrite. État : `s1.sh` vaut `5ccba38e…` (inchangé depuis `essais`, donc pas d'accord de
+modification) ; `$T/image.digest` contient `sha256:99790c13…` ; `s1-verrou.json`, `s1-verrou.log` et `s1-verrou-mock.log`
+n'existent pas encore.
+
+**Lectures faites pour cette note.** Code de mock 6.9 dans l'archive `m2` (sha256 `3c034916…`), extraite dans le scratchpad ;
+`mock-core-configs` 45.2 de la même archive, version égale à celle de l'image (E2). Rien de ceci n'est exécuté.
+- **dnf dans `rockylinux:9.7` brut : ligne du journal et lecture de code.** Dans `s1-essais.log` (ligne 97, essai
+  `nspawn`), mock écrit « Package manager dnf4 detected and used (fallback) » juste après avoir copié l'image dans le
+  bootstrap, et avant « Bootstrap image not marked ready ». D'après le code, `_init` charge l'image (`buildroot.py:325`)
+  puis cherche le gestionnaire de paquets (`:338`, message écrit en `:183`). Cette recherche se fait dans l'image extraite
+  quand `uses_bootstrap_image` est vrai (`package_manager.py:69` à `:71`), c'est-à-dire pour un bootstrap dont l'image n'a
+  pas été abandonnée (`buildroot.py:1158`, `:308`). Le journal d'`essais` ne contient aucun « falling back ».
+- **`--buildsrpm` n'appelle pas `builddep`** : `do_buildsrpm` (`rebuild.py:90` à `:99`) appelle `buildsrpm`
+  (`backend.py:562`), lu jusqu'à `:600` ; au-delà, une recherche de motif seulement : de `:299` à `:703`, `backend.py` ne
+  mentionne `Deps` ou `builddep` qu'en `:299` (mode `rebuild`) et `:703` (commentaire). `--calculate-build-dependencies` devient le mode
+  `rebuild` (`mock.py:447`), qui reconstruit le src.rpm puis appelle `builddep` (`backend.py:299`, `:207`). Avec dnf4,
+  l'absence du greffon donne « builddep command missing. Please install package dnf-plugins-core. »
+  (`package_manager.py:717`), si une ligne de l'erreur contient « no such command: builddep » (`:716`). Avec `bootstrap_image_ready = True`, mock n'installe rien dans le bootstrap (V9).
+- **Non lu : la présence du greffon `builddep` (python3-dnf-plugins-core) dans `rockylinux:9.7` brut.** En `essais`, image
+  non prête, mock a demandé son installation (`s1-essais.log`, ligne 116). Le début du `root.log` de `simple` n'est pas
+  archivé : on ne sait pas s'il était déjà là. C'est ce point qui décide V2 et la suite.
+- **Le verrou** : fichier `buildroot_lock.json` (`buildroot_lock.py:37`), format `1.1.0` (`:72`), écrit au crochet
+  `postdeps` (`backend.py:736`), donc après `builddep`. Options recopiées si présentes (`:85` à `:97`) : `target_arch`,
+  `legal_host_arches`, `dist`, `package_manager`, `bootstrap_image`, `bootstrap_image_ready`, `macros`. `rocky-9.tpl` pose
+  `dist` (ligne 2) et `package_manager` (ligne 4) ; la configuration de S1 pose les cinq autres. **`macros` est dans la
+  liste** : `m2-predictions.md` l'a relevé le 12/11 (« V4 de S1 devrait tomber ») ; V4 reste telle qu'elle a été écrite.
+- **Paquets du buildroot** : champs `name`, `arch`, `license`, `version`, `release`, `epoch`, `sigmd5`, `signature`
+  (`buildroot_lock.py:51`, `:52`), plus `url` (`installed_packages.py:144`). `signature` garde les 8 derniers caractères
+  hexadécimaux de l'identifiant de clé (`installed_packages.py:79`). Si un seul paquet n'a pas d'URL dans les dépôts
+  configurés, mock s'arrête sur « Can't get location for … » (`:151`) et ne produit pas de verrou.
+- **Nouveau chemin d'échec, non lu jusqu'au bout.** mock retire son étiquette temporaire du bootstrap après l'avoir copié
+  (`buildroot.py:303`, `podman rmi`, `podman.py:244`). Le verrou interroge ensuite `podman image inspect` sur la référence
+  par digest (`podman.py:268`), avec `check=True` (`:271`). Seule `PodmanError` est rattrapée (`buildroot_lock.py:112`) :
+  si l'image a disparu du stockage de podman, l'erreur remonte, sans verrou. Contrairement à `essais`, `SONDE_VERROU` ne
+  tire pas l'image elle-même. Que podman garde une image tirée par digest après ce `rmi` n'est pas lu.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| V10 (V1 précisée) | `mock --debug-config : rc 0` ; `mock --buildsrpm (image prête) : rc 0` ; src.rpm `sample-app-1.0.0-2.el9.src.rpm` | Moyenne : dnf dans l'image (journal et code), `--buildsrpm` sans `builddep` (code) |
+| V11 | Même sha256 du src.rpm qu'en `essais` : `c802e60a…` | Moyenne : même spec, même archive, `SOURCE_DATE_EPOCH` et clamp ; deux constructions seulement |
+| V12 (V2 précisée) | **Pas de pari sur la branche.** Greffon présent : `--calculate-build-dependencies : rc 0` et un seul `.json`. Greffon absent : rc non nul, « builddep command missing » dans les 25 dernières lignes de `verrou-calc.log`, puis « aucun verrou produit ». Une autre cause d'échec est notée telle quelle | Moyenne sur le message : le texte exact de dnf et sa présence dans l'erreur de mock ne sont pas lus ; à défaut, la ligne brute de dnf est l'observable. La branche n'est pas prédite |
+| V13 (V3 précisée) | Si un verrou est produit : un seul fichier, `buildroot_lock.json` ; « version du verrou : 1.1.0 » ; « options de configuration recopiées : bootstrap_image, bootstrap_image_ready, dist, legal_host_arches, macros, package_manager, target_arch » ; « bootstrap_image_ready enregistré : True » | Haute pour le nom et la version ; moyenne pour les sept options (objet de configuration lu par le greffon non suivi) |
+| V14 | « macros recopiées : oui » : **V4 ne devrait pas tenir** | Haute (code lu) |
+| V15 | Si un verrou est produit : `pull_digest` vaut `sha256:ee90dc0e…` ; architecture `amd64` ; `image_digest` est un autre sha256 (V3, note de 15:18:25 le 12/11). Autre branche possible, non prédite : rc non nul au crochet `postdeps` à cause du `podman image inspect` | Moyenne |
+| V16 | « rpm du buildroot : N ; champs : arch, epoch, license, name, release, sigmd5, signature, url, version ». N entre 150 et 400 (V5, inchangée) | Haute pour les champs ; V5 garde sa confiance |
+| V17 | Dans le JSON archivé : chaque `signature` vaut `350d275d` (clé Rocky 9 d'E3), chaque `url` commence par `https://dl.rockylinux.org/vault/rocky/9.7/`, aucune sous `/extras/` (EX2) | Moyenne : signature de chaque paquet non lue |
+| V18 | Intégrité : `s1-verrou.json` a la taille et le sha256 de la ligne « verrou : buildroot_lock.json … » de la sonde (la copie passe par un `grep -v` ligne à ligne, puis le pod est supprimé) | Haute : aucun mot filtré attendu dans un verrou |
+| V19 | Durées, ancrées sur `essais` (53 s et 43 s, même image, même type de pod) et non sur `racine` : `--buildsrpm` entre 20 et 300 s ; `--calculate-build-dependencies` entre 10 et 300 s | Moyenne |
+| V20 | Sonde complète : des lignes « résultat : » puis « (code de l'exec : 0) ». La sonde finit par `true` : le code 0 seul ne prouve rien (comme E11). Aucune ligne « No space left on device » dans les deux journaux ; la sonde n'a pas de ligne `df` | Moyenne |
+
+V6 à V9 restent telles qu'elles ont été écrites. Rien n'est écrit dans Zot ; le pod `s1-05-verrou` est supprimé en fin
+d'étape, ce qu'un `kubectl get` vérifiera.
+
+**Commande prévue** : `env -u PREFIXE ISOLATION=simple DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/s1.sh verrou
+</dev/null`, avec `KUBECONFIG` posé à `~/.kube/supply-chain-poc.yaml` dans la même commande, sur le commit de cette note.
+`ISOLATION` est posée explicitement, pour qu'une variable héritée ne la change pas. Elle tournera en arrière-plan sous
+`bash -c`, entre deux `date -u`, avec le code lu par `PIPESTATUS`. Journaux attendus : `resultats/s1-verrou.log`,
+`resultats/s1-verrou-mock.log` et, si un verrou est produit, `resultats/s1-verrou.json`.
+
+Suite, chaque point sur accord nommé : `verrou` (« Je lance verrou ? »).
