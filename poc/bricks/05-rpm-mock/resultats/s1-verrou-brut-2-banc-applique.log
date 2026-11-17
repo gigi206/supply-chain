@@ -1,0 +1,138 @@
+# banc-brut.sh, 2026-11-17T13:23:44Z
+# s1.sh du dépôt 5ccba38e5e572ccfb457d21e53ca89e815668d049d984ddf202531634aec9a60 ; copie modifiée b7db829c7775795eba79d43152304be0c7ec0dbd2a65ba96332ea68b2571c2ef
+## A : insertions seules
+OK   lignes retirées : 0
+OK   blocs insérés : 2
+OK   copie sans les blocs insérés égale au dépôt
+     en-tête inséré : 4 lignes ; bloc inséré : 98 lignes
+## B : syntaxe et shellcheck
+OK   bash -n de la copie
+     remarques shellcheck : dépôt 13, copie 15
+     diff shellcheck : 2c2
+     diff shellcheck : <       6 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+     diff shellcheck : ---
+     diff shellcheck : >       8 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+OK   remarques shellcheck SC1112 (guillemet typographique) dans la copie : 0
+OK   remarques shellcheck de niveau error dans la copie : 0
+## C : sonde de verrou_brut
+     variables extraites : 3
+OK   marqueurs @ restants : 0
+OK   --no-cleanup-after : 1
+OK   ligne du calcul : 1
+OK   libellé image brute : 1
+OK   configuration prête absente : 0
+OK   lignes changées contre verrou (même configuration) : 4
+     20c20
+     < r=$?; echo "mock --buildsrpm (image prête) : rc $r en $(($(date +%s) - t)) s"
+     ---
+     > r=$?; echo "mock --buildsrpm (image brute) : rc $r en $(($(date +%s) - t)) s"
+     25c25
+     < mock -r poc-rocky-9.7-x86_64 --isolation=simple --resultdir=/w/res-verrou --calculate-build-dependencies "$s" > /w/verrou-calc.log 2>&1
+     ---
+     > mock -r poc-rocky-9.7-x86_64 --isolation=simple --resultdir=/w/res-verrou --calculate-build-dependencies --no-cleanup-after "$s" > /w/verrou-calc.log 2>&1
+OK   sh -n de la sonde rendue
+## D : SONDE_BOOT avec doublures
+OK   marqueurs @ restants (SONDE_BOOT) : 0
+OK   /w restant hors banc, libellé de df exclu (SONDE_BOOT rendue) : 0
+OK   sh -n de SONDE_BOOT rendue
+### D1 : cas nominal
+OK   d1 : code : 0
+     bootstrap préparé par mock : 1 chemin(s) pour <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap*/root ; retenu : <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap/root
+     bootstrap de mock : rpm -qa rc 0, 3 ligne(s), stderr 1 ligne(s)
+     bootstrap de mock, stderr : avertissement de la doublure : <banc>/w/rpmdb-boot-mock
+     podman pull de rockylinux:9.7 brut : rc 0 en 0 s
+     podman image mount : rc 0
+     rockylinux:9.7 brut : rpm -qa rc 0, 3 ligne(s), stderr 1 ligne(s)
+     rockylinux:9.7 brut, stderr : avertissement de la doublure : <banc>/w/rpmdb-boot-image
+     seulement dans le bootstrap de mock : python3-dnf-plugins-core.noarch 0:4.3.0-24.el9 s=k1
+     seulement dans rockylinux:9.7 brut : yum.noarch 0:4.14.0-31.el9 s=k1
+     lignes communes : 2
+     capacité de /w : 32123936 kB ; utilisés : 3992060 kB
+OK   D1 chemin retenu : 1
+OK   D1 seulement dans le bootstrap : 1
+OK   D1 seulement dans rockylinux:9.7 brut : 1
+OK   D1 lignes communes : 2
+OK   D1 stderr compté à part, deux listes : 2
+OK   D1 avertissement absent des listes : 0
+OK   D1 df en dernière ligne : 1
+OK   D1 base lue sur une copie, pas sur le montage : oui
+### D2 : bootstrap absent
+OK   d2 : code : 0
+     bootstrap préparé par mock : 1 chemin(s) pour <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap*/root ; retenu : <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap*/root
+     bootstrap préparé par mock : <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap*/root absent
+     dossier de mock : ls: impossible d'accéder à '<banc>/w/mock/*' : Aucun fichier ou répertoire de ce type
+     podman pull de rockylinux:9.7 brut : rc 0 en 0 s
+     podman image mount : rc 0
+     rockylinux:9.7 brut : rpm -qa rc 0, 3 ligne(s), stderr 1 ligne(s)
+     rockylinux:9.7 brut, stderr : avertissement de la doublure : <banc>/w/rpmdb-boot-image
+     comparaison non faite (bootstrap de mock lu : 0 ; rockylinux:9.7 brut lu : 1)
+     rockylinux:9.7 brut, liste : python3-dnf.noarch 0:4.14.0-31.el9 s=k1
+     rockylinux:9.7 brut, liste : rpm.x86_64 0:4.16.1.3-39.el9 s=k1
+     rockylinux:9.7 brut, liste : yum.noarch 0:4.14.0-31.el9 s=k1
+     capacité de /w : 32123936 kB ; utilisés : 3992052 kB
+OK   D2 absence signalée : 1
+OK   D2 liste de l'image seule : 3
+OK   D2 comparaison non faite : 1
+OK   D2 df en dernière ligne : 1
+### D3 : pull refusé
+OK   d3 : code : 0
+     bootstrap préparé par mock : 1 chemin(s) pour <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap*/root ; retenu : <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap/root
+     bootstrap de mock : rpm -qa rc 0, 3 ligne(s), stderr 1 ligne(s)
+     bootstrap de mock, stderr : avertissement de la doublure : <banc>/w/rpmdb-boot-mock
+     podman pull de rockylinux:9.7 brut : rc 125 en 0 s
+     doublure : pull refusé
+     comparaison non faite (bootstrap de mock lu : 1 ; rockylinux:9.7 brut lu : 0)
+     bootstrap de mock, liste : python3-dnf-plugins-core.noarch 0:4.3.0-24.el9 s=k1
+     bootstrap de mock, liste : python3-dnf.noarch 0:4.14.0-31.el9 s=k1
+     bootstrap de mock, liste : rpm.x86_64 0:4.16.1.3-39.el9 s=k1
+     capacité de /w : 32123936 kB ; utilisés : 3992064 kB
+OK   D3 pull en échec affiché : 1
+OK   D3 liste du bootstrap seule : 3
+OK   D3 comparaison non faite : 1
+OK   D3 df en dernière ligne : 1
+### D4 : base rpm absente de l'image
+OK   d4 : code : 0
+     bootstrap préparé par mock : 1 chemin(s) pour <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap*/root ; retenu : <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap/root
+     bootstrap de mock : rpm -qa rc 0, 3 ligne(s), stderr 1 ligne(s)
+     bootstrap de mock, stderr : avertissement de la doublure : <banc>/w/rpmdb-boot-mock
+     podman pull de rockylinux:9.7 brut : rc 0 en 0 s
+     podman image mount : rc 0
+     rockylinux:9.7 brut : copie de var/lib/rpm en échec
+     cp: cannot stat '<banc>/w/image/var/lib/rpm': No such file or directory
+     comparaison non faite (bootstrap de mock lu : 1 ; rockylinux:9.7 brut lu : 0)
+     bootstrap de mock, liste : python3-dnf-plugins-core.noarch 0:4.3.0-24.el9 s=k1
+     bootstrap de mock, liste : python3-dnf.noarch 0:4.14.0-31.el9 s=k1
+     bootstrap de mock, liste : rpm.x86_64 0:4.16.1.3-39.el9 s=k1
+     capacité de /w : 32123936 kB ; utilisés : 3992068 kB
+OK   D4 copie en échec signalée : 1
+OK   D4 comparaison non faite : 1
+OK   D4 df en dernière ligne : 1
+OK   doublure rpm jamais appelée sans --dbpath (D1 à D4) : 0
+## E : résumé du verrou
+OK   résumé, verrou 1 : 0
+     version du verrou : 1.1.0
+     options de configuration recopiées : bootstrap_image, bootstrap_image_ready, macros
+     bootstrap_image enregistré : r:5000/x@sha256:0
+     bootstrap_image_ready enregistré : False
+     macros recopiées : oui
+     bootstrap, champs : architecture, image_digest, pull_digest
+     bootstrap, pull_digest (digest du manifeste tiré) : sha256:1
+     bootstrap, image_digest (sha256 de RootFS et Config, podman.py:21) : sha256:2
+     bootstrap, architecture : amd64
+     rpm du buildroot : 2 ; champs : name, signature, url
+     rpm avec url : 1 sur 2
+     préfixes des url : dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/a
+     valeurs distinctes de signature : 2 ; 350d275d, None
+OK   rpm avec url (verrou 1) : 1
+OK   préfixe (verrou 1) : 1
+OK   résumé, verrou 2 : 0
+OK   bootstrap vide signalé (verrou 2) : 1
+OK   JSON cassé : sous-shell set -e : 0
+OK   JSON cassé : échec signalé, étape poursuivie : 1
+OK   résumé non fatal dans la copie : 1
+OK   ordre : sonde, SONDE_BOOT, journaux, résumé, retrait
+OK   fin de verrou-calc.log archivée : 1
+## F : étape connue de lancer
+OK   fonction etape_verrou_brut : 1
+OK   nom du pod conforme (minuscules, chiffres, tirets) : 1
+# bilan : tenu, fin 2026-11-17T13:23:46Z

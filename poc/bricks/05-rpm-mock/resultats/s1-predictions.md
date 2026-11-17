@@ -1221,3 +1221,26 @@ commentaire et l'en-tête changent par rapport à `c86589c4…` :
 sonde. C'est le seul moyen de voir si le filtre `jeton|token` a retiré une ligne.
 
 Suite : appliquer `s1-verrou-brut-2.patch` à `s1.sh` sur accord. Rien n'est lancé.
+
+## Étape `verrou_brut` appliquée au dépôt (note du 2026-11-17, écrite à 2026-11-17T13:24:29Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « J'applique s1-verrou-brut-2.patch (copie b7db829c) à s1.sh ? », réponse « Oui, applique-le ».
+
+- `git apply` de [`../s1-verrou-brut-2.patch`](../s1-verrou-brut-2.patch) à 13:23:39 UTC (`date -u` avant et après, code 0).
+  `s1.sh` passe de `5ccba38e…` à `b7db829c…`, la copie bancée.
+- Le banc a été repassé sur le fichier du dépôt à 13:23:44 UTC : tenu, 52 OK
+  ([journal](s1-verrou-brut-2-banc-applique.log)). Hors l'heure de fin, il ne diffère du journal de la copie
+  ([`s1-verrou-brut-2-banc.log`](s1-verrou-brut-2-banc.log)) que par quatre lignes « utilisés » du `df` de la section D. Ce `df`
+  porte sur le dossier du banc, sur l'hôte : la place occupée y varie d'un passage à l'autre.
+- Deux lignes datées ont ensuite été ajoutées à l'en-tête, sous la description de `verrou_brut` :
+  - « Correctif appliqué au dépôt le 17/11/2026 à 13:23:39 UTC (« Oui, applique-le »), sha256 égal à la copie bancée
+    (b7db829c…) ; non lancé. » ;
+  - `s1.sh` vaut alors `139aab3c…`.
+- Contrôles :
+  - `bash -n` passe ;
+  - shellcheck : 15 remarques, toutes de niveau note, aucune de niveau warning ou au-dessus ;
+  - banc N3/N4 sur ce fichier à 13:24:01 UTC, sous python3 3.13.12 : tenu, 35 OK ([journal](s1-verrou-brut-2-banc-n34-applique.log)).
+- Le premier correctif, [`../s1-verrou-brut.patch`](../s1-verrou-brut.patch), n'a pas été appliqué.
+
+Suite : prédictions de `verrou_brut`, écrites et commitées avant tout passage, puis accord de lancement. Rien n'est lancé, rien
+n'est écrit dans Zot.
