@@ -1,0 +1,217 @@
+### /w/res-verrou/root.log
+DEBUG util.py:537:  binutils-gold-2.35.2-67.el9_7.1.x86_64
+DEBUG util.py:537:  binutils-2.35.2-67.el9_7.1.x86_64
+DEBUG util.py:537:  elfutils-0.193-1.el9.rocky.0.1.x86_64
+DEBUG util.py:537:  gdb-minimal-16.3-2.el9.x86_64
+DEBUG util.py:537:  debugedit-5.0-11.el9.x86_64
+DEBUG util.py:537:  curl-7.76.1-35.el9_7.3.x86_64
+DEBUG util.py:537:  rpm-4.16.1.3-39.el9.x86_64
+DEBUG util.py:537:  rpm-libs-4.16.1.3-39.el9.x86_64
+DEBUG util.py:537:  rpm-build-libs-4.16.1.3-39.el9.x86_64
+DEBUG util.py:537:  efi-srpm-macros-6-4.el9.noarch
+DEBUG util.py:537:  lua-srpm-macros-1-6.el9.noarch
+DEBUG util.py:537:  fonts-srpm-macros-2.0.5-7.el9.1.noarch
+DEBUG util.py:537:  go-srpm-macros-3.6.0-14.el9_7.noarch
+DEBUG util.py:537:  python-srpm-macros-3.9-54.el9.noarch
+DEBUG util.py:537:  pyproject-srpm-macros-1.16.2-1.el9.noarch
+DEBUG util.py:537:  redhat-rpm-config-210-1.el9.noarch
+DEBUG util.py:537:  rpm-build-4.16.1.3-39.el9.x86_64
+DEBUG util.py:537:  util-linux-2.37.4-21.el9_7.x86_64
+DEBUG util.py:537:  which-2.21-30.el9_6.x86_64
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-pret-x86_64/root
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: rpmbuild --help with env {'TERM': 'vt100', 'SHELL': '/bin/bash', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'PROMPT_COMMAND': 'printf "\\033]0;<mock-chroot>\\007"', 'PS1': '<mock-chroot> \\s-\\v\\$ ', 'LANG': 'C.UTF-8'} and shell True
+DEBUG util.py:537:  Usage: rpmbuild [OPTION...]
+DEBUG util.py:537:  Build options with [ <specfile> | <tarball> | <source package> ]:
+DEBUG util.py:537:        -bp                        build through %prep (unpack sources and apply
+DEBUG util.py:537:                                   patches) from <specfile>
+DEBUG util.py:537:        -bc                        build through %build (%prep, then compile)
+DEBUG util.py:537:                                   from <specfile>
+DEBUG util.py:537:        -bi                        build through %install (%prep, %build, then
+DEBUG util.py:537:                                   install) from <specfile>
+DEBUG util.py:537:        -bl                        verify %files section from <specfile>
+DEBUG util.py:537:        -ba                        build source and binary packages from
+DEBUG util.py:537:                                   <specfile>
+DEBUG util.py:537:        -bb                        build binary package only from <specfile>
+DEBUG util.py:537:        -bs                        build source package only from <specfile>
+DEBUG util.py:537:        -br                        build source package only from <specfile> -
+DEBUG util.py:537:                                   calculate dynamic build requires
+DEBUG util.py:537:        -rp                        build through %prep (unpack sources and apply
+DEBUG util.py:537:                                   patches) from <source package>
+DEBUG util.py:537:        -rc                        build through %build (%prep, then compile)
+DEBUG util.py:537:                                   from <source package>
+DEBUG util.py:537:        -ri                        build through %install (%prep, %build, then
+DEBUG util.py:537:                                   install) from <source package>
+DEBUG util.py:537:        -rl                        verify %files section from <source package>
+DEBUG util.py:537:        -ra                        build source and binary packages from <source
+DEBUG util.py:537:                                   package>
+DEBUG util.py:537:        -rb                        build binary package only from <source
+DEBUG util.py:537:                                   package>
+DEBUG util.py:537:        -rs                        build source package only from <source
+DEBUG util.py:537:                                   package>
+DEBUG util.py:537:        -rr                        build source package only from <source
+DEBUG util.py:537:                                   package> - calculate dynamic build requires
+DEBUG util.py:537:        -tp                        build through %prep (unpack sources and apply
+DEBUG util.py:537:                                   patches) from <tarball>
+DEBUG util.py:537:        -tc                        build through %build (%prep, then compile)
+DEBUG util.py:537:                                   from <tarball>
+DEBUG util.py:537:        -ti                        build through %install (%prep, %build, then
+DEBUG util.py:537:                                   install) from <tarball>
+DEBUG util.py:537:        -ta                        build source and binary packages from
+DEBUG util.py:537:                                   <tarball>
+DEBUG util.py:537:        -tb                        build binary package only from <tarball>
+DEBUG util.py:537:        -ts                        build source package only from <tarball>
+DEBUG util.py:537:        -tr                        build source package only from <tarball> -
+DEBUG util.py:537:                                   calculate dynamic build requires
+DEBUG util.py:537:        --rebuild                  build binary package from <source package>
+DEBUG util.py:537:        --recompile                build through %install (%prep, %build, then
+DEBUG util.py:537:                                   install) from <source package>
+DEBUG util.py:537:        --buildroot=DIRECTORY      override build root
+DEBUG util.py:537:        --build-in-place           run build in current directory
+DEBUG util.py:537:        --clean                    remove build tree when done
+DEBUG util.py:537:        --nobuild                  do not execute any stages of the build
+DEBUG util.py:537:        --nodeps                   do not verify build dependencies
+DEBUG util.py:537:                                   (legacy) rpm v3 packaging
+DEBUG util.py:537:        --noclean                  do not execute %clean stage of the build
+DEBUG util.py:537:        --noprep                   do not execute %prep stage of the build
+DEBUG util.py:537:        --nocheck                  do not execute %check stage of the build
+DEBUG util.py:537:        --rmsource                 remove sources when done
+DEBUG util.py:537:        --rmspec                   remove specfile when done
+DEBUG util.py:537:        --short-circuit            skip straight to specified stage (only for
+DEBUG util.py:537:                                   c,i)
+DEBUG util.py:537:        --target=CPU-VENDOR-OS     override target platform
+DEBUG util.py:537:  Common options for all rpm modes and executables:
+DEBUG util.py:537:    -D, --define='MACRO EXPR'      define MACRO with value EXPR
+DEBUG util.py:537:        --undefine=MACRO           undefine MACRO
+DEBUG util.py:537:    -E, --eval='EXPR'              print macro expansion of EXPR
+DEBUG util.py:537:        --target=CPU-VENDOR-OS     Specify target platform
+DEBUG util.py:537:        --macros=<FILE:...>        read <FILE:...> instead of default file(s)
+DEBUG util.py:537:        --load=<FILE>              load a single macro file
+DEBUG util.py:537:        --noplugins                don't enable any plugins
+DEBUG util.py:537:        --nodigest                 don't verify package digest(s)
+DEBUG util.py:537:        --nosignature              don't verify package signature(s)
+DEBUG util.py:537:        --rcfile=<FILE:...>        read <FILE:...> instead of default file(s)
+DEBUG util.py:537:    -r, --root=ROOT                use ROOT as top level directory (default: "/")
+DEBUG util.py:537:        --dbpath=DIRECTORY         use database in DIRECTORY
+DEBUG util.py:537:        --querytags                display known query tags
+DEBUG util.py:537:        --showrc                   display final rpmrc and macro configuration
+DEBUG util.py:537:        --quiet                    provide less detailed output
+DEBUG util.py:537:    -v, --verbose                  provide more detailed output
+DEBUG util.py:537:        --version                  print the version of rpm being used
+DEBUG util.py:537:  Options implemented via popt alias/exec:
+DEBUG util.py:537:        --with=<option>            enable configure <option> for build
+DEBUG util.py:537:        --without=<option>         disable configure <option> for build
+DEBUG util.py:537:        --scm=<scm>                shortcut for '--define="__scm <scm>"'
+DEBUG util.py:537:        --buildpolicy=<policy>     set buildroot <policy> (e.g. compress man
+DEBUG util.py:537:                                   pages)
+DEBUG util.py:537:        --trace                    trace macro expansion
+DEBUG util.py:537:        --nodebuginfo              do not generate debuginfo for this package
+DEBUG util.py:537:  Help options:
+DEBUG util.py:537:    -?, --help                     Show this help message
+DEBUG util.py:537:        --usage                    Display brief usage message
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/mount', '-n', '-t', 'tmpfs', '-o', 'private,mode=0755', 'tmpfs', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/mount', '-n', '-o', 'rbind', '/w/mock/poc-rocky-9.7-pret-x86_64/root', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/mount', '-n', '-o', 'remount,private,rbind', '--target', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/poc-rocky-9.7-pret-x86_64/root/installation-homedir
+DEBUG package_manager.py:296:  ['/usr/bin/dnf-3', 'builddep', '--installroot', '/w/mock/poc-rocky-9.7-pret-x86_64/root/', '--releasever', '9', '--setopt=deltarpm=False', '--setopt=allow_vendor_change=yes', '--allowerasing', '--disableplugin=local', '--disableplugin=spacewalk', '--disableplugin=versionlock', '/w/mock/poc-rocky-9.7-pret-x86_64/root//builddir/build/SRPMS/sample-app-1.0.0-2.el9.src.rpm']
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/usr/bin/dnf-3', 'builddep', '--installroot', '/w/mock/poc-rocky-9.7-pret-x86_64/root/', '--releasever', '9', '--setopt=deltarpm=False', '--setopt=allow_vendor_change=yes', '--allowerasing', '--disableplugin=local', '--disableplugin=spacewalk', '--disableplugin=versionlock', '/w/mock/poc-rocky-9.7-pret-x86_64/root//builddir/build/SRPMS/sample-app-1.0.0-2.el9.src.rpm'] with env {'TERM': 'vt100', 'SHELL': '/bin/bash', 'HOME': '/w/mock/poc-rocky-9.7-pret-x86_64/root/installation-homedir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'PROMPT_COMMAND': 'printf "\\033]0;<mock-chroot>\\007"', 'PS1': '<mock-chroot> \\s-\\v\\$ ', 'LANG': 'C.UTF-8', 'LC_MESSAGES': 'C.UTF-8'} and shell False
+DEBUG util.py:535:  No matches found for the following disable plugin patterns: local, spacewalk, versionlock
+DEBUG util.py:535:  No such command: builddep. Please use /usr/bin/dnf-3 --help
+DEBUG util.py:535:  It could be a DNF plugin command, try: "dnf install 'dnf-command(builddep)'"
+DEBUG util.py:688:  Child return code was: 1
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-pret-x86_64/root
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-pret-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-pret-x86_64/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/poc-rocky-9.7-pret-x86_64/root/var/cache/dnf'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/poc-rocky-9.7-pret-x86_64/root/var/cache/yum'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64/root/dev/pts'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64/root/dev/shm'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['btrfs', 'subv', 'list', '/w/mock'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/var/cache/dnf'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/var/cache/yum'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/dev/pts'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/dev/shm'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+### /w/res-verrou/build.log
+Mock Version: 6.9
+Executing command: ['bash', '--login', '-c', '/usr/bin/rpmbuild -bs --noclean --target x86_64 --nodeps /builddir/build/SPECS/sample-app.spec'] with env {'TERM': 'vt100', 'SHELL': '/bin/bash', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'PROMPT_COMMAND': 'printf "\\033]0;<mock-chroot>\\007"', 'PS1': '<mock-chroot> \\s-\\v\\$ ', 'LANG': 'C.UTF-8'} and shell False
+warning: Macro expanded in comment on line 3: %_buildhost) viennent de la configuration
+Building target platforms: x86_64
+Building for target x86_64
+setting SOURCE_DATE_EPOCH=1794787200
+Wrote: /builddir/build/SRPMS/sample-app-1.0.0-2.el9.src.rpm
+Child return code was: 0
+Mock Version: 6.9
+Executing command: ['bash', '--login', '-c', '/usr/bin/rpmbuild -bs --noclean --target x86_64 --nodeps /builddir/build/SPECS/sample-app.spec'] with env {'TERM': 'vt100', 'SHELL': '/bin/bash', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'PROMPT_COMMAND': 'printf "\\033]0;<mock-chroot>\\007"', 'PS1': '<mock-chroot> \\s-\\v\\$ ', 'LANG': 'C.UTF-8'} and shell False
+warning: Macro expanded in comment on line 3: %_buildhost) viennent de la configuration
+Building target platforms: x86_64
+Building for target x86_64
+setting SOURCE_DATE_EPOCH=1794787200
+Wrote: /builddir/build/SRPMS/sample-app-1.0.0-2.el9.src.rpm
+Child return code was: 0

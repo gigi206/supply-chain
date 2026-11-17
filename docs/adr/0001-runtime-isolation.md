@@ -303,3 +303,8 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 - **Isolation** : `--isolation=nspawn` échoue en 5 s (« Failed to open system bus ») ; `--isolation=simple` produit le src.rpm et le rpm (53 s et 43 s).
 - **Limites** : un seul passage ; build non hermétique (dépendances lues sur vault 9.7 pendant l'essai) ; la cause de l'échec de nspawn n'est pas mesurée au-delà de son message.
 - **Conséquence pour cet ADR** : la voie A (mock en pod Kata privilégié) a fonctionné pour mock sur ce passage, avec l'isolation `simple`. Le verrou et le mode hermétique restent à mesurer (étape `verrou`, puis M2).
+
+**Additif du 17/11/2026, 12:52 UTC : verrou de mock avec une image de bootstrap « prête »** (brique 05, S1, étape `verrou`, [résultat](../../poc/bricks/05-rpm-mock/resultats/s1-predictions.md)). Le 17/11/2026 de 12:47:47 à 12:48:49 UTC, dans le même type de pod Kata privilégié et root, avec `--isolation=simple` et `bootstrap_image_ready = True` :
+- `--buildsrpm` passe en 50 s, avec le même src.rpm qu'`essais` ;
+- `--calculate-build-dependencies` échoue en 6 s : le dnf de `rockylinux:9.7` brut n'a pas la commande `dnf builddep` (greffon `dnf-plugins-core`) ; aucun verrou n'est produit.
+- **Conséquence pour cet ADR** : l'isolation n'est pas en cause. Le verrou et le mode hermétique demandent au moins une image de bootstrap qui contient `builddep` (nécessaire, pas suffisant : la suite du calcul n'a pas été atteinte) ; son origine reste à décider. Rien n'est mesuré sur le mode hermétique.

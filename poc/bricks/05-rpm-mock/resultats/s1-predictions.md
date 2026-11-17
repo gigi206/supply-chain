@@ -1054,3 +1054,62 @@ d'étape, ce qu'un `kubectl get` vérifiera.
 `resultats/s1-verrou-mock.log` et, si un verrou est produit, `resultats/s1-verrou.json`.
 
 Suite, chaque point sur accord nommé : `verrou` (« Je lance verrou ? »).
+
+## Étape `verrou` : résultat (note du 2026-11-17, écrite à 2026-11-17T12:52:25Z ; rien n'est réécrit)
+
+Question : « Je lance verrou ? ». Réponse : « Oui, lance verrou ». Commande : `env -u PREFIXE ISOLATION=simple DISTRO=rke2
+mise exec -- poc/bricks/05-rpm-mock/s1.sh verrou </dev/null`, avec `KUBECONFIG` posé à `~/.kube/supply-chain-poc.yaml` dans la
+même commande, sur `a429f6f`, en arrière-plan, sous `bash -c`. Elle a tourné le 17/11/2026 de 12:47:47 à 12:48:49 UTC, soit
+62 s (`date -u` autour de la commande, et `chrono.tsv`). Journaux : [`s1-verrou.log`](s1-verrou.log), sha256 `0f3ba64b…`,
+74 lignes, égal à la sortie écrite dans un fichier du scratchpad ; [`s1-verrou-mock.log`](s1-verrou-mock.log), `d0577bfc…`,
+217 lignes : 199 lignes de `root.log` (et non 200 comme en `essais` : le seul retrait de lignes de l'étape est le filtre
+`jeton|token`, et la cause de l'écart n'est plus vérifiable, le pod étant supprimé), puis `build.log` entier (1 382 octets,
+égal au `ls` de la sonde). Le code 0 a été lu par `PIPESTATUS`, dans un
+fichier du scratchpad non archivé ; la ligne « fait » de `chrono.tsv` le corrobore. `s1-verrou.json` n'existe pas.
+
+**En bref.** `rockylinux:9.7` brut ne suffit pas comme image de bootstrap « prête » : `--buildsrpm` passe, mais
+`--calculate-build-dependencies` échoue en 6 s, faute de la commande `builddep` de dnf (greffon `dnf-plugins-core`). Aucun
+verrou n'est produit. C'est la branche « greffon absent » de V12.
+
+| | Mesure | Verdict |
+|---|---|---|
+| V6 | « configuration : config_opts['bootstrap_image_ready'] = True » | Tenue |
+| V7 | « options bootstrap_* qui annulent « prête », posées : 0 » | Tenue |
+| V8 | Ni « Package management in bootstrap » ni « Bootstrap image not marked ready », ni dans la sonde (qui lit tout `root.log`) ni dans les journaux archivés | Tenue |
+| V9 | Après `--buildsrpm` : une ligne « Not updating bootstrap chroot, bootstrap_image_ready=True » (`buildroot.py:1193`) | Tenue |
+| V1, V10 | `mock --debug-config : rc 0` ; `mock --buildsrpm (image prête) : rc 0 en 50 s` ; src.rpm `sample-app-1.0.0-2.el9.src.rpm` | Tenues |
+| V11 | sha256 du src.rpm `c802e60a…`, égal à celui d'`essais` | Tenue : deux constructions du src.rpm, même empreinte |
+| V2 | Telle qu'écrite (« si V1 échoue »), sans objet : V1 tient. Le manque d'outil qu'elle visait apparaît à l'étape suivante (V12) | Sans objet |
+| V12 | Branche « greffon absent » : `--calculate-build-dependencies : rc 10 en 6 s` ; « ERROR: builddep command missing. » et « Please install package dnf-plugins-core. » dans la sortie de mock ; « aucun verrou produit ». Ligne brute de dnf, dans `s1-verrou-mock.log` (ligne 138) : « No such command: builddep. Please use /usr/bin/dnf-3 --help », pour `dnf-3 builddep --installroot /w/mock/poc-rocky-9.7-pret-x86_64/root/` | Tenue (branche non prédite, observables tenus) |
+| V19 | `--buildsrpm` en 50 s (borne 20 à 300 s) ; `--calculate-build-dependencies` en 6 s (borne basse : 10 s) | Tenue pour `--buildsrpm` ; **non tenue** pour le calcul, arrêté avant toute installation de dépendances |
+| V20 | Lignes « résultat : » (`build.log`, `hw_info.log`, `root.log`, le src.rpm, `state.log`), puis « (code de l'exec : 0) » ; aucune ligne « No space left on device » | Tenue |
+| V3, V13, V15 à V18 | Aucun verrou : rien à lire. Le chemin `podman image inspect` après `podman rmi` (V15) n'est pas atteint | Sans objet |
+| V4, V14, V5, EX2 | Aucun verrou | Non mesurées |
+
+**Le `dnf-3` en échec est celui de l'image de bootstrap**, d'après trois éléments :
+- mock écrit « Buildroot is handled by package management downloaded with a bootstrap image: » et liste
+  `rpm-4.16.1.3-39.el9`, `python3-dnf-4.14.0-31.el9`, `yum-4.14.0-31.el9`. Que cette liste soit exhaustive n'est pas lu ;
+- le buildroot est monté (`rbind`) sous la racine du bootstrap, dans `/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root/w/mock/…`,
+  avant l'appel à `dnf-3 builddep --installroot` ;
+- l'image d'essai porte une autre version de dnf : la liste de `racine` donne `python3-dnf-4.14.0-34.el9_8.rocky.0.1`
+  ([`s1-racine.log`](s1-racine.log), ligne 160), pas `4.14.0-31.el9`.
+
+**Observé hors prédiction.**
+- Pour le buildroot, mock écrit « Package manager dnf4 detected and used (direct choice) » (fin de `verrou-calc.log`).
+- Le nombre cumulé de lignes « Not updating bootstrap chroot » reste 1 après `--calculate-build-dependencies`
+  (accroissement non prédit dans la note du 12/11). Deux lectures possibles, non tranchées : le second appel n'écrit pas ce
+  message, ou `root.log` n'est pas cumulé d'un appel à l'autre.
+- `build.log` contient deux lignes « Wrote: … src.rpm », une par appel : en mode calcul, mock reconstruit le src.rpm avant
+  d'appeler `builddep`. Le sha256 de la seconde construction n'est pas relevé.
+
+**Ce que cela décide, et ce que cela ne décide pas.** Pour l'embranchement 2 de M2 (`m2-predictions.md`, « Image de
+bootstrap prête »), c'est mesuré sur un passage : l'image brute ne suffit pas. Une image de bootstrap qui contient le
+greffon `builddep` est donc nécessaire, mais pas suffisante : la recherche des URL des paquets (`installed_packages.py:151`)
+et le `podman image inspect` après `podman rmi` (V15) n'ont pas été atteints. La façon de produire cette image (par
+exemple une image construite par la chaîne, par digest) est une décision du propriétaire, non prise ici. Rien n'est
+mesuré sur le contenu du verrou ni sur le mode hermétique.
+
+Retiré : le pod `s1-05-verrou`. La suppression est demandée en fin d'étape (`--wait=false`) ; un `kubectl get pod` à
+12:49:04 UTC répond NotFound (vu à l'écran, non archivé). Rien n'est écrit dans Zot.
+
+Suite : l'image de bootstrap prête est une décision du propriétaire, avant toute nouvelle étape `verrou`.
