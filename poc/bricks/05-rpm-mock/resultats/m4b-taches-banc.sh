@@ -5,7 +5,7 @@
 # B : la vraie fonction etape_prealables_taches de la copie, avec les vrais gabarits du dépôt, le vrai publier-fermeture signé, yq,
 #     jq et oras de l'hôte (layouts locaux), sur des données du banc (222 rpm factices, verrou du banc au digest d'un faux manifeste,
 #     fermeture restaurée et arbre de référence factices) et un faux « sur » : nominal ; fichier restauré différent ; gabarit de la
-#     tâche avec une variable d'environnement de plus : code 1.
+#     tâche avec une variable d'environnement de plus ; ressources sous computeResources (nom de l'API v1) : code 1.
 # C : le script de la tâche, rendu et substitué par les fonctions de la copie comme dans l'étape, chemins /tmp et de la clé
 #     réécrits pour le banc, joué par dash avec de faux curl, rpm, createrepo_c, skopeo, gpg et un PATH restreint aux outils de base
 #     de l'image : nominal (résultat écrit) ; la vraie liste des 222 rpm passe les contrôles (arrêt au premier téléchargement, faux
@@ -139,6 +139,10 @@ mkdir -p "$B/taches-env"; cp poc/bricks/05-rpm-mock/fermeture/*.yaml "$B/taches-
 sed -i 's/^    - name: HOME$/    - name: LISTE_EN_TROP\n      value: x\n    - name: HOME/' "$B/taches-env/prefetch-rpm.yaml"
 restauree "$B/W3"
 cas_etape "variable d'environnement de plus dans la tâche : refusée" 1 "^KO   tâche : variables d'environnement du pas" "$B/W3" "$B/R" etape_prealables_taches TACHES_CAS="$B/taches-env"
+mkdir -p "$B/taches-v1"; cp poc/bricks/05-rpm-mock/fermeture/*.yaml "$B/taches-v1/"
+sed -i 's/^    resources:$/    computeResources:/' "$B/taches-v1/prefetch-rpm.yaml"   # nom du champ dans l'API v1, inconnu du Step de v1beta1
+restauree "$B/W4"
+cas_etape "ressources sous computeResources (API v1) : refusées" 1 "^KO   tâche : ressources du pas, champ resources de v1beta1" "$B/W4" "$B/R" etape_prealables_taches TACHES_CAS="$B/taches-v1"
 
 echo "## C : script de la tâche (rendu, substitué), par dash"
 # script du banc : celui de l'étape nominale, substitué pour des chemins du banc ; /tmp et la clé réécrits (banc seulement)

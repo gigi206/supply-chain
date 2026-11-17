@@ -483,8 +483,8 @@ etape_prealables_taches() {
   attendu "tâche : paramètres" "$(yq -o=json -I=0 '[.spec.params[].name]' "$T/prefetch-rpm.yaml")" '["liste","source","dossier","empreinte","repomd"]'
   attendu "tâche : UID, runAsNonRoot, capacités, élévation" \
     "$(yq '.spec.stepTemplate.securityContext | [.runAsUser, .runAsNonRoot, .capabilities.drop[0], .allowPrivilegeEscalation] | join(" ")' "$T/prefetch-rpm.yaml")" "65532 true ALL false"
-  attendu "tâche : ressources (demandes, limites)" \
-    "$(yq -o=json -I=0 '.spec.steps[0].computeResources' "$T/prefetch-rpm.yaml")" '{"requests":{"cpu":"2","memory":"2Gi"},"limits":{"cpu":"2","memory":"2Gi"}}'
+  attendu "tâche : ressources du pas, champ resources de v1beta1 (demandes, limites)" \
+    "$(yq -o=json -I=0 '[.spec.steps[0].resources, ([.. | select(tag == "!!map") | keys[] | select(. == "computeResources")] | length)]' "$T/prefetch-rpm.yaml")" '[{"requests":{"cpu":"2","memory":"2Gi"},"limits":{"cpu":"2","memory":"2Gi"}},0]'
   attendu "tâche : variables d'environnement du pas" "$(yq -o=json -I=0 '.spec.steps[0].env' "$T/prefetch-rpm.yaml")" '[{"name":"HOME","value":"/tmp"}]'
   attendu "pipeline : liste rendue identique à la liste" \
     "$(yq '.spec.tasks[0].params[] | select(.name == "liste") | .value' "$T/prefetch-rpm-sample-app.yaml" | sed '/^$/d' | cmp -s - "$LISTE" && echo identique || echo différente)" identique

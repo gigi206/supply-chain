@@ -1,0 +1,48 @@
+# m4b-taches-banc.sh, 2026-11-17T22:58:14Z ; m4b.sh avant bf927e5b0925f77c3fda16f7762800e8f300e639d07cb8f93bc75353b8281963 ; copie 5e08bef058e6a6d0f0bd5328be77f52e202ad1b6a4e5d488e2f7410e52f2d084
+# gabarits : prefetch-rpm.yaml 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c ; prefetch-rpm-sample-app.yaml ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+## A : insertions seules, syntaxe, shellcheck
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+OK   lignes insérées (en-tête 14, bloc 165) : 179
+OK   bash -n : ok
+OK   shellcheck : écarts (SC2016 seulement) : < SC2016 > SC2016
+OK   données : arbre de référence (fichiers) : 230
+## B : vraie fonction etape_prealables_taches
+OK   nominal (code 0)
+OK   nominal : lignes OK de l'étape : 22
+OK   nominal : diff du script contre PREFETCH_FINAL archivé dans la sortie : 29
+OK   nominal : couches à titres « @ » et « : » : 1
+OK   nominal : deux layouts distincts : 2
+OK   nominal : référence de la tâche dans la pipeline rendue (factice) : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:0000000000000000000000000000000000000000000000000000000000000000
+OK   fichier restauré différent de final : refusé (code 1)
+OK   variable d'environnement de plus dans la tâche : refusée (code 1)
+OK   ressources sous computeResources (API v1) : refusées (code 1)
+## C : script de la tâche (rendu, substitué), par dash
+OK   nominal (code 0)
+OK   nominal : résultat BOOTSTRAP_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap","digest":"sha256:659f7e41827e76690689ec414bf5796252f555ba52b34ecadabf1056cfe325f9"}
+OK   nominal : arbre égal à la référence : égal
+OK   vraie liste (222 lignes) : contrôles passés, arrêt au premier téléchargement (code 1)
+OK   vraie liste : aucun refus de contrôle : 0
+OK   repomd.xml attendu faux : refusé (code 1)
+OK   repomd.xml faux : ni dossier dir:, ni résultat : 0 0
+OK   source sans digest : refusée (code 1)
+OK   digest de la source trop court : refusé (code 1)
+OK   dossier incohérent : refusé (code 1)
+OK   empreinte en minuscules : refusée (code 1)
+OK   repomd attendu mal formé : refusé (code 1)
+OK   URL hors de vault 9.7 : refusée (code 1)
+OK   URL avec « .. » : refusée (code 1)
+OK   sha256 mal formé : refusé (code 1)
+OK   taille mal formée : refusée (code 1)
+OK   ligne à quatre champs : refusée (code 1)
+OK   gpg absent : refusé (code 1)
+## D : vraie fonction etape_essai_tache, faux kubectl
+OK   nominal (code 0)
+OK   nominal : lignes OK de l'étape : 14
+OK   nominal : pods créés : 1
+OK   script en échec : refusé, pod laissé (code 1)
+OK   script en échec : pod laissé (faux cluster) : m4b-05-essai-tache
+OK   arbre différent de la référence : refusé (code 1)
+OK   retrait du pod en échec : refusé (code 1)
+OK   PVC restante : refusée (code 1)
+# bilan : tenu, 41 OK, 0 KO, fin 2026-11-17T22:58:48Z

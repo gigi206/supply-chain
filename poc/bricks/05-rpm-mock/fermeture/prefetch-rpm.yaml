@@ -56,7 +56,7 @@ spec:
   steps:
   - name: prefetch
     image: @IMAGE@
-    computeResources:
+    resources:
       requests:
         cpu: "2"
         memory: 2Gi

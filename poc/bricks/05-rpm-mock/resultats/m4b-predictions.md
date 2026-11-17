@@ -332,3 +332,19 @@ Recoupement hors script, à la relecture (non archivé autrement que par ce text
 - ET3 ou ET6 non tenues : pas de signature ; correction du gabarit, puis nouveau passage.
 
 Accords demandés : `prealables_taches`, puis `essai_tache`, un chacun.
+
+## Note datée du 17/11/2026, écrite à 22:59:14 UTC : correction du champ des ressources, avant tout passage
+
+Relecture du conseiller. Le texte commité reste ; il se lit avec ces corrections.
+- **Défaut du gabarit, corrigé.** La tâche est en `tekton.dev/v1beta1`. Le `Step` de cette version porte les ressources sous `resources` : `pkg/apis/pipeline/v1beta1/container_types.go` lu au tag v1.15.5, champ `Resources`, json `resources`, aucun champ `computeResources`. Les tâches signées du dépôt en v1beta1 écrivent aussi `resources`. `computeResources` est le nom de l'API v1. Il aurait été perdu à la lecture du gabarit, et le pas aurait tourné sous les valeurs de `config-defaults` (1 CPU, 512 Mi).
+- **Pourquoi aucun contrôle ne l'a vu.** `prealables_taches` relisait le texte YAML, et le banc reprenait le même champ. `essai_tache` prend ses limites dans la spec du pod d'essai, pas dans le gabarit.
+- **Corrections.**
+  - Gabarit `prefetch-rpm.yaml` : `resources` au lieu de `computeResources` (`96b9d6bd…`).
+  - Contrôle de `prealables_taches` : exige `resources` et aucune clé `computeResources` dans la tâche. C'est la seule ligne de `m4b.sh` changée, une ligne commitée mais jamais lancée. `m4b.sh` = `5e08bef0…`.
+  - Banc : un cas de plus, `computeResources` refusé ; rejoué : 41 OK, 0 KO ([journal](m4b-taches-banc-2.log)).
+  - Les bancs de l'essai et de `final` ne lisent pas cette ligne ; ils ne sont pas rejoués.
+- **SC2016.** La note précédente les attribue à `printf` et `echo`. Le relevé de shellcheck en montre aussi sur des motifs de `sed` et de `grep` (`'$fp'`, `'^cd "$f"$'`) et sur un littéral attendu (`'K=${CLE_ROCKY:-…}'`). Tous sont sans expansion voulue.
+- **À lire avant `taches`, sans bloquer ces deux étapes.**
+  - `pkg/pod/script.go` au tag v1.15.5 : comment le script d'environ 45 Ko arrive dans le pod (taille d'un argument unique).
+  - Après `SIGNER=1` et avant tout bundle : comparer le script et les ressources du fichier signé à ceux du gabarit rendu. Un bundle écrit dans Zot ne se retire pas.
+- **Prédictions PT1 à PT8 et ET1 à ET8 inchangées.** PT2 couvre désormais le champ `resources`.
