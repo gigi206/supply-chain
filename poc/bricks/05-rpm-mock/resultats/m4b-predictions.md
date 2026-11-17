@@ -221,3 +221,25 @@ Relecture du conseiller. Le texte commité reste ; il se lit avec ces correction
 - « les dix refus de `PREFETCH` inchangés » : ils sont **neuf** (`createrepo_c` absent, sha256, taille, doublon, HTTP 404, signature, empreinte, identifiant court, manifeste ; [journal](m4b-final-banc.log), section C). Les deux autres refus de la section C (`gpg` absent, `createrepo_c` en échec) sont nouveaux.
 - « `SORTIE=/workspace/sortie` (racine du volume) » : c'est la racine du **montage**, qui est le sous-dossier `fermeture` du volume (`subPath`), comme pour l'essai.
 - FN9, « rien écrit dans Zot » : l'étape ne le mesure pas. Les pods de `final` joignent Zot (lecture anonyme de l'image de bootstrap), à la différence du pod de `m4b_mock_v2`, dont le témoin Zot était fermé. FN9 se lit : code 0 ; rien écrit dans Zot **(lecture : aucune commande d'écriture vers un registre dans les scripts du pod, `skopeo copy` vers un dossier `dir:` ; aucun identifiant de Zot monté, `automountServiceAccountToken: false`)**.
+
+## Note datée du 17/11/2026, écrite à 22:31:03 UTC : étape `final` passée (« Oui, lance-la »)
+
+Passage du 17/11/2026 de 22:28:13 à 22:30:29 UTC (`chrono.tsv`), code 0, aucune ligne KO ([journal](m4b-final.log), [arbre](m4b-final-arbre.txt)). `m4b.sh` = `bf927e5b…`. Relevé avant le lancement : ni journal ni arbre archivé, aucun pod ni PVC `m4b-05-final-*` parmi 68 objets de `builds` ; après : 68 objets (comptés, non comparés nom à nom).
+
+| # | Mesure | Verdict |
+|---|---|---|
+| FN1 | Liste `95541ee8…` ; source du bootstrap `…rocky9-bootstrap@sha256:f0ccf105…` | Tenue |
+| FN2 | Deux pods admis en dry-run serveur, prêts sur `sc-build`, `runtimeClassName` vide ; liste livrée égale | Tenue |
+| FN3 | Chaque passage : 222 téléchargés et contrôlés ; empreinte conforme par `gpg` ; `rpm -K` 222 OK sur 222 | Tenue |
+| FN4 | Chaque passage : `repomd.xml` `239a5a71…`, 4 fichiers (`createrepo_c` en 1 s) | Tenue |
+| FN5 | Chaque passage : `skopeo copy` anonyme, manifeste `f0ccf105…` (1 s) | Tenue |
+| FN6 | Chaque passage : 230 fichiers, 317 984 334 octets ; arbres p1 et p2 égaux, `repodata` compris (liste `fc556539…` aux deux) ; arbre archivé | Tenue |
+| FN7 | Chaque pod : retrait code 0, PVC `<pod>-w` retirée (`kubectl wait` code 0), aucun pod ni PVC au nom du pod | Tenue (durée de chaque retrait non relevée) |
+| FN8 | 28 s par passage | Tenue |
+| FN9 | Code 0 ; rien écrit dans Zot (lecture, voir la note de correction) | Tenue pour le code ; Zot non mesuré |
+
+Recoupement hors script, à la relecture (non archivé autrement que par ce texte) : les 222 rpm de l'arbre archivé ont le sha256 et la taille de `m4b-liste.txt` ; `repodata/repomd.xml` y vaut `239a5a71…` ; les 4 autres fichiers sont ceux du dossier `dir:`.
+
+**Ce que cela établit** : deux exécutions du pas final, chacune dans un pod neuf avec son volume, sans root, sous runc, donnent la même fermeture au fichier près, `repodata` compris, et cet index est celui que mock a accepté en hermétique (`m4b_mock_v2`). `PREFETCH_FINAL` peut servir de base au script de la tâche `prefetch-rpm`.
+
+**Ce que cela n'établit pas** : la liste reçue en paramètre de Tekton, le workspace de Tekton, `publier-fermeture` et la tâche signée ; qu'un build parte de cette fermeture (sans `verrou.json` ni `outils/`) ; rien écrit dans Zot (non mesuré).
