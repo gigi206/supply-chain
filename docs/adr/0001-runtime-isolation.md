@@ -321,3 +321,6 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 
 **Additif du 17/11/2026, 13:53 UTC : contenu de l'image dérivée décidé** ([détail](../../poc/bricks/05-rpm-mock/resultats/s1-predictions.md)). Décision du propriétaire « Dix lignes » : l'image de bootstrap dérivée reprend `rockylinux:9.7` plus les six paquets ajoutés par mock et les quatre mises à jour de dnf, aux versions mesurées à `verrou_brut`. Avec cette image marquée prête, mock n'installerait plus rien dans le bootstrap (lecture de code).
 - **Conséquence pour cet ADR** : aucune pour l'instant ; rien n'est construit.
+
+**Additif du 17/11/2026, 14:53 UTC : image de bootstrap dérivée construite** ([détail](../../poc/bricks/05-rpm-mock/resultats/s1-predictions.md)). Dans un pod Kata privilégié et root, le `dnf-3` de l'image d'essai a installé en `--installroot` les dix paquets décidés dans une copie de `rockylinux:9.7` (vault 9.7, signatures vérifiées) ; l'archive, assemblée sur l'hôte sans rien exécuter, est dans Zot : `essais-05/rocky9-bootstrap@sha256:f0ccf105…`.
+- **Conséquence pour cet ADR** : aucune ; l'isolation n'est pas en jeu tant que mock n'a pas tourné avec cette image.

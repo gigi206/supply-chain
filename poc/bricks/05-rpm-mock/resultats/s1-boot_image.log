@@ -1,0 +1,8 @@
+# s1.sh boot_image, 2026-11-17T14:52:28Z
+OK   archive racine dérivée, sha256 égal à celui de boot_racine : 8ae17f92b27377fff20009d0a88740b1bf9045d533f0506949d6e209c970f1f2
+archive racine dérivée : 258129920 octets
+couche sha256:22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99 97742593 octets
+annotation org.opencontainers.image.base.digest = sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+annotation org.opencontainers.image.base.name = sc-stockage.poc.test:5000/amont/rockylinux/rockylinux
+config : os linux ; architecture amd64
+image de bootstrap dérivée : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6

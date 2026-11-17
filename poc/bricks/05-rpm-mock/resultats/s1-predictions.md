@@ -1710,3 +1710,26 @@ n'existait pas le 17/11/2026 à 14:51:40 UTC ([relevé](s1-boot-image-zot-avant.
 relevé d'`image` (10:32:01 UTC), avant que `essais-05/mock-rocky9` n'y soit écrit.
 
 Suite : accord d'écriture dans Zot (`boot_image`, `essais-05/rocky9-bootstrap:s1`, dépôt définitif), digest attendu `f0ccf105…`.
+
+## Étape `boot_image` : résultat (note du 2026-11-17, écrite à 2026-11-17T14:53:14Z ; rien n'est réécrit)
+
+Passage sur accord « Oui, lance boot_image », le 17/11/2026 de 14:52:28 à 14:52:38 UTC (`date -u` du lancement et
+[`chrono.tsv`](chrono.tsv)), code 0. Commande : `env -u PREFIXE -u ISOLATION DISTRO=rke2 KUBECONFIG=… mise exec --
+poc/bricks/05-rpm-mock/s1.sh boot_image`, `s1.sh` à `2b0a3b7b…`. Journal : [`s1-boot_image.log`](s1-boot_image.log).
+
+**L'image de bootstrap dérivée est dans Zot** : `sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6`, tag `:s1`.
+Ce dépôt est définitif.
+
+| # | Résultat |
+|---|---|
+| DI1 | **Tenue.** sha256 de l'archive égal à celui de `boot_racine` (`8ae17f92…`). |
+| DI2 | **Tenue.** `crane append` et `crane mutate` sans erreur, sans nouvelle authentification (aucune ligne d'`auth_zot` dans le journal). |
+| DI3 | **Tenue.** Une couche `22495746…` de 97 742 593 octets ; les deux annotations attendues ; `linux/amd64`. |
+| DI4 | **Tenue.** Digest égal à celui des deux passages en loopback ([`s1-boot-image-local.log`](s1-boot-image-local.log)). |
+| DI5 | **Tenue.** 10 s. |
+
+Non vérifié ici : la lecture de ce dépôt par le `podman` d'un pod. La configuration commitée de Zot donne la lecture anonyme sur
+`**`, et aucun podman de pod n'a encore tiré un dépôt `essais-05/`.
+
+Suite : préparer à sec l'étape qui reprend `verrou` avec cette image (configuration jumelle : `bootstrap_image` = ce digest,
+`bootstrap_image_ready=True`), avec son correctif, son banc, ses prédictions et son accord.
