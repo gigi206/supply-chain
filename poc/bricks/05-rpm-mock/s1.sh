@@ -139,6 +139,15 @@
 #               diffoscope hors du script (installation à demander au propriétaire en cas d'écart)
 #               Correctif appliqué au dépôt le 17/11/2026 à 19:53:32 UTC (« Oui, applique-le »), sha256 égal à la copie bancée
 #               (18c9d4ce…) ; non lancé ; politique construction-rpm-sans-sortie NON POSÉE (m3_reseau, accord à part).
+#   m4b_mock_v2  brique 05, M4b (décision « V2 » du 17/11/2026 ; ajoutée à sec sur « Oui, prépare-la », NON LANCÉE) : build
+#               hermétique de m3_build, sans aucun changement de m3_build, sur une copie en liens durs de la fermeture restaurée 1
+#               ($T/m3/restauree-v2 ; pod s1-05-m3-v2, chemins /w/bv2, label construire-rpm, témoins fermés) ; seule la sonde change,
+#               par une insertion juste avant mock, après la porte d'intégrité : repodata de la fermeture retiré, rpm datés à
+#               l'époque 0, createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database (la variante V2 de
+#               l'essai de M4b) ; repomd.xml comparé à celui de l'essai, rpm et src.rpm à ceux de M3 (écarts comptés, code 1 s'il y
+#               en a un) ; repomd.xml imprimé en entier au journal (sommes de chaque fichier) ; rien écrit dans Zot.
+#               Correctif appliqué au dépôt le 17/11/2026 à 22:04:05 UTC (« Oui, applique-le »), sha256 égal à la copie bancée
+#               (3d26df84…) ; non lancé.
 # Les replis (stockage vfs, mock non root, bootstrap sans image) ne sont pas lancés ici : chacun demande sa prédiction et un accord.
 # Retrait : Zot n'autorise pas la suppression ; dépôts amont/rockylinux/rockylinux et essais-05/mock-rocky9 définitifs.
 #
@@ -1750,6 +1759,39 @@ m3_build() { # n : build n dans le pod $POD_M3-n, depuis $T/m3/restauree-n, chem
 }
 etape_m3_build1() { m3_build 1; }
 etape_m3_build2() { m3_build 2; }
+
+# Brique 05, M4b (décision « V2 » du 17/11/2026) : mock hermétique sur des repodata régénérés avec la variante V2 de createrepo_c.
+REPOMD_V2=239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164   # essai de M4b (m4b-essai.log), deux copies
+RPM_M3=864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f      # m3_comparaison
+SRPM_M3=c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128     # m3_comparaison
+BLOC_V2='command -v createrepo_c >/dev/null 2>&1 || ko "createrepo_c absent de l image"
+rm -rf "$D/repodata" || ko "repodata de la fermeture non retiré"
+find "$D" -maxdepth 1 -name "*.rpm" -exec touch -h -d @0 {} + || ko "dates des rpm"
+createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database "$D" > "$B/createrepo-v2.log" 2>&1 \
+  || { tail -n 20 "$B/createrepo-v2.log"; ko "createrepo_c V2"; }
+echo "repodata V2 : repomd.xml $(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64) ; fichiers $(ls "$D/repodata" | wc -l)"
+sed "s/^/repomd.xml V2 : /" "$D/repodata/repomd.xml"
+'
+etape_m4b_mock_v2() { # m3_build inchangé, sur une copie en liens durs de la fermeture restaurée 1 ; sonde de M3 avec BLOC_V2 avant mock
+  local o=$T/m3 m='mkdir -p "$B/res"' s f x
+  [ -d "$o/restauree-1" ] || { echo "KO   lancer d'abord l'étape m3_restauration" >&2; exit 1; }
+  rm -rf -- "${o:?}/restauree-v2" && cp -al "$o/restauree-1" "$o/restauree-v2"
+  echo "fermeture : copie en liens durs de restauree-1 sous restauree-v2 ($(find "$o/restauree-v2" -type f | wc -l) fichiers)"
+  s=$SONDE_M3
+  attendu "point d'insertion dans la sonde de M3 (lignes)" "$(grep -c -F -x "$m" <<<"$s")" 1
+  local SONDE_M3=${s/"$m"/"$BLOC_V2$m"}   # remplacement entre guillemets : sinon bash 5.2 et plus remplacent « & » (2>&1) par le motif
+  attendu "sonde V2 : sonde de M3 et BLOC_V2, rien d'autre" "$(( ${#SONDE_M3} - ${#s} ))" "${#BLOC_V2}"
+  m3_build v2
+  ECARTS_M3=0
+  mesure_m3 "repodata V2 dans le pod, repomd.xml" "$(champ m3-buildv2 'repodata V2' | cut -d' ' -f2)" "$REPOMD_V2"
+  mesure_m3 "repodata V2 dans le pod, fichiers" "$(champ m3-buildv2 'repodata V2' | awk '{print $NF}')" 4
+  for f in "$o/build-v2"/*.rpm; do [ -e "$f" ] || continue; x=$(sha256sum < "$f" | cut -c1-64)
+    case "${f##*/}" in *.src.rpm) mesure_m3 "src.rpm ${f##*/}, sha256 égal à M3" "$x" "$SRPM_M3" ;;
+      *) mesure_m3 "rpm ${f##*/}, sha256 égal à M3" "$x" "$RPM_M3" ;; esac
+  done
+  echo "écarts : $ECARTS_M3"
+  [ "$ECARTS_M3" = 0 ]
+}
 
 ECARTS_M3=0
 mesure_m3() { if [ "$2" = "$3" ]; then echo "OK   $1 : $2"; else echo "ÉCART $1 : $2 (attendu : $3)"; ECARTS_M3=$((ECARTS_M3 + 1)); fi; }

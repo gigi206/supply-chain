@@ -1,0 +1,41 @@
+# s1-m4b-v2-banc.sh, 2026-11-17T22:04:22Z ; s1.sh avant 06c2da46793b179682be372eb9d1c94c275a728f52af748d1b36ee648792cc58 ; copie 362af7ef18e1dcf4d53e68ba366230cdfc716cc9183a5771072b227cbd707f84
+## A : insertions seules
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+OK   lignes insérées (en-tête 9, code 33) : 42
+## B : syntaxe et shellcheck
+OK   bash -n : ok
+OK   shellcheck : écarts (SC2016 seulement) : < SC2016 > SC2016
+OK   shellcheck : SC2016, avant et copie (deux de plus) : 20 22
+## C : constantes, et la vraie fonction avec un m3_build simulé
+OK   REPOMD_V2 égale à V2 dans m4b-essai.log (deux copies) : 2
+OK   RPM_M3 et SRPM_M3 présentes dans s1-m3_comparaison.log : oui oui
+OK   nominal : code et « écarts : 0 » : 0 1
+OK   nominal : six OK (insertion, composition, repomd, fichiers, rpm, src.rpm) : 6
+OK   repomd.xml faux : code 1, un écart : 1 1
+OK   rpm faux : code 1, un écart : 1 1
+OK   src.rpm faux : code 1, un écart : 1 1
+OK   ligne absente : code 1, deux écarts : 1 1
+     fermeture : copie en liens durs de restauree-1 sous restauree-v2 (3 fichiers)
+     OK   point d'insertion dans la sonde de M3 (lignes) : 1
+     OK   sonde V2 : sonde de M3 et BLOC_V2, rien d'autre : 593
+     OK   repodata V2 dans le pod, repomd.xml : 454349e422f05297191ead13e21d3db520e5abef52055e4964b82fb213f593a1
+     OK   repodata V2 dans le pod, fichiers : 4
+     OK   src.rpm sample-app-1.0.0-2.el9.src.rpm, sha256 égal à M3 : 0c0ad7ae185e02579861b4cd0c0c6d1b80e74c25b561463b993f0f520775404c
+     OK   rpm sample-app-1.0.0-2.el9.x86_64.rpm, sha256 égal à M3 : 9e7ab438597fee20e16e8e441bed0ce966bd59e0fb993fa7c94be31fb1384d88
+     écarts : 0
+OK   copie en liens durs de la fermeture : 2
+OK   sonde composée : sonde de M3 et BLOC_V2 seuls, inséré une fois : OK
+OK   ordre : porte d'intégrité, sources, BLOC_V2, mkdir, mock : OK
+OK   sonde composée, dash -n : ok
+OK   sonde composée, bash -n : ok
+## D : BLOC_V2 joué par dash
+OK   nominal : code : 0
+OK   repodata ancien retiré : retiré
+OK   rpm datés à l'époque 0 : 0
+OK   options de createrepo_c : --compatibility --revision 0 --set-timestamp-to-revision --no-database
+OK   ligne repodata V2 lisible comme par champ (repomd.xml, sha256 de 64, 4 fichiers) : repomd.xml 64 4
+OK   repomd.xml imprimé ligne à ligne : 3
+OK   createrepo_c absent : ko : 1:1
+OK   createrepo_c en échec : ko et fin de son journal : 1:1:1
+# bilan : tenu, 27 OK, 0 KO, fin 2026-11-17T22:04:28Z

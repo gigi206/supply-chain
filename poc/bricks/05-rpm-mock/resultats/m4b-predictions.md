@@ -151,3 +151,12 @@ Suite : choisir la variante de `createrepo_c` et confirmer `rpm -K` avant d'écr
 - MV4 tenue : mock a lu les quatre fichiers mêmes que la tâche produira (`repomd.xml` porte leurs sha256).
 - MV4 non tenue, MV5 et MV6 tenues : mock accepte un index V2, mais la reproductibilité d'un environnement à l'autre n'est pas établie ; la signature reste bloquée.
 - Non couvert : ce build part de la fermeture de M3, avec `verrou.json` et `outils/` ; la fermeture de la plateforme n'aura ni l'un ni l'autre (« Option A », « Le retirer »).
+
+## Note datée du 17/11/2026, écrite à 22:05:44 UTC : correctif appliqué à `s1.sh` (« Oui, applique-le »)
+
+- Appliqué le 17/11/2026 à 22:04:05 UTC : `s1.sh` passe de `06c2da46…` à `362af7ef…`, soit la copie bancée `3d26df84…` plus deux lignes datées à l'en-tête, après le bloc de `m4b_mock_v2` (même forme qu'à l'application de M3). Annoncé au propriétaire : une ligne datée (en-tête de 8 lignes) ; fait : deux (en-tête de 9 lignes). Une première tentative, à 22:03:54 UTC, n'a rien écrit : une assertion du script d'application (plafond de largeur de la ligne datée, choisi par moi) l'a arrêtée avant l'écriture ; la ligne a été coupée en deux.
+- Banc dédié rejoué sur le fichier du dépôt contre le `s1.sh` d'avant (`06c2da46…`), arguments 9 et 33 : 27 OK, 0 KO ([journal](s1-m4b-v2-banc-applique.log)).
+- Banc de M3 sur le fichier du dépôt ([journal](s1-m4b-v2-banc-m3-applique.log)) : 75 OK, 2 KO, tous deux dans sa section A, qui cherche les blocs du correctif de M3 entre le `s1.sh` du dépôt et une copie, ici le même fichier (0 bloc). Hors section A, les écarts avec le journal de la copie sont : chemins du dossier de banc, heures, `df` de l'hôte, taille du faux `root.log` (349 et 352 octets ; le chemin du dossier de banc y est plus long de 3 caractères, lecture), et remarques shellcheck désormais égales des deux côtés (32).
+- Banc N3/N4 sur le fichier du dépôt : 35 OK ([journal](s1-m4b-v2-banc-n34-applique.log)).
+- Dossiers de banc laissés : `~/.cache/supply-chain-poc/05/banc-m4v2-4`, `banc-m4v2-m3-4`, `banc-n34-m4v2-4`.
+- Rien n'est lancé. MV1 à MV7 sont inchangées ; le lancement de `m4b_mock_v2` demande son propre accord.
