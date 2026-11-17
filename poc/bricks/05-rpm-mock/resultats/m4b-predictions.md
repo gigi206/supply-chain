@@ -1,0 +1,48 @@
+# Brique 05, M4b : prédictions de `prealables` et `essai` (17/11/2026, écrites à 21:32:50 UTC, avant tout lancement)
+
+Script : [`../m4b.sh`](../m4b.sh) (`6da65a32…`), préparé à sec sur « Oui, prépare-les ». Décisions : « Option A » (liste dans le gabarit), « Le retirer » (pas de rpm de mock), « Option 1 » (images d'essai) ([carte](m4b-carte.md)). Rien n'est lancé.
+
+Accords demandés : `prealables` (hôte seul, hors ligne) et `essai` (un pod d'essai dans `builds`, rien dans Zot), un chacun.
+
+## Vérifié à sec, hors cluster
+
+- `bash -n` passe ; shellcheck 0.11.0 : SC2015 (`attendu`) et SC2016 (`printf` voulu sans expansion), remarques de style.
+- **Banc des trois scripts du pod** (sonde, pas de prefetch, comparaisons ; [script](m4b-banc.sh), [journal](m4b-banc.log)) : extraits de `m4b.sh`, joués par dash avec de faux `curl`, `rpm`, `createrepo_c`, `skopeo` et `gpg`, et un `PATH` restreint aux seuls outils de base présents dans l'image d'outillage (liste des paquets de `s1-racine.log` : ni `cmp` ni `diff`, `diffutils` absent) ; 21 OK, 0 KO. La sonde rapporte un outil absent et une clé absente sans s'arrêter, et lit le manifeste sous les deux formes de CA. Le pas de prefetch passe le cas nominal, et sans `gpg` ; il refuse un sha256 faux, une taille fausse, un nom en double, un HTTP 404, une signature refusée, une empreinte fausse, un identifiant court faux, un manifeste différent, `createrepo_c` absent. Les comparaisons voient `repodata` par défaut différer et les variantes égales (faux `createrepo_c` conçu pour cela : cela teste le script, pas l'outil). Premier passage du banc archivé à part ([journal](m4b-banc-passage1.log)) : deux attentes fausses du banc (8 fichiers et non 6 ; `gpg` de l'hôte dans `/usr/bin`), pas du script. Relecture du conseiller ensuite : les comparaisons utilisaient `cmp` et `diff`, absents de l'image, ce qui aurait fait conclure « différents » à tort ; remplacés par des sha256 et `comm`, et le banc rejoué sur le `PATH` restreint.
+- Non archivé : la construction de la liste, essayée sur des primary synthétiques (222 lignes ; URL absente, écart avec la collecte et doublon refusés).
+
+## Lectures qui fondent l'essai
+
+- Pod de la future tâche, modelé sur la pipeline de la fermeture deb (S4b) : `serviceAccountName: build`, zone `build`, `runAsNonRoot`, UID 65532, seccomp `RuntimeDefault`, capacités retirées ; workspace en volume demandé par gabarit et monté sous un `subPath` (ici `fermeture`, comme `prefetch-deb`) ; CA du PoC par la ConfigMap `ca-poc` (`/etc/ca-poc`), comme `publier-fermeture`. Le volume est un volume éphémère du pod, de la même classe par défaut que le `volumeClaimTemplate` de Tekton (lecture : aucune `storageClassName` dans les deux).
+- La clé de Rocky est prise dans l'image (`/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9`), et non livrée : la même clé signe les `repomd.xml` de vault 9.7 et de Rocky 9.8 (signataire `21CB256A…` des deux, mesuré, `s1-3-hote.log`) ; que le fichier de l'image soit cette clé est à vérifier par l'essai.
+- Non couvert par l'essai : la liste reçue en paramètre de Tekton (ici, un fichier livré par `kubectl exec`), et `publier-fermeture`.
+- `rpm -K` est gardé dans l'essai, en plus du sha256 fixé par fichier ; la décision de le garder dans la tâche signée se prendra sur la mesure (durée, sans root).
+
+## `prealables` (hôte, hors ligne)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| PA1 | Verrou `b6d0f8f1…` | Haute |
+| PA2 | Pour BaseOS, AppStream, CRB et extras de vault 9.7 : `repomd.xml` signé par `21CB256A…`, `primary.xml.gz` égal à `repomd.xml`, primary décompressé égal à celui du cache de `s1.sh` | Haute : mêmes fichiers que `hote97` ; leur présence dans le cache n'est pas relevée (le cache n'est pas listé) |
+| PA3 | Liste de 222 lignes, 0 URL absente, 0 doublon ; collecte : 222 rpm, 0 écart | Haute : la collecte a mesuré l'égalité aux primary |
+| PA4 | `resultats/m4b-liste.txt` écrit ; 222 lignes, total des tailles égal aux 222 rpm de la collecte | Haute |
+| PA5 | Les deux scripts du pod passent `sh -n` (dash) | Haute (banc) |
+
+## `essai` (pod d'essai, rien dans Zot)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| E1 | Pod admis en dry-run serveur | Moyenne : premier volume éphémère dans `builds` ; neuf ValidatingPolicy et Pod Security non essayés sur cette forme |
+| E2 | Pod prêt sur un nœud `zone=build`, sans `runtimeClassName` (runc) | Moyenne : image tirée de `essais-05/` par le nœud, mesurée en M3 sous Kata seulement |
+| E3 | `id` : uid 65532 ; volume inscriptible sous le `subPath` | Moyenne : `prefetch-deb` écrit en 65532 sous un `subPath` (S4b), mais avec un `volumeClaimTemplate` de Tekton |
+| ES1 | Sonde : uid 65532 ; volume inscriptible | Moyenne : voir E3 |
+| ES2 | Sonde : `cmp` et `diff` absents ; `curl`, `rpm`, `createrepo_c`, `skopeo`, `gpg`, `find`, `du`, `awk`, `comm` présents | Haute : liste des paquets de la racine (`s1-racine.log`) |
+| ES3 | Sonde : clé de l'image présente, empreinte `21CB256A…` par `gpg`, identifiant court `350d275d` | Haute : `rocky-gpg-keys-9.8` dans la racine ; même signataire pour 9.7 et 9.8 |
+| ES4 | Sonde : les deux formes de CA lisent le manifeste `f0ccf105…` en anonyme | Moyenne : lecture anonyme mesurée depuis l'hôte (R8 de M4a), jamais depuis un pod runc |
+| E4 | Passage p1 : 222 téléchargés et contrôlés ; clé de Rocky conforme ; `rpm -K` 222 OK sur 222 sans root ; `createrepo_c` rc 0 ; `skopeo copy` anonyme rc 0, manifeste `f0ccf105…` ; 233 fichiers (222 rpm, 7 de `repodata`, 4 du dossier `dir:`) | Moyenne : jamais joué sans root ; `--src-cert-dir` jamais utilisé |
+| E5 | Passage p2 : de même | Moyenne, si E4 tient |
+| E6 | p1 et p2 égaux hors `repodata` (226 fichiers) | Haute, si E4 et E5 tiennent |
+| E7 | `repodata` par défaut différents entre p1 et p2 | Haute : `repomd.xml` a déjà différé entre `voie2` et `collecte` (mesuré) |
+| E8 | V1 (rpm datés à 0, `--compatibility --revision 0 --set-timestamp-to-revision`) : les deux options existent dans `createrepo_c` de l'image, et les deux copies donnent les mêmes `repodata` | Faible : options de mémoire, jamais relues ni essayées |
+| E9 | V2 (V1 et `--no-database`) : deux copies égales, trois fichiers de moins (bases sqlite) | Faible : de même |
+| E10 | Pod supprimé à la fin, avec son volume éphémère (une PVC et son volume) ; rien écrit dans Zot | Haute |
+| E11 | Durée d'un passage sous 300 s | Moyenne : 61 s de téléchargement en M2, sous Kata |

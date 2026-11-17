@@ -1,0 +1,17 @@
+KO   nominal, passage p1 : code 0, attendu 0 ; sortie : skopeo copy --preserve-digests : en 0 s ; manifeste sha256:659f7e41827e76690689ec414bf5796252f555ba52b34ecadabf1056cfe325f9 fermeture : 8 fichiers, 193 octets 
+KO   gpg absent : identifiant court seul (PATH sans gpg) : code 1, attendu 0 ; sortie : téléchargés et contrôlés (sha256, taille) : 3 KO   empreinte de la clé de l'image :  
+OK   sha256 faux refusé (code 1)
+OK   taille fausse refusée (code 1)
+OK   nom en double refusé (code 1)
+OK   fichier absent du dépôt (HTTP 404) refusé (code 1)
+OK   signature d'un rpm refusée (code 1)
+OK   empreinte gpg fausse refusée (code 1)
+OK   identifiant court faux refusé (code 1)
+OK   manifeste différent refusé (code 1)
+OK   createrepo_c absent refusé (code 1)
+OK   p1 et p2 égaux hors repodata
+OK   repodata par défaut différents
+OK   aide de createrepo_c relevée
+OK   V1 : deux copies, repodata égaux
+OK   V2 : deux copies, repodata égaux, sans base sqlite
+bilan : 14 OK, 2 KO

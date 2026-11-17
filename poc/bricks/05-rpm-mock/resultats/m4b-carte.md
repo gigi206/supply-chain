@@ -88,3 +88,7 @@ Le transport de la liste (point 1). **Recommandation** (relue par le conseiller)
 **Questions de conception de M4b closes.** Restent à mesurer dans le pod d'essai : le runtime (runc, sans root), `repodata` reproductible ou non et les options de `createrepo_c`, la lecture de l'image de bootstrap depuis `essais-05/` par `skopeo` dans un pod de la plateforme. Reste à décider en préparation, avec le conseiller : garder `rpm -K` en plus du sha256 fixé par fichier.
 
 **Suite proposée** : préparer à sec `prealables` (hôte) et `essai` (pod d'essai) de M4b, avec leurs prédictions.
+
+## Note datée du 17/11/2026, 21:32:50 UTC : `prealables` et `essai` préparés à sec (« Oui, prépare-les »)
+
+[`m4b.sh`](../m4b.sh) (`6da65a32…`) ; [prédictions](m4b-predictions.md) PA1 à PA5, ES1 à ES4, E1 à E11 ; banc des scripts du pod 21 OK sur le `PATH` de l'image ([journal](m4b-banc.log)). `diffutils` n'est pas dans l'image d'outillage (liste de `s1-racine.log`) : les comparaisons passent par sha256. Une sonde passe avant les passages et ne s'arrête sur aucun écart. Accord demandé : `prealables` seul ; `essai` aura le sien. Rien lancé.
