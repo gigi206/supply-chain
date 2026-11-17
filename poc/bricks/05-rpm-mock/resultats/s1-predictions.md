@@ -500,3 +500,41 @@ Question : « Je lance amorce ? ». Réponse : « Oui, lance amorce ». Lancée 
 
 Suite, chaque point sur accord nommé : `hote` de nouveau sous un nouveau préfixe (HB1 à HB8, HX1, HX2), `racine` (lire `rpm`
 dans sa liste), `image`, `essais`, `verrou`.
+
+## Troisième passage de `hote` : résultat (note du 2026-11-17, écrite à 2026-11-17T08:33:09Z ; rien n'est réécrit)
+
+Question : « Je lance hote (PREFIXE=s1-3) ? ». Réponse : « Oui, lance hote ». Lancé le 17/11/2026 de 08:30:27 à 08:30:42 UTC
+(`date -u` autour de la commande, et `chrono.tsv`), HEAD `d6d191f`, `s1.sh` `ad16fc99…`. Commande
+`PREFIXE=s1-3 DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/s1.sh hote`, dans `bash -c` : 15 lignes OK, aucune KO. Journal :
+[`s1-3-hote.log`](s1-3-hote.log), sha256 `5f05bd72…`. **Code de retour 0**, lu par `PIPESTATUS` à l'écran, non archivé (le journal
+ne le contient pas) ; il est corroboré par la ligne « 05 S1 hote fait » de `chrono.tsv`, que `lancer` n'écrit qu'après l'étape.
+
+| | Mesure | Verdict |
+|---|---|---|
+| HB1 | `sample-app-1.0.0.tar.gz` et `sample-app.spec` : OK | Tenue |
+| HB2 | Clés aux sha256 `3a66e521…` (Rocky) et `fcf0eab4…` (EPEL) ; empreinte de Rocky égale à `FP_ROCKY` ; `FF8AD134…` présente sur la page d'EPEL | Tenue |
+| HB3 | vault 9.7 BaseOS, AppStream, CRB signés par la clé de Rocky ; repomd.xml `fa6d5054…`, `06f01d40…`, `3936113e…` | Tenue |
+| HB4 | pub 9.8 BaseOS et AppStream signés par la clé de Rocky ; repomd.xml `abac8b17…` et `a3ca4230…` | Tenue |
+| HB5 | EPEL 9 : `repomd.xml.asc` absent ; repomd.xml `8190707a…`, primary `b81a3880…` contrôlé par repomd | Tenue |
+| HB6 | podman 5.8.2-8.el9_8 `561d6e4d…`, skopeo 1.22.2-9.el9_8 `c6cca7fe…`, dans AppStream 9.8 | Tenue |
+| HB7 | mock 6.9-1.el9 `a5043350…`, mock-core-configs 45.2-1.el9 `84f19c05…`, dans EPEL 9 | Tenue |
+| HB8 | Code 0, aucune KO | Tenue |
+| HX1 | vault 9.7 `extras` : repomd.xml signé par `FP_ROCKY` ; sha256 `54ec0c53…` | Tenue |
+| HX2 | 15 lignes OK, dont 4 pour vault 9.7 ; aucune KO ; HB1 à HB8 tenues | Tenue |
+
+- **Écart avec le passage du 16/11** ([`s1-2-hote.log`](s1-2-hote.log)) : l'en-tête, les deux lignes d'EPEL (repomd.xml
+  `73fd2581…` → `8190707a…`, primary `ccc17999…` → `b81a3880…`), et les deux lignes d'`extras`, ajoutées par le correctif. Toutes
+  les autres lignes sont égales.
+- **Non prédit** : le repomd.xml d'`extras` (`54ec0c53…`) est égal à celui du relevé `releve7` du 12/11/2026 à 17:54:37 UTC
+  ([m2-releve7.log](m2-releve7.log), ligne 37). Les repomd.xml de pub 9.8 (`abac8b17…`, `a3ca4230…`) sont égaux à ceux des relevés
+  du 12/11 ([`s1-hote.log`](s1-hote.log)) et du 16/11 : trois relevés égaux, rien n'est dit de l'entre-deux.
+- **EPEL 9** : son repomd.xml a une somme différente à chacun des trois relevés : `454b0238…` le 12/11, `73fd2581…` le 16/11,
+  `8190707a…` le 17/11.
+- **Pour `racine`** (lecture du code, non exécuté) : `depot_hote` écrit dans `$T`, hors du dépôt, `<dépôt>.repomd.sha256` et
+  `<dépôt>.primary.xml`. Les six fichiers de baseos98, appstream98 et epel9 sont non vides après ce passage, et les trois sommes valent
+  celles du journal (vérifié par le script qui écrit cette note). `racine` compare, pour ces trois dépôts, le repomd lu par dnf dans le pod à ces sommes
+  (`attendu`, lignes 324 à 326 de `s1.sh`, sous `set -euo pipefail`). Si pub 9.8 ou EPEL changent avant `racine`, ce contrôle
+  devrait donc s'arrêter en KO, et `hote` serait à rejouer sous un préfixe neuf.
+- Rien n'a touché le cluster ni Zot.
+
+Suite, chaque point sur accord nommé : `racine` (lire `rpm` dans sa liste), `image`, `essais`, `verrou`.
