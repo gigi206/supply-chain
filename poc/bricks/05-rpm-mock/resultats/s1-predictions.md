@@ -2814,3 +2814,43 @@ comparé à la liste de `collecte` : chemin, taille et sha256 (lecture du code).
 
 Suite : accord de lancement de `m3_build1`. C'est le premier pod au label `construire-rpm` : il mesurera l'effet de la
 politique (témoins), puis le build sans réseau. Rien d'autre n'est lancé.
+
+## Étape `m3_build1` passée (note du 2026-11-17, écrite à 2026-11-17T20:13:41Z ; rien n'est réécrit)
+
+Décision du propriétaire : question « Je lance m3_build1 (pod Kata, témoins puis build sans réseau) ? », réponse « Oui,
+lance-le ». Lancée le 17/11/2026 de 20:09:09 à 20:12:37 UTC (`date -u` avant et après, `chrono.tsv`), code 0, `s1.sh`
+`06c2da46…` ([journal](s1-m3_build1.log), [journaux de mock](s1-m3_build1-mock.log)). **`mock --hermetic-build` a construit
+sample-app dans un pod dont les quatre témoins (DNS, adresse publique, Zot, API) n'ont reçu aucune réponse**, depuis la
+fermeture restaurée par digest.
+
+| # | Tenue ? | Mesure |
+|---|---|---|
+| BD1 | Oui | Fermeture restaurée 1 conforme (235 fichiers), verrou `b6d0f8f1…`, manifeste `f0ccf105…` ; politique relue, aucune autorisation ; spec admise en dry-run serveur ; pod `s1-05-m3-1` prêt ; label `construire-rpm` relu dans le cluster |
+| BD2 | Oui | Codes DNS, public (`199.232.170.132:443`), Zot (`192.168.161.13:5000`), API (`10.43.0.1:443`) : « 124 124 124 124 » ; le DNS a rendu 124, l'une des deux valeurs prédites |
+| BD3 | Oui | Tar de 319 283 200 octets en 5 morceaux, sha256 conforme ; fiche des sommes (26 272 octets) en 1 morceau ; déballage puis livraisons passés (sources « rc 0 ») |
+| BD4 | Oui | « fermeture revérifiée dans le pod : rc 0 ; fichiers 235 ; lignes de la liste 235 » ; verrou et manifeste égaux ; mock de la fermeture et de l'image : `mock-6.9-1.el9.noarch`, même `SHA256HEADER` `af027935…` |
+| BD5 | Oui | **`mock --hermetic-build` rc 0 en 78 s**, sous 2 min |
+| BD6 | Oui | « Using container image: dir: », « Checking image digest: 18d64b03… » et « Not updating bootstrap chroot » : 1 dans la sortie et 1 dans `root.log` ; repli, écart de digest et « No space left on device » : 0 |
+| BD7 | Oui | `installed_pkgs.log` : 222 lignes ; 222 lignes « paquet » relues par `rpm --root` (comparaison au verrou : `m3_comparaison`) |
+| BD8 | Oui | src.rpm `c802e60a…` et rpm `864d55f4…`, égaux à ceux d'`hermetique` ; `BUILDHOST reproducible`, `BUILDTIME 1794787200` ; rapatriés, sha256 égaux à la sonde |
+| BD9 | Oui | `/w` : 312 268 kB utilisés avant mock, 1 456 500 kB après ; quatre journaux archivés en entier (3 620 lignes) ; pod supprimé (`kubectl get pod` : « NotFound » à 20:13:03 UTC, vu à l'écran, non archivé) ; code 0 en 208 s |
+
+**Lecture** :
+- Le témoin positif de `m3_temoin` a rendu 0 pour les mêmes outils, la même image et les trois premières cibles. Les quatre
+  « 124 » de ce pod sont donc attribués à `construction-rpm-sans-sortie` : aucune réponse dans les 10 s. Les témoins ont été
+  joués avant mock, pas pendant ; pendant le build, la coupure repose sur la politique.
+- Aucune ligne `http://` ni `https://` dans la sortie de mock, dans `root.log` ni dans `build.log`, archivés en entier.
+- Pas de pari tranché :
+  - 4 lignes `installroot` dans `root.log`, de la forme `'/usr/bin/dnf-3', '--installroot', '/w/b1/mock-h/hermetic-build/root/'`
+    (deux arguments), comme lu dans `package_manager.py:238` ;
+  - c'est la première fois que cette forme est vue dans un vrai `root.log`.
+- Durée de mock : 78 s, contre 47 s à `hermetique` (réseau présent, autre pod). La cause n'est pas mesurée.
+- Le NEVRA lu par `rpm -qp --qf %{NEVRA}` vaut `sample-app-1.0.0-2.el9.x86_64` aussi pour le src.rpm. C'est la forme de
+  cette requête ; elle sera comparée telle quelle entre les deux builds.
+- `resultdir` contient aussi `hw_info.log` et `state.log`, non archivés.
+- Invité : noyau 6.18.56, 3 vCPU.
+- Les occurrences de `/tmp/` du journal de mock sont des chemins du chroot et du pod (`ccache`, `rpm-tmp`) : aucun chemin de
+  l'hôte. Une ligne y est masquée par le filtre jeton/token.
+
+Un seul build est fait : le critère de M3 (deux builds identiques) attend `m3_build2` et `m3_comparaison`. Suite : accord de
+lancement de `m3_build2`. Rien d'autre n'est lancé.
