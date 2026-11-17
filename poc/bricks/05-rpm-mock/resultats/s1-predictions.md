@@ -1418,3 +1418,71 @@ forcément le nécessaire. Aucun argument de sécurité n'est retenu pour `rocky
 - archiver `rpm -q --requires python3-dnf-plugins-core`, qui répondra à la question des `Requires` sans téléchargement à part.
 
 Suite : préparation à sec de l'étape de construction. Rien n'est lancé, rien n'est écrit dans Zot.
+
+## Image dérivée : trois étapes préparées à sec (note du 2026-11-17, écrite à 2026-11-17T14:18:41Z ; rien n'est réécrit), NON APPLIQUÉ
+
+Décision du propriétaire : question « Je prépare à sec le correctif des trois étapes ? », réponse « Oui, prépare-le ».
+
+**Correction de la note de décision précédente.** Elle annonçait une étape de construction « avec deux accords ». Il en faut
+trois, un par lancement : `hote97` (hôte seul, téléchargement de métadonnées publiques de vault 9.7), `boot_racine` (pod, rien
+poussé) et `boot_image` (écriture dans Zot). `hote97` est une étape à part et non un rejeu de `hote`, qui réécrirait les relevés
+de 9.8 et d'EPEL liés à `racine.tar`.
+
+**Correctif** : [`../s1-derivee.patch`](../s1-derivee.patch) (sha256 `cec93810…`), insertions seules (en-tête 10 lignes,
+variables 7, étapes 206), produit par [`s1-derivee-modifier.py`](s1-derivee-modifier.py) ; copie bancée `ee611aac…`.
+- `hote97` : clé de Rocky relue (empreinte), puis `depot_hote` pour BaseOS, AppStream, CRB et extras de vault 9.7 (repomd.xml
+  vérifié par gpgv, primary contrôlé par repomd), comparés au relevé de `hote`. Pour chacun des dix paquets, dépôt et sha256 tirés
+  du primary, avec arrêt si l'un manque ou porte deux empreintes ; `Requires` de `python3-dnf-plugins-core` affichés.
+- `boot_racine` : pod de l'image d'essai ; racine de `rockylinux:9.7` copiée depuis `podman image mount` (le montage n'est jamais
+  écrit) ; `dnf-3 --installroot` des dix NEVRA exacts, avec `--setopt=reposdir=/w/aucun` en ligne de commande et
+  `dnf97.conf` (quatre dépôts de vault 9.7 en baseurl fixes, `gpgcheck=1`, `repo_gpgcheck=1`, `best=1`, `install_weak_deps=0`).
+  Sont affichés : la transaction, les rpm téléchargés et leur sha256, `rpm -K`, `gpg-pubkey` avant et après, les listes
+  `rpm -qa` complètes avant et après et leurs différences, et les `Requires` du greffon installé. Avant l'archive, la sonde ne
+  retire que `/w` de la racine, seul dossier qu'elle y ajoute ; `var/cache/dnf` de l'image de base est gardé (base plus dix
+  paquets) et son nombre d'entrées est affiché. Sur l'hôte, l'archive ne sort du pod que si les quatre repomd sont égaux à ceux de
+  `hote97`, si `rpm -K` donne « 10 OK sur 10 » et si les rpm téléchargés sont exactement les dix de `hote97`, empreintes
+  comprises. Le pod est retiré à chaque arrêt décidé après la sonde ; un échec de `pod_demarrer` ou de `livrer` sort sans retrait
+  (`set -e`). Aucune archive d'un passage précédent ne survit : elle est effacée au début de l'étape.
+- `boot_image` : vérifie que l'archive a le sha256 noté par `boot_racine`, puis `crane append` d'une couche pleine vers
+  `essais-05/rocky9-bootstrap:<PREFIXE>`, `crane mutate` (plateforme `linux/amd64`, annotations
+  `org.opencontainers.image.base.name` et `.base.digest` = `ee90dc0e…`). Le dépôt sera définitif : Zot n'autorise pas la
+  suppression. Lecture anonyme : dans [`zot.json`](../../08-trust-plane/stockage/zot.json) du dépôt, le motif `**` porte
+  `anonymousPolicy` `read`, qui couvre `essais-05/**` (lecture de la configuration commitée ; la configuration déployée n'est pas
+  relue, et aucun podman de pod n'a encore tiré un dépôt `essais-05/`).
+
+**Lu ou vérifié pendant la préparation, sans lancement** :
+- L'image d'essai n'a pas `/usr/bin/dnf`, seulement `/usr/bin/dnf-3` (`tar -tf` de `racine.tar`, `d7433a05…`).
+  [`s1-racine.log`](s1-racine.log) cite `python3-dnf-4.14.0-34.el9_8.rocky.0.1` et aucun rpm `dnf` ; que `dnf-3` vienne de
+  `python3-dnf` est une déduction, non lue. La sonde appelle donc `dnf-3`, comme mock. La
+  première copie (`99440237…`) appelait `dnf` : ce défaut du correctif a été vu à la relecture, pas par le banc, dont la
+  doublure s'appelait alors `dnf`. Les autres commandes de la sonde sont toutes dans `/usr/bin` de `racine.tar` (section I).
+- `rocky-9.tpl` complet de mock 6.9-1 (archive de M2, `3c034916…`) : pas de `tsflags` ; `best=1` et `install_weak_deps=0` ;
+  dépôts actifs baseos, appstream, crb et extras. `dnf97.conf` reprend ces options et ces quatre dépôts.
+- `crane` 0.20.6 : `mutate` accepte `-a, --annotation` (aide de la commande).
+
+**Banc** [`s1-derivee-banc.sh`](s1-derivee-banc.sh), sections A à I, sans réseau extérieur (un registre crane en loopback pour G) :
+- passage final le 17/11/2026 à 14:17:56 UTC sur la copie `ee611aac…`, python3 3.13.12 : tenu, 151 OK
+  ([journal](s1-derivee-banc.log)) ; shellcheck : 15 remarques sur le dépôt, 17 sur la copie, aucune de niveau warning ou au-dessus ;
+- N3/N4 ([`s1-n34-banc.sh`](s1-n34-banc.sh), inchangé) sur la même copie à 14:17:59 UTC : tenu, 35 OK
+  ([journal](s1-derivee-banc-n34.log)) ;
+- passages précédents, archivés :
+  - 14:07:45 UTC, copie `99440237…` : NON TENU, 4 KO, tous des défauts du banc (lignes préfixées du journal de `verrou_brut` non
+    lues, motif de fonction trop strict) ([journal](s1-derivee-banc-passage1.log)) ;
+  - 14:07:58 UTC, même copie : tenu, 117 OK, sur la copie qui appelait encore `dnf` ([journal](s1-derivee-banc-passage2.log)) ;
+  - 14:12:45 UTC, copie `05cc0086…`, banc étendu (G2, H, I) : NON TENU, 15 KO, tous des défauts du banc (motif `dnf` qui prenait
+    un commentaire, catalogue vide de crane écrit `null` et non `[]`, sonde non chargée dans le harnais de H)
+    ([journal](s1-derivee-banc-passage3.log)). Dans ce passage, un contrôle de H1 a passé à tort en comparant deux chaînes vides ;
+    il a été resserré pour le passage suivant ;
+  - 14:13:09 UTC, copie `05cc0086…` : tenu, 149 OK ([journal](s1-derivee-banc-passage4.log)), et N3/N4 à 14:13:26 UTC : tenu,
+    35 OK ([journal](s1-derivee-banc-n34-passage1.log)). Cette copie retirait aussi `var/cache/dnf` de la racine ; la relecture a
+    jugé que ce dossier pouvait venir de l'image de base : le retrait est abandonné, d'où la copie `ee611aac…`.
+- Le banc et le modificateur archivés sont les versions finales ; les versions intermédiaires ne sont pas gardées.
+- **Bornes** : 151 OK sur des doublures, sans vrai dnf, rpm ou podman, sans kubectl, sans vault 9.7 et sans Zot. G ne montre la
+  plateforme et les annotations que sur une archive factice de 10 240 octets, en loopback. Le passage en loopback avec la vraie
+  archive reste à faire entre `boot_racine` et l'accord d'écriture dans Zot.
+
+**Non lus, à mesurer** : qu'un `dnf install` d'un NEVRA exact fasse la montée de version d'un paquet présent ; qu'un dnf de 9.8
+en `--installroot` donne le même état que le dnf du bootstrap dans le chroot ; si dnf importe la clé dans la racine
+(`gpg-pubkey`) ; les `Requires` réels du greffon (lus par `hote97`).
+
+Suite : appliquer `s1-derivee.patch` à `s1.sh` sur accord. Rien n'est lancé, rien n'est écrit dans Zot.
