@@ -1,0 +1,81 @@
+# banc-brut.sh, 2026-11-17T13:14:15Z
+# s1.sh du dépôt 5ccba38e5e572ccfb457d21e53ca89e815668d049d984ddf202531634aec9a60 ; copie modifiée c86589c426cf9aec527b1f08ef553559fe43e8cdbc0a3f3aa1c7315ecda606dd
+## A : insertions seules
+OK   lignes retirées : 0
+OK   blocs insérés : 2
+OK   copie sans les blocs insérés égale au dépôt
+     en-tête inséré : 4 lignes ; bloc inséré : 80 lignes
+## B : syntaxe et shellcheck
+OK   bash -n de la copie
+     remarques shellcheck : dépôt 13, copie 15
+     diff shellcheck : 2c2
+     diff shellcheck : <       6 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+     diff shellcheck : ---
+     diff shellcheck : >       8 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+OK   remarques shellcheck SC1112 (guillemet typographique) dans la copie : 0
+OK   remarques shellcheck de niveau error dans la copie : 0
+## C : sonde de verrou_brut
+     variables extraites : 3
+OK   marqueurs @ restants : 0
+OK   --no-cleanup-after : 1
+OK   ligne du calcul : 1
+OK   libellé image brute : 1
+OK   configuration prête absente : 0
+OK   lignes changées contre verrou (même configuration) : 4
+     20c20
+     < r=$?; echo "mock --buildsrpm (image prête) : rc $r en $(($(date +%s) - t)) s"
+     ---
+     > r=$?; echo "mock --buildsrpm (image brute) : rc $r en $(($(date +%s) - t)) s"
+     25c25
+     < mock -r poc-rocky-9.7-x86_64 --isolation=simple --resultdir=/w/res-verrou --calculate-build-dependencies "$s" > /w/verrou-calc.log 2>&1
+     ---
+     > mock -r poc-rocky-9.7-x86_64 --isolation=simple --resultdir=/w/res-verrou --calculate-build-dependencies --no-cleanup-after "$s" > /w/verrou-calc.log 2>&1
+OK   sh -n de la sonde rendue
+## D : SONDE_BOOT avec doublures
+OK   marqueurs @ restants (SONDE_BOOT) : 0
+OK   sh -n de SONDE_BOOT rendue
+OK   code de SONDE_BOOT : 0
+     bootstrap préparé par mock : 1 chemin(s) pour <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap*/root ; retenu : <banc>/w/mock/poc-rocky-9.7-x86_64-bootstrap/root
+     bootstrap préparé par mock : rpm -qa rc 0, 3 ligne(s)
+     podman pull de rockylinux:9.7 brut : rc 0 en 0 s
+     podman image mount : rc 0
+     rockylinux:9.7 brut : rpm -qa rc 0, 3 ligne(s)
+     seulement dans le bootstrap de mock : python3-dnf-plugins-core.noarch 0:4.3.0-24.el9 RSA/SHA256, k 702d426d350d275d
+     seulement dans rockylinux:9.7 brut : yum.noarch 0:4.14.0-31.el9 RSA/SHA256, k 702d426d350d275d
+     lignes communes : 2
+     capacité de /w : 32123936 kB ; utilisés : 3991836 kB
+OK   seulement dans le bootstrap : 1
+OK   seulement dans rockylinux:9.7 brut : 1
+OK   lignes communes : 2
+OK   chemin du bootstrap retenu : 1
+OK   ligne df en fin de SONDE_BOOT : 1
+OK   code sans bootstrap : 0
+OK   bootstrap absent signalé : 1
+## E : résumé du verrou
+OK   résumé, verrou 1 : 0
+     version du verrou : 1.1.0
+     options de configuration recopiées : bootstrap_image, bootstrap_image_ready, macros
+     bootstrap_image enregistré : r:5000/x@sha256:0
+     bootstrap_image_ready enregistré : False
+     macros recopiées : oui
+     bootstrap, champs : architecture, image_digest, pull_digest
+     bootstrap, pull_digest (digest du manifeste tiré) : sha256:1
+     bootstrap, image_digest (sha256 de RootFS et Config, podman.py:21) : sha256:2
+     bootstrap, architecture : amd64
+     rpm du buildroot : 2 ; champs : name, signature, url
+     rpm avec url : 1 sur 2
+     préfixes des url : dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/a
+     valeurs distinctes de signature : 2 ; 350d275d, None
+OK   rpm avec url (verrou 1) : 1
+OK   préfixe (verrou 1) : 1
+OK   résumé, verrou 2 : 0
+OK   bootstrap vide signalé (verrou 2) : 1
+OK   JSON cassé : sous-shell set -e : 0
+OK   JSON cassé : échec signalé, étape poursuivie : 1
+OK   résumé non fatal dans la copie : 1
+OK   ordre : sonde, SONDE_BOOT, journaux, résumé, retrait
+OK   fin de verrou-calc.log archivée : 1
+## F : étape connue de lancer
+OK   fonction etape_verrou_brut : 1
+OK   nom du pod conforme (minuscules, chiffres, tirets) : 1
+# bilan : tenu, fin 2026-11-17T13:14:16Z

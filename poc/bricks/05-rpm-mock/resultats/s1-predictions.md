@@ -1113,3 +1113,66 @@ Retiré : le pod `s1-05-verrou`. La suppression est demandée en fin d'étape (`
 12:49:04 UTC répond NotFound (vu à l'écran, non archivé). Rien n'est écrit dans Zot.
 
 Suite : l'image de bootstrap prête est une décision du propriétaire, avant toute nouvelle étape `verrou`.
+
+## Image de bootstrap : décisions, et étape `verrou_brut` préparée à sec (note du 2026-11-17, écrite à 2026-11-17T13:16:28Z ; rien n'est réécrit ; NON APPLIQUÉ)
+
+Deux décisions du propriétaire, prises le 17/11/2026 :
+- Question : « D'où doit venir l'image de bootstrap prête pour M2 ? ». Options présentées : une image dérivée de
+  `rockylinux:9.7` (`ee90dc0e…`) avec `python3-dnf-plugins-core` de vault 9.7 ; ou reporter M2. AlmaLinux a été écartée : aucun
+  verdict dans docs/04. Pour mémoire, `almalinux-9.tpl:7` de mock-core-configs la déclare prête ; c'est une lecture de code, son
+  contenu n'est pas mesuré. Réponse : « Image Rocky dérivée », lue avant 13:02:14 UTC (premier `date -u` qui la suit).
+- Question : « Je mesure d'abord le verrou sur l'image brute, avant de dériver ? ». Réponse : « Mesurer d'abord », lue avant
+  13:07:55 UTC (premier `date -u` qui la suit).
+
+**Lecture de code** (mock 6.9, archive `3c034916…`), **non mesurée** :
+- Le greffon `buildroot_lock` attache l'écriture du verrou au crochet `postdeps` (`buildroot_lock.py:28`). De `:30` à `:117`,
+  `bootstrap_image_ready` est recopié (`:94`), jamais exigé. Le refus vient plus tard, de `--hermetic-build` (`config.py:824`).
+  Avec `bootstrap_image_ready = False`, le calcul devrait donc écrire un verrou, inutilisable en mode hermétique.
+- Avec `use_bootstrap_image` vrai (`:105`), le verrou interroge l'image par podman (`:110`), et seule `PodmanError` est
+  attrapée (`:112`). D'après la lecture, c'est le même chemin qu'avec une image prête. La question de l'`inspect` après le
+  `rmi` (note de `verrou`) s'y pose donc aussi.
+- `cleanup_on_success` vaut `True` par défaut (`config.py:128`). `rebuild.py:32` à `:34` nettoie alors en fin de passage, et
+  `--no-cleanup-after` le met à `False` (`config.py:658` à `:660`).
+- Le champ `signature` du verrou vient de `%{sigpgp:pgpsig}` (`installed_packages.py:62` à `:64`).
+
+**Correctif** : [`../s1-verrou-brut.patch`](../s1-verrou-brut.patch), insertions seules (4 lignes d'en-tête, 80 lignes avant
+l'appel de `lancer`), sha256 `c29d5be7…`. Copie modifiée de `s1.sh` : sha256 `c86589c4…`, écrite par
+[`s1-verrou-brut-modifier.py`](s1-verrou-brut-modifier.py) à partir de `5ccba38e…`. `SONDE_VERROU` et `etape_verrou` ne changent
+pas. L'étape `verrou_brut` :
+- démarre le même type de pod (`s1-05-verrou-brut`, image d'essai `99790c13…`) et livre les mêmes fichiers ;
+- passe `SONDE_VERROU` avec `$CFG` (`bootstrap_image_ready = False`) au lieu de `$CFG_PRET`. Deux lignes seulement diffèrent
+  du rendu de `verrou` avec la même configuration : le libellé « (image brute) », et `--no-cleanup-after` sur le calcul ;
+- lance `SONDE_BOOT`. Elle cherche le bootstrap gardé par mock (motif `-bootstrap*/root`, chemin retenu affiché, car le chemin
+  sans `uniqueext` n'est relevé dans aucun journal). Elle lit `rpm -qa` de ce bootstrap, puis de `rockylinux:9.7` brut, tiré par
+  digest et monté. Elle affiche ensuite les lignes propres à chacun, avec deux étiquettes de signature (`sigpgp` et
+  `rsaheader`), et finit par `df -k /w` ;
+- archive les journaux : `root.log` et `build.log` (400 dernières lignes) et la fin de `verrou-calc.log`, masqués ;
+- archive le verrou s'il existe, puis le résume. Le résumé dit si le champ `bootstrap` est vide et compte les `url`, avec leurs
+  préfixes et les valeurs de `signature`. Il ne peut pas arrêter l'étape (`|| echo`), car cette branche n'a jamais tourné en vrai ;
+- retire le pod. Journaux distincts : `s1-verrou_brut.log`, `s1-verrou_brut.json`, `s1-verrou_brut-mock.log`. Rien n'est
+  écrit dans Zot.
+
+**Bancs** (hors réseau, ni cluster ni Zot) :
+- [`s1-verrou-brut-banc.sh`](s1-verrou-brut-banc.sh), quatre passages :
+  - 13:11:05 UTC, copie `130069f6…` : non tenu, journal écrasé, **non archivé**. Deux KO venaient du banc (fin de ligne du rendu
+    de comparaison, motif de la doublure `rpm`). Shellcheck a aussi relevé deux apostrophes typographiques dans le texte de la
+    sonde (SC1112), remplacées.
+  - 13:11:22 UTC, copie `937d3f0b…` : tenu ([journal](s1-verrou-brut-banc-passage2.log)). Le conseiller a ensuite demandé cinq
+    corrections : résumé non fatal et placé après `SONDE_BOOT` et les journaux ; étiquette `rsaheader` en plus ; chemin du
+    bootstrap par motif ; fin de `verrou-calc.log` archivée ; `df -k /w` en fin de `SONDE_BOOT`.
+  - 13:14:07 UTC, copie `c86589c4…` : un KO venu du banc, la substitution de `/w` qui manquait `df -k /w`
+    ([journal](s1-verrou-brut-banc-passage3.log)).
+  - 13:14:15 UTC, même copie : tenu, 35 OK ([journal](s1-verrou-brut-banc.log)).
+- Banc N3/N4 de la note N3/N4 ([`s1-n34-banc.sh`](s1-n34-banc.sh)) rejoué tel quel sur `c86589c4…` à 13:14:32 UTC : tenu, 35 OK
+  ([journal](s1-verrou-brut-banc-n34.log)).
+- Dans les journaux archivés, le dossier de travail du banc est remplacé par `<banc>`.
+- Les versions et signatures des doublures (par exemple `python3-dnf-plugins-core` 4.3.0-24.el9) sont **inventées pour le
+  banc** : aucune n'est une valeur relevée.
+- Non couvert : vrai pod, vrai mock, vrai `rpm` (étiquettes de `--qf`), vrai podman, `kubectl`.
+
+**Place sur `/w`, non mesurée pour cet état.** `essais` a mesuré une capacité de 3 059 832 kB, et 1034 Mo occupés après le build
+`simple` avant son nettoyage ([`s1-essais.log`](s1-essais.log)). `verrou_brut` garde le buildroot et le bootstrap
+(`--no-cleanup-after`), puis tire une seconde fois `rockylinux:9.7`. La ligne `df` finale le mesurera.
+
+Suite : appliquer le correctif à `s1.sh` sur accord, puis écrire les prédictions de `verrou_brut`, puis demander l'accord de
+lancement. Rien n'est lancé.

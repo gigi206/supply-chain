@@ -308,3 +308,8 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 - `--buildsrpm` passe en 50 s, avec le même src.rpm qu'`essais` ;
 - `--calculate-build-dependencies` échoue en 6 s : le dnf de `rockylinux:9.7` brut n'a pas la commande `dnf builddep` (greffon `dnf-plugins-core`) ; aucun verrou n'est produit.
 - **Conséquence pour cet ADR** : l'isolation n'est pas en cause. Le verrou et le mode hermétique demandent au moins une image de bootstrap qui contient `builddep` (nécessaire, pas suffisant : la suite du calcul n'a pas été atteinte) ; son origine reste à décider. Rien n'est mesuré sur le mode hermétique.
+
+**Additif du 17/11/2026, 13:16 UTC : origine de l'image de bootstrap prête** (brique 05, S1, [note](../../poc/bricks/05-rpm-mock/resultats/s1-predictions.md)). Deux décisions du propriétaire :
+- « Image Rocky dérivée » : l'image prête sera `rockylinux:9.7` (`ee90dc0e…`) plus `python3-dnf-plugins-core` de vault 9.7. Elle garde la même base, la même clé (`350d275d`) et le même dépôt. AlmaLinux est écartée, faute de verdict dans docs/04.
+- « Mesurer d'abord » : avant de construire, un calcul avec `bootstrap_image_ready = False` sur l'image brute. Il doit mesurer ce qu'une image dérivée ne corrigerait pas, et les paquets que mock ajoute lui-même. L'étape `verrou_brut` est préparée à sec, NON APPLIQUÉE, rien n'est lancé.
+- **Conséquence pour cet ADR** : aucune pour l'instant ; l'isolation reste `simple`, celle qu'`essais` a vue construire.

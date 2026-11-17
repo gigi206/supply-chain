@@ -1,0 +1,101 @@
+"""Copie modifiée de s1.sh : étape verrou_brut (décision « Mesurer d'abord »), insertions seules. Assertions.
+Usage : python3 -I modifier.py <s1.sh du dépôt> <copie à écrire>"""
+import hashlib, sys
+src, dst = sys.argv[1:3]
+s = open(src, encoding='utf-8').read()
+assert hashlib.sha256(s.encode()).hexdigest() == '5ccba38e5e572ccfb457d21e53ca89e815668d049d984ddf202531634aec9a60'
+assert 'verrou_brut' not in s and 'SONDE_BOOT' not in s
+ancre = "# Les replis (stockage vfs, mock non root, bootstrap sans image) ne sont pas lancés ici"
+assert s.count(ancre) == 1
+entete = (
+"#   verrou_brut (../s1-verrou-brut.patch, préparé à sec le 17/11/2026 à partir de 13:09:43 UTC, NON APPLIQUÉ ; décision du\n"
+"#               propriétaire « Mesurer d'abord ») : comme verrou, mais configuration $CFG (bootstrap_image_ready=False) ;\n"
+"#               verrou archivé pour lecture seulement (resultats/s1-verrou_brut.json), puis paquets du bootstrap préparé par\n"
+"#               mock comparés à ceux de l'image brute (SONDE_BOOT) ; rien poussé\n")
+s = s.replace(ancre, entete + ancre)
+fin = 'lancer "$PREFIXE" "05 S1" "$@"\n'
+assert s.endswith(fin) and s.count(fin) == 1
+bloc = r'''# Étape verrou_brut (ajoutée à sec le 17/11/2026 à partir de 13:09:43 UTC, NON LANCÉE ; décision du propriétaire « Mesurer
+# d'abord ») : la sonde de verrou, avec la configuration $CFG (bootstrap_image_ready=False) au lieu de $CFG_PRET. mock installe
+# alors lui-même dnf et builddep dans le bootstrap tiré de rockylinux:9.7 brut, comme à essais, puis calcule. D'après le code
+# (buildroot_lock.py:28 à :117, lecture), le greffon écrit le verrou quel que soit bootstrap_image_ready ; --hermetic-build le
+# refusera (config.py:824) : il est archivé pour lecture, sans suite. Mesure ce qu'une image dérivée ne corrigerait pas (adresse
+# de chaque paquet, podman image inspect après rmi) et, par SONDE_BOOT, les paquets que mock ajoute à l'image brute (base de
+# l'épinglage de l'image dérivée). --no-cleanup-after garde le bootstrap pour SONDE_BOOT (cleanup_on_success, rebuild.py:32).
+# Étiquettes de signature : celle du champ signature du verrou (sigpgp:pgpsig, installed_packages.py:62 à :64) et rsaheader.
+# Ordre : SONDE_BOOT et journaux avant le résumé du verrou, qui ne peut pas arrêter l'étape (branche jamais jouée en vrai).
+# SONDE_VERROU et etape_verrou ne changent pas ; journaux distincts : s1-verrou_brut*.
+SONDE_BOOT='set -u
+Q="%{NAME}.%{ARCH} %{EPOCHNUM}:%{VERSION}-%{RELEASE} sigpgp=%{SIGPGP:pgpsig} rsaheader=%{RSAHEADER:pgpsig}\n"
+set -- /w/mock/@CFG@-bootstrap*/root
+echo "bootstrap préparé par mock : $# chemin(s) pour /w/mock/@CFG@-bootstrap*/root ; retenu : $1"; b=$1
+[ -d "$b" ] || { echo "bootstrap préparé par mock : $b absent"; ls -d /w/mock/* 2>&1 | sed "s/^/dossier de mock : /"; exit 0; }
+rpm --root "$b" -qa --qf "$Q" > /w/boot-mock.brut 2>&1; r=$?; sort /w/boot-mock.brut > /w/boot-mock.txt
+echo "bootstrap préparé par mock : rpm -qa rc $r, $(wc -l < /w/boot-mock.txt) ligne(s)"
+t=$(date +%s); podman pull @BOOT@ > /w/pull-brut.log 2>&1
+r=$?; echo "podman pull de rockylinux:9.7 brut : rc $r en $(($(date +%s) - t)) s"; [ $r = 0 ] || { tail -n 5 /w/pull-brut.log; exit 0; }
+m=$(podman image mount @BOOT@ 2>/w/mount-brut.err); r=$?
+echo "podman image mount : rc $r"; [ $r = 0 ] || { tail -n 3 /w/mount-brut.err; exit 0; }
+rpm --root "$m" -qa --qf "$Q" > /w/boot-image.brut 2>&1; r=$?; sort /w/boot-image.brut > /w/boot-image.txt
+echo "rockylinux:9.7 brut : rpm -qa rc $r, $(wc -l < /w/boot-image.txt) ligne(s)"
+podman image umount @BOOT@ >/dev/null 2>&1
+comm -13 /w/boot-image.txt /w/boot-mock.txt | sed "s/^/seulement dans le bootstrap de mock : /"
+comm -23 /w/boot-image.txt /w/boot-mock.txt | sed "s/^/seulement dans rockylinux:9.7 brut : /"
+echo "lignes communes : $(comm -12 /w/boot-image.txt /w/boot-mock.txt | wc -l)"
+df -k /w | awk "NR == 2 {print \"capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
+true'
+
+etape_verrou_brut() {
+  local d img n=s1-05-verrou-brut f
+  d=$(cat "$T/image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape image" >&2; exit 1; }
+  img=$REG/$DEPOT_ESSAI@$d
+  echo "image : $img ; isolation : $ISOLATION ; configuration : $CFG (bootstrap_image_ready=False)"
+  pod_spec "$n" "$img"
+  pod_demarrer "$n"
+  livrer "$n" "/etc/containers/certs.d/$REG/ca.crt" "$P/ca-poc.crt"
+  livrer "$n" /w/src/sample-app-1.0.0.tar.gz "$PKG/sample-app-1.0.0.tar.gz"
+  livrer "$n" /w/src/sample-app.spec "$PKG/sample-app.spec"
+  livrer "$n" /w/src/SHA256SUMS.s1 "$T/SHA256SUMS.s1"
+  sed -e "s|@CFG_PRET@|$CFG|g" -e "s|@ISO@|$ISOLATION|g" -e "s|(image prête)|(image brute)|" \
+    -e "s|--resultdir=/w/res-verrou --calculate-build-dependencies |--resultdir=/w/res-verrou --calculate-build-dependencies --no-cleanup-after |" \
+    <<<"$SONDE_VERROU" | dans "$n" verrou-brut
+  sed -e "s|@CFG@|$CFG|g" -e "s|@BOOT@|$BOOT|g" <<<"$SONDE_BOOT" | dans "$n" verrou-brut-boot
+  kubectl exec -n builds "$n" -- sh -c 'for f in /w/res-verrou/root.log /w/res-verrou/build.log; do [ -e "$f" ] && { echo "### $f"; tail -n 400 "$f"; }; done
+    [ -e /w/verrou-calc.log ] && { echo "### /w/verrou-calc.log"; tail -n 60 /w/verrou-calc.log; }; true' \
+    </dev/null 2>&1 | grep -i -v -E 'jeton|token' > "$R/$PREFIXE-verrou_brut-mock.log" || true
+  echo "journaux de mock : $(wc -l < "$R/$PREFIXE-verrou_brut-mock.log") lignes, resultats/$PREFIXE-verrou_brut-mock.log"
+  f=$(kubectl exec -n builds "$n" -- sh -c 'ls /w/res-verrou/*.json 2>/dev/null | head -1' </dev/null || true)
+  if [ -n "$f" ]; then
+    kubectl exec -n builds "$n" -- cat "$f" </dev/null | grep -i -v -E 'jeton|token' > "$R/$PREFIXE-verrou_brut.json" \
+      || echo "copie du verrou : code non nul"
+    python3 -I - "$R/$PREFIXE-verrou_brut.json" <<'PY' || echo "résumé du verrou en échec : rc $?"
+import json, sys
+from urllib.parse import urlsplit
+d = json.load(open(sys.argv[1], encoding='utf-8'))
+c = d.get('config', {})
+print('version du verrou :', d.get('version'))
+print('options de configuration recopiées :', ', '.join(sorted(c)))
+print('bootstrap_image enregistré :', c.get('bootstrap_image'))
+print('bootstrap_image_ready enregistré :', c.get('bootstrap_image_ready'))
+print('macros recopiées :', 'oui' if any('macro' in k for k in c) else 'non')
+bs = d.get('bootstrap', {})
+print('bootstrap, champs :', ', '.join(sorted(bs)) if bs else 'aucun (PodmanError attrapée, ou use_bootstrap_image faux)')
+print('bootstrap, pull_digest (digest du manifeste tiré) :', bs.get('pull_digest'))
+print('bootstrap, image_digest (sha256 de RootFS et Config, podman.py:21) :', bs.get('image_digest'))
+print('bootstrap, architecture :', bs.get('architecture'))
+b = d.get('buildroot', {}).get('rpms', [])
+print('rpm du buildroot :', len(b), '; champs :', ', '.join(sorted(b[0])) if b else '-')
+u = [r.get('url') for r in b]
+print('rpm avec url :', sum(1 for x in u if x), 'sur', len(b))
+print('préfixes des url :', ', '.join(sorted({urlsplit(x).netloc + urlsplit(x).path.rsplit('/', 1)[0] for x in u if x})) or '-')
+g = sorted({str(r.get('signature')) for r in b})
+print('valeurs distinctes de signature :', len(g), ';', ', '.join(g[:5]))
+PY
+  else echo "aucun verrou produit"; fi
+  pod_retirer "$n"
+}
+
+'''
+s = s[:-len(fin)] + bloc + fin
+open(dst, 'w', encoding='utf-8').write(s)
+print('copie :', hashlib.sha256(s.encode()).hexdigest())
