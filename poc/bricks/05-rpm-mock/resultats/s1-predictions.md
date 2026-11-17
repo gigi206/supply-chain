@@ -1176,3 +1176,48 @@ pas. L'étape `verrou_brut` :
 
 Suite : appliquer le correctif à `s1.sh` sur accord, puis écrire les prédictions de `verrou_brut`, puis demander l'accord de
 lancement. Rien n'est lancé.
+
+### Corrections de la note précédente, et deuxième version de `verrou_brut` (note du 2026-11-17, écrite à 2026-11-17T13:22:41Z ; rien n'est réécrit ; NON APPLIQUÉ)
+
+Corrections de la note « Image de bootstrap : décisions, et étape `verrou_brut` préparée à sec » :
+- **« Le chemin sans `uniqueext` n'est relevé dans aucun journal » est faux.** Mes deux recherches ne pouvaient pas le trouver.
+  La première avait une classe de caractères sans `_`, la seconde était coupée par `head`. Le chemin figure 20 fois dans
+  [`s1-verrou-mock.log`](s1-verrou-mock.log) et 9 fois dans [`s1-verrou.log`](s1-verrou.log), sous la forme
+  `/w/mock/poc-rocky-9.7-pret-x86_64-bootstrap/root`. Pour `$CFG`, la forme attendue est donc, par analogie,
+  `/w/mock/poc-rocky-9.7-x86_64-bootstrap/root`. Le motif `-bootstrap*/root` reste en place et affiche le chemin retenu.
+- **Premier passage du banc (13:11:05 UTC)** : trois lignes KO, pour deux défauts du banc, et non « deux KO ».
+- **Interpréteur des bancs.** Le banc N3/N4 de 13:14:32 UTC a tourné sous python3 3.15.2
+  ([journal](s1-verrou-brut-banc-n34.log)), et non sous le 3.13.12 de ses passages précédents
+  ([`s1-duree-banc-n34.log`](s1-duree-banc-n34.log)). Il avait été lancé depuis le dossier de travail, hors du dépôt, où mise
+  fournit 3.13.12. « Tel quel » valait donc pour le script, pas pour l'interpréteur. Les quatre passages du banc de
+  `verrou_brut` ont été lancés depuis le même dossier ; ce banc ne journalise pas la version de python.
+
+**Deuxième version** : [`../s1-verrou-brut-2.patch`](../s1-verrou-brut-2.patch), sha256 `01fc4fc6…`. Elle remplace
+[`../s1-verrou-brut.patch`](../s1-verrou-brut.patch), qui reste dans le dépôt et ne doit pas être appliqué. Toujours des
+insertions seules : 4 lignes d'en-tête et 98 lignes. Copie modifiée `b7db829c…`, écrite par
+[`s1-verrou-brut-2-modifier.py`](s1-verrou-brut-2-modifier.py) à partir de `5ccba38e…`. Seuls `SONDE_BOOT`, deux lignes de
+commentaire et l'en-tête changent par rapport à `c86589c4…` :
+- Chaque liste et le `df` valent seuls. Si le bootstrap est introuvable, si le pull échoue ou si une base est illisible, l'autre
+  liste est quand même affichée, ainsi que le `df` final. La comparaison n'est faite que si les deux listes sont lues.
+- La sortie d'erreur de `rpm` va dans un fichier à part, comptée et affichée (3 lignes au plus), jamais dans les listes.
+- `rpm -qa` lit une copie de `var/lib/rpm` faite sous `/w` (`--dbpath`), pour le bootstrap comme pour l'image. Le montage de
+  `podman image mount` n'est donc jamais écrit. `essais` n'y a lu que `os-release` ([`s1-essais.log`](s1-essais.log)) : qu'il
+  soit en lecture seule ou non n'est pas vérifié ici.
+- `LC_ALL=C` pour `sort` et `comm`.
+
+**Bancs, lancés depuis le dépôt** (python3 3.13.12, d'après `python3 --version` du même dossier, non journalisé par ce banc) :
+- [`s1-verrou-brut-2-banc.sh`](s1-verrou-brut-2-banc.sh). Sa section D joue `SONDE_BOOT` dans quatre cas : nominal, bootstrap
+  absent, pull refusé, base rpm absente de l'image. Elle contrôle aussi que la doublure de `rpm` n'est jamais appelée sans
+  `--dbpath`. Les versions de la doublure restent **inventées**.
+  - 13:20:58 UTC, copie `393946ff…` : un KO venu du banc. Son contrôle « /w restant » comptait le libellé « capacité de /w »
+    ([journal](s1-verrou-brut-2-banc-passage1.log)).
+  - 13:21:22 UTC, copie `b7db829c…` (en-tête au nom du nouveau correctif) : tenu. La ligne du contrôle corrigé portait une
+    commande inutile, retirée ensuite. Journal écrasé, **non archivé**.
+  - 13:21:36 UTC, même copie : tenu, 52 OK ([journal](s1-verrou-brut-2-banc.log)).
+- Banc N3/N4 rejoué sur `b7db829c…` à 13:21:37 UTC, sous python3 3.13.12 : tenu, 35 OK
+  ([journal](s1-verrou-brut-2-banc-n34.log)).
+
+**Pour les prédictions de `verrou_brut`** : il faudra comparer le sha256 du JSON archivé à la ligne « verrou : … sha256 » de la
+sonde. C'est le seul moyen de voir si le filtre `jeton|token` a retiré une ligne.
+
+Suite : appliquer `s1-verrou-brut-2.patch` à `s1.sh` sur accord. Rien n'est lancé.
