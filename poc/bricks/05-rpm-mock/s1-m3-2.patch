@@ -1,0 +1,296 @@
+--- a/poc/bricks/05-rpm-mock/s1.sh
++++ b/poc/bricks/05-rpm-mock/s1.sh
+@@ -109,6 +109,34 @@
+ #               la liste de collecte ; inode et liens des blobs de l'image relus (relevé rejouable)
+ #               Correctif appliqué au dépôt le 17/11/2026 à 17:08:38 UTC (« Oui, applique-le »), sha256 égal à la copie bancée
+ #               (7cd2edd0…) ; non lancé.
++#   m3_reseau   (../s1-m3-2.patch, préparé à sec le 17/11/2026, NON APPLIQUÉ ; jalon M3 ; décision du propriétaire « Tout
++#               couper ») : écriture dans le cluster, sur accord : NetworkPolicy politiques/construction-rpm-sans-sortie.yaml
++#               (aucune règle : ni entrée ni sortie pour le label tekton.dev/task=construire-rpm), admise en dry-run serveur,
++#               posée, relue ; aucune politique de builds ne doit autoriser de trafic à ce label (selecteurs.jq de la 08). Elle
++#               reste posée ensuite, comme celle de la 06
++#   m3_temoin   témoin positif, lecture seule : pod s1-05-m3-temoin au label prefetch-rpm (sortie dédiée : DNS, 443 public,
++#               Zot) ; les témoins de M3 (DNS sous timeout, TCP par adresse IP vers l'adresse publique des dépôts de Rocky,
++#               résolue sur l'hôte, vers Zot et vers l'API du cluster) doivent répondre pour le DNS, l'adresse publique et Zot ;
++#               le code de l'API est relevé ; pod retiré ; cibles écrites dans $T/m3-cibles après la porte seulement
++#   m3_restauration lecture dans Zot : deux pulls par digest de la fermeture de M2 (FERMETURE_DIGEST, égal à
++#               $T/mf/fermeture.digest), chacun dans un dossier neuf ($T/m3/restauree-1 et -2), chacun comparé à la liste de
++#               collecte ; $T/mf n'est pas touché
++#   m3_build1, m3_build2  un pod Kata privilégié, root, par build (s1-05-m3-1, s1-05-m3-2), image d'essai, label
++#               tekton.dev/task=construire-rpm ; avant toute création : construction-rpm-sans-sortie relue dans le cluster et
++#               invariant contrôlé, sinon aucun pod ; cibles validées par m3_temoin relues, sinon aucun pod ; spec admise en
++#               dry-run serveur, label relu dans le cluster ; témoins de m3_temoin : les quatre doivent échouer, avec le code 1,
++#               2 ou 124 (tout autre code arrête), sinon pod retiré et mock non lancé ; fermeture restaurée n copiée par tar
++#               en morceaux de 64 Mio (copier, repris de la 06, s3.sh), sha256 comparé dans le pod, puis revérifiée fichier par
++#               fichier dans le pod ; sources livrées (hors fermeture) ; mock --hermetic-build sur le verrou et le dépôt de la
++#               fermeture, chemins distincts par build (/w/b1, /w/b2 : fermeture, basedir, cache_topdir, resultdir),
++#               --no-cleanup-after ; paquets du buildroot relus par rpm --root ; rpm et src.rpm (NEVRA, sha256, BUILDHOST,
++#               BUILDTIME) ; root.log, build.log, installed_pkgs.log et sortie de mock archivés en entier ; rpm rapatriés sur
++#               l'hôte, sha256 comparés ; pod retiré ; rien écrit dans Zot
++#   m3_comparaison hôte seul, sans réseau : nombre de rpm et de NEVRA lus, NEVRA et sha256 du rpm et du src.rpm, build 1
++#               contre build 2 (critère de M3, seul compté en écarts) ; relevés à part, sans effet sur le code : témoins,
++#               paquets du buildroot de chaque build contre les 222 du verrou, lignes http(s):// des journaux de mock
++#               (affichées), mock de la fermeture contre celui de l'image, égalité avec le rpm et le src.rpm d'hermetique ;
++#               diffoscope hors du script (installation à demander au propriétaire en cas d'écart)
+ # Les replis (stockage vfs, mock non root, bootstrap sans image) ne sont pas lancés ici : chacun demande sa prédiction et un accord.
+ # Retrait : Zot n'autorise pas la suppression ; dépôts amont/rockylinux/rockylinux et essais-05/mock-rocky9 définitifs.
+ #
+@@ -1506,4 +1534,258 @@
+   zot_liens "sc-stockage.poc.test@$bd" "$o/fermeture.attendue"
+ }
+ 
++# Étapes m3_reseau, m3_temoin, m3_restauration, m3_build1, m3_build2 et m3_comparaison (s1-m3-2.patch, préparées à sec le
++# 17/11/2026, NON APPLIQUÉES ; jalon M3 ; remplace s1-m3.patch, gardé) : voir l'en-tête. Tout ce qui entre dans mock vient de la fermeture restaurée ($T/m3/restauree-<n>) ;
++# $T/mf/fermeture.attendue et VERROU_DERIVEE_SHA ne servent que d'attendus. Sources de sample-app et image d'essai hors fermeture.
++# « Sans réseau » (décision « Tout couper ») : ni entrée ni sortie pour le label construire-rpm ; les témoins doivent tous échouer.
++POD_M3=s1-05-m3
++FERMETURE_DIGEST=sha256:f235a98b46d82b2d295cd39e869eb07344938e8896fc4f7465171687e9c48417   # fermeture de M2 (s1-fermeture.log)
++RPM_HERMETIQUE=864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f    # rpm binaire d'hermetique (s1-hermetique.log)
++SRPM_HERMETIQUE=c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128   # src.rpm d'hermetique (même journal)
++TEMOIN_HOTE=dl.rockylinux.org   # adresse publique des dépôts de Rocky : résolue sur l'hôte, témoin TCP sur 443
++MORCEAU_MIO=64
++LABEL_M3=construire-rpm   # nom de la tâche de M4 ; sélectionné par construction-rpm-sans-sortie
++POLITIQUE_M3=$here/politiques/construction-rpm-sans-sortie.yaml
++POD_M3T=s1-05-m3-temoin
++
++politique_m3_relue() { # politiques de builds relues dans le cluster ; KO si le label $LABEL_M3 n'est pas coupé
++  local t=$T/m3-politiques.json
++  { kubectl get networkpolicy -n builds -o json </dev/null | jq '.items[] | .kind = "NetworkPolicy"'
++    kubectl get ciliumnetworkpolicy -n builds -o json </dev/null | jq '.items[] | .kind = "CiliumNetworkPolicy"'; } | jq -s '{items: .}' > "$t"
++  echo "politiques de builds : $(jq -r '[.items[] | "\(.kind) \(.metadata.name)"] | join(", ")' "$t")"
++  attendu "construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie" \
++    "$(jq -c '[.items[] | select(.kind == "NetworkPolicy" and .metadata.name == "construction-rpm-sans-sortie")
++      | [.spec.podSelector, (.spec.policyTypes | sort), (.spec.ingress // []), (.spec.egress // [])]]' "$t")" \
++    "[[{\"matchLabels\":{\"tekton.dev/task\":\"$LABEL_M3\"}},[\"Egress\",\"Ingress\"],[],[]]]"
++  attendu "politiques de builds qui sélectionnent $LABEL_M3 et autorisent du trafic" "$(jq -r -L "$here/../08-trust-plane" --arg l "$LABEL_M3" \
++    'include "selecteurs"; [.items[] | select(selectionne({"tekton.dev/task": $l}) and autorise) | nom] | join(", ")' "$t")" ""
++}
++
++etape_m3_reseau() { # écriture dans le cluster : pose de construction-rpm-sans-sortie
++  attendu "politique du dépôt : nom, sélecteur, types, règles" "$(kubectl create --dry-run=client -o json -f "$POLITIQUE_M3" </dev/null \
++    | jq -c '[.metadata.namespace, .metadata.name, .spec.podSelector, (.spec.policyTypes | sort), (.spec.ingress // []), (.spec.egress // [])]')" \
++    "[\"builds\",\"construction-rpm-sans-sortie\",{\"matchLabels\":{\"tekton.dev/task\":\"$LABEL_M3\"}},[\"Egress\",\"Ingress\"],[],[]]"
++  kubectl apply --dry-run=server -f "$POLITIQUE_M3" </dev/null >/dev/null || { echo "KO   politique refusée en dry-run serveur" >&2; exit 1; }
++  echo "OK   politique admise en dry-run serveur"
++  kubectl apply -f "$POLITIQUE_M3" </dev/null
++  politique_m3_relue
++}
++
++resoudre() { getent ahostsv4 "$1" 2>/dev/null | awk 'NR == 1 {print $1}'; }   # sur l'hôte : première adresse IPv4
++temoins_cibles() { # « adresse-publique adresse-de-Zot adresse-de-l'API », lues sur l'hôte ; code 1 si l'une est illisible
++  local x pub api
++  pub=$(resoudre "$TEMOIN_HOTE"); api=$(kubectl get svc -n default kubernetes -o jsonpath='{.spec.clusterIP}' </dev/null)
++  for x in "$pub" "${REG_HOTE%:*}" "$api"; do
++    [[ $x =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]] || { echo "KO   adresse de témoin illisible : « $x »" >&2; return 1; }; done
++  echo "$pub ${REG_HOTE%:*} $api"
++}
++SONDE_TEMOINS='set -u
++for o in bash getent timeout head tr; do command -v $o >/dev/null 2>&1 || { echo "KO   $o absent de l image"; exit 1; }; done
++timeout 10 getent hosts @HOTE@ > /w/t-dns.log 2>&1; echo "témoin DNS @HOTE@ (10 s) : rc $?"
++for c in "public @PUB@ 443" "Zot @ZOT@ @ZOT_PORT@" "API @API@ 443"; do
++  set -- $c
++  timeout 10 bash -c "exec 3<>/dev/tcp/$2/$3" > /w/t-tcp.log 2>&1; echo "témoin TCP $1 $2:$3 (10 s) : rc $? $(head -c 120 /w/t-tcp.log | tr "\n" " ")"
++done
++true'
++temoins() { # pod « cibles » libellé : SONDE_TEMOINS dans le pod, journal $T/<libellé>.log
++  local pub zot api; read -r pub zot api <<<"$2"
++  sed -e "s|@HOTE@|$TEMOIN_HOTE|g" -e "s|@PUB@|$pub|g" -e "s|@ZOT@|$zot|g" -e "s|@ZOT_PORT@|${REG_HOTE##*:}|g" -e "s|@API@|$api|g" \
++    <<<"$SONDE_TEMOINS" | dans "$1" "$3"
++}
++temoins_rc() { # libellé : codes « DNS public Zot API » relus dans le journal
++  local l; for l in 'témoin DNS [^ ]*' 'témoin TCP public [^ ]*' 'témoin TCP Zot [^ ]*' 'témoin TCP API [^ ]*'; do
++    champ "$1" "$l (10 s)" | awk '{print $2}'; done | paste -sd ' '
++}
++
++etape_m3_temoin() { # témoin positif, lecture seule : pod au label $LABEL (prefetch-rpm-sortie : DNS, 443 public, Zot)
++  local d n=$POD_M3T c r
++  rm -f -- "$T/m3-cibles"
++  d=$(cat "$T/image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape image" >&2; exit 1; }
++  c=$(temoins_cibles) || exit 1
++  echo "cibles des témoins (lues sur l'hôte) : public $TEMOIN_HOTE ${c%% *} ; Zot et API ${c#* }"
++  pod_spec "$n" "$REG/$DEPOT_ESSAI@$d"
++  pod_demarrer "$n"
++  temoins "$n" "$c" m3-temoin
++  pod_retirer "$n"
++  r=$(temoins_rc m3-temoin)
++  attendu "témoin positif (label $LABEL), codes DNS, public, Zot" "$(cut -d ' ' -f1-3 <<<"$r")" "0 0 0"
++  echo "témoin positif, code API (non autorisée par prefetch-rpm-sortie ; relevé, sans pari) : $(cut -d ' ' -f4 <<<"$r")"
++  echo "$c" > "$T/m3-cibles"; echo "cibles écrites pour m3_build1 et m3_build2 : $c"
++}
++
++etape_m3_restauration() {
++  local o=$T/m3 n
++  [ -s "$T/mf/fermeture.attendue" ] || { echo "KO   liste de collecte absente : lancer d'abord l'étape collecte" >&2; exit 1; }
++  attendu "digest écrit par l'étape fermeture" "$(cat "$T/mf/fermeture.digest" 2>/dev/null || echo absent)" "$FERMETURE_DIGEST"
++  case "$T$P" in *' '*) echo "KO   chemin avec espace" >&2; exit 1 ;; esac
++  auth_zot "$T/zot.json"
++  mkdir -p "$o"
++  for n in 1 2; do
++    rm -rf -- "${o:?}/restauree-$n"
++    ORAS_OPTS=$(oras_zot) "$CLOSURE" pull "$REG_HOTE/$DEPOT_FERMETURE@$FERMETURE_DIGEST" "$o/restauree-$n"
++    echo "restauration $n depuis $REG/$DEPOT_FERMETURE@$FERMETURE_DIGEST, dans un dossier vide"
++    fermeture_controle comparer "$o/restauree-$n" "$T/mf/fermeture.attendue" || { echo "KO   fermeture restaurée $n différente" >&2; exit 1; }
++  done
++}
++
++copier() { # pod fichier-hôte chemin-pod : repris de la 06 (s3.sh, après sa sonde du 10/11 : l'exec sous Kata bloque à 512 Mio)
++  local n i k e m=$((MORCEAU_MIO * 1048576)) nb
++  n=$(stat -c %s "$2"); nb=$(( (n + m - 1) / m )); [ "$nb" -gt 0 ] || nb=1
++  kubectl exec -n builds "$1" -- sh -c ": > $3" </dev/null
++  for ((i = 0; i < nb; i++)); do
++    k=$(( n - i * m < m ? n - i * m : m ))
++    dd if="$2" bs=1M skip=$((i * MORCEAU_MIO)) count=$MORCEAU_MIO status=none \
++      | timeout 120 kubectl exec -i -n builds "$1" -- sh -c "head -c $k >> $3" \
++      || { pod_retirer "$1"; echo "KO   copie de ${2##*/}, morceau $((i + 1)) sur $nb" >&2; exit 1; }
++    e=$(kubectl exec -n builds "$1" -- stat -c %s "$3" </dev/null)
++    [ "$e" = "$(( i * m + k ))" ] \
++      || { pod_retirer "$1"; echo "KO   copie de ${2##*/} : $e octets après le morceau $((i + 1)) (attendu : $(( i * m + k )))" >&2; exit 1; }
++  done
++  e=$(kubectl exec -n builds "$1" -- sha256sum "$3" </dev/null | cut -c1-64)
++  [ "$e" = "$(sha256sum < "$2" | cut -c1-64)" ] && echo "OK   copie de ${2##*/} dans le pod : $n octets en $nb morceau(x), sha256 conforme" \
++    || { pod_retirer "$1"; echo "KO   copie de ${2##*/} : sha256 dans le pod $e" >&2; exit 1; }
++}
++
++m3_pod() { # nom image : pod de pod_spec au label $LABEL_M3 ; spec admise en dry-run serveur ; label relu dans le cluster
++  local LABEL=$LABEL_M3
++  pod_spec "$1" "$2"
++  attendu "label tekton.dev/task de la spec $1" "$(jq -r '.metadata.labels["tekton.dev/task"] // "absent"' "$T/$1.json")" "$LABEL_M3"
++  kubectl delete pod -n builds "$1" --ignore-not-found --wait=true </dev/null >/dev/null
++  kubectl create --dry-run=server -f "$T/$1.json" </dev/null >/dev/null || { echo "KO   spec $1 refusée en dry-run serveur" >&2; exit 1; }
++  echo "OK   spec $1 admise en dry-run serveur"
++  pod_demarrer "$1"
++  ( attendu "label tekton.dev/task du pod $1, relu dans le cluster" \
++      "$(kubectl get pod -n builds "$1" -o json </dev/null | jq -r '.metadata.labels["tekton.dev/task"] // "absent"')" "$LABEL_M3" ) \
++    || { pod_retirer "$1"; exit 1; }
++}
++
++SONDE_M3='set -u
++export LC_ALL=C
++B=@B@; F=@B@/fermeture; D=@B@/fermeture/depot
++compte() { c=$(grep -c -E -e "$1" "$2" 2>/dev/null); echo "${c:-absent}"; }
++ko() { echo "KO   $*"; exit 1; }
++for o in rpm mock sha256sum find df tar; do command -v $o >/dev/null 2>&1 || ko "$o absent de l image"; done
++echo "invité : $(uname -r), $(nproc) vCPU ; uid $(id -u)"
++(cd "$F" && sha256sum -c --quiet /w/fermeture.sha256) > /w/f.log 2>&1; r=$?
++echo "fermeture revérifiée dans le pod : rc $r ; fichiers $(find "$F" -type f | wc -l) ; lignes de la liste $(wc -l < /w/fermeture.sha256)"
++[ $r = 0 ] || { head -c 600 /w/f.log; ko "fermeture différente de la liste de collecte"; }
++[ "$(find "$F" -type f | wc -l)" = "$(wc -l < /w/fermeture.sha256)" ] || ko "fichiers en trop dans la fermeture"
++echo "verrou de la fermeture : sha256 $(sha256sum < "$F/verrou.json" | cut -c1-64)"
++echo "manifeste du dossier dir: : sha256:$(sha256sum < "$D/@DOSSIER@/manifest.json" | cut -c1-64)"
++(cd /w/src && sha256sum -c SHA256SUMS.s1) > /w/c.log 2>&1; r=$?; echo "sources livrées : rc $r $(paste -sd " " /w/c.log)"
++[ $r = 0 ] || ko "sources de sample-app"
++echo "mock de la fermeture : $(rpm -qp --qf "%{NEVRA} %{SHA256HEADER}" "$F/outils/@MOCK_NOM@" 2>/dev/null)"
++echo "mock de l image : $(rpm -q --qf "%{NEVRA} %{SHA256HEADER}" mock 2>/dev/null)"
++df -k /w | awk "NR == 2 {print \"avant mock, capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
++mkdir -p "$B/res"
++t=$(date +%s)
++mock --hermetic-build "$F/verrou.json" "$D" --isolation=@ISO@ --no-cleanup-after --config-opts=basedir=$B/mock-h \
++  --config-opts=cache_topdir=$B/mock-h-cache --resultdir=$B/res --spec /w/src/sample-app.spec --sources /w/src > "$B/mock.out" 2>&1
++r=$?; echo "mock --hermetic-build : rc $r en $(($(date +%s) - t)) s"
++for m in "Using container image: dir:" "Checking image digest: @IMAGE_DIGEST@" "falling back to chroot installation" \
++  "Expected digest for image" "Not updating bootstrap chroot" "installroot.{1,4}$B/mock-h/" "No space left on device"; do
++  echo "lignes « $m » : sortie $(compte "$m" "$B/mock.out") ; root.log $(compte "$m" "$B/res/root.log")"
++done
++for f in "$B/mock.out" "$B/res/root.log" "$B/res/build.log"; do echo "lignes http ou https de ${f##*/} : $(compte "https?://" "$f")"; done
++echo "installed_pkgs.log : $(wc -l < "$B/res/installed_pkgs.log" 2>/dev/null || echo absent) ligne(s)"
++rpm -qa --root "$B/mock-h/hermetic-build/root" --qf "paquet %{NAME} %{VERSION} %{RELEASE} %{ARCH} %{SIGMD5}\n" 2>/dev/null | sort
++echo "paquets du buildroot (rpm --root) : $(rpm -qa --root "$B/mock-h/hermetic-build/root" 2>/dev/null | wc -l)"
++ls -l "$B/res" | sed "s/^/résultat : /"
++for f in "$B/res"/*.rpm; do [ -e "$f" ] || continue
++  echo "rpm : ${f##*/} sha256 $(sha256sum < "$f" | cut -c1-64) ; NEVRA $(rpm -qp --qf "%{NEVRA} ; BUILDHOST %{BUILDHOST} ; BUILDTIME %{BUILDTIME}" "$f" 2>/dev/null)"
++done
++df -k /w | awk "NR == 2 {print \"après mock (buildroot gardé), capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
++true'
++
++m3_build() { # n : build n dans le pod $POD_M3-n, depuis $T/m3/restauree-n, chemins sous /w/bn
++  local n=$1 p=$POD_M3-$1 o=$T/m3 b=/w/b$1 d bd v src dos id f x c r z=0
++  d=$(cat "$T/image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape image" >&2; exit 1; }
++  bd=$(cat "$T/boot-image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape boot_image" >&2; exit 1; }
++  [[ $bd =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "KO   digest de boot_image illisible : $bd" >&2; exit 1; }
++  [ -d "$o/restauree-$n" ] && [ -s "$T/mf/fermeture.attendue" ] || { echo "KO   lancer d'abord l'étape m3_restauration" >&2; exit 1; }
++  fermeture_controle comparer "$o/restauree-$n" "$T/mf/fermeture.attendue" || { echo "KO   fermeture restaurée $n changée" >&2; exit 1; }
++  v=$o/restauree-$n/verrou.json
++  attendu "verrou de la fermeture restaurée $n, sha256" "$(sha256sum < "$v" | cut -c1-64)" "$VERROU_DERIVEE_SHA"
++  src=$(jq -r '.config.bootstrap_image' "$v"); dos=${src%%:*}@$bd; id=$(jq -r '.bootstrap.image_digest' "$v")
++  [[ $id =~ ^[0-9a-f]{64}$ ]] || { echo "KO   image_digest du verrou illisible : $id" >&2; exit 1; }
++  attendu "manifeste du dossier dir: de la fermeture restaurée $n" \
++    "sha256:$(sha256sum < "$o/restauree-$n/depot/$dos/manifest.json" | cut -c1-64)" "$bd"
++  (cd "$PKG" && sha256sum -c --quiet "$T/SHA256SUMS.s1") || { echo "KO   sources de sample-app" >&2; exit 1; }
++  awk '{print $2 "  " $1}' "$T/mf/fermeture.attendue" > "$o/fermeture.sha256"
++  tar -C "$o/restauree-$n" -cf "$o/fermeture-$n.tar" .
++  politique_m3_relue
++  c=$(cat "$T/m3-cibles" 2>/dev/null) || { echo "KO   cibles absentes : lancer d'abord l'étape m3_temoin" >&2; exit 1; }
++  [[ $c =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}\ [0-9]{1,3}(\.[0-9]{1,3}){3}\ [0-9]{1,3}(\.[0-9]{1,3}){3}$ ]] || { echo "KO   cibles illisibles : $c" >&2; exit 1; }
++  echo "image : $REG/$DEPOT_ESSAI@$d ; pod : $p ; chemins sous $b ; cibles des témoins : $c"
++  m3_pod "$p" "$REG/$DEPOT_ESSAI@$d"
++  temoins "$p" "$c" "m3-temoins$n"
++  r=$(temoins_rc "m3-temoins$n"); echo "témoins, codes DNS, public, Zot, API : $r"
++  awk 'function f(x) {return x == 1 || x == 2 || x == 124}   # refus, nom introuvable, délai ; tout autre code arrête
++    NF == 4 && f($1) && f($2) && f($3) && f($4) {t = 1} END {exit !t}' <<<"$r" \
++    || { pod_retirer "$p"; echo "KO   réseau joignable ou témoin illisible (codes : $r) : mock non lancé" >&2; exit 1; }
++  echo "OK   témoins : DNS, adresse publique, Zot et API injoignables"
++  copier "$p" "$o/fermeture-$n.tar" /w/fermeture.tar
++  copier "$p" "$o/fermeture.sha256" /w/fermeture.sha256
++  kubectl exec -n builds "$p" -- sh -c "mkdir -p $b/fermeture && tar --no-same-owner -xf /w/fermeture.tar -C $b/fermeture && rm /w/fermeture.tar" \
++    </dev/null || { pod_retirer "$p"; echo "KO   déballage de la fermeture dans $p" >&2; exit 1; }
++  livrer "$p" /w/src/sample-app-1.0.0.tar.gz "$PKG/sample-app-1.0.0.tar.gz"
++  livrer "$p" /w/src/sample-app.spec "$PKG/sample-app.spec"
++  livrer "$p" /w/src/SHA256SUMS.s1 "$T/SHA256SUMS.s1"
++  sed -e "s|@B@|$b|g" -e "s|@DOSSIER@|$dos|g" -e "s|@MOCK_NOM@|${MOCK_CHEMIN##*/}|g" -e "s|@ISO@|$ISOLATION|g" -e "s|@IMAGE_DIGEST@|$id|g" \
++    <<<"$SONDE_M3" | dans "$p" "m3-build$n"
++  kubectl exec -n builds "$p" -- sh -c "for f in $b/mock.out $b/res/root.log $b/res/build.log $b/res/installed_pkgs.log; do
++      [ -e \"\$f\" ] && { echo \"### \$f\"; cat \"\$f\"; }; done; true" </dev/null \
++    | sed '/jeton\|token/I c\[ligne masquée : motif jeton|token]' > "$R/$PREFIXE-m3_build$n-mock.log" || echo "journaux de mock : code non nul"
++  echo "journaux de mock : $(wc -l < "$R/$PREFIXE-m3_build$n-mock.log") lignes, resultats/$PREFIXE-m3_build$n-mock.log"
++  rm -rf -- "${o:?}/build-$n" && mkdir -p "$o/build-$n"
++  kubectl exec -n builds "$p" -- sh -c "cd $b/res && tar -cf - ./*.rpm" </dev/null | tar -xf - -C "$o/build-$n" || echo "rapatriement des rpm : code non nul"
++  pod_retirer "$p"
++  attendu "code de mock --hermetic-build" "$(champ "m3-build$n" 'mock --hermetic-build' | cut -d ' ' -f1-2)" "rc 0"
++  for f in "$o/build-$n"/*.rpm; do [ -e "$f" ] || continue; z=$((z + 1)); x=$(sha256sum < "$f" | cut -c1-64)
++    attendu "rpm rapatrié ${f##*/}, sha256 $x, lignes égales dans la sonde" "$(grep -c -F "rpm : ${f##*/} sha256 $x ;" "$T/m3-build$n.log")" 1
++  done
++  attendu "rpm rapatriés (src.rpm et binaire)" "$z" 2
++}
++etape_m3_build1() { m3_build 1; }
++etape_m3_build2() { m3_build 2; }
++
++ECARTS_M3=0
++mesure_m3() { if [ "$2" = "$3" ]; then echo "OK   $1 : $2"; else echo "ÉCART $1 : $2 (attendu : $3)"; ECARTS_M3=$((ECARTS_M3 + 1)); fi; }
++
++etape_m3_comparaison() { # hôte seul, sans réseau ; critère de M3 compté en écarts (code 1 s'il y en a un) ; provenance relevée à part
++  local o=$T/m3 n v f
++  for n in 1 2; do [ -s "$T/m3-build$n.log" ] && [ -s "$T/m3-temoins$n.log" ] && [ -d "$o/build-$n" ] || { echo "KO   lancer d'abord l'étape m3_build$n" >&2; exit 1; }; done
++  v=$o/restauree-1/verrou.json
++  attendu "verrou de référence (fermeture restaurée 1), sha256" "$(sha256sum < "$v" | cut -c1-64)" "$VERROU_DERIVEE_SHA"
++  jq -r '.buildroot.rpms[] | "paquet \(.name) \(.version) \(.release) \(.arch) \(.sigmd5)"' "$v" | sort > "$o/verrou.paquets"
++  for n in 1 2; do
++    (cd "$o/build-$n" && for f in *.rpm; do [ -e "$f" ] || continue; echo "$f $(sha256sum < "$f" | cut -c1-64)"; done) > "$o/rpm-$n.txt"
++    sed "s/^/build $n : /" "$o/rpm-$n.txt"
++    sed -n 's/^rpm : \([^ ]*\) sha256 [0-9a-f]* ; NEVRA \([^ ]*\) ;.*/\1 \2/p' "$T/m3-build$n.log" > "$o/nevra-$n.txt"
++    grep '^paquet ' "$T/m3-build$n.log" | sort > "$o/paquets-$n.txt" || true
++  done
++  echo "## critère de M3 (build 1 contre build 2)"
++  mesure_m3 "fichiers rpm par build" "$(wc -l < "$o/rpm-1.txt") $(wc -l < "$o/rpm-2.txt")" "2 2"
++  mesure_m3 "lignes NEVRA lues par build" "$(wc -l < "$o/nevra-1.txt") $(wc -l < "$o/nevra-2.txt")" "2 2"
++  mesure_m3 "rpm et src.rpm (nom et sha256), build 2 contre build 1" "$(paste -sd ' ' "$o/rpm-2.txt")" "$(paste -sd ' ' "$o/rpm-1.txt")"
++  mesure_m3 "NEVRA, build 2 contre build 1" "$(paste -sd ' ' "$o/nevra-2.txt")" "$(paste -sd ' ' "$o/nevra-1.txt")"
++  if [ "$(paste -sd ' ' "$o/rpm-1.txt")" != "$(paste -sd ' ' "$o/rpm-2.txt")" ]; then
++    echo "     diffoscope à demander au propriétaire (installation) ; rpm gardés sous \$T/m3/build-1 et \$T/m3/build-2"; fi
++  echo "## relevés à part (sans effet sur le code)"
++  for f in "$RPM_HERMETIQUE" "$SRPM_HERMETIQUE"; do
++    echo "relevé : sha256 ${f:0:12}… d'hermetique (17/11, 16:20 UTC) retrouvé dans le build 1 : $(grep -c -F " $f" "$o/rpm-1.txt" || true) fois ; build 2 : $(grep -c -F " $f" "$o/rpm-2.txt" || true) fois"
++  done
++  for n in 1 2; do
++    echo "relevé, build $n : paquets du buildroot (rpm --root) $(wc -l < "$o/paquets-$n.txt"), verrou $(wc -l < "$o/verrou.paquets") ; lignes d'écart (nom, version, release, arch, sigmd5) : $(diff "$o/paquets-$n.txt" "$o/verrou.paquets" | grep -c '^[<>]' || true)"
++    diff "$o/paquets-$n.txt" "$o/verrou.paquets" | grep '^[<>]' | head -n 10 | sed 's/^/     /' || true
++    echo "relevé, build $n : lignes http(s):// (sortie, root.log, build.log) : $(for f in mock.out root.log build.log; do champ "m3-build$n" "lignes http ou https de $f"; done | paste -sd ' ')"
++    grep -E 'https?://' "$R/$PREFIXE-m3_build$n-mock.log" | head -n 10 | cut -c1-200 | sed 's/^/     /' || true
++    echo "relevé, build $n : mock de la fermeture : $(champ "m3-build$n" "mock de la fermeture") ; mock de l'image : $(champ "m3-build$n" "mock de l image") ; $([ -n "$(champ "m3-build$n" "mock de la fermeture")" ] && [ "$(champ "m3-build$n" "mock de la fermeture")" = "$(champ "m3-build$n" "mock de l image")" ] && echo égaux || echo 'différents ou illisibles')"
++    grep -E '^témoin ' "$T/m3-temoins$n.log" | sed 's/^/     /' || true
++    grep -E '^(installed_pkgs.log|mock --hermetic-build|lignes « )' "$T/m3-build$n.log" | sed 's/^/     /'
++  done
++  echo "écarts du critère : $ECARTS_M3"
++  [ "$ECARTS_M3" = 0 ]
++}
++
+ lancer "$PREFIXE" "05 S1" "$@"

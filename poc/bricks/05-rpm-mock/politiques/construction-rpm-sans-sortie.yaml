@@ -1,0 +1,22 @@
+# Brique 05, M3 (décision du propriétaire du 17/11/2026, « Tout couper ») : aucune entrée ni sortie réseau pour les pods de
+# la tâche construire-rpm (Kata privilégié, root) : ni adresses publiques, ni Zot, ni DNS, ni API du cluster. Sur le modèle de
+# construction-sans-sortie (08) et de construction-deb-sans-sortie (06) : sélection par tekton.dev/task, que le contrôleur de
+# Tekton réécrit avec le nom de la tâche résolue ; aucune règle, donc rien d'autorisé. L'invariant de la 08 (aucune politique
+# de builds n'autorise de trafic aux pods de construction) reste à vérifier à la pose. builds-sans-internet (08c) et son NotIn
+# sont inchangés : son refus des adresses publiques s'ajoute à ce refus total. La valeur du label engage le nom de la tâche de
+# M4. Sous Cilium, mesuré dans la 08 (kata.sh reseau, 13/11/2026, resultats/kata-reseau.log) : usurpation d'adresse source
+# depuis un pod Kata privilégié refusée (INVALID_SOURCE_IP), aucune fenêtre au démarrage ; la limite de l'en-tête de
+# construction-sans-sortie (contournement par usurpation) a été écrite sous kube-router.
+# PROPOSITION, NON POSÉE (17/11/2026) : posée par s1.sh m3_reseau, sur accord ; reste posée ensuite, comme celle de la 06.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: construction-rpm-sans-sortie
+  namespace: builds
+spec:
+  podSelector:
+    matchLabels:
+      tekton.dev/task: construire-rpm
+  policyTypes:
+  - Ingress
+  - Egress

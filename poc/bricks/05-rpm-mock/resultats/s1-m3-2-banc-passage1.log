@@ -1,0 +1,441 @@
+# s1-m3-2-banc.sh, 2026-11-17T19:45:41Z, python3 3.13.12, Version: 1.3.6, crane 0.20.6
+# s1.sh du dépôt 4c3adb536e4c97aed74734f04832911da7c4fb91a3e50eb12f4494fa2e139ec8 ; copie modifiée 6dbc4963da7d55bfe681a9366427e3fbc3d71c2c6c3e31c546df70dd3c5a7904 ; closure.sh 297aa2c21de183d16377112e06aef73290af4f6af32cce35797462dc94fb4c7e
+## A : insertions seules
+OK   lignes retirées : 0
+OK   blocs insérés : 2
+OK   copie sans les blocs insérés égale au dépôt
+     en-tête inséré : 27 lignes ; bloc inséré : 250 lignes
+## B : syntaxe et shellcheck
+OK   bash -n de la copie
+     remarques shellcheck : dépôt 27, copie 30
+     diff shellcheck : 2c2
+     diff shellcheck : <      17 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+     diff shellcheck : ---
+     diff shellcheck : >      19 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+     diff shellcheck : 4c4
+     diff shellcheck : <       4 note: Note that A && B || C is not if-then-else. C may run when A is true. [SC2015]
+     diff shellcheck : ---
+     diff shellcheck : >       5 note: Note that A && B || C is not if-then-else. C may run when A is true. [SC2015]
+OK   remarques shellcheck de niveau warning ou error dans la copie : 0
+## C : motif installroot de la sonde
+OK   sonde extraite : première et dernière lignes : SONDE_M3='set -u|true'
+OK   motif de la sonde : 1
+OK   lignes trouvées pour /w/b1 (deux formes), aucune pour /w/b2 : 2 1
+OK   fragments extraits (fonctions attendues, une fois chacune) : 
+## D : m3_restauration contre un registre local
+OK   doublure : fichiers, verrou réel : 9 b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   registre local prêt (http, 127.0.0.1:5910)
+OK   doublure poussée par closure.sh, digest : lisible
+     OK   digest écrit par l'étape fermeture : sha256:fcad7b28a83ee7b7e8f998053e1aebcfa6bc85b630f1acb2558e8d9638779436
+     restauration 1 depuis sc-stockage.poc.test:5000/deps/sample-app/mock-buildroot-lock@sha256:fcad7b28a83ee7b7e8f998053e1aebcfa6bc85b630f1acb2558e8d9638779436, dans un dossier vide
+     OK   arbre égal à la liste : 9 fichiers, 2733350 octets
+     restauration 2 depuis sc-stockage.poc.test:5000/deps/sample-app/mock-buildroot-lock@sha256:fcad7b28a83ee7b7e8f998053e1aebcfa6bc85b630f1acb2558e8d9638779436, dans un dossier vide
+     OK   arbre égal à la liste : 9 fichiers, 2733350 octets
+OK   restauration : code, deux arbres conformes : 0 2
+OK   restauration : dossier dir: recréé dans les deux arbres : 2
+OK   digest de fermeture.digest différent : refusé, aucun pull (intrus laissé) : 1 1 laissé
+OK   restauration rejouée : dossiers vidés puis conformes : 0 2 parti
+## E : m3_build avec un faux kubectl
+OK   politique du dépôt convertie par helm : nom et sélecteur : ["construction-rpm-sans-sortie",{"matchLabels":{"tekton.dev/task":"construire-rpm"}}]
+     OK   politique du dépôt : nom, sélecteur, types, règles : ["builds","construction-rpm-sans-sortie",{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]
+     OK   politique admise en dry-run serveur
+     networkpolicy.networking.k8s.io/construction-rpm-sans-sortie created
+     politiques de builds : NetworkPolicy construction-sans-sortie, NetworkPolicy construction-deb-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-rpm-sortie
+     OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+     OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+OK   m3_reseau : code, posée, ordre des appels : 0 posée create --dry-run=client|apply --dry-run=server|apply -f|get networkpolicy|get ciliumnetworkpolicy
+OK   m3_reseau : invariants : 4
+OK   m3_reseau : politiques relues (trois NetworkPolicy, deux CiliumNetworkPolicy) : 1
+OK   m3_reseau : politique qui autorise du trafic au label, refusée à la relecture : 1 1
+OK   m3_reseau : dry-run serveur refusé, aucune pose : 1 non posée
+     cibles des témoins (lues sur l'hôte) : public dl.rockylinux.org 192.0.2.10 ; Zot et API 192.168.161.13 10.43.0.1
+     ### s1-05-m3-temoin (kata, uid 0, privilégié, label tekton.dev/task=prefetch-rpm) : prêt
+          témoin DNS dl.rockylinux.org (10 s) : rc 0
+          témoin TCP public 192.0.2.10:443 (10 s) : rc 1 connexion refusée (banc) 
+          témoin TCP Zot 192.168.161.13:5000 (10 s) : rc 1 connexion refusée (banc) 
+          témoin TCP API 10.43.0.1:443 (10 s) : rc 1 connexion refusée (banc) 
+          (code de l'exec : 0)
+     pod s1-05-m3-temoin supprimé
+     KO   témoin positif (label prefetch-rpm), codes DNS, public, Zot : 0 1 1 (attendu : 0 0 0)
+KO   m3_temoin : code, porte, API relevée, pod au label prefetch-rpm retiré : 1 0 0 prefetch-rpm 1 (attendu : 0 1 1 prefetch-rpm 1)
+OK   m3_temoin : cibles (public résolu sur l'hôte, Zot, API) : 1
+OK   m3_temoin : Zot fermé, refusé : 1 1
+     OK   arbre égal à la liste : 9 fichiers, 2733350 octets
+     OK   verrou de la fermeture restaurée 1, sha256 : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+     OK   manifeste du dossier dir: de la fermeture restaurée 1 : sha256:d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7163
+     politiques de builds : NetworkPolicy construction-sans-sortie, NetworkPolicy construction-deb-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-rpm-sortie
+     OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+     OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+     image : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:image-du-banc ; pod : s1-05-m3-1 ; chemins sous /w/b1 ; cibles des témoins : 192.0.2.10 192.168.161.13 10.43.0.1
+     OK   label tekton.dev/task de la spec s1-05-m3-1 : construire-rpm
+     OK   spec s1-05-m3-1 admise en dry-run serveur
+     ### s1-05-m3-1 (kata, uid 0, privilégié, label tekton.dev/task=construire-rpm) : prêt
+     OK   label tekton.dev/task du pod s1-05-m3-1, relu dans le cluster : construire-rpm
+          témoin DNS dl.rockylinux.org (10 s) : rc 2
+          témoin TCP public 192.0.2.10:443 (10 s) : rc 1 connexion refusée (banc) 
+          témoin TCP Zot 192.168.161.13:5000 (10 s) : rc 1 connexion refusée (banc) 
+          témoin TCP API 10.43.0.1:443 (10 s) : rc 1 connexion refusée (banc) 
+          (code de l'exec : 0)
+     témoins, codes DNS, public, Zot, API : 2 1 1 1
+     OK   témoins : DNS, adresse publique, Zot et API injoignables
+     OK   copie de fermeture-1.tar dans le pod : 2754560 octets en 3 morceau(x), sha256 conforme
+     OK   copie de fermeture.sha256 dans le pod : 1278 octets en 1 morceau(x), sha256 conforme
+          invité : 7.0.0-31-generic, 16 vCPU ; uid 1000
+          fermeture revérifiée dans le pod : rc 0 ; fichiers 9 ; lignes de la liste 9
+          verrou de la fermeture : sha256 b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+          manifeste du dossier dir: : sha256:d74b390e16795f1d25abcf67c9f044e88b20549f20ff9a0742be402f7c9e7163
+          sources livrées : rc 0 sample-app-1.0.0.tar.gz: OK sample-app.spec: OK
+          mock de la fermeture : mock-6.9-1.el9.noarch 0000000000000000000000000000000000000000000000000000000000000007
+          mock de l image : mock-6.9-1.el9.noarch 0000000000000000000000000000000000000000000000000000000000000007
+          avant mock, capacité de ~/.cache/supply-chain-poc/05/banc-m3-2-1/pod/w : 599879200 kB ; utilisés : 506848080 kB
+          mock --hermetic-build : rc 0 en 0 s
+          lignes « Using container image: dir: » : sortie 0 ; root.log 1
+          lignes « Checking image digest: 18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af » : sortie 0 ; root.log 1
+          lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+          lignes « Expected digest for image » : sortie 0 ; root.log 0
+          lignes « Not updating bootstrap chroot » : sortie 0 ; root.log 0
+          lignes « installroot.{1,4}~/.cache/supply-chain-poc/05/banc-m3-2-1/pod/w/b1/mock-h/ » : sortie 0 ; root.log 1
+          lignes « No space left on device » : sortie 0 ; root.log 0
+          lignes http ou https de mock.out : 0
+          lignes http ou https de root.log : 0
+          lignes http ou https de build.log : 0
+          installed_pkgs.log : 1 ligne(s)
+          paquet alternatives 1.24 2.el9 x86_64 5832caf6730301817da8e513d9fca84f
+          paquet annobin 12.98 1.el9 x86_64 cac6ac6096eeaa85df3bbca0b97b627d
+          paquet audit-libs 3.1.5 7.el9 x86_64 8a5c6cb18a1287886c1985a4b598f94b
+          paquet basesystem 11 13.el9.0.1 noarch f879a2f8e19c7d73507d01111e899ca0
+          paquet bash 5.1.8 9.el9 x86_64 5d975b56a64ca3b035f8191eba908139
+          paquet binutils 2.35.2 67.el9_7.1 x86_64 cda5e16ee9e27ba339192f6bfd71e8b7
+          paquet binutils-gold 2.35.2 67.el9_7.1 x86_64 023a79a841f39d90b74c84d09a6311dc
+          paquet bzip2 1.0.8 10.el9_5 x86_64 61ee3f020508b2ba1c2c910d786365b9
+          paquet bzip2-libs 1.0.8 10.el9_5 x86_64 105251a34ba7200503c7b1719488abca
+          paquet ca-certificates 2025.2.80_v9.0.305 91.el9 noarch d83ff6a833abe330f77c2b4586421c66
+          paquet coreutils 8.32 39.el9 x86_64 0a42e50672f4f3aba4d9820e05b8ca43
+          paquet coreutils-common 8.32 39.el9 x86_64 ecbe915007226780e3481fb1423dd4f6
+          paquet cpio 2.13 16.el9 x86_64 92b5a0e69a90cb4cdd561954ef2f92e6
+          paquet cpp 11.5.0 11.el9 x86_64 8c2641b1830d9fc7321db4a789be17a5
+          paquet cracklib 2.9.6 27.el9 x86_64 9e558ac1727da7b9f6ecabf18a83daa1
+          paquet cracklib-dicts 2.9.6 27.el9 x86_64 12acec65b7f9b7b688070dc47712c208
+          paquet crypto-policies 20250905 1.git377cc42.el9 noarch 0d58514c6853e073ad29a2148f73001f
+          paquet curl 7.76.1 35.el9_7.3 x86_64 782d9fa38fe5344c533327540a318b31
+          paquet cyrus-sasl-lib 2.1.27 22.el9_7 x86_64 1d56d8b7ada6e30bf727e13a7f5d1c18
+          paquet debugedit 5.0 11.el9 x86_64 952c172e9aa1ed92551b65f98d2c9505
+          paquet diffutils 3.7 12.el9 x86_64 3fbd27f737957ccf8bc68713319471db
+          paquet dwz 0.16 1.el9 x86_64 b7291dfbbbba4fd7c877eb4a00357f70
+          paquet ed 1.14.2 12.el9 x86_64 19769aef4345277f58192dedc6418bfc
+          paquet efi-srpm-macros 6 4.el9 noarch fbb5241da61a9803c97c5faebdca409c
+          paquet elfutils 0.193 1.el9.rocky.0.1 x86_64 859c7303d411818876e971ad1a5a6f29
+          paquet elfutils-debuginfod-client 0.193 1.el9.rocky.0.1 x86_64 b7e37afbef8453481b3b571f00ffe461
+          paquet elfutils-default-yama-scope 0.193 1.el9.rocky.0.1 noarch 95cb14c993bb8afe8c46134c654233de
+          paquet elfutils-libelf 0.193 1.el9.rocky.0.1 x86_64 e721de4b9f6e5384897cf9433e71d8f2
+          paquet elfutils-libs 0.193 1.el9.rocky.0.1 x86_64 3ee02fd9a5584f9373fd9faed6632a3a
+          paquet file 5.39 16.el9 x86_64 4a8b0de2bef2340189fb3e64f8cfe0e8
+          paquet file-libs 5.39 16.el9 x86_64 8a6abd7e8541ba109fc0feec729f6280
+          paquet filesystem 3.16 5.el9 x86_64 7306685389960cd7154aa097b83c47ce
+          paquet findutils 4.8.0 7.el9 x86_64 ef5887254f0c0875fa3f2490f8a4f859
+          paquet fonts-srpm-macros 2.0.5 7.el9.1 noarch 356003bd30cda7187d766cba0c547d8c
+          paquet gawk 5.1.0 6.el9 x86_64 6a721f681e66961ab13ef1288f028e22
+          paquet gcc 11.5.0 11.el9 x86_64 315068cb65b0d618978ce2dd8eab236d
+          paquet gcc-plugin-annobin 11.5.0 11.el9 x86_64 0d6d4f306e8e095f4d107d93460d7be4
+          paquet gdb-minimal 16.3 2.el9 x86_64 1b03ec4b25a19f20a01d4820bdf5c48f
+          paquet gdbm-libs 1.23 1.el9 x86_64 2e41ba837321388b4083b00cf1b13c2d
+          paquet ghc-srpm-macros 1.5.0 6.el9 noarch 71fed58726c9a4e11b4ca5eeec6adfe4
+          paquet glibc 2.34 231.el9_7.10 x86_64 9e441cde951d662f12771959a6d8c181
+          paquet glibc-common 2.34 231.el9_7.10 x86_64 c034d86a9a1553f622792108109c2df2
+          paquet glibc-devel 2.34 231.el9_7.10 x86_64 43f4916d4ed4e4612743b3c8f11be646
+          paquet glibc-gconv-extra 2.34 231.el9_7.10 x86_64 e1306dfc8a0df47b5bf1a6df64ea8744
+          paquet glibc-headers 2.34 231.el9_7.10 x86_64 d2a4edd9f429305558fe39e19f0c1579
+          paquet glibc-minimal-langpack 2.34 231.el9_7.10 x86_64 158b1ca611d059cdbdaffd1363995197
+          paquet gmp 6.2.0 13.el9 x86_64 774609cd79716dc0d9b8d99d2db05d5b
+          paquet go-srpm-macros 3.6.0 14.el9_7 noarch 680bd12fbd7818af6650851fe73b38ea
+          paquet golang 1.25.9 1.el9_7 x86_64 f84394fc92164b6ac446f586e61c57cd
+          paquet golang-bin 1.25.9 1.el9_7 x86_64 cca579810673e59c3d7f4e189b00bcd3
+          paquet golang-race 1.25.9 1.el9_7 x86_64 4eaa03223ee025015770b6a576f90fe0
+          paquet golang-src 1.25.9 1.el9_7 noarch b3b272e933a863bc889510d5305a3902
+          paquet grep 3.6 5.el9 x86_64 98d808fd3d09606215d7de3258c9f1a9
+          paquet groff-base 1.22.4 10.el9.0.1 x86_64 07cc850c55c40771cf66526d8e05c4e8
+          paquet gzip 1.12 1.el9 x86_64 c3b6a711959934acd5bde6ee77091d4f
+          paquet info 6.7 15.el9 x86_64 9065cd2c5f7bf7c4203969e66fe0f4fe
+          paquet json-c 0.14 11.el9 x86_64 da1e9eaa62fe800979c80a5c7b8a8d95
+          paquet kernel-headers 5.14.0 611.55.1.el9_7 x86_64 4399912cb6acfd18c84cc79f2755e25e
+          paquet kernel-srpm-macros 1.0 14.el9 noarch 247198282ea72b12664b7f5c5acfe2c6
+          paquet keyutils-libs 1.6.3 1.el9 x86_64 b280a8e5cca83fc5e3df0704a38e180f
+          paquet krb5-libs 1.21.1 9.el9_7 x86_64 f60314a39e7cad5e3e49968f0f73a77d
+          paquet libacl 2.3.1 4.el9 x86_64 5fde7da3b371015dd2e8ff6378b3e9fb
+          paquet libarchive 3.5.3 9.el9_7 x86_64 947320589e4a4e7dc59fc2194afb392d
+          paquet libattr 2.5.1 3.el9 x86_64 1592052a48688a467ac8c10809b4c1e9
+          paquet libblkid 2.37.4 21.el9_7 x86_64 703a89a33267cba03a5db4620ea5821f
+          paquet libbrotli 1.0.9 9.el9_7 x86_64 747dc29aaa5a740fca5fbe9cdd421467
+          paquet libcap 2.48 10.el9_7.1 x86_64 0fd590799898e4b080d217bf8ea753e2
+          paquet libcap-ng 0.8.2 7.el9 x86_64 45dc2b2ff774e4f4e94f7c354dd56e74
+          paquet libcom_err 1.46.5 8.el9 x86_64 65cc0a856d04980a81d0ec59fcab3a3c
+          paquet libcurl 7.76.1 35.el9_7.3 x86_64 cedfb44fde8998e3f72220d9960fe398
+          paquet libdb 5.3.28 57.el9_6 x86_64 3a7bfed326794eaffd65145bbb761c53
+          paquet libeconf 0.4.1 4.el9 x86_64 dde72fce8cab774393607423627cf75c
+          paquet libedit 3.1 38.20210216cvs.el9 x86_64 82d03f76417695578b5140e36da31fb2
+          paquet libevent 2.1.12 8.el9_4 x86_64 d9405087fd87d67381a1f397a7e25664
+          paquet libfdisk 2.37.4 21.el9_7 x86_64 7f08853c1bf8551874f2a17f54400f7d
+          paquet libffi 3.4.2 8.el9 x86_64 67a9fdf44690673ca2034843b2459a18
+          paquet libgcc 11.5.0 11.el9 x86_64 77803b11ecf93bf5ba7024ced80ff0b4
+          paquet libgcrypt 1.10.0 11.el9 x86_64 ffb8d9ceca3acfe65d9a6b63bec43c7d
+          paquet libgomp 11.5.0 11.el9 x86_64 dc3faeb12a4e9343b0326e9f8983b22b
+          paquet libgpg-error 1.42 5.el9 x86_64 99c44f4fadc8f9a9103d47e9b21d2620
+          paquet libidn2 2.3.0 7.el9 x86_64 b212886c674f27c872317e6ee6855977
+          paquet libmount 2.37.4 21.el9_7 x86_64 b0928fed766df7fc502d111efa189dd5
+          paquet libmpc 1.2.1 4.el9 x86_64 9d370c48a81c56b99bdb7c4d0aae607e
+          paquet libnghttp2 1.43.0 6.el9_7.1 x86_64 4ae7db347d48959859a62b5e6d7efccf
+          paquet libpkgconf 1.7.3 10.el9 x86_64 5d8bf5d30b338e5cddf9ac38db81428b
+          paquet libpsl 0.21.1 5.el9 x86_64 cc480e6508a7637917397ee92fede3a0
+          paquet libpwquality 1.4.4 8.el9 x86_64 fca0191f7104f50acf34e27c0fb604a8
+          paquet libselinux 3.6 3.el9 x86_64 15b7329babbe9bf9e9b4c4c8a0f7fd8c
+          paquet libsemanage 3.6 5.el9_6 x86_64 31d26d29f5b1c9ba079fb35c73aa1615
+          paquet libsepol 3.6 3.el9 x86_64 ec24197b536785f1603339aba9201d6b
+          paquet libsigsegv 2.13 4.el9 x86_64 06625e6afe8f42ae91ba0e98dfa9e222
+          paquet libsmartcols 2.37.4 21.el9_7 x86_64 de1c13be5c9c60425840890d71a344d9
+          paquet libssh 0.10.4 17.el9_7 x86_64 2dd1df963df3816e81d0fb6c75f7b522
+          paquet libssh-config 0.10.4 17.el9_7 noarch ee713a2ae09a8c25f3f7208edf90487b
+          paquet libstdc++ 11.5.0 11.el9 x86_64 2dc10f13bb6f3ef23dc1b9add1d4ce5c
+          paquet libtasn1 4.16.0 9.el9 x86_64 8e066650d1ba8c35354d80f422fbb9d4
+          paquet libtool-ltdl 2.4.6 46.el9 x86_64 4333a6ae7619c1298d558871703f1d5b
+          paquet libunistring 0.9.10 15.el9 x86_64 354dedb80398de4afb10e8e3806bc5da
+          paquet libutempter 1.2.1 6.el9 x86_64 c8a01f5605facb680c8781954f73e338
+          paquet libuuid 2.37.4 21.el9_7 x86_64 92f43195adcdab4ae50cdb860097f446
+          paquet libverto 0.3.2 3.el9 x86_64 ab20fd3e76a7e65cda2205582d56669d
+          paquet libxcrypt 4.4.18 3.el9 x86_64 009b94ca2e493d96aa69f2cf33ea75bc
+          paquet libxcrypt-devel 4.4.18 3.el9 x86_64 fda458b53a75fcd4b21c7f7e2b02e461
+          paquet libxml2 2.9.13 14.el9_7 x86_64 da8f3e5f1351d764468c4c41bdbeb711
+          paquet libzstd 1.5.5 1.el9 x86_64 83f03d9173837806c24c1debe0c19430
+          paquet llvm-filesystem 20.1.8 3.el9 x86_64 8a73100e6104985835d17af870ac7a86
+          paquet llvm-libs 20.1.8 3.el9 x86_64 4f2eb7f6460186452c52fc4e54d30fa8
+          paquet lua-libs 5.4.4 4.el9 x86_64 32deba31381adab09c4376aa86a7f2f5
+          paquet lua-srpm-macros 1 6.el9 noarch 870f5bd7a9f316ac2a42d6cda3bc6d41
+          paquet lz4-libs 1.9.3 5.el9 x86_64 cfdb2734e4e037ef811fa970b2a41ddd
+          paquet make 4.3 8.el9 x86_64 8cb0facf22181efda18b2ad4f29ce8a2
+          paquet mpfr 4.1.0 7.el9 x86_64 74619be075ab6bbc6f6f3eb27869ac7e
+          paquet ncurses 6.2 12.20210508.el9 x86_64 888a2ed8bed7b53e1851b1de0d370b4d
+          paquet ncurses-base 6.2 12.20210508.el9 noarch 7b155cc38964315829a723729faf39da
+          paquet ncurses-libs 6.2 12.20210508.el9 x86_64 72f688c695e13a539523baa4859b6079
+          paquet nodejs 16.20.2 8.el9_4 x86_64 66696738ae249f7e4689f5e62b442b5c
+          paquet nodejs-libs 16.20.2 8.el9_4 x86_64 2c904777174aeb242bf4795addf0b756
+          paquet ocaml-srpm-macros 6 6.el9 noarch 73be47bd06ff2934c420576ab4426d56
+          paquet openblas-srpm-macros 2 11.el9 noarch d4f8d1073512b1b0c44f95a04285ce97
+          paquet openldap 2.6.8 4.el9.0.1 x86_64 d6eeb39b5a1a6617fb438717dc519ecb
+          paquet openssl 3.5.1 7.el9_7 x86_64 1437ffe3f226c79f0e9ced2b371b6ac2
+          paquet openssl-devel 3.5.1 7.el9_7 x86_64 861c691d500ba8fb4b89eb1a6dd57376
+          paquet openssl-fips-provider 3.5.1 7.el9_7 x86_64 61638f3dd0821d0744a66362beb483ad
+          paquet openssl-libs 3.5.1 7.el9_7 x86_64 b7f35fe7d58cc855bff73e967c3f6c1f
+          paquet p11-kit 0.25.3 3.el9_5 x86_64 bd2aaa574f26d49d8699711ca9befc0a
+          paquet p11-kit-trust 0.25.3 3.el9_5 x86_64 2dfd361825d159f907ba4294ea187ee8
+          paquet pam 1.5.1 26.el9_6 x86_64 b395ec5681ea90955b0d1a5e3a49de05
+          paquet patch 2.7.6 16.el9 x86_64 bdfc6d2c361a1fc7c381fea53c0a76ac
+          paquet pcre 8.44 4.el9 x86_64 765a3e0316de46e3db520b432fa941ac
+          paquet pcre2 10.40 6.el9 x86_64 c8398a0fca8168e4647c255f832ee865
+          paquet pcre2-syntax 10.40 6.el9 noarch 10212dbd923fec1f2151d4ef16754dc3
+          paquet perl-AutoLoader 5.74 481.1.el9_6 noarch 9f58c103fadd4368a4dd443b16843642
+          paquet perl-B 1.80 481.1.el9_6 x86_64 1f57a1daef3fb85121f91964a3bc994d
+          paquet perl-Carp 1.50 460.el9.0.1 noarch abfd0a7186623c8c3ade066b63d9df5a
+          paquet perl-Class-Struct 0.66 481.1.el9_6 noarch 3202ccab5e6c6b0db803a7842e6b83f5
+          paquet perl-Data-Dumper 2.174 462.el9 x86_64 3aa2e656fe92cf1ed66d60f77aea3fce
+          paquet perl-Digest 1.19 4.el9.0.1 noarch a11113316fe662654b12ec84df6d6b27
+          paquet perl-Digest-MD5 2.58 4.el9 x86_64 12bfc64ff312fa435f1de2e068508db2
+          paquet perl-Encode 3.08 462.el9 x86_64 cf3cbbaf60be22194fd1dae2a20da92a
+          paquet perl-Errno 1.30 481.1.el9_6 x86_64 5a282c90f78631504f5802de659b98cd
+          paquet perl-Exporter 5.74 461.el9 noarch c01c2a31a2561b748052cc0463c35215
+          paquet perl-Fcntl 1.13 481.1.el9_6 x86_64 b71b4e94c5b6d4773921aac73a7bbbde
+          paquet perl-File-Basename 2.85 481.1.el9_6 noarch 6057464999c6d7b6b1a8d893d76bd38b
+          paquet perl-File-Path 2.18 4.el9 noarch 0913f114ee7544e2c36b3c1306b3cacd
+          paquet perl-File-Temp 0.231.100 4.el9 noarch f59e524679a0053d68e5543e8e7e314f
+          paquet perl-File-stat 1.09 481.1.el9_6 noarch 5b79bd7181b0a897d60b6e38b47ee79d
+          paquet perl-FileHandle 2.03 481.1.el9_6 noarch fd3dc680472d27cf02d7494179784cb3
+          paquet perl-Getopt-Long 2.52 4.el9 noarch d27908b132dda891df7dc6951fa2c34b
+          paquet perl-Getopt-Std 1.12 481.1.el9_6 noarch 60128235c0831ee80bcc79541665872d
+          paquet perl-HTTP-Tiny 0.076 462.el9 noarch c0d71e59cd5878a35fb4e106c7f2a7b7
+          paquet perl-IO 1.43 481.1.el9_6 x86_64 8cace3ce9b7aefd379cec1acd8a7e2a7
+          paquet perl-IO-Socket-IP 0.41 5.el9 noarch e15309272bc8233c371974031d4038f4
+          paquet perl-IO-Socket-SSL 2.073 2.el9 noarch cb9d5e58fbe6d47b52744c67b088b98c
+          paquet perl-IPC-Open3 1.21 481.1.el9_6 noarch bf64fe9fd2a4ef3945b15240d570bfd3
+          paquet perl-MIME-Base64 3.16 4.el9 x86_64 79131d65e200b0c6e64dc18850ff8a06
+          paquet perl-Mozilla-CA 20200520 6.el9 noarch 379218f96763af378c71e840443183f8
+          paquet perl-Net-SSLeay 1.94 3.el9 x86_64 001848fd9f8a8c4f66d831638949cbff
+          paquet perl-POSIX 1.94 481.1.el9_6 x86_64 b0ff90ba4108a40c7242242b8e60daf8
+          paquet perl-PathTools 3.78 461.el9 x86_64 835426614e155f37f1ffa650efe6de40
+          paquet perl-Pod-Escapes 1.07 460.el9.0.1 noarch c6c94dde8b8c16ea0d9ae66e0ef4a4cb
+          paquet perl-Pod-Perldoc 3.28.01 461.el9 noarch 83cda205537bd2ad32547af109e20f11
+          paquet perl-Pod-Simple 3.42 4.el9 noarch 82d3854aa1de3ebb86a9312a6340e90f
+          paquet perl-Pod-Usage 2.01 4.el9 noarch 98f6af2a3d64753ac904d5d9407e878e
+          paquet perl-Scalar-List-Utils 1.56 462.el9 x86_64 25431cd814537699d04a6bd116464a28
+          paquet perl-SelectSaver 1.02 481.1.el9_6 noarch a98d550fd36618409ba5dd24196a1527
+          paquet perl-Socket 2.031 4.el9 x86_64 249702354e9054c64a9e9e44c213ec96
+          paquet perl-Storable 3.21 460.el9 x86_64 f562f7fa711e68402776f692f3add570
+          paquet perl-Symbol 1.08 481.1.el9_6 noarch a945d62472a270e999af3dc901779584
+          paquet perl-Term-ANSIColor 5.01 461.el9.0.1 noarch a1860327f42a070371b2cd671cd980be
+          paquet perl-Term-Cap 1.17 460.el9.0.1 noarch a02eda5eb74278d88ac2f9fc1abd326f
+          paquet perl-Text-ParseWords 3.30 460.el9 noarch f0cff9642d107f0207c44c00e68af130
+          paquet perl-Text-Tabs+Wrap 2013.0523 460.el9.0.1 noarch 76fdb8715ee5a07495562548bbf66d63
+          paquet perl-Time-Local 1.300 7.el9 noarch 1ceb12a5fab9494f14aeeae4f98974f8
+          paquet perl-URI 5.09 3.el9.0.1 noarch 458c5584e97d3af7b786ad3f38566d40
+          paquet perl-base 2.27 481.1.el9_6 noarch 1d86694e12c93a8738a175f1c779e6f6
+          paquet perl-constant 1.33 461.el9.0.1 noarch f35cd6a19158668ed3856b33884d936d
+          paquet perl-if 0.60.800 481.1.el9_6 noarch 38aef3b2cf57f279e2a6661c03b656a1
+          paquet perl-interpreter 5.32.1 481.1.el9_6 x86_64 776fe5177ff52565dc20c394dfd94415
+          paquet perl-libnet 3.13 4.el9 noarch 5cad22704f22db0d115e4f8d698810a0
+          paquet perl-libs 5.32.1 481.1.el9_6 x86_64 c071ac9e460132c8752cd07c836ab126
+          paquet perl-mro 1.23 481.1.el9_6 x86_64 159cfe5bc49c6df0dc698f2c6e2ca03e
+          paquet perl-overload 1.31 481.1.el9_6 noarch 91186cacedc81dfe85381da01627ee4d
+          paquet perl-overloading 0.02 481.1.el9_6 noarch 4b9f641f5e1352cdc8ddaafa21439118
+          paquet perl-parent 0.238 460.el9 noarch cd964be73bdf6940a87b3d0fe0476847
+          paquet perl-podlators 4.14 460.el9.0.1 noarch 8635014cbb4597f185f7124e77ecdb1b
+          paquet perl-srpm-macros 1 41.el9 noarch 52f1bf91c8b58cea8094d6e3be4c7f0e
+          paquet perl-subs 1.03 481.1.el9_6 noarch 977f2c5a42f9f04cf7b0c0959df94842
+          paquet perl-vars 1.05 481.1.el9_6 noarch 48d8ec93b2b169381b601ee9504284e3
+          paquet pkgconf 1.7.3 10.el9 x86_64 6d4afc2fa1090836b5e24e8ab21be4a6
+          paquet pkgconf-m4 1.7.3 10.el9 noarch 12b061c94e3a733e9c1e8921ea590501
+          paquet pkgconf-pkg-config 1.7.3 10.el9 x86_64 22a1213f2869406a12ca4174b5dd103e
+          paquet popt 1.18 8.el9 x86_64 c6ee753abf2608135eef84c6543c4713
+          paquet publicsuffix-list-dafsa 20210518 3.el9 noarch d1ed826a6c010597e8edb6dc130b0901
+          paquet pyproject-srpm-macros 1.16.2 1.el9 noarch 96c50e62d638304e39b582e0e3516e5d
+          paquet python-srpm-macros 3.9 54.el9 noarch 69d130ef9a21da361859ceeacf238881
+          paquet qt5-srpm-macros 5.15.9 1.el9 noarch f878432102092d87bbdbb2e936f8378b
+          paquet readline 8.1 4.el9 x86_64 66ec97b30c4ebb8b6e3cd340d919dcd3
+          paquet redhat-rpm-config 210 1.el9 noarch 979b3e97c1d85b8552cbd4f6f89cf9bc
+          paquet rocky-gpg-keys 9.7 1.7.el9 noarch 81b54eff28b9440d8a13e8df5022ea78
+          paquet rocky-release 9.7 1.7.el9 noarch 4c18420f2f7449fac4df7f785834be84
+          paquet rocky-repos 9.7 1.7.el9 noarch e0711a18ad9c8ace90497a4ad1bf7662
+          paquet rpm 4.16.1.3 39.el9 x86_64 f3931592da0e928b9daf2c251ef7eee7
+          paquet rpm-build 4.16.1.3 39.el9 x86_64 fd6be0e485cdb453a7ba5d907f57dee4
+          paquet rpm-build-libs 4.16.1.3 39.el9 x86_64 ba01d44123a6ecf8826896f1e6d3e2ba
+          paquet rpm-libs 4.16.1.3 39.el9 x86_64 768f539586b50b309e5116b32cfb8c98
+          paquet rust-srpm-macros 17 4.el9 noarch f473eb960de326eea8285ce84d1e7972
+          paquet sed 4.8 9.el9 x86_64 415f8fb73ee020b229344cba9cfc297d
+          paquet setup 2.13.7 10.el9 noarch 69bddb22c48ee24373556f12566c97fe
+          paquet shadow-utils 4.9 15.el9 x86_64 d645442718019cb73c4516800a321387
+          paquet sqlite-libs 3.34.1 9.el9_7 x86_64 c9024e11e64e8157a1a194f12afe6473
+          paquet systemd-libs 252 55.el9_7.9.rocky.0.1 x86_64 dd913c1aebb7b01448ce03bbba87834e
+          paquet tar 1.34 9.el9_7 x86_64 258307fe6d1c4f5a6da60cf787fc0b2a
+          paquet tzdata 2026a 1.el9_7 noarch 13852f5f796366f1331d50d47ed3bc8c
+          paquet unzip 6.0 59.el9 x86_64 f8c184c5c9b7c3cef6bb2b8bc0884481
+          paquet util-linux 2.37.4 21.el9_7 x86_64 7302edfdbd843cdb6f5a1a8dee3491be
+          paquet util-linux-core 2.37.4 21.el9_7 x86_64 7561ef94b8c1ab71dbbee1f743e25726
+          paquet which 2.21 30.el9_6 x86_64 0e055838636b786507f4a6c791bd7bb8
+          paquet xz 5.2.5 8.el9_0 x86_64 32384d0037322e70b1394d34df5d71ab
+          paquet xz-libs 5.2.5 8.el9_0 x86_64 078cdcb6e241d5bae897e8ffbe5abc12
+          paquet zip 3.0 35.el9 x86_64 12a2063a23942b9626bc54af762d1769
+          paquet zlib 1.2.11 40.el9 x86_64 769b855a81f624aff2c4d5d5f7b85874
+          paquet zstd 1.5.5 1.el9 x86_64 9bf8ac4e16254ef48a77dcaf3af5ff8d
+          paquets du buildroot (rpm --root) : 222
+          résultat : total 20
+          résultat : -rw-rw-r-- 1 gigi gigi  18 Nov 17 20:45 build.log
+          résultat : -rw-rw-r-- 1 gigi gigi  40 Nov 17 20:45 installed_pkgs.log
+          résultat : -rw-rw-r-- 1 gigi gigi 349 Nov 17 20:45 root.log
+          résultat : -rw-rw-r-- 1 gigi gigi  15 Nov 17 20:45 sample-app-1.0.0-2.el9.src.rpm
+          résultat : -rw-rw-r-- 1 gigi gigi  11 Nov 17 20:45 sample-app-1.0.0-2.el9.x86_64.rpm
+          rpm : sample-app-1.0.0-2.el9.src.rpm sha256 8b23ce18b0cc0396f2ec1410508651223413c246ced66dca02eaabd4564fe889 ; NEVRA sample-app-1.0.0-2.el9.src ; BUILDHOST reproducible ; BUILDTIME 1794787200
+          rpm : sample-app-1.0.0-2.el9.x86_64.rpm sha256 1407b7ef9da8f42f2fd8d3d29fa0200905c9a5ecaebaa92fb3a4ceef3e39802f ; NEVRA sample-app-1.0.0-2.el9.x86_64 ; BUILDHOST reproducible ; BUILDTIME 1794787200
+          après mock (buildroot gardé), capacité de ~/.cache/supply-chain-poc/05/banc-m3-2-1/pod/w : 599879200 kB ; utilisés : 506848140 kB
+          (code de l'exec : 0)
+     journaux de mock : 11 lignes, resultats/s1-m3_build1-mock.log
+     pod s1-05-m3-1 supprimé
+     OK   code de mock --hermetic-build : rc 0
+     OK   rpm rapatrié sample-app-1.0.0-2.el9.src.rpm, sha256 8b23ce18b0cc0396f2ec1410508651223413c246ced66dca02eaabd4564fe889, lignes égales dans la sonde : 1
+     OK   rpm rapatrié sample-app-1.0.0-2.el9.x86_64.rpm, sha256 1407b7ef9da8f42f2fd8d3d29fa0200905c9a5ecaebaa92fb3a4ceef3e39802f, lignes égales dans la sonde : 1
+     OK   rpm rapatriés (src.rpm et binaire) : 2
+OK   build 1 : code : 0
+OK   build 1 : copie en morceaux de 1 Mio (tar de la fermeture) : 1
+OK   build 1 : dry-run avant la création, une création : --dry-run=server |
+OK   build 1 : spec au label construire-rpm : construire-rpm
+OK   build 1 : politique relue avant toute création : get networkpolicy
+OK   build 1 : sonde reçue sans marque @…@ : 0
+OK   build 1 : chemins de mock sous /w/b1 (fermeture, basedir, cache, resultdir) : 5
+OK   build 1 : quatre témoins fermés, porte : 4 1
+OK   build 1 : lignes comptées (image, digest, installroot ; aucune ligne http) : 3 3
+OK   build 1 : paquets du buildroot relus (222) ; installed_pkgs.log lu : 222 1
+OK   build 1 : journaux de mock archivés (quatre fichiers) : 4
+OK   build 1 : rpm rapatriés et portes : sample-app-1.0.0-2.el9.src.rpm sample-app-1.0.0-2.el9.x86_64.rpm 4
+OK   build 1 : pod retiré une fois : 1
+OK   build 2 : code, chemins sous /w/b2, pod retiré : 0 1 1
+KO   Zot joignable : code 1, mock non lancé, pod retiré : 0 0 lancé 1 (attendu : 1 1 non lancé 1)
+OK   DNS joignable : code 1, mock non lancé, pod retiré : 1 1 non lancé 1
+OK   politique (sanspolitique) : code 1, aucun pod créé : 1 0
+OK   politique (autorise) : code 1, aucun pod créé : 1 0
+OK   label différent dans le cluster : code 1, aucune sonde jouée, pod retiré : 1 non jouée 1
+OK   spec refusée en dry-run : code 1, aucune création : 1 0
+OK   fermeture changée sur l'hôte : code 1, aucun appel à kubectl : 1 non appelé
+OK   build 1 rejoué : code : 0
+## F : m3_comparaison
+     OK   verrou de référence (fermeture restaurée 1), sha256 : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+     build 1 : sample-app-1.0.0-2.el9.src.rpm 8b23ce18b0cc0396f2ec1410508651223413c246ced66dca02eaabd4564fe889
+     build 1 : sample-app-1.0.0-2.el9.x86_64.rpm 1407b7ef9da8f42f2fd8d3d29fa0200905c9a5ecaebaa92fb3a4ceef3e39802f
+     build 2 : sample-app-1.0.0-2.el9.src.rpm 8b23ce18b0cc0396f2ec1410508651223413c246ced66dca02eaabd4564fe889
+     build 2 : sample-app-1.0.0-2.el9.x86_64.rpm 1407b7ef9da8f42f2fd8d3d29fa0200905c9a5ecaebaa92fb3a4ceef3e39802f
+     ## critère de M3 (build 1 contre build 2)
+     OK   fichiers rpm par build : 2 2
+     OK   lignes NEVRA lues par build : 2 2
+     OK   rpm et src.rpm (nom et sha256), build 2 contre build 1 : sample-app-1.0.0-2.el9.src.rpm 8b23ce18b0cc0396f2ec1410508651223413c246ced66dca02eaabd4564fe889 sample-app-1.0.0-2.el9.x86_64.rpm 1407b7ef9da8f42f2fd8d3d29fa0200905c9a5ecaebaa92fb3a4ceef3e39802f
+     OK   NEVRA, build 2 contre build 1 : sample-app-1.0.0-2.el9.src.rpm sample-app-1.0.0-2.el9.src sample-app-1.0.0-2.el9.x86_64.rpm sample-app-1.0.0-2.el9.x86_64
+     ## relevés à part (sans effet sur le code)
+     relevé : sha256 864d55f486f4… d'hermetique (17/11, 16:20 UTC) retrouvé dans le build 1 : 0 fois ; build 2 : 0 fois
+     relevé : sha256 c802e60a511c… d'hermetique (17/11, 16:20 UTC) retrouvé dans le build 1 : 0 fois ; build 2 : 0 fois
+     relevé, build 1 : paquets du buildroot (rpm --root) 222, verrou 222 ; lignes d'écart (nom, version, release, arch, sigmd5) : 0
+     relevé, build 1 : lignes http(s):// (sortie, root.log, build.log) : 0 0 0
+     relevé, build 1 : mock de la fermeture : mock-6.9-1.el9.noarch 0000000000000000000000000000000000000000000000000000000000000007 ; mock de l'image : mock-6.9-1.el9.noarch 0000000000000000000000000000000000000000000000000000000000000007 ; égaux
+          témoin DNS dl.rockylinux.org (10 s) : rc 2
+          témoin TCP public 192.0.2.10:443 (10 s) : rc 1 connexion refusée (banc) 
+          témoin TCP Zot 192.168.161.13:5000 (10 s) : rc 1 connexion refusée (banc) 
+          témoin TCP API 10.43.0.1:443 (10 s) : rc 1 connexion refusée (banc) 
+          mock --hermetic-build : rc 0 en 0 s
+          lignes « Using container image: dir: » : sortie 0 ; root.log 1
+          lignes « Checking image digest: 18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af » : sortie 0 ; root.log 1
+          lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+          lignes « Expected digest for image » : sortie 0 ; root.log 0
+          lignes « Not updating bootstrap chroot » : sortie 0 ; root.log 0
+          lignes « installroot.{1,4}~/.cache/supply-chain-poc/05/banc-m3-2-1/pod/w/b1/mock-h/ » : sortie 0 ; root.log 1
+          lignes « No space left on device » : sortie 0 ; root.log 0
+          installed_pkgs.log : 1 ligne(s)
+     relevé, build 2 : paquets du buildroot (rpm --root) 222, verrou 222 ; lignes d'écart (nom, version, release, arch, sigmd5) : 0
+     relevé, build 2 : lignes http(s):// (sortie, root.log, build.log) : 0 0 0
+     relevé, build 2 : mock de la fermeture : mock-6.9-1.el9.noarch 0000000000000000000000000000000000000000000000000000000000000007 ; mock de l'image : mock-6.9-1.el9.noarch 0000000000000000000000000000000000000000000000000000000000000007 ; égaux
+          témoin DNS dl.rockylinux.org (10 s) : rc 2
+          témoin TCP public 192.0.2.10:443 (10 s) : rc 1 connexion refusée (banc) 
+          témoin TCP Zot 192.168.161.13:5000 (10 s) : rc 1 connexion refusée (banc) 
+          témoin TCP API 10.43.0.1:443 (10 s) : rc 1 connexion refusée (banc) 
+          mock --hermetic-build : rc 0 en 0 s
+          lignes « Using container image: dir: » : sortie 0 ; root.log 1
+          lignes « Checking image digest: 18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af » : sortie 0 ; root.log 1
+          lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+          lignes « Expected digest for image » : sortie 0 ; root.log 0
+          lignes « Not updating bootstrap chroot » : sortie 0 ; root.log 0
+          lignes « installroot.{1,4}~/.cache/supply-chain-poc/05/banc-m3-2-1/pod/w/b2/mock-h/ » : sortie 0 ; root.log 1
+          lignes « No space left on device » : sortie 0 ; root.log 0
+          installed_pkgs.log : 1 ligne(s)
+     écarts du critère : 0
+OK   nominal : code et écarts : 0 1
+OK   nominal : mesures OK (verrou, nombre de rpm, lignes NEVRA, sha256, NEVRA) : 5
+OK   nominal : relevé d'hermetique (factices : 0 fois) : 2
+OK   nominal : relevés par build (paquets 222 sans écart, aucune URL, mock égaux) : 6
+OK   rpm du build 2 altéré : code 1, un écart, diffoscope signalé : 1 1 1
+OK   paquet manquant au buildroot du build 2 : relevé seulement, code 0, une ligne d'écart relevée : 0 1 1
+OK   NEVRA du src.rpm illisible au build 2 : code 1, deux écarts (nombre de lignes, NEVRA) : 1 1 1
+OK   NEVRA illisibles aux deux builds : code 1, pas d'égalité à vide : 1 1
+## G : structure
+OK   six étapes définies une fois
+OK   seule m3_reseau écrit dans le cluster (kubectl apply : dry-run serveur puis pose)
+OK   m3_build : politique relue et cibles lues avant m3_pod, témoins avant toute copie
+OK   m3_temoin : pod de pod_spec au label global, sans m3_pod ni écriture
+OK   aucune écriture dans Zot (ni push, ni crane, ni oras hors de closure.sh pull)
+OK   restauration lit par FERMETURE_DIGEST seulement
+OK   comparaison sans kubectl ni Zot
+OK   build : une seule création de pod, par m3_pod ; dry-run avant
+OK   build ne lit ni $T/m2, ni voie2, ni le verrou de resultats/
+OK   noms de pods conformes et distincts
+## H : image d'essai
+OK   racine.tar (image d'essai), sha256 de l'étape racine : d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+OK   commandes des sondes et des exec absentes de /usr/bin : 
+## I : lectures de mock 6.9 citées (archive des sources de M2)
+OK   archive des sources de mock 6.9-1, sha256 (m2-releve.log) : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+OK   config.py:98 :     config_opts['rpmbuild_networking'] = False
+OK   config.py:210 :             'installed_pkgs': True,
+OK   package_manager.py:238 :             invocation += ['--installroot', self.buildroot.make_chroot_path('')]
+OK   plugins/package_state.py:70 :         out_file = self.buildroot.resultdir + '/installed_pkgs.log'
+OK   backend.py:63 :         self.private_network = not config['rpmbuild_networking']
+OK   config.py : chroothome (chemin de build dans le chroot, le même pour les deux builds) : 79:    config_opts['chroothome'] = '/builddir'
+# bilan : NON TENU, fin 2026-11-17T19:45:59Z

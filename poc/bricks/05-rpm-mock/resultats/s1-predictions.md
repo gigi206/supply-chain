@@ -2562,3 +2562,87 @@ seules dans `s1.sh` (`4c3adb53…`), copie `60bcceaa…`. Quatre étapes, un acc
 
 Suite : la lecture de « sans réseau » revient au propriétaire. Viendront ensuite l'application sur accord, les prédictions,
 puis un lancement par étape. Rien n'est appliqué ni lancé.
+
+## Décision « Tout couper » ; M3, seconde version (`s1-m3-2.patch`) préparée à sec (note du 2026-11-17, écrite à 2026-11-17T19:51:44Z ; rien n'est réécrit), NON APPLIQUÉ
+
+Question posée : « « Sans réseau » pour M3 : adresses publiques fermées, ça vous suffit ? » (choix proposés : « Oui, ça suffit »
+ou « Tout couper ») ; réponse du propriétaire : **« Tout couper »**. M3 se lit donc : ni adresse publique, ni Zot, ni DNS, ni
+API du cluster pendant le build.
+
+**Corrections de la note précédente** (commitée en `dbbfd44`, non réécrite) :
+- [`../s1-m3.patch`](../s1-m3.patch) (`2281cdf4…`) est remplacé par [`../s1-m3-2.patch`](../s1-m3-2.patch) ; il est gardé et
+  ne doit pas être appliqué ;
+- la phrase « Le refus ne sera attribuable à la politique que si le DNS et Zot répondent (rc 0) » est caduque : les quatre
+  témoins doivent désormais échouer, et l'outillage est prouvé à part, par un témoin positif.
+
+**Mécanisme retenu** : celui que le dépôt a déjà mesuré, pas `unshare -n`, qui serait une seconde variable dans le pod.
+- Une NetworkPolicy sans règle, [`../politiques/construction-rpm-sans-sortie.yaml`](../politiques/construction-rpm-sans-sortie.yaml)
+  (`2471ee68…`). Elle sélectionne `tekton.dev/task=construire-rpm`, comme `construction-sans-sortie` (08) et
+  `construction-deb-sans-sortie` (06) : ni entrée ni sortie. `builds-sans-internet` s'y ajoute sans changement.
+- Mesuré dans la 06 (commit `1459e3f`, S4d1) :
+  - la politique de la 06 est posée à 18:25:50 UTC le 11/11 ;
+  - à partir de 18:25:55 UTC, un pod Kata au label `construire-deb` reçoit 227 266 560 octets par `kubectl exec`, en 4 morceaux,
+    sha256 conforme.
+  - L'exec passe donc sous une telle politique. Ce n'est pas encore mesuré pour la nouvelle.
+- Mesuré dans la 08 sous Cilium, le 13/11 ([`kata-reseau.log`](../../08-trust-plane/resultats/kata-reseau.log)) :
+  - « kata : aucune fenêtre en 3 essais » ;
+  - depuis un pod Kata privilégié, l'usurpation d'adresse source est refusée (« tout refusé » avec une adresse inutilisée).
+  - La limite de l'en-tête de `construction-sans-sortie` (contournement par usurpation) avait été écrite sous kube-router.
+
+**Seconde version** (insertions seules dans `s1.sh` `4c3adb53…`, copie `18c9d4ce…`, correctif `2017c43d…`) : six étapes, un
+accord chacune.
+- **`m3_reseau`** (**écriture dans le cluster**) :
+  - la politique du dépôt est contrôlée (nom, sélecteur, types, aucune règle), puis admise en dry-run serveur, puis posée ;
+  - les politiques de `builds` sont relues : NetworkPolicy et CiliumNetworkPolicy ;
+  - aucune ne doit autoriser de trafic au label, d'après l'évaluateur `selecteurs.jq` de la 08 ;
+  - la politique reste posée ensuite, comme celle de la 06.
+- **`m3_temoin`** (lecture seule) : c'est le témoin positif.
+  - Un pod au label `prefetch-rpm` joue les témoins de M3 : DNS sous `timeout`, puis TCP par adresse IP vers l'adresse publique
+    de `dl.rockylinux.org` (résolue sur l'hôte), vers Zot et vers l'API (ClusterIP du service `kubernetes`).
+  - Le DNS, l'adresse publique et Zot doivent répondre (codes « 0 0 0 », sortie autorisée par `prefetch-rpm-sortie`).
+  - Le code de l'API est relevé, sans pari.
+  - Les cibles ne sont écrites dans `$T/m3-cibles` qu'après cette porte.
+- **`m3_restauration`** : inchangée.
+- **`m3_build1` et `m3_build2`** : le pod porte le label `construire-rpm`.
+  - Avant toute création : la politique et l'invariant sont relus, et les cibles de `m3_temoin` sont relues. Sinon, aucun pod.
+  - Après la création, avant toute copie : les quatre témoins, sur les mêmes cibles et la même image, doivent échouer avec le
+    code 1, 2 ou 124 (refus, nom introuvable, délai). Tout autre code, par exemple 127 pour un outil absent, arrête l'étape :
+    pod retiré, mock non lancé.
+  - Le reste ne change pas.
+- **`m3_comparaison`** : inchangée, sauf que les témoins de chaque build sont affichés parmi les relevés.
+
+**Bornes** :
+- Les témoins sont joués avant mock, pas pendant, et sur quatre cibles seulement. Pendant le build, la coupure repose sur la
+  politique, mesurée dans la 06 et la 08, pas sur une mesure de M3.
+- L'invariant ne lit que les politiques du namespace `builds`. Les politiques de Cilium valables pour tout le cluster ne sont
+  pas relues.
+- La valeur `construire-rpm` engage le nom de la tâche de M4.
+- L'inventaire de [`sortie-builds.sh`](../../08c-durcissement/sortie-builds.sh) ne connaît pas cette politique.
+- Les autres bornes de la note précédente restent :
+  - même chemin de build dans le chroot (`/builddir`) ;
+  - sources et image d'essai hors fermeture ;
+  - mock de l'image comparé à celui de la fermeture ;
+  - place de `/w`.
+
+**Bancs** :
+- Banc ([script](s1-m3-2-banc.sh), `ba483f0c…`, [journal](s1-m3-2-banc.log)), lancé à 19:50:11 UTC : tenu, 77 OK. Il reprend
+  celui de la première version. Le faux kubectl y sert les vraies politiques du dépôt (08, 06, 05, 08c), converties par helm.
+  - `m3_reseau` : le nominal tient. Une politique qui autorise du trafic au label est refusée à la relecture. Un dry-run serveur
+    refusé empêche la pose.
+  - `m3_temoin` : Zot fermé est refusé, sans cible écrite (une ancienne est effacée) ; au nominal, les cibles sont écrites.
+  - `m3_build` : quatre témoins fermés au nominal, et la politique relue avant toute création. Sont refusés :
+    - Zot joignable, DNS joignable ou un code 127 : mock non lancé, pod retiré ;
+    - cibles absentes, politique absente ou politique qui autorise : aucun pod créé.
+- N3/N4 sur la copie finale, à 19:50:32 UTC : tenu, 35 OK ([journal](s1-m3-2-banc-n34.log)).
+- Deux passages antérieurs, sur la copie `6dbc4963…` :
+  - à 19:45:41 UTC, non tenu ([journal](s1-m3-2-banc-passage1.log)), script du banc non archivé : défaut du banc seul, le faux
+    bash appliquait `${*##…}` à chaque argument, d'où deux KO ;
+  - à 19:46:15 UTC, tenu, 74 OK ([journal](s1-m3-2-banc-passage2.log)), avant la relecture du correctif. Le N3/N4 de 19:46:38
+    UTC sur cette copie (35 OK) a été écrasé ; il n'est pas archivé (vu à l'écran).
+  - La relecture du correctif par le conseiller a amené trois changements : cibles validées par `m3_temoin` reprises par les
+    builds, codes de témoin restreints à 1, 2 et 124, en-tête de la politique réécrit d'après la mesure sous Cilium.
+- Non couvert : vrai pod Kata, application réelle de la nouvelle politique par Cilium, vrai mock et vrai rpm, exec Kata sous la
+  nouvelle politique, adresse publique réelle.
+
+Suite : l'application de `s1-m3-2.patch` attend un accord. Viendront ensuite les prédictions, puis un lancement par étape. La
+pose de la politique (`m3_reseau`) a son propre accord. Rien n'est appliqué, posé ni lancé.
