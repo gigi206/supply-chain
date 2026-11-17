@@ -1,0 +1,26 @@
+# s1.sh voie2, 2026-11-17T16:17:55Z
+OK   verrou d'entrée resultats/s1-verrou_derivee.json, sha256 : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   empreinte de la clé de Rocky livrée : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   version du verrou : 1.1.0
+OK   bootstrap_image_ready du verrou : true
+OK   pull_digest du verrou (digest de boot_image) : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+OK   bootstrap_image du verrou : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+OK   image_digest du verrou, 64 hexadécimaux : true
+OK   verrou : 222 paquets, tous sous https://dl.rockylinux.org/vault/rocky/9.7 (BaseOS, AppStream, CRB)
+bootstrap : docker://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 vers dir:<dépôt>/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+image : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771 ; pod : s1-05-m2
+### s1-05-m2 (kata, uid 0, privilégié, label tekton.dev/task=prefetch-rpm) : prêt
+     verrou livré : sha256 b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+     paquets du verrou : 222
+     téléchargement : 222 fichiers en 40 s
+     rpm -K : rc 0, 222 OK sur 222
+     OK   nom, version, release, arch et sigmd5 des 222 rpm égaux au verrou
+     createrepo_c --compatibility : rc 0 en 1 s
+     repomd.xml : sha256 86ddcef148519bae503dd02021883b1c9ff8f10866c99622502cb23109ea9456
+     skopeo copy --preserve-digests : rc 0 en 1 s
+     OK   manifeste copié : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     capacité de /w : 3059832 kB ; utilisés : 312296 kB
+     (code de l'exec : 0)
+OK   verrou relu dans le pod : sha256 b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   manifeste copié (dernière porte de voie2) : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+pod s1-05-m2 laissé pour l'étape hermetique (sleep 43200) ; à retirer à la main si hermetique n'est pas lancée

@@ -2114,3 +2114,27 @@ Suite : accord de lancement de `voie2`. Rien n'est lancé.
 
 *Note du 2026-11-17, écrite à 2026-11-17T16:12:07Z* : les tailles citées dans la note de préparation de ces étapes (219 543 349 et 749 249 076
 octets), vues alors seulement à l'écran, sont archivées depuis ce commit ([journal](s1-m2-tailles.log)) ; valeurs inchangées.
+
+## Résultat de `voie2` (note du 2026-11-17, écrite à 2026-11-17T16:19:32Z ; rien n'est réécrit)
+
+Accord du propriétaire : « Oui, lance voie2 ». Passage le 17/11/2026 de 16:17:55 à 16:18:52 UTC (`date -u` avant et après,
+`chrono.tsv`), code 0 ([journal](s1-voie2.log)). **MV1 à MV9 tenues.** Le pod `s1-05-m2` est laissé en place pour `hermetique` :
+`kubectl get pod` (non archivé) le donne en `Running`, démarré à 16:17:55 UTC ; son sommeil de 43 200 s le fait tenir jusqu'au
+18/11/2026 vers 04:17 UTC.
+
+| # | Résultat |
+|---|---|
+| MV1 | **Tenue.** Verrou d'entrée `b6d0f8f1…`, empreinte `21CB256A…`, les cinq « OK » de `m2_preparer`, 222 paquets ; dossier `dir:` `sc-stockage.poc.test@sha256:f0ccf105…`. |
+| MV2 | **Tenue.** Pod prêt, sept livraisons passées ; « verrou livré : sha256 b6d0f8f1… ». |
+| MV3 | **Tenue.** 222 fichiers téléchargés en 40 s, chacun en HTTP 200 (garde du script). |
+| MV4 | **Tenue.** `rpm -K` : rc 0, 222 OK sur 222, avec la seule clé de Rocky. |
+| MV5 | **Tenue.** Nom, version, release, arch et sigmd5 des 222 rpm égaux au verrou. |
+| MV6 | **Tenue.** `createrepo_c --compatibility` : rc 0 en 1 s ; `repomd.xml` `86ddcef1…`. |
+| MV7 | **Tenue.** `skopeo copy --preserve-digests` : rc 0 en 1 s ; manifeste copié `f0ccf105…`, relu par l'hôte ; lecture anonyme de `essais-05/` par skopeo dans un pod, CA livré. |
+| MV8 | **Tenue.** 312 296 kB utilisés, dans la fourchette de 300 000 à 600 000 kB. Les rpm comptent pour 214 398 kB ; le reste, environ 98 000 kB, est proche de la seule couche de 97 742 593 octets. La composition du dossier `dir:` n'est pas relevée : c'est une déduction. |
+| MV9 | **Tenue.** Code 0 ; pod laissé ; 57 s au total ; aucune écriture dans Zot (l'étape n'en fait aucune, lecture du code). |
+
+Bornes : un seul passage ; réseau présent ; les signatures sont contrôlées avec la clé de Rocky livrée, vérifiée sur l'hôte, sans
+la comparer au trousseau de l'image.
+
+Suite : accord de lancement de `hermetique`, dans le pod laissé, avant le 18/11/2026 vers 04:17 UTC. Rien d'autre n'est lancé.
