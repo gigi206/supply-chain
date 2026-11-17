@@ -89,3 +89,23 @@ Code 0 ([journal](m4b-essai.log), `f6260291…`). Pod `m4b-05-essai` sur `sc-bui
 - Non mesuré : que mock, en mode hermétique, accepte des `repodata` faits avec V1 ou V2 (sans bases sqlite pour V2). Ce sera à mesurer en M4c, ou par un build d'essai.
 
 Suite : choisir la variante de `createrepo_c` et confirmer `rpm -K` avant d'écrire la tâche signée.
+
+## Note datée du 17/11/2026, 21:40:04 UTC : deux corrections au résultat de `essai`, et question sur la variante
+
+**Correction 1, la cause.** La note de résultat dit que l'écart « venait des dates des fichiers […] et des dates de `repomd.xml` ». C'est une inférence, pas une mesure : V1 change à la fois la date des rpm et les deux options, sans les isoler. V1 est donc une unité mesurée : la date des rpm à 0, `--revision 0` et `--set-timestamp-to-revision` restent ensemble dans la tâche.
+
+**Correction 2, le retrait du pod.** Le contrôle de la note de résultat (« plus aucun pod ni PVC de ce nom ») masquait le code de `kubectl` et ne distinguait pas « aucun » d'un échec ; sa valeur n'était qu'à l'écran. Refait avec le code visible à 21:39:44 UTC ([journal](m4b-essai-retrait.log)) : `kubectl` rc 0, 68 objets pod et PVC dans `builds`, aucun nommé `m4b-05-essai`.
+
+**`rpm -K` gardé.** 222 OK sur 222 sans root, dans des passages de moins de 30 s ; la ligne M2 du tableau des jalons demande des signatures vérifiées. Ce n'est pas une question.
+
+**Question : la variante de `createrepo_c` pour la tâche signée.**
+- **V1** (rpm datés à 0, `--compatibility --revision 0 --set-timestamp-to-revision`) : les sept fichiers de `repodata` de la fermeture de M3, mêmes types, seules les dates et la révision fixées. `repomd.xml` `65061cd6…` aux deux copies.
+- **V2** (V1 et `--no-database`) : quatre fichiers, sans les trois bases sqlite ; un écart de plus avec la fermeture de M3. `repomd.xml` `239a5a71…`.
+- Mock n'a lu ni l'une ni l'autre.
+- **Recommandation** (relue par le conseiller) : V1, sur ce seul motif : c'est la fermeture de M3 aux dates près.
+
+**Ce qui bloque `taches`, quelle que soit la variante**
+1. **Mock sur des `repodata` V1** : rejouer un build hermétique sur un arbre restauré de M3 (`$T/m3`), `repodata` régénéré avec V1, sous Kata comme `m3_build`. Attendus : `repomd.xml` `65061cd6…` (sinon, une autre entrée que les rpm et les options y entre), rpm `864d55f4…`, src.rpm `c802e60a…`.
+2. **Le script à signer n'a pas tourné entier** : le pas de prefetch a tourné avec `createrepo_c` par défaut ; V1 n'a tourné que dans les comparaisons, sur des copies en liens durs. Le pas final est à rejouer entier dans le pod runc.
+- Les deux demandent un script modifié, donc un accord chacun ; la mesure de mock d'abord.
+- Pour le script final et la carte de `taches` : retirer le repli par l'identifiant court (`gpg` est dans l'image épinglée) ; déclarer l'image de bootstrap en `*_ARTIFACT_INPUTS` ; rejouer la section d'envoi de `publier-fermeture` sur les vrais noms de fichiers.
