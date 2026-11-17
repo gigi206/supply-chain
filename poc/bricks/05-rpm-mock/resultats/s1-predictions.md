@@ -538,3 +538,53 @@ ne le contient pas) ; il est corroboré par la ligne « 05 S1 hote fait » de `c
 - Rien n'a touché le cluster ni Zot.
 
 Suite, chaque point sur accord nommé : `racine` (lire `rpm` dans sa liste), `image`, `essais`, `verrou`.
+
+## Étape `racine` : prédictions (note du 2026-11-17, écrite à 2026-11-17T08:40:44Z, avant tout passage ; rien n'est réécrit)
+
+Elles complètent P5 à P7 (12/11), sans les remplacer. Commande prévue : `DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/s1.sh racine`,
+préfixe par défaut `s1`, donc journal `s1-racine.log` (il n'existe pas encore). Elle tourne en arrière-plan, sous `bash -c`, avec
+`date -u` avant et après, et `PIPESTATUS`. Effets : un pod Kata privilégié root, `s1-05-racine`, dans `builds`. Une archive est
+rapatriée sous `~/.cache`. Rien n'est écrit dans Zot.
+
+**Ce que le code fait et ne contrôle pas** (lecture de `s1.sh` `ad16fc99…`, assertions du script qui écrit cette note) :
+- Dans le pod, le script `RACINE` tourne sous `set -u` seulement. `dans` affiche le code de l'exec sans s'arrêter. Seules quatre
+  choses arrêtent l'étape sur l'hôte : le pod non prêt ; un des trois `attendu` sur les repomd ; l'absence de la ligne d'archive ;
+  un sha256 de l'archive rapatriée différent.
+- `controle_rpms` ne bloque pas (`|| echo "ÉCART…"`). Le compte de `rpm -K` et les lignes « installé : … absent » ne sont
+  contrôlés par rien. **Un code 0 et la ligne « fait » de `chrono.tsv` ne prouvent donc pas P5** : chaque verdict se lira sur les
+  lignes du journal nommées ci-dessous.
+- Le code de retour de `tar -cf` n'est pas lu. Si le tmpfs de 4 Gio se remplissait, une archive tronquée serait hachée, rapatriée,
+  et son sha256 tiendrait. Contrôle prévu pour les notes du résultat, sur l'hôte : `tar -tf` sur `$T/racine.tar`, désigné par son
+  nom, code 0 et nombre d'entrées. Il ne bloque pas `racine`, mais il conditionne `image`.
+- Les repomd sont comparés **après** l'installation et l'archive. Si un `attendu` échoue, l'étape sort sans `pod_retirer` :
+  `s1-05-racine` reste en place (`sleep 10800`, 2 CPU et 6 Gio demandés) jusqu'au `pod_demarrer` suivant, qui le supprime d'abord.
+- L'occupation maximale de `/w` n'est pas mesurée par le script. Aucune prédiction n'est faite sur elle.
+
+**Premières mesures réelles de cette étape** (jusqu'ici, dry-run ou pod témoin seulement) : admission réelle du pod Kata
+privilégié sous le label `prefetch-rpm` ; tirage de l'amorce 9.8 depuis Zot par digest ; dnf joignant dl.rockylinux.org et
+dl.fedoraproject.org par la sortie rpm ; `repo_gpgcheck=1` avec la clé de Rocky livrée, sous `--installroot`.
+
+**Dépendances lues dans les primary vérifiés par `hote`** (fichiers de `$T` du 17/11 à 08:30:42 UTC, sans lecture réseau ;
+assertions du script) :
+- mock requiert directement `systemd-container`, ce qui lève le doute de P5.
+- Il requiert aussi `python3-rpm`, qui requiert `rpm-libs(x86-64)`, qui requiert `rpm`, et `createrepo_c`, qui requiert `rpm`.
+- BaseOS 9.8 n'offre qu'une version de `rpm` : 4.16.1.3-40.el9.
+
+Il s'agit de métadonnées, pas d'une résolution par dnf.
+
+| | Prédiction | Confiance |
+|---|---|---|
+| RC1 | « ### s1-05-racine (kata, uid 0, privilégié, label tekton.dev/task=prefetch-rpm) : prêt » | Haute (dry-run serveur du 16/11 ; précédent `s1-racine` de la 06, le 13/11) |
+| RC2 | « makecache : rc 0 », et trois lignes « repomd <dépôt> : sha256 » non vides | Moyenne (`repo_gpgcheck` sous `--installroot`, avec une clé en `file://`, non lu). En cas d'échec, le symptôme serait une somme vide, puis un KO de l'`attendu` |
+| RC3 | Deux OK « repomd baseos98 » et « repomd appstream98 … = repomd vérifié sur l'hôte » | Moyenne-haute (trois relevés égaux, les 12, 16 et 17/11 ; rien n'est dit de l'entre-deux) |
+| RC4 | OK « repomd epel9 … = repomd vérifié sur l'hôte » | **Faible** (trois relevés, trois sommes : `454b0238…`, `73fd2581…`, `8190707a…`) |
+| RC5 | « installation : rc 0 ». Cinq lignes « installé : » sans « absent » : mock-0:6.9-1.el9, mock-core-configs-0:45.2-1.el9, podman-6:5.8.2-8.el9_8, skopeo-2:1.22.2-9.el9_8, systemd-container | Moyenne-haute (épinglages relus par `hote` à 08:30) |
+| RC6 | « OK   sha256 des rpm conformes aux primary vérifiés : N sur N », sans ligne « écart », et « rpm -K : N OK sur N », avec le même N | Haute si RC5 tient |
+| RC7 | Une ligne « rpm baseos98 rpm-4.16.1.3-40.el9.x86_64.rpm … » : `rpm`, donc `rpm2cpio`, est dans la racine (précondition de N3 et N4) | Haute (lu dans les primary, ci-dessus) |
+| RC8 | P6 : la ligne « caches : » ne nomme que `/w/racine/w/cache` | Faible, comme P6 |
+| RC9 | P7 : « archive racine : » entre 400 et 900 Mo ; OK « archive racine rapatriée » ; puis `tar -tf` sur l'hôte, code 0 | Faible pour la taille ; moyenne-haute pour le rapatriement |
+
+**En cas de KO sur un repomd** (RC3 ou RC4), chaque point se fait sur son accord : `hote` sous un préfixe neuf, puis `racine` sous un
+préfixe neuf, pour ne pas écraser `s1-racine.log`. Le pod resté en place est supprimé par le `pod_demarrer` suivant.
+
+Suite, chaque point sur accord nommé : `racine`, `image`, `essais`, `verrou`.
