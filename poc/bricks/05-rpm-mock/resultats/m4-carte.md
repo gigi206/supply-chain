@@ -97,3 +97,48 @@ Les images (point B). Le conflit D3 (point A), la portée (point C), les transpo
   - `prefetch-rpm-sortie` sélectionne par nom de tâche : la tâche de résolution porte ce nom, ou il faut une sortie de plus et une modification du `NotIn` de `builds-sans-internet` (08c), c'est-à-dire deux changements du cluster.
   - Elle demande un pod d'essai et un cycle de signature de plus.
 - **Recommandation** : l'option 1. Elle tient la preuve de M4 (sujet rpm signé, fermeture dans `resolvedDependencies`) au moindre coût, sans résolution neuve ni changement du cluster, et garde la liste revue sans tâche privilégiée ouverte sur Internet. Ce dernier argument est le mien : le refus du 10/11/2026 ne le dit pas. Le prix est une lecture de D3 (a) moins stricte que son texte, et un verrou mis à jour hors de la plateforme.
+
+## Note datée du 17/11/2026, 20:54:54 UTC : décision « Hors plateforme » sur D3 (a), et découpage proposé de M4
+
+**Décision du propriétaire** (réponse reçue avant 20:50:59 UTC, heure exacte non relevée) : « Hors plateforme ». Elle tranche le point A. Ce n'est un accord pour aucune mesure ni aucune écriture.
+- Le verrou archivé `b6d0f8f1…` (222 rpm, `verrou_derivee`) est repris tel quel, sans nouvelle résolution. Il sera publié par l'hôte avec `sample-app.spec` dans un artefact de packaging rpm sous `entrees/`, sur le modèle de `packaging-deb`.
+- D3 (a) se lit désormais « résolution hors de Tekton, récupération dans Tekton ». Le texte de D3 (a) du 10/11/2026 et sa lecture du 12/11/2026 ne sont pas réécrits ; cette décision les précise.
+- Limite inscrite : mettre le verrou à jour demande un passage hors de la plateforme, comme `go.sum`.
+- Avant la réponse, j'ai relayé au propriétaire, à sa demande, l'avis du conseiller : même recommandation, avec ses conditions.
+
+**Découpage proposé de M4**, sur le modèle de S4 de la 06. Aucune prédiction, aucun script. Les heures sont celles des commits des comparables ([relevé](m4-projection-06.log)).
+
+| Jalon | Contenu | Écrit dans | Accords | Comparable |
+|---|---|---|---|---|
+| M4a | Relevé de l'état en service (point 11, avec la présence dans Zot de `builds/fermetures/sample-app-sources@sha256:50dc73f7…`), lecture seule ; puis artefact de packaging rpm `entrees/sample-app/packaging-rpm` : `sample-app.spec` et verrou `b6d0f8f1…`, publié par l'hôte | Zot (une écriture définitive) | un pour le jalon (relevé), un pour l'écriture | S4c : 0,16 h |
+| M4b | Pod d'essai de `prefetch-rpm` (runtime) ; tâche `prefetch-rpm` **neuve**, écrite, essayée et signée ; pipeline de la fermeture rpm : liste inscrite par l'hôte dans le gabarit (précédent A de S4b), `publier-fermeture` inchangée si le point 4 tient ; fermeture sous `builds/fermetures/` | Zot (bundles, fermeture), `taches.yml` | pod d'essai, revue de `taches.yml`, chaque écriture | S4b : 0,87 h, plus l'écriture et la signature d'une tâche neuve (dans S4a pour `prefetch-deb`, S4a entier : 1,01 h) |
+| M4c | Pod d'essai de `construire-rpm` sous Tekton (point 7) ; pipeline `sample-app-rpm`, lancée depuis l'hôte comme S4d1 : `preparer-rpm` (runc ; commit, fermeture rpm, fermeture applicative `50dc73f7…` de la 06, artefact de packaging), `construire-rpm` (Kata, `essais-05/mock-rocky9@sha256:99790c13…`, `--hermetic-build`), `publier-image` inchangée ; provenance de Chains | Zot (bundles, artefact), `taches.yml` | pods d'essai, revue de `taches.yml`, chaque écriture | S4d1 : 2,10 h |
+| Hors M4 | Porte étendue à la voie rpm, déclencheur, rattrapage (point C) ; `tools/index`, cité par les « Limites connues » | cluster, Zot | à décider à l'ouverture | S4d2 et S4d3 : 0,95 h |
+
+**Ce que « Hors M4 » laisse ouvert dans la porte** (lecture).
+- `_constructions` (`construire-image`, `construire-deb`), `_attendues` et `_appariement` ne nomment aucune tâche rpm (`porte.rego`, lignes 55, 122 à 125 et 214).
+- Une provenance faite de `preparer-rpm` et de `construire-rpm` échapperait donc à `construction_kata` et à `fermeture_plateforme` sans rien refuser : c'est le « succès à vide » noté pour le deb (README de la 06, complément de 21:20 UTC le 10/11/2026, point 11 c), un trou et non une acceptation.
+- D'où la condition du deb, reprise ici : **aucun déclencheur ni rattrapage pour le rpm avant que la porte soit étendue** (`taches.yml` : « elle sera étendue en S4d2, avant tout trigger »). Les pipelines de M4 sont lancées depuis l'hôte.
+- Le rattachement de cette extension à la règle des 2× sera au propriétaire, à son ouverture : les « Limites connues » disent que ce travail n'est « pas chiffré ici ».
+
+**Écarts avec la ligne M4 du tableau des jalons**
+1. Dépôt de sortie : `builds/sample-app-rpm`, et non `artifacts/sample-app/rpm`. Raison lue dans la 06 (carte de S4, point 6) : sous `**`, seul `poc-ecriture` écrit ; `builds/**` a déjà un compte de création seule, celui de `publier-image`.
+2. « Sujet rpm signé » : le sujet est le manifeste OCI qui porte le rpm. Le rpm est dans la couche de ce manifeste ; son sha256 se relit en extrayant la couche, comme pour le deb (`construire-deb.yaml`, layout OCI écrit à la main).
+
+**Laissé à la carte de M4c** : le contenu de l'artefact signé, rpm seul ou rpm et src.rpm. Pour le deb, « deb seul » a été un choix explicite du propriétaire, et le src.rpm est l'un des deux fichiers comparés en M3.
+
+**Points à relever en route**
+- Le rpm de mock (`a5043350…`) est l'un des 235 fichiers de la fermeture de M2 ; il vient d'EPEL, qui ne garde en général que la dernière construction (HB7). À relever avant les prédictions de M4b.
+- `preparer-deb` contrôle la fermeture applicative contre le commit construit (`go mod verify`, integrity du lockfile ; lecture de son en-tête). À vérifier pour le rpm.
+- `construire-deb` écrit son layout OCI avec `tar`, `sha256sum` et `stat`. Ces outils sont à vérifier dans la liste des paquets de `mock-rocky9@99790c13…`, figée par « Option 1 ».
+- **Repli de M4b** : si `prefetch-rpm` ne passe pas sous runc sans root avec cette image, rien n'est signé et la décision revient au propriétaire. Une tâche de prefetch privilégiée ouverte sur Internet irait contre l'argument donné pour « Hors plateforme », et pourrait rouvrir « Option 1 ».
+
+**Ce que couvrirait un « oui »**
+1. L'ordre M4a, M4b, M4c, avec le relevé de l'état en service en tête de M4a.
+2. Les deux écarts avec la ligne M4 du tableau des jalons.
+3. Porte, déclencheur et rattrapage hors de M4, avec la condition « aucun déclencheur ni rattrapage rpm avant la porte étendue ».
+4. Pipeline `sample-app-rpm` à part, et `publier-fermeture` et `publier-image` inchangées tant que leurs points tiennent.
+
+Il ne vaudrait accord pour aucune mesure ni aucune écriture : chaque jalon sera préparé à sec, avec ses prédictions commitées avant tout lancement.
+
+**Recommandation** (relue par le conseiller) : ce découpage. Il suit l'ordre qui a tenu pour le deb (S4c, S4b, S4d1), chaque jalon ne dépend que du précédent, et la preuve de M4 tombe à la fin de M4c sans toucher à la porte ni au cluster.
