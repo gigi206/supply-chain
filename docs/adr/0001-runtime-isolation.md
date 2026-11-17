@@ -324,3 +324,6 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 
 **Additif du 17/11/2026, 14:53 UTC : image de bootstrap dérivée construite** ([détail](../../poc/bricks/05-rpm-mock/resultats/s1-predictions.md)). Dans un pod Kata privilégié et root, le `dnf-3` de l'image d'essai a installé en `--installroot` les dix paquets décidés dans une copie de `rockylinux:9.7` (vault 9.7, signatures vérifiées) ; l'archive, assemblée sur l'hôte sans rien exécuter, est dans Zot : `essais-05/rocky9-bootstrap@sha256:f0ccf105…`.
 - **Conséquence pour cet ADR** : aucune ; l'isolation n'est pas en jeu tant que mock n'a pas tourné avec cette image.
+
+**Additif du 17/11/2026, 15:29 UTC : verrou calculé avec l'image de bootstrap dérivée** ([détail](../../poc/bricks/05-rpm-mock/resultats/s1-predictions.md)). Dans un pod Kata privilégié et root, isolation `simple`, mock a tiré `essais-05/rocky9-bootstrap@sha256:f0ccf105…` marquée prête, n'a rien installé dans le bootstrap (153 paquets, égaux à ceux de l'image) et a écrit un verrou de 222 rpm avec `bootstrap_image_ready=True`.
+- **Conséquence pour cet ADR** : aucune ; mêmes conditions d'isolation qu'à `essais`. `--hermetic-build` (M2) reste à mesurer.

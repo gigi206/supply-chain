@@ -1900,3 +1900,41 @@ Entrées vérifiées par leur nom avant d'écrire, sans lister le dossier de tra
 - VD13 en écart : les dix premières différences sont dans le journal ; elles sont analysées avant M2.
 
 Suite : accord de lancement (« verrou_derivee »). Rien n'est lancé.
+
+## Étape `verrou_derivee` : résultat (note du 2026-11-17, écrite à 2026-11-17T15:29:03Z ; rien n'est réécrit)
+
+Passage sur accord « Oui, lance-la », le 17/11/2026 de 15:26:17 à 15:27:52 UTC (`date -u` du lancement et
+[`chrono.tsv`](chrono.tsv)), code 0. `s1.sh` à `049fccad…`. Journaux : [`s1-verrou_derivee.log`](s1-verrou_derivee.log),
+[`s1-verrou_derivee-mock.log`](s1-verrou_derivee-mock.log) ; verrou : [`s1-verrou_derivee.json`](s1-verrou_derivee.json).
+
+**Avec l'image dérivée marquée prête, mock n'a rien installé dans le bootstrap et a calculé le verrou.** Le bootstrap qu'il a
+préparé a les mêmes 153 paquets que l'image dérivée, sans aucun écart (versions et étiquettes de signature comprises). Le
+verrou a les mêmes 222 rpm que celui de `verrou_brut`, sur le nom, l'epoch, la version, la release, l'arch, le `sigmd5` et
+l'url ; il enregistre `bootstrap_image_ready=True` et `pull_digest` = `f0ccf105…`.
+
+| # | Résultat |
+|---|---|
+| VD1 | **Tenue.** Six lignes d'écart ; configuration dérivée `78645df7…`, la valeur du banc. |
+| VD2 | **Tenue.** Pod prêt, livraisons faites. |
+| VD3 | **Tenue.** Configuration de base `a8e5f2bc…`, configuration livrée `78645df7…` ; `--debug-config` `rc 0` ; trois lignes (`bootstrap_image`, `bootstrap_image_ready = True`, `root`), aucune pour `bootstrap_image_fallback` ni `bootstrap_image_assert_digest`. |
+| VD4 | **Tenue.** `podman pull` de l'image dérivée par le pod : `rc 0` en 8 s ; inspect `f0ccf105…`, `linux/amd64`. La lecture de `essais-05/` par un pod est mesurée pour la première fois. |
+| VD5 | **Tenue.** `--buildsrpm (image dérivée)` `rc 0` en 42 s ; src.rpm `c802e60a…` (quatrième fois). |
+| VD6 | **Tenue.** « Not updating bootstrap chroot, bootstrap_image_ready=True », compte cumulé de 1 après chaque appel ; ni « not marked ready » ni « Package management in bootstrap ». |
+| VD7 | **Tenue.** Calcul `rc 0` en 34 s ; un `buildroot_lock.json` de 111 561 octets ; pas de « builddep command missing ». |
+| VD8 | **Tenue.** Liste exacte : `rpm-4.16.1.3-39.el9`, `python3-dnf-4.14.0-31.el9.rocky.0.1`, `python3-dnf-plugins-core-4.3.0-24.el9_7`, `yum-4.14.0-31.el9.rocky.0.1`. |
+| VD9 | **Tenue.** 0 ligne de repli dans chacun des trois fichiers. |
+| VD10 | **Tenue.** Un chemin, `…-derivee-x86_64-bootstrap/root` ; 153 lignes des deux côtés ; aucune ligne « seulement dans » ; 153 lignes communes. |
+| VD11 | **Tenue.** Version 1.1.0, les sept options, `bootstrap_image` sur l'image dérivée, `True`, macros, quatre champs, `amd64`. |
+| VD12 | **Tenue.** `image_digest` `18d64b03…`, différent de `fdd27347…`. |
+| VD13 | **Tenue.** `pull_digest` égal au digest de `boot_image` ; seules `bootstrap_image` et `bootstrap_image_ready` diffèrent de `verrou_brut` ; 222 communs, 0 et 0. |
+| VD14 | **Tenue.** 222 sur 222 avec url, mêmes préfixes que `verrou_brut`, signature `None`. |
+| VD15 | **Tenue.** Pod supprimé, code 0, 95 s ; aucun appel à `auth_zot`. |
+| VD16 | **Tenue.** Capacité 3 059 832 kB ; 1 767 372 kB utilisés ; aucun « No space left on device ». |
+| VD17 | **Tenue.** sha256 du verrou archivé égal à celui de la sonde, `b6d0f8f1…`. |
+
+Bornes : un seul passage ; isolation `simple` seulement ; le verrou n'a pas encore été donné à `--hermetic-build` (M2). La
+ligne « Start: dnf4 update » reste dans le journal du calcul : elle porte sur le buildroot, d'après sa place après la liste du
+bootstrap (lecture du journal, pas du code).
+
+Suite : M2 (`--hermetic-build` avec ce verrou), à préparer à sec ; d'abord lire `config.py:844`, qui coupe `bootstrap_image` au
+premier « : ». Rien n'est lancé.
