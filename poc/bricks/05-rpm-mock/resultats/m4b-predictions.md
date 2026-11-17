@@ -117,3 +117,37 @@ Suite : choisir la variante de `createrepo_c` et confirmer `rpm -K` avant d'écr
 - `repodata` de la fermeture de la plateforme : quatre fichiers, sans les trois bases sqlite. Mesuré à l'essai : `repomd.xml` `239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164` aux deux copies.
 - Écart avec la fermeture de M3 : les trois bases sqlite en moins, en plus des dates fixées.
 - **Mesure qui bloque `taches`, ajustée à V2** : un build hermétique par mock, sous Kata, sur un arbre restauré de M3 dont `repodata` est régénéré avec V2. Attendus : `repomd.xml` `239a5a71…`, rpm `864d55f4…`, src.rpm `c802e60a…`. Puis le pas final rejoué entier dans le pod runc. Chacun demande un script modifié et un accord.
+
+## Étape `m4b_mock_v2` de `s1.sh` : préparée à sec (17/11/2026, 21:59:20 UTC, « Oui, prépare-la »), NON APPLIQUÉE
+
+**Objet** : mesurer que mock, en mode hermétique, construit le même rpm sur des `repodata` faits avec la variante V2, avant de signer `prefetch-rpm`.
+
+**Correctif** [`s1-m4b-v2.patch`](../s1-m4b-v2.patch) (`b7535d39…`), copie bancée `3d26df84…` ; `s1.sh` du dépôt `06c2da46…`.
+- Insertions seules : en-tête de 7 lignes, code de 33 lignes ; aucune ligne de `s1.sh` retirée ni changée.
+- `m3_build` inchangé, appelé avec `n=v2` : pod `s1-05-m3-v2`, label `construire-rpm` (politique « Tout couper » relue, quatre témoins fermés exigés), chemins `/w/bv2`, sur une copie en liens durs de la fermeture restaurée 1 (`$T/m3/restauree-v2`).
+- Seule la sonde change, par une insertion juste avant mock, après la porte d'intégrité et la vérification des sources : `repodata` de la fermeture retiré, rpm datés à l'époque 0, `createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database` (fin de son journal imprimée s'il échoue), ligne « repodata V2 », puis `repomd.xml` imprimé en entier (sommes de chaque fichier de `repodata`).
+- Mesures comptées en écarts (code 1 s'il y en a un) : `repomd.xml` égal à `239a5a71…` (essai), 4 fichiers, rpm `864d55f4…` et src.rpm `c802e60a…` (M3).
+
+**Bancs**
+- Banc dédié ([script](s1-m4b-v2-banc.sh), [journal](s1-m4b-v2-banc.log)) : 27 OK, 0 KO. Il joue la vraie fonction de l'étape avec un `m3_build` simulé (nominal en code 0 ; `repomd.xml`, rpm ou src.rpm faux, ligne absente : code 1), la composition de la sonde, et `BLOC_V2` par dash avec un faux `createrepo_c`. Il se rejoue après application contre le `s1.sh` d'avant (arguments).
+- Premier passage ([journal](s1-m4b-v2-banc-passage1.log)) : il a trouvé un vrai défaut, corrigé. Dans `${s/"$m"/$BLOC_V2$m}`, bash 5.2 et plus remplacent chaque « & » du remplacement par le motif trouvé : `2>&1` aurait altéré la sonde. Le remplacement est mis entre guillemets. Défaut du banc aussi : shellcheck sous `LC_ALL=C` s'arrêtait sur les accents.
+- Second passage ([journal](s1-m4b-v2-banc-passage2.log)), 17 OK : tenu, mais la fin de l'étape n'y était pas jouée ; banc réécrit sur relecture du conseiller, qui a aussi fait imprimer `repomd.xml` et l'erreur de `createrepo_c`.
+- Non-régression sur la copie finale : banc de M3 ([journal](s1-m4b-v2-banc-m3.log)), 76 OK et 1 KO, celui de sa section A, propre aux blocs du correctif de M3 ; aucune remarque shellcheck de niveau warning ou error. Banc N3/N4 ([journal](s1-m4b-v2-banc-n34.log)) : 35 OK.
+- Dossiers de banc laissés : `~/.cache/supply-chain-poc/05/banc-m4v2`, `banc-m4v2-2`, `banc-m4v2-3`, `banc-n34-m4v2`, `banc-n34-m4v2-2`, `banc-n34-m4v2-3`.
+
+**Prédictions** (écrites avant toute application et tout passage)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| MV1 | Copie en liens durs de 235 fichiers ; point d'insertion unique ; sonde composée de la sonde de M3 et de `BLOC_V2` seuls | Haute (banc) |
+| MV2 | Politique relue ; quatre témoins à 124 dans le pod `construire-rpm` | Haute : deux fois en M3 |
+| MV3 | Fermeture copiée et revérifiée dans le pod : 235 fichiers, porte d'intégrité rc 0 | Haute : deux fois en M3 |
+| MV4 | `repodata` V2 dans le pod : `repomd.xml` `239a5a71…`, 4 fichiers | Moyenne : mêmes rpm et même `createrepo_c` (même image) qu'à l'essai, mais premier passage sur un autre système de fichiers (`/w` en tmpfs sous Kata, contre un volume sous runc) et en root. S'il diffère : regarder d'abord l'ordre des fichiers et le nombre de fils de `createrepo_c` |
+| MV5 | `mock --hermetic-build` rc 0 sur ces `repodata` sans bases sqlite | Moyenne : dnf lit les métadonnées XML (de mémoire, non vérifié) ; jamais mesuré |
+| MV6 | rpm `864d55f4…` et src.rpm `c802e60a…`, égaux à M3 ; 222 paquets au buildroot | Moyenne, si MV5 tient : `repodata` n'entre pas dans le paquet |
+| MV7 | Aucune ligne http ou https dans les journaux de mock ; « écarts : 0 », code 0 | Moyenne, si MV4 à MV6 tiennent |
+
+**Ce que chaque issue permet**
+- MV4 tenue : mock a lu les quatre fichiers mêmes que la tâche produira (`repomd.xml` porte leurs sha256).
+- MV4 non tenue, MV5 et MV6 tenues : mock accepte un index V2, mais la reproductibilité d'un environnement à l'autre n'est pas établie ; la signature reste bloquée.
+- Non couvert : ce build part de la fermeture de M3, avec `verrou.json` et `outils/` ; la fermeture de la plateforme n'aura ni l'un ni l'autre (« Option A », « Le retirer »).

@@ -1,0 +1,26 @@
+# s1-m4b-v2-banc.sh, 2026-11-17T21:51:40Z ; s1.sh du dépôt 06c2da46793b179682be372eb9d1c94c275a728f52af748d1b36ee648792cc58 ; copie 08b7e01705701e7b6a183e2352d995a619bb02536ce7f2c04889e1e34492a50b
+## A : insertions seules
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+OK   lignes insérées (en-tête 7, code 31) : 38
+## B : syntaxe et shellcheck
+OK   bash -n : ok
+OK   shellcheck : écarts (seul SC2016, de 20 à 22) : < 20 SC2016 > 22 SC2016
+## C : composition de la sonde
+OK   fonction jouée jusqu'à la composition : 0
+     fermeture : copie en liens durs de restauree-1 sous restauree-v2 (1 fichiers)
+     OK   point d'insertion dans la sonde de M3 (lignes) : 1
+     OK   sonde V2 : sonde de M3 et BLOC_V2, rien d'autre : 496
+OK   copie en liens durs de la fermeture : 2
+OK   composition et ordre : 2
+OK   sonde composée, dash -n : ok
+OK   sonde composée, bash -n : ok
+## D : BLOC_V2 joué par dash
+OK   nominal : code : 0
+OK   repodata ancien retiré : retiré
+OK   rpm datés à l'époque 0 : 0
+OK   options de createrepo_c : --compatibility --revision 0 --set-timestamp-to-revision --no-database
+OK   ligne repodata V2 : repomd.xml et nombre de fichiers lisibles comme par champ : repomd.xml 64 4
+OK   createrepo_c absent : ko : 1:1
+OK   createrepo_c en échec : ko : 1:1
+# bilan : tenu, 17 OK, 0 KO, fin 2026-11-17T21:51:44Z

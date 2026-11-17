@@ -1,0 +1,40 @@
+# s1-m4b-v2-banc.sh, 2026-11-17T21:51:01Z ; s1.sh du dépôt 06c2da46793b179682be372eb9d1c94c275a728f52af748d1b36ee648792cc58 ; copie f9d13f65484b4a0acb5dd7de9b846db2b4b509c36e443f803385d4eaa3e2f823
+## A : insertions seules
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+OK   lignes insérées (en-tête 7, code 31) : 38
+## B : syntaxe et shellcheck
+OK   bash -n : ok
+KO   shellcheck : écarts (seul SC2016, de 20 à 22) :  (attendu : < 20 SC2016 > 22 SC2016)
+## C : composition de la sonde
+KO   fonction jouée jusqu'à la composition : 1 (attendu : 0)
+     fermeture : copie en liens durs de restauree-1 sous restauree-v2 (1 fichiers)
+     OK   point d'insertion dans la sonde de M3 (lignes) : 1
+     KO   sonde V2 : sonde de M3 et BLOC_V2, rien d'autre : 528 (attendu : 496)
+OK   copie en liens durs de la fermeture : 2
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+  File "~/.local/share/mise/installs/python/3.13.12/lib/python3.13/pathlib/_local.py", line 546, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/mise/installs/python/3.13.12/lib/python3.13/pathlib/_abc.py", line 632, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/mise/installs/python/3.13.12/lib/python3.13/pathlib/_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '<scratchpad>/m4v2/banc-1/sonde-composee.txt'
+KO   composition et ordre : 0 (attendu : 2)
+sh: 0: cannot open <scratchpad>/m4v2/banc-1/sonde-composee.txt: No such file
+KO   sonde composée, dash -n :  (attendu : ok)
+bash: <scratchpad>/m4v2/banc-1/sonde-composee.txt: No such file or directory
+KO   sonde composée, bash -n :  (attendu : ok)
+## D : BLOC_V2 joué par dash
+OK   nominal : code : 0
+OK   repodata ancien retiré : retiré
+OK   rpm datés à l'époque 0 : 0
+OK   options de createrepo_c : --compatibility --revision 0 --set-timestamp-to-revision --no-database
+OK   ligne repodata V2 : repomd.xml et nombre de fichiers lisibles comme par champ : repomd.xml 64 4
+OK   createrepo_c absent : ko : 1:1
+OK   createrepo_c en échec : ko : 1:1
+# bilan : NON TENU, 12 OK, 5 KO, fin 2026-11-17T21:51:06Z
