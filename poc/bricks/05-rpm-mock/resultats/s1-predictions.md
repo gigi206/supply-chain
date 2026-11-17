@@ -2138,3 +2138,42 @@ Bornes : un seul passage ; réseau présent ; les signatures sont contrôlées a
 la comparer au trousseau de l'image.
 
 Suite : accord de lancement de `hermetique`, dans le pod laissé, avant le 18/11/2026 vers 04:17 UTC. Rien d'autre n'est lancé.
+
+## Résultat de `hermetique` (note du 2026-11-17, écrite à 2026-11-17T16:24:29Z ; rien n'est réécrit)
+
+Accord du propriétaire : « Oui, lance hermetique ». Passage le 17/11/2026 de 16:20:06 à 16:20:54 UTC (`date -u` avant et après,
+`chrono.tsv`), code 0 ([journal](s1-hermetique.log), [journaux de mock](s1-hermetique-mock.log)). **`mock --hermetic-build` a
+construit sample-app avec l'image `dir:`, réseau présent ; que les paquets viennent du dépôt hors ligne est une déduction** :
+`hermetic-build.cfg` n'a que ce dépôt et `reposdir=/dev/null` (fichier égal au tag, section G du banc), et son montage
+`hermetic_repo` est vu, mais aucune ligne archivée ne nomme le dépôt servi. MH4 n'est tenue qu'en partie, toutes les autres le
+sont. Le pod est retiré (`kubectl get pod`, non archivé : plus rien à 16:21:35 UTC).
+
+| # | Résultat |
+|---|---|
+| MH1 | **Tenue.** Porte de `voie2`, pod `Running` ; dans le pod : verrou `b6d0f8f1…`, `repomd.xml` `86ddcef1…` égal à celui de `voie2`, manifeste `f0ccf105…`. |
+| MH2 | **Tenue.** Sources `rc 0` ; 312 300 kB avant mock, contre 312 296 kB à la fin de `voie2`. |
+| MH3 | **Tenue.** `mock --hermetic-build` : rc 0 en 47 s (src.rpm en 26 s, puis rebuild en 18 s, d'après la sortie de mock). La forme `--spec`/`--sources` a donc tourné ; le chemin `dir:` à « : » et « @ » n'a rien arrêté ; pour le dépôt `file:///` et l'absence de `--releasever`, l'appel de dnf n'est pas archivé (lecture). |
+| MH4 | **Tenue en partie.** Une ligne dans la sortie et une dans `root.log` pour chacune : « Using container image: dir: », « Pulling image: dir: », le tag `mock-bootstrap-`, « Checking image digest: 18d64b03… », le calcul du digest, l'architecture, « Not updating bootstrap chroot ». **Non tenue pour `--installroot=/w/mock-h/` : 0 ligne dans les deux fichiers.** Le buildroot et le bootstrap sont pourtant sous `/w/mock-h` d'après les lignes archivées de `root.log` (`kill orphans in chroot /w/mock-h/hermetic-build/root`, montage de `/w/mock-h/hermetic-build/root/hermetic_repo`), et `/var/lib/mock` est vide ou absent. **Le motif était mal choisi** (lecture) : la forme `--installroot=` vient du `repoquery --location` du greffon de verrou (`installed_packages.py:123`, ligne 116 de [`s1-verrou_brut-mock.log`](s1-verrou_brut-mock.log) et de [`s1-verrou_derivee-mock.log`](s1-verrou_derivee-mock.log)), qui ne tourne pas en mode hermétique ; l'installation passe `--installroot` et le chemin en deux arguments (`package_manager.py:238`, [`m2-releve9.log`](m2-releve9.log)). Un prochain correctif de sonde, sous un nouveau nom, cherchera `'--installroot', '/w/mock-h/`. |
+| MH5 | **Tenue.** Zéro ligne de repli, d'écart de digest et de « No space left on device ». Le digest affirmé (`image_digest` du verrou) a été vérifié sur l'image chargée depuis `dir:`. |
+| MH6 | **Tenue.** `sample-app-1.0.0-2.el9.src.rpm` `c802e60a…` et un seul rpm binaire. D'après la lecture de `backend.py` (`:285`, `:756-757`), le fichier mesuré est le src.rpm reconstruit au rebuild ; il a les mêmes octets que celui des quatre relevés précédents. Les dates de `ls` ne distinguent pas les deux fichiers. |
+| MH7 | **Tenue.** `BUILDHOST reproducible` et `BUILDTIME 1794787200` pour les deux rpm ; `date -u -d @1794787200` (sur l'hôte, non archivé) donne le 16/11/2026 à 00:00 UTC, la date de la dernière entrée du `%changelog` du spec, et non l'heure du build. |
+| MH8 | **Tenue** (pari de confiance moyenne à faible). Le rpm binaire a le sha256 de celui d'`essais`, `864d55f4…`. |
+| MH9 | **Tenue.** 1 456 532 kB utilisés après mock, buildroot gardé, dans la fourchette de 1 300 000 à 2 600 000 kB. |
+| MH10 | **Tenue.** 584 lignes de journaux de mock archivées ; pod supprimé ; code 0 ; 48 s au total ; aucune écriture dans Zot (lecture du code de l'étape). |
+
+**Ce que cela établit, et ce que cela n'établit pas** :
+- Établi : le mécanisme de `--hermetic-build` de mock 6.9 fonctionne dans notre pod Kata privilégié, isolation `simple`, avec
+  notre voie 2 (dépôt construit par nous, `rpm -K` 222 OK, image de bootstrap copiée par digest). Que les paquets viennent du
+  dépôt hors ligne est une déduction (voir plus haut). Les macros du verrou passent : `%_buildhost` directement
+  (`BUILDHOST reproducible`), les macros d'époque par l'indice d'un `BUILDTIME` égal à la date du changelog.
+- MH8 : deux constructions donnent le même rpm binaire, au même octet. Celle d'`essais` avait un bootstrap brut et des dépôts en
+  ligne ; celle-ci a un bootstrap dérivé et le dépôt hors ligne. C'est un premier indice de reproductibilité, pas la preuve de M3,
+  qui demande deux `--hermetic-build` sans réseau depuis la fermeture restaurée, dans deux répertoires différents.
+- Non établi : l'hermétisme. Le réseau était ouvert (label `prefetch-rpm`) et aucune mesure ne dit si quelque chose l'a utilisé
+  pendant le build. La fermeture dans Zot, sa restauration par digest et la déduplication restent à faire : **M2 n'est pas passé.**
+- Bornes : un seul passage. Seules les fins de `root.log` (400 lignes) et de la sortie de mock (80 lignes) sont archivées, et le
+  pod est retiré : l'appel de dnf, le dépôt servi et le nombre de paquets installés ne sont plus vérifiables.
+
+Suite, sans décision : préparer à sec la fermeture de M2 (poussée dans Zot sous `deps/sample-app/mock-buildroot-lock`, avec le
+rpm de mock et l'image de bootstrap, restauration par digest, déduplication), avec un accord à part pour l'écriture dans Zot.
+Pour M3, la sonde devra archiver `root.log` entier, `installed_pkgs.log` et la sortie entière de mock. Rien n'est lancé.

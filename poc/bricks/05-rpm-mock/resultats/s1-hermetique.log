@@ -1,0 +1,40 @@
+# s1.sh hermetique, 2026-11-17T16:20:06Z
+OK   dernière porte de voie2 (manifeste copié) : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+OK   pod s1-05-m2 laissé par voie2 : Running
+     verrou : sha256 b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+     repomd.xml : sha256 86ddcef148519bae503dd02021883b1c9ff8f10866c99622502cb23109ea9456
+     manifeste du dossier dir: : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     (code de l'exec : 0)
+OK   verrou relu dans le pod : sha256 b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   repomd.xml égal à celui de voie2 : sha256 86ddcef148519bae503dd02021883b1c9ff8f10866c99622502cb23109ea9456
+OK   manifeste du dossier dir: (pull_digest) : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+mock --hermetic-build, isolation simple ; RÉSEAU PRÉSENT (label prefetch-rpm) : mécanisme mesuré, pas une preuve d'hermétisme
+     sources livrées : rc 0 sample-app-1.0.0.tar.gz: OK sample-app.spec: OK
+     avant mock, capacité de /w : 3059832 kB ; utilisés : 312300 kB
+     mock --hermetic-build : rc 0 en 47 s
+     lignes « Using container image: dir: » : sortie 1 ; root.log 1
+     lignes « Pulling image: dir: » : sortie 1 ; root.log 1
+     lignes « Tagging container image as mock-bootstrap- » : sortie 1 ; root.log 1
+     lignes « Checking image digest: 18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af » : sortie 1 ; root.log 1
+     lignes « Calculating .* image OCI digest » : sortie 1 ; root.log 1
+     lignes « matches host.s architecture » : sortie 1 ; root.log 1
+     lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+     lignes « Expected digest for image » : sortie 0 ; root.log 0
+     lignes « Not updating bootstrap chroot » : sortie 1 ; root.log 1
+     lignes « --installroot=/w/mock-h/ » : sortie 0 ; root.log 0
+     lignes « No space left on device » : sortie 0 ; root.log 0
+     /var/lib/mock : 0 entrée(s)
+     résultat : total 2552
+     résultat : -rw-r--r-- 1 root mock    5659 Nov 17 16:20 build.log
+     résultat : -rw-r--r-- 1 root mock    3397 Nov 17 16:20 hw_info.log
+     résultat : -rw-r--r-- 1 root mock   13601 Nov 17 16:20 installed_pkgs.log
+     résultat : -rw-r--r-- 1 root mock  251701 Nov 17 16:20 root.log
+     résultat : -rw-r--r-- 1 root mock  151068 Nov 17 16:20 sample-app-1.0.0-2.el9.src.rpm
+     résultat : -rw-r--r-- 1 root mock 2173376 Nov 17 16:20 sample-app-1.0.0-2.el9.x86_64.rpm
+     résultat : -rw-r--r-- 1 root mock    2009 Nov 17 16:20 state.log
+     rpm : sample-app-1.0.0-2.el9.src.rpm sha256 c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128 ; BUILDHOST reproducible ; BUILDTIME 1794787200
+     rpm : sample-app-1.0.0-2.el9.x86_64.rpm sha256 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f ; BUILDHOST reproducible ; BUILDTIME 1794787200
+     après mock (buildroot gardé, --no-cleanup-after), capacité de /w : 3059832 kB ; utilisés : 1456532 kB
+     (code de l'exec : 0)
+journaux de mock : 584 lignes, resultats/s1-hermetique-mock.log
+pod s1-05-m2 supprimé
