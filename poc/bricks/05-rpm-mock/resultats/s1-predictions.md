@@ -1302,3 +1302,82 @@ Ce que la mesure apportera pour la suite :
   décision reviendrait au propriétaire.
 - La coupure de la référence au port du registre (`config.py:844`) ne joue qu'en mode hermétique : elle reste hors de cette
   mesure.
+
+## Étape `verrou_brut` : résultat (note du 2026-11-17, écrite à 2026-11-17T13:41:16Z ; rien n'est réécrit)
+
+Passage sur accord « Oui, lance verrou_brut », le 17/11/2026 de 13:34:25 à 13:36:06 UTC (`date -u` du lancement et
+[`chrono.tsv`](chrono.tsv)), code 0. Commande : `env -u PREFIXE -u ISOLATION DISTRO=rke2 KUBECONFIG=… mise exec --
+poc/bricks/05-rpm-mock/s1.sh verrou_brut`, `s1.sh` à `139aab3c…`. Journaux : [`s1-verrou_brut.log`](s1-verrou_brut.log),
+[`s1-verrou_brut-mock.log`](s1-verrou_brut-mock.log) (482 lignes) et le verrou [`s1-verrou_brut.json`](s1-verrou_brut.json).
+
+**Le calcul a abouti : c'est la branche (a), un verrou écrit**, sur un passage. mock a installé lui-même `builddep` dans le
+bootstrap, puis a écrit `buildroot_lock.json` (111 563 octets). Avec `bootstrap_image_ready = False`, ce verrou est
+inutilisable par `--hermetic-build` (`config.py:824`, lecture) : il sert de référence pour la suite.
+
+| # | Résultat |
+|---|---|
+| VB1 | **Tenue.** Pod prêt, sources `rc 0`, `--debug-config` `rc 0`. |
+| VB2 | **Tenue.** `bootstrap_image_ready` absent de `--debug-config` (valeur par défaut, `False`) ; 0 option qui annule « prête ». |
+| VB3 | **Tenue.** `--buildsrpm (image brute)` `rc 0` ; src.rpm `c802e60a…`, le même pour la troisième fois. |
+| VB4 | **Tenue.** Après `--buildsrpm`, une ligne « Bootstrap image not marked ready » (`buildroot.py:1176`), aucune « Not updating bootstrap chroot ». Après le calcul, le compte cumulé reste 1, comme à `verrou`. |
+| VB5 | **Tenue.** « Start: Generating the buildroot lockfile: buildroot_lock.json » puis « Finish: … » (lignes 473 et 477 du journal de mock) ; aucune ligne « builddep command missing ». La preuve que le greffon était là est maintenant directe : `python3-dnf-plugins-core` figure dans le bootstrap et pas dans l'image (VB13). |
+| VB6 | **Branche (a), mesurée** (pas de pari) : `--calculate-build-dependencies` `rc 0` en 26 s, un seul `buildroot_lock.json`. « Reading image … » est présent (lignes 349 et 475) : l'`inspect` du greffon a réussi. Le `rmi` qui le précède est lu dans le code et vu à `essais`, pas dans ce passage (voir les observations) ; le pod est supprimé, ce point n'est plus vérifiable. Ni trace, ni « Can't get location ». |
+| VB7 | **Tenue.** Version 1.1.0 ; les sept options de V13 ; `bootstrap_image` égal à `$BOOT` (`…@sha256:ee90dc0e…`) ; `bootstrap_image_ready` `False` ; macros recopiées (7 macros). |
+| VB8 | **Tenue.** Champs `architecture, id, image_digest, pull_digest` ; `pull_digest` `sha256:ee90dc0e…` ; `amd64` ; `image_digest` `fdd27347…`, différent. L'`id` vaut `9e021fde…`, l'identifiant d'image démonté à `essais` ([`s1-essais.log`](s1-essais.log), ligne 95). |
+| VB9 | **Tenue.** 222 rpm dans le buildroot (V5 : 150 à 400) ; 222 sur 222 avec une url, toutes sous `https://dl.rockylinux.org/vault/rocky/9.7/` : 129 dans BaseOS, 93 dans AppStream, aucune sous `/extras/`. |
+| VB10 | **Branche « None partout », mesurée** (pas de pari) : les 222 `signature` valent `null`. Dans `SONDE_BOOT`, les 14 lignes affichées (ajouts et mises à jour) portent `sigpgp=(none)` et une signature `rsaheader` (clé `702d426d350d275d`) ; les 143 lignes communes ne sont pas affichées. Pour le buildroot, `null` vient de « (none) » d'après la lecture de `installed_packages.py` ; les lignes brutes de la requête de mock qui figurent dans les 400 dernières lignes archivées de `root.log` (93 lignes, par exemple les lignes 55 et 58) finissent toutes par `(none)`. Les rpm de Rocky lus ici n'ont donc qu'une signature d'en-tête, que le champ `signature` de mock ne lit pas. `sigmd5` est rempli pour les 222. |
+| VB11 | **Tenue.** sha256 de `s1-verrou_brut.json` `57cb190f…`, égal à la ligne de la sonde ; 111 563 octets des deux côtés. Le filtre `jeton\|token` n'a rien retiré. |
+| VB12 | **Tenue.** Un chemin, `/w/mock/poc-rocky-9.7-x86_64-bootstrap/root` ; listes de 153 (bootstrap) et 147 (image) lignes, `rc 0`, stderr 0 ligne ; pull `rc 0`. |
+| VB13 | **Tenue pour le greffon, non tenue pour « aucune ligne ».** Voir le détail plus bas. |
+| VB14 | **Tenue.** `--buildsrpm` 67 s (20 à 300) ; calcul 26 s (10 à 300). |
+| VB15 | **Tenue.** Capacité 3 059 832 kB ; 1 850 684 kB utilisés en fin de `SONDE_BOOT` (800 000 à 2 500 000) ; aucun « No space left on device ». |
+| VB16 | **Tenue.** Les deux sondes finissent par « (code de l'exec : 0) » ; « journaux de mock : 482 lignes » ; pod supprimé. |
+
+**VB13 en détail : ce que mock ajoute à `rockylinux:9.7` brut** (base de l'épinglage de l'image dérivée). 143 lignes communes.
+Six paquets ajoutés :
+- `dbus-libs-1:1.12.20-8.el9.x86_64` ;
+- `python3-dateutil-1:2.9.0.post0-1.el9_7.noarch` ;
+- `python3-dbus-1.2.18-2.el9.0.1.x86_64` ;
+- `python3-dnf-plugins-core-4.3.0-24.el9_7.noarch` ;
+- `python3-six-1.15.0-9.el9.noarch` ;
+- `python3-systemd-234-19.el9.x86_64`.
+
+Quatre paquets mis à jour, de `4.14.0-31.el9` vers `4.14.0-31.el9.rocky.0.1` : `dnf`, `dnf-data`, `python3-dnf` et `yum`. C'est
+ce qui fait tomber « aucune ligne ». Tous portent une signature d'en-tête de la clé `702d426d350d275d`. Le dépôt d'origine de
+chacun n'est pas lu : les lignes d'installation du bootstrap sont hors des 400 dernières lignes de `root.log` archivées. La
+version de la doublure du banc (4.3.0-24.el9) avait été écrite avant ce passage, sans source ; elle n'a servi à rien ici.
+
+**Observations, sans prédiction :**
+- Le second `podman pull` de `SONDE_BOOT` a pris 0 s, contre 7 s à `essais`. C'est un indice, et seulement un indice, que
+  l'image était encore là après le `rmi` de mock. L'`inspect` réussi de VB6 va dans le même sens.
+- La ligne « Removing image » de ce passage n'est pas dans les journaux archivés : on ne sait pas si mock a refait le pull et le
+  `rmi` pour le calcul ou réutilisé le bootstrap de `--buildsrpm`.
+
+**Ce que cela change pour la suite** (lecture et un seul passage) :
+- **Ces dix lignes sont la référence pour l'image dérivée** : ce que mock applique, pas forcément ce qui est nécessaire. La
+  cause des quatre mises à jour n'est pas lue : une exigence du greffon, ou la commande d'installation de mock, qui nomme aussi
+  `python3-dnf` (`dnf4_install_command`, [`m2-releve9.log`](m2-releve9.log), ligne 39). La décision consignée disait
+  « plus `python3-dnf-plugins-core` » : le choix entre les six ajouts seuls et les dix lignes reste ouvert, et revient au
+  propriétaire.
+- **Rien d'autre ne bloque, sur ce passage, avant l'écriture du verrou.** Le `podman image inspect` du greffon et les adresses
+  des paquets ont réussi. La coupure de la référence au port du registre (`config.py:844`) ne joue qu'en mode hermétique : elle
+  reste à mesurer.
+- **Le verrou ne porte aucune clé de signature.** Le champ `signature` est vide pour tous les rpm de Rocky lus ici. M2 devait déjà
+  vérifier les signatures par nous : `mock-hermetic-repo` ne vérifie ni GPG ni somme (N6r de `releve2`,
+  [`m2-predictions.md`](m2-predictions.md)), et le mode hermétique met `gpgcheck=0`. Le verrou n'y aidera pas par ce champ ;
+  `sigmd5` est présent.
+
+Retiré : le pod `s1-05-verrou-brut`. La suppression est demandée en fin d'étape (`--wait=false`) ; un
+`kubectl get pod` à 13:40:06 UTC répond NotFound (vu à l'écran, non archivé). Rien n'est écrit dans Zot.
+
+**Prédictions de `verrou` restées sans mesure** (V4, V5, V14, V17, EX2) : ce passage, sous `$CFG` et non sous l'image prête,
+montre des macros recopiées (V4 et V14), 222 rpm dans le buildroot (V5), aucune url sous `/extras/` (EX2), et des `signature`
+à `null`, ce qui contredit V17 (`350d275d`) par le même mécanisme qu'en VB10. Elles ne sont pas déclarées tranchées pour
+l'image prête.
+
+**Commande** : elle diffère de la commande prévue par `-u ISOLATION`, qui écarte une variable héritée, et par
+`KUBECONFIG=…`, posé comme au passage de `verrou`. L'isolation affichée est `simple`, la valeur par défaut prévue : aucun effet
+visible.
+
+Suite : la construction de l'image dérivée est une nouvelle étape, avec son correctif, ses prédictions et deux accords, l'un
+pour la construction et l'autre pour l'écriture dans Zot.

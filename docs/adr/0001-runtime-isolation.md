@@ -313,3 +313,8 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 - « Image Rocky dérivée » : l'image prête sera `rockylinux:9.7` (`ee90dc0e…`) plus `python3-dnf-plugins-core` de vault 9.7. Elle garde la même base, la même clé (`350d275d`) et le même dépôt. AlmaLinux est écartée, faute de verdict dans docs/04.
 - « Mesurer d'abord » : avant de construire, un calcul avec `bootstrap_image_ready = False` sur l'image brute. Il doit mesurer ce qu'une image dérivée ne corrigerait pas, et les paquets que mock ajoute lui-même. L'étape `verrou_brut` est préparée à sec, NON APPLIQUÉE, rien n'est lancé.
 - **Conséquence pour cet ADR** : aucune pour l'instant ; l'isolation reste `simple`, celle qu'`essais` a vue construire.
+
+**Additif du 17/11/2026, 13:41 UTC : verrou de mock sur l'image brute** (brique 05, S1, étape `verrou_brut`, [résultat](../../poc/bricks/05-rpm-mock/resultats/s1-predictions.md)). Le 17/11/2026 de 13:34:25 à 13:36:06 UTC, dans le même type de pod Kata privilégié et root, avec `--isolation=simple` et `bootstrap_image_ready = False` :
+- mock installe lui-même `builddep` dans le bootstrap, et `--calculate-build-dependencies` écrit un verrou en 26 s : 222 rpm, tous adressés dans vault 9.7. Ce verrou est inutilisable en mode hermétique, qui exige une image prête (lecture de code).
+- Par rapport à `rockylinux:9.7` brut, mock ajoute six paquets et en met quatre à jour (famille dnf). Ces dix lignes sont la référence de l'image dérivée ; le choix entre les six ajouts seuls et les dix reste au propriétaire.
+- **Conséquence pour cet ADR** : aucune ; l'isolation `simple` a tenu sur ce passage aussi.

@@ -1,0 +1,62 @@
+# s1.sh verrou_brut, 2026-11-17T13:34:25Z
+image : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771 ; isolation : simple ; configuration : poc-rocky-9.7-x86_64 (bootstrap_image_ready=False)
+### s1-05-verrou-brut (kata, uid 0, privilégié, label tekton.dev/task=prefetch-rpm) : prêt
+     isolation : simple ; configuration : poc-rocky-9.7-x86_64
+     sources livrées : rc 0 sample-app-1.0.0.tar.gz: OK sample-app.spec: OK
+     mock --debug-config : rc 0
+     configuration : bootstrap_image_ready absent de --debug-config, donc valeur par défaut (False)
+     options bootstrap_* qui annulent « prête », posées : 0 (absente = valeur par défaut, vide)
+     mock --buildsrpm (image brute) : rc 0 en 67 s
+     root.log, après --buildsrpm : 1 ligne(s) sur le bootstrap prêt ou non, cumulées
+     root.log, après --buildsrpm : INFO buildroot.py:1176:  Bootstrap image not marked ready
+     src.rpm : sample-app-1.0.0-2.el9.src.rpm c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128
+     mock --calculate-build-dependencies : rc 0 en 26 s
+     root.log, après --calculate-build-dependencies : 1 ligne(s) sur le bootstrap prêt ou non, cumulées
+     root.log, après --calculate-build-dependencies : INFO buildroot.py:1176:  Bootstrap image not marked ready
+     résultat : total 732
+     résultat : -rw-r--r-- 1 root mock   2055 Nov 17 13:36 build.log
+     résultat : -rw-r--r-- 1 root mock 111563 Nov 17 13:36 buildroot_lock.json
+     résultat : -rw-r--r-- 1 root mock   3397 Nov 17 13:35 hw_info.log
+     résultat : -rw-r--r-- 1 root mock  13653 Nov 17 13:36 installed_pkgs.log
+     résultat : -rw-r--r-- 1 root mock 453419 Nov 17 13:36 root.log
+     résultat : -rw-r--r-- 1 root mock 151068 Nov 17 13:36 sample-app-1.0.0-2.el9.src.rpm
+     résultat : -rw-r--r-- 1 root mock   2932 Nov 17 13:36 state.log
+     verrou : buildroot_lock.json 111563 octets, sha256 57cb190f0881508e30baab90adef470dbd7a6e1022673768c902c5ccfd6fd92a
+     (code de l'exec : 0)
+     bootstrap préparé par mock : 1 chemin(s) pour /w/mock/poc-rocky-9.7-x86_64-bootstrap*/root ; retenu : /w/mock/poc-rocky-9.7-x86_64-bootstrap/root
+     bootstrap de mock : rpm -qa rc 0, 153 ligne(s), stderr 0 ligne(s)
+     podman pull de rockylinux:9.7 brut : rc 0 en 0 s
+     podman image mount : rc 0
+     rockylinux:9.7 brut : rpm -qa rc 0, 147 ligne(s), stderr 0 ligne(s)
+     seulement dans le bootstrap de mock : dbus-libs.x86_64 1:1.12.20-8.el9 sigpgp=(none) rsaheader=RSA/SHA256, Tue Oct 31 09:06:34 2023, Key ID 702d426d350d275d
+     seulement dans le bootstrap de mock : dnf-data.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:36 2025, Key ID 702d426d350d275d
+     seulement dans le bootstrap de mock : dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:38 2025, Key ID 702d426d350d275d
+     seulement dans le bootstrap de mock : python3-dateutil.noarch 1:2.9.0.post0-1.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 18:09:01 2025, Key ID 702d426d350d275d
+     seulement dans le bootstrap de mock : python3-dbus.x86_64 0:1.2.18-2.el9.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Sat May  4 04:33:27 2024, Key ID 702d426d350d275d
+     seulement dans le bootstrap de mock : python3-dnf-plugins-core.noarch 0:4.3.0-24.el9_7 sigpgp=(none) rsaheader=RSA/SHA256, Tue Nov 11 22:03:52 2025, Key ID 702d426d350d275d
+     seulement dans le bootstrap de mock : python3-dnf.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:34 2025, Key ID 702d426d350d275d
+     seulement dans le bootstrap de mock : python3-six.noarch 0:1.15.0-9.el9 sigpgp=(none) rsaheader=RSA/SHA256, Wed May 11 11:12:53 2022, Key ID 702d426d350d275d
+     seulement dans le bootstrap de mock : python3-systemd.x86_64 0:234-19.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  4 21:08:59 2024, Key ID 702d426d350d275d
+     seulement dans le bootstrap de mock : yum.noarch 0:4.14.0-31.el9.rocky.0.1 sigpgp=(none) rsaheader=RSA/SHA256, Mon Dec 29 06:37:44 2025, Key ID 702d426d350d275d
+     seulement dans rockylinux:9.7 brut : dnf-data.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:06:36 2025, Key ID 702d426d350d275d
+     seulement dans rockylinux:9.7 brut : dnf.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:06:36 2025, Key ID 702d426d350d275d
+     seulement dans rockylinux:9.7 brut : python3-dnf.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:06:36 2025, Key ID 702d426d350d275d
+     seulement dans rockylinux:9.7 brut : yum.noarch 0:4.14.0-31.el9 sigpgp=(none) rsaheader=RSA/SHA256, Mon Nov  3 04:06:36 2025, Key ID 702d426d350d275d
+     lignes communes : 143
+     capacité de /w : 3059832 kB ; utilisés : 1850684 kB
+     (code de l'exec : 0)
+journaux de mock : 482 lignes, resultats/s1-verrou_brut-mock.log
+version du verrou : 1.1.0
+options de configuration recopiées : bootstrap_image, bootstrap_image_ready, dist, legal_host_arches, macros, package_manager, target_arch
+bootstrap_image enregistré : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+bootstrap_image_ready enregistré : False
+macros recopiées : oui
+bootstrap, champs : architecture, id, image_digest, pull_digest
+bootstrap, pull_digest (digest du manifeste tiré) : sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+bootstrap, image_digest (sha256 de RootFS et Config, podman.py:21) : fdd27347f777b52f2ff47b00653b8a357973820392b38be34627f75400021fc8
+bootstrap, architecture : amd64
+rpm du buildroot : 222 ; champs : arch, epoch, license, name, release, sigmd5, signature, url, version
+rpm avec url : 222 sur 222
+préfixes des url : dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/a, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/c, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/d, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/e, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/f, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/k, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/l, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/n, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/o, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/q, dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/r, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/a, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/b, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/c, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/d, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/e, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/f, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/i, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/j, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/k, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/m, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/n, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/o, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/r, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/s, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/t, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/u, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/w, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/x, dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/z
+valeurs distinctes de signature : 1 ; None
+pod s1-05-verrou-brut supprimé
