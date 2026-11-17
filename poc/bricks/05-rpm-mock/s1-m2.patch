@@ -1,0 +1,193 @@
+--- a/poc/bricks/05-rpm-mock/s1.sh
++++ b/poc/bricks/05-rpm-mock/s1.sh
+@@ -71,6 +71,22 @@
+ #               (resultats/s1-verrou_derivee.json), comparé à celui de verrou_brut ; rien poussé
+ #               Correctif appliqué au dépôt le 17/11/2026 à 15:18:00 UTC (« Oui, applique-le »), sha256 égal à la copie bancée
+ #               (199b4ff2…) ; non lancé.
++#   voie2       (../s1-m2.patch, préparé à sec le 17/11/2026 à partir de 15:40:59 UTC, NON APPLIQUÉ ; première partie de M2,
++#               voie 2 décidée le 12/11) : verrou de verrou_derivee (resultats/s1-verrou_derivee.json, sha256 épinglé) mis à plat
++#               sur l'hôte ; attendus tirés des mesures de S1 (boot-image.digest, DEPOT_DERIVE), jamais du verrou ; pod s1-05-m2
++#               (image d'essai, pod_spec inchangé) : rpm du verrou téléchargés, rpm -K avec la seule clé de Rocky (empreinte
++#               FP_ROCKY contrôlée sur l'hôte), en-têtes égaux au verrou, createrepo_c --compatibility, skopeo copy
++#               --preserve-digests de l'image dérivée vers le dossier dir: de config.py:844-847 ; pod laissé pour hermetique si
++#               la dernière ligne (manifeste copié) passe, retiré sinon. Cœur recopié de celui de m2.sh (NON BRANCHÉ, 12/11),
++#               qui reste tel quel ; écarts : attendus, verrou épinglé et relu dans le pod, df de /w ; m2.sh ne fait plus foi
++#               pour ces étapes
++#   hermetique  (même correctif) : dans le pod laissé par voie2, jamais recréé ; verrou, repomd.xml et dossier dir: relus et
++#               comparés à voie2 ; mock --hermetic-build sur ce verrou et ce dépôt, --isolation=$ISOLATION, basedir et
++#               cache_topdir sous /w par --config-opts (config.py:468-499), src.rpm construit par --spec et --sources
++#               (mock.py:994-1003), buildroot gardé par --no-cleanup-after pour que le df final mesure le pic ; lignes de
++#               podman.py et de buildroot.py comptées, et --installroot=/w/mock-h/ ; rpm produits (sha256, BUILDHOST,
++#               BUILDTIME) ; RÉSEAU PRÉSENT (label prefetch-rpm) : mécanisme mesuré, pas une preuve d'hermétisme (M3) ; rien
++#               poussé ; pod retiré
+ # Les replis (stockage vfs, mock non root, bootstrap sans image) ne sont pas lancés ici : chacun demande sa prédiction et un accord.
+ # Retrait : Zot n'autorise pas la suppression ; dépôts amont/rockylinux/rockylinux et essais-05/mock-rocky9 définitifs.
+ #
+@@ -1031,4 +1047,167 @@
+   pod_retirer "$n"
+ }
+ 
++# Étapes voie2 et hermetique (s1-m2.patch, préparées à sec le 17/11/2026 à partir de 15:40:59 UTC, NON APPLIQUÉES) : voir
++# l'en-tête. m2_preparer et VOIE2_M2 recopient voie2_preparer et VOIE2 de m2.sh ; écarts déclarés : attendus tirés de
++# boot-image.digest et de DEPOT_DERIVE (au lieu de BOOT_DIGEST et DEPOT_AMONT), bootstrap_image_ready et image_digest exigés,
++# baseurl de vault 9.7 prises dans VAULT97 de ce fichier, verrou relu dans le pod, df de /w en fin de script.
++VERROU_DERIVEE_SHA=b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f   # resultats/s1-verrou_derivee.json (303b428)
++POD_M2=s1-05-m2
++m2_preparer() { # verrou dossier digest-de-boot_image : liste.tsv et voie2.sh écrits dans dossier ; KO sur tout écart du verrou
++  local v=$1 o=$2 b=$3 p=$VAULT97 src dos x
++  mkdir -p "$o"
++  attendu "version du verrou" "$(jq -r '.version' "$v")" 1.1.0
++  attendu "bootstrap_image_ready du verrou" "$(jq -r '.config.bootstrap_image_ready' "$v")" true
++  attendu "pull_digest du verrou (digest de boot_image)" "$(jq -r '.bootstrap.pull_digest // "absent"' "$v")" "$b"
++  src=$(jq -r '.config.bootstrap_image // "absent"' "$v")
++  attendu "bootstrap_image du verrou" "$src" "$REG/$DEPOT_DERIVE@$b"
++  attendu "image_digest du verrou, 64 hexadécimaux" "$(jq -r '.bootstrap.image_digest // "" | test("^[0-9a-f]{64}$")' "$v")" true
++  dos=${src%%:*}@$b   # split(':')[0] de mock, puis @pull_digest (config.py:844-846)
++  jq -r '.buildroot.rpms[] | [.name, .version, .release, .arch, .sigmd5, .url] | map(if type == "string" then . else "" end) | @tsv' \
++    "$v" > "$o/liste.tsv"
++  awk -F '\t' -v p="$p" '
++    function ko(m) { print "KO   ligne " NR " du verrou : " m > "/dev/stderr"; e = 1 }
++    { n++; f = $6; sub(/.*\//, "", f) }
++    NF != 6 || $1 == "" || $2 == "" || $3 == "" || $4 == "" || $5 == "" || $6 == "" { ko("champ manquant"); next }
++    length($5) != 32 || $5 ~ /[^0-9a-f]/ { ko("sigmd5 inattendu : " $5) }
++    index($6, p "/BaseOS/x86_64/os/") != 1 && index($6, p "/AppStream/x86_64/os/") != 1 && index($6, p "/CRB/x86_64/os/") != 1 {
++      ko("URL hors des dépôts épinglés : " $6) }
++    $6 ~ /[^A-Za-z0-9:\/._+-]/ || index($6, "/../") || index($6, "/./") { ko("URL refusée (caractère ou segment . ou ..) : " $6) }
++    f !~ /^[A-Za-z0-9._+-]+\.rpm$/ { ko("nom de fichier refusé : " f) }
++    vu[f]++ { ko("nom de fichier en double : " f) }
++    END { if (!n) { print "KO   aucun paquet dans le verrou" > "/dev/stderr"; e = 1 }; exit e }' "$o/liste.tsv" \
++    || { echo "KO   verrou refusé (motifs ci-dessus)" >&2; exit 1; }
++  echo "OK   verrou : $(wc -l < "$o/liste.tsv") paquets, tous sous $p (BaseOS, AppStream, CRB)"
++  x=${VOIE2_M2//@SOURCE@/$src}; x=${x//@DOSSIER@/$dos}; printf '%s\n' "${x//@DIGEST@/$b}" > "$o/voie2.sh"
++  echo "bootstrap : docker://$src vers dir:<dépôt>/$dos"
++}
++
++VOIE2_M2='set -u
++export LC_ALL=C
++R=${VOIE2_RACINE:-/w}; D=$R/voie2/depot; B=$R/voie2/rpmdb; L=$R/voie2/liste.tsv; T=$(printf "\t")
++ko() { echo "KO   $*"; exit 1; }
++echo "verrou livré : sha256 $(sha256sum < "$R/verrou.json" | cut -c1-64)"
++for o in curl rpm createrepo_c skopeo sha256sum; do command -v $o >/dev/null 2>&1 || ko "$o absent de l image"; done
++rm -rf "${D:?}" "${B:?}"; mkdir -p "$D" "$B"
++n=$(wc -l < "$L"); echo "paquets du verrou : $n"
++t=$(date +%s)
++while IFS="$T" read -r nom ver rel arch md5 url; do
++  h=$(curl -sS --proto =https --max-time 120 -o "$D/${url##*/}" -w "%{http_code}" "$(printf %s "$url" | sed "s/+/%2B/g")") || ko "curl en échec : $url"
++  [ "$h" = 200 ] || ko "HTTP $h : $url"
++done < "$L"
++c=$(find "$D" -maxdepth 1 -type f -name "*.rpm" | wc -l)
++[ "$c" = "$n" ] || ko "$c fichiers téléchargés pour $n paquets"
++echo "téléchargement : $c fichiers en $(($(date +%s) - t)) s"
++rpm --dbpath "$B" --initdb </dev/null || ko "rpmdb vide non créée"
++rpm --dbpath "$B" --import "$R/cles/RPM-GPG-KEY-Rocky-9" </dev/null || ko "clé de Rocky non importée"
++rpm --dbpath "$B" -K "$D"/*.rpm > "$R/voie2/k.log" 2>&1 </dev/null; r=$?
++k=$(grep -c -E "digests signatures OK$" "$R/voie2/k.log")
++echo "rpm -K : rc $r, $k OK sur $n"
++grep -v -E "digests signatures OK$" "$R/voie2/k.log" | head -n 5
++[ "$r" = 0 ] && [ "$k" = "$n" ] || ko "signatures des rpm"
++while IFS="$T" read -r nom ver rel arch md5 url; do
++  q=$(rpm --dbpath "$B" -qp --qf "%{NAME}$T%{VERSION}$T%{RELEASE}$T%{ARCH}$T%{SIGMD5}" "$D/${url##*/}" 2>/dev/null </dev/null)
++  [ "$q" = "$nom$T$ver$T$rel$T$arch$T$md5" ] || ko "en-tête de ${url##*/} différent du verrou"
++done < "$L"
++echo "OK   nom, version, release, arch et sigmd5 des $n rpm égaux au verrou"
++t=$(date +%s); createrepo_c --compatibility "$D" > "$R/voie2/createrepo.log" 2>&1 </dev/null; r=$?
++echo "createrepo_c --compatibility : rc $r en $(($(date +%s) - t)) s"
++[ "$r" = 0 ] || { tail -n 5 "$R/voie2/createrepo.log"; ko "createrepo_c"; }
++[ -s "$D/repodata/repomd.xml" ] || ko "repodata/repomd.xml absent"
++echo "repomd.xml : sha256 $(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64)"
++t=$(date +%s); skopeo copy --preserve-digests "docker://@SOURCE@" "dir:$D/@DOSSIER@" > "$R/voie2/skopeo.log" 2>&1 </dev/null; r=$?
++echo "skopeo copy --preserve-digests : rc $r en $(($(date +%s) - t)) s"
++[ "$r" = 0 ] || { tail -n 5 "$R/voie2/skopeo.log"; ko "skopeo copy"; }
++m=sha256:$(sha256sum < "$D/@DOSSIER@/manifest.json" | cut -c1-64)
++[ "$m" = "@DIGEST@" ] || ko "manifeste copié $m, attendu @DIGEST@"
++echo "OK   manifeste copié : $m"
++df -k /w | awk "NR == 2 {print \"capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
++'
++
++etape_voie2() {
++  local d bd img n=$POD_M2 o=$T/m2 fp
++  d=$(cat "$T/image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape image" >&2; exit 1; }
++  bd=$(cat "$T/boot-image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape boot_image" >&2; exit 1; }
++  [[ $bd =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "KO   digest de boot_image illisible : $bd" >&2; exit 1; }
++  attendu "verrou d'entrée resultats/s1-verrou_derivee.json, sha256" "$(sha256sum < "$R/s1-verrou_derivee.json" | cut -c1-64)" \
++    "$VERROU_DERIVEE_SHA"
++  [ -s "$T/hote/RPM-GPG-KEY-Rocky-9" ] || { echo "KO   clé de Rocky absente : lancer d'abord l'étape hote" >&2; exit 1; }
++  fp=$(gpg --batch --with-colons --show-keys "$T/hote/RPM-GPG-KEY-Rocky-9" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}')
++  attendu "empreinte de la clé de Rocky livrée" "$fp" "$FP_ROCKY"
++  rm -rf -- "${o:?}"
++  m2_preparer "$R/s1-verrou_derivee.json" "$o" "$bd"
++  img=$REG/$DEPOT_ESSAI@$d
++  echo "image : $img ; pod : $n"
++  pod_spec "$n" "$img"
++  pod_demarrer "$n"
++  livrer "$n" "/etc/containers/certs.d/$REG/ca.crt" "$P/ca-poc.crt"
++  livrer "$n" /w/cles/RPM-GPG-KEY-Rocky-9 "$T/hote/RPM-GPG-KEY-Rocky-9"
++  livrer "$n" /w/voie2/liste.tsv "$o/liste.tsv"
++  livrer "$n" /w/verrou.json "$R/s1-verrou_derivee.json"
++  livrer "$n" /w/src/sample-app-1.0.0.tar.gz "$PKG/sample-app-1.0.0.tar.gz"
++  livrer "$n" /w/src/sample-app.spec "$PKG/sample-app.spec"
++  livrer "$n" /w/src/SHA256SUMS.s1 "$T/SHA256SUMS.s1"
++  dans "$n" m2-voie2 < "$o/voie2.sh"
++  ( attendu "verrou relu dans le pod" "$(champ m2-voie2 'verrou livré')" "sha256 $VERROU_DERIVEE_SHA"
++    attendu "manifeste copié (dernière porte de voie2)" "$(champ m2-voie2 'OK   manifeste copié')" "$bd" ) \
++    || { pod_retirer "$n"; exit 1; }
++  echo "pod $n laissé pour l'étape hermetique (sleep 43200) ; à retirer à la main si hermetique n'est pas lancée"
++}
++
++SONDE_HERMETIQUE_PRE='set -u
++D=/w/voie2/depot
++echo "verrou : sha256 $(sha256sum < /w/verrou.json | cut -c1-64)"
++echo "repomd.xml : sha256 $(sha256sum < $D/repodata/repomd.xml | cut -c1-64)"
++echo "manifeste du dossier dir: : sha256:$(sha256sum < "$D/@DOSSIER@/manifest.json" | cut -c1-64)"
++true'
++
++SONDE_HERMETIQUE='set -u
++D=/w/voie2/depot
++compte() { c=$(grep -c -E -e "$1" "$2" 2>/dev/null); echo "${c:-absent}"; }
++cd /w/src && sha256sum -c SHA256SUMS.s1 > /w/c.log 2>&1; echo "sources livrées : rc $? $(paste -sd " " /w/c.log)"
++df -k /w | awk "NR == 2 {print \"avant mock, capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
++mkdir -p /w/res-h
++t=$(date +%s)
++mock --hermetic-build /w/verrou.json "$D" --isolation=@ISO@ --no-cleanup-after --config-opts=basedir=/w/mock-h --config-opts=cache_topdir=/w/mock-h-cache \
++  --resultdir=/w/res-h --spec /w/src/sample-app.spec --sources /w/src > /w/hermetique.log 2>&1
++r=$?; echo "mock --hermetic-build : rc $r en $(($(date +%s) - t)) s"
++for m in "Using container image: dir:" "Pulling image: dir:" "Tagging container image as mock-bootstrap-" \
++  "Checking image digest: @IMAGE_DIGEST@" "Calculating .* image OCI digest" "matches host.s architecture" \
++  "falling back to chroot installation" "Expected digest for image" "Not updating bootstrap chroot" \
++  "--installroot=/w/mock-h/" "No space left on device"; do
++  echo "lignes « $m » : sortie $(compte "$m" /w/hermetique.log) ; root.log $(compte "$m" /w/res-h/root.log)"
++done
++echo "/var/lib/mock : $(ls -A /var/lib/mock 2>/dev/null | wc -l) entrée(s)"
++ls -l /w/res-h | sed "s/^/résultat : /"
++for f in /w/res-h/*.rpm; do [ -e "$f" ] || continue
++  echo "rpm : ${f##*/} sha256 $(sha256sum < "$f" | cut -c1-64) ; $(rpm -qp --qf "BUILDHOST %{BUILDHOST} ; BUILDTIME %{BUILDTIME}" "$f" 2>/dev/null)"
++done
++df -k /w | awk "NR == 2 {print \"après mock (buildroot gardé, --no-cleanup-after), capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
++[ $r = 0 ] || { tail -n 25 /w/hermetique.log; tail -n 25 /w/res-h/root.log 2>/dev/null; }
++true'
++
++etape_hermetique() {
++  local bd n=$POD_M2 src dos ph id
++  bd=$(cat "$T/boot-image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape boot_image" >&2; exit 1; }
++  [[ $bd =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "KO   digest de boot_image illisible : $bd" >&2; exit 1; }
++  [ -s "$T/m2-voie2.log" ] || { echo "KO   lancer d'abord l'étape voie2" >&2; exit 1; }
++  attendu "dernière porte de voie2 (manifeste copié)" "$(champ m2-voie2 'OK   manifeste copié')" "$bd"
++  ph=$(kubectl get pod -n builds "$n" -o jsonpath='{.status.phase}' </dev/null 2>/dev/null || true)
++  attendu "pod $n laissé par voie2" "${ph:-absent}" Running
++  src=$(jq -r '.config.bootstrap_image' "$R/s1-verrou_derivee.json"); dos=${src%%:*}@$bd
++  id=$(jq -r '.bootstrap.image_digest' "$R/s1-verrou_derivee.json")
++  sed -e "s|@DOSSIER@|$dos|g" <<<"$SONDE_HERMETIQUE_PRE" | dans "$n" m2-hermetique-pre
++  ( attendu "verrou relu dans le pod" "$(champ m2-hermetique-pre 'verrou')" "sha256 $VERROU_DERIVEE_SHA"
++    attendu "repomd.xml égal à celui de voie2" "$(champ m2-hermetique-pre 'repomd.xml')" "$(champ m2-voie2 'repomd.xml')"
++    attendu "manifeste du dossier dir: (pull_digest)" "$(champ m2-hermetique-pre 'manifeste du dossier dir:')" "$bd" ) \
++    || { pod_retirer "$n"; exit 1; }
++  echo "mock --hermetic-build, isolation $ISOLATION ; RÉSEAU PRÉSENT (label $LABEL) : mécanisme mesuré, pas une preuve d'hermétisme"
++  sed -e "s|@ISO@|$ISOLATION|g" -e "s|@IMAGE_DIGEST@|$id|g" <<<"$SONDE_HERMETIQUE" | dans "$n" m2-hermetique
++  kubectl exec -n builds "$n" -- sh -c 'for f in /w/res-h/root.log /w/res-h/build.log; do [ -e "$f" ] && { echo "### $f"; tail -n 400 "$f"; }; done
++    for f in /w/hermetique.log; do [ -e "$f" ] && { echo "### $f"; tail -n 80 "$f"; }; done; true' </dev/null \
++    | sed '/jeton\|token/I c\[ligne masquée : motif jeton|token]' > "$R/$PREFIXE-hermetique-mock.log" || echo "journaux de mock : code non nul"
++  echo "journaux de mock : $(wc -l < "$R/$PREFIXE-hermetique-mock.log") lignes, resultats/$PREFIXE-hermetique-mock.log"
++  pod_retirer "$n"
++}
++
+ lancer "$PREFIXE" "05 S1" "$@"

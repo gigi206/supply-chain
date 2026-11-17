@@ -895,3 +895,13 @@ les quatre lignes de `SHA256SUMS` hors spec (archive rpm `07521c1e…`, orig `15
 dépôt ; `sha256sum -c` tenu sur le cache. Le réseau a servi au module chi (`go mod verify`) et à marked (sha512 du lockfile),
 comme d'habitude. Le script n'est pas rejouable tel quel : ses gardes s'arrêtent sur le journal existant. N2 à N6 attendent le
 premier build de la 05, sur accords à part.
+
+## Note du 2026-11-17 (écrite à 2026-11-17T16:00:56Z ; rien n'est réécrit) : cœur de la voie 2 recopié dans `s1.sh`, NON APPLIQUÉ
+
+- Le cœur NON BRANCHÉ de `m2.sh` (`voie2_preparer` et `VOIE2`, 12/11) est recopié dans `s1.sh` par
+  [`../s1-m2.patch`](../s1-m2.patch), préparé à sec et non appliqué, sous les noms `m2_preparer` et `VOIE2_M2`, avec des
+  attendus tirés de l'image de bootstrap dérivée ([détail](s1-predictions.md)).
+- `m2.sh` n'est pas modifié. Pour les étapes `voie2` et `hermetique`, c'est `s1.sh` qui fera foi, une fois le correctif appliqué.
+- V1 et V2 de la voie 2 (ci-dessus) se lisent sur le verrou réel, `s1-verrou_derivee.json` : toutes ses URL sont sous vault 9.7
+  (BaseOS, AppStream), et il n'a aucune entrée `gpg-pubkey`. C'est une lecture du fichier, pas un passage. Pour V3, seul le format
+  du sigmd5 (32 hexadécimaux) est vérifié. V4 et V5 attendent le passage de `voie2`.

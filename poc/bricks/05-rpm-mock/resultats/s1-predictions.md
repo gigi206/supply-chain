@@ -1938,3 +1938,101 @@ bootstrap (lecture du journal, pas du code).
 
 Suite : M2 (`--hermetic-build` avec ce verrou), à préparer à sec ; d'abord lire `config.py:844`, qui coupe `bootstrap_image` au
 premier « : ». Rien n'est lancé.
+
+## Étapes `voie2` et `hermetique` préparées à sec, début de M2 (note du 2026-11-17, écrite à 2026-11-17T16:00:56Z ; rien n'est réécrit), NON APPLIQUÉ
+
+Préparation faite sur le message « continue » du propriétaire, qui suivait le message annonçant M2 comme prochaine étape à
+préparer à sec. Rien n'est appliqué à `s1.sh`, et rien n'est lancé, ni dans le cluster ni dans Zot.
+
+**Correctif** : [`../s1-m2.patch`](../s1-m2.patch) (sha256 `9684b495…`), insertions seules (en-tête 16 lignes, bloc 163 lignes)
+dans `s1.sh` `049fccad…` ; copie bancée `8c60bca2…`. Le correctif fait foi : la copie vient d'un script du scratchpad, non
+archivé ; la section A du banc montre qu'il n'y a que des insertions, et `git apply --check` passe.
+
+**Périmètre** : première partie de M2 seulement.
+- `voie2` joue la voie 2 décidée le 12/11 : rpm du verrou téléchargés, `rpm -K` avec la seule clé de Rocky, en-têtes égaux au
+  verrou, `createrepo_c --compatibility`, `skopeo copy --preserve-digests` de l'image dérivée.
+- `hermetique` lance `mock --hermetic-build` dans le même pod, **réseau présent** (label `prefetch-rpm`) : elle mesure le
+  mécanisme, pas l'hermétisme, qui est l'objet de M3.
+- La fermeture dans Zot, sa restauration par digest et la déduplication, preuves de M2 au README, restent à préparer, avec un
+  accord à part (écriture dans Zot). Un passage réussi de ces deux étapes ne permettra pas d'écrire « M2 passé ».
+
+**Lieu** : `s1.sh`, qui a les aides de pod (`pod_spec`, `pod_demarrer`, `dans`, `livrer`), le dossier de travail et les
+digests mesurés.
+- Le cœur de la voie 2 de `m2.sh` (NON BRANCHÉ, 12/11) y est recopié sous les noms `m2_preparer` et `VOIE2_M2`. `m2.sh` n'est
+  pas modifié et ne fait plus foi pour ces étapes.
+- Écarts déclarés, comparés par le banc (section C) : attendus tirés de `boot-image.digest` et de `DEPOT_DERIVE` au lieu de
+  l'image brute ; `bootstrap_image_ready` et `image_digest` exigés ; verrou d'entrée épinglé (`b6d0f8f1…`) sur l'hôte et relu
+  dans le pod ; `df` de `/w`.
+- `chrono.tsv` portera « 05 S1 voie2 » et « 05 S1 hermetique », puisque `s1.sh` appelle `lancer` avec le jalon « 05 S1 ».
+
+**Découpage** : deux étapes, un accord chacune, un même pod `s1-05-m2`, car le dépôt hors ligne est sur le tmpfs `/w`.
+- `voie2` laisse le pod privilégié en place (sommeil de 12 h) si sa dernière ligne, « OK   manifeste copié », porte le digest de
+  `boot_image` ; sinon elle le retire. `dans` ne rend pas le code du script : la porte est cette ligne, lue par l'hôte.
+- `hermetique` ne recrée jamais le pod. Elle exige la porte de `voie2` et le pod en `Running`, puis relit dans le pod le sha256
+  du verrou, celui de `repomd.xml` (égal à celui de `voie2`) et le manifeste du dossier `dir:`. Elle retire toujours le pod à la
+  fin : toute relance refait donc `voie2`, sous un autre `PREFIXE`.
+
+**Commande de mock** : `mock --hermetic-build /w/verrou.json /w/voie2/depot --isolation=simple --no-cleanup-after
+--config-opts=basedir=/w/mock-h --config-opts=cache_topdir=/w/mock-h-cache --resultdir=/w/res-h --spec … --sources …`.
+Raisons, lues dans le code de mock 6.9 (archive `3c034916…`) :
+- `hermetic-build.cfg` ne pose ni `basedir` ni `cache_topdir` ([`m2-releve.log`](m2-releve.log)) ; `--config-opts` passe après
+  `process_hermetic_build_config` et l'emporte (`config.py:468-499`) ;
+- `-r` est refusé et le mode `rebuild` exigé (`mock.py:436-443`). Avec `--spec` et `--sources`, mock construit d'abord le src.rpm
+  (`mock.py:994-1003`). Cette forme n'a jamais tourné ici (à `essais`, deux appels séparés), et la documentation donne un
+  src.rpm : si elle échoue, le repli est un src.rpm rapatrié puis livré ;
+- `--no-cleanup-after` garde le buildroot (`cleanup_on_success`, `config.py:128`), pour que le `df` final mesure le pic, comme à
+  `verrou_derivee` ;
+- `--debug-config` est un mode (`mock.py:130-131`), donc refusé avec `--hermetic-build`. À sa place, la sonde compte dans la
+  sortie et dans `root.log` : les lignes INFO de `podman.py` (`:113`, `:119`, `:159`, `:29`, `:72`), « Checking image digest »
+  (`buildroot.py:291`), le repli, « Not updating bootstrap chroot », `--installroot=/w/mock-h/` et « No space left on device ».
+  Elle relève ensuite le sha256, le `BUILDHOST` et le `BUILDTIME` des rpm produits : c'est le passage des macros par le verrou,
+  point ouvert du 12/11.
+
+**Lu, non mesuré** :
+- `config.py:844-847` : sur notre verrou, la coupure au premier « : » donne `sc-stockage.poc.test`. Le dossier `dir:` est donc
+  `<dépôt>/sc-stockage.poc.test@sha256:f0ccf105…`, un seul composant de chemin, celui que `skopeo copy` remplit ;
+- `config.py:864` et `:868` : le digest affirmé est l'`image_digest` du verrou (`18d64b03…`), sans repli. `podman.py:21-59`
+  calcule ce digest sur `RootFS` et `Config` de l'image chargée depuis `dir:` (`:200-214`) ;
+- `package_manager.py:509-530` : un dépôt `file:///` est monté dans le bootstrap ;
+- `config.py:106` : `use_bootstrap_image` vaut `True` par défaut. `config.py:320` : `releasever` vaut `None`, et ni
+  `hermetic-build.cfg` ni le verrou ne le posent ; dnf tourne alors sans `--releasever` (`package_manager.py:241-243`,
+  [`m2-releve6.log`](m2-releve6.log)) ;
+- skopeo lit le CA livré sous `/etc/containers/certs.d/` par la même bibliothèque que podman : lecture, pas mesure.
+
+**Vérifié sur l'hôte** :
+- verrou `s1-verrou_derivee.json` : 222 rpm, tous sous vault 9.7 BaseOS ou AppStream ; aucune entrée `gpg-pubkey`, aucun champ
+  vide ; sigmd5 tous de 32 hexadécimaux ;
+- place : les 222 rpm font 219 543 349 octets (somme des tailles dans les primary de vault 9.7 vérifiés par `hote97`, tous
+  trouvés), et 749 249 076 octets installés. `verrou_derivee` a fini à 1 767 372 kB utilisés sur 3 059 832 kB ;
+- image d'essai (`racine.tar` `d7433a05…`) : toutes les commandes des sondes sont dans `/usr/bin`, et `etc/mock/hermetic-build.cfg`
+  est égal à celui du tag `mock-6.9-1` (section G du banc) ;
+- le dossier `m2` de travail, vidé par `voie2`, n'existe pas encore (contrôle par son nom).
+
+**Banc** [`s1-m2-banc.sh`](s1-m2-banc.sh), sections A à G, ni cluster, ni Zot, ni réseau :
+- passage final le 17/11/2026 à 15:58:20 UTC, sur la copie `8c60bca2…`, python3 3.13.12 : tenu, 71 OK
+  ([journal](s1-m2-banc.log)) ;
+  - `m2_preparer` accepte le vrai verrou et en refuse douze altérés ;
+  - `voie2.sh` est joué sur 222 rpm avec des outils simulés : le nominal passe ; cinq échecs et deux outils absents donnent
+    chacun un KO ;
+  - les portes des deux étapes sont rejouées avec les lignes de la copie ;
+  - la sonde de mock est jouée sur un faux mock : arguments, comptes, rpm, échec.
+
+  shellcheck : 20 remarques sur le dépôt, 25 sur la copie (quatre `SC2016` et un `SC2001` de plus, de niveau note), aucune de
+  niveau warning ;
+- N3/N4 ([`s1-n34-banc.sh`](s1-n34-banc.sh), inchangé) sur la même copie, lancé à 15:58:39 UTC : tenu, 35 OK
+  ([journal](s1-m2-banc-n34.log)) ;
+- passages précédents :
+  - à 15:49:45 UTC, copie `2f56f6b6…` : NON TENU, 3 KO, tous des attendus du banc ([journal](s1-m2-banc-passage1.log)). Neuf
+    fragments extraits et non huit ; longueurs des sondes devinées ; « ERROR » attendu deux fois, alors que le faux `root.log`
+    est écrit avant l'erreur. Rejoué à l'identique juste après : sortie écrasée, non archivée ;
+  - à 15:50:37 UTC, banc corrigé : tenu, 69 OK ([journal](s1-m2-banc-passage2.log)). Deux libellés du banc ont ensuite été
+    renommés, car ils contenaient un mot que nos lectures masquent ; ils restent dans ces deux journaux. Rejoué : tenu, sortie
+    écrasée, non archivée. N3/N4 sur `2f56f6b6…`, fini à 15:50:52 UTC : tenu, 35 OK, sortie écrasée, non archivée ;
+  - la relecture a ensuite fait retoucher la sonde de mock : `--no-cleanup-after`, compte de `--installroot`, motif passé par
+    `-e` (un motif qui commence par « -- » serait pris pour une option de grep), « No space left on device ». D'où la copie
+    `8c60bca2…`.
+- **Bornes** : doublures seulement ; ni vrai mock, ni vrai podman, ni vrais rpm, createrepo_c ou skopeo, ni kubectl, ni Zot, ni
+  réseau.
+
+Suite : appliquer `s1-m2.patch` à `s1.sh`, sur accord ; puis écrire et commiter les prédictions des deux étapes avant tout
+lancement ; puis un accord par étape. Rien n'est lancé.

@@ -1,0 +1,145 @@
+# banc-m2.sh, 2026-11-17T15:58:20Z, python3 3.13.12
+# s1.sh du dépôt 049fccadbe8252ed5115f4788a36b363c018d033a84add4bc19fe5b4a27d1cc9 ; copie modifiée 8c60bca25d1df61a92ced33a25ddf0b40b36d82c095179b7e36ce8e5a0042c34
+## A : insertions seules
+OK   lignes retirées : 0
+OK   blocs insérés : 2
+OK   copie sans les blocs insérés égale au dépôt
+     en-tête inséré : 16 lignes ; bloc inséré : 163 lignes
+## B : syntaxe et shellcheck
+OK   bash -n de la copie
+     remarques shellcheck : dépôt 20, copie 25
+     diff shellcheck : 2c2
+     diff shellcheck : <      12 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+     diff shellcheck : ---
+     diff shellcheck : >      16 note: Expressions don't expand in single quotes, use double quotes for that. [SC2016]
+     diff shellcheck : 5c5
+     diff shellcheck : <       1 note: See if you can use ${variable//search/replace} instead. [SC2001]
+     diff shellcheck : ---
+     diff shellcheck : >       2 note: See if you can use ${variable//search/replace} instead. [SC2001]
+OK   remarques shellcheck de niveau warning ou error dans la copie : 0
+## C : m2_preparer sur le vrai verrou, puis sur des verrous altérés
+OK   fragments extraits (variables, attendu, champ, m2_preparer, VOIE2_M2) : 9
+     écart du cœur : < VOIE2='set -u
+     écart du cœur : > VOIE2_M2='set -u
+     écart du cœur : > echo "verrou livré : sha256 $(sha256sum < "$R/verrou.json" | cut -c1-64)"
+     écart du cœur : > df -k /w | awk "NR == 2 {print \"capacité de /w : \" \$2 \" kB ; utilisés : \" \$3 \" kB\"}"
+OK   écarts du cœur à m2.sh : nom, verrou relu, df : 4
+OK   verrou d'entrée, sha256 épinglé dans la copie : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   digest de boot_image du dossier de travail : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     OK   version du verrou : 1.1.0
+     OK   bootstrap_image_ready du verrou : true
+     OK   pull_digest du verrou (digest de boot_image) : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     OK   bootstrap_image du verrou : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     OK   image_digest du verrou, 64 hexadécimaux : true
+     OK   verrou : 222 paquets, tous sous https://dl.rockylinux.org/vault/rocky/9.7 (BaseOS, AppStream, CRB)
+     bootstrap : docker://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 vers dir:<dépôt>/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+OK   vrai verrou : code : 0
+OK   vrai verrou : paquets : 222
+OK   voie2.sh : marque @…@ restante : 0
+OK   voie2.sh : source de skopeo : 1
+OK   voie2.sh : dossier dir: (config.py:844-847) : 1
+OK   refusé : version 1.0.0 (code 1)
+OK   refusé : bootstrap_image_ready faux (code 1)
+OK   refusé : pull_digest d'une autre image (code 1)
+OK   refusé : bootstrap_image brute (code 1)
+OK   refusé : image_digest préfixé (code 1)
+OK   refusé : URL manquante (code 1)
+OK   refusé : sigmd5 court (code 1)
+OK   refusé : URL d'extras (code 1)
+OK   refusé : URL avec .. (code 1)
+OK   refusé : doublon (code 1)
+OK   refusé : verrou vide (code 1)
+OK   refusé : digest de boot_image différent du verrou (code 1)
+## D : voie2.sh joué avec des outils simulés
+OK   verrou synthétique préparé : code : 0
+OK   voie2.sh du banc : seule la ligne df change : 1
+     verrou livré : sha256 6519b501fc6dbce3be984fbeaa831401df605d63b15a4f37b84f41a803cbdd34
+     paquets du verrou : 222
+     téléchargement : 222 fichiers en 1 s
+     rpm -K : rc 0, 222 OK sur 222
+     OK   nom, version, release, arch et sigmd5 des 222 rpm égaux au verrou
+     createrepo_c --compatibility : rc 0 en 1 s
+     repomd.xml : sha256 10238037e4aec1d2b20c4588cada5d2af8e83b4620feddcddaa62fc0fe30dfb8
+     skopeo copy --preserve-digests : rc 0 en 0 s
+     OK   manifeste copié : sha256:ea2f793b65cdb1274d0b4172d08c5ff043aef21b2c341467258b565f7ffc80f6
+     capacité de /w : 599879200 kB ; utilisés : 505537224 kB
+OK   nominal : code : 0
+OK   nominal : URL demandées : 222
+OK   nominal : dernière porte : 1
+OK   nominal : arguments de skopeo : copy --preserve-digests docker://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:ea2f793b65cdb1274d0b4172d08c5ff043aef21b2c341467258b565f7ffc80f6 dir:~/.cache/supply-chain-poc/05/banc-m2/w/voie2/depot/sc-stockage.poc.test@sha256:ea2f793b65cdb1274d0b4172d08c5ff043aef21b2c341467258b565f7ffc80f6
+OK   nominal : ligne df : 1
+     OK   verrou relu dans le pod : sha256 6519b501fc6dbce3be984fbeaa831401df605d63b15a4f37b84f41a803cbdd34
+     OK   manifeste copié (dernière porte de voie2) : sha256:ea2f793b65cdb1274d0b4172d08c5ff043aef21b2c341467258b565f7ffc80f6
+     porte passée
+OK   porte de etape_voie2 sur la sortie nominale : porte passée
+OK   cas http404 : code 1, KO   HTTP 404 : https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/b/bash-5.1.8-9.e
+OK   cas signature : code 1, KO   signatures des rpm
+OK   cas entete : code 1, KO   en-tête de bash-5.1.8-9.el9.x86_64.rpm différent du verrou
+OK   cas createrepo : code 1, KO   createrepo_c
+OK   cas manifeste : code 1, KO   manifeste copié sha256:e996f291499ef4190e47d296e2d958987f3dbc7be497f56aabb63c3a629cdab6, atten
+OK   porte de etape_voie2 sur la sortie du cas manifeste : pod retiré, porte non passée : 1 0
+OK   cas sans skopeo : code et ligne : 1 1
+OK   cas sans createrepo_c : code et ligne : 1 1
+## E : sondes de hermetique
+OK   sondes extraites : première et dernière lignes : set -u|true set -u|true
+     verrou : sha256 6519b501fc6dbce3be984fbeaa831401df605d63b15a4f37b84f41a803cbdd34
+     repomd.xml : sha256 10238037e4aec1d2b20c4588cada5d2af8e83b4620feddcddaa62fc0fe30dfb8
+     manifeste du dossier dir: : sha256:ea2f793b65cdb1274d0b4172d08c5ff043aef21b2c341467258b565f7ffc80f6
+     OK   verrou relu dans le pod : sha256 6519b501fc6dbce3be984fbeaa831401df605d63b15a4f37b84f41a803cbdd34
+     OK   repomd.xml égal à celui de voie2 : sha256 10238037e4aec1d2b20c4588cada5d2af8e83b4620feddcddaa62fc0fe30dfb8
+     OK   manifeste du dossier dir: (pull_digest) : sha256:ea2f793b65cdb1274d0b4172d08c5ff043aef21b2c341467258b565f7ffc80f6
+     porte passée
+OK   porte de etape_hermetique, nominal : porte passée
+OK   porte de etape_hermetique, repomd.xml changé : pod retiré, porte non passée : 1 0
+     sources livrées : rc 0 sample-app-1.0.0.tar.gz: OK sample-app.spec: OK
+     avant mock, capacité de /w : 599879200 kB ; utilisés : 505538488 kB
+     mock --hermetic-build : rc 0 en 0 s
+     lignes « Using container image: dir: » : sortie 1 ; root.log 1
+     lignes « Pulling image: dir: » : sortie 1 ; root.log 1
+     lignes « Tagging container image as mock-bootstrap- » : sortie 1 ; root.log 1
+     lignes « Checking image digest: 18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af » : sortie 1 ; root.log 1
+     lignes « Calculating .* image OCI digest » : sortie 1 ; root.log 1
+     lignes « matches host.s architecture » : sortie 1 ; root.log 1
+     lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+     lignes « Expected digest for image » : sortie 0 ; root.log 0
+     lignes « Not updating bootstrap chroot » : sortie 0 ; root.log 0
+     lignes « --installroot=~/.cache/supply-chain-poc/05/banc-m2/w/mock-h/ » : sortie 1 ; root.log 1
+     lignes « No space left on device » : sortie 0 ; root.log 0
+     /var/lib/mock : 0 entrée(s)
+     résultat : total 4
+     résultat : -rw-rw-r-- 1 gigi gigi   0 Nov 17 16:58 build.log
+     résultat : -rw-rw-r-- 1 gigi gigi 507 Nov 17 16:58 root.log
+     résultat : -rw-rw-r-- 1 gigi gigi   0 Nov 17 16:58 sample-app-1.0.0-2.el9.src.rpm
+     résultat : -rw-rw-r-- 1 gigi gigi   0 Nov 17 16:58 sample-app-1.0.0-2.el9.x86_64.rpm
+     rpm : sample-app-1.0.0-2.el9.src.rpm sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 ; BUILDHOST reproducible ; BUILDTIME 1731000000
+     rpm : sample-app-1.0.0-2.el9.x86_64.rpm sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 ; BUILDHOST reproducible ; BUILDTIME 1731000000
+     après mock (buildroot gardé, --no-cleanup-after), capacité de /w : 599879200 kB ; utilisés : 505538504 kB
+OK   rendu : marque @…@ restante : 0
+OK   sources livrées : 1
+OK   arguments de mock : --hermetic-build ~/.cache/supply-chain-poc/05/banc-m2/w/verrou.json ~/.cache/supply-chain-poc/05/banc-m2/w/voie2/depot --isolation=simple --no-cleanup-after --config-opts=basedir=~/.cache/supply-chain-poc/05/banc-m2/w/mock-h --config-opts=cache_topdir=~/.cache/supply-chain-poc/05/banc-m2/w/mock-h-cache --resultdir=~/.cache/supply-chain-poc/05/banc-m2/w/res-h --spec ~/.cache/supply-chain-poc/05/banc-m2/w/src/sample-app.spec --sources ~/.cache/supply-chain-poc/05/banc-m2/w/src
+OK   mock : rc : 1
+OK   compte « Using container image: dir: » : 1
+OK   compte « Pulling image: dir: » : 1
+OK   compte « Tagging container image as mock-bootstrap- » : 1
+OK   compte « Calculating .* image OCI digest » : 1
+OK   compte « matches host.s architecture » : 1
+OK   compte du digest affirmé : 1
+OK   compte du repli (0) : 1
+OK   compte de --installroot sous le basedir (motif commençant par --, passé par -e) : 1
+OK   compte de « No space left on device » (0) : 1
+OK   rpm produits relevés : 2
+OK   lignes df avant et après : 2
+OK   mock en échec : rc et fin de journal : 1 1
+## F : structure
+OK   etape_voie2 et etape_hermetique définies une fois
+OK   hermetique ne recrée pas le pod (ni pod_spec, ni pod_demarrer)
+OK   hermetique retire le pod sur échec de sa porte et à la fin
+OK   voie2 retire le pod sur échec de sa porte, et seulement là
+OK   voie2 ne joue mock nulle part
+OK   nom du pod conforme (DNS-1123, 63 au plus)
+## G : image d'essai
+OK   racine.tar (image d'essai), sha256 de l'étape racine : d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+OK   commandes des sondes absentes de /usr/bin : 
+OK   archive des sources de mock, sha256 (m2-releve.log) : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+OK   hermetic-build.cfg de l'image égal à celui du tag mock-6.9-1 : 08537ed0f70a84e0d033aa36c9d3e6918be4ec04700d8624f1b593aa82684ef5
+# bilan : tenu, fin 2026-11-17T15:58:29Z
