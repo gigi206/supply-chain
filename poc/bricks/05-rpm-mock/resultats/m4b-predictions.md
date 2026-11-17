@@ -60,3 +60,32 @@ Code 0 ([journal](m4b-prealables.log), `95bcad00…`), hôte seul, hors ligne.
 | PA5 | **Tenue.** Sonde, pas de prefetch et comparaisons passent `sh -n` (dash). |
 
 La liste qui sera inscrite dans le gabarit est fixée : `95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910`. Suite : `essai`, sur accord nommé.
+
+## Résultat de `essai` (17/11/2026, de 21:34:52 à 21:36:04 UTC, « Oui, lance-le » ; note écrite à 21:36:36 UTC)
+
+Code 0 ([journal](m4b-essai.log), `f6260291…`). Pod `m4b-05-essai` sur `sc-build`, sans `runtimeClassName` (runc), supprimé à la fin avec son volume éphémère ; plus aucun pod ni PVC de ce nom dans `builds` à 21:36:36 UTC. Rien écrit dans Zot.
+
+| # | Résultat |
+|---|---|
+| E1 | **Tenue.** Admis en dry-run serveur. |
+| E2 | **Tenue.** Prêt sur `sc-build`, runc. |
+| ES1, E3 | **Tenues.** `uid=65532 gid=65532` ; `/workspace/sortie` (sous `subPath`) et `/tmp` en `drwxrwxrwx`, volume inscriptible. |
+| ES2 | **Tenue.** `cmp` et `diff` absents ; tous les autres outils présents, `python3` aussi. |
+| ES3 | **Tenue.** Clé de l'image présente, empreinte `21CB256AE16FC54C6E652949702D426D350D275D` par `gpg`, identifiant court `350d275d`. |
+| ES4 | **Tenue.** Les deux formes de CA (`--cert-dir /etc/ca-poc`, `SSL_CERT_FILE`) lisent le manifeste `f0ccf105…` en anonyme. |
+| E4 | **Tenue.** p1 : 222 rpm téléchargés et contrôlés (sha256, taille), `rpm -K` 222 OK sur 222 sans root, `createrepo_c` rc 0, `skopeo copy` anonyme, manifeste `f0ccf105…` ; 233 fichiers, 318 744 669 octets. |
+| E5 | **Tenue.** p2 : de même ; 233 fichiers, 318 744 630 octets. |
+| E6 | **Tenue.** p1 et p2 égaux hors `repodata` : 226 fichiers. |
+| E7 | **Tenue.** `repodata` par défaut différents (`repomd.xml` `af75d39e…` contre `3524b507…`). Seuls diffèrent `primary.xml.gz`, `primary.sqlite.bz2` et `repomd.xml` : `filelists` et `other` sont égaux (lecture du journal). |
+| E8 | **Tenue.** V1 (rpm datés à 0, `--compatibility --revision 0 --set-timestamp-to-revision`) : les options existent dans `createrepo_c` 0.20.1 ; deux copies, mêmes `repodata` (7 fichiers, `repomd.xml` `65061cd6…`). |
+| E9 | **Tenue.** V2 (V1 et `--no-database`) : deux copies, mêmes `repodata` (4 fichiers, `repomd.xml` `239a5a71…`). |
+| E10 | **Tenue.** Pod supprimé avec son volume. |
+| E11 | **Tenue.** 26 s et 29 s par passage (61 s de téléchargement seul en M2, sous Kata). |
+
+**Constats**
+- La fermeture de la plateforme peut être reproductible : avec V1 ou V2, deux passages donnent les mêmes `repodata`, et le reste est déjà égal. L'écart venait des dates des fichiers (que `curl` pose au téléchargement et que `primary` reprend) et des dates de `repomd.xml`.
+- `rpm -K` coûte peu : les deux passages entiers durent moins de 30 s.
+- Le volume éphémère montre 30 753 032 kB, et non les 4 Gi demandés : la classe de stockage par défaut ne borne pas la taille (lecture du `df`).
+- Non mesuré : que mock, en mode hermétique, accepte des `repodata` faits avec V1 ou V2 (sans bases sqlite pour V2). Ce sera à mesurer en M4c, ou par un build d'essai.
+
+Suite : choisir la variante de `createrepo_c` et confirmer `rpm -K` avant d'écrire la tâche signée.

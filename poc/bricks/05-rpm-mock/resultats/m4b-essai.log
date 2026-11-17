@@ -1,0 +1,90 @@
+# m4b.sh essai, 2026-11-17T21:34:52Z
+source du bootstrap : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 ; dossier dir: : sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+OK   pod d'essai admis en dry-run serveur
+### m4b-05-essai (runc, uid 65532, label tekton.dev/task=prefetch-rpm) : prêt sur sc-build, runtimeClassName «  »
+## sonde (ne s'arrête sur aucun écart)
+     identité : uid=65532 gid=65532 groups=65532
+     drwxrwxrwx 2 root root 4096 Nov 17 21:34 /tmp
+     drwxrwxrwx 2 root root 4096 Nov 17 21:34 /workspace/sortie
+     volume inscriptible : oui
+     outil curl : /usr/bin/curl
+     outil rpm : /usr/bin/rpm
+     outil createrepo_c : /usr/bin/createrepo_c
+     outil skopeo : /usr/bin/skopeo
+     outil sha256sum : /usr/bin/sha256sum
+     outil stat : /usr/bin/stat
+     outil gpg : /usr/bin/gpg
+     outil find : /usr/bin/find
+     outil du : /usr/bin/du
+     outil awk : /usr/bin/awk
+     outil touch : /usr/bin/touch
+     outil cp : /usr/bin/cp
+     outil comm : /usr/bin/comm
+     outil sort : /usr/bin/sort
+     outil cmp : absent
+     outil diff : absent
+     outil python3 : /usr/bin/python3
+     clé de l'image : présente ; empreinte gpg : 21CB256AE16FC54C6E652949702D426D350D275D
+     clé de l'image : identifiant court rpm 350d275d
+     createrepo_c : Version: 0.20.1 (Features: LegacyWeakdeps )
+          --no-database                                Do not generate sqlite databases in the repository.
+          --retain-old-md=NUM                          Specify NUM to 0 to remove all repodata present in old repomd.xml or any other positive number to keep all old repodata. Use --compatibility flag to get the behavior of original createrepo: Keep around the latest (by timestamp) NUM copies of the old repodata (works only for primary, filelists, other and their DB variants).
+          --revision=REVISION                          User-specified revision for this repository.
+          --set-timestamp-to-revision                  Set timestamp fields in repomd.xml and last modification times of created repodata to a value given with --revision. This requires --revision to be a timestamp formatted in 'date +%s' format.
+          --compatibility                              Enforce maximal compatibility with classical createrepo (Affects only: --retain-old-md).
+     skopeo inspect, --cert-dir /etc/ca-poc : manifeste sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 ; 
+     skopeo inspect, SSL_CERT_FILE : manifeste sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 ; 
+     attendu : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     (code de l'exec : 0)
+OK   liste livrée (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+## passage p1
+     téléchargés et contrôlés (sha256, taille) : 222
+     clé de Rocky de l'image : empreinte conforme (gpg)
+     rpm -K : rc 0, 222 OK sur 222
+     createrepo_c --compatibility : en 1 s ; repomd.xml af75d39efcf9b796497beb7fce8763a8b98477c1441b6767bb82842924029681
+     skopeo copy --preserve-digests : en 1 s ; manifeste sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     fermeture : 233 fichiers, 318744669 octets
+     durée du passage : 26 s
+     (code de l'exec : 0)
+## passage p2
+     téléchargés et contrôlés (sha256, taille) : 222
+     clé de Rocky de l'image : empreinte conforme (gpg)
+     rpm -K : rc 0, 222 OK sur 222
+     createrepo_c --compatibility : en 1 s ; repomd.xml 3524b5070c9fd5fb71ec4ae684591eee5c1d1164d80c422c085242c5131e3c0e
+     skopeo copy --preserve-digests : en 1 s ; manifeste sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     fermeture : 233 fichiers, 318744630 octets
+     durée du passage : 29 s
+     (code de l'exec : 0)
+## comparaisons
+     ## passages p1 et p2 : fichiers hors repodata
+     égaux : 226 fichiers
+     ## repodata, défaut (comme en M2)
+     p1 : af75d39efcf9b796497beb7fce8763a8b98477c1441b6767bb82842924029681 ; p2 : 3524b5070c9fd5fb71ec4ae684591eee5c1d1164d80c422c085242c5131e3c0e
+     repodata différents :
+          	4dcac766ef6635f49fb66be3627dbb5e071512706ff727dc037412e81d98d98b-primary.xml.gz 4dcac766ef6635f4
+          64edc66d1f4b3f2857366152f14a8dcda9e3aa3547ed07ee81394c56a8b380c6-primary.sqlite.bz2 64edc66d1f4b3f28
+          	860cb61efaaab632006ea783c56e41d85064ee17739fe250c4145d194bbd6b81-primary.sqlite.bz2 860cb61efaaab632
+          db90250a5bd6165e7f8bf1500a90b675128de1ced6842c944c31ff054fa67e09-primary.xml.gz db90250a5bd6165e
+          	repomd.xml 3524b5070c9fd5fb
+          repomd.xml af75d39efcf9b796
+     ## options de createrepo_c (aide)
+     Version: 0.20.1 (Features: LegacyWeakdeps )
+          --no-database                                Do not generate sqlite databases in the repository.
+          --retain-old-md=NUM                          Specify NUM to 0 to remove all repodata present in old repomd.xml or any other positive number to keep all old repodata. Use --compatibility flag to get the behavior of original createrepo: Keep around the latest (by timestamp) NUM copies of the old repodata (works only for primary, filelists, other and their DB variants).
+          --distro=DISTRO                              Distro tag and optional cpeid: --distro'cpeid,textname'.
+          --content=CONTENT_TAGS                       Tags for the content in the repository.
+          --revision=REVISION                          User-specified revision for this repository.
+          --set-timestamp-to-revision                  Set timestamp fields in repomd.xml and last modification times of created repodata to a value given with --revision. This requires --revision to be a timestamp formatted in 'date +%s' format.
+          --compatibility                              Enforce maximal compatibility with classical createrepo (Affects only: --retain-old-md).
+          --retain-old-md-by-age=AGE                   During --update, remove all files in repodata/ which are older then the specified period of time. (e.g. '2h', '30d', ...). Available units (m - minutes, h - hours, d - days)
+     ## variante V1 : rpm datés à 0, --compatibility --revision 0 --set-timestamp-to-revision
+     V1 p1 : rc 0 ; repomd.xml 65061cd6c92c9e2d29e8d8b6ff19e17ee26759ada360e7826c8243bea3008b3b
+     V1 p2 : rc 0 ; repomd.xml 65061cd6c92c9e2d29e8d8b6ff19e17ee26759ada360e7826c8243bea3008b3b
+     V1 : repodata égaux (7 fichiers)
+     ## variante V2 : V1 et --no-database
+     V2 p1 : rc 0 ; repomd.xml 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+     V2 p2 : rc 0 ; repomd.xml 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+     V2 : repodata égaux (4 fichiers)
+     volume : 30753032 kB, utilisés 15837788 kB
+     (code de l'exec : 0)
+pod m4b-05-essai supprimé (volume éphémère avec lui)
