@@ -204,3 +204,32 @@ Journal : [`m1b-complements.log`](m1b-complements.log).
 - **Si seul un des deux fichiers devient stable**, c'est un résultat à noter, pas un échec. Je lirai alors les sources de rpm ou de p11-kit, sur leurs SRPM signés.
 - **Si RT8 montre d'autres membres**, je les liste et je ne conclus pas.
 - **Les replis** (réécrire la base rpm après l'installation, retirer ou régénérer `cacerts`) restent non mesurés. Ils ne seront listés dans la carte que comme tels.
+
+## Résultat du troisième banc, du 18/11/2026, de 20:15:56 à 20:16:39 UTC, code 0 (note écrite à 2026-11-18T20:17:28Z)
+
+Journal : [`m1b-repro3.log`](m1b-repro3.log). Les arbres et les archives sont dans `~/.cache/supply-chain-poc/05/m1b-repro3-20261118T201556Z`, laissés en place.
+
+- **RT1 tenue** : S vaut 1778610852 (12/05/2026, 18:34:12 UTC). C'est la plus grande `FILEMTIMES`, au-dessus de E.
+- **RT2 tenue** : dnf rend 0 aux deux installations, avec 222 paquets et la même liste triée (`251ac6c5…`).
+- **RT3 en partie** :
+  - `INSTALLTID` vaut S pour les 222 paquets ;
+  - **`INSTALLTIME` n'est pas constant** : il vaut S pour le premier paquet, puis augmente d'une seconde par paquet, jusqu'à S + 221 (18:37:53 UTC) ;
+  - la suite est la même dans i3 et dans i4. L'écart à la prédiction ne coûte donc rien à la reproductibilité.
+- **RT4 tenue** : 3332 entrées dépassent S dans chaque arbre (2824 répertoires, 326 liens, 182 fichiers). La variable ne change pas les mtimes du système de fichiers ; c'est la borne de tar qui s'en charge.
+- **RT5 tenue** : `cacerts` est identique entre i3 et i4. Ses 146 entrées portent l'horodatage S. La variable passe donc de dnf au scriptlet de `ca-certificates`, puis à `trust`.
+- **RT6 tenue** : i3 archivé deux fois donne deux fichiers identiques.
+- **RT7 tenue** : **a3.tar et a4.tar sont identiques octet à octet** (`0c00666a…`, 776 755 200 octets). La base rpm l'est aussi, table par table : 222 blobs égaux, 2691 pages.
+- **RT8 tenue** : contre i1, installé sans la variable, seuls `rpmdb.sqlite` et `cacerts` diffèrent. La variable ne change rien d'autre dans l'archive.
+- **RT9 tenue** : le troisième champ de `etc/shadow` vaut 19820 (7/04/2024) sur 13 lignes, dans i1 comme dans i3. Il ne vient donc pas du jour de l'installation, mais il ne dit rien des autres champs au jour près.
+
+**Lecture, selon la règle écrite d'avance** : **le point 1 A est neutralisable sur le banc. Il n'est pas établi.** Deux moyens suffisent ici, et aucun ne demande d'installation :
+1. poser `SOURCE_DATE_EPOCH=S` pendant `dnf --installroot` ;
+2. borner les mtimes de l'archive à cette même valeur S (`--mtime=@S --clamp-mtime`), avec S = max(`BUILDTIME`, `FILEMTIMES`). Aucune mtime livrée par rpm ne change alors.
+
+Il faut aussi retirer les huit fichiers du second banc (journaux et historique de dnf, `aux-cache`). Les quatre angles morts écrits d'avance restent à mesurer :
+1. **Jour différent** : le rejeu aura lieu après le 28/11. Fausser l'horloge demanderait une installation.
+2. **Jeu de paquets** : il reste les 201 paquets de l'outillage, et le bootstrap (base 9.7 plus dix lignes).
+3. **Installeur** : rpm de l'amorce `ed654c69`, non lu.
+4. **Miroir partiel** au lieu de fichiers locaux : `var/cache/dnf` et `var/lib/dnf`.
+
+**Portée** : ce sont des installations sur l'hôte, des 222 rpm de vault 9.7, avec rpm 4.16.1.3-40. Le banc ne dit pas si mock fonctionne sans les huit fichiers retirés. Il ne dit pas non plus ce que fera la tâche Kata. Les replis (réécrire la base rpm, retirer ou régénérer `cacerts`) restent non mesurés et sans objet tant que la variable suffit. Le choix de S est le mien : c'est la plus petite borne qui ne change aucune mtime livrée par rpm. Il ne devient une recommandation qu'après relecture du conseiller.

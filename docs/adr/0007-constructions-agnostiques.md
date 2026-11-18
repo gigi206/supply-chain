@@ -124,3 +124,8 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Mesuré aussi** : les 199 rpm de l'outillage du 17/11 sont servis à deux adresses figées. Les 190 de Rocky sont dans vault 9.8, avec des repomd signés identiques à ceux du 17/11. Les 9 d'EPEL sont dans `pub/archive/epel/9.8`, sans métadonnées signées.
 - **Conséquence pour cet ADR** : aucune décision ne change. Tous les écarts lus viennent de l'heure de l'installation, et aucun moyen de les neutraliser n'est mesuré.
 - **Portée** : ce sont un traitement de l'archive sur l'hôte et un relevé public. Ils ne disent rien de mock sans les fichiers retirés, ni de la tâche Kata, ni de la durée de conservation des archives.
+
+**Additif du 18/11/2026, 20:17 UTC : troisième banc de M1b** ([détail](../../poc/bricks/05-rpm-mock/resultats/m1b-predictions.md)).
+- **Mesuré** : sur l'hôte, hors ligne, deux `dnf --installroot` des mêmes 222 rpm, avec `SOURCE_DATE_EPOCH=S`, donnent la même archive octet à octet. L'archive est bornée à S et ne contient ni les journaux de dnf, ni son historique, ni `aux-cache`. S est le plus grand des `BUILDTIME` et des `FILEMTIMES`. rpm 4.16.1.3 pose alors `INSTALLTID` à S et `INSTALLTIME` à S plus le rang du paquet. p11-kit horodate `cacerts` à S.
+- **Conséquence pour cet ADR** : aucune décision ne change. Une racine rpm reproductible paraît possible sans outil ajouté, mais ce n'est pas établi.
+- **Portée** : il reste à mesurer un autre jour, les paquets de l'outillage et du bootstrap, le rpm de l'amorce et un miroir partiel au lieu de fichiers locaux.
