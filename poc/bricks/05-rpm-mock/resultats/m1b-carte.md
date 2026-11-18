@@ -171,3 +171,8 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Langues** : `%_install_langs` vaut `en_US` dans l'amorce (`macros.image-language-conf`) et `all` dans la racine d'outils de `99790c13`.
 - **Suite** : refaire le banc de l'outillage avec la racine de l'amorce, sous `umask 022`.
 - **Détail** : [lecture](m1b-predictions.md), [journal](m1b-amorce-lecture.log).
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T21:13:18Z UTC : portée de la référence 05d35d64
+
+- **Portée** : `05d35d64…` ne vaut que pour les outils de `99790c13`, sous le umask de l'hôte (0002). Elle ne sert pas de référence à un banc fait avec les outils de l'amorce, qui en aura une à lui, faite le même jour.
+- **ee90dc0e** : sa présence en local est désormais archivée ([journal](m1b-images-locales.log)).

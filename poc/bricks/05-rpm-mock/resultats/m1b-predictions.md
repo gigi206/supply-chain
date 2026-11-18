@@ -676,3 +676,12 @@ Le point 1 A reste non établi.
 - **umask** : la configuration de l'image n'en porte pas (Env `container=oci`, Cmd `/bin/bash`). Il vient du lanceur, et il n'est pas lu ici.
 
 **Ce que cela change** : l'hypothèse « langues des outils » a désormais une cause lisible : `en_US` contre `all`. Le lien avec les 34 membres de `racine.tar` reste à mesurer. Il faut refaire le banc de l'outillage avec la racine de l'amorce comme outils, sous `umask 022`, après des prédictions commitées. La racine extraite est laissée dans `~/.cache/supply-chain-poc/05/m1b-amorce-20261118T211051Z/racine`.
+
+### Compléments à la lecture de l'amorce (note écrite à 2026-11-18T21:13:18Z UTC, après relecture par le conseiller)
+
+1. **`ee90dc0e` archivé** : la vérification « à la main » de l'image du bootstrap n'avait laissé aucun journal. Elle est refaite par [`m1b-images-locales.sh`](m1b-images-locales.sh) ([journal](m1b-images-locales.log)), de 21:12:59 UTC, code 0. Pour les deux images, le manifeste, la configuration et la couche ont la taille et le sha256 attendus (6 « OK »).
+2. **Balayage des notes fausses** : j'ai cherché « pas en local », « n'ai pas en local », « non lisible » et « seule lisible » dans la brique 05, docs/03, l'ADR 0007 et la mémoire. Les trois endroits listés dans la correction sont les seuls trouvés.
+3. **Portée de la référence `05d35d64`** : elle ne vaut que pour la racine d'outils de `99790c13`, sous le umask des commandes de l'hôte (0002). Un banc fait avec les outils de l'amorce, sous `umask 022`, donnera une autre archive, qui ne se compare pas à `05d35d64`. Si cette configuration est retenue, il lui faudra sa propre référence du même jour avant la relance d'un autre jour.
+4. **Avant les prédictions de ce banc** :
+   - lire l'étape racine de `s1.sh` pour savoir si le pod a tourné sur `ed654c69` sans rien y installer ni changer avant `dnf --installroot`, et quel umask il avait ;
+   - relire `%_install_langs` dans le banc lui-même, comme témoin.

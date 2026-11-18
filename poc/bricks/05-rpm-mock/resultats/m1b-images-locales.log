@@ -1,0 +1,11 @@
+# m1b-images-locales.sh, début 2026-11-18T21:12:59Z
+index.json du cache : ed654c694190 ee90dc0e23c2
+## amorce (ed654c694190)
+OK   manifeste ed654c694190 : 572 octets, sha256 égal
+OK   configuration 686e4558d0a5 : 1006 octets, sha256 égal
+OK   couche 99c753a880cc : 87572693 octets, sha256 égal
+## bootstrap (ee90dc0e23c2)
+OK   manifeste ee90dc0e23c2 : 573 octets, sha256 égal
+OK   configuration 9e021fdeb530 : 1006 octets, sha256 égal
+OK   couche 812c44127102 : 87054388 octets, sha256 égal
+# fin 2026-11-18T21:12:59Z, code 0
