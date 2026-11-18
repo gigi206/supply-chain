@@ -102,3 +102,16 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 - **Second passage, 14:10:48 UTC, code 1** ([journal](m4c-prealables-passage2.log)) : arrêt dès le nettoyage. Le retrait récursif du dossier de travail n'a pas pu enlever le cache de modules de go laissé par le premier passage, que go extrait en lecture seule (170 lignes « Permission denied »). Aucun contrôle n'a tourné. C'est un défaut de `m4c.sh` au second passage, non prédit, que le premier passage ne pouvait pas montrer.
 - **Correction** : les droits d'écriture sont rendus avant le retrait (`chmod -R u+w`, comme le piège de `sources.sh`). `m4c.sh` passe de `08b29ab5…` à `b5a7f79d…`, par cette seule insertion de trois lignes ; les gabarits ne changent pas.
 - **Troisième passage, 14:11:15 à 14:11:26 UTC, code 0, 62 OK** ([journal](m4c-prealables.log)) : journal identique ligne pour ligne au premier ([journal du premier passage](m4c-prealables-passage1.log)), sauf l'en-tête et la ligne de `entrees.tar` (nouveau sha256 `b84f68ee…`, même taille, 318 842 880 octets). La prédiction de rejeu tient : PR1 à PR10, digest attendu `7b17e7e7…`.
+
+## Note datée du 18/11/2026, écrite à 14:13:18 UTC : `essai_preparer` passée (accord permanent du 18/11)
+
+**Passage** ([journal](m4c-essai_preparer.log), [journaux du pod](m4c-essai-preparer-pod.log)) : le 18/11/2026, `date -u` avant et après le lancement : 14:12:26 et 14:12:35 UTC ; code 0, 14 OK, aucun KO. Sur `80592ce`, `m4c.sh` = `b5a7f79d…`.
+
+**Confrontation aux prédictions**
+- **EP1 tenue** : `construction-rpm-sans-sortie` telle que posée en M3 ; aucune politique de `builds` n'autorise de trafic à `construire-rpm`. Relevé : seule `builds-sans-internet` (CiliumNetworkPolicy) sélectionne `preparer-rpm`. Le libellé du relevé répète « CiliumNetworkPolicy », défaut d'affichage sans effet.
+- **EP2 tenue** : admis en dry-run serveur ; créé à 14:12:26, vu `Succeeded` à 14:12:34 (relevé toutes les 2 s), sur sc-build, sans `runtimeClassName` (runc).
+- **EP3 tenue** : clone de Forgejo (git 2.51.2, commit `6391fd43…`, arbre `30e808ff…`) ; trois pulls par l'`oras` de l'image d'outils, dont le dossier `dir:` (230 fichiers de la fermeture, 8 de la fermeture applicative, 2 du packaging) ; contrôles du pas `entrees` passés sous son busybox ; assemblage égal à l'hôte. Sous `builds-sans-internet`, sans politique dédiée, Forgejo et Zot ont été joints (mesuré).
+- **EP4 tenue** : les cinq résultats égaux à l'attendu.
+- **EP5 tenue** : arbre `entrees/` du pod égal à celui de `prealables`, 273 fichiers, en contenu, modes et types.
+
+**Portée.** Le pod d'essai rejoue les pas, leurs images, leurs montages et leur contexte, sur des `emptyDir`. Le PVC sous `subPath`, l'image d'entrée de Tekton et l'ordre des pas tenu par Tekton ne sont pas couverts : ce sera à `pipeline`.

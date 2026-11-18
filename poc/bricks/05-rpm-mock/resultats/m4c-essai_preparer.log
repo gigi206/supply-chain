@@ -1,0 +1,36 @@
+# m4c.sh essai_preparer, 2026-11-18T14:12:26Z
+OK   script sources : variables Tekton restantes : 0
+OK   script entrees : variables Tekton restantes : 0
+OK   script assemblage : variables Tekton restantes : 0
+OK   images des pas (gabarit rendu) : sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0 sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+politiques de builds : NetworkPolicy builder-sans-sortie, NetworkPolicy construction-deb-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
+OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+relevé : politiques de builds qui sélectionnent preparer-rpm : CiliumNetworkPolicy CiliumNetworkPolicy builds-sans-internet
+OK   pod m4c-essai-preparer admis en dry-run serveur
+pod m4c-essai-preparer créé à 14:12:26
+pod m4c-essai-preparer : Succeeded à 14:12:34, sur sc-build, runtimeClassName «  »
+### sources (code 0)
+     git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+### entrees (code 0)
+     fermeture rpm : 230 fichiers ; fermeture applicative : 8 fichiers ; packaging : 2 fichiers
+### assemblage (code 0)
+     all modules verified
+     go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+     entrées prêtes : src (41 fichiers), fermeture rpm (230 fichiers), spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6, verrou b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+### liste (code 0)
+     résultat CHAINS-GIT_COMMIT : 6391fd437f26696847041be3226bbbf633f55a2f
+     résultat CHAINS-GIT_URL : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+     résultat FERMETURE_RPM_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm","digest":"sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c"}
+     résultat FERMETURE_SOURCES_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources","digest":"sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21"}
+     résultat PACKAGING_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm","digest":"sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8"}
+pod m4c-essai-preparer supprimé
+OK   pod d'essai de preparer-rpm : Succeeded
+OK   résultat CHAINS-GIT_URL : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+OK   résultat CHAINS-GIT_COMMIT : 6391fd437f26696847041be3226bbbf633f55a2f
+OK   résultat FERMETURE_RPM_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm","digest":"sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c"}
+OK   résultat FERMETURE_SOURCES_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources","digest":"sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21"}
+OK   résultat PACKAGING_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm","digest":"sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8"}
+arbre entrees/ : 273 fichiers dans le pod, 273 dans prealables
+OK   arbre entrees/ du pod égal à celui de prealables (contenu, modes, types) : égal

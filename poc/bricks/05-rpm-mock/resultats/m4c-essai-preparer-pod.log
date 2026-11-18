@@ -1,0 +1,578 @@
+git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+fermeture rpm : 230 fichiers ; fermeture applicative : 8 fichiers ; packaging : 2 fichiers
+all modules verified
+go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+entrées prêtes : src (41 fichiers), fermeture rpm (230 fichiers), spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6, verrou b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+résultat CHAINS-GIT_COMMIT : 6391fd437f26696847041be3226bbbf633f55a2f
+résultat CHAINS-GIT_URL : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+résultat FERMETURE_RPM_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm","digest":"sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c"}
+résultat FERMETURE_SOURCES_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources","digest":"sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21"}
+résultat PACKAGING_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm","digest":"sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8"}
+----- liste -----
+f86eaeb883bf10655478306b8aafbb5f14f1b1e37270b177ad59d600a4a86a9e  ./fermeture/depot/alternatives-1.24-2.el9.x86_64.rpm
+b29dc442fbf462c7fbf3216e2756e680e8b911641cf7e78d7bf97710621f18ff  ./fermeture/depot/annobin-12.98-1.el9.x86_64.rpm
+51333801328f306711e1e86f8540f10aae5511272cb772e3e1a31cb26b956166  ./fermeture/depot/audit-libs-3.1.5-7.el9.x86_64.rpm
+9f707e8d1046381c9b4a4df6a6674327df6ffe0298d48e1750972212c97aafad  ./fermeture/depot/basesystem-11-13.el9.0.1.noarch.rpm
+2c1cfef019e5fecfe00d7a1cde3e34456871b447debb4b32c9aacd8045d3e1f6  ./fermeture/depot/bash-5.1.8-9.el9.x86_64.rpm
+0aff0c56fecedccc86e5f10c25a041cb91072e69e625df2f7c17565a995d5ebf  ./fermeture/depot/binutils-2.35.2-67.el9_7.1.x86_64.rpm
+5abdcc998c2c488864badd0da76c9d7d673c56373c2a09893b76ecbd1d89ae79  ./fermeture/depot/binutils-gold-2.35.2-67.el9_7.1.x86_64.rpm
+e0e10fe1b5e52da0647eadc516387cd6f2bb279403842b5c7e6f4b07cb6ff93e  ./fermeture/depot/bzip2-1.0.8-10.el9_5.x86_64.rpm
+1741762b008088e223b9ec386bc77322b95ab47ed8e982e32e8f3d11997955be  ./fermeture/depot/bzip2-libs-1.0.8-10.el9_5.x86_64.rpm
+e9a23ff4a534bfbe07df445df2c37a4f7e80260ce6a4c07863443fc77df167a8  ./fermeture/depot/ca-certificates-2025.2.80_v9.0.305-91.el9.noarch.rpm
+73a91621d9303290c1e27d2a834df4e5532d94dfa9ef2eca984d97f1fd2249a5  ./fermeture/depot/coreutils-8.32-39.el9.x86_64.rpm
+78f60e9037f1e78f6e0e9d9790c85e93069b3faefeb1cf520e4cefbb9e4afb87  ./fermeture/depot/coreutils-common-8.32-39.el9.x86_64.rpm
+7143e372db516da138e6c6ed9dc3570dea42394415b2806ab1b06463b4f94395  ./fermeture/depot/cpio-2.13-16.el9.x86_64.rpm
+d9d5f890e457b958996c961ec935d07cc6a541c789301058f36c9247d758cffe  ./fermeture/depot/cpp-11.5.0-11.el9.x86_64.rpm
+05abbfe7039c63fd1f3e9c216beec6edfda60568ee2f12e203f126dd2b618877  ./fermeture/depot/cracklib-2.9.6-27.el9.x86_64.rpm
+5ba79a7ce247aa40f1f9d95a917c054210a931070d059ebf1614a34461b5432c  ./fermeture/depot/cracklib-dicts-2.9.6-27.el9.x86_64.rpm
+4de2e44ed7e229331875d41647e3495b8dfb3e64882a40e409beaa662d8c1bad  ./fermeture/depot/crypto-policies-20250905-1.git377cc42.el9.noarch.rpm
+fca87a21522a66da54b6a9d0e347df2ca9f36fc028f3937b2a9a3e1874cee2a4  ./fermeture/depot/curl-7.76.1-35.el9_7.3.x86_64.rpm
+dce77bdef6637955b07de109615d76659cb15dd22a73ace9ceb828840aec3bd6  ./fermeture/depot/cyrus-sasl-lib-2.1.27-22.el9_7.x86_64.rpm
+90a4ee340cd3005615e4b179f8eb896cf178884a03d78f1cd2b6c198970993bf  ./fermeture/depot/debugedit-5.0-11.el9.x86_64.rpm
+d3932991f5d9b1e5f6326e376cf77f3f676bbf0c5657b2ddf1013bfdb4738a69  ./fermeture/depot/diffutils-3.7-12.el9.x86_64.rpm
+7b4ca5af34eb0a11b27d55c45d753afc0b05d625900968e8ef00a8fad5289c0c  ./fermeture/depot/dwz-0.16-1.el9.x86_64.rpm
+59802af650b8af62b02fac7811f8dc7312b6f62ae84630b161769dbc224241bb  ./fermeture/depot/ed-1.14.2-12.el9.x86_64.rpm
+5c9f9818e2b5b59da1d6f8d46b89e18b95d691c5cce237cd23b0c5c77a96baf9  ./fermeture/depot/efi-srpm-macros-6-4.el9.noarch.rpm
+cd5e016fcdf0164659d8f26f4ab39c1e8927926a4ec3295d11e3c5a22937ca79  ./fermeture/depot/elfutils-0.193-1.el9.rocky.0.1.x86_64.rpm
+a3229804c751cebed43dbce546dcf9f9c4240ae8ef034369240d5cc4625c2d16  ./fermeture/depot/elfutils-debuginfod-client-0.193-1.el9.rocky.0.1.x86_64.rpm
+88d67c92fa4bc5b5e54071724523c0e642f6902c030c810c5d4e430f69bd18f7  ./fermeture/depot/elfutils-default-yama-scope-0.193-1.el9.rocky.0.1.noarch.rpm
+28f205ac27dd657cf198e46ed4e87b52df0399659e1c8702acfa82ee455faa8b  ./fermeture/depot/elfutils-libelf-0.193-1.el9.rocky.0.1.x86_64.rpm
+4a35d0b2f98d7ef0484a922867b6519ce91e2da288221e0eefd4037a798f6618  ./fermeture/depot/elfutils-libs-0.193-1.el9.rocky.0.1.x86_64.rpm
+eb536c8c563d7f3ff58adcdc3981e8670085c950361f75d5c2d5d27cd80bd044  ./fermeture/depot/file-5.39-16.el9.x86_64.rpm
+36c90a263c9197f1bacc9ad9f2c861a2e6f9c9671b306e886a4534468e0fa19a  ./fermeture/depot/file-libs-5.39-16.el9.x86_64.rpm
+cabe98453b9517158c5a045cfec0418b747c874da2717d183f4296f240bdf8d9  ./fermeture/depot/filesystem-3.16-5.el9.x86_64.rpm
+1c9c28792695c61ced41da9337f323111973ba7eea938c3c11944532e384a662  ./fermeture/depot/findutils-4.8.0-7.el9.x86_64.rpm
+01b6088fbed339508161744f5d79e64c2fcf49e1ce119964e684f7d95806c3ac  ./fermeture/depot/fonts-srpm-macros-2.0.5-7.el9.1.noarch.rpm
+eaca68b315d6c2ef5ec30deaf9b7c38401e2ed0169972d158fd88b917e8a47dc  ./fermeture/depot/gawk-5.1.0-6.el9.x86_64.rpm
+4dbc7c4c1ea919c90b6d7172d4ded6f63ae9aa3d5a2c6daa80f15aa8c1dcd2b3  ./fermeture/depot/gcc-11.5.0-11.el9.x86_64.rpm
+e172188c1044ed89d83fa1247d6e8900f5151639f355f252d21188d7c6316f7b  ./fermeture/depot/gcc-plugin-annobin-11.5.0-11.el9.x86_64.rpm
+a462c9a7b84c8a34e06364fb0cdaba3db35ac6998f424f477a91249cd4853083  ./fermeture/depot/gdb-minimal-16.3-2.el9.x86_64.rpm
+bb36dd4e2083f62f26f9e942dd88f72bdbf5a8b67404833ddbbf1a1d6d8bd29f  ./fermeture/depot/gdbm-libs-1.23-1.el9.x86_64.rpm
+b0a7d5bc94309feb1b4284e81d1905bcfa4ea1be6e4281e2ce4f2a81037bbdc5  ./fermeture/depot/ghc-srpm-macros-1.5.0-6.el9.noarch.rpm
+5e16d9eabca98c267b50e6422bb218978ae0e90c2cb2b16fd2414eee3e901857  ./fermeture/depot/glibc-2.34-231.el9_7.10.x86_64.rpm
+4bb874e9060305e09c5bd3a3846cd364595ec419b482d1338d162b4b517a2e66  ./fermeture/depot/glibc-common-2.34-231.el9_7.10.x86_64.rpm
+e77901fd80fbfcf933a7d39ab7bfbb9457955096a09b5719125f49f15ba3bb7d  ./fermeture/depot/glibc-devel-2.34-231.el9_7.10.x86_64.rpm
+7fd713c32207ea2b0b48d434da600bd8261b78385ba4d9a235cf717ad1f1942d  ./fermeture/depot/glibc-gconv-extra-2.34-231.el9_7.10.x86_64.rpm
+eb8937363598a42459a9f6e3812085c11ccf2785cb13d3ddf62b20e6d3d92ee9  ./fermeture/depot/glibc-headers-2.34-231.el9_7.10.x86_64.rpm
+27ba37c4096b1584c81ca9fcebb4837601252f4b7515a0fc7f2dd1f54b0eab7c  ./fermeture/depot/glibc-minimal-langpack-2.34-231.el9_7.10.x86_64.rpm
+ca72ae69218b96c43c82bdc35dd1078300692714db76d21c7f7dedd8268af799  ./fermeture/depot/gmp-6.2.0-13.el9.x86_64.rpm
+2c720e81e35aceedc3a0d93bca82799afdd3cf8615cccbbe50e0129c19681992  ./fermeture/depot/go-srpm-macros-3.6.0-14.el9_7.noarch.rpm
+5ebd70263e373e689cf267245a9fcb93be46ab621b6d90f1bb51a564f3209a25  ./fermeture/depot/golang-1.25.9-1.el9_7.x86_64.rpm
+847cb19baa80f6cec9481b57c0204e80f467739688507747e04ecd5ffe52bcd1  ./fermeture/depot/golang-bin-1.25.9-1.el9_7.x86_64.rpm
+5cd7102ad51070ba7fd9d8afbf86fd6efa88df6d24710045d199b917b864ac10  ./fermeture/depot/golang-race-1.25.9-1.el9_7.x86_64.rpm
+5c2190690660a46f7efa938d99fa067ca861f734bc838c4709ace2b27cfed2bb  ./fermeture/depot/golang-src-1.25.9-1.el9_7.noarch.rpm
+9c1beaec9264e08459f9097c9bd58aa6118293df47d6f07f8054054cc7c40544  ./fermeture/depot/grep-3.6-5.el9.x86_64.rpm
+46731a989fb41fe6170bf9b1d2d0329f58d28180d918ac3e4b8a24e62da0c1e8  ./fermeture/depot/groff-base-1.22.4-10.el9.0.1.x86_64.rpm
+cd22e3e9e04436c7463f0fd1cb44c816421fd62bd17336081a7453fd646a5c29  ./fermeture/depot/gzip-1.12-1.el9.x86_64.rpm
+179486d9f439b2a79ee2518db90ec43d8037602ef103e68d9f2384af359f9512  ./fermeture/depot/info-6.7-15.el9.x86_64.rpm
+e2e487e4b6d48595612b0785963f0a4294e5dbea8500284ff0df4571afe79c8f  ./fermeture/depot/json-c-0.14-11.el9.x86_64.rpm
+90f2181c261d787d5d2a1e3286c8e171e02841f957db7f6eb49698ea669fdcd1  ./fermeture/depot/kernel-headers-5.14.0-611.55.1.el9_7.x86_64.rpm
+e81522d07dae91b69ebff92958bf499a1c80e5032074e9279afd0ae55d6f4129  ./fermeture/depot/kernel-srpm-macros-1.0-14.el9.noarch.rpm
+347a9d44e0271c1ff6f511fe493e736b3d36fde683360ccc51c852ab91810b16  ./fermeture/depot/keyutils-libs-1.6.3-1.el9.x86_64.rpm
+3247e5b6b9f2d8b812911751f0380a425fabe6be91a9710f31cb18175aefb7fd  ./fermeture/depot/krb5-libs-1.21.1-9.el9_7.x86_64.rpm
+d79fdcbeaa2fe424ff319b5c281dc5c084e9d9aba9aa40c306b6cd34b15386b8  ./fermeture/depot/libacl-2.3.1-4.el9.x86_64.rpm
+507bb07447819c16fc730b178d3ad7614b5d849c277adc2a02b73d13d0f811dc  ./fermeture/depot/libarchive-3.5.3-9.el9_7.x86_64.rpm
+77742a1097d81c384b8c7529e3c049fb7de206b773ad230553be99ba5c9d9fc1  ./fermeture/depot/libattr-2.5.1-3.el9.x86_64.rpm
+81309a68241f77edbd8abb9bdbeea3f7d451471295766d9b560c89e03fe54e58  ./fermeture/depot/libblkid-2.37.4-21.el9_7.x86_64.rpm
+ad9f9d5fe07e9944dbfc6d28b9955c9b220f1887fb46bf45bbedb179373659c6  ./fermeture/depot/libbrotli-1.0.9-9.el9_7.x86_64.rpm
+e6152b9a1d44f9903d4e6c16dc778b40566b0cd66dcbbeac5b21fa84c3a38246  ./fermeture/depot/libcap-2.48-10.el9_7.1.x86_64.rpm
+eb8a42e8ac59905dfa2aa1530e4fb7a0b994ff4ae5ee79dd4557f972f1316ae8  ./fermeture/depot/libcap-ng-0.8.2-7.el9.x86_64.rpm
+efe6cf30cec41b29ebd8cbcdff587566a4567156420d9166d7cf1e8a365c9c4b  ./fermeture/depot/libcom_err-1.46.5-8.el9.x86_64.rpm
+422ed3e7899ab50c142cda8ec687c695a241ffc5d10198900ab15cdac0238ee8  ./fermeture/depot/libcurl-7.76.1-35.el9_7.3.x86_64.rpm
+d1eddd3b0bbbc9ff5e0b6e985093ae0f09f9b4a11257d871e83542654d5400bc  ./fermeture/depot/libdb-5.3.28-57.el9_6.x86_64.rpm
+efcf2e2e938567925770ed40adf3ed9bfb94fce85f7dacb4aa0a863522d75410  ./fermeture/depot/libeconf-0.4.1-4.el9.x86_64.rpm
+2ad9109e8d8a5b297b99f90af7a700aa060207765db75de6349ac458a01e397a  ./fermeture/depot/libedit-3.1-38.20210216cvs.el9.x86_64.rpm
+0de19e8f460c88b3ec808eb5a5a2776930659c593b582664635bdfd1f3fd0a7b  ./fermeture/depot/libevent-2.1.12-8.el9_4.x86_64.rpm
+0d958d361754b5503259964033af5f7f48c9fcf70d17b8c0ac8fad83c259a498  ./fermeture/depot/libfdisk-2.37.4-21.el9_7.x86_64.rpm
+1bdb4b3b047169bc728c2612b71c31b79bb6f823f50134629bf650dcbf21565a  ./fermeture/depot/libffi-3.4.2-8.el9.x86_64.rpm
+9215b225e9cd3de1f80e1ff2c41ab17b5feb84acf9c2d354b6af1d5aba2fd46d  ./fermeture/depot/libgcc-11.5.0-11.el9.x86_64.rpm
+350f4bc7f8c9f5a9ac566d73b3317b4a8183f829efc491d10f4f258d14a28631  ./fermeture/depot/libgcrypt-1.10.0-11.el9.x86_64.rpm
+551b1a9000df501732a37487c6ac293a78d4beba0bdef0cba3ed82f4dc7ede8b  ./fermeture/depot/libgomp-11.5.0-11.el9.x86_64.rpm
+7d48fb4ca1e935a491cb02a85abdd5b91b329168962c1b11ca434c2b80c079fa  ./fermeture/depot/libgpg-error-1.42-5.el9.x86_64.rpm
+be32d8ba7ff8cf790c15d89c5ea18747d7fcc0126782a0e80f15901bb9889b31  ./fermeture/depot/libidn2-2.3.0-7.el9.x86_64.rpm
+a3a6fb92229b8d684afb42105ed840ed113a53cb378e74a28fa6f1e87fd34642  ./fermeture/depot/libmount-2.37.4-21.el9_7.x86_64.rpm
+c4def74fc686113748590ce9bc8591092947be804650ef56aa161e049660273e  ./fermeture/depot/libmpc-1.2.1-4.el9.x86_64.rpm
+9f6dce5d9ebbbe0602b1f8faa68cb40311c919d66db68b0907262c111dd23f81  ./fermeture/depot/libnghttp2-1.43.0-6.el9_7.1.x86_64.rpm
+85df83111841ea9501653408fd86828da263365f8152ac56d92f01940e38519e  ./fermeture/depot/libpkgconf-1.7.3-10.el9.x86_64.rpm
+30553c652451362ebf346a98ff45fa2417dc25a9a644401b4d86d9000c0346a9  ./fermeture/depot/libpsl-0.21.1-5.el9.x86_64.rpm
+d572dfa42d099b58e29fc0c1431c80e1baa4d0555265f79b1a346ebe99ac9ae1  ./fermeture/depot/libpwquality-1.4.4-8.el9.x86_64.rpm
+52f36acacd851901745f7729b7bce31ef7e5fa0fa250a0ce653d4e76dce02664  ./fermeture/depot/libselinux-3.6-3.el9.x86_64.rpm
+e860232d6250dc38958018f06133f748a7bc93d4439df4a760d30ed889b38455  ./fermeture/depot/libsemanage-3.6-5.el9_6.x86_64.rpm
+f2f2f1461334547ba64c41ed7666dc3b8014d5a636edc7d22cfeab9689c1f8be  ./fermeture/depot/libsepol-3.6-3.el9.x86_64.rpm
+a80701bd3f67994493b1a14e043d9212032c86fd24374c309cf2b7006900f4da  ./fermeture/depot/libsigsegv-2.13-4.el9.x86_64.rpm
+764830f62b91a0d4446820ede93b20aaec7098d1a2e3faecf2106bbfc5a18916  ./fermeture/depot/libsmartcols-2.37.4-21.el9_7.x86_64.rpm
+17dff31a8e40a5b19e92f90cd5df48860aa72d1942a67f8dfdaccf065c2876ff  ./fermeture/depot/libssh-0.10.4-17.el9_7.x86_64.rpm
+9acb36f4bcc58478253f77b3df155306629b9e699d45c49077a409a81d570391  ./fermeture/depot/libssh-config-0.10.4-17.el9_7.noarch.rpm
+b341c6fdf7cd85813acdceb07a2f479fecad769dd0bb86e44ad20cc5214c6956  ./fermeture/depot/libstdc++-11.5.0-11.el9.x86_64.rpm
+378e7fc39ac1581c3326aaa945eef0c144a7eb7b9124abb5cf7a1c1205503c72  ./fermeture/depot/libtasn1-4.16.0-9.el9.x86_64.rpm
+2225f18e23d3b4b9e886c1048c93c23c74c32753cb74112812db1f2a688eed53  ./fermeture/depot/libtool-ltdl-2.4.6-46.el9.x86_64.rpm
+7e8b90a282ec310de6766619056296bdf666f3040f22cff211cd52710b39ece5  ./fermeture/depot/libunistring-0.9.10-15.el9.x86_64.rpm
+146dca82c8f1df8135ae7d5cc4aa4af35e02e60f1f61143badc9c5f7ff5029b9  ./fermeture/depot/libutempter-1.2.1-6.el9.x86_64.rpm
+2aaf326df58d3f156b5f07bf04bfb75e2f2391946ff834f9a66718fcd2716d2c  ./fermeture/depot/libuuid-2.37.4-21.el9_7.x86_64.rpm
+f430f1b95b7467c461c7a745eba07beab00306984f2f21ecfcc04f37100405d1  ./fermeture/depot/libverto-0.3.2-3.el9.x86_64.rpm
+e3c178ed2e04ac25699d5af612fad51694a23f5d544b72cab2f65d35b8db5f28  ./fermeture/depot/libxcrypt-4.4.18-3.el9.x86_64.rpm
+f98951be16cb84133ac14201348a202c9884f8958f908b6040fb5db12e4dba81  ./fermeture/depot/libxcrypt-devel-4.4.18-3.el9.x86_64.rpm
+a7534cbcbd8e8f0baac2164a36acfbb5cb1391a832e28c593830588f92586549  ./fermeture/depot/libxml2-2.9.13-14.el9_7.x86_64.rpm
+c5c8b675cfad29fee013a84a2f70bcb958f400b654ff63455bb80597daae86ab  ./fermeture/depot/libzstd-1.5.5-1.el9.x86_64.rpm
+27d56e82a2c8e7b482b7f51693315bd86e57db5af7838b302f6f9c4a0371b68a  ./fermeture/depot/llvm-filesystem-20.1.8-3.el9.x86_64.rpm
+ec70ba70eeef90dca12315f1b785fcc0367a33f8e0476aa12769e88070351383  ./fermeture/depot/llvm-libs-20.1.8-3.el9.x86_64.rpm
+164f78bdc4b37210c54752761d48a229c935824503d5c591c020e447318a1749  ./fermeture/depot/lua-libs-5.4.4-4.el9.x86_64.rpm
+a5cab6e3a6ecb1d3a87c1573d0e993ff042e5948fa8e8262740b53c69eac2390  ./fermeture/depot/lua-srpm-macros-1-6.el9.noarch.rpm
+60f82f4c3f76a543ab247acb37cb439d9de9e40c410ac2f315d6805717d6283e  ./fermeture/depot/lz4-libs-1.9.3-5.el9.x86_64.rpm
+5940dfcf00ba780f0c7e18dc169574fac4b78a0c1ca039747c15869920b4ec08  ./fermeture/depot/make-4.3-8.el9.x86_64.rpm
+88e46af29bde609d8f414313d0090e30501cc38ddf5c6a1bffe34ae896ca936e  ./fermeture/depot/mpfr-4.1.0-7.el9.x86_64.rpm
+ab12764bd659da7e88d77bfeb6533f0edcfe78b72daac1751d7700c4cb49787f  ./fermeture/depot/ncurses-6.2-12.20210508.el9.x86_64.rpm
+2116eef9fcf217ba902c7e4d682a4c6fa182dc6d106e8d573d65461f0989bb05  ./fermeture/depot/ncurses-base-6.2-12.20210508.el9.noarch.rpm
+7f2d8058b975c753388a7180e167c9c610060e6d20bd2212f39d5e7a7d850561  ./fermeture/depot/ncurses-libs-6.2-12.20210508.el9.x86_64.rpm
+ba4435a0a301b3388b63ed65f33614083a096496d1639aafe430601995bc86d3  ./fermeture/depot/nodejs-16.20.2-8.el9_4.x86_64.rpm
+2427bf82b879735c9c42ac58ee45fbaf4a18e2aebd84943726bdecaa32978a30  ./fermeture/depot/nodejs-libs-16.20.2-8.el9_4.x86_64.rpm
+d3734ecf41e5adca9ee09baf59e7a3a54481cd7bfad00e433d0fedb0eea2d924  ./fermeture/depot/ocaml-srpm-macros-6-6.el9.noarch.rpm
+c36ae20c96419534745708b7a93f20ce19f47e953233ca17c4994e25cd4d7c59  ./fermeture/depot/openblas-srpm-macros-2-11.el9.noarch.rpm
+d8b53def51bfdc720f0e5be117498148bb22543e0627fd1f10b7ac3f11fea09a  ./fermeture/depot/openldap-2.6.8-4.el9.0.1.x86_64.rpm
+90d9ecf0be18ee0c56c774ee7f7841f701abc2e48e7327a5da7f271820d0e7c5  ./fermeture/depot/openssl-3.5.1-7.el9_7.x86_64.rpm
+ef06bf8332e71295793a19da851a5321e2e2442bd9bd4ed66a304e28a1310805  ./fermeture/depot/openssl-devel-3.5.1-7.el9_7.x86_64.rpm
+ea50bfc7520718e74e482c643e69762f2914ffba03d699ba8128fbf297328b63  ./fermeture/depot/openssl-fips-provider-3.5.1-7.el9_7.x86_64.rpm
+bdb6ae06f1c7ea72fcb0de7512140b5640bd60055280efdd23eb381a164409ee  ./fermeture/depot/openssl-libs-3.5.1-7.el9_7.x86_64.rpm
+f17153354278785dee1fbaab7b838ee4a97bd5a6d52f865b221d6246e00c7d17  ./fermeture/depot/p11-kit-0.25.3-3.el9_5.x86_64.rpm
+28548ac14bcf8f2cdc8de6832b5e8444eb390de9ce7ae5db93ccb7fcefb2a90c  ./fermeture/depot/p11-kit-trust-0.25.3-3.el9_5.x86_64.rpm
+0eb9874591978c4b224b28d963933aeae99ecc8301fede1b366e059e21d8c1c1  ./fermeture/depot/pam-1.5.1-26.el9_6.x86_64.rpm
+76b4b0ebecb7dc952372923a96c8f653a723c15299b3f8b7d2aa2ff37c8d948c  ./fermeture/depot/patch-2.7.6-16.el9.x86_64.rpm
+d167b64017c547bd39280de99875a7a32a4f869431d9c6fdad46d98ee9480c43  ./fermeture/depot/pcre-8.44-4.el9.x86_64.rpm
+a63b04da521e99d3b5b3938e29dfd33b1f367735caa8b2986c5cf053871127ee  ./fermeture/depot/pcre2-10.40-6.el9.x86_64.rpm
+833ca3aac79f43a85cc2152bc6ae72a7dc52b7e8212481a03a2516a369e522f2  ./fermeture/depot/pcre2-syntax-10.40-6.el9.noarch.rpm
+5fb4cf43908ab35d97b5a2323ca4710668ede5313302ee3fe5cce2b4b9c3b5f5  ./fermeture/depot/perl-AutoLoader-5.74-481.1.el9_6.noarch.rpm
+3bdb1db099cd202d219129d30ce9dc2adbeb23ede667cf0a0fd22f6349540f9e  ./fermeture/depot/perl-B-1.80-481.1.el9_6.x86_64.rpm
+4b478fdd6ecbc67f38ca35d44dff2a9c5c09ea5d766d772d9981d78e5de2b2c1  ./fermeture/depot/perl-Carp-1.50-460.el9.0.1.noarch.rpm
+d77c297f4c93074936a0a50fd932d7b43eb623401e5b73590db76c7f0ba469dd  ./fermeture/depot/perl-Class-Struct-0.66-481.1.el9_6.noarch.rpm
+9de98b2b4bff63d413158a65bba5334d8536c6eb1b3398d76f024e0e9f74ce75  ./fermeture/depot/perl-Data-Dumper-2.174-462.el9.x86_64.rpm
+e5ecc001ae26339fc6aa161cad8d223ec775bf2a2fcaa129ab489d1650a3d636  ./fermeture/depot/perl-Digest-1.19-4.el9.0.1.noarch.rpm
+b1f4db8af3cab8814a4fea1c773a0f2e4c7d011fddaad24b1c28f2bfd0ddb144  ./fermeture/depot/perl-Digest-MD5-2.58-4.el9.x86_64.rpm
+e82e31795bc9935d931f3a3d1e6c047a53bad58639a5416ba6dc109f9bf7d21b  ./fermeture/depot/perl-Encode-3.08-462.el9.x86_64.rpm
+ae4bef99c5797aa4286b39986ce30b05bcb07652b0f8b37d6c417e54ef8e37d7  ./fermeture/depot/perl-Errno-1.30-481.1.el9_6.x86_64.rpm
+561a49eff3da57f0b88fc3251691998077d34555af431695525babc6aac09dae  ./fermeture/depot/perl-Exporter-5.74-461.el9.noarch.rpm
+600072000bbb8dada561923e0bf1a005d5c12608d08c2aefa95446781c0fe98f  ./fermeture/depot/perl-Fcntl-1.13-481.1.el9_6.x86_64.rpm
+5245601ae54986863aff6291badddfa294e4272e14f763a070048e75930b0e81  ./fermeture/depot/perl-File-Basename-2.85-481.1.el9_6.noarch.rpm
+8d47e85b8f150481c64cdad38199cb527b3f4e0aaa18f7c04157f08ccc6b44ea  ./fermeture/depot/perl-File-Path-2.18-4.el9.noarch.rpm
+ac408a99cdc94ae249761fa5f1ac9b0db794267527e07df78d36515b09c2a1a0  ./fermeture/depot/perl-File-Temp-0.231.100-4.el9.noarch.rpm
+937ec664f943b994dcd175feec2bc74e64969fc3481f64981a6c09b146e4b511  ./fermeture/depot/perl-File-stat-1.09-481.1.el9_6.noarch.rpm
+85cf4db1d292557e1829c170c35063253a970ff6d338f1546b7d4d5032231287  ./fermeture/depot/perl-FileHandle-2.03-481.1.el9_6.noarch.rpm
+073ab80a2867bff161163125c13ac9433488681ed27aabaa784021c0f423518e  ./fermeture/depot/perl-Getopt-Long-2.52-4.el9.noarch.rpm
+42354346e696ea3de8178288d62d0ccab37d83d27558b6b5c820c57449d253e2  ./fermeture/depot/perl-Getopt-Std-1.12-481.1.el9_6.noarch.rpm
+4d7badc2339ef6f35c53fe221d5d6830588ad144957d0f93e6c9bf8b7519821a  ./fermeture/depot/perl-HTTP-Tiny-0.076-462.el9.noarch.rpm
+68682ce4f860ac680ee5c905aa9c1910b44c2530c4b88dfa3cb909ce05ca1b5d  ./fermeture/depot/perl-IO-1.43-481.1.el9_6.x86_64.rpm
+ffb4b46f1ed518b2275bdf732212082387a6f3021e1a7cd3b1c6ec6e6ea7ce09  ./fermeture/depot/perl-IO-Socket-IP-0.41-5.el9.noarch.rpm
+d6aaf5d0d4aa4bd716956767bdbe75996c1c9f99c2e5b41440a8b92e92ba678e  ./fermeture/depot/perl-IO-Socket-SSL-2.073-2.el9.noarch.rpm
+db1136339fffd9825622420185994573788a88e1ffe25de3bc8fccc157e72c60  ./fermeture/depot/perl-IPC-Open3-1.21-481.1.el9_6.noarch.rpm
+5c45dad965abc4f062efcf37bb260d28cf38b4b7f79f02308f5526d5de3874fe  ./fermeture/depot/perl-MIME-Base64-3.16-4.el9.x86_64.rpm
+c0c93096a5ce0448ec12a8bb04a6180844d1e133dab824953aa332404a6af81e  ./fermeture/depot/perl-Mozilla-CA-20200520-6.el9.noarch.rpm
+8025bce9f4da6d6e0cbf82f740d1009c21aeaf35417e87eb729a56a685546139  ./fermeture/depot/perl-Net-SSLeay-1.94-3.el9.x86_64.rpm
+78c011b363d5ffb5fece0737100c6e62c61121c4b8a2dbbbe933713043ce4158  ./fermeture/depot/perl-POSIX-1.94-481.1.el9_6.x86_64.rpm
+463e8e1704053e1cbd984c15d47ca12dbab1dc6cc774df014f1ac0e52009adfc  ./fermeture/depot/perl-PathTools-3.78-461.el9.x86_64.rpm
+cdba24881e11e5b16226d839fb4c2755c99d8e2bf0f14bd1cfe6912c74c40754  ./fermeture/depot/perl-Pod-Escapes-1.07-460.el9.0.1.noarch.rpm
+4bc4888efc7cc0b39aea13267e621d245d35e8e808603ca0f3a9434fce8d2e8b  ./fermeture/depot/perl-Pod-Perldoc-3.28.01-461.el9.noarch.rpm
+aaac71076e517a13ca7459918761c66a460f0fd993cb510644af7e5978d2fbcc  ./fermeture/depot/perl-Pod-Simple-3.42-4.el9.noarch.rpm
+cab7aea2d5686233dea13aa7ae4de48a9b6cc9a81f73f6f1448558f8e6423862  ./fermeture/depot/perl-Pod-Usage-2.01-4.el9.noarch.rpm
+3c28f6e6e2610c33cab2282fe4db7e0d0316537e81ab33c70d9571ef4daf5db6  ./fermeture/depot/perl-Scalar-List-Utils-1.56-462.el9.x86_64.rpm
+681ca4222fb9e6000312e51d65413e246cc592f34f8c2349d1658955a70a0024  ./fermeture/depot/perl-SelectSaver-1.02-481.1.el9_6.noarch.rpm
+1f21b37d47f95b550e26db0c0b5f257db65123b3846cacbed9bc3c36b9b65a8f  ./fermeture/depot/perl-Socket-2.031-4.el9.x86_64.rpm
+98f0b75a6a7de6aab4821e60f78596fae47b29d4b93e6a2ae4dddf5c626368a7  ./fermeture/depot/perl-Storable-3.21-460.el9.x86_64.rpm
+9dd7c6e3487dabc2868c7772313c96ecf8c5848d3bbbe031620cee3d4b5d4f1f  ./fermeture/depot/perl-Symbol-1.08-481.1.el9_6.noarch.rpm
+dc31dd230d18b070688b0d168c9dd42fbd7a74a5ed5265f319c7c5246b1518b5  ./fermeture/depot/perl-Term-ANSIColor-5.01-461.el9.0.1.noarch.rpm
+81e4fb85f1d3e5f790fe29b7b2c82d590993393987e91625e7a74ddc8f24c5cf  ./fermeture/depot/perl-Term-Cap-1.17-460.el9.0.1.noarch.rpm
+f42e27499c2060ed69355d0a9ebf3d65e15dca452a15620ca68c53442bc4d7f8  ./fermeture/depot/perl-Text-ParseWords-3.30-460.el9.noarch.rpm
+777a7ad7dda07f83c9aacf277c34c0dc410893fec1f986d8c9e586c51682a9d8  ./fermeture/depot/perl-Text-Tabs+Wrap-2013.0523-460.el9.0.1.noarch.rpm
+d989488e3beff23f6209ca8de9fa16e6f0f61ed0343acbd44b21292c3fc028be  ./fermeture/depot/perl-Time-Local-1.300-7.el9.noarch.rpm
+519c6f78063626c957d09e7c47ce2c5ec1fc116dd371096530e4c374a6dcbba8  ./fermeture/depot/perl-URI-5.09-3.el9.0.1.noarch.rpm
+3d77858021530864b6e353f78a4aea3dd21c9ddf14ca32296a0dc165a9b9eb7c  ./fermeture/depot/perl-base-2.27-481.1.el9_6.noarch.rpm
+ba8b8b3283012ccf9ba28b5c2262055ac0f7785008e9e92d095d21d0590bbfe0  ./fermeture/depot/perl-constant-1.33-461.el9.0.1.noarch.rpm
+75a4bd8f511c758b3c7e664a6a17181240e9d9cf127fb58710108b881676dd37  ./fermeture/depot/perl-if-0.60.800-481.1.el9_6.noarch.rpm
+fda8d0616ed874871d9cd7a6083b08036837046c4abce155d911271b92d39f72  ./fermeture/depot/perl-interpreter-5.32.1-481.1.el9_6.x86_64.rpm
+e369b44b80d60ade095dda03c59d3eb7fa5fb2632f60e593bdefdac7b84eb02f  ./fermeture/depot/perl-libnet-3.13-4.el9.noarch.rpm
+e729814bf78fc5c3d6e8412a246a749884a9808288b980dc321cf5146cc24316  ./fermeture/depot/perl-libs-5.32.1-481.1.el9_6.x86_64.rpm
+f4b0857ba6580e9c3d7a774a3ef08ba203994b4334de1c39d86467c4e298f44f  ./fermeture/depot/perl-mro-1.23-481.1.el9_6.x86_64.rpm
+6a88ad1df43e183e9b6abbc108a62915b02b397abd92dc43002f9798c6b46258  ./fermeture/depot/perl-overload-1.31-481.1.el9_6.noarch.rpm
+e884589964f5d37c8562ea4093225a9b1c9b827337f22bba3c19ba4378b61a37  ./fermeture/depot/perl-overloading-0.02-481.1.el9_6.noarch.rpm
+3a66910d2ab5c5b5e574b5377dede0fbaa87012bcd7130d66027d3f6117df03b  ./fermeture/depot/perl-parent-0.238-460.el9.noarch.rpm
+781851647ddeb42c8691f8ee569153092542415cc6f2c88df6360911abf8ecf8  ./fermeture/depot/perl-podlators-4.14-460.el9.0.1.noarch.rpm
+d513c5c2a9a51bc7af808b7619ec8aaa9495d72f34b403a9d0b8a839bad4e41a  ./fermeture/depot/perl-srpm-macros-1-41.el9.noarch.rpm
+57065e051f3727449c7c72cfc34ef902235344261b72f5766e4852b4df2b00b1  ./fermeture/depot/perl-subs-1.03-481.1.el9_6.noarch.rpm
+1745cc552a7a9cc9165e5d5cc3a4e551ba24d1345afba25af71486e0d611531c  ./fermeture/depot/perl-vars-1.05-481.1.el9_6.noarch.rpm
+6a5ee8580ea3fb5edf1722c7a3941c1a5a431040a251dbff0e34f85c8352c93a  ./fermeture/depot/pkgconf-1.7.3-10.el9.x86_64.rpm
+ac0ab185f11a413f08f645b6225aa67f4542b23e293cbc7af78d71e0259d7389  ./fermeture/depot/pkgconf-m4-1.7.3-10.el9.noarch.rpm
+c7e4569fe2d676e76dc689a751884541bcd6595616e8c9fb00bc198bce642031  ./fermeture/depot/pkgconf-pkg-config-1.7.3-10.el9.x86_64.rpm
+4306e6bb950191170669ccbfe904bf943a94736e910179f9b0db962148fe4bcf  ./fermeture/depot/popt-1.18-8.el9.x86_64.rpm
+e21742695de260517bfa5340aaab1360d936b20cd9896ab79ed74e74a0949eb2  ./fermeture/depot/publicsuffix-list-dafsa-20210518-3.el9.noarch.rpm
+5413db568ab35a323adfaed6a7dede87973ed830611aab02950d01cfc0a255b9  ./fermeture/depot/pyproject-srpm-macros-1.16.2-1.el9.noarch.rpm
+bc317132bec082f5614b531617f69e552133257dc261dd1e4cc2b3bb2f3f457f  ./fermeture/depot/python-srpm-macros-3.9-54.el9.noarch.rpm
+2c65750c0670bedd03d602bea66d847ad25200d2098d746d0f2363ae79d89d45  ./fermeture/depot/qt5-srpm-macros-5.15.9-1.el9.noarch.rpm
+b85f5cffef627afe640cf7405845cb45956d66ef5a06e7c48dc7da47a7191674  ./fermeture/depot/readline-8.1-4.el9.x86_64.rpm
+4361d87d04a579dcc3c660465876c2323b399e09d8aea728ae62dbbc7e79325f  ./fermeture/depot/redhat-rpm-config-210-1.el9.noarch.rpm
+152feb18d71a8880aff41cce804bf2a6949dba4955aa62014d9a8e446345ddd7  ./fermeture/depot/repodata/152feb18d71a8880aff41cce804bf2a6949dba4955aa62014d9a8e446345ddd7-filelists.xml.gz
+82ecf122061ff6969c76ee80363011022d54941e70d22f4b81268832dea2181d  ./fermeture/depot/repodata/82ecf122061ff6969c76ee80363011022d54941e70d22f4b81268832dea2181d-primary.xml.gz
+8d40856db0aeb2f1ee4aaa49b2ef7342279da1473825c08bb45f8014975b376e  ./fermeture/depot/repodata/8d40856db0aeb2f1ee4aaa49b2ef7342279da1473825c08bb45f8014975b376e-other.xml.gz
+239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164  ./fermeture/depot/repodata/repomd.xml
+9e327d73f18c71a94060742a383c07ee8f228d8d6722482989ee2169600c4c10  ./fermeture/depot/rocky-gpg-keys-9.7-1.7.el9.noarch.rpm
+53c53e7b2f8c02d3278a6b5fc5c389315a9c897204e1d0cefa47d99b9d9df217  ./fermeture/depot/rocky-release-9.7-1.7.el9.noarch.rpm
+ae69abad15f6f195e88bdcc3747d97016bdee583aa3a1d8da7e5b89c3ede7306  ./fermeture/depot/rocky-repos-9.7-1.7.el9.noarch.rpm
+7cacce02ea617560e932c900b77315882b8dccb2bc430ec70edfffbbc78f947f  ./fermeture/depot/rpm-4.16.1.3-39.el9.x86_64.rpm
+10fce44ce6ff644fb9683f7007d6efd085ca210f6989fbddb7356145304c6915  ./fermeture/depot/rpm-build-4.16.1.3-39.el9.x86_64.rpm
+16dac732ee9ed52c57af566ecc18d641fdbc5e9ba7d29b089f75483e70e4b921  ./fermeture/depot/rpm-build-libs-4.16.1.3-39.el9.x86_64.rpm
+9a0eb58bc893fed3b48e85ca4c4445d3b1fa6c11270e4757479a7e356f038a5b  ./fermeture/depot/rpm-libs-4.16.1.3-39.el9.x86_64.rpm
+d24e845e8bd18f2420543ae792d98a823b313de698c432d7345e1889568d789f  ./fermeture/depot/rust-srpm-macros-17-4.el9.noarch.rpm
+22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99  ./fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99
+7bf628be885bd8d1f02d62fe280703e185e2f6b6e049e6c5361d832f67b72698  ./fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/7bf628be885bd8d1f02d62fe280703e185e2f6b6e049e6c5361d832f67b72698
+f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6  ./fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/manifest.json
+c08ff8b68add15153b4fa2ca4ab4e70a6068f4d28286145b60636da0b374c9a4  ./fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/version
+005c959166838b0e45f02e699c35ec5449025e2463751c56b7e614bbd9514732  ./fermeture/depot/sed-4.8-9.el9.x86_64.rpm
+7a8a464a72c41f39eb4d4c47d33bd889b36d5c1d9eeb293c7d0a03b1b594743c  ./fermeture/depot/setup-2.13.7-10.el9.noarch.rpm
+20879fabfa12d44a1d926415bac21f0fe09b5b89204b83e75a797a145467305b  ./fermeture/depot/shadow-utils-4.9-15.el9.x86_64.rpm
+4e1acdae73193f62e6922ec4f38ec28ae3eb0d3f9f89d879d50bf4194a14af5c  ./fermeture/depot/sqlite-libs-3.34.1-9.el9_7.x86_64.rpm
+e7c20edb9a3df8459df784786286d98b4bea5cb5cad34d89052c96da2633197e  ./fermeture/depot/systemd-libs-252-55.el9_7.9.rocky.0.1.x86_64.rpm
+865a845095123343b5ed02e0a918e21e802459ae37e09a39ee7c7ee78ff9763d  ./fermeture/depot/tar-1.34-9.el9_7.x86_64.rpm
+726d6fa8928e04e4050fa293dcfd3ab769e12c2f5612bea15ecd7bbf1f1f1adb  ./fermeture/depot/tzdata-2026a-1.el9_7.noarch.rpm
+bc217e4d0551c39fbb2795a23aa65e3dc6ecd1e917d7eb8d1af0a19c1ed34fe5  ./fermeture/depot/unzip-6.0-59.el9.x86_64.rpm
+395c1e9f113537e948fd7eae19556204a4bebafbda4139828bd11ce6e6354a38  ./fermeture/depot/util-linux-2.37.4-21.el9_7.x86_64.rpm
+2f452f6fe088d91da9f7daae47dde574008a5d9e2aeecc49db14f64aaf85ab86  ./fermeture/depot/util-linux-core-2.37.4-21.el9_7.x86_64.rpm
+ad1681c574bb2765e0f8ba1decb89513aa61568339db6e286c6816f944ba9532  ./fermeture/depot/which-2.21-30.el9_6.x86_64.rpm
+41043f1c47c48b956cfcc24f3640225120089fad47c87a954c81828ab77e7c46  ./fermeture/depot/xz-5.2.5-8.el9_0.x86_64.rpm
+7a6f5891537bbbf601ee574c5946c3f0f121369b85c6cdfdd07e974a4dc8d81d  ./fermeture/depot/xz-libs-5.2.5-8.el9_0.x86_64.rpm
+6a99abf42430ccddd7da0b0e02b9035734ce5c42aaa83c92e6b87e8017f3f9ba  ./fermeture/depot/zip-3.0-35.el9.x86_64.rpm
+fcd8ca717c72aeb30ea69b4f892dc021e507d8835e7b03aff501cb094db083ea  ./fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm
+c503373b18546946facf7c613d9cdd786f9050bb7921cc78cfbe4e0244384acb  ./fermeture/depot/zstd-1.5.5-1.el9.x86_64.rpm
+918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6  ./sample-app.spec
+b6f3c6a11e349965cf944912f2d868e06acfcf57350673e32e64b08768f557ad  ./src/.gitignore
+074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff  ./src/LICENSES/Apache-2.0.txt
+7f4a8b977473d410038ea8107806a9c2ef91f070dd23dee3817bd423282c11ec  ./src/README.md
+58cc61fe165725e06c4b2734413fae82073bad807690b9f99d2482334683509c  ./src/REUSE.toml
+26085d4086d5e70bb89668f5614b53b404c1baf057dc120e3196d4c1919c8c5e  ./src/go.mod
+4287858b5a26193e956121259679e31c96ae07eb3f2a486623641c22496bacce  ./src/go.sum
+ecf1d641878540c4bdd3028e878e6b851fbbbc6646a81c5bb6c5955611b163f9  ./src/main.go
+785f18e2ac99c66b81d8d185aa1a65cfe4f39b12bef24c1f8037d85840490929  ./src/vendor/github.com/go-chi/chi/v5/.gitignore
+65c419049d2e6efc04b110426e4b5efc628a4ee6b8f080092f25a0dbbb35f071  ./src/vendor/github.com/go-chi/chi/v5/CHANGELOG.md
+961da16c4fcec58d600fd49cc6ab0dd632d143646d4fcb2f5b1818fb0197fbe7  ./src/vendor/github.com/go-chi/chi/v5/CONTRIBUTING.md
+a2d51b7515acfaff2f7a88688650f2fc4fd99561383e72bba2305e3db59a1647  ./src/vendor/github.com/go-chi/chi/v5/LICENSE
+b343163c9d40108d37c7e5fe73e3c1d8f39c2acf26de5d1d227a1be2770205ad  ./src/vendor/github.com/go-chi/chi/v5/Makefile
+ef6ed94a615b29c4161b9898955e602404655049a68ddf46066bda30e3f297c9  ./src/vendor/github.com/go-chi/chi/v5/README.md
+c5f181d947996aebd888182fb8dccf6e7026690e701b5e5ca50b288b4a2cf5c3  ./src/vendor/github.com/go-chi/chi/v5/SECURITY.md
+8c22d7bbc23f4b4d46ded5ef721a9c3a173031fa2c2c9a7b48c46c2b07e8bd80  ./src/vendor/github.com/go-chi/chi/v5/chain.go
+3eaf980c6907f98497be9ec759ae601510f799656fd0663c2c3e202ba4fc5ec9  ./src/vendor/github.com/go-chi/chi/v5/chi.go
+bf1f093c84b276cc4790a23014f37abc92f85c0e4f5f6ed4830a233a29628916  ./src/vendor/github.com/go-chi/chi/v5/context.go
+c403e4f0c9c5c20c49faa9019380ac2599a66e359a23843f4b1d50d8a7704ee9  ./src/vendor/github.com/go-chi/chi/v5/mux.go
+05827f643e0153ca95763474a707f2e656c4d4a3d016cefb52a8ee92fa483a0c  ./src/vendor/github.com/go-chi/chi/v5/path_value.go
+cb2f0c7c6c29de7566124accf9dfaf6bd863c85e925db6cc12c56f213e1e7d3c  ./src/vendor/github.com/go-chi/chi/v5/path_value_fallback.go
+f4055b0a67d02cc86ca8fd2a0e62dc36bbfa8cebc27dece9d912c4809c9ebbb6  ./src/vendor/github.com/go-chi/chi/v5/pattern.go
+299a995467b45dc679c810c00ad080c91390481d02037361114b8e71056964b6  ./src/vendor/github.com/go-chi/chi/v5/pattern_fallback.go
+a7dfa11d4570e3684c83c26d126935a27d20c80d55b834f563696ae7cdb8eb60  ./src/vendor/github.com/go-chi/chi/v5/tree.go
+f858a6de1d23a4a6ebfa5030012de79e11d70393d3eb3be1cb169bf2f46f5f47  ./src/vendor/modules.txt
+103c3272f59ea2740f25b7360475fa8f96120dd0d211fae2f6a46e344adc0595  ./src/web/build.mjs
+8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c  ./src/web/node_modules/marked/LICENSE.md
+3a214cf9e4d03493e1bd75fbafb8bc39a4c94b18e30fa3204a943cb48c23dd69  ./src/web/node_modules/marked/README.md
+9c00640137feb9f0410f00119a1cacd2f5b53cc6ba91816e890643785279dc95  ./src/web/node_modules/marked/bin/main.js
+e4ec45ee17631a5f3a837b98580f8ad47686181c7e4aaf24ecd9de7231357920  ./src/web/node_modules/marked/bin/marked.js
+7dcb8433fd192c5f9612bd13252c5390b25417e22d6a7c18039976b24603331e  ./src/web/node_modules/marked/lib/marked.d.ts
+d9c4e080c4467814be6f5671c65eeb5bac2815e81e1d838406a744e89e3611eb  ./src/web/node_modules/marked/lib/marked.esm.js
+ece396fde4a3cf5ac8cbc4e467e0c71dbc79c8707ce03d24dfc0f54e7a84e63c  ./src/web/node_modules/marked/lib/marked.esm.js.map
+aced561246e2cf95f6a7007310a73c2edfc86e2ee136ae0c11a59f9ac8fee097  ./src/web/node_modules/marked/lib/marked.umd.js
+d1ad3177387e56cf6f7d2dfb08acae2b648d73e16a52c80f6edc79f7be4c68f9  ./src/web/node_modules/marked/lib/marked.umd.js.map
+198f189bd029f6e7c85d2d9e38ab520fbd8040cafd8be33bbd0ac548f3a9c3c1  ./src/web/node_modules/marked/man/marked.1
+356fded5d8067b9e2e4e0aa4deb6b612393b1cdb6dba53167fedd13c53bd4f1e  ./src/web/node_modules/marked/man/marked.1.md
+601a804931b82e378f2e8a5070c6f236156b9adf3534b0193e7c09183ea76b23  ./src/web/node_modules/marked/package.json
+ae98d90756bad103494d00227b256580c8cda5436f0a55be879b148da278a238  ./src/web/package-lock.json
+2d37c48ded96348c23bc402376625f2838d9dab64fe007ba18d95588e6de9ae9  ./src/web/package.json
+38d739f7a31b5d633e8c8010e0e035cb4cc553c4d811e2649c070065a02bd388  ./src/web/src/README.md
+ddf49ccd00607aa57ec678a739da4b5aa11de5e313bd329b1c60794690f29d48  ./src/web/src/index.html
+b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f  ./verrou-rpm.json
+755 directory .
+755 directory ./fermeture
+755 directory ./fermeture/depot
+755 directory ./fermeture/depot/repodata
+755 directory ./fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+755 directory ./src
+755 directory ./src/LICENSES
+755 directory ./src/vendor
+755 directory ./src/vendor/github.com
+755 directory ./src/vendor/github.com/go-chi
+755 directory ./src/vendor/github.com/go-chi/chi
+755 directory ./src/vendor/github.com/go-chi/chi/v5
+755 directory ./src/web
+755 directory ./src/web/node_modules
+755 directory ./src/web/node_modules/marked
+755 directory ./src/web/node_modules/marked/bin
+755 directory ./src/web/node_modules/marked/lib
+755 directory ./src/web/node_modules/marked/man
+755 directory ./src/web/src
+644 regular file ./fermeture/depot/alternatives-1.24-2.el9.x86_64.rpm
+644 regular file ./fermeture/depot/annobin-12.98-1.el9.x86_64.rpm
+644 regular file ./fermeture/depot/audit-libs-3.1.5-7.el9.x86_64.rpm
+644 regular file ./fermeture/depot/basesystem-11-13.el9.0.1.noarch.rpm
+644 regular file ./fermeture/depot/bash-5.1.8-9.el9.x86_64.rpm
+644 regular file ./fermeture/depot/binutils-2.35.2-67.el9_7.1.x86_64.rpm
+644 regular file ./fermeture/depot/binutils-gold-2.35.2-67.el9_7.1.x86_64.rpm
+644 regular file ./fermeture/depot/bzip2-1.0.8-10.el9_5.x86_64.rpm
+644 regular file ./fermeture/depot/bzip2-libs-1.0.8-10.el9_5.x86_64.rpm
+644 regular file ./fermeture/depot/ca-certificates-2025.2.80_v9.0.305-91.el9.noarch.rpm
+644 regular file ./fermeture/depot/coreutils-8.32-39.el9.x86_64.rpm
+644 regular file ./fermeture/depot/coreutils-common-8.32-39.el9.x86_64.rpm
+644 regular file ./fermeture/depot/cpio-2.13-16.el9.x86_64.rpm
+644 regular file ./fermeture/depot/cpp-11.5.0-11.el9.x86_64.rpm
+644 regular file ./fermeture/depot/cracklib-2.9.6-27.el9.x86_64.rpm
+644 regular file ./fermeture/depot/cracklib-dicts-2.9.6-27.el9.x86_64.rpm
+644 regular file ./fermeture/depot/crypto-policies-20250905-1.git377cc42.el9.noarch.rpm
+644 regular file ./fermeture/depot/curl-7.76.1-35.el9_7.3.x86_64.rpm
+644 regular file ./fermeture/depot/cyrus-sasl-lib-2.1.27-22.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/debugedit-5.0-11.el9.x86_64.rpm
+644 regular file ./fermeture/depot/diffutils-3.7-12.el9.x86_64.rpm
+644 regular file ./fermeture/depot/dwz-0.16-1.el9.x86_64.rpm
+644 regular file ./fermeture/depot/ed-1.14.2-12.el9.x86_64.rpm
+644 regular file ./fermeture/depot/efi-srpm-macros-6-4.el9.noarch.rpm
+644 regular file ./fermeture/depot/elfutils-0.193-1.el9.rocky.0.1.x86_64.rpm
+644 regular file ./fermeture/depot/elfutils-debuginfod-client-0.193-1.el9.rocky.0.1.x86_64.rpm
+644 regular file ./fermeture/depot/elfutils-default-yama-scope-0.193-1.el9.rocky.0.1.noarch.rpm
+644 regular file ./fermeture/depot/elfutils-libelf-0.193-1.el9.rocky.0.1.x86_64.rpm
+644 regular file ./fermeture/depot/elfutils-libs-0.193-1.el9.rocky.0.1.x86_64.rpm
+644 regular file ./fermeture/depot/file-5.39-16.el9.x86_64.rpm
+644 regular file ./fermeture/depot/file-libs-5.39-16.el9.x86_64.rpm
+644 regular file ./fermeture/depot/filesystem-3.16-5.el9.x86_64.rpm
+644 regular file ./fermeture/depot/findutils-4.8.0-7.el9.x86_64.rpm
+644 regular file ./fermeture/depot/fonts-srpm-macros-2.0.5-7.el9.1.noarch.rpm
+644 regular file ./fermeture/depot/gawk-5.1.0-6.el9.x86_64.rpm
+644 regular file ./fermeture/depot/gcc-11.5.0-11.el9.x86_64.rpm
+644 regular file ./fermeture/depot/gcc-plugin-annobin-11.5.0-11.el9.x86_64.rpm
+644 regular file ./fermeture/depot/gdb-minimal-16.3-2.el9.x86_64.rpm
+644 regular file ./fermeture/depot/gdbm-libs-1.23-1.el9.x86_64.rpm
+644 regular file ./fermeture/depot/ghc-srpm-macros-1.5.0-6.el9.noarch.rpm
+644 regular file ./fermeture/depot/glibc-2.34-231.el9_7.10.x86_64.rpm
+644 regular file ./fermeture/depot/glibc-common-2.34-231.el9_7.10.x86_64.rpm
+644 regular file ./fermeture/depot/glibc-devel-2.34-231.el9_7.10.x86_64.rpm
+644 regular file ./fermeture/depot/glibc-gconv-extra-2.34-231.el9_7.10.x86_64.rpm
+644 regular file ./fermeture/depot/glibc-headers-2.34-231.el9_7.10.x86_64.rpm
+644 regular file ./fermeture/depot/glibc-minimal-langpack-2.34-231.el9_7.10.x86_64.rpm
+644 regular file ./fermeture/depot/gmp-6.2.0-13.el9.x86_64.rpm
+644 regular file ./fermeture/depot/go-srpm-macros-3.6.0-14.el9_7.noarch.rpm
+644 regular file ./fermeture/depot/golang-1.25.9-1.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/golang-bin-1.25.9-1.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/golang-race-1.25.9-1.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/golang-src-1.25.9-1.el9_7.noarch.rpm
+644 regular file ./fermeture/depot/grep-3.6-5.el9.x86_64.rpm
+644 regular file ./fermeture/depot/groff-base-1.22.4-10.el9.0.1.x86_64.rpm
+644 regular file ./fermeture/depot/gzip-1.12-1.el9.x86_64.rpm
+644 regular file ./fermeture/depot/info-6.7-15.el9.x86_64.rpm
+644 regular file ./fermeture/depot/json-c-0.14-11.el9.x86_64.rpm
+644 regular file ./fermeture/depot/kernel-headers-5.14.0-611.55.1.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/kernel-srpm-macros-1.0-14.el9.noarch.rpm
+644 regular file ./fermeture/depot/keyutils-libs-1.6.3-1.el9.x86_64.rpm
+644 regular file ./fermeture/depot/krb5-libs-1.21.1-9.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/libacl-2.3.1-4.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libarchive-3.5.3-9.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/libattr-2.5.1-3.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libblkid-2.37.4-21.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/libbrotli-1.0.9-9.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/libcap-2.48-10.el9_7.1.x86_64.rpm
+644 regular file ./fermeture/depot/libcap-ng-0.8.2-7.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libcom_err-1.46.5-8.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libcurl-7.76.1-35.el9_7.3.x86_64.rpm
+644 regular file ./fermeture/depot/libdb-5.3.28-57.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/libeconf-0.4.1-4.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libedit-3.1-38.20210216cvs.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libevent-2.1.12-8.el9_4.x86_64.rpm
+644 regular file ./fermeture/depot/libfdisk-2.37.4-21.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/libffi-3.4.2-8.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libgcc-11.5.0-11.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libgcrypt-1.10.0-11.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libgomp-11.5.0-11.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libgpg-error-1.42-5.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libidn2-2.3.0-7.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libmount-2.37.4-21.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/libmpc-1.2.1-4.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libnghttp2-1.43.0-6.el9_7.1.x86_64.rpm
+644 regular file ./fermeture/depot/libpkgconf-1.7.3-10.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libpsl-0.21.1-5.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libpwquality-1.4.4-8.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libselinux-3.6-3.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libsemanage-3.6-5.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/libsepol-3.6-3.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libsigsegv-2.13-4.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libsmartcols-2.37.4-21.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/libssh-0.10.4-17.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/libssh-config-0.10.4-17.el9_7.noarch.rpm
+644 regular file ./fermeture/depot/libstdc++-11.5.0-11.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libtasn1-4.16.0-9.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libtool-ltdl-2.4.6-46.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libunistring-0.9.10-15.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libutempter-1.2.1-6.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libuuid-2.37.4-21.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/libverto-0.3.2-3.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libxcrypt-4.4.18-3.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libxcrypt-devel-4.4.18-3.el9.x86_64.rpm
+644 regular file ./fermeture/depot/libxml2-2.9.13-14.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/libzstd-1.5.5-1.el9.x86_64.rpm
+644 regular file ./fermeture/depot/llvm-filesystem-20.1.8-3.el9.x86_64.rpm
+644 regular file ./fermeture/depot/llvm-libs-20.1.8-3.el9.x86_64.rpm
+644 regular file ./fermeture/depot/lua-libs-5.4.4-4.el9.x86_64.rpm
+644 regular file ./fermeture/depot/lua-srpm-macros-1-6.el9.noarch.rpm
+644 regular file ./fermeture/depot/lz4-libs-1.9.3-5.el9.x86_64.rpm
+644 regular file ./fermeture/depot/make-4.3-8.el9.x86_64.rpm
+644 regular file ./fermeture/depot/mpfr-4.1.0-7.el9.x86_64.rpm
+644 regular file ./fermeture/depot/ncurses-6.2-12.20210508.el9.x86_64.rpm
+644 regular file ./fermeture/depot/ncurses-base-6.2-12.20210508.el9.noarch.rpm
+644 regular file ./fermeture/depot/ncurses-libs-6.2-12.20210508.el9.x86_64.rpm
+644 regular file ./fermeture/depot/nodejs-16.20.2-8.el9_4.x86_64.rpm
+644 regular file ./fermeture/depot/nodejs-libs-16.20.2-8.el9_4.x86_64.rpm
+644 regular file ./fermeture/depot/ocaml-srpm-macros-6-6.el9.noarch.rpm
+644 regular file ./fermeture/depot/openblas-srpm-macros-2-11.el9.noarch.rpm
+644 regular file ./fermeture/depot/openldap-2.6.8-4.el9.0.1.x86_64.rpm
+644 regular file ./fermeture/depot/openssl-3.5.1-7.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/openssl-devel-3.5.1-7.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/openssl-fips-provider-3.5.1-7.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/openssl-libs-3.5.1-7.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/p11-kit-0.25.3-3.el9_5.x86_64.rpm
+644 regular file ./fermeture/depot/p11-kit-trust-0.25.3-3.el9_5.x86_64.rpm
+644 regular file ./fermeture/depot/pam-1.5.1-26.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/patch-2.7.6-16.el9.x86_64.rpm
+644 regular file ./fermeture/depot/pcre-8.44-4.el9.x86_64.rpm
+644 regular file ./fermeture/depot/pcre2-10.40-6.el9.x86_64.rpm
+644 regular file ./fermeture/depot/pcre2-syntax-10.40-6.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-AutoLoader-5.74-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-B-1.80-481.1.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/perl-Carp-1.50-460.el9.0.1.noarch.rpm
+644 regular file ./fermeture/depot/perl-Class-Struct-0.66-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-Data-Dumper-2.174-462.el9.x86_64.rpm
+644 regular file ./fermeture/depot/perl-Digest-1.19-4.el9.0.1.noarch.rpm
+644 regular file ./fermeture/depot/perl-Digest-MD5-2.58-4.el9.x86_64.rpm
+644 regular file ./fermeture/depot/perl-Encode-3.08-462.el9.x86_64.rpm
+644 regular file ./fermeture/depot/perl-Errno-1.30-481.1.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/perl-Exporter-5.74-461.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-Fcntl-1.13-481.1.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/perl-File-Basename-2.85-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-File-Path-2.18-4.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-File-Temp-0.231.100-4.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-File-stat-1.09-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-FileHandle-2.03-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-Getopt-Long-2.52-4.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-Getopt-Std-1.12-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-HTTP-Tiny-0.076-462.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-IO-1.43-481.1.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/perl-IO-Socket-IP-0.41-5.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-IO-Socket-SSL-2.073-2.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-IPC-Open3-1.21-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-MIME-Base64-3.16-4.el9.x86_64.rpm
+644 regular file ./fermeture/depot/perl-Mozilla-CA-20200520-6.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-Net-SSLeay-1.94-3.el9.x86_64.rpm
+644 regular file ./fermeture/depot/perl-POSIX-1.94-481.1.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/perl-PathTools-3.78-461.el9.x86_64.rpm
+644 regular file ./fermeture/depot/perl-Pod-Escapes-1.07-460.el9.0.1.noarch.rpm
+644 regular file ./fermeture/depot/perl-Pod-Perldoc-3.28.01-461.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-Pod-Simple-3.42-4.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-Pod-Usage-2.01-4.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-Scalar-List-Utils-1.56-462.el9.x86_64.rpm
+644 regular file ./fermeture/depot/perl-SelectSaver-1.02-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-Socket-2.031-4.el9.x86_64.rpm
+644 regular file ./fermeture/depot/perl-Storable-3.21-460.el9.x86_64.rpm
+644 regular file ./fermeture/depot/perl-Symbol-1.08-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-Term-ANSIColor-5.01-461.el9.0.1.noarch.rpm
+644 regular file ./fermeture/depot/perl-Term-Cap-1.17-460.el9.0.1.noarch.rpm
+644 regular file ./fermeture/depot/perl-Text-ParseWords-3.30-460.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-Text-Tabs+Wrap-2013.0523-460.el9.0.1.noarch.rpm
+644 regular file ./fermeture/depot/perl-Time-Local-1.300-7.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-URI-5.09-3.el9.0.1.noarch.rpm
+644 regular file ./fermeture/depot/perl-base-2.27-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-constant-1.33-461.el9.0.1.noarch.rpm
+644 regular file ./fermeture/depot/perl-if-0.60.800-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-interpreter-5.32.1-481.1.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/perl-libnet-3.13-4.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-libs-5.32.1-481.1.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/perl-mro-1.23-481.1.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/perl-overload-1.31-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-overloading-0.02-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-parent-0.238-460.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-podlators-4.14-460.el9.0.1.noarch.rpm
+644 regular file ./fermeture/depot/perl-srpm-macros-1-41.el9.noarch.rpm
+644 regular file ./fermeture/depot/perl-subs-1.03-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/perl-vars-1.05-481.1.el9_6.noarch.rpm
+644 regular file ./fermeture/depot/pkgconf-1.7.3-10.el9.x86_64.rpm
+644 regular file ./fermeture/depot/pkgconf-m4-1.7.3-10.el9.noarch.rpm
+644 regular file ./fermeture/depot/pkgconf-pkg-config-1.7.3-10.el9.x86_64.rpm
+644 regular file ./fermeture/depot/popt-1.18-8.el9.x86_64.rpm
+644 regular file ./fermeture/depot/publicsuffix-list-dafsa-20210518-3.el9.noarch.rpm
+644 regular file ./fermeture/depot/pyproject-srpm-macros-1.16.2-1.el9.noarch.rpm
+644 regular file ./fermeture/depot/python-srpm-macros-3.9-54.el9.noarch.rpm
+644 regular file ./fermeture/depot/qt5-srpm-macros-5.15.9-1.el9.noarch.rpm
+644 regular file ./fermeture/depot/readline-8.1-4.el9.x86_64.rpm
+644 regular file ./fermeture/depot/redhat-rpm-config-210-1.el9.noarch.rpm
+644 regular file ./fermeture/depot/repodata/152feb18d71a8880aff41cce804bf2a6949dba4955aa62014d9a8e446345ddd7-filelists.xml.gz
+644 regular file ./fermeture/depot/repodata/82ecf122061ff6969c76ee80363011022d54941e70d22f4b81268832dea2181d-primary.xml.gz
+644 regular file ./fermeture/depot/repodata/8d40856db0aeb2f1ee4aaa49b2ef7342279da1473825c08bb45f8014975b376e-other.xml.gz
+644 regular file ./fermeture/depot/repodata/repomd.xml
+644 regular file ./fermeture/depot/rocky-gpg-keys-9.7-1.7.el9.noarch.rpm
+644 regular file ./fermeture/depot/rocky-release-9.7-1.7.el9.noarch.rpm
+644 regular file ./fermeture/depot/rocky-repos-9.7-1.7.el9.noarch.rpm
+644 regular file ./fermeture/depot/rpm-4.16.1.3-39.el9.x86_64.rpm
+644 regular file ./fermeture/depot/rpm-build-4.16.1.3-39.el9.x86_64.rpm
+644 regular file ./fermeture/depot/rpm-build-libs-4.16.1.3-39.el9.x86_64.rpm
+644 regular file ./fermeture/depot/rpm-libs-4.16.1.3-39.el9.x86_64.rpm
+644 regular file ./fermeture/depot/rust-srpm-macros-17-4.el9.noarch.rpm
+644 regular file ./fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99
+644 regular file ./fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/7bf628be885bd8d1f02d62fe280703e185e2f6b6e049e6c5361d832f67b72698
+644 regular file ./fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/manifest.json
+644 regular file ./fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/version
+644 regular file ./fermeture/depot/sed-4.8-9.el9.x86_64.rpm
+644 regular file ./fermeture/depot/setup-2.13.7-10.el9.noarch.rpm
+644 regular file ./fermeture/depot/shadow-utils-4.9-15.el9.x86_64.rpm
+644 regular file ./fermeture/depot/sqlite-libs-3.34.1-9.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/systemd-libs-252-55.el9_7.9.rocky.0.1.x86_64.rpm
+644 regular file ./fermeture/depot/tar-1.34-9.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/tzdata-2026a-1.el9_7.noarch.rpm
+644 regular file ./fermeture/depot/unzip-6.0-59.el9.x86_64.rpm
+644 regular file ./fermeture/depot/util-linux-2.37.4-21.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/util-linux-core-2.37.4-21.el9_7.x86_64.rpm
+644 regular file ./fermeture/depot/which-2.21-30.el9_6.x86_64.rpm
+644 regular file ./fermeture/depot/xz-5.2.5-8.el9_0.x86_64.rpm
+644 regular file ./fermeture/depot/xz-libs-5.2.5-8.el9_0.x86_64.rpm
+644 regular file ./fermeture/depot/zip-3.0-35.el9.x86_64.rpm
+644 regular file ./fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm
+644 regular file ./fermeture/depot/zstd-1.5.5-1.el9.x86_64.rpm
+644 regular file ./sample-app.spec
+644 regular file ./src/.gitignore
+644 regular file ./src/LICENSES/Apache-2.0.txt
+644 regular file ./src/README.md
+644 regular file ./src/REUSE.toml
+644 regular file ./src/go.mod
+644 regular file ./src/go.sum
+644 regular file ./src/main.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/.gitignore
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/CHANGELOG.md
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/CONTRIBUTING.md
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/LICENSE
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/Makefile
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/README.md
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/SECURITY.md
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/chain.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/chi.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/context.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/mux.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/path_value.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/path_value_fallback.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/pattern.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/pattern_fallback.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/tree.go
+644 regular file ./src/vendor/modules.txt
+644 regular file ./src/web/build.mjs
+644 regular file ./src/web/node_modules/marked/LICENSE.md
+644 regular file ./src/web/node_modules/marked/README.md
+644 regular file ./src/web/node_modules/marked/bin/main.js
+755 regular file ./src/web/node_modules/marked/bin/marked.js
+644 regular file ./src/web/node_modules/marked/lib/marked.d.ts
+644 regular file ./src/web/node_modules/marked/lib/marked.esm.js
+644 regular file ./src/web/node_modules/marked/lib/marked.esm.js.map
+644 regular file ./src/web/node_modules/marked/lib/marked.umd.js
+644 regular file ./src/web/node_modules/marked/lib/marked.umd.js.map
+644 regular file ./src/web/node_modules/marked/man/marked.1
+644 regular file ./src/web/node_modules/marked/man/marked.1.md
+644 regular file ./src/web/node_modules/marked/package.json
+644 regular file ./src/web/package-lock.json
+644 regular file ./src/web/package.json
+644 regular file ./src/web/src/README.md
+644 regular file ./src/web/src/index.html
+644 regular file ./verrou-rpm.json
+----- fin de la liste -----
