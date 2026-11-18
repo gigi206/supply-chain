@@ -348,3 +348,34 @@ Relecture du conseiller. Le texte commité reste ; il se lit avec ces correction
   - `pkg/pod/script.go` au tag v1.15.5 : comment le script d'environ 45 Ko arrive dans le pod (taille d'un argument unique).
   - Après `SIGNER=1` et avant tout bundle : comparer le script et les ressources du fichier signé à ceux du gabarit rendu. Un bundle écrit dans Zot ne se retire pas.
 - **Prédictions PT1 à PT8 et ET1 à ET8 inchangées.** PT2 couvre désormais le champ `resources`.
+
+## Note datée du 18/11/2026, écrite à 09:08:17 UTC : `prealables_taches` passée (« Oui »)
+
+Passage du 18/11/2026 de 09:07:03 à 09:07:08 UTC, code 0 ([journal](m4b-prealables_taches.log)). `m4b.sh` = `5e08bef0…`.
+
+| # | Mesure | Verdict |
+|---|---|---|
+| PT1 | Liste `95541ee8…` ; source `…rocky9-bootstrap@sha256:f0ccf105…` ; dossier `sc-stockage.poc.test@sha256:f0ccf105…` | Tenue |
+| PT2 | Tous les contrôles des gabarits rendus tenus, dont `resources` (2 CPU, 2 Gi) et aucune clé `computeResources` | Tenue |
+| PT3 | 1 ligne retirée, 29 ajoutées ; `dash -n` | Tenue |
+| PT4 | Script substitué : `dash -n`, liste du heredoc égale ; 44 751 octets, sha256 `572fb78c…` | Tenue |
+| PT5 | Arbre : 226 fichiers réels conformes, 4 factices | Tenue |
+| PT6 | Deux poussées au même digest de manifeste local (`f550faf1…`) ; 230 couches aux titres distincts, égaux aux chemins de `final` préfixés par `depot/`, dont 4 à « : » et « @ » ; layout de 317 347 580 octets ; oras 1.3.6 | Tenue |
+| PT7 | `/var/lib/zot` : 4 491 038 720 octets libres, 15 529 877 504 utilisés | **Non tenue** (sous 4,5 Go) |
+| PT8 | Code 0, en 5 s | Tenue |
+
+**PT7.** La base de la prédiction était fausse. Les 5 055 672 320 octets libres de `s1-fermeture.log` ont été relevés *avant* l'envoi de la fermeture de M2, qui a ajouté 225 861 632 puis 253 952 octets. Le reste de l'écart, 338 518 016 octets utilisés de plus depuis la fin de M2, n'est attribué à rien : il n'a pas été relevé, et la prédiction supposait à tort qu'il n'y en avait pas. L'espace libre reste plus de dix fois supérieur au layout local de la fermeture (317 347 580 octets). PT7 ne bloque donc pas `essai_tache`, qui n'écrit rien dans Zot (ET8).
+
+**Ce que cela établit** :
+- les gabarits rendus portent les valeurs attendues ;
+- le script de `prefetch-rpm`, substitué comme Tekton le fera, est du sh valide, et la liste lui arrive intacte ;
+- la section d'envoi de `publier-fermeture` signée publie les 230 vrais noms en titres `depot/…` distincts, au même digest à deux poussées, sur le volume réel de la fermeture.
+
+**Ce que cela n'établit pas** :
+- le script dans un pod (`essai_tache`) ;
+- Tekton lui-même ;
+- `publier-fermeture` dans son pod sous 512 Mi ;
+- l'envoi vers Zot ;
+- l'origine des 338 518 016 octets.
+
+Accord suivant : `essai_tache`. Le sha256 du script substitué qu'elle imprimera doit être `572fb78c…`.

@@ -1,0 +1,68 @@
+# m4b.sh prealables_taches, 2026-11-18T09:07:03Z
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+source du bootstrap : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 ; dossier dir: : sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+## gabarits rendus (références des tâches factices)
+OK   tâche : nom, image : prefetch-rpm sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+OK   tâche : paramètres : ["liste","source","dossier","empreinte","repomd"]
+OK   tâche : UID, runAsNonRoot, capacités, élévation : 65532 true ALL false
+OK   tâche : ressources du pas, champ resources de v1beta1 (demandes, limites) : [{"requests":{"cpu":"2","memory":"2Gi"},"limits":{"cpu":"2","memory":"2Gi"}},0]
+OK   tâche : variables d'environnement du pas : [{"name":"HOME","value":"/tmp"}]
+OK   pipeline : liste rendue identique à la liste : identique
+OK   pipeline : source, dossier, empreinte, repomd : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 21CB256AE16FC54C6E652949702D426D350D275D 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+OK   pipeline : subPath de prefetch, racine pour publier : ["fermeture",null]
+OK   pipeline : tâches, dépôt de la fermeture : prefetch-rpm publier-fermeture sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+## script de la tâche contre PREFETCH_FINAL (étape final)
+     0a1,13
+     > #!/bin/sh
+     > export LC_ALL=C
+     > # Entrées fixées par la pipeline signée, écrites par substitution de Tekton et jamais lues dans une variable d'environnement :
+     > # l'env du podTemplate d'un PipelineRun l'emporterait sur celui du pas (docs/podtemplates.md de Tekton v1.15.5).
+     > cat > /tmp/liste <<'FIN_LISTE'
+     > $(params.liste)
+     > FIN_LISTE
+     > SOURCE='$(params.source)'
+     > DOSSIER='$(params.dossier)'
+     > FP_ROCKY='$(params.empreinte)'
+     > REPOMD='$(params.repomd)'
+     > SORTIE='$(workspaces.sortie.path)'
+     > LISTE_FICHIER=/tmp/liste
+     2a16,28
+     > case $SOURCE in sc-stockage.poc.test:5000/*@sha256:*) ;; *) ko "source invalide : $SOURCE" ;; esac
+     > h=${SOURCE##*@sha256:}; case $h in *[!0-9a-f]*) ko "digest de la source invalide" ;; esac; [ ${#h} = 64 ] || ko "digest de la source invalide"
+     > [ "$DOSSIER" = "${SOURCE%%:*}@${SOURCE##*@}" ] || ko "dossier incohérent avec la source : $DOSSIER"
+     > case $FP_ROCKY in *[!0-9A-F]*) ko "empreinte invalide" ;; esac; [ ${#FP_ROCKY} = 40 ] || ko "empreinte invalide"
+     > case $REPOMD in *[!0-9a-f]*) ko "repomd invalide" ;; esac; [ ${#REPOMD} = 64 ] || ko "repomd invalide"
+     > while read -r url sha taille reste; do
+     >   [ -n "$url" ] || continue
+     >   [ -z "$reste" ] || ko "ligne de liste à plus de trois champs : $url"
+     >   case $url in https://dl.rockylinux.org/vault/rocky/9.7/*.rpm) ;; *) ko "URL hors de vault 9.7 : $url" ;; esac
+     >   case $url in *..*|*[!A-Za-z0-9._/:+~-]*) ko "URL invalide : $url" ;; esac
+     >   case $sha in *[!0-9a-f]*) ko "sha256 invalide : $url" ;; esac; [ ${#sha} = 64 ] || ko "sha256 invalide : $url"
+     >   case $taille in ''|*[!0-9]*) ko "taille invalide : $url" ;; esac
+     > done < "$LISTE_FICHIER"
+     19c45
+     < K=${CLE_ROCKY:-/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9}   # réglable pour le banc seulement
+     ---
+     > K=/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+     38a65
+     > [ "$(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64)" = "$REPOMD" ] || ko "repomd.xml différent de l'attendu (fixé par la pipeline)"
+     45a73
+     > printf '{"uri":"oci://%s","digest":"%s"}' "${SOURCE%@*}" "${SOURCE##*@}" > '$(results.BOOTSTRAP_ARTIFACT_INPUTS.path)'
+OK   ligne retirée de PREFETCH_FINAL (la clé réglable) : K=${CLE_ROCKY:-/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9}
+OK   lignes ajoutées (en-tête 13, contrôles 13, clé 1, repomd.xml 1, résultat 1) : 29
+OK   script de la tâche, dash -n : ok
+## script substitué comme par Tekton
+OK   script substitué, dash -n : ok
+OK   liste du heredoc égale à la liste : égale
+script substitué : 44751 octets, sha256 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+## publier-fermeture : section d'envoi (version signée) sur les 230 vrais noms
+OK   arbre : fichiers réels (liens durs, sha256 et taille de final), factices de repodata : 226 4
+OK   section extraite : cd, boucle find, oras push : 3
+OK   digest du manifeste, layout local : sha256:f550faf1ac13286d7f498349c7765fad868bd301d1bf9de080fcfe8cdef21a12
+OK   seconde poussée, autre copie : même digest : sha256:f550faf1ac13286d7f498349c7765fad868bd301d1bf9de080fcfe8cdef21a12
+OK   couches : nombre, titres distincts : 230 230
+OK   titres égaux aux chemins de final, préfixés par depot/ : égaux
+OK   titres à « : » et « @ » (dossier dir:) : 4
+manifeste local : sha256:f550faf1ac13286d7f498349c7765fad868bd301d1bf9de080fcfe8cdef21a12 ; layout : 317347580 octets ; oras de l'hôte : Version:        1.3.6
+## espace de /var/lib/zot (lecture sur sc-stockage, sans sudo)
+utilisés 15529877504 octets ; libres 4491038720 octets
