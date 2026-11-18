@@ -1,0 +1,5 @@
+# enveloppes valides (cosign verify-attestation, clé de Chains, sans journal de transparence, lecture anonyme) après M5a ; commande de la note du 2026-11-18T19:07:58Z
+2026-11-18T19:07:24Z
+builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c : 4
+builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 : 4
+2026-11-18T19:07:24Z

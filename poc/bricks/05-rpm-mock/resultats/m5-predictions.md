@@ -213,3 +213,24 @@ Suite : `sans_kata`, puis `reseau`.
 - Les réserves de M4c demeurent : image d'outillage hors plateforme, BUILDTIME non expliqué, porte sans tâche rpm, vérification par clé.
 
 Suite : M5b (rejeu de zéro, pas avant le 28/11), sur sa propre carte.
+
+## Note datée du 18/11/2026, écrite à 19:07:58 UTC : portée des affirmations du bilan, après relecture du conseiller
+
+1. **R7, cause** : la mesure porte sur **une seule configuration**, mock 6.9 en `--hermetic-build` et `--isolation=simple`, dans un pod Kata privilégié. Cette config ne coupe pas le réseau de `%build`. La cause, lue dans le code de mock 6.9 du rootfs de l'image d'outillage (lecture, non mesurée) :
+   - `rpmbuild.py`, l. 110 : rpmbuild est lancé avec `unshare_net=not rpmbuild_networking` ;
+   - `config.py`, l. 98 : `rpmbuild_networking` vaut `False` par défaut ;
+   - `util.py`, l. 428-429 : `condUnshareNet` ne crée l'espace de noms réseau que `if USE_NSPAWN and unshare_net`.
+
+   Sans nspawn, qui échoue ici (étape `essais`), mock ne coupe donc jamais le réseau de rpmbuild. C'est le comportement prévu par son code, pas un échec silencieux. `mock.out` du bras a n'est pas archivé ; les lignes `M5-SONDE` de `build.log` le sont, dans [m5-reseau.log](m5-reseau.log).
+2. **Différence avec le deb** (additif à l'ADR 0007) : vérifié dans le dépôt. `deb/construire-deb.signee.yaml` (06), l. 45, recalcule le sha256 de chaque paquet contre le verrou. N5 de la 06 a mesuré la confrontation de `preparer-deb`.
+3. **« Rien écrit dans Zot », « aucun n'a publié »** : recompte en lecture seule ([relevé](m5-enveloppes-apres.log), 2026-11-18T19:07:58Z) : **4 enveloppes** sur la fermeture rpm `2a9e2ea7…`, comme en M4b (PV3), et **4** sur l'artefact `07b7bd6f…`. Le reste est lu dans les tâches : `preparer-rpm` tourne sans secret, et l'identifiant d'écriture de Zot n'entre jamais dans `construire-rpm` (en-têtes des tâches signées).
+4. **R4, « dnf contre `primary` »** : c'est déduit du message de dnf (« from local repository … has incorrect checksum ») et de la façon dont `repodata/` est écrit en M4b. Ce n'est pas mesuré.
+5. **Dossiers laissés sur l'hôte** :
+   - `~/.cache/supply-chain-poc/05/m5-sigmd5` (rootfs de l'image d'outillage) ;
+   - `~/.cache/supply-chain-poc/05/m5-essai-alterer` ;
+   - `~/.cache/supply-chain-poc/08/travail/m5-05`, avec ses deux dossiers `banc-hote-*` ;
+   - `~/.cache/supply-chain-poc/08/travail/m5banc1-05`.
+
+   Aucun n'est retiré.
+
+Le bilan « M5a tenu » est inchangé. Les phrases du README, de `docs/03` et de l'ADR 0001 qui attribuent l'absence de coupure à `--isolation=simple` se lisent avec le point 1 : configuration mesurée, cause lue dans le code.
