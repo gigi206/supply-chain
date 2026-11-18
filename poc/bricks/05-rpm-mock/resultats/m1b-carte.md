@@ -1,0 +1,107 @@
+# Brique 05, carte de M1b (images rpm construites par la plateforme), préparée à sec (18/11/2026, écrite à 19:38:39 UTC)
+
+**Interprétation** : la décision « C » (carte de M5b, note de 19:33:32 UTC) appelle « un jalon à part, avec sa propre carte ». Je la prépare à sec sous l'accord permanent du 18/11. Rien n'a été lancé ni écrit dans Zot, le cluster ou les VM, et rien n'a été mesuré. Aucune tâche, aucun script, aucune prédiction : c'est la même règle que la carte de S4a de la 06.
+
+**Nom** : « M1b » est mon choix. Le texte de M1 au tableau des jalons du README demande une « image `builders/mock-rocky9` construite par notre chaîne, base Rocky par digest, mock 6.9 épinglé ». S1 a construit les images d'essai hors de la plateforme (« Option 1 »). M1b fait ce que M1 demandait, et y ajoute l'image de bootstrap.
+
+**Objet** : la plateforme construit sans réseau les deux images, outillage et bootstrap. Elle les publie et les fait signer par Chains, avec une provenance. Les tâches rpm passent ensuite sur ces images, puis le rejeu de M5b les refait. Docs/04 prévoit déjà ce remède pour les images de base Rocky : « Bases reconstruites depuis les dépôts signés (dnf `--installroot`, mmdebstrap), à mesurer » (l. 192).
+
+## 1. Le point qui commande le reste : refaire la même image sans rien lire dans Zot
+
+Les tâches signées épinglent l'image d'outillage par digest : `prefetch-rpm`, l. 44, et `construire-rpm`, l. 18. Le verrou et la fermeture épinglent le bootstrap. Le rejeu vide Zot. M1b ne tient donc que si le rejeu reconstruit chaque image **au même digest**. Sinon, chaque rejeu demande de nouvelles signatures et une nouvelle revue de `taches.yml`. La voie deb y arrive : `749d746c` a été retrouvé au bit près en S5b. Pour le rpm, deux points ne sont pas établis.
+
+**A. La racine n'est pas reproductible.**
+- `s1.sh`, l. 793, l'écrit en commentaire, sans mesure : « pas reproductible au bit près (base rpm : INSTALLTIME ; journaux de dnf sous var/log) ».
+- mmdebstrap a `SOURCE_DATE_EPOCH`, que le manuel lu en S4a documente. Pour rpm 4.16.1.3 et dnf de Rocky 9, je n'ai rien lu qui fixe l'heure d'installation, la base rpm ou l'historique de dnf.
+- **À mesurer en premier**, par un banc hors ligne sur l'hôte, comme `m5-sigmd5.sh` :
+  - deux `dnf --installroot` des mêmes rpm locaux dans deux dossiers, sous `unshare -rn` et dans la racine de l'image d'outillage (rpm 4.16.1.3 et dnf) ;
+  - puis comparer les deux archives fichier par fichier, pour nommer chaque écart : base rpm, journaux, historique de dnf, `machine-id`, caches.
+  
+  C'est une préparation, puis une mesure sur l'hôte : elle se fait sous l'accord permanent, sans cluster ni Zot.
+- **Si un écart ne peut pas être neutralisé**, sans retirer ce dont mock a besoin, le jalon change de nature : l'image a un nouveau digest à chaque rejeu. Le choix te reviendrait alors : accepter une signature et une revue par rejeu, ou épingler autrement.
+
+**B. Les sources de l'outillage bougent.**
+- D4 (a) prend l'outillage sur Rocky 9.8 (pub) et EPEL 9 (`s1.sh`, l. 160 à 168). Les quatre paquets épinglés sont mock 6.9-1.el9 et mock-core-configs 45.2-1.el9 (EPEL 9), podman 5.8.2-8.el9_8 et skopeo 1.22.2-9.el9_8 (AppStream 9.8). Ils tirent 199 rpm téléchargés (`s1-racine.log`, l. 223).
+- `s1.sh`, l. 6, le dit déjà : « pub/9.8 et EPEL bougent ».
+- **À relever** (lecture publique, à faire avant toute préparation) :
+  - si les 199 rpm restent téléchargeables à une adresse figée, par exemple vault pour 9.8 et les archives de construction de Fedora pour EPEL ;
+  - et si leurs métadonnées signées s'y trouvent aussi.
+  
+  Je ne l'ai pas vérifié.
+- **Sinon**, le rejeu dépend d'un cache de l'hôte, et c'est la dette de l'option A qui revient : deux fichiers hors de toute sauvegarde. C'est en conflit avec D4 (a), que je ne tranche pas : D2 (a) avait choisi vault 9.7 précisément parce qu'il est figé.
+- **Le bootstrap n'a pas ce problème** : sa base, `rockylinux:9.7` par digest (`ee90dc0e`), et ses dix NEVRA viennent de vault 9.7, qui est figé (D2 a).
+- **Listes** : `s1-racine.log` donne, pour chaque rpm, le dépôt, le nom de fichier et le sha256, et « 199 sur 199 » ont été contrôlés contre les primary vérifiés. `boot_racine` a été comparé aux dix NEVRA épinglés, ni plus ni moins. Leçon de la correction 1 de S4a, où les listes des journaux étaient incomplètes : la liste complète à installer devra être retirée de la base rpm des racines archivées (201 paquets installés pour l'outillage, l. 211), et non des seules lignes « rpm ».
+
+## 2. Transposition de S4a (décision « Oui, retiens-les » du 10/11, README de la 06, additif de 22:54 UTC)
+
+| Choix de S4a (deb) | Transposition proposée (rpm) | Neuf ou repris |
+|---|---|---|
+| 1. Publication dans `builds/builders/sbuild-debian13` par `publier-image` inchangée | `builds/builders/mock-rocky9` et `builds/builders/rocky9-bootstrap`, par `publier-image` (`d21931f3`). Zot et Chains restent inchangés, comme en S4a | Repris |
+| 2. `prefetch-deb` en runc sans root, puis une tâche Kata privilégiée sans aucune sortie | Une tâche runc sans root qui télécharge les rpm, vérifie le `repomd.xml` par gpgv et le sha256 de chaque rpm contre `primary`, puis reconstitue un miroir partiel avec les métadonnées amont. Ensuite une tâche Kata privilégiée, sans aucune sortie, qui lance `dnf --installroot` sur ce miroir | Repris dans la forme ; outils neufs (point 3) |
+| 3. mmdebstrap installé par `dpkg -i` dans l'amorce `debian:trixie-…` par digest | dnf est déjà dans l'amorce `rockylinux:9.8` (`ed654c69`), copiée par `s1.sh amorce` ; aucun outil n'est à installer avant `--installroot` | Mesuré en S1 : `racine` a lancé `dnf --installroot` depuis l'image 9.8, mais avec réseau. Hors ligne, sur un miroir partiel : à mesurer |
+| 4. Layout OCI écrit à la main, couches non compressées | Même chose. La couche de la racine, puis la couche de configuration de mock (`MOCK_CFG` et `STOCKAGE`, `s1.sh`, l. 454 à 477) pour l'outillage ; la couche pleine de `boot_image` pour le bootstrap | Repris |
+
+## 3. Circularité et outils
+
+- **`prefetch-rpm` tourne sur `99790c13`**, l'image à remplacer (l. 44). Le prefetch de l'outillage ne peut donc pas la prendre. Les candidats sont l'amorce `rockylinux:9.8` par digest, qui a dnf, rpm et python3, ou `plateforme/outils-prefetch` (`68e0ae70`), qui n'a pas d'outil rpm (lecture des tâches, à vérifier).
+- **Outils nécessaires et image qui les fournit** (à vérifier dans les images, rien n'est mesuré) :
+  - gpgv et sha256 pour le prefetch, et un téléchargeur. Une tâche runc en python3 sur l'amorce suffirait, comme `n34-binaire.py` en S1 ;
+  - dnf et rpm pour la tâche Kata (amorce) ;
+  - tar, sha256sum et JSON pour le layout (amorce : tar et coreutils ; JSON à la main, comme `construire-deb`).
+- **Verdicts de docs/04** :
+  - rpm : Scorecard 3,8 ; createrepo_c : Scorecard non mesurée (l. 191) ;
+  - mock : 4,9 (l. 45) ; podman et skopeo (l. 76 et 77) ;
+  - images Rocky (l. 166) ;
+  - **dnf n'a pas de ligne propre**. Je ne l'utiliserai pas avant d'avoir vérifié son verdict, conformément à la règle « rien de Risqué ».
+- **Configuration de mock** : elle porte `$BOOT`, la base brute 9.7 copiée par l'amorce. Ce n'est pas le bootstrap dérivé. Dans la voie signée, `construire-rpm` lance `mock --hermetic-build /w/verrou.json` (`construire-rpm.signee.yaml`, l. 122), et le bootstrap vient alors du verrou (`config.bootstrap_image`, lu par `m5-alterer.py`). Les deux images se construisent donc indépendamment. Seul le verrou les relie.
+
+## 4. Changements du cluster, chacun avec son accord
+
+- **Sortie** pour le label de la tâche de prefetch neuve (DNS, adresses publiques en 443), et son ajout au `NotIn` de `builds-sans-internet` (`sortie-builds.sh`, à transposer de `rpm_appliquer`).
+- **Politique sans sortie** pour la tâche Kata neuve. `construction-rpm-sans-sortie` ne sélectionne que `construire-rpm`, et `builder-sans-sortie` de la 06 que `construire-builder`.
+- **Zot** : aucun changement attendu (choix 1, comme S4a).
+- **Liste revue** : deux tâches neuves, et de nouveaux bundles de `prefetch-rpm` et de `construire-rpm`, qui citent la nouvelle image d'outillage. Chacun demande sa revue de `taches.yml`.
+- **Pod d'essai avant toute signature** (processus allégé), pour chaque tâche neuve.
+
+## 5. Cascade et frontière du jalon
+
+- **Dans M1b** :
+  - les deux tâches neuves ;
+  - la pipeline `builders` ;
+  - les deux images, avec deux passages au même digest et leur provenance ;
+  - le banc de reproductibilité (point 1 A) ;
+  - le relevé des sources (point 1 B).
+- **Après M1b, avant M5b** :
+  - verrou refait hors de la plateforme, avec le nouveau bootstrap (décision « Hors plateforme » ; résolution par mock, sur l'image d'outillage neuve) ;
+  - artefact de packaging de M4a republié ;
+  - nouveaux bundles de `prefetch-rpm` et de `construire-rpm`, et revue ;
+  - fermeture rpm (M4b) ;
+  - pipeline et rpm (M4c), rpm à recomparer à celui de M3 ;
+  - provenances.
+- **Refus de M5a** : ils ont été mesurés sur le bundle actuel de `construire-rpm`. Le code de la confrontation ne change pas, mais le bundle change. Je propose de rejouer R1 à R8 sur le nouveau bundle : `m5.sh` a duré environ 21 min d'exécution, de 18:42:14 à 19:03:47 UTC.
+- **Ordre par rapport au 28/11** : tout ce qui est écrit dans Zot avant le rejeu sera effacé et refait par lui. M1b peut se mesurer avant le 28/11. Ses étapes durables entrent dans `rejeu.sh`, dans le bloc de la 05, à la place des images d'essai.
+- **Disque** : 4,49 Go libres pour Zot le 18/11 (PT7 non tenue) et `/` de sc-stockage qui grossit d'environ 1,19 Go par jour ; c'est un préalable à relever. L'outillage pèse environ 362 Mo non compressé (archive de `racine`) et le bootstrap environ 258 Mo (archive de `boot_racine`), chacun deux fois s'il est poussé à deux tags.
+
+## 6. Effort et estimation
+
+- **Comparables mesurés** :
+  - option 2 de la carte de M4, image d'outillage par une pipeline `builders` : « option 1 et S4a, 4,14 h » (cité tel quel) ;
+  - brique 05, de `boot_racine` à M3, 8,93 h (carte de M4) ;
+  - M4c, 4,29 h de bout en bout, pour refaire une pipeline et ses preuves ;
+  - M5a, environ 21 min d'exécution, plus sa préparation.
+- **Estimation de M1b et de sa cascade** : **3 jours**, en supposant le point 1 A neutralisable et le point 1 B résolu par une adresse figée. Les comparables additionnés font environ 17 h. Le bootstrap et le relevé des sources n'ont pas de comparable.
+- **Règle des 2×** : décision avec toi à 6 jours, ou plus tôt si le point 1 A ou le point 1 B échoue.
+- **Brique 05** : 24,89 h à `c2c5809`, avant M5a. Avec M1b et M5b, la projection est de 24,89 h, plus M5a, plus 3 jours pour M1b, plus 1 jour de rejeu pour M5b. L'estimation de 1,5 jour de M5b valait pour l'option A ; la préparation de son rejeu reste à refaire. Le seuil de 5 pw demande une conversion entre heures et pw que je n'ai jamais faite (« les heures ne sont pas converties en pw », carte de M5). Je ne la fais pas ici : ce point est mis de côté pour plus tard, il n'est pas posé.
+
+## Question posée
+
+**Transposition de S4a** : retiens-tu les quatre transpositions du point 2 (destination `builds/builders/`, prefetch runc et constructeur Kata sans sortie, dnf de l'amorce, layout OCI à la main) ?
+
+**Ordonnées pour plus tard, non posées** :
+1. Résultat du banc de reproductibilité (point 1 A) ;
+2. Relevé des sources figées de 9.8 et d'EPEL, et conflit éventuel avec D4 (a) (point 1 B) ;
+3. Verdict de dnf dans docs/04 ;
+4. Rejeu de R1 à R8 sur le nouveau bundle ;
+5. Lecture du seuil de 5 pw.
+
+Suite sans attendre la réponse, sous l'accord permanent : le banc de reproductibilité du point 1 A, hors ligne sur l'hôte.
