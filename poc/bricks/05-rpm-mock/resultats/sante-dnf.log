@@ -1,0 +1,91 @@
+# sante.sh dnf, 2026-11-18T20:24:37Z
+M1b : dnf 4 et les bibliothèques qu'il exécute ; commits depuis 2026-08-20T00:00:00Z, avis depuis 2025-11-18
+Relevé du 2026-11-18 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| dnf | rpm-software-management/dnf | packaging | oui | 4 | 2026-11-02 | 5 | 8 | 10 | ? |
+| libdnf | rpm-software-management/libdnf | packaging | oui | n/d | — | — | — | — | — |
+| librepo | rpm-software-management/librepo | packaging | oui | n/d | — | — | — | — | — |
+| libsolv | openSUSE/libsolv | packaging | oui | 4.3 | 2026-11-16 | 10 | -1 | 1 | ? |
+## rpm-software-management/dnf
+nom final rpm-software-management/dnf, archivé false, licence GPL-2.0, dernier push 2026-11-16
+dernière release : 4.24.0 du 2025-10-21
+commits depuis 2026-08-20T00:00:00Z : 7 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+        4 ssuryad-amzn	amazon.com
+        1 ydirson	vates.tech
+        1 janblazek	redhat.com
+        1 LUX-ETVERITAS	gmail.com
+fusionneurs des 100 dernières PR : dcantrell 1, evan-goode 22, fhbash 1, jan-kolarik 1, janblazek 1, jrohel 5, kontura 18, m-blaha 9, mfocko 1, pkratoch 11, ppisar 30
+SECURITY.md : absent
+avis publiés : 0 ; depuis un an : 0
+  étiquette maint-el7-0.6.4-1-build-sync : commit du 2015-03-04
+  étiquette last-yum-commit : commit du 2012-01-18
+  étiquette dnf-2.6.3-1 : commit du 2017-08-07
+  étiquette dnf-2.6.2-1 : commit du 2017-07-24
+  étiquette dnf-2.5.1-1 : commit du 2017-06-12
+## rpm-software-management/libdnf
+nom final rpm-software-management/libdnf, archivé false, licence LGPL-2.1, dernier push 2026-10-29
+dernière release : 0.76.0 du 2026-09-17
+commits depuis 2026-08-20T00:00:00Z : 12 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+        5 ssuryad-amzn	amazon.com
+        3 kontura	redhat.com
+        1 ppisar	redhat.com
+        1 jmarrero	redhat.com
+        1 bluca	gmail.com
+        1 UOS-liang	uniontech.com
+fusionneurs des 100 dernières PR : Conan-Kudo 4, dcantrell 1, evan-goode 18, fhbash 3, jan-kolarik 5, jrohel 7, kontura 33, m-blaha 8, mfocko 1, pkratoch 6, ppisar 14
+SECURITY.md : absent
+avis publiés : 0 ; depuis un an : 0
+  étiquette libhif_0_2_3 : commit du 2016-06-30
+  étiquette libhif_0_2_2 : commit du 2016-02-12
+  étiquette libhif_0_2_1 : commit du 2015-07-13
+  étiquette libhif_0_2_0 : commit du 2015-04-08
+  étiquette libhif_0_1_8 : commit du 2015-01-19
+## rpm-software-management/librepo
+nom final rpm-software-management/librepo, archivé false, licence LGPL-2.1, dernier push 2026-11-02
+dernière release : 1.22.0 du 2026-11-02
+commits depuis 2026-08-20T00:00:00Z : 32 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+       17 prownd	kylinos.cn
+        3 stewartsmith	amazon.com
+        3 evan-goode	evangoo.de
+        3 bc-lee	gmx.com
+        2 m-blaha	redhat.com
+        2 kontura	redhat.com
+        1 ppisar	redhat.com
+        1 fundawang	yeah.net
+fusionneurs des 100 dernières PR : Conan-Kudo 6, dcantrell 1, evan-goode 5, fhbash 2, jan-kolarik 12, jrohel 7, kontura 18, m-blaha 26, pkratoch 3, ppisar 20
+SECURITY.md : absent
+avis publiés : 0 ; depuis un an : 0
+  étiquette librepo-1.7.20 : commit du 2016-08-25
+  étiquette librepo-1.7.19 : commit du 2016-08-24
+  étiquette librepo-1.7.18 : commit du 2016-03-04
+  étiquette librepo-1.7.17 : commit du 2015-09-25
+  étiquette librepo-1.7.16 : commit du 2015-05-29
+## openSUSE/libsolv
+nom final openSUSE/libsolv, archivé false, licence NOASSERTION, dernier push 2026-10-26
+dernière release : aucune
+commits depuis 2026-08-20T00:00:00Z : 40 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+       35 mlschroe	suse.de
+        2 venkatchalla06	users.noreply.github.com
+        1 pslldq	pengutronix.de
+        1 pkratoch	redhat.com
+        1 evan-goode	evangoo.de
+fusionneurs des 100 dernières PR : igor-raits 5, mlschroe 95
+SECURITY.md : absent
+avis publiés : 0 ; depuis un an : 0
+  étiquette BASE-SuSE-Code-13_1-Branch : commit du 2013-09-24
+  étiquette BASE-SuSE-Code-12_3-Branch : commit du 2013-04-25
+  étiquette BASE-SuSE-Code-12_2-Branch : commit du 2012-06-27
+  étiquette BASE-SuSE-Code-12_1-Branch : commit du 2011-12-15
+  étiquette 0.7.41 : commit du 2026-10-23
+## fichiers dans vault/rocky/9.8/BaseOS (décision « Oui 9.8 » ; liste non signée, indice de version seulement)
+  BaseOS : dnf-4.14.0-34.el9_8.rocky.0.1.noarch.rpm
+  BaseOS : dnf-data-4.14.0-34.el9_8.rocky.0.1.noarch.rpm
+  BaseOS : libdnf-0.69.0-18.el9.rocky.0.1.x86_64.rpm
+  BaseOS : librepo-1.19.0-1.el9.x86_64.rpm
+  BaseOS : libsolv-0.7.24-5.el9_8.x86_64.rpm
+  BaseOS : libsolv-0.7.24-6.el9_8.x86_64.rpm
+  BaseOS : python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch.rpm
+  BaseOS : python3-libdnf-0.69.0-18.el9.rocky.0.1.x86_64.rpm
+  BaseOS : python3-hawkey-0.69.0-18.el9.rocky.0.1.x86_64.rpm

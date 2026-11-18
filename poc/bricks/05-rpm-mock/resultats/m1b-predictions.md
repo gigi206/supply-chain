@@ -295,3 +295,36 @@ Journal : `resultats/sante-dnf.log`.
 - **Si DN1 à DN3 tiennent pour les quatre**, aucun n'est « Risqué ». J'ajouterai une ligne « À surveiller » ou « Sain » à docs/04, selon les critères du §1, avec un plan de sortie. Je proposerai le verdict au propriétaire. Je ne l'écrirai pas comme un verdict de sa part.
 - **Si l'un d'eux tombe sous « Risqué »**, dnf n'est pas utilisé. M1b revient au propriétaire, car la transposition 3 de S4a ne tient plus.
 - **Le relevé ne dit rien du rythme de correction des CVE** par Rocky, que docs/04 laisse aux distributions.
+
+## Résultat du relevé de santé de dnf, du 18/11/2026 à 20:24:37 UTC, code 0 (note écrite à 2026-11-18T20:26:07Z)
+
+Journal : [`sante-dnf.log`](sante-dnf.log).
+- **DN1 tenue** : aucun des quatre dépôts n'est archivé.
+- **DN2 non tenue pour dnf, ou du moins non établie** :
+  - **dnf** : sa dernière release GitHub est la 4.24.0, du 21/10/2025. Au jour du relevé, elle a donc plus de 12 mois (12 mois et 28 jours), ce qui est le critère « Risqué » de docs/04. Les cinq étiquettes lues ne datent pas la plus récente : l'API ne les trie pas par date (les cinq lues datent de 2012 à 2017). Le relevé ne dit donc pas si dnf a publié depuis sans release GitHub.
+  - **libdnf** : 0.76.0, du 17/09/2026.
+  - **librepo** : 1.22.0, du 2/11/2026.
+  - **libsolv** : aucune release GitHub, mais l'étiquette 0.7.41 a un commit du 23/10/2026.
+- **DN3 tenue** : il y a des commits sur 90 jours pour les quatre : 7 pour dnf, 12 pour libdnf, 32 pour librepo, 40 pour libsolv.
+- **DN4 tenue** :
+  - **Scorecard** : 4 pour dnf, 4,3 pour libsolv, « n/d » pour libdnf et librepo ;
+  - **SECURITY.md** : absent des quatre ;
+  - **libsolv** : 95 des 100 dernières fusions sont de mlschroe (adresse suse.de), soit un bus factor de 1.
+- **DN5 tenue** : vault 9.8 liste `dnf-4.14.0-34.el9_8.rocky.0.1`, de la même version que l'image d'outillage. Il liste aussi libdnf 0.69.0, librepo 1.19.0 et libsolv 0.7.24 (deux releases Rocky, -5 et -6). Ces versions sont très en retrait de l'amont.
+
+**Lecture, selon la règle écrite d'avance** : je ne conclus pas encore. Si aucune publication de dnf n'est plus récente que le 21/10/2025, dnf tombe sous le critère « Risqué », et M1b revient au propriétaire. Le complément [`m1b-dnf-complements.sh`](m1b-dnf-complements.sh) lit :
+- les étiquettes triées par date ;
+- les dernières releases GitHub ;
+- ce que le README de dnf dit de dnf5 ou de la maintenance.
+
+### Compléments du relevé de dnf : prédictions écrites avant le lancement (2026-11-18T20:26:07Z UTC)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| DC1 | Aucune étiquette de dnf n'a de commit postérieur au 21/10/2025 | Moyenne : 7 commits en 90 jours, mais aucune release |
+| DC2 | Les étiquettes les plus récentes de libdnf, librepo et libsolv sont celles de leur dernière release (0.76.0, 1.22.0, 0.7.41) | Moyenne-haute |
+| DC3 | Le README de dnf cite dnf5 | Moyenne : Fedora est passée à dnf5 |
+
+**Ce qui est décidé d'avance** :
+- **Si DC1 tient**, dnf remplit le critère « Risqué » de docs/04 au sens littéral (aucune release depuis plus de 12 mois). Je ne l'utiliserai pas, et je poserai la question au propriétaire. Le dnf de Rocky 9.8 est maintenu par la distribution (4.14.0-34.el9_8), et docs/04 dit que « la criticité et l'adoption pondèrent le verdict ». Mais pondérer ce critère, ou le lever, n'est pas à moi de le décider.
+- **Si une étiquette postérieure existe**, dnf n'est pas « Risqué » par ce critère. Je proposerai alors une ligne « À surveiller », avec un plan de sortie.
