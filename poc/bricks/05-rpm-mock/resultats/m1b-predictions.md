@@ -439,3 +439,17 @@ Journal : [`m1b-dnf5.log`](m1b-dnf5.log).
 | K4 | Les 5 fusions d'igor-raits sur libsolv sont toutes plus anciennes que les 95 de mlschroe | Basse : je n'en sais rien |
 
 **Ce qui est décidé d'avance** : je rapporterai la recommandation et le résultat de sa condition, sans rien écrire dans docs/04, et sans reprendre dnf avant un oui explicite du propriétaire.
+
+### Premier passage des conditions (18/11/2026, 20:41:02 UTC, code 0 ; note écrite à 2026-11-18T20:41:32Z)
+
+**Le premier passage est défectueux, et son journal n'est pas archivé.**
+- **Cause** : `rpm --qf` ne lit pas l'échappement `\x1e`, que j'avais pris pour séparateur. Les entrées des changelogs n'ont donc pas été séparées : chaque paquet compte « 1 entrée ».
+- **Adresses** : le texte des entrées suivantes a laissé passer deux adresses de mainteneurs de la distribution, que le script devait retirer. Ces adresses sont publiques dans les paquets, mais le journal a été écrasé par le passage suivant, sans être commité.
+- **Partie 2 lisible** : les 5 fusions d'igor-raits sur libsolv datent du 25/03/2019 au 13/08/2019. Les 95 de mlschroe vont du 13/02/2019 au 26/10/2026. Le passage corrigé la relit.
+
+**Correction**, écrite avant le passage suivant :
+- les séparateurs sont en clair (`@@T@@`, `@@FIN@@`) ;
+- les adresses sont retirées aussi du texte ;
+- les lignes qui citent `RHEL-`, `CVE-` ou « fix » sont comptées.
+
+Les prédictions K1 à K4 sont inchangées.

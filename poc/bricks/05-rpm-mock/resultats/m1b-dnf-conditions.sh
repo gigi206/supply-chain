@@ -14,17 +14,20 @@ A=$(date -u -d '1 year ago' +%s)
 echo "# m1b-dnf-conditions.sh, début $(date -u +%FT%TZ) ; entrées comptées depuis $(date -u -d "@$A" +%F)"
 echo "## 1. changelogs de l'image d'outillage, 12 derniers mois"
 for p in python3-dnf libdnf librepo libsolv; do
-  unshare --map-auto --map-root-user -n chroot "$R" /usr/bin/rpm -q --qf '[%{CHANGELOGTIME}\t%{CHANGELOGNAME}\t%{CHANGELOGTEXT}\x1e]' "$p" \
+  unshare --map-auto --map-root-user -n chroot "$R" /usr/bin/rpm -q --qf '[%{CHANGELOGTIME}@@T@@%{CHANGELOGNAME}@@T@@%{CHANGELOGTEXT}@@FIN@@]' "$p" \
     | python3 -I -c '
 import datetime, re, sys
 p, a = sys.argv[1], int(sys.argv[2])
-e = [x.split("\t", 2) for x in sys.stdin.read().split("\x1e") if x.strip()]
+# correction (18/11/2026, après le passage de 20:41:02 UTC) : rpm --qf ne lit pas \x1e ; séparateurs en clair
+e = [x.strip().split("@@T@@", 2) for x in sys.stdin.read().split("@@FIN@@") if x.strip()]
 r = [x for x in e if int(x[0]) >= a]
 print(f"{p} : {len(e)} entrées en tout ; {len(r)} depuis un an")
 for t, n, x in r:
-    n = re.sub(r"<[^>]*>", "<adresse retirée>", n)
+    n = re.sub(r"<[^>]*>", "<adresse retirée>", n); x = re.sub(r"<[^>]*@[^>]*>", "<adresse retirée>", x)
     l = [y.strip() for y in x.splitlines() if y.strip()]
     print(f"  {datetime.datetime.fromtimestamp(int(t), datetime.timezone.utc):%Y-%m-%d} ; {n[:90]} ; {len(l)} ligne(s) ; première : {l[0][:140] if l else chr(45)}")
+    k = [y for y in l if re.search(r"RHEL-|CVE-|[Ff]ix", y)]
+    print(f"    lignes citant RHEL-, CVE- ou fix : {len(k)}" + "".join(f"\n      {y[:140]}" for y in k[:3]))
 ' "$p" "$A"
 done
 echo "## 2. openSUSE/libsolv : dates des fusions des 100 dernières PR, par fusionneur"
