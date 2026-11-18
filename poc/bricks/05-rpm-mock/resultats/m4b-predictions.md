@@ -903,3 +903,59 @@ La note de résultat dit, sous RP2, que la résolution et la vérification des d
 - aucun rpm n'a été construit à partir de cette fermeture (M4c).
 
 Dossier tiré laissé sous `~/.cache/supply-chain-poc/08/travail/m4b-05/comparaison/tiree` (317 955 662 octets).
+
+## Note datée du 18/11/2026, écrite à 13:03:55 UTC : étape `provenance` préparée à sec et ajoutée à `m4b.sh` (accord permanent du 18/11), NON LANCÉE
+
+**Script.** `m4b.sh` passe de `af9f2961…` à `9364cc03…`, par insertions seules : 9 lignes d'en-tête et un bloc avant `lancer`. Plan relu par le conseiller avant l'écriture ; modèle : `etape_provenance` de `s4b.sh` (06).
+- L'étape est en lecture seule : Zot en lecture anonyme, PipelineRuns et TaskRuns relus. Rien n'est écrit dans Zot ni dans le cluster.
+- **Gardes** : sha256 de la clé publique de Chains (`1e7b2a03…`, réécrite au rebâti du 13/11, `688af09`), de la liste et du verrou.
+- **Vérification** : `cosign verify-attestation` sur le sujet `builds/fermetures/sample-app-rpm@2a9e2ea7…`, avec la clé de Chains, sans journal de transparence (`--insecure-ignore-tlog`).
+- **Différence avec la 06** : `s4b.sh` ne contrôlait que le premier PipelineRun. Ici, les deux PipelineRuns de `rpm` attestent le même sujet, donc le tag `.att` porte plusieurs enveloppes :
+  - l'`invocationId` de chaque enveloppe est imprimé et rapporté aux PipelineRuns et TaskRuns de `rpm` ;
+  - `controler_prov` est jouée pour chacun des deux PipelineRuns, avec exactement une enveloppe exigée à son uid.
+- **`controler_prov`** (hors ligne, jouée au banc) imprime tout, écarts compris (`comm -3`), avant les assertions :
+  - sujet unique égal à `DEPOT_FERMETURE@FERMETURE_RPM` ; `buildType` `https://tekton.dev/chains/v2/slsa-tekton` ;
+  - `resolvedDependencies` égales, ligne pour ligne (nom, URI, digest), à six entrées tirées des références épinglées du script : pipeline `9b89b029…`, `prefetch-rpm` `9afe09db…` et `publier-fermeture` `7fa92ad3…` (bundles), images des deux pas (`mock-rocky9@99790c13…`, `outils-horodatage@c7bebae2…`), image de bootstrap en `inputs/result` (`oci://…/essais-05/rocky9-bootstrap`, `f0ccf105…`) ;
+  - l'égalité porte sur la liste entière : jamais de sélection par préfixe d'URI (deux entrées `oci://…/essais-05/…` coexistent) ;
+  - paramètres des deux tâches égaux à ceux de la pipeline : `liste` (sha256 après retrait des lignes vides : `95541ee8…`, 222 lignes), `source`, `dossier`, `empreinte`, `repomd`, et `depot` pour `publier-fermeture`. Le contenu des `pipelineTask` n'est jamais imprimé en entier.
+- **Relevés** : `builder.id`, début et fin ; signature simplesigning (tag `.sig`) par `cosign verify` (code et nombre relevés, non exigés).
+- **Refus** : la même vérification avec une autre clé (générée par openssl) doit échouer avec « no matching attestations » ou « invalid signature ».
+
+**Banc** ([script](m4b-provenance-banc.sh), [journal](m4b-provenance-banc.log)) : 57 OK, 0 KO, de 13:02:42 à 13:02:44 UTC.
+- A : insertions seules, deux blocs, noms neufs (aussi contre `commun.sh`), `bash -n`, mêmes codes shellcheck avant et après.
+- B : les vraies fonctions `attendu`, `echec`, `lire_prov`, `controler_prov` et `prov_attendue`, extraites de `m4b.sh`, sur des enveloppes fausses de la forme de Chains bâties avec la vraie liste et le vrai verrou.
+  - Le cas nominal passe (une enveloppe à l'uid, une autre à un autre uid).
+  - Neuf cas d'écart sont refusés, chacun avec le KO attendu et les écarts imprimés avant : aucune enveloppe à l'uid, deux, sujet faux, `buildType` faux, dépendance retirée, digest de l'image de bootstrap faux, dépendance en trop, une ligne de la liste changée, paramètre en trop.
+  - Une ligne vide ajoutée à la liste est acceptée : c'est la règle du retrait des lignes vides, reprise de la 06. Elle est relevée ici, pas cachée.
+- C : constantes contre les fichiers archivés. Clé de Chains ; images des pas des deux tâches signées ; deux tâches dans la liste revue ; liste sans ligne vide (222 lignes) ; verrou. Les paramètres attendus sont égaux à ceux de la pipeline signée par `taches` (copie locale, référence `9b89b029…`).
+- D : lecture seule, réelle. Les attestations de la fermeture deb de la 06 se vérifient avec la clé de Chains actuelle : code 0, 8 enveloppes valides, pour quatre exécutions des 13 et 14/11. `controler_prov` passe sur l'enveloppe de `s4b-deb-1` (5 OK), avec l'attendu tiré des journaux archivés de la 06. Les mêmes `jq` lisent donc la forme réelle des enveloppes de Chains.
+- **Deux passages du banc avant celui-ci, non archivés**, ont montré trois défauts du banc lui-même, tous corrigés :
+  - `here` non défini (les contrôles de la clé, de l'image de `publier-fermeture` et de la liste revue lisaient un chemin vide) ;
+  - compte des constantes par une expression sans chiffres, qui ne voyait pas `REPOMD_V2` (la constante était bien extraite et utilisée) ;
+  - `grep` qui lisait une ligne commençant par « - » comme une option.
+  `m4b.sh` n'a pas changé entre ces passages.
+- Non couvert par le banc : l'attestation du rpm elle-même ; c'est l'étape.
+
+**Prédictions**
+
+| | Prédiction | Confiance |
+|---|---|---|
+| PV1 | Gardes tenues : clé `1e7b2a03…`, liste `95541ee8…`, verrou `b6d0f8f1…`. | haute |
+| PV2 | `cosign verify-attestation` en code 0 avec la clé du fichier. | haute : la clé a été réécrite au rebâti du 13/11 et n'a pas changé depuis (git) ; les attestations deb des 13 et 14/11 se vérifient avec elle (banc D) |
+| PV3 | 4 enveloppes valides : une par PipelineRun et une par TaskRun `publier`, comme pour le deb (8 pour quatre exécutions). Chaque `invocationId` se rapporte à un objet de `rpm`, aucun « (hors de rpm) ». Relevé, pas une assertion. | moyenne : constat de J4 (`4bcd129`) : deux envois simultanés d'attestations vers un même digest peuvent en perdre un sans erreur ; le PipelineRun et son TaskRun `publier` finissent dans la même seconde |
+| PV4 | Exactement une enveloppe à l'uid de `m4b-rpm-1`, et une à celui de `m4b-rpm-2`. | moyenne-haute, pour la même raison |
+| PV5 | Sujet unique `sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea7…` ; `buildType` attendu. | haute |
+| PV6 | `resolvedDependencies` égales aux six entrées attendues, dont l'image de bootstrap en `inputs/result` (`f0ccf105…`). | moyenne-haute : même forme que le deb (banc D), où le résultat `INSTANTANE_ARTIFACT_INPUTS` donnait `inputs/result` ; le résultat `BOOTSTRAP_ARTIFACT_INPUTS` (URI `oci://`) n'a jamais été lu par Chains |
+| PV7 | Paramètres des deux tâches égaux à ceux de la pipeline signée (6 lignes). | haute |
+| PV8 | `builder.id` `https://supply-chain.example/builders/tekton-chains@v1`, comme le deb. Relevé. | haute |
+| PV9 | `cosign verify` (`.sig`) en code 0, au moins une signature valide, digest signé `2a9e2ea7…`. Relevé, non exigé ; nombre non prédit. | moyenne |
+| PV10 | Refus avec une autre clé : « no matching attestations », comme à la 06. | haute |
+| PV11 | Étape en code 0, en moins d'une minute, au premier plan. | haute pour le code ; moyenne pour la durée |
+
+**Si PV4 ne tient pas** (enveloppe d'un PipelineRun absente), il n'y a pas de chemin de reprise : `rpm` ne se relance pas (dépôt présent, rien n'est purgé). La suite est une décision avec le propriétaire.
+
+**Portée, à garder dans la note de résultat.**
+- L'image de bootstrap en `inputs/result` est **déclarée par la tâche signée** : le résultat `BOOTSTRAP_ARTIFACT_INPUTS` est écrit à partir du paramètre `source`, après le contrôle de `manifest.json` copié contre ce digest (lecture de `fermeture/prefetch-rpm.signee.yaml`). Chains ne mesure pas l'image.
+- La vérification se fait par clé seule, sans journal de transparence.
+- Que la clé du fichier soit celle de Chains dans le cluster est une prédiction (PV2), tenue seulement si cosign passe. Le refus avec une autre clé prouve que la vérification discrimine ; il ne prouve pas l'origine de la clé.
+- Si l'étape tient, M4b est tenu : l'additif de l'ADR et la mise à jour de `docs/03` iront dans le commit de résultat, avec ces réserves.
