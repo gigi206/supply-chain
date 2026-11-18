@@ -204,3 +204,9 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Écart non prévu** (BT9 en partie) : le mode de la racine de l'archive, 0775 sur le banc (`mkdir` de l'hôte) et 0555 dans S1. C'est une valeur de plus à choisir dans la carte.
 - **Autre jour** : relancer `m1b-boot.sh` inchangé et comparer `x1` à `28634a12…`.
 - **Détail** : [résultat](m1b-predictions.md), [journal](m1b-boot.log).
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T21:46:32Z UTC : banc du bootstrap, corrections
+
+- **Mesure archivée** : les modes de la racine et la composition de la couche sont relevés dans [`m1b-boot-modes.log`](m1b-boot-modes.log).
+- **Portée** : `SOURCE_DATE_EPOCH`, la borne S et les exclusions suffisent sur le banc. Seules 8 exclusions sont montrées nécessaires (journaux de dnf, `history.sqlite*`, `aux-cache`). `etc/machine-id` et `var/cache/dnf` viennent de la base et sont exclus par choix. La référence `28634a12…` vaut pour la liste large.
+- **Origine du 0555 de S1** : c'est une hypothèse (lecture de `s1.sh`), non mesurée.

@@ -1,0 +1,25 @@
+# m1b-boot-modes.sh, début 2026-11-18T21:46:00Z
+OK   c1 : sha256 égal (447ece2b645add4de28b44d893a28b3ce6eb6dff3ff342ea8ff07c005f0ca90a)
+OK   x1 : sha256 égal (28634a12c5e99aae558a0cd6719d8f87fad6bac329724f0afafee252e6b78ab3)
+OK   boot-racine.tar : sha256 égal (8ae17f92b27377fff20009d0a88740b1bf9045d533f0506949d6e209c970f1f2)
+OK   couche-812c4412 : sha256 égal (812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09)
+c1 : premier membre '.', mode 0o775, uid 0, gid 0
+x1 : premier membre '.', mode 0o775, uid 0, gid 0
+boot-racine.tar : premier membre '.', mode 0o555, uid 0, gid 0
+couche : 11170 membres ; membre racine (« . », « ./ » ou vide) : 0 []
+couche : premiers membres ['.profile', 'afs', 'bin']
+membres de c1 absents de x1 : 10 ; de x1 absents de c1 : 0
+     absent de x1 : ./etc/machine-id
+     absent de x1 : ./var/cache/dnf
+     absent de x1 : ./var/cache/ldconfig/aux-cache
+     absent de x1 : ./var/lib/dnf/history.sqlite
+     absent de x1 : ./var/lib/dnf/history.sqlite-shm
+     absent de x1 : ./var/lib/dnf/history.sqlite-wal
+     absent de x1 : ./var/log/dnf.librepo.log
+     absent de x1 : ./var/log/dnf.log
+     absent de x1 : ./var/log/dnf.rpm.log
+     absent de x1 : ./var/log/hawkey.log
+stat de b1 : 775 gigi:gigi
+stat de b2 : 775 gigi:gigi
+mtime maximal de la couche, 1763921880 : 2025-11-23T18:18:00Z
+# fin 2026-11-18T21:46:02Z

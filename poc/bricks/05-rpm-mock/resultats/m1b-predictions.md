@@ -816,3 +816,12 @@ Journal : [`m1b-boot.log`](m1b-boot.log). Dossier : `~/.cache/supply-chain-poc/0
 - Les 4 lignes comptées dans chaque journal de dnf sont des « Running scriptlet ».
 
 **Lecture** : sur le banc, deux installations du bootstrap faites le même jour donnent la même archive. Il y faut `SOURCE_DATE_EPOCH=S`, la borne S et les exclusions du banc de l'outillage. Le mode de la racine de l'archive est une entrée de plus, à fixer ; sa valeur (0555 comme S1, ou une autre) revient à la carte. Rien n'est mesuré un autre jour, ni dans le pod Kata, ni avec les outils de `99790c13`, ni avec les quatre dépôts. Le point 1 A reste non établi.
+
+### Corrections au résultat du banc du bootstrap (note écrite à 2026-11-18T21:46:32Z UTC, après relecture par le conseiller ; le texte d'origine reste en place)
+
+Relevé en lecture seule : [`m1b-boot-modes.sh`](m1b-boot-modes.sh), journal [`m1b-boot-modes.log`](m1b-boot-modes.log), de 21:46:00 à 21:46:02 UTC, code 0.
+
+1. **Valeurs citées sans journal** : le mode de `.` (0775 dans `c1` et `x1`, 0555 dans `boot-racine.tar`), l'absence de membre racine dans la couche (11 170 membres, aucun « . », « ./ » ni nom vide), `stat` de `b1` et `b2` (775) et la date du mtime maximal de la couche (2025-11-23T18:18:00Z) venaient de commandes non archivées ou d'une déduction. Elles sont désormais mesurées dans ce journal, et elles sont égales à celles de la note.
+2. **« Il y faut `SOURCE_DATE_EPOCH=S`, la borne S et les exclusions »** dépasse la mesure. Le banc montre que ces conditions **suffisent** sur le banc. Il n'a aucun témoin sans `SOURCE_DATE_EPOCH` ni sans borne pour le bootstrap. Seules les 8 exclusions dont les membres diffèrent entre `c1` et `c2` sont montrées nécessaires.
+3. **« Dans S1, il vient de `cp -a "$m/." "$R/"` »** est une hypothèse tirée de la lecture de `s1.sh`, pas une mesure.
+4. **Exclusions** : `x1` a 10 membres de moins que `c1`. Ce sont les 8 membres qui diffèrent, plus `./etc/machine-id` et `./var/cache/dnf`, membres de la base, égaux dans `c1` et `c2`, que S1 gardait. La liste minimale mesurée a donc 8 membres ; le reste est un choix de carte. La référence `28634a12…` vaut pour la liste large du banc de l'outillage.
