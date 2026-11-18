@@ -685,3 +685,32 @@ Le point 1 A reste non établi.
 4. **Avant les prédictions de ce banc** :
    - lire l'étape racine de `s1.sh` pour savoir si le pod a tourné sur `ed654c69` sans rien y installer ni changer avant `dnf --installroot`, et quel umask il avait ;
    - relire `%_install_langs` dans le banc lui-même, comme témoin.
+
+### Banc de l'outillage avec les outils de l'amorce : lecture et prédictions (écrites à 2026-11-18T21:25:06Z UTC, avant le lancement)
+
+**Lecture de l'étape racine de [`s1.sh`](../s1.sh)**, faite avant ces prédictions. Elle porte sur le fichier du passage du 17/11 (08:44:02 UTC) : à `b70f384`, `s1.sh` a le sha256 `ad16fc99…`. Ses fonctions `etape_racine`, `dnf_conf`, `dans`, `livrer`, `pod_demarrer` et son script `RACINE` sont égaux, au sha256 près, à ceux du fichier actuel. `pod_spec` ne diffère que par `sleep 10800` au lieu de `sleep 43200` (correctif de durée, appliqué après le passage).
+- **Base du pod** : le pod `s1-05-racine` tourne sur `$AMORCE`, c'est-à-dire `ed654c69` par digest (l. 169 et 434 du fichier actuel). Son conteneur ne lance que `sleep` (`pod_spec`). `etape_racine` (l. 430 à 449, lue en entier) ne fait, avant le script, que livrer deux clés et `/w/dnf.conf` (l. 436 à 438). Le script `RACINE` (l. 355 à 379) n'installe rien dans l'amorce et ne change pas sa configuration. **Les outils de l'étape racine sont donc l'amorce nue.**
+- **umask** : le `umask 022` de la l. 192 s'applique sur l'hôte, au script lui-même. Le script `RACINE` ne fixe aucun umask : il hérite de celui de `kubectl exec … sh -s` dans le pod Kata. [`s1-racine.log`](s1-racine.log) ne le relève pas. **Le umask du pod n'est pas mesuré.** Seul indice : `var/lib/dnf` a le mode 0755 dans `racine.tar`, ce qui va avec un umask de 022, sans le prouver.
+- **Commande** : `dnf -y -c /w/dnf.conf --setopt=reposdir=/w/aucun --installroot=/w/racine --releasever=9 install …` (l. 366), donc `/usr/bin/dnf` de l'amorce. Sa configuration (`dnf_conf`, l. 381) a `tsflags=nodocs` et `install_weak_deps=0`, comme celle du banc de 20:57:14 UTC.
+
+**Ce qui est lancé** ([`m1b-outil-amorce.sh`](m1b-outil-amorce.sh)), entièrement hors ligne :
+- le miroir partiel du banc de 20:57:14 UTC est copié dans un dossier neuf et revérifié (repomd, signatures de vault, métadonnées, 199 rpm) ;
+- la couche de l'amorce est extraite et sert de racine d'outils, avec `umask 022` fixé dans chaque commande ;
+- quatre installations par nom ont la forme de S1, sous `SOURCE_DATE_EPOCH=S` et `container=oci` (Env de l'image) : `i8` et `i9` sous `umask 022` ; le témoin `i10` sous `umask 022`, avec `/etc/rpm/macros.image-language-conf` de la racine d'outils masqué (`/dev/null` lié dessus) ; le témoin `i11` sous `umask 0002` ;
+- les archives sont bornées à S, avec les exclusions du ré-archivage (dont `etc/machine-id`) : `a8`, `a9`, le témoin `a8b`, `a10` et `a11` ;
+- comparaisons de contenu : `a8` contre `racine.tar`, `a10` contre `a8`, `a11` contre `a8`.
+
+**Prédictions :**
+- **AO1** : les trois `repomd.xml` du miroir copié sont égaux aux copies du 18/11. Ceux de vault sont signés par la clé de Rocky. Les métadonnées et les 199 rpm ont le sha256 attendu.
+- **AO2** : dans la racine d'outils, le umask vaut `0022` et `%_install_langs` vaut `en_US`. Témoins : le umask de `i11` vaut `0002`, et `%_install_langs` vaut `all` quand la macro de l'image est masquée. Les versions sont celles de la lecture de l'amorce (rpm 4.16.1.3-40.el9, dnf 4.14.0-34.el9_8.rocky.0.1).
+- **AO3** : `rpm -K` donne 199 « digests signatures OK » sur 199, et S vaut 1793914619.
+- **AO4** : dnf rend 0 pour `i8`, `i9`, `i10` et `i11`. Chacune a 201 entrées : les 199 NEVRA de `racine.tar` et 2 gpg-pubkey.
+- **AO5** : `a8.tar` et `a9.tar` sont identiques octet à octet, et le témoin `a8b.tar` est égal à `a8.tar`.
+- **AO6** (langues) : `a8` et `racine.tar` ont le même nombre de membres sous `usr/share/locale` : 34, dont 7 fichiers `.mo`. Aucun membre n'est seulement dans `a8`.
+- **AO7** (reste de l'écart avec S1) : 9 membres ne sont que dans `racine.tar`, soit les 8 fichiers exclus et `etc/machine-id`. Exactement 4 membres communs diffèrent : le `cacerts` de Java, `etc/shadow`, `etc/shadow-` et `rpmdb.sqlite`. Aucun écart de mode, `var/lib/dnf` compris.
+- **AO8** (témoin de langue) : `a10` a 2 567 membres sous `usr/share/locale`, dont 1 157 fichiers `.mo`, comme `a5` au banc de 20:57:14 UTC. Il a 2 533 membres de plus que `a8`, aucun de moins, et un seul membre commun diffère : `rpmdb.sqlite`.
+- **AO9** (témoin de umask) : `a11` et `a8` ont les mêmes membres. Un seul diffère : `var/lib/dnf`, par son mode (0775 contre 0755).
+
+**Confiance** : AO1 à AO4 sont des relectures. AO5 suit le ré-archivage de 21:08:52 UTC, mais avec d'autres outils. AO6 à AO9 sont le vrai test de l'hypothèse « langues et umask des outils ». AO8 et AO9 sont moyennes : d'autres membres (dossiers créés par des scriptlets, base rpm) peuvent bouger avec la macro ou le umask. Si AO6 ne tient pas, la cause des 2 533 membres reste ouverte.
+
+**Portée, avant le lancement** : même si tout tient, ce banc montre seulement trois choses, le même jour. Avec les outils de l'amorce sous `umask 022`, deux installations donnent la même archive. Ces outils donnent les mêmes membres de langues que `racine.tar`. Et, dans ces outils, masquer la seule macro `macros.image-language-conf` suffit à ramener toutes les langues. Ce dernier point attribue l'écart à cette macro **sur le banc** ; il ne dit rien du pod Kata. Le umask du pod Kata reste non mesuré ; le témoin `i11` montre seulement l'effet d'un umask sur ce banc. Écart connu avec S1 : le banc tourne dans un chroot sous `unshare`, pas dans un pod Kata. Si AO5 tient, `a8.tar` devient la référence du 18/11 pour cette configuration, distincte de `05d35d64`. Restent non mesurés : un autre jour, le choix entre fichier vide et fichier absent pour machine-id, et le bootstrap. Le point 1 A reste non établi.
