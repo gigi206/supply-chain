@@ -26,3 +26,23 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 | PR10 | Code 0, en moins de deux minutes. | haute pour le code si PR1 à PR9 tiennent ; moyenne pour la durée (deux `go mod vendor` hors ligne) |
 
 **Non couvert par `prealables`** : le vrai `rpm`, le `tar` 1.34 et le `gzip` 1.12 de Rocky, mock dans un pas de Tekton, les pulls par `oras` de l'image d'outils, le réseau et l'admission. Ce sera aux pods d'essai.
+
+## Note datée du 18/11/2026, écrite à 14:02:40 UTC : `prealables` passée (accord permanent du 18/11)
+
+**Passage** ([journal](m4c-prealables.log)) : le 18/11/2026, `date -u` avant et après le lancement : 14:01:46 et 14:01:57 UTC ; code 0, 62 OK, aucun KO. Premier plan, sur `bb428e6`.
+
+**Confrontation aux prédictions**
+- **PR1 tenue** : références épinglées relues ; 230 fichiers sous `depot/` de la fermeture tirée, rien d'autre à la racine.
+- **PR2 tenue** : les trois gabarits rendus se lisent, champs égaux à l'attendu.
+- **PR3 tenue** : syntaxe sans erreur ; pas `sources` égal à celui de `preparer-deb` ; début de l'assemblage égal sur 31 lignes ; un seul heredoc Python.
+- **PR4 tenue** : contrôles du pas `entrees` passés ; `entrees/src` (41 fichiers ; `vendor/` reconstitué, 17 fichiers ; `marked` 16.4.1, 12 membres extraits) égal en contenu à l'arbre de l'archive de `sources.sh` ; spec et verrou égaux au dépôt.
+- **PR5 tenue** : sous le busybox de l'image de prefetch, mêmes entrées en contenu, modes et types.
+- **PR6 tenue** : la confrontation, avec le `rpm` simulé, trouve les 222 `sigmd5` égaux au verrou, l'image de bootstrap, 4 fichiers de `repodata` et 4 du dossier `dir:`. Les `sigmd5` du verrou venant du vrai `rpm`, l'égalité sur 222 rpm vaut aussi contrôle de la lecture de l'étiquette 1004 (déduit).
+- **PR7 tenue** : onze cas altérés refusés, chacun avec son motif.
+- **PR8 tenue** : Source0 faite par la section du pas, avec le `tar` 1.35 et le `gzip` 1.14 de l'hôte, égale à `07521c1e…`. L'option (i) reproduit donc l'archive de M3 sur l'hôte. Avec le `tar` 1.34 et le `gzip` 1.12 de Rocky : à mesurer dans le pod d'essai.
+- **PR9 tenue** : layout lu comme `publier-image`, couche = le rpm seul, rpm égal à `864d55f4…`. **Digest attendu** de l'artefact, si le rpm de la plateforme est celui de M3 et si le `tar` de l'image d'outillage écrit la même couche : `sha256:7b17e7e7…` (relevé).
+- **PR10 tenue** : code 0, en 11 s d'après les deux `date -u`.
+
+**Portée.** Tout a tourné sur l'hôte. Rien ne dit encore que le vrai `rpm`, le `tar` et le `gzip` de Rocky, mock dans un pas de Tekton, les pulls par `oras`, le réseau ou l'admission se comportent de même : c'est le rôle des pods d'essai. `entrees.tar` (318 842 880 octets, `1334e4a4…`) est prêt pour le pod d'essai de `construire-rpm`.
+
+**Suite** : préparer à sec `essai_preparer` et `essai`, sur le modèle de `s4d.sh`, avec leurs prédictions.

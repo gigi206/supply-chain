@@ -1,0 +1,86 @@
+# m4c.sh prealables, 2026-11-18T14:01:46Z
+## références épinglées
+OK   verrou du dépôt (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   spec du dépôt (sha256) : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6
+OK   publier-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   époque : date du dernier commit de poc/sample-app (celle de sources.sh) : 1793229566
+OK   arbre de poc/sample-app à HEAD : 30e808ffa327288c656ddda7b6fafe4005234b77
+OK   archive de sources.sh (S1, M3) : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb
+OK   rpm de M3 (build 1) : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+OK   fermeture rpm tirée par comparaison (M4b) : fichiers sous depot/ : 230
+OK   fermeture rpm tirée : rien d'autre que depot/ à la racine : depot
+## gabarits rendus (références des tâches factices dans la pipeline)
+OK   pipeline : subPath des workspaces (preparer, construire, publier) : [null,"entrees","image","image"]
+OK   pipeline : entrées de preparer fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   pipeline : époque de construire (chaîne) : [{"name":"epoque","value":"1793229566"}]
+OK   pipeline : tâches (nom, tâche du bundle) : preparer:preparer-rpm construire:construire-rpm publier:publier-image
+OK   preparer-rpm.yaml : apiVersion, kind, nom : tekton.dev/v1beta1 Task preparer-rpm
+OK   construire-rpm.yaml : apiVersion, kind, nom : tekton.dev/v1beta1 Task construire-rpm
+OK   sample-app-rpm.yaml : apiVersion, kind, nom : tekton.dev/v1beta1 Pipeline sample-app-rpm
+OK   preparer-rpm : pas et images : sources=sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc entrees=sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0 assemblage=sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   preparer-rpm : contexte de sécurité commun : {"runAsUser":65532,"runAsNonRoot":true,"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}
+OK   preparer-rpm : résultats : CHAINS-GIT_URL CHAINS-GIT_COMMIT FERMETURE_RPM_ARTIFACT_INPUTS FERMETURE_SOURCES_ARTIFACT_INPUTS PACKAGING_ARTIFACT_INPUTS
+OK   construire-rpm : un pas, image d'outillage : construire=sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+OK   construire-rpm : contexte de sécurité du pas : {"privileged":true,"allowPrivilegeEscalation":true,"runAsUser":0,"runAsGroup":0,"runAsNonRoot":false}
+OK   construire-rpm : ressources (demandes = limites) : {"requests":{"cpu":"2","memory":"6Gi"},"limits":{"cpu":"2","memory":"6Gi"}}
+OK   construire-rpm : workspaces (entrees en lecture seule) : [{"name":"entrees","readOnly":true},{"name":"sortie"}]
+OK   construire-rpm : env du pas (l'époque seule) : [{"name":"EPOQUE","value":"$(params.epoque)"}]
+## scripts des pas
+OK   syntaxe : sh -n (sources, entrees, assemblage), bash -n (construire)
+OK   pas sources égal à celui de preparer-deb : égal
+OK   pas assemblage : début égal à celui de preparer-deb (jusqu'à la copie du packaging, lignes) : égal 31
+OK   construire : un seul heredoc Python (lignes FIN) : 1
+## preparer-rpm, sur l'hôte : contrôles du pas entrees, puis assemblage sous unshare -rn (go go1.26.10)
+OK   contrôles du pas entrees extraits (lignes) : 6
+OK   contrôles du pas entrees passés sur les copies locales
+OK   assemblage : variables Tekton restantes : 0
+     all modules verified
+     go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+     entrées prêtes : src (41 fichiers), fermeture rpm (230 fichiers), spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6, verrou b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   entrees/src égal à l'arbre de l'archive de sources.sh (contenu) : égal
+OK   entrees/sample-app.spec égal au spec du dépôt : égal
+OK   entrees/verrou-rpm.json égal au verrou du dépôt : égal
+OK   entrees : contenu de premier niveau : fermeture sample-app.spec src verrou-rpm.json
+## preparer-rpm sous le busybox de l'image de prefetch (applets seuls, plus go et python3)
+OK   layout local de l'image de prefetch : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   bin/busybox de l'image (couche ae7c62ca50cd) : 49227c027f9b972f929780d60ee486dee5948ea7042cb7ab400690bb104418bc
+     all modules verified
+     go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+     entrées prêtes : src (41 fichiers), fermeture rpm (230 fichiers), spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6, verrou b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   entrees obtenues sous busybox et sous les outils de l'hôte : contenu : égal
+OK   entrees obtenues sous busybox et sous les outils de l'hôte : modes et types : égal
+## construire-rpm, sur l'hôte : confrontation au verrou (section Python du pas, rpm simulé)
+OK   section Python extraite (première et dernière lignes) : import hashlib, json, os, stat, subprocess, sys|print(dos, j['bootstrap']['image_digest'])
+     fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+OK   confrontation : sortie (dossier dir:, image_digest) : sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af
+OK   confrontation : message : fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+OK   cas refusé, rpm du verrou retiré : code 1, « fermeture : 1 rpm du verrou absent(s) : ['bash-5.1.8-9.el9.x86_64.rpm'] »
+OK   cas refusé, rpm en trop : code 1, « fermeture : 1 objet(s) hors du verrou, de repodata/ et du dossier dir: : ['bash-0-0.el9.x86_64.rpm'] »
+OK   cas refusé, fichier hors de repodata et du dossier dir: : code 1, « fermeture : 1 objet(s) hors du verrou, de repodata/ et du dossier dir: : ['LISEZMOI'] »
+OK   cas refusé, sous-dossier inattendu : code 1, « fermeture : 1 objet(s) hors du verrou, de repodata/ et du dossier dir: : ['autre/'] »
+OK   cas refusé, lien symbolique à la place d'un rpm : code 1, « fermeture : 1 objet(s) hors du verrou, de repodata/ et du dossier dir: : ['bash-5.1.8-9.el9.x86_64.rpm'] »
+OK   cas refusé, rpm remplacé par un autre sous le même nom : code 1, « sigmd5 différent du verrou : bash-5.1.8-9.el9.x86_64.rpm (5832caf6730301817da8e513d9fca84f) »
+OK   cas refusé, sigmd5 du verrou altéré : code 1, « sigmd5 différent du verrou : alternatives-1.24-2.el9.x86_64.rpm (5832caf6730301817da8e513d9fca84f) »
+OK   cas refusé, manifest.json du dossier dir: altéré : code 1, « manifest.json du dossier dir: différent du pull_digest : sha256:4462461083b09d1dadb59531076429c71845fdd63d60a »
+OK   cas refusé, repomd.xml absent : code 1, « repodata/repomd.xml absent »
+OK   cas refusé, nom en double dans le verrou : code 1, « nom du verrou non admis ou en double : alternatives-1.24-2.el9.x86_64.rpm »
+OK   cas refusé, verrou vide : code 1, « verrou vide »
+## construire-rpm, sur l'hôte : archive Source0 (section du pas, outils de l'hôte : tar (GNU tar) 1.35, gzip 1.14)
+OK   section de Source0 extraite (début, tar, fin) : 3
+     Source0 sample-app-1.0.0.tar.gz (époque 1793229566) : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6
+OK   Source0 égale à l'archive de sources.sh : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb
+OK   spec livré à mock égal au spec du dépôt : égal
+## construire-rpm, sur l'hôte : layout écrit avec le rpm de M3 (section du pas), lu comme publier-image
+OK   section du layout extraite (début, fin) : 2
+     couche sha256:4af5e17f103ff9686d943a0cb42edc2afbb023e7b1bc560cf01ecaedec58b195 (2181120 octets) ; configuration sha256:4c2aeea9326a3aac7e10ddc2646070d66fa8d9ccfe5d12ede2c387a46cd9d9f5 ; manifeste sha256:7b17e7e7fcff3383a7dab3db34c03940320126d89fa3fbfe20f6d2eee1bfa697
+     image.tar : 2191360 octets
+OK   index.json lu comme publier-image : une ligne, égale au résultat : 1 sha256:7b17e7e7fcff3383a7dab3db34c03940320126d89fa3fbfe20f6d2eee1bfa697
+OK   chaque blob a pour nom son sha256 (3 blobs)
+OK   diff_ids égaux aux digests des couches : ["sha256:4af5e17f103ff9686d943a0cb42edc2afbb023e7b1bc560cf01ecaedec58b195"]
+OK   couche : le rpm seul, en 0644, propriétaire 0 : -rw-r--r-- 0/0 sample-app-1.0.0-2.el9.x86_64.rpm
+OK   rpm de la couche égal au rpm de M3 : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+digest attendu de l'artefact, si le rpm est 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f et le tar de l'image d'outillage écrit la même couche : sha256:7b17e7e7fcff3383a7dab3db34c03940320126d89fa3fbfe20f6d2eee1bfa697
+## entrées du pod d'essai
+entrees.tar : 318842880 octets, sha256 1334e4a483427e7f9f807af3f7d6b3c33d0c1f5bad44a2fe537a6c8c24fdda3f
