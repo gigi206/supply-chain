@@ -444,3 +444,5 @@ Point « à lire avant `taches` » de la note de 22:59:14 UTC le 17/11.
   - Depuis le relevé de `prealables_taches` à 09:07:08 UTC : 18 825 216 octets de plus en 1 363 s. Seul `publier` a écrit dans Zot pendant cette fenêtre, deux petits fichiers.
   - Rythme moyen sur la fenêtre : environ 1.19 Go par jour (calcul). À ce rythme, l'espace libre durerait un peu moins de quatre jours (calcul, non une prédiction).
   - L'origine n'est pas relevée. Elle est à attribuer avant `rpm`, en commençant par des `du -sx` espacés sur les arbres lisibles sans sudo ; sinon le relevé revient au propriétaire.
+
+*Correction datée du 18/11/2026, écrite à 09:30:18 UTC.* La note précédente place les trois passages non archivés « entre 09:26:20 et 09:26:29 UTC ». Le premier, arrêté au chargement de `commun.sh`, n'a rien imprimé, pas même `date -u` : son heure n'est pas connue, sinon qu'il précède 09:26:20 UTC. Les deux autres ont commencé à 09:26:20 UTC (le deuxième, heure lue à l'écran, non archivée) et se sont terminés au plus tard à 09:26:29 UTC (le troisième).
