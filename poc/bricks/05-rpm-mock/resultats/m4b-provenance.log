@@ -1,0 +1,67 @@
+# m4b.sh provenance, 2026-11-18T13:04:11Z
+## gardes
+OK   clé publique de Chains (sha256) : 1e7b2a03f9d5d289898e63b57410aeafa4e3680e86474d4f35aaa4e01f0c5e65
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   verrou (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+attendu : 6 dépendances, 6 paramètres ; sujet sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+## cosign verify-attestation (clé de Chains, sans journal de transparence), lecture anonyme
+OK   cosign verify-attestation : 4 enveloppe(s) valide(s) sur sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+invocationId des enveloppes (nombre, valeur, objet de rpm) :
+     1 2f1c276d-4390-4ed8-ada2-a941dd0ba6fc PipelineRun m4b-rpm-1
+     1 d0d8834b-c519-4e5d-8acc-5a21900c54df TaskRun m4b-rpm-1-publier
+     1 e5fa2bcb-b899-4922-a574-810c67f56985 PipelineRun m4b-rpm-2
+     1 f114df01-a6b7-4e00-956b-dc40227ea7de TaskRun m4b-rpm-2-publier
+## provenance de m4b-rpm-1 (2f1c276d-4390-4ed8-ada2-a941dd0ba6fc)
+enveloppes de l'invocation 2f1c276d-4390-4ed8-ada2-a941dd0ba6fc : 1
+sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://supply-chain.example/builders/tekton-chains@v1 (relevé)
+début et fin : 2026-11-18T11:01:19Z 2026-11-18T11:03:11Z (relevé)
+resolvedDependencies (6) :
+     - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+     - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+     inputs/result oci://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     pipeline sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+     pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+     pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+paramètres des tâches (6) :
+     prefetch-rpm dossier sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     prefetch-rpm empreinte 21CB256AE16FC54C6E652949702D426D350D275D
+     prefetch-rpm liste sha256:95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910 (222 lignes non vides)
+     prefetch-rpm repomd 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+     prefetch-rpm source sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     publier-fermeture depot sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+OK   enveloppes de l'invocation : 1
+OK   sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : 03c1c482f72981d20168ebe779f707a13420b37fcc7397d644fe3ce872ddddba
+OK   paramètres des tâches égaux à ceux de la pipeline (sha256 des listes triées) : 94236cc8bf8e4bc17404ef570ea627923071323ca2e870eb0426ab55159c72e6
+## provenance de m4b-rpm-2 (e5fa2bcb-b899-4922-a574-810c67f56985)
+enveloppes de l'invocation e5fa2bcb-b899-4922-a574-810c67f56985 : 1
+sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://supply-chain.example/builders/tekton-chains@v1 (relevé)
+début et fin : 2026-11-18T11:03:19Z 2026-11-18T11:03:53Z (relevé)
+resolvedDependencies (6) :
+     - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+     - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+     inputs/result oci://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     pipeline sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+     pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+     pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+paramètres des tâches (6) :
+     prefetch-rpm dossier sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     prefetch-rpm empreinte 21CB256AE16FC54C6E652949702D426D350D275D
+     prefetch-rpm liste sha256:95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910 (222 lignes non vides)
+     prefetch-rpm repomd 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+     prefetch-rpm source sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     publier-fermeture depot sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+OK   enveloppes de l'invocation : 1
+OK   sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : 03c1c482f72981d20168ebe779f707a13420b37fcc7397d644fe3ce872ddddba
+OK   paramètres des tâches égaux à ceux de la pipeline (sha256 des listes triées) : 94236cc8bf8e4bc17404ef570ea627923071323ca2e870eb0426ab55159c72e6
+## signature simplesigning (tag .sig), relevé
+cosign verify : code 0 ; 1 signature(s) valide(s) ; digests signés : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c (relevé, non exigé)
+## refus
+OK   provenance vérifiée avec une autre clé : refusé (no matching attestations)

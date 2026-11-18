@@ -959,3 +959,34 @@ Dossier tiré laissé sous `~/.cache/supply-chain-poc/08/travail/m4b-05/comparai
 - La vérification se fait par clé seule, sans journal de transparence.
 - Que la clé du fichier soit celle de Chains dans le cluster est une prédiction (PV2), tenue seulement si cosign passe. Le refus avec une autre clé prouve que la vérification discrimine ; il ne prouve pas l'origine de la clé.
 - Si l'étape tient, M4b est tenu : l'additif de l'ADR et la mise à jour de `docs/03` iront dans le commit de résultat, avec ces réserves.
+
+## Note datée du 18/11/2026, écrite à 13:05:45 UTC : `provenance` passée (accord permanent du 18/11) ; M4b tenu
+
+**Passage** ([journal](m4b-provenance.log)) : le 18/11/2026, `date -u` avant et après le lancement lus à la même seconde, 13:04:11 UTC ; code 0, 15 OK, aucun KO. Premier plan, sur `afe3530`, `m4b.sh` = `9364cc03…`.
+
+**Confrontation aux prédictions**
+- **PV1 tenue** : gardes passées (clé `1e7b2a03…`, liste, verrou).
+- **PV2 tenue** : `cosign verify-attestation` en code 0 avec la clé du fichier, sans journal de transparence.
+- **PV3 tenue** : 4 enveloppes valides. Chaque `invocationId` se rapporte à un objet de `rpm` : `m4b-rpm-1`, `m4b-rpm-1-publier`, `m4b-rpm-2`, `m4b-rpm-2-publier`. Aucune perte mesurée, malgré le constat de J4.
+- **PV4 tenue** : une enveloppe à l'uid de chacun des deux PipelineRuns.
+- **PV5 tenue** : sujet unique `sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea7…`, `buildType` attendu, pour les deux.
+- **PV6 tenue** : six `resolvedDependencies`, égales à l'attendu pour les deux (sha256 de la liste triée `03c1c482…`). Le résultat `BOOTSTRAP_ARTIFACT_INPUTS` donne bien `inputs/result oci://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap`, digest `f0ccf105…`.
+- **PV7 tenue** : six paramètres, égaux à ceux de la pipeline signée (`94236cc8…`), dont la liste de 222 lignes (`95541ee8…`).
+- **PV8 tenue** : `builder.id` `https://supply-chain.example/builders/tekton-chains@v1`. Début et fin relus dans les deux provenances, égaux à ceux des statuts relevés à `rpm`.
+- **PV9 tenue** : `cosign verify` en code 0, digest signé `sha256:2a9e2ea7…`. Relevé non prédit : **une seule** signature valide au tag `.sig`. Il y a une enveloppe d'attestation par TaskRun `publier` (PV3) ; qu'ils aient aussi écrit chacun une signature simplesigning est **déduit** de la configuration, pas mesuré (`rpm` n'a relu l'annotation de Chains que sur les PipelineRuns). Cause non relevée ; rien n'est exigé ici de la signature simplesigning.
+- **PV10 tenue** : refus avec une autre clé, « no matching attestations ».
+- **PV11 tenue** : code 0, en moins d'une seconde d'après les deux `date -u`.
+
+**Portée.**
+- Les deux PipelineRuns de la plateforme ont chacun une provenance SLSA signée par la clé du fichier, pour la fermeture `sha256:2a9e2ea7…`. Chacune nomme la pipeline et les deux tâches par leur bundle et leur digest, les images des deux pas, la liste des 222 rpm (paramètre `liste`, égal à `m4b-liste.txt`) et l'image de bootstrap.
+- L'image de bootstrap en `inputs/result` est **déclarée par la tâche signée** : le résultat est écrit à partir du paramètre `source`, après le contrôle de `manifest.json` copié contre ce digest (lecture de la tâche signée). Chains ne mesure pas l'image. Que la fermeture la contienne bien a été mesuré par `comparaison` (`manifest.json` au digest `f0ccf105…`).
+- La vérification se fait par clé seule, sans journal de transparence.
+- La clé du fichier vérifie les enveloppes produites pour ces PipelineRuns, que Chains a annotés comme signés (relevé de `rpm`). Qu'elle soit la clé de Chains en est **déduit**, pas lu dans le cluster. Le refus avec une autre clé prouve que la vérification discrimine, pas l'origine de la clé.
+
+**M4b tenu** (carte de M4 : tâche `prefetch-rpm` neuve, essayée et signée ; pipeline de la fermeture rpm ; fermeture sous `builds/fermetures/`), avec ces étapes : `m4b_mock_v2` (dans `s1.sh`), puis, dans `m4b.sh`, `prealables`, `essai`, `final`, `prealables_taches`, `essai_tache`, `taches`, `rpm`, `comparaison`, `provenance`. Réserves :
+- **RP14 en partie non tenue** : le second PipelineRun a duré 34 s, sous la borne basse prédite ; la plage était mal prédite, le résultat n'en dépend pas.
+- **CP6 en partie non tenue** : `du -sb` de l'hôte égal à la somme des fichiers (uutils) ; l'écart de 28 672 octets avec le `du` du pod reste non expliqué.
+- **Lecture, déjà signalée** : l'`env` du `podTemplate` prime sur celui des pas des tâches signées ; les PipelineRuns de M4b n'en portent pas.
+- **Disque de sc-stockage** : `/` grossit sans écriture attribuée à la brique ; le `sudo du` est confié au propriétaire.
+- La porte (ConfigMap `porte`) n'a pas été évaluée sur cette fermeture : à republier avant toute évaluation (M4c).
+- **Aucun rpm n'a encore été construit par la plateforme à partir de cette fermeture** : c'est M4c.

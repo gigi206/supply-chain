@@ -96,3 +96,9 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
   Sous sbuild unshare, la construction n'a aucun réseau. Hors Kata, la tâche privilégiée est refusée.
 - **Conséquence pour la règle générique** : un gestionnaire dont l'outil de construction ne vérifie pas les hash (sbuild et `--extra-package`, comme les paquets natifs de yarn) doit être confronté à un verrou dans la tâche de préparation. Le tirage par digest ne suffit pas, puisqu'il accepte une fermeture cohérente mais différente.
 - **Non mesuré** : le rejeu de zéro (S5b, jalon de plateforme), VSA et scan d'un deb (jalon séparé).
+
+**Additif du 18/11/2026, 13:08 UTC : M4b de la brique 05 mesuré** (brique 05, [résultats](../../poc/bricks/05-rpm-mock/resultats/m4b-predictions.md)).
+- **Mesuré** : une fermeture rpm produite par la plateforme. La tâche neuve `prefetch-rpm` (runc, sans root) prend la liste des 222 rpm du verrou, inscrite par l'hôte dans la pipeline signée, comme `prefetch-deb` en S4b. Elle contrôle chaque rpm (sha256, taille, signature de Rocky), bâtit `repodata` de façon reproductible et copie l'image de bootstrap de mock par digest.
+- `publier-fermeture` est reprise sans changement. Deux PipelineRuns donnent la même fermeture au digest près. Tirée de Zot, elle est égale fichier par fichier à celle mesurée dans les pods d'essai. Chaque PipelineRun a une provenance signée par Chains, qui nomme les tâches, la liste et l'image de bootstrap.
+- **Conséquence pour la règle générique** : le rpm suit le schéma du deb (liste lue par l'hôte, prefetch dans la plateforme, publication commune). Une troisième forme de fermeture demandera, d'après S4d2a, son entrée dans `_attendues` et sa branche de `_forme` dans `porte.rego`.
+- **Non mesuré** : la construction rpm depuis cette fermeture dans la plateforme et sa confrontation au verrou (M4c), la porte sur une construction rpm, le refus d'une archive altérée dans la plateforme.
