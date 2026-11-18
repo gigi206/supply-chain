@@ -79,3 +79,12 @@ Chaque point est marqué « vérifié dans le dépôt », « mesuré » (journal
 - **M5b**, en jalon à part, pas avant le 28/11 : le rejeu de zéro, avec sa propre carte, qui tranche la dette des images d'essai.
 
 Rien ne change dans `rejeu.sh` avant ta réponse. La liste des tests et les pods d'essai viendront ensuite, sur M5a.
+
+## Note datée du 18/11/2026, écrite à 18:29:02 UTC : décision « Ok »
+
+**Décision du propriétaire** (réponse reçue avant 18:29:02 UTC, heure exacte non relevée) : « Ok », sur la question du découpage.
+- **M5a** : les tests R1 à R8 du tableau ci-dessus, sans écriture dans Zot, pod d'essai de R7 compris.
+- **M5b** : le rejeu de zéro, jalon à part, pas avant le 28/11, avec sa propre carte, qui tranche la dette des images d'essai.
+- Ce n'est un accord pour aucun lancement ni aucune écriture. `rejeu.sh` reste inchangé.
+
+**Lecture** : la question portait sur « M5a, maintenant : les tests R1 à R8, sans écriture dans Zot ». Je lis donc ce « Ok » comme valant aussi pour la liste des tests et pour le pod d'essai de R7. Les deux points annoncés « ensuite » ne sont pas reposés. Suite : préparation à sec de M5a sous l'accord permanent du 18/11 (script, banc, prédictions), puis chaque lancement selon ce même accord.
