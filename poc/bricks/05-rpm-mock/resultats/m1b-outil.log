@@ -1,0 +1,157 @@
+# m1b-outil.sh, début 2026-11-18T20:57:14Z
+liste épinglée : 199 rpm, sha256 c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f
+## 1. clés et repomd.xml
+OK   RPM-GPG-KEY-Rocky-9 : empreinte 21CB256AE16FC54C6E652949702D426D350D275D
+OK   RPM-GPG-KEY-EPEL-9 : empreinte FF8AD1344597106ECE813B918A3872BF3228467C
+baseos98 : repomd.xml sha256 abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163 ; copie du 18/11 (vault98-baseos98) : abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+OK   baseos98 : repomd.xml égal à la copie du 18/11
+OK   baseos98 : signature de repomd.xml valide (21CB256AE16FC54C6E652949702D426D350D275D)
+appstream98 : repomd.xml sha256 a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b ; copie du 18/11 (vault98-appstream98) : a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+OK   appstream98 : repomd.xml égal à la copie du 18/11
+OK   appstream98 : signature de repomd.xml valide (21CB256AE16FC54C6E652949702D426D350D275D)
+epel9 : repomd.xml sha256 e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61 ; copie du 18/11 (archive-9.8) : e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61
+OK   epel9 : repomd.xml égal à la copie du 18/11
+epel9 : repomd.xml non signé (instantané d'EPEL) ; ancre : sha256 de la copie du 18/11 et de la liste épinglée
+## 2. métadonnées et rpm du miroir partiel
+écarté primary_db -
+écarté filelists_db -
+écarté other_db -
+     baseos98 : primary, 45549029 octets, sha256 conforme
+     baseos98 : filelists, 3142076 octets, sha256 conforme
+     baseos98 : other, 4188483 octets, sha256 conforme
+     baseos98 : group, 289672 octets, sha256 conforme
+     baseos98 : group_xz, 55504 octets, sha256 conforme
+     baseos98 : updateinfo, 703963 octets, sha256 conforme
+OK   baseos98 : 6 fichier(s) de métadonnées, 53928727 octets, sha256 conformes à repomd.xml
+écarté primary_db -
+écarté filelists_db -
+écarté other_db -
+     appstream98 : primary, 2700960 octets, sha256 conforme
+     appstream98 : filelists, 27736973 octets, sha256 conforme
+     appstream98 : other, 3040878 octets, sha256 conforme
+     appstream98 : group, 539964 octets, sha256 conforme
+     appstream98 : group_xz, 89984 octets, sha256 conforme
+     appstream98 : modules, 15640 octets, sha256 conforme
+     appstream98 : updateinfo, 1968043 octets, sha256 conforme
+OK   appstream98 : 7 fichier(s) de métadonnées, 36092442 octets, sha256 conformes à repomd.xml
+écarté primary_db -
+écarté filelists_db -
+écarté other_db -
+     epel9 : primary, 4565620 octets, sha256 conforme
+     epel9 : filelists, 14623676 octets, sha256 conforme
+     epel9 : other, 1982292 octets, sha256 conforme
+     epel9 : group, 30404 octets, sha256 conforme
+     epel9 : updateinfo, 2026129 octets, sha256 conforme
+OK   epel9 : 5 fichier(s) de métadonnées, 23228121 octets, sha256 conformes à repomd.xml
+OK   199 rpm de la liste trouvés dans les primary, même sha256 : 199
+OK   rpm téléchargés, sha256 égal à la liste et au primary : 199, 113665783 octets
+## 3. racine d'outils, signatures et borne S
+OK   couche e48fc4d689daa5ec7af47350d996f93d76a138ff7267aed6972feefe3e4526bd : sha256 égal à son nom
+OK   couche fd00cdb1ac39ed07d03836b05bd7c24cf435e68a2b29d63403e5dfc4610ac157 : sha256 égal à son nom
+outils : RPM version 4.16.1.3 ; dnf 4.14.0
+rpm -K : 199 « digests signatures OK » sur 199
+plus grand BUILDTIME E = 1793913216 (2026-11-05T21:13:36Z) ; plus grande FILEMTIMES F = 1793914619 (2026-11-05T21:36:59Z)
+S = 1793914619 (2026-11-05T21:36:59Z) ; porteur de F : glibc-common-2.34-284.el9_8.4.x86_64 
+## 4. installations
+dnf.conf : sha256 d554fb1ce168663fbfbfaffa175056f049506a2fa33675acb63dedf2969d03cc
+## installation 5, début 2026-11-18T20:58:10Z
+dnf code 0 ; 883 lignes de journal
+lignes « scriptlet », « warning » ou « error » (casse ignorée) : 29
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+## installation 5, fin 2026-11-18T20:58:34Z
+## installation 6, début 2026-11-18T20:58:39Z
+dnf code 0 ; 883 lignes de journal
+lignes « scriptlet », « warning » ou « error » (casse ignorée) : 29
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+## installation 6, fin 2026-11-18T20:59:03Z
+## installation 7, début 2026-11-18T20:59:08Z
+dnf code 0 ; 854 lignes de journal
+lignes « scriptlet », « warning » ou « error » (casse ignorée) : 29
+      distribution-gpg-keys          noarch  1.123-1.el9                   @commandline  773 k
+      keyutils                       x86_64  1.6.3-1.el9                   @commandline   72 k
+      keyutils-libs                  x86_64  1.6.3-1.el9                   @commandline   31 k
+      python3-hawkey                 x86_64  0.69.0-18.el9.rocky.0.1       @commandline  101 k
+      rocky-gpg-keys                 noarch  9.8-1.2.el9                   @commandline   25 k
+       Installing       : rocky-gpg-keys-9.8-1.2.el9.noarch                    2/199 
+## installation 7, fin 2026-11-18T20:59:15Z
+référence : 199 NEVRA hors gpg-pubkey (base de racine.tar)
+i5 : 201 entrée(s), dont 2 gpg-pubkey ; NEVRA égaux à la référence : oui (en plus : 0, en moins : 0)
+     gpg-pubkey 3228467c-613798eb : INSTALLTIME S+0 ; INSTALLTID S+0
+     gpg-pubkey 350d275d-6279464b : INSTALLTIME S+0 ; INSTALLTID S+0
+     rpm : INSTALLTIME de S+0 à S+198, 199 valeur(s) ; INSTALLTID : S+0 (199)
+i6 : 201 entrée(s), dont 2 gpg-pubkey ; NEVRA égaux à la référence : oui (en plus : 0, en moins : 0)
+     gpg-pubkey 3228467c-613798eb : INSTALLTIME S+0 ; INSTALLTID S+0
+     gpg-pubkey 350d275d-6279464b : INSTALLTIME S+0 ; INSTALLTID S+0
+     rpm : INSTALLTIME de S+0 à S+198, 199 valeur(s) ; INSTALLTID : S+0 (199)
+i7 : 199 entrée(s), dont 0 gpg-pubkey ; NEVRA égaux à la référence : oui (en plus : 0, en moins : 0)
+     rpm : INSTALLTIME de S+0 à S+198, 199 valeur(s) ; INSTALLTID : S+0 (199)
+## 5. archives bornées à S
+i5 : cache de dnf dans la racine : /m/cache-5 /m/cache-5/expired_repos.json 
+i6 : cache de dnf dans la racine : /m/cache-6 /m/cache-6/expired_repos.json 
+i7 : cache de dnf dans la racine : /m/cache-7 /m/cache-7/expired_repos.json 
+a5.tar : 396861440 octets, sha256 babac0060652f499bda0e8134b7b51dcbfcf6c0f7567248c49df1764e9bf1827
+a6.tar : 396861440 octets, sha256 edb00b6d3ec08fe2ac9b34a02130914603ddfb84dd9c467d2a579dee2cd87f6a
+a5b.tar : 396861440 octets, sha256 babac0060652f499bda0e8134b7b51dcbfcf6c0f7567248c49df1764e9bf1827
+a7.tar : 396861440 octets, sha256 08bb1624087ae03738c47607b65281ea928e21994454fcda246d79373065f1c7
+## 5a. i5 et i6 (miroir, même variable)
+ÉCART a5.tar et a6.tar différents
+membres : 15866 et 15866
+seulement d'un côté : 0 ; présents des deux côtés et différents : 1
+     écart : ./etc/machine-id (sha256)
+champs en cause : sha256 1
+OK   témoin : a5.tar et a5b.tar identiques octet à octet
+## 5b. i5 et i7 (miroir contre fichiers locaux)
+membres : 15866 et 15866
+seulement d'un côté : 0 ; présents des deux côtés et différents : 2
+     écart : ./etc/machine-id (sha256)
+     écart : ./var/lib/rpm/rpmdb.sqlite (sha256)
+champs en cause : sha256 2
+## 5c. contenu seul : a5 contre racine.tar de S1 (sans mtime ni en-têtes pax)
+membres : a5 15866 ; racine.tar 13341
+seulement dans a5 : 2533 ; seulement dans racine.tar : 8 ; présents des deux côtés et différents : 6
+     seul dans a5 : ./usr/share/locale/aa
+     seul dans a5 : ./usr/share/locale/aa/LC_MESSAGES
+     seul dans a5 : ./usr/share/locale/ab
+     seul dans a5 : ./usr/share/locale/ab/LC_MESSAGES
+     seul dans a5 : ./usr/share/locale/ace
+     seul dans a5 : ./usr/share/locale/ace/LC_MESSAGES
+     seul dans a5 : ./usr/share/locale/ach
+     seul dans a5 : ./usr/share/locale/ach/LC_MESSAGES
+     seul dans a5 : ./usr/share/locale/ada
+     seul dans a5 : ./usr/share/locale/ada/LC_MESSAGES
+     seul dans a5 : ./usr/share/locale/ady
+     seul dans a5 : ./usr/share/locale/ady/LC_MESSAGES
+     seul dans a5 : ./usr/share/locale/ae
+     seul dans a5 : ./usr/share/locale/ae/LC_MESSAGES
+     seul dans a5 : ./usr/share/locale/af
+     seul dans a5 : ./usr/share/locale/af/LC_MESSAGES
+     seul dans a5 : ./usr/share/locale/af/LC_MESSAGES/Linux-PAM.mo
+     seul dans a5 : ./usr/share/locale/af/LC_MESSAGES/bash.mo
+     seul dans a5 : ./usr/share/locale/af/LC_MESSAGES/coreutils.mo
+     seul dans a5 : ./usr/share/locale/af/LC_MESSAGES/glib20.mo
+     seul dans racine.tar : ./var/cache/ldconfig/aux-cache
+     seul dans racine.tar : ./var/lib/dnf/history.sqlite
+     seul dans racine.tar : ./var/lib/dnf/history.sqlite-shm
+     seul dans racine.tar : ./var/lib/dnf/history.sqlite-wal
+     seul dans racine.tar : ./var/log/dnf.librepo.log
+     seul dans racine.tar : ./var/log/dnf.log
+     seul dans racine.tar : ./var/log/dnf.rpm.log
+     seul dans racine.tar : ./var/log/hawkey.log
+     écart : ./etc/machine-id (sha256)
+     écart : ./etc/pki/ca-trust/extracted/java/cacerts (sha256)
+     écart : ./etc/shadow (sha256)
+     écart : ./etc/shadow- (sha256)
+     écart : ./var/lib/dnf (mode)
+     écart : ./var/lib/rpm/rpmdb.sqlite (sha256)
+champs en cause : mode 1, sha256 5
+# fin 2026-11-18T20:59:22Z

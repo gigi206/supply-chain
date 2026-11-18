@@ -577,3 +577,34 @@ Journal : [`m1b-outil-1.log`](m1b-outil-1.log). **Le passage s'arrête à la pre
 - Le porteur s'écrit `%{=NEVRA}`.
 
 **Effet sur les prédictions** : O1 à O9 sont inchangées, et O1 à O3 seront relues au passage corrigé. Le troisième banc tournait sans `/proc`, et les scriptlets peuvent s'y comporter autrement : la comparaison avec lui n'est donc pas directe. Le pod Kata de la future tâche a `/proc`.
+
+### Résultat du banc de l'outillage, passage corrigé du 18/11/2026, de 20:57:14 à 20:59:22 UTC, code 0 (note écrite à 2026-11-18T21:01:09Z)
+
+Journal : [`m1b-outil.log`](m1b-outil.log). Les adresses e-mail de la clé de Rocky, affichées par dnf, en ont été retirées après le passage. Analyse des écarts : [`m1b-outil-analyse.sh`](m1b-outil-analyse.sh), [journal](m1b-outil-analyse.log). Arbres et archives : `~/.cache/supply-chain-poc/05/m1b-outil-20261118T205714Z`, laissés en place.
+- **Erreur dans l'analyse** : son premier lancement visait un dossier deviné (`…205713Z`) au lieu du dossier réel (`…205714Z`), et s'est arrêté sur « banc absent ». Le chemin a été corrigé, puis l'analyse relancée.
+
+**Tenues : O1 à O6.**
+- **O1** : les trois `repomd.xml` sont égaux aux copies du 18/11, et ceux de vault sont signés par la clé de Rocky. **L'instantané `archive/epel/9.8` n'a pas bougé** (`e86fdcd8…`) : c'est sa relecture.
+- **O2** : les métadonnées ont le sha256 de `repomd.xml`. Les 199 rpm (113 665 783 octets) ont le sha256 de la liste et des primary, et `rpm -K` donne 199 « digests signatures OK ».
+- **O3** : S vaut 1793914619. Il est porté par glibc-common 2.34-284.el9_8.4.
+- **O4** : i5 et i6 ont chacune 201 entrées : les 199 NEVRA de `racine.tar` et les 2 gpg-pubkey. Le miroir partiel et l'instantané d'EPEL résolvent donc les mêmes paquets que S1.
+- **O5** : les 199 rpm ont un INSTALLTID égal à S, et des INSTALLTIME de S à S + 198.
+- **O6** : les 2 gpg-pubkey ont un INSTALLTIME et un INSTALLTID égaux à S.
+
+**Non tenues : O7, O8 (en partie) et O9.**
+- **O7** : `a5.tar` et `a6.tar` diffèrent (`babac006…` et `edb00b6d…`), alors que le témoin `a5b.tar` est égal à `a5.tar`. **Un seul membre diffère, `etc/machine-id`.** Il fait 33 octets, avec un contenu différent dans chaque installation (i5, i6, i7) et dans `racine.tar`. Les journaux de dnf ne citent pas machine-id : le scriptlet qui l'écrit n'est pas identifié. Le troisième banc tournait sans `/proc` ; cet écart n'y apparaissait pas, et la cause de cette différence n'est pas mesurée.
+- **O8** : i7 rend 0, avec 199 entrées et aucune gpg-pubkey (tenu). Mais `a7.tar` diffère de `a5.tar` par `etc/machine-id` en plus de `rpmdb.sqlite` (non tenu).
+- **O9** : les 8 membres propres à `racine.tar` sont bien les fichiers exclus (tenu). Mais `a5.tar` a 2 533 membres de plus, presque tous sous `usr/share/locale` : 2 567 membres et 1 157 fichiers `.mo`, contre 34 et 7 dans `racine.tar`. Six membres communs diffèrent :
+  - `etc/machine-id` ;
+  - le `cacerts` de Java ;
+  - `rpmdb.sqlite` ;
+  - `etc/shadow` et `etc/shadow-` : le troisième champ de 2 lignes vaut 20762, le jour de S, dans le banc, et 20774, le 17/11/2026, dans `racine.tar` ;
+  - le mode de `var/lib/dnf` : 0775 dans le banc, 0755 dans `racine.tar`.
+
+**Lecture**, sans conclusion au-delà de la mesure :
+1. **machine-id** : c'est le seul écart entre deux installations du banc. Il faut le neutraliser (par exemple, le vider), ce qui n'est pas mesuré. À ce membre près, deux installations de l'outillage donnent la même archive.
+2. **Les outils comptent.** La racine d'outils de `99790c13` n'a aucune macro `%_install_langs` ni `override_install_langs`. Elle installe donc toutes les langues, alors que l'installation de S1, faite par le dnf de l'amorce `ed654c69`, n'en a gardé que peu. La configuration de l'amorce n'est pas lue, car elle n'est pas en local. C'est l'angle mort « rpm et dnf de l'amorce », désormais visible.
+3. **umask** : le mode 0775 de `var/lib/dnf` suggère que le umask des commandes de l’hôte (0002, lu après le passage) est passé dans le banc ; le lien n’est pas mesuré. La tâche devra fixer son umask.
+4. **shadow** : SOURCE_DATE_EPOCH fixe aussi le jour du dernier changement. Sans la variable, ce champ vaut le jour de l'installation.
+
+**Conséquence** : le point 1 A n'est pas neutralisable sur le banc pour l'outillage, à cause de machine-id. Il n'est pas établi non plus. Restent : machine-id, les outils de l'amorce (langues, umask), un autre jour et le bootstrap.

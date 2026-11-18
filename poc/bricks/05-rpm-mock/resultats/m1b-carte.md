@@ -144,3 +144,12 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Bootstrap** : 153 entrées. 143 viennent de l'image `rockylinux:9.7` (23/11/2025) et 10 de la transaction des dix lignes (17/11/2026). Son S vaut 1766985142 (29/12/2025).
 - **Détail** : [prédictions et résultat](m1b-predictions.md), [journal](m1b-listes.log).
 - **Reste** : relire l'instantané `archive/epel/9.8`, puis faire le banc de l'outillage, qui demande de télécharger les 199 rpm.
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T21:01:09Z UTC : banc de l'outillage
+
+- **Relecture d'EPEL** : l'instantané `archive/epel/9.8` n'a pas bougé depuis le relevé du 18/11 (`repomd.xml` `e86fdcd8…`).
+- **Miroir partiel** : il est vérifié (199 rpm, sha256 et `rpm -K`), et il résout les 199 paquets de S1.
+- **Reproductibilité** : deux installations sous SOURCE_DATE_EPOCH ne diffèrent que par `etc/machine-id`, aléatoire.
+- **Écart avec S1** : le banc garde toutes les langues, contre très peu dans S1, et `var/lib/dnf` y a le mode 0775 au lieu de 0755. Les outils de l'amorce comptent donc.
+- **Détail** : [prédictions et résultat](m1b-predictions.md), [journal](m1b-outil.log), [analyse](m1b-outil-analyse.log).
+- **Ce n'est pas un accord** pour une écriture dans le cluster ni dans Zot.
