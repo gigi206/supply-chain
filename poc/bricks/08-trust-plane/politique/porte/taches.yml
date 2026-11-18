@@ -74,3 +74,13 @@ trusted_tasks:
   # trigger
   oci://sc-stockage.poc.test:5000/tekton/tasks/construire-deb:
     - ref: sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+  # Brique 05, M4b (signée le 18/11/2026 entre 09:57:50 et 09:57:52 UTC, chrono.tsv ; accord permanent du 18/11) :
+  # 05-rpm-mock/fermeture/prefetch-rpm.signee.yaml, pod runc restreint (UID 65532, runAsNonRoot, capacités retirées, sans
+  # élévation) sans aucun secret, 2 CPU et 2 Gi ; image d'outillage de M3 par digest (essais-05/mock-rocky9@99790c13,
+  # « Option 1 ») ; sortie limitée par la CiliumNetworkPolicy prefetch-rpm-sortie (DNS, adresses publiques en 443, Zot).
+  # Télécharge les 222 rpm du buildroot depuis vault 9.7 selon la liste fixée par la pipeline (sha256 et taille de chaque rpm,
+  # rpm -K contre la clé de Rocky d'empreinte fixée), recalcule repodata (repomd.xml comparé à la valeur attendue) et copie
+  # l'image de bootstrap par digest ; résultat BOOTSTRAP_ARTIFACT_INPUTS pour Chains. Contenu signé relu avant versionnement :
+  # script substitué égal à celui joué dans le pod d'essai (sha256 572fb78c)
+  oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm:
+    - ref: sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
