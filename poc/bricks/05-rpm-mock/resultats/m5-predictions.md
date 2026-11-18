@@ -123,3 +123,17 @@ Suite : écrire les étapes `temoin`, `alterer`, `fermeture`, `reseau`, `sans_ka
 **Durées** (non exigées) : `preparer` et `alterer`, quelques minutes ; `fermeture`, de l'ordre de 15 à 30 min (trois mock complets au plus, intacte, R4 et R6) ; `reseau`, deux mock hermétiques.
 
 **Après le passage** : une prédiction non tenue est lue dans le journal avant toute correction. Une acceptation de R4, de R6 ou du bras a de R7 est un constat que je remonte, sans modifier de tâche signée.
+
+## Note datée du 18/11/2026, écrite à 18:49:02 UTC : premier passage de `preparer` arrêté par mon attendu ; étape `preparer_relu` ajoutée
+
+**Passage** : 18:48:14 à 18:48:27 UTC, code 1 ([journal](m5-preparer.log)) ; `alterer` n'a pas tourné.
+- **Créés dans le cluster** : PVC `m5-entrees` et TaskRun `m5-preparer`, qui a réussi (`True|Succeeded`, pod au label `preparer-rpm`, sans Kata). Il a tiré 230 fichiers de fermeture rpm, 8 de fermeture applicative et 2 de packaging, et `go mod verify` a donné « all modules verified ».
+- 5 OK, puis un KO **de mon attendu** : Tekton rend le résultat objet `FERMETURE_RPM_ARTIFACT_INPUTS` en JSON indenté, et je le comparais à une chaîne compacte. Ses deux valeurs, uri et digest `2a9e2ea7…`, sont celles attendues ; elles sont imprimées dans le journal.
+- Les deux autres résultats objets n'ont pas été contrôlés.
+
+**Correction** (`m5.sh` = `141c811a…`) :
+- comparaison des résultats objets en JSON trié des deux côtés ;
+- contrôles regroupés dans `verifier_preparer` ;
+- étape **`preparer_relu`**, en lecture seule : elle relit le TaskRun existant et refait tous ses contrôles, sans rien recréer (garde d'absence).
+
+PP1 sera jugée sur `preparer_relu`. Suite : `preparer_relu`, puis `alterer`.

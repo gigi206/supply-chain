@@ -341,7 +341,7 @@ EOF
 }
 
 etape_preparer() { # PVC $N-entrees, puis TaskRun isolé de preparer-rpm (runc) qui remplit entrees/ ; résultats relus
-  local n=$N-preparer s a
+  local n=$N-preparer s
   rendre_tout
   attendu "enveloppes valides sur l'artefact de M4c (avant)" "$(enveloppes)" 4
   creer "$T/pvc-$N-entrees.json" pvc "$N-entrees"
@@ -349,13 +349,23 @@ etape_preparer() { # PVC $N-entrees, puis TaskRun isolé de preparer-rpm (runc) 
   s=$(tr_attendre "$n")
   echo "pod : $(tr_pod "$n") ; journal : $(wc -l < "$T/$n.log") lignes"
   grep -v '^paquet ' "$T/$n.log" | tail -n 12 | cut -c1-220 | sed 's/^/     /'
-  attendu "TaskRun $n" "$s" "True|Succeeded"
+  verifier_preparer "$s"
+}
+etape_preparer_relu() { # lecture seule (ajoutée le 18/11/2026 après le premier passage de preparer) : TaskRun $N-preparer relu
+  local n=$N-preparer
+  present taskrun "$n" || echec "lancer d'abord preparer"
+  kubectl get taskrun -n builds "$n" -o json < /dev/null > "$T/$n.tr.json"
+  verifier_preparer "$(jq -r '.status.conditions[] | select(.type == "Succeeded") | "\(.status)|\(.reason)"' "$T/$n.tr.json")"
+}
+verifier_preparer() { # statut : contrôles de $N-preparer ($T/<nom>.tr.json, $T/<nom>.pod.json) ; résultats objets en JSON trié
+  local n=$N-preparer a
+  attendu "TaskRun $n" "$1" "True|Succeeded"
   attendu "pod de $n : label de tâche, runtimeClassName" "$(tr_pod "$n" | cut -d'|' -f1,3)" "$LABEL_PREPARER|-"
   attendu "résultat CHAINS-GIT_URL" "$(tr_resultat "$n" CHAINS-GIT_URL)" "$DEPOT_GIT"
   attendu "résultat CHAINS-GIT_COMMIT" "$(tr_resultat "$n" CHAINS-GIT_COMMIT)" "$COMMIT"
   for a in "FERMETURE_RPM $FERMETURE_RPM" "FERMETURE_SOURCES $FERMETURE_SOURCES" "PACKAGING $PACKAGING"; do
     set -- $a
-    attendu "résultat $1_ARTIFACT_INPUTS" "$(tr_resultat "$n" "$1_ARTIFACT_INPUTS")" "{\"uri\":\"oci://${2%@*}\",\"digest\":\"${2#*@}\"}"
+    attendu "résultat $1_ARTIFACT_INPUTS (JSON trié)" "$(tr_resultat "$n" "$1_ARTIFACT_INPUTS" | jq -cS .)" "$(jq -cnS --arg u "oci://${2%@*}" --arg d "${2#*@}" '{uri: $u, digest: $d}')"   # correction du 18/11 : résultat objet
   done
   echo "relevé : annotation de Chains sur $n : $(kubectl get taskrun -n builds "$n" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}' < /dev/null)"
 }

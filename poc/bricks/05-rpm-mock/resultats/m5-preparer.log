@@ -1,0 +1,24 @@
+# m5.sh preparer, 2026-11-18T18:48:14Z
+OK   enveloppes valides sur l'artefact de M4c (avant) : 4
+pvc m5-entrees créé à 18:48:15
+taskrun m5-preparer créé à 18:48:15
+TaskRun m5-preparer terminé à 18:48:27
+pod : preparer-rpm|sc-build|- ; journal : 10 lignes
+     2026/11/18 18:48:21 Entrypoint initialization
+     2026/11/18 18:48:21 Decoded script /tekton/scripts/script-0-q6hlk
+     2026/11/18 18:48:21 Decoded script /tekton/scripts/script-1-7bqqk
+     2026/11/18 18:48:21 Decoded script /tekton/scripts/script-2-lr5k6
+     git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     fermeture rpm : 230 fichiers ; fermeture applicative : 8 fichiers ; packaging : 2 fichiers
+     all modules verified
+     go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+     entrées prêtes : src (41 fichiers), fermeture rpm (230 fichiers), spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6, verrou b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   TaskRun m5-preparer : True|Succeeded
+OK   pod de m5-preparer : label de tâche, runtimeClassName : preparer-rpm|-
+OK   résultat CHAINS-GIT_URL : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+OK   résultat CHAINS-GIT_COMMIT : 6391fd437f26696847041be3226bbbf633f55a2f
+KO   résultat FERMETURE_RPM_ARTIFACT_INPUTS : {
+  "digest": "sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c",
+  "uri": "oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm"
+} (attendu : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm","digest":"sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c"})
