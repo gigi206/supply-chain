@@ -748,3 +748,11 @@ Journal : [`m1b-outil-amorce.log`](m1b-outil-amorce.log). Modes de `var/lib/dnf`
 
 **Prédiction :**
 - **AB1** : les sha256 des deux archives sont égaux à ceux de leurs journaux, et les archives diffèrent octet à octet. Aucun membre n'est d'un seul côté. Un seul membre commun diffère : `var/lib/dnf`, par son mode. Confiance moyenne : la base rpm (versions de rpm des deux racines d'outils) et `container=oci` (absent du banc de 20:57:14 UTC) peuvent ajouter des écarts.
+
+### Résultat de la comparaison `a10` contre `b5`, 18/11/2026, de 21:30:16 à 21:30:19 UTC, code 0 (note écrite à 2026-11-18T21:30:46Z UTC)
+
+Journal : [`m1b-a10-b5.log`](m1b-a10-b5.log).
+
+**AB1 tenue.** Les deux archives ont le sha256 de leur journal et diffèrent octet à octet. Elles ont les mêmes 15 865 membres, dont 2 567 sous `usr/share/locale`. Un seul membre commun diffère : `var/lib/dnf`, par son mode.
+
+**Lecture** : sur le banc, une fois la macro de langue masquée et à umask près, les outils de l'amorce et ceux de `99790c13` donnent le même contenu d'archive. Les deux écarts du banc de 20:57:14 UTC avec `racine.tar` (langues et mode de `var/lib/dnf`) viennent donc, sur le banc, de la macro `macros.image-language-conf` et du umask, pas du reste des outils. `container=oci` n'a rien changé au contenu. Le pod Kata n'est pas mesuré, et le point 1 A reste non établi.

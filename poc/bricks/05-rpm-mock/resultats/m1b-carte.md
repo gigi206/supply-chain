@@ -184,3 +184,9 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Témoins** : macro de langue masquée → 2 567 membres de langues ; umask 0002 → `var/lib/dnf` en 0775, rien d'autre.
 - **Reste** : un autre jour, machine-id (vide ou absent), bootstrap, pod Kata. Point 1 A non établi.
 - **Détail** : [résultat](m1b-predictions.md), [journal](m1b-outil-amorce.log).
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T21:30:46Z UTC : a10 contre b5, et corrections
+
+- **a10 contre b5** (AB1 tenue) : macro de langue masquée et umask mis à part, les outils de l'amorce et ceux de `99790c13` donnent, sur le banc, le même contenu ; seul le mode de `var/lib/dnf` diffère.
+- **Valeurs à retenir** : `en_US` et umask 022 sont les valeurs de S1 ; les garder pour la tâche est un choix de la carte, non mesuré dans le pod Kata.
+- **Autre jour** : relancer `m1b-outil-amorce.sh` (référence `06c289ad…`) et les scripts de `05d35d64…`, inchangés.

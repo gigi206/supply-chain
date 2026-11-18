@@ -1,0 +1,11 @@
+# m1b-a10-b5.sh, début 2026-11-18T21:30:16Z
+OK   a10 : 396861440 octets, sha256 égal au journal de son passage
+OK   b5 : 396861440 octets, sha256 égal au journal de son passage
+a10 et b5 différents octet à octet
+membres : a10 15865 ; b5 15865
+a10 : 2567 membres sous usr/share/locale, dont 1157 fichiers .mo
+b5 : 2567 membres sous usr/share/locale, dont 1157 fichiers .mo
+seulement dans a10 : 0 ; seulement dans b5 : 0 ; présents des deux côtés et différents : 1
+     écart : ./var/lib/dnf (mode)
+champs en cause : mode 1
+# fin 2026-11-18T21:30:19Z
