@@ -1,0 +1,34 @@
+# m1b-listes.sh, début 2026-11-18T20:49:44Z
+## 1. archives
+racine.tar : 361758720 octets, sha256 d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+OK   racine.tar conforme au journal de S1 (361758720 octets, d7433a05…)
+boot-racine.tar : 258129920 octets, sha256 8ae17f92b27377fff20009d0a88740b1bf9045d533f0506949d6e209c970f1f2
+OK   boot-racine.tar conforme au journal de S1 (258129920 octets, 8ae17f92…)
+## 2. extraction de ./var/lib/rpm
+OK   couche e48fc4d689daa5ec7af47350d996f93d76a138ff7267aed6972feefe3e4526bd : sha256 égal à son nom
+OK   couche fd00cdb1ac39ed07d03836b05bd7c24cf435e68a2b29d63403e5dfc4610ac157 : sha256 égal à son nom
+rpm de la racine d'outils : RPM version 4.16.1.3
+racine.tar : 4 fichier(s) extrait(s) sous var/lib/rpm : ./.rpm.lock ./rpmdb.sqlite ./rpmdb.sqlite-shm ./rpmdb.sqlite-wal 
+boot-racine.tar : 4 fichier(s) extrait(s) sous var/lib/rpm : ./.rpm.lock ./rpmdb.sqlite ./rpmdb.sqlite-shm ./rpmdb.sqlite-wal 
+## 3. relevés des deux bases
+outillage : 201 entrée(s) ; stderr 0 ligne(s)
+bootstrap : 153 entrée(s) ; stderr 0 ligne(s)
+## 4. rapprochements et bornes
+lignes « rpm » de s1-racine.log : 199 ; par dépôt : {'appstream98': 21, 'baseos98': 169, 'epel9': 9}
+### outillage : 201 entrée(s), dont 2 gpg-pubkey
+  gpg-pubkey 3228467c-613798eb ; INSTALLTIME 2026-11-17T08:45:19Z ; INSTALLTID 1794905119
+  gpg-pubkey 350d275d-6279464b ; INSTALLTIME 2026-11-17T08:45:19Z ; INSTALLTID 1794905119
+  plus grand BUILDTIME 1793913216 (2026-11-05T21:13:36Z) ; plus grande FILEMTIMES 1793914619 (2026-11-05T21:36:59Z) ; S = 1793914619 (2026-11-05T21:36:59Z)
+  INSTALLTID distincts : 2
+    INSTALLTID 1794905119 (2026-11-17T08:45:19Z) : 2 entrée(s) ; INSTALLTIME de 2026-11-17T08:45:19Z à 2026-11-17T08:45:19Z, 1 valeur(s) distincte(s)
+    INSTALLTID 1794905129 (2026-11-17T08:45:29Z) : 199 entrée(s) ; INSTALLTIME de 2026-11-17T08:45:30Z à 2026-11-17T09:48:36Z, 22 valeur(s) distincte(s)
+  entrées rapprochées d'une ligne : 199 ; entrées sans ligne : 0 ; lignes sans entrée : 0
+  liste écrite : m1b-listes-outillage.txt, 199 ligne(s)
+### bootstrap : 153 entrée(s), dont 1 gpg-pubkey
+  gpg-pubkey 350d275d-6279464b ; INSTALLTIME 2025-11-23T18:17:59Z ; INSTALLTID 1763921879
+  plus grand BUILDTIME 1766985105 (2025-12-29T05:11:45Z) ; plus grande FILEMTIMES 1766985142 (2025-12-29T05:12:22Z) ; S = 1766985142 (2025-12-29T05:12:22Z)
+  INSTALLTID distincts : 3
+    INSTALLTID 1763921869 (2025-11-23T18:17:49Z) : 142 entrée(s) ; INSTALLTIME de 2025-11-23T18:17:50Z à 2025-11-23T18:17:54Z, 5 valeur(s) distincte(s)
+    INSTALLTID 1763921879 (2025-11-23T18:17:59Z) : 1 entrée(s) ; INSTALLTIME de 2025-11-23T18:17:59Z à 2025-11-23T18:17:59Z, 1 valeur(s) distincte(s)
+    INSTALLTID 1794925947 (2026-11-17T14:32:27Z) : 10 entrée(s) ; INSTALLTIME de 2026-11-17T14:32:27Z à 2026-11-17T14:35:38Z, 2 valeur(s) distincte(s)
+# fin 2026-11-18T20:49:47Z

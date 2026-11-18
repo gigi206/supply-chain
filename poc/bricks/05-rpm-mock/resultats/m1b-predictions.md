@@ -504,3 +504,26 @@ Journal : [`m1b-dnf-conditions.log`](m1b-dnf-conditions.log).
 - Si L2 n'est pas tenue, la liste écrite ne garde que les entrées rapprochées, et l'écart est consigné.
 - Rien n'est épinglé avant la relecture de l'instantané `archive/epel/9.8`.
 - Le banc de l'outillage, qui télécharge les 199 rpm, aura ses propres prédictions.
+
+### Résultat des listes, du 18/11/2026, de 20:49:44 à 20:49:47 UTC, code 0 (note écrite à 2026-11-18T20:50:47Z)
+
+Journal : [`m1b-listes.log`](m1b-listes.log). Liste épinglée : [`m1b-listes-outillage.txt`](m1b-listes-outillage.txt) (199 lignes : dépôt, fichier, sha256). Les copies des bases sont dans `~/.cache/supply-chain-poc/05/m1b-listes-20261118T204944Z`.
+
+**Les six prédictions sont tenues.**
+- **L1** : les deux archives ont la taille et le sha256 du journal de S1.
+- **L2** : la base de l'outillage a 201 entrées. Les 199 rpm se rapprochent un à un des lignes de `s1-racine.log` : 169 de baseos98, 21 d'appstream98 et 9 d'epel9. Les 2 autres sont des gpg-pubkey, `350d275d` (Rocky 9) et `3228467c` (EPEL 9). Aucune entrée sans ligne, aucune ligne sans entrée.
+- **L3** : les 199 rpm ont un seul INSTALLTID (17/11/2026, 08:45:29 UTC) et 22 valeurs d'INSTALLTIME, de 08:45:30 à 09:48:36 UTC. Les deux gpg-pubkey ont leur propre INSTALLTID, 10 s plus tôt (08:45:19 UTC).
+- **L4** : le S de l'outillage vaut 1793914619, soit le 5/11/2026 à 21:36:59 UTC (plus grande FILEMTIMES ; plus grand BUILDTIME le même jour à 21:13:36). Il diffère de celui du buildroot. Le paquet qui le porte n'est pas lu.
+- **L5** : la base du bootstrap a 153 entrées et 3 INSTALLTID :
+  - 142 entrées le 23/11/2025 à 18:17:49 UTC, l'image `rockylinux:9.7` ;
+  - la seule gpg-pubkey (`350d275d`), 10 s plus tard, dans la même image ;
+  - 10 entrées le 17/11/2026 à 14:32:27 UTC, les dix lignes, avec 2 valeurs d'INSTALLTIME.
+
+  Son S vaut 1766985142 (29/12/2025, 05:12:22 UTC). Il est postérieur à l'image : il vient donc des dix lignes.
+- **L6** : rpm n'écrit rien sur stderr.
+
+**Ce que cela change pour le banc de l'outillage** :
+- Les gpg-pubkey entrent dans la base, avec leur propre INSTALLTID. Le troisième banc n'en avait aucune ; il faudra mesurer si SOURCE_DATE_EPOCH les fixe aussi.
+- Le bootstrap mêle deux époques : 143 entrées figées par l'image et 10 posées le jour de l'installation. Une reproduction devra au moins fixer ces 10.
+
+**Inchangé** : rien n'est épinglé avant la relecture de l'instantané `archive/epel/9.8`. Les 9 rpm d'EPEL de la liste viennent du dépôt EPEL 9 vivant du 17/11 ; `m1b-sources.log` les a trouvés dans l'instantané, 9 sur 9, avec le même fichier et le même sha256 (relevé du 18/11, `repomd.xml` `e86fdcd8…`, non signé).

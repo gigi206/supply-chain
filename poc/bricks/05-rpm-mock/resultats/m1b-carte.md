@@ -137,3 +137,10 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Consigné** : ligne au §3 de docs/04 et plan de sortie au §6, ce dernier marqué « non mesuré ».
 - **Conséquence** : dnf n'est plus suspendu dans M1b. La relance du troisième banc, à partir du 19/11, et le banc du bootstrap reprennent.
 - **Ce n'est pas un accord** pour une écriture dans le cluster ni dans Zot.
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T20:50:47Z UTC : listes complètes retirées des deux racines archivées
+
+- **Outillage** : 199 rpm et 2 gpg-pubkey (Rocky 9 et EPEL 9). La liste est épinglée par dépôt, fichier et sha256 dans [`m1b-listes-outillage.txt`](m1b-listes-outillage.txt). Son S vaut 1793914619 (5/11/2026).
+- **Bootstrap** : 153 entrées. 143 viennent de l'image `rockylinux:9.7` (23/11/2025) et 10 de la transaction des dix lignes (17/11/2026). Son S vaut 1766985142 (29/12/2025).
+- **Détail** : [prédictions et résultat](m1b-predictions.md), [journal](m1b-listes.log).
+- **Reste** : relire l'instantané `archive/epel/9.8`, puis faire le banc de l'outillage, qui demande de télécharger les 199 rpm.
