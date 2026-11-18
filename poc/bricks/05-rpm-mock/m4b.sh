@@ -58,6 +58,14 @@
 #               résultats ; digest relevé à côté du digest calculé à sec (resultats/m4b-rpm-digest.log), sans en dépendre.
 #               Écritures définitives dans Zot (builds/fermetures/sample-app-rpm, attestations de Chains) ; PipelineRuns et
 #               PVC laissés dans builds pour l'étape provenance.
+#   comparaison ajoutée le 18/11/2026 (préparée à sec, accord permanent du 18/11), NON LANCÉE ; lecture seule (Zot en lecture
+#               anonyme, PipelineRuns relus) : arbre de final et liste contrôlés par sha256 ; IMAGE_DIGEST des deux PipelineRuns
+#               relu (relevé : le tirage n'en dépend pas, il prend le digest épinglé FERMETURE_RPM) ; manifeste relu, liste de ses
+#               couches confrontée à l'arbre de final (relevé, redit l'égalité des digests de rpm) ; fermeture tirée une fois par
+#               digest dans un dossier neuf ; confronter (hors ligne, jouée au banc) : chaque fichier tiré, chemin, taille et sha256
+#               recalculé, contre l'arbre de final préfixé par depot/, les deux côtés retriés sur l'hôte ; écarts imprimés avant les
+#               assertions ; puis 222 rpm égaux à la liste, repomd.xml égal à l'attendu, image de bootstrap (manifest.json égal au
+#               digest du verrou, blobs nommés par leur sha256). Dossier tiré laissé sous $T/comparaison.
 # Usage (racine du dépôt) : DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/m4b.sh <étape>…
 # (journal : resultats/m4b-<étape>.log)
 set -euo pipefail
@@ -794,6 +802,70 @@ etape_rpm() {
     echo "/ de sc-stockage : $(libre_zot) octets libres à $(date -u +%H:%M:%S)"
   done
   attendu "deux exécutions, même fermeture" "$(cat "$T/rpm-2.digest")" "$(cat "$T/rpm-1.digest")"
+}
+
+FERMETURE_RPM=sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c   # rpm passée (resultats/m4b-rpm.log, 7e1e6a2)
+ARBRE_SHA=fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880   # resultats/m4b-final-arbre.txt (final, 312efce)
+arbre_de() { # dossier : « chemin taille sha256 » de chaque fichier, chemin relatif au dossier, trié sous LC_ALL=C
+  (cd "$1" && find . -type f -printf '%P %s\n' | sort | while read -r f s; do echo "$f $s $(sha256sum < "$f" | cut -c1-64)"; done)
+}
+confronter() { # dossier arbre-de-référence (relatif à depot/) travail : tout imprimé, puis assertions ; hors ligne (banc)
+  local x=$1 a=$3
+  sed 's|^|depot/|' "$2" | sort > "$a/arbre-ref.txt"
+  arbre_de "$x" > "$a/arbre-tire.txt"
+  find "$x" ! -type f ! -type d > "$a/autres.txt"
+  comm -3 "$a/arbre-tire.txt" "$a/arbre-ref.txt" > "$a/ecarts.txt"
+  echo "fichiers tirés : $(wc -l < "$a/arbre-tire.txt") (référence : $(wc -l < "$a/arbre-ref.txt")) ; octets, somme des fichiers : $(awk '{s += $2} END {print s + 0}' "$a/arbre-tire.txt") ; hors de depot/ : $(grep -vc '^depot/' "$a/arbre-tire.txt" || true) ; ni fichier ni dossier : $(wc -l < "$a/autres.txt")"
+  echo "écarts (comm -3 ; sans retrait : tiré seul ; avec retrait : référence seule) : $(wc -l < "$a/ecarts.txt"), 20 premiers :"
+  sed -n '1,20p' "$a/ecarts.txt" | cut -c1-200 | sed 's/^/     /'
+  attendu "fichiers tirés" "$(wc -l < "$a/arbre-tire.txt")" "$(wc -l < "$a/arbre-ref.txt")"
+  attendu "fichiers hors de depot/" "$(grep -vc '^depot/' "$a/arbre-tire.txt" || true)" 0
+  attendu "objets ni fichier ni dossier" "$(wc -l < "$a/autres.txt")" 0
+  attendu "arbre tiré égal à l'arbre de final préfixé par depot/ (sha256 des listes)" \
+    "$(sha256sum < "$a/arbre-tire.txt" | cut -c1-64)" "$(sha256sum < "$a/arbre-ref.txt" | cut -c1-64)"
+}
+etape_comparaison() { # lecture seule : fermeture tirée par digest (lecture anonyme) dans un dossier neuf, confrontée à l'arbre de final
+  local c=$T/comparaison i d src b t f
+  echo "## gardes"
+  attendu "arbre de final (sha256)" "$(sha256sum < "$ARBRE_REF" | cut -c1-64)" "$ARBRE_SHA"
+  attendu "arbre de final : fichiers" "$(wc -l < "$ARBRE_REF")" 230
+  attendu "liste des rpm (sha256)" "$(sha256sum < "$LISTE" | cut -c1-64)" "$LISTE_SHA"
+  attendu "verrou (sha256)" "$(sha256sum < "$VERROU_SRC" | cut -c1-64)" "$VERROU_SHA"
+  src=$(jq -r '.config.bootstrap_image' "$VERROU_SRC")
+  echo "## IMAGE_DIGEST relu sur les deux PipelineRuns (relevé ; le tirage prend le digest épinglé)"
+  for i in 1 2; do
+    d=$(kubectl get pipelinerun -n builds "m4b-rpm-$i" -o json < /dev/null | jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value')
+    attendu "IMAGE_DIGEST de m4b-rpm-$i" "$d" "$FERMETURE_RPM"
+  done
+  rm -rf -- "${c:?}"; mkdir -p "$c/tiree"
+  echo "## manifeste (relevé : redit l'égalité des digests mesurée à rpm)"
+  oras manifest fetch --ca-file "$P/ca-poc.crt" "${DEPOT_FERMETURE/$REG/$REG_HOTE}@$FERMETURE_RPM" < /dev/null > "$c/manifeste.json"
+  attendu "manifeste : sha256 des octets lus" "sha256:$(sha256sum < "$c/manifeste.json" | cut -c1-64)" "$FERMETURE_RPM"
+  echo "artifactType $(jq -r '.artifactType // "-"' "$c/manifeste.json") ; couches par type : $(jq -r '[.layers[].mediaType] | group_by(.) | map("\(.[0]) x\(length)") | join(", ")' "$c/manifeste.json")"
+  jq -r '.layers[] | "\(.annotations["org.opencontainers.image.title"] // "-") \(.size) \(.digest | sub("^sha256:"; ""))"' "$c/manifeste.json" | sort > "$c/manifeste-arbre.txt"
+  echo "couches : $(wc -l < "$c/manifeste-arbre.txt"), sans titre : $(grep -c '^- ' "$c/manifeste-arbre.txt" || true) ; égales à l'arbre de final préfixé : $(
+    [ "$(sha256sum < "$c/manifeste-arbre.txt")" = "$(sed 's|^|depot/|' "$ARBRE_REF" | sort | sha256sum)" ] && echo oui || echo non) (relevé, non exigé)"
+  echo "## tirage par digest, lecture anonyme, dossier neuf"
+  t=$(date +%s)
+  oras pull --no-tty --ca-file "$P/ca-poc.crt" -o "$c/tiree" "${DEPOT_FERMETURE/$REG/$REG_HOTE}@$FERMETURE_RPM" < /dev/null > "$c/pull.out" 2>&1 \
+    || { sed -n '1,5p' "$c/pull.out" >&2; echec "oras pull de la fermeture"; }
+  echo "tirée en $(($(date +%s) - t)) s ; du -sb : $(du -sb "$c/tiree" | cut -f1) octets (dossiers compris, relevé)"
+  echo "## confrontation à l'arbre de final"
+  confronter "$c/tiree" "$ARBRE_REF" "$c"
+  echo "## au-delà de l'arbre de final"
+  awk '{n = $1; sub(/.*\//, "", n); print "depot/" n, $3, $2}' "$LISTE" | sort > "$c/liste-rpm.txt"
+  grep -E '^depot/[^/]+\.rpm ' "$c/arbre-tire.txt" > "$c/tire-rpm.txt" || true
+  attendu "rpm tirés au premier niveau de depot/" "$(wc -l < "$c/tire-rpm.txt")" 222
+  attendu "rpm égaux à la liste (nom, taille, sha256)" "$(sha256sum < "$c/tire-rpm.txt" | cut -c1-64)" "$(sha256sum < "$c/liste-rpm.txt" | cut -c1-64)"
+  attendu "repomd.xml" "$(sha256sum < "$c/tiree/depot/repodata/repomd.xml" | cut -c1-64)" "$REPOMD_V2"
+  b=$(find "$c/tiree/depot" -mindepth 1 -maxdepth 1 -type d -name "*@${src#*@}")
+  attendu "dossier de l'image de bootstrap (${src#*@})" "$(grep -c . <<< "$b" || true)" 1
+  attendu "image de bootstrap : manifest.json" "sha256:$(sha256sum < "$b/manifest.json" | cut -c1-64)" "${src#*@}"
+  for f in "$b"/*; do
+    case ${f##*/} in manifest.json|version) continue ;; esac
+    attendu "image de bootstrap : blob ${f##*/} nommé par son sha256" "$(sha256sum < "$f" | cut -c1-64)" "${f##*/}"
+  done
+  echo "dossier tiré laissé : $c/tiree ($(du -sb "$c/tiree" | cut -f1) octets)"
 }
 
 lancer m4b "05 M4b" "$@"

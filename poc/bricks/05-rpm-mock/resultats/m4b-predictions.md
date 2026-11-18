@@ -838,3 +838,39 @@ La note de résultat dit, sous RP2, que la résolution et la vérification des d
 - La phrase de RP2 est désormais mesurée.
 - **ADR** : aucun additif pour cette étape. Les étapes de M4a et de M4b (`publier`, `final`, `taches`) n en ont pas reçu ; l additif de l ADR 0001 viendra quand M4b sera tenu.
 
+## Note datée du 18/11/2026, écrite à 12:29:13 UTC : étape `comparaison` préparée à sec et ajoutée à `m4b.sh` (accord permanent du 18/11), NON LANCÉE
+
+**Script.** `m4b.sh` passe de `38c39b3e…` à `af9f2961…`, par insertions seules : 8 lignes d'en-tête et un bloc avant `lancer`. Plan relu par le conseiller avant l'écriture.
+- L'étape est en lecture seule : Zot en lecture anonyme, PipelineRuns relus. Rien n'est écrit dans Zot ni dans le cluster.
+- **Gardes** : sha256 de l'arbre de `final` (`fc556539…`, 230 lignes), de la liste et du verrou.
+- **Digest tiré épinglé** dans le script (`FERMETURE_RPM`, valeur mesurée à `rpm`, [journal](m4b-rpm.log)), et non lu d'un cache. `IMAGE_DIGEST` des deux PipelineRuns est relu à côté ; le tirage n'en dépend pas.
+- **Manifeste** : relu, sha256 de ses octets égal au digest, liste des couches (titre, taille, digest) confrontée à l'arbre de `final`. C'est un **relevé** : cette égalité redit celle des digests, déjà mesurée à `rpm`, puisque le calcul à sec partait de cet arbre.
+- **La mesure neuve** : la fermeture est tirée une fois par digest dans un dossier neuf (`oras pull`, lecture anonyme). Chaque fichier tiré est relu (chemin, taille, sha256 recalculé). `confronter` compare cette liste à l'arbre de `final` préfixé par `depot/` :
+  - les deux côtés sont retriés sur l'hôte sous `LC_ALL=C` (l'arbre de référence a été trié dans le pod) ;
+  - les comptes et les écarts (`comm -3`, 20 premiers) sont imprimés avant toute assertion ;
+  - puis : autant de fichiers que la référence, aucun hors de `depot/`, aucun objet ni fichier ni dossier, listes égales.
+  - Un tirage suffit : les deux PipelineRuns ont le même digest. `oras pull` saute une couche sans titre : c'est le compte de fichiers qui le couvre, pas son code.
+- **Au-delà de l'arbre** : 222 rpm au premier niveau de `depot/`, égaux à la liste (nom, taille, sha256) ; `repomd.xml` égal à `239a5a71…` ; un seul dossier de l'image de bootstrap, `manifest.json` au digest du verrou (`f0ccf105…`), blobs nommés par leur sha256.
+- Dossier tiré laissé sous le dossier de travail de `m4b.sh` (`comparaison/tiree`).
+
+**Banc** ([script](m4b-comparaison-banc.sh), [journal](m4b-comparaison-banc.log)) : 38 OK, 0 KO.
+- A : insertions seules, deux blocs, noms neufs, `bash -n`, mêmes codes shellcheck avant et après.
+- B : les vraies fonctions `attendu`, `echec`, `arbre_de` et `confronter`, extraites de `m4b.sh`, sur des arbres faux à noms contenant « : » et « @ », avec une référence triée à l'envers. Le cas nominal passe. Six cas d'écart sont refusés, chacun avec le KO attendu et les écarts imprimés avant : fichier manquant, fichier en trop, taille fausse dans la référence, contenu faux de même taille, fichier hors de `depot/` à compte égal, lien symbolique en plus.
+- C : sur les vrais fichiers archivés, les contrôles « au-delà de l'arbre » tiennent sur la référence : 222 rpm égaux à la liste transformée comme dans l'étape, `repomd.xml`, dossier de bootstrap, `manifest.json`, deux blobs. Répartition de la référence : 222 rpm, 4 fichiers de `repodata`, 4 de l'image de bootstrap.
+- Un premier passage du banc (38 OK, non archivé) portait un libellé inexact (« autres » sans compte) ; libellé corrigé, banc rejoué. Shellcheck sur le banc lui-même : seulement SC1091 (information, fichier sourcé créé à l'exécution).
+- Non couvert : Zot (manifeste, `oras pull` de noms à « : » et « @ » depuis la plateforme), kubectl, réseau. Précédent : M3 a tiré par `oras pull` (via `closure.sh`) une fermeture aux mêmes formes de noms (vérifié dans `s1.sh`).
+
+**Prédictions**
+
+| | Prédiction | Confiance |
+|---|---|---|
+| CP1 | Gardes tenues : arbre `fc556539…` (230 lignes), liste `95541ee8…`, verrou `b6d0f8f1…`. | haute |
+| CP2 | `IMAGE_DIGEST` de `m4b-rpm-1` et `m4b-rpm-2` égal à `2a9e2ea7…`. | haute |
+| CP3 | Manifeste : sha256 des octets égal au digest ; 230 couches, aucune sans titre ; liste des couches égale à l'arbre préfixé (« oui », relevé). | haute |
+| CP4 | `oras pull` en code 0, sans identifiants, en moins de 120 s. | haute pour le code ; basse pour la durée |
+| CP5 | `confronter` : 230 fichiers tirés pour 230, aucun hors de `depot/`, aucun autre objet, aucun écart, listes égales. | haute |
+| CP6 | Somme des tailles : 317 955 662 octets. `du -sb` plus grand (dossiers comptés) : relevé, sans valeur prédite. | haute pour la somme |
+| CP7 | 222 rpm égaux à la liste ; `repomd.xml` `239a5a71…` ; bootstrap : un dossier, `manifest.json` `f0ccf105…`, deux blobs conformes. | haute |
+| CP8 | Étape en code 0, en moins de 3 minutes. Aucune écriture dans Zot ni dans le cluster (par construction ; non relu par l'étape). | haute pour le code ; moyenne pour la durée |
+
+**Portée.** Si CP5 tient, la fermeture tirée de Zot restitue, octet pour octet, l'arbre de `final` sous `depot/`. Cela ne dit rien du build par mock (M4c) ni des attestations (étape `provenance`).

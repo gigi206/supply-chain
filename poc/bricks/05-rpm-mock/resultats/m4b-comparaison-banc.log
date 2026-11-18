@@ -1,0 +1,85 @@
+# m4b-comparaison-banc.sh, 2026-11-18T12:28:22Z ; m4b.sh avant 38c39b3e70ecfbfe026cd368c0aadf3e9b410e6357746e2d13e2d407becee4f5 ; m4b.sh af9f29612e3d53159e63c2be7de04dd0be2130a4feeed2cc492fe3befc16c517
+## A : insertions seules, noms neufs, syntaxe, shellcheck
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+noms définis par l'ajout : ARBRE_SHA FERMETURE_RPM arbre_de confronter etape_comparaison
+OK   noms de l'ajout déjà définis avant : 0
+OK   bash -n : ok
+OK   shellcheck : mêmes codes avant et après : mêmes
+## B : confronter sur des arbres faux
+OK   fonctions extraites (attendu, echec, arbre_de, confronter) : 4
+OK   référence fausse : 4 lignes, ordre différent du tri de l'hôte : 4 non-trié
+     fichiers tirés : 4 (référence : 4) ; octets, somme des fichiers : 26 ; hors de depot/ : 0 ; ni fichier ni dossier : 0
+     écarts (comm -3 ; sans retrait : tiré seul ; avec retrait : référence seule) : 0, 20 premiers :
+     OK   fichiers tirés : 4
+     OK   fichiers hors de depot/ : 0
+     OK   objets ni fichier ni dossier : 0
+     OK   arbre tiré égal à l'arbre de final préfixé par depot/ (sha256 des listes) : 1cf47b73a7a20288f79d9f43ad6a87f430930fbb2e1e8e5dce5aca9d41ca2afd
+OK   nominal : code : 0
+OK   nominal : OK, aucun KO : 4 0
+     fichiers tirés : 3 (référence : 4) ; octets, somme des fichiers : 19 ; hors de depot/ : 0 ; ni fichier ni dossier : 0
+     écarts (comm -3 ; sans retrait : tiré seul ; avec retrait : référence seule) : 1, 20 premiers :
+          	depot/b-2.0-1.el9.noarch.rpm 7 381bccf9712a0258ae4d9050f781fb29357ee3b7548c8875ebe57f45262f901f
+     KO   fichiers tirés : 3 (attendu : 4)
+OK   manquant : code : 1
+OK   manquant : KO attendu : 1
+OK   manquant : écarts imprimés avant le KO : oui
+     fichiers tirés : 5 (référence : 4) ; octets, somme des fichiers : 32 ; hors de depot/ : 0 ; ni fichier ni dossier : 0
+     écarts (comm -3 ; sans retrait : tiré seul ; avec retrait : référence seule) : 1, 20 premiers :
+          depot/c-1-1.el9.noarch.rpm 6 3e12eaf29d6a05e31cda2b7169e48c96e06ebb953a0b6d75e7aaa74d390b1238
+     KO   fichiers tirés : 5 (attendu : 4)
+OK   en_trop : code : 1
+OK   en_trop : KO attendu : 1
+OK   en_trop : écarts imprimés avant le KO : oui
+OK   taille : référence modifiée : 1
+     fichiers tirés : 4 (référence : 4) ; octets, somme des fichiers : 26 ; hors de depot/ : 0 ; ni fichier ni dossier : 0
+     écarts (comm -3 ; sans retrait : tiré seul ; avec retrait : référence seule) : 2, 20 premiers :
+          depot/a-1.0-1.el9.x86_64.rpm 6 dd21a742a7b65106937b7539374ca438ccb8024e1439d3b8575910442ae73ee6
+          	depot/a-1.0-1.el9.x86_64.rpm 7 dd21a742a7b65106937b7539374ca438ccb8024e1439d3b8575910442ae73ee6
+     OK   fichiers tirés : 4
+     OK   fichiers hors de depot/ : 0
+     OK   objets ni fichier ni dossier : 0
+     KO   arbre tiré égal à l'arbre de final préfixé par depot/ (sha256 des listes) : 1cf47b73a7a20288f79d9f43ad6a87f430930fbb2e1e8e5dce5aca9d41ca2afd (attendu : 4382fcc98a6b61255789fc5f238f02a3630305834e2f5df53d91b872372822ff)
+OK   taille : code : 1
+OK   taille : KO attendu : 1
+OK   taille : écarts imprimés avant le KO : oui
+     fichiers tirés : 4 (référence : 4) ; octets, somme des fichiers : 26 ; hors de depot/ : 0 ; ni fichier ni dossier : 0
+     écarts (comm -3 ; sans retrait : tiré seul ; avec retrait : référence seule) : 2, 20 premiers :
+          	depot/a-1.0-1.el9.x86_64.rpm 6 dd21a742a7b65106937b7539374ca438ccb8024e1439d3b8575910442ae73ee6
+          depot/a-1.0-1.el9.x86_64.rpm 6 ee6b0849b31eab09663ff98ce51a9734f0bea70bf408df3ccb00b4bc964c7788
+     OK   fichiers tirés : 4
+     OK   fichiers hors de depot/ : 0
+     OK   objets ni fichier ni dossier : 0
+     KO   arbre tiré égal à l'arbre de final préfixé par depot/ (sha256 des listes) : 9e26cf03740fd28f19bac78cb97a388a90dbbf4c5a23571a8d393eff5024fe15 (attendu : 1cf47b73a7a20288f79d9f43ad6a87f430930fbb2e1e8e5dce5aca9d41ca2afd)
+OK   contenu : code : 1
+OK   contenu : KO attendu : 1
+OK   contenu : écarts imprimés avant le KO : oui
+     fichiers tirés : 4 (référence : 4) ; octets, somme des fichiers : 26 ; hors de depot/ : 1 ; ni fichier ni dossier : 0
+     écarts (comm -3 ; sans retrait : tiré seul ; avec retrait : référence seule) : 2, 20 premiers :
+          b-2.0-1.el9.noarch.rpm 7 381bccf9712a0258ae4d9050f781fb29357ee3b7548c8875ebe57f45262f901f
+          	depot/b-2.0-1.el9.noarch.rpm 7 381bccf9712a0258ae4d9050f781fb29357ee3b7548c8875ebe57f45262f901f
+     OK   fichiers tirés : 4
+     KO   fichiers hors de depot/ : 1 (attendu : 0)
+OK   hors_depot : code : 1
+OK   hors_depot : KO attendu : 1
+OK   hors_depot : écarts imprimés avant le KO : oui
+     fichiers tirés : 4 (référence : 4) ; octets, somme des fichiers : 26 ; hors de depot/ : 0 ; ni fichier ni dossier : 1
+     écarts (comm -3 ; sans retrait : tiré seul ; avec retrait : référence seule) : 0, 20 premiers :
+     OK   fichiers tirés : 4
+     OK   fichiers hors de depot/ : 0
+     KO   objets ni fichier ni dossier : 1 (attendu : 0)
+OK   lien : code : 1
+OK   lien : KO attendu : 1
+OK   lien : écarts imprimés avant le KO : oui
+## C : contrôles au-delà de l'arbre, sur les vrais fichiers archivés
+OK   arbre de final (sha256) : fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+OK   liste (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   verrou (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   rpm de la référence au premier niveau de depot/ : 222
+OK   rpm de la référence égaux à la liste transformée : 4d836331fe759af560537313a72c4b5e0059b238923ff888c584f358d3c88c75
+OK   repomd.xml de la référence : 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+OK   dossier de l'image de bootstrap dans la référence : 1
+OK   manifest.json au digest du verrou : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+OK   blobs nommés par leur sha256 : 2 oui
+OK   fichiers de la référence : rpm, repodata, image de bootstrap : 222 4 4
+# bilan : 38 OK, 0 KO ; fin 2026-11-18T12:28:23Z
