@@ -115,3 +115,30 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 - **EP5 tenue** : arbre `entrees/` du pod égal à celui de `prealables`, 273 fichiers, en contenu, modes et types.
 
 **Portée.** Le pod d'essai rejoue les pas, leurs images, leurs montages et leur contexte, sur des `emptyDir`. Le PVC sous `subPath`, l'image d'entrée de Tekton et l'ordre des pas tenu par Tekton ne sont pas couverts : ce sera à `pipeline`.
+
+## Note datée du 18/11/2026, écrite à 14:16:37 UTC : `essai` passée, code 1 sur un seul écart ; rpm et src.rpm égaux à M3
+
+**Passage** ([journal](m4c-essai.log), [journal du script](m4c-essai-construire.log), [comparaison des couches](m4c-essai-couches.log)) : le 18/11/2026, `date -u` avant et après le lancement : 14:12:44 et 14:15:23 UTC. Arrière-plan, sur `2779a90`, `m4c.sh` = `b5a7f79d…`. Code 1, voulu par l'étape dès qu'un écart est compté : 1 écart, aucun KO. Le script de `construire-rpm` a tourné de 14:13:37 à 14:15:22 UTC, code 0. `chrono.tsv` n'a pas de ligne « fait » pour cette étape, car `lancer` s'arrête sur le code 1.
+
+**Confrontation aux prédictions**
+- **ES1 tenue** : politiques relues comme en EP1.
+- **ES2 tenue** : admis en dry-run serveur, prêt sous `kata` sur sc-build. Le contexte du `podTemplate` au niveau du pod et le pas root privilégié au niveau du conteneur sont admis ensemble.
+- **ES3 tenue** : 318 842 880 octets en 5 morceaux, sha256 conforme ; 273 fichiers déballés par l'UID 65532.
+- **ES4 tenue** : outils présents ; écriture refusée sur les entrées, montées en `virtiofs ro,relatime` sous Kata. Invité : 4 vCPU, 7 151 664 kB, uid 0.
+- **ES5 tenue** : les quatre témoins échouent, code 124 (délai).
+- **ES6 tenue** : confrontation avec le vrai `rpm`, même message que dans `prealables`.
+- **ES7 tenue** : Source0 faite par le `tar` 1.34 et le `gzip` 1.12 de Rocky, égale à `07521c1e…`.
+- **ES8 tenue** : mock en code 0 en 54 s ; « Using container image: dir: » et « Checking image digest: 18d64b03… » une fois chacune, dans la sortie et dans `root.log` ; ni repli, ni « Expected digest », ni « No space » ; aucune ligne `http(s)://` ; 222 paquets au buildroot, aucun écart au verrou.
+- **ES9 en partie non tenue** :
+  - le src.rpm est égal à `c802e60a…` et le rpm à `864d55f4…`, ceux de M3 ;
+  - le digest de l'artefact est `sha256:07b7bd6f…`, non `7b17e7e7…`.
+  - Cause mesurée : la couche fait la même taille (2 181 120 octets) et porte le même rpm. 17 octets de l'en-tête ustar diffèrent : le `tar` 1.34 de l'image écrit « 0000000 » dans `devmajor` et `devminor`, là où le `tar` 1.35 de l'hôte laisse des octets nuls, et la somme de l'en-tête suit.
+  - La prédiction l'avait signalé comme risque : la couche est écrite par le `tar` de Rocky, pas par celui de l'hôte. Le digest attendu de `prealables` ne valait que pour un `tar` de l'hôte.
+- **ES10 non tenue** sur le code : 1 écart, l'ES9 ci-dessus. Durée tenue : 2 min 39 s entre les deux `date -u`.
+
+**Conséquences**
+- Le rpm de la plateforme, dans le pod d'essai, est celui de M3 à l'octet près. L'option (i) tient donc sa promesse : M3 reste la référence.
+- **Référence de l'artefact pour `pipeline`** : `sha256:07b7bd6f…`, digest produit par le `tar` de l'image d'outillage, celui de la tâche signée. Celui de `prealables` (`7b17e7e7…`) est consigné comme propre à l'hôte. Ce n'est pas une décision : le contenu est le même rpm, et la pipeline comparera ses deux exécutions entre elles puis à l'essai.
+- Aucune correction du gabarit n'est demandée par cet essai. `construire-rpm.yaml` (`e88f5521…`) et `preparer-rpm.yaml` sont prêts pour la signature (étape `taches`, à préparer), puis pour la revue de `taches.yml`.
+
+**Non couvert** : le PVC sous `subPath` et Kata, l'`env` et le `HOME` de Tekton, `publier-image`, Chains, la provenance.
