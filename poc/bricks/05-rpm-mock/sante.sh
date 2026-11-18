@@ -17,6 +17,9 @@
 #               Corrigé à sec le 12/11/2026 (relecture du conseiller), NON LANCÉE : code HTTP relevé, une erreur donne un KO distinct
 #               d'une liste vide ; chaque répertoire n'est lu qu'une fois.
 #               Les relevés par dépôt de releves sont mis en fonction (releve_depot), sans changement de commande ni de sortie.
+#   dnf         ajoutée à sec le 18/11/2026 (M1b, décision « Oui 9.8 ») : dnf 4 et les bibliothèques qu'il exécute (libdnf, librepo,
+#               libsolv), que la tâche Kata de M1b lancera par dnf --installroot depuis l'amorce rockylinux:9.8 ; mêmes relevés que
+#               voie2 ; fichiers de ces paquets listés dans vault/rocky/9.8/BaseOS (liste non signée : indice de version seulement).
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/sante.sh <étape>…   (journal : resultats/sante-<étape>.log)
 set -uo pipefail
@@ -220,6 +223,33 @@ etape_voie2() {
         f=$(grep -oE "\"$n-[0-9][^\"]*\.x86_64\.rpm\"" "$T/liste.html" | tr -d '"' | sort -uV | tail -2)
         if [ -n "$f" ]; then sed "s/^/  $x : /" <<<"$f"; else echo "  $x : aucun fichier $n-<version>.x86_64.rpm (liste lue, HTTP 200)"; fi
       done
+    done
+  done
+  rm -f -- "${T:?}/liste.html"
+}
+
+etape_dnf() {
+  local d a r p f c h n
+  d=$(date -u -d '90 days ago' +%Y-%m-%dT00:00:00Z); a=$(date -u -d '1 year ago' +%Y-%m-%d)
+  echo "M1b : dnf 4 et les bibliothèques qu'il exécute ; commits depuis $d, avis depuis $a"
+  printf 'dnf\trpm-software-management/dnf\tpackaging\toui\nlibdnf\trpm-software-management/libdnf\tpackaging\toui\nlibrepo\trpm-software-management/librepo\tpackaging\toui\nlibsolv\topenSUSE/libsolv\tpackaging\toui\n' > "$T/projets-dnf.tsv"
+  "$repo/tools/health/scorecard.sh" "$T/projets-dnf.tsv"
+  for r in rpm-software-management/dnf rpm-software-management/libdnf rpm-software-management/librepo openSUSE/libsolv; do
+    releve_depot "$r" "$d" "$a"
+    # un projet peut publier des étiquettes sans release GitHub : les cinq premières de l'API, avec la date de leur commit
+    gh api "repos/$r/tags?per_page=5" --jq '.[] | "\(.name)\t\(.commit.sha)"' | while IFS=$'\t' read -r n c; do
+      echo "  étiquette $n : commit du $(gh api "repos/$r/commits/$c" --jq '.commit.committer.date[0:10]')"
+    done
+  done
+  echo "## fichiers dans vault/rocky/9.8/BaseOS (décision « Oui 9.8 » ; liste non signée, indice de version seulement)"
+  for c in d l p; do
+    h=$(curl -sSL --max-time 60 -o "$T/liste.html" -w '%{http_code}' "https://dl.rockylinux.org/vault/rocky/9.8/BaseOS/x86_64/os/Packages/$c/") \
+      || h="$h, curl en échec"
+    if [ "$h" != 200 ]; then echo "KO   BaseOS Packages/$c/ : HTTP $h, liste non lue"; continue; fi
+    case $c in d) p='dnf dnf-data' ;; l) p='libdnf librepo libsolv' ;; p) p='python3-dnf python3-libdnf python3-hawkey' ;; esac
+    for n in $p; do
+      f=$(grep -oE "\"$n-[0-9][^\"]*\.(x86_64|noarch)\.rpm\"" "$T/liste.html" | tr -d '"' | sort -uV | tail -2)
+      if [ -n "$f" ]; then sed "s/^/  BaseOS : /" <<<"$f"; else echo "  BaseOS : aucun fichier $n-<version>.(x86_64|noarch).rpm (liste lue, HTTP 200)"; fi
     done
   done
   rm -f -- "${T:?}/liste.html"

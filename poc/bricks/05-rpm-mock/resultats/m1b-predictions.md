@@ -265,3 +265,33 @@ Journal : [`m1b-complements3-ordre.log`](m1b-complements3-ordre.log), remplacé 
 Journal : [`m1b-complements3-ordre.log`](m1b-complements3-ordre.log).
 - **C3c tenue** : 220 rangs donnent le même nom, et 2 un nom que dnf tronque (préfixe du nom de rpm). Aucun autre écart. **Trier les paquets par `INSTALLTIME` redonne l'ordre de la transaction** du journal de dnf : `INSTALLTIME` vaut S plus le rang du paquet dans la transaction, moins un.
 - **Conséquence** : la formule corrigée à 20:20 UTC est maintenant mesurée, sur une installation. La reproductibilité de `INSTALLTIME` dépend donc aussi de l'ordre de la transaction, et cet ordre était le même dans i3 et i4.
+
+## Relevé de santé de dnf : prédictions écrites avant le lancement (2026-11-18T20:24:33Z UTC)
+
+**Objet** : la carte de M1b interdit d'utiliser dnf avant d'avoir vérifié son verdict dans docs/04, car il n'y a pas de ligne propre. La tâche Kata de M1b lancera `dnf --installroot` depuis l'amorce `rockylinux:9.8`. Le relevé couvre :
+- dnf 4 ;
+- les trois bibliothèques que dnf exécute : libdnf (avec hawkey), librepo et libsolv.
+
+**Relevé** : étape `dnf` de [`sante.sh`](../sante.sh), ajoutée le 18/11/2026, avec les mêmes relevés que l'étape `voie2` :
+- Scorecard, release, commits sur 90 jours, auteurs, fusionneurs, SECURITY.md et avis de l'année ;
+- en plus, les cinq premières étiquettes et la date de leur commit, car un projet peut publier sans release GitHub ;
+- la liste des fichiers de ces paquets dans `vault/rocky/9.8/BaseOS`. Cette liste n'est pas signée : c'est un indice de version, pas un épinglage.
+
+Journal : `resultats/sante-dnf.log`.
+
+**Règle de docs/04 (§1)** :
+- **Risqué** : aucune release depuis plus de 12 mois, projet archivé, mainteneur unique sans soutien, ou compromission non résolue.
+- **À surveiller** : un critère manque, bus factor de 1 ou 2, ou Scorecard < 6.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| DN1 | Aucun des quatre dépôts n'est archivé | Haute : bibliothèques de Fedora et de RHEL 9 |
+| DN2 | Chacun a une release ou une étiquette datée de moins de 12 mois | Moyenne : libsolv publie peut-être sans release GitHub (d'où les étiquettes) ; dnf 4 est en maintenance depuis dnf5 |
+| DN3 | Chacun a des commits sur les 90 derniers jours | Moyenne : même raison |
+| DN4 | Au moins un critère « À surveiller » par projet : Scorecard sous 6 ou « n/d », fusionneurs d'un seul employeur, ou SECURITY.md absent | Moyenne-haute : même éditeur que rpm et createrepo_c (ligne du 12/11) |
+| DN5 | vault/rocky/9.8/BaseOS liste dnf-4.14.0 et python3-dnf-4.14.0, de la même version que le python3-dnf de l'image d'outillage (4.14.0-34.el9_8.rocky.0.1) | Moyenne : liste lue, mais le nom exact de la release Rocky est incertain |
+
+**Ce qui est décidé d'avance** :
+- **Si DN1 à DN3 tiennent pour les quatre**, aucun n'est « Risqué ». J'ajouterai une ligne « À surveiller » ou « Sain » à docs/04, selon les critères du §1, avec un plan de sortie. Je proposerai le verdict au propriétaire. Je ne l'écrirai pas comme un verdict de sa part.
+- **Si l'un d'eux tombe sous « Risqué »**, dnf n'est pas utilisé. M1b revient au propriétaire, car la transposition 3 de S4a ne tient plus.
+- **Le relevé ne dit rien du rythme de correction des CVE** par Rocky, que docs/04 laisse aux distributions.
