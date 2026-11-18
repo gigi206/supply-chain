@@ -1,0 +1,18 @@
+# controles-apres.sh, début 2026-11-18T22:55:16Z
+## objets soumis au dry-run (fichiers locaux)
+reel.json : apiVersion tekton.dev/v1
+{"v":"temoin","apiVersion":"tekton.dev/v1","kind":"PipelineRun","env":null,"pipelineRef":"bundles","pipelineSpec":false}
+{"v":"env","apiVersion":"tekton.dev/v1","kind":"PipelineRun","env":[{"name":"BANC_PAC","value":"env-du-podTemplate"}],"pipelineRef":"bundles","pipelineSpec":false}
+{"v":"hostile","apiVersion":"tekton.dev/v1","kind":"PipelineRun","env":[{"name":"BANC_PAC","value":"env-du-podTemplate"}],"pipelineRef":null,"pipelineSpec":true}
+{"v":"enligne","apiVersion":"tekton.dev/v1","kind":"PipelineRun","env":null,"pipelineRef":null,"pipelineSpec":true}
+## démontage
+OK   Forgejo du banc (pid 1409885) absent
+ports 3010 et 8182 à l'écoute : 0
+clusters kind : []
+conteneurs banc-pac : 0
+## fichiers de secrets du banc laissés dans le cache (mode seulement, jamais lus)
+admin.token : 600
+webhook.secret : 600
+entete-api : 600
+hook.json : 664
+# fin 2026-11-18T22:55:16Z

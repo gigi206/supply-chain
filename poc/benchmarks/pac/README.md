@@ -226,3 +226,20 @@ Journaux : [`preparer`](resultats/banc-preparer.log), [`cluster`](resultats/banc
 **Démontage** : cluster `banc-pac` supprimé, Forgejo du banc arrêté (processus absent). Le `KUBECONFIG` dédié reste en place, vide de son contexte. Les dossiers restent dans `~/.cache/supply-chain-poc/pac/banc`.
 
 **Effort** : de 22:44:56 à 22:52:02 UTC pour le banc, et de 22:11:40 UTC (cadre) à 22:52:55 UTC pour toute l'évaluation, préparation comprise. L'estimation était de 0,5 pw à sec, plus 1 pw pour les étapes 1 et 2 ; les heures ne sont pas converties en pw.
+
+### Corrections datées du résultat du banc (18/11/2026, écrites à 22:55:41 UTC, après relecture par le conseiller)
+
+Journal : [`controles-apres.log`](resultats/controles-apres.log), 22:55:16 UTC, sans requête au cluster du PoC.
+
+- **`v-env` admis : la forme est vérifiée.** Le témoin et `v-env` sont en `tekton.dev/v1`, avec `pipelineRef` par bundle et sans `pipelineSpec`. `v-env` porte bien l'`env` au chemin `spec.taskRunTemplate.podTemplate.env`, et le témoin n'en a pas. Un champ ignoré en silence est donc écarté.
+- **« Seul l'EventListener peut créer des PipelineRuns dans `builds` (docs/02) » est faux tel qu'écrit.** docs/02, l. 86, dit ce que l'EventListener a le droit de faire, pas qu'il est le seul. Le rattrapage crée aussi des PipelineRuns (ADR 0007, l. 86), et la liste relevée à 22:40 montre des runs sans label de Triggers. Aucune mesure RBAC de « qui peut créer » n'est archivée ici.
+- **« Ouvre » est trop fort.** `m4b-predictions.md`, l. 515, disait déjà que le test 2 de l'admission n'interdit pas `env` au `podTemplate`. Ce qui est neuf, c'est la mesure : en dry-run, sous l'identité de l'EventListener, l'admission accepte cet `env`.
+- **« Passe notre admission avec un `env` à lui » est une composition de deux mesures, pas une mesure.**
+  - Mesuré : PaC crée l'objet avec l'`env` (K8) et garde un `pipelineRef` par bundle (K7).
+  - Mesuré aussi : l'admission de `builds` accepte un PipelineRun réel par bundle plus un `env`, sous `el-forgejo`.
+  - Non mesuré : l'objet produit par PaC n'a pas été soumis, et PaC créerait sous son propre compte, pas sous `el-forgejo`.
+- **Démontage** :
+  - le processus de Forgejo est absent, aucun port 3010 ou 8182 n'écoute, et il ne reste ni cluster kind ni conteneur `banc-pac` (archivé) ;
+  - **défaut trouvé** : `hook.json`, qui contient le secret du webhook du banc, était en 664 (créé hors du `umask 077`). Son dossier était en 700. Je l'ai passé en 600 à 22:55:21 UTC ;
+  - `admin.token`, `webhook.secret`, `entete-api` et `hook.json` restent dans `~/.cache/supply-chain-poc/pac/banc/forgejo/`, à ne jamais lire.
+- **Audit, identité empruntée** : en plus des quatre dry-run de 22:51:53 UTC, deux requêtes `kubectl auth can-i … --as=…el-forgejo` ont été faites entre 22:36:29 et 22:40:22 UTC. La première heure est celle du `date -u` qui précède, la seconde celle du `date -u` qui suit : l'heure exacte n'est pas relevée.
