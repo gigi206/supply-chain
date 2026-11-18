@@ -1,0 +1,44 @@
+# m1b-dnf-conditions.sh, début 2026-11-18T20:41:34Z ; entrées comptées depuis 2025-11-18
+## 1. changelogs de l'image d'outillage, 12 derniers mois
+python3-dnf : 24 entrées en tout ; 4 depuis un an
+  2026-05-19 ; Release Engineering <adresse retirée> - 4.14.0-34.rocky.0.1 ; 1 ligne(s) ; première : - Add Rocky bugtracker
+    lignes citant RHEL-, CVE- ou fix : 0
+  2026-03-25 ; Evan Goode <adresse retirée> - 4.14.0-34 ; 1 ligne(s) ; première : - bootc: unlock only if /usr is read-only (RHEL-138512)
+    lignes citant RHEL-, CVE- ou fix : 1
+      - bootc: unlock only if /usr is read-only (RHEL-138512)
+  2026-02-11 ; Ales Matej <adresse retirée> - 4.14.0-33 ; 2 ligne(s) ; première : - autoremove: when a dangling protected dependency is found produce a wanrning
+    lignes citant RHEL-, CVE- ou fix : 1
+      and skip it (RHEL-76112)
+  2026-01-09 ; Petr Pisar <adresse retirée> - 4.14.0-32 ; 2 ligne(s) ; première : - automatic: Expand email_to in command_email emitter to individual arguments
+    lignes citant RHEL-, CVE- ou fix : 1
+      (RHEL-94321)
+libdnf : 11 entrées en tout ; 3 depuis un an
+  2026-02-16 ; Louis Abel <adresse retirée> - 0.69.0-18.rocky.0.1 ; 1 ligne(s) ; première : - Add Rocky Linux bug tracker
+    lignes citant RHEL-, CVE- ou fix : 0
+  2026-02-09 ; Ales Matej <adresse retirée> - 0.69.0-18 ; 5 ligne(s) ; première : - Fix a crash when parsing multiple key files fails (RHEL-145618)
+    lignes citant RHEL-, CVE- ou fix : 3
+      - Fix a crash when parsing multiple key files fails (RHEL-145618)
+      - Mark all protected packages as user installed for all transactions (RHEL-76112)
+      - Describe all problems even when there are protected removals (RHEL-115194)
+  2026-02-03 ; Matej Focko <adresse retirée> - 0.69.0-17 ; 1 ligne(s) ; première : - Fix comparison of RPM items in the transaction (RHEL-81779)
+    lignes citant RHEL-, CVE- ou fix : 1
+      - Fix comparison of RPM items in the transaction (RHEL-81779)
+librepo : 2 entrées en tout ; 1 depuis un an
+  2025-11-27 ; Petr Pisar <adresse retirée> - 1.19.0-1 ; 1 ligne(s) ; première : - Rebase to 1.19.0 (RHEL-62033)
+    lignes citant RHEL-, CVE- ou fix : 1
+      - Rebase to 1.19.0 (RHEL-62033)
+libsolv : 3 entrées en tout ; 3 depuis un an
+  2026-06-05 ; Petr Pisar <adresse retirée> - 0.7.24-6 ; 2 ligne(s) ; première : - Fix a buffer overflow when decompressing solv pages (CVE-2026-48864)
+    lignes citant RHEL-, CVE- ou fix : 2
+      - Fix a buffer overflow when decompressing solv pages (CVE-2026-48864)
+      (RHEL-178982)
+  2026-04-22 ; Marek Blaha <adresse retirée> - 0.7.24-5 ; 2 ligne(s) ; première : - Backport "choice rules: also do solver_choicerulecheck for package downgrades"
+    lignes citant RHEL-, CVE- ou fix : 1
+      Resolves: RHEL-141449
+  2026-01-22 ; Evan Goode <adresse retirée> - 0.7.24-4 ; 2 ligne(s) ; première : - Backport "Implement color filtering when adding update targets"
+    lignes citant RHEL-, CVE- ou fix : 1
+      Resolves: RHEL-103995
+## 2. openSUSE/libsolv : dates des fusions des 100 dernières PR, par fusionneur
+  igor-raits : 5 fusion(s), de 2019-03-25 à 2019-08-13
+  mlschroe : 95 fusion(s), de 2019-02-13 à 2026-10-26
+# fin 2026-11-18T20:41:35Z

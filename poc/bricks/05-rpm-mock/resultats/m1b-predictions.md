@@ -453,3 +453,24 @@ Journal : [`m1b-dnf5.log`](m1b-dnf5.log).
 - les lignes qui citent `RHEL-`, `CVE-` ou « fix » sont comptées.
 
 Les prédictions K1 à K4 sont inchangées.
+
+### Résultat des conditions, du 18/11/2026, de 20:41:34 à 20:41:35 UTC, code 0 (note écrite à 2026-11-18T20:42:02Z)
+
+Journal : [`m1b-dnf-conditions.log`](m1b-dnf-conditions.log).
+- **K1 tenue** : outre l'entrée de Rocky, le changelog de python3-dnf 4.14.0-34 a trois entrées de la distribution amont depuis un an :
+  - -32 du 9/01/2026 ;
+  - -33 du 11/02/2026 ;
+  - -34 du 25/03/2026.
+- **K2 tenue, au sens du critère écrit** : chacune de ces entrées renvoie à un ticket RHEL :
+  - `bootc` (RHEL-138512) ;
+  - `autoremove` (RHEL-76112) ;
+  - `dnf-automatic` (RHEL-94321).
+
+  Ce sont des corrections de comportement. **Aucune ne cite de CVE.**
+- **K3 tenue** : chaque bibliothèque a des entrées de la distribution depuis un an :
+  - libdnf : deux, dont « Fix a crash… », RHEL-145618 ;
+  - librepo : une, rebase vers 1.19.0, RHEL-62033 ;
+  - libsolv : trois, dont la correction d'un débordement de tampon, CVE-2026-48864, le 5/06/2026.
+- **K4 tenue** : les 5 fusions d'igor-raits datent de 2019 (25/03 au 13/08). Depuis août 2019, toutes les fusions des 100 dernières PR sont de mlschroe. libsolv a donc un mainteneur unique de fait ; son soutien (adresse suse.de) n'est pas mesuré.
+
+**Lecture** : la condition du conseiller est remplie. dnf 4 et ses bibliothèques reçoivent des correctifs de la distribution sur les 12 derniers mois. La recommandation du conseiller (« À surveiller » par décision du propriétaire) tient donc. Le verdict reste au propriétaire. Il porte aussi sur libsolv : le critère « mainteneur unique sans soutien » se joue sur le soutien, qui n'est pas mesuré. Rien n'est écrit dans docs/04, et dnf n'est pas repris.
