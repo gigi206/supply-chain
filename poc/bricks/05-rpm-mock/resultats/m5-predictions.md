@@ -146,3 +146,26 @@ PP1 sera jugée sur `preparer_relu`. Suite : `preparer_relu`, puis `alterer`.
 - Relevé : le PVC `local-path` voit le disque du nœud, 16 874 396 kB utilisés sur 30 753 032.
 
 Suite : `fermeture`.
+
+## Note datée du 18/11/2026, écrite à 19:01:41 UTC : `fermeture` passée (18:50:25 à 19:00:41 UTC, code 0) ; FE1 à FE4 tenues
+
+[Journal](m5-fermeture.log) : **21 OK, aucun KO**. Sept TaskRuns isolés de `construire-rpm` signée, sous Kata (label `construire-rpm`, nœud `sc-build`). Chacun a eu son écriture refusée sur les entrées (virtiofs en lecture seule) et ses quatre témoins réseau en échec (code 124), avant toute confrontation. Rien n'a été publié.
+
+| Cas | Altération | Résultat | Barrière, d'après le journal |
+|---|---|---|---|
+| témoin | copie intacte | `True|Succeeded`, mock rc 0 en 46 s ; rpm `864d55f4…` (M3), src.rpm `c802e60a…`, `DIGEST_CONSTRUIT` `07b7bd6f…` (M4c) | — |
+| R1 | rpm substitué | `False|StepFailed`, mock jamais lancé | confrontation : « sigmd5 différent du verrou : zlib-1.2.11-40.el9.x86_64.rpm » |
+| R2 | fichier en trop | idem | confrontation : « 1 objet(s) hors du verrou … ['m5-en-trop.rpm'] » |
+| R3 | rpm retiré | idem | confrontation : « 1 rpm du verrou absent(s) » |
+| R4 | payload altéré, en-tête intact | confrontation **passée** ; mock rc 30 en 13 s | **dnf** : « Package "zlib-1.2.11-40.el9.x86_64" from local repository "offline" has incorrect checksum », puis « Some packages from local repository have incorrect checksum » ([journal du pod](m5-fermeture-r4-pod.log)). Ce refus vient avant rpm. |
+| R5 | `manifest.json` altéré | `False|StepFailed`, mock jamais lancé | confrontation : « manifest.json du dossier dir: différent du pull_digest » |
+| R6 | blob de l'image de bootstrap altéré | confrontation **passée** ; mock rc 1 en 124 s | **copie de l'image par podman** : « Copying blob sha256:22495746… », « Digest did not match », pull réessayé, puis `PodmanError: Image pull failed`. Aucun repli sur un bootstrap fait de paquets (0 ligne « falling back to chroot installation », [journal du pod](m5-fermeture-r6-pod.log)). |
+
+- **FE1 tenue** : le témoin redonne le rpm de M3 et l'artefact de M4c, depuis une copie faite par le même mécanisme que les copies altérées.
+- **FE2 tenue** : R1, R2, R3 et R5 sont refusées par la confrontation au verrou, avec les messages du banc, et mock n'est jamais lancé.
+- **FE3 tenue, branche refus** : la barrière de R4 est **dnf**, qui compare la somme de contrôle du paquet à `primary` (écrit par `createrepo_c` en M4b), et non rpm. La confrontation au verrou ne voit pas ce cas (mesure hors ligne du point 1) ; dnf le voit, dans mock. Ce refus dépend de `repodata/`, que la confrontation ne contrôle pas : un `repodata/` refait pour le rpm altéré n'est pas testé ici. Rpm (digest du payload, PR2) reste une barrière derrière, non atteinte.
+- **FE4 tenue, branche refus** : la barrière de R6 est la vérification du digest du blob par la copie de l'image. Le `manifest.json` intact fixe le digest attendu.
+
+**Réserve** : R4 n'a pas de second test avec un `repodata/` cohérent avec l'altération. Si `repodata/` est refait, la seule barrière restante, déduite et non mesurée dans mock, est la vérification du digest du payload par rpm (refusée hors ligne, PR2).
+
+Suite : `sans_kata`, puis `reseau`.
