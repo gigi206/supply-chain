@@ -527,3 +527,30 @@ Journal : [`m1b-listes.log`](m1b-listes.log). Liste épinglée : [`m1b-listes-ou
 - Le bootstrap mêle deux époques : 143 entrées figées par l'image et 10 posées le jour de l'installation. Une reproduction devra au moins fixer ces 10.
 
 **Inchangé** : rien n'est épinglé avant la relecture de l'instantané `archive/epel/9.8`. Les 9 rpm d'EPEL de la liste viennent du dépôt EPEL 9 vivant du 17/11 ; `m1b-sources.log` les a trouvés dans l'instantané, 9 sur 9, avec le même fichier et le même sha256 (relevé du 18/11, `repomd.xml` `e86fdcd8…`, non signé).
+
+## Banc de l'outillage : prédictions écrites avant le lancement (2026-11-18T20:54:44Z UTC)
+
+**Question** : deux installations de l'outillage, faites sous SOURCE_DATE_EPOCH depuis un miroir partiel, donnent-elles la même archive bornée ? Le miroir garde les métadonnées amont et les 199 rpm de la liste épinglée.
+- **Forme** : choisie avec le conseiller. C'est la forme de la future tâche : `dnf install` des six noms de l'étape racine de S1, sur un miroir en `file://` avec les métadonnées amont. Un témoin installe les 199 fichiers locaux, dépôts coupés, comme le troisième banc. Le banc vise deux angles morts d'un coup : le jeu de paquets de l'outillage et le miroir partiel.
+- **Relecture** : le `repomd.xml` de l'instantané `archive/epel/9.8` est relu et comparé à la copie du 18/11. S'il a changé, le banc s'arrête avant tout téléchargement de rpm.
+- **Téléchargements** : 199 rpm et les métadonnées des trois dépôts, sous `~/.cache/supply-chain-poc/05/`. Ce n'est pas une installation système. Chaque fichier est vérifié par sha256 contre `repomd.xml` (signé pour vault), le primary et la liste épinglée, puis par `rpm -K` avec les deux clés. Les bases sqlite `*_db`, que dnf 4 ne lit pas, ne sont pas téléchargées.
+- **Outils** : la racine d'outils reste celle de `99790c13`, comme au troisième banc. Le rpm et le dnf de l'amorce `ed654c69` restent un angle mort.
+
+**Mesure** : [`m1b-outil.sh`](m1b-outil.sh).
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| O1 | Les trois `repomd.xml` sont égaux aux copies du 18/11 ; ceux de vault ont une signature valide de la clé de Rocky ; l'instantané d'EPEL n'a pas bougé | Haute pour vault, moyenne pour EPEL |
+| O2 | Toutes les métadonnées téléchargées ont le sha256 de `repomd.xml`. Les 199 rpm sont trouvés dans les primary avec le sha256 de la liste, et téléchargés conformes ; `rpm -K` donne 199 « digests signatures OK » | Moyenne : 199 sur 199 dans S1 |
+| O3 | S, calculé par `rpm -qp` sur les 199 fichiers, vaut 1793914619, comme dans la base de `racine.tar` | Haute |
+| O4 | i5 et i6 : dnf rend 0 ; 201 entrées, les 199 NEVRA de `racine.tar` et 2 gpg-pubkey | Moyenne : EPEL vient de l'instantané, pas du dépôt vivant du 17/11 |
+| O5 | Dans i5 et i6, les 199 rpm ont un INSTALLTID égal à S et 199 INSTALLTIME consécutifs, de S à S + 198 | Moyenne : forme du troisième banc, autre jeu de paquets |
+| O6 | Les gpg-pubkey de i5 et i6 ont un INSTALLTIME et un INSTALLTID égaux à S | Basse : je ne sais pas si l'import des clés lit SOURCE_DATE_EPOCH |
+| O7 | `a5.tar` et `a6.tar` sont identiques octet à octet, et `a5b.tar` aussi | Moyenne : dépend de O6 et du cache de dnf exclu |
+| O8 | i7 (fichiers locaux) : dnf rend 0, 199 entrées, aucune gpg-pubkey. `a7.tar` diffère de `a5.tar`, mais seulement par `var/lib/rpm/rpmdb.sqlite` | Basse |
+| O9 | Contenu seul de `a5.tar` contre `racine.tar` : les membres propres à `racine.tar` sont les fichiers exclus ; les contenus ne diffèrent que dans `rpmdb.sqlite` et le `cacerts` de Java | Basse |
+
+**Ce qui est décidé d'avance** :
+- Si O1 n'est pas tenue pour EPEL, le banc s'arrête et l'instantané est déclaré mobile. Rien n'est épinglé.
+- Si O7 est tenue, j'écrirai « neutralisable sur le banc pour l'outillage », jamais « établi » : il resterait un autre jour, le rpm et le dnf de l'amorce, et le bootstrap.
+- Rien n'est écrit dans le cluster ni dans Zot.
