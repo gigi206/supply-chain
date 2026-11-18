@@ -98,3 +98,72 @@ Journal : [`lecture-complement.log`](resultats/lecture-complement.log), 22:21:00
 - **Fait.** Dans A1, PaC était le déclencheur de Konflux v0.2.2. L'opérateur Tekton l'installe, et le build-service crée le webhook vers le contrôleur PaC ([résultats de A1](../konflux/resultats/README.md), point 4 des adaptations ; [README de A1](../konflux/README.md), « PaC en mode Forgejo »).
 - **Oubli de la note de 22:18:13 UTC.** Selon docs/04, l'adoption pondère le verdict de santé, et je ne l'ai pas prise en compte. Le verdict reste pourtant « À surveiller » : la règle le donne dès qu'un critère manque, et il en manque trois (Scorecard inférieur à 6, releases non signées, maturité 0.x). L'adoption par Konflux plaide en revanche pour un projet suivi, ce que confirment les 103 commits sur 90 jours.
 - **Ce que l'adoption ne dit pas pour nos exigences.** Dans Konflux, la forme du PipelineRun vient du dépôt (`.tekton/`). Ce qui protège vient ensuite, à la porte de release : les règles Conforma `required_tasks` et `trusted_task`, citées dans A1. Avant la porte, A1 a mesuré qu'une PR fait tourner une étape privilégiée avec `hostPath: /` (test 4). A1 a aussi mesuré que Konflux accepte le rejeu (test 5, même PaC). Notre architecture fixe la forme du PipelineRun dans la zone Confiance, avant l'admission. **E1, E3 et E6 restent donc tels qu'ils sont écrits.** Le choix de Konflux répond à un autre modèle de menace : la protection se fait à la release, et Forgejo n'y est pris en charge qu'en partie ([docs/00](../../../docs/00-etude-existant.md), §2).
+
+## Banc en cluster : protocole et prédictions (à sec, note écrite à 22:35:25 UTC, le 18/11/2026)
+
+**Décision du propriétaire (18/11/2026)** : « Banc PaC en cluster », en réponse à « Que décides-tu pour PaC ? ». La décision fixe qu'il y a un banc, pas où il tourne ni ce qui s'installe. **Rien n'est installé ni lancé** avant un accord sur le lieu et les téléchargements.
+
+**Correction d’un message précédent au propriétaire.** J'y ai rangé le rattrapage des webhooks perdus parmi ce que notre chaîne ne tient pas non plus. C'est faux : notre réconciliateur le tient, mesuré le 13/11/2026 ([`politique-rattrapage.log`](../../bricks/08-trust-plane/resultats/politique-rattrapage.log)). Forgejo n'a pas relivré un push perdu, et le PipelineRun a été créé par le rattrapage. Ce point départage, en notre faveur.
+
+**Ce que le banc peut trancher.** Le statut de Forgejo (Tech Preview) et le Scorecard ne bougeront pas. Le banc ne peut renverser « garder Triggers » que si :
+- le rejeu est refusé au tag v0.54.0, contrairement à la lecture ;
+- **ou** PaC rattrape un webhook perdu ;
+- **et** l'admission de `builds` borne la forme d'un PipelineRun venu de `.tekton/`, `env` du `podTemplate` compris.
+
+**Estimation neuve : 1 pw** pour les étapes 1 et 2 (l'évaluation à sec en avait 0,5). Au-delà de 2 pw, décision avec le propriétaire.
+
+### Étape 1 : cluster kind jetable, sur le modèle de A1
+
+- **Cluster** : kind 0.33.0 (`mise.toml`), cluster `banc-pac`, avec un `KUBECONFIG` dédié jamais fusionné. Ports sur 127.0.0.1 seulement, nœud plafonné à 6 Gi.
+  - Mémoire disponible relevée à 22:33 UTC : 11 Gi, avec les quatre VM du PoC allumées.
+  - Docker est sur `/` (70 G libres) ; `/home` n'a que 29 G libres.
+- **À vérifier avant lancement** :
+  - version de Kubernetes du nœud : A1 a utilisé `kindest/node:v1.37.0@sha256:a1ed56cf…`, mais le `kubectl` de `mise.toml` est en 1.35.10, hors de l'écart toléré de ±1. Il faut l'image v1.35 listée par kind 0.33.0, avec le digest pris dans les notes de release, ou bien consigner l'écart ;
+  - les besoins de PaC v0.54.0 : Pipelines v1.7.0 au minimum d'après sa doc (`requirements.md` l. 310), construit sur `tektoncd/pipeline` v1.18.0 (`go.mod` l. 33).
+- **Téléchargements**, tous à archiver avec leur sha256 ou leur digest. **Rien n'est signé** côté PaC (voir la santé) :
+  - nœud kind (image, par digest) ;
+  - Tekton Pipelines v1.15.5 : manifeste **déjà téléchargé et vérifié** par la 08 (sha256 `c2fe5c2a…`), images par digest. C'est la version du PoC ;
+  - `release.k8s.yaml` de PaC v0.54.0 (74 648 octets), appliqué depuis le disque, et ses trois images épinglées par digest (`crane digest`). Le binaire `tkn-pac` n'est pas téléchargé ;
+  - Forgejo 15.0.11 : binaire de `mise.toml`, déjà vérifié. Il écoute sur la passerelle du réseau `kind`, en SQLite, avec un dépôt d'essai neuf.
+- **Ne touche ni au webhook ni au dépôt `sample-app` du PoC.**
+- **Cas mesurés** (secrets par fichier, journaux de PaC masqués, aucun message d'Event affiché) :
+  - **K1** : installation, pods prêts, rôles sur les Secrets égaux à la lecture ;
+  - **K2** : livraisons sans signature et à signature fausse (remesure de A1 sur v0.54.0) ;
+  - **K3** : rejeu à l'identique (même corps, mêmes en-têtes, même `X-Forgejo-Delivery`) d'une livraison valide ; noms des PipelineRuns ;
+  - **K4** : contrôleur à 0 réplique pendant un push, puis remis à 1. On attend 3 minutes et on compte les PipelineRuns de ce commit ;
+  - **K5** : Repository global dans l'espace de PaC, Repository local sans secret, `secret-auto-create: false`. On regarde si le PipelineRun est créé et si un Secret apparaît dans l'espace du build (noms comptés, jamais lus). Le clone sans identifiant n'est pas mesuré ;
+  - **K6** : `pipelinerun_provenance: default_branch`, avec une PR qui modifie `.tekton/`. Quelle définition est prise ?
+  - **K7** : `pipelineRef` avec `resolver: bundles`, et la spec du PipelineRun créé, lue dans l'objet. L'exécution n'est pas demandée : il n'y a pas de registre de bundles dans kind ;
+  - **K8** : PipelineRun hostile dans `.tekton/` (`env` au `podTemplate`, `taskSpec` en ligne, étape privilégiée). On archive l'objet créé par PaC, nettoyé des secrets et des UID, pour l'étape 2.
+- **Démontage, écrit avant l'installation** : `kind delete cluster --name banc-pac`, arrêt de Forgejo, puis suppression du `KUBECONFIG` dédié par son nom en clair. Les journaux restent dans `resultats/` et les dossiers dans `~/.cache/supply-chain-poc/pac/`.
+
+### Étape 2 : cluster du PoC, sans rien y installer
+
+- Soumettre l'objet de K8, et ses variantes une à une, à l'admission de l'espace `builds` en **dry-run serveur** (`kubectl create --dry-run=server`).
+- **À vérifier avant** :
+  - que les webhooks de Kyverno et de Tekton acceptent le dry-run sans effet de bord (`sideEffects` de leurs configurations) ;
+  - sous quelle identité soumettre l'objet (celle de l'EventListener).
+
+### Étape 3, seulement si 1 et 2 laissent une question
+
+Installer PaC dans le cluster du PoC. **Accord à part**, car :
+- il faudrait des images non signées ;
+- deux ClusterRoles écriraient tous les Secrets du plan de confiance ;
+- il faudrait un jeton Forgejo réel ;
+- Chains signerait les runs du banc.
+
+### Prédictions (avant tout lancement)
+
+- **K1** : installation en moins de 10 minutes ; rôles égaux à la lecture. Confiance haute.
+- **K2** : les deux livraisons sont refusées, avec les messages de A1. Confiance haute (lecture et A1).
+- **K3** : **rejeu accepté**, un second PipelineRun est créé, et les deux noms diffèrent (`generateName`). **Prédiction non aveugle** (A1 et lecture). Confiance haute.
+- **K4** : aucun PipelineRun pour le commit poussé pendant l'arrêt. Confiance moyenne : l'absence n'a été cherchée que par mots-clés.
+- **K5** : PipelineRun créé, aucun Secret neuf dans l'espace du build. Confiance moyenne.
+- **K6** : définition de la branche par défaut. Confiance haute (lecture).
+- **K7** : `pipelineRef` gardé tel quel, `resolver: bundles`. Confiance haute (lecture).
+- **K8** : PaC crée l'objet hostile tel quel, sans filtre. Confiance haute (A1).
+- **Étape 2** :
+  - `taskSpec` en ligne et étape privilégiée refusés par l'admission de `builds` ;
+  - **`env` du `podTemplate` admis**, d'après la brique 05 ([`m4b-predictions.md`](../../bricks/05-rpm-mock/resultats/m4b-predictions.md), l. 515).
+
+  Confiance moyenne : le dry-run n'a jamais été essayé sur ce cluster.
