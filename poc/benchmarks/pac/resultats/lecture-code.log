@@ -1,0 +1,244 @@
+# lecture-code.sh, début 2026-11-18T22:15:17Z ; clone /home/gigi/.cache/supply-chain-poc/pac/depot-20261118T221251Z ; HEAD bb2df3052556e2c7516eb1146a02e3ece5c4f252 ; tag v0.54.0
+état du clone (git status --porcelain, vide attendu) : [0 lignes]
+
+## E1, signature Forgejo ou Gitea : HMAC du corps seul : pkg/provider/gitea/gitea.go, l. 236 à 266 (sha256 du fichier 87d4044f8e787226)
+ 236 | func (v *Provider) Validate(_ context.Context, _ *params.Run, event *info.Event) error {
+ 237 | 	signature := event.Request.Header.Get(ForgejoSignatureHeader)
+ 238 | 	if signature == "" {
+ 239 | 		signature = event.Request.Header.Get(GiteaSignatureHeader)
+ 240 | 	}
+ 241 | 	if signature == "" {
+ 242 | 		return fmt.Errorf("no signature has been detected, for security reason we are not allowing webhooks without a secret")
+ 243 | 	}
+ 244 | 
+ 245 | 	secret := event.Provider.WebhookSecret
+ 246 | 	if secret == "" {
+ 247 | 		return fmt.Errorf("no webhook secret has been set, in repository CR or secret")
+ 248 | 	}
+ 249 | 
+ 250 | 	return validateSignature(signature, event.Request.Payload, []byte(secret))
+ 251 | }
+ 252 | 
+ 253 | func validateSignature(signature string, payload, secret []byte) error {
+ 254 | 	signatureBytes, err := hex.DecodeString(signature)
+ 255 | 	if err != nil {
+ 256 | 		return fmt.Errorf("gitea/forgejo webhook signature is not valid hex: %w", err)
+ 257 | 	}
+ 258 | 
+ 259 | 	mac := hmac.New(sha256.New, secret)
+ 260 | 	mac.Write(payload)
+ 261 | 	expectedMAC := mac.Sum(nil)
+ 262 | 
+ 263 | 	if subtle.ConstantTimeCompare(signatureBytes, expectedMAC) != 1 {
+ 264 | 		return fmt.Errorf("gitea/forgejo webhook signature validation failed")
+ 265 | 	}
+ 266 | 	return nil
+
+## E1, identifiant de livraison : lu pour les journaux : pkg/adapter/adapter.go, l. 176 à 179 (sha256 du fichier 3ccf32b18ad79824)
+ 176 | 		eventID := getProviderEventIDFromHeader(request.Header)
+ 177 | 		eventLogger := l.logger.With("event-id", eventID)
+ 178 | 		defer func() {
+ 179 | 			eventLogger.Infof("controller responded to event %s in %dms", eventID, time.Since(start).Milliseconds())
+
+## E1, identifiant de livraison : fonction : pkg/adapter/adapter.go, l. 294 à 301 (sha256 du fichier 3ccf32b18ad79824)
+ 294 | func getProviderEventIDFromHeader(header http.Header) string {
+ 295 | 	if header.Get("X-GitHub-Delivery") != "" {
+ 296 | 		return header.Get("X-GitHub-Delivery")
+ 297 | 	}
+ 298 | 	// For Gitea/Forgejo
+ 299 | 	if header.Get("X-Gitea-Delivery") != "" {
+ 300 | 		return header.Get("X-Gitea-Delivery")
+ 301 | 	}
+
+## E1, recherche d'un anti-rejeu (dedup, duplicate, replay, already processed) hors tests :
+pkg/acl/owners.go:63:// Expand aliases into the list of owners removing the duplicates.
+pkg/acl/owners.go:64:// Due to the use of map for deduplication, the order is not guaranteed.
+pkg/acl/owners.go:66:	dedups := make(map[string]bool)
+pkg/acl/owners.go:68:		if _, ok := dedups[owner]; !ok {
+pkg/acl/owners.go:72:					dedups[name] = true
+pkg/acl/owners.go:75:				dedups[owner] = true
+pkg/acl/owners.go:79:	expanded := make([]string, 0, len(dedups))
+pkg/acl/owners.go:80:	for o := range dedups {
+pkg/provider/github/github.go:1029:	dedupTrace      string
+pkg/provider/github/github.go:1036:func newDedupTraceID() string {
+pkg/provider/github/github.go:1109:		dedupTrace:      newDedupTraceID(),
+pkg/provider/github/github.go:1135:		"dedup_trace", trace.dedupTrace,
+pkg/provider/github/github.go:1140:	v.Logger.Debugw("github comment dedup flow", append(baseFields, kv...)...)
+pkg/provider/github/github.go:1216:				event, trace, "duplicate_detected",
+pkg/provider/retryhttp/retryhttp.go:67:	canReplay := req.Body == nil || req.GetBody != nil
+pkg/provider/retryhttp/retryhttp.go:79:		if !canReplay || attempt >= t.opts.MaxAttempts || !t.shouldRetry(req, resp, err) {
+pkg/provider/retryhttp/retryhttp.go:116:		// Network errors: only retry requests known to be safe to replay; the
+pkg/provider/gitlab/gitlab.go:159:// are skipped rather than risking a duplicated mutation.
+pkg/customparams/standard.go:23:	changedFiles.RemoveDuplicates()
+pkg/customparams/customparams.go:83:// value, so it can be stored and replayed with WithFilterOutcomes.
+pkg/pipelinerungroup/followup.go:64:	// definition is templated from at replay.
+pkg/pipelinerungroup/graph.go:32:	ProblemDuplicateName        ProblemKind = "duplicate-name"
+pkg/pipelinerungroup/graph.go:54:	deduped := make([]string, 0, len(deps))
+pkg/pipelinerungroup/graph.go:63:			deduped = append(deduped, dep)
+pkg/pipelinerungroup/graph.go:66:	return deduped, nil
+pkg/pipelinerungroup/graph.go:140:			add(def.Name, ProblemDuplicateName, "definition %q is defined more than once in the .tekton directory", def.Name)
+pkg/cli/iostreams.go:90:	// prevent duplicate isTerminal queries now that we know the answer
+pkg/changedfiles/changedfiles.go:11:// removeDuplicates removes duplicates from a slice of strings.
+pkg/changedfiles/changedfiles.go:12:func removeDuplicates(s []string) []string {
+pkg/changedfiles/changedfiles.go:24:func (c *ChangedFiles) RemoveDuplicates() {
+pkg/changedfiles/changedfiles.go:25:	c.All = removeDuplicates(c.All)
+pkg/changedfiles/changedfiles.go:26:	c.Added = removeDuplicates(c.Added)
+pkg/changedfiles/changedfiles.go:27:	c.Deleted = removeDuplicates(c.Deleted)
+pkg/changedfiles/changedfiles.go:28:	c.Modified = removeDuplicates(c.Modified)
+pkg/changedfiles/changedfiles.go:29:	c.Renamed = removeDuplicates(c.Renamed)
+## E1, usages de X-Gitea-Delivery hors tests :
+pkg/adapter/adapter.go:299:	if header.Get("X-Gitea-Delivery") != "" {
+pkg/adapter/adapter.go:300:		return header.Get("X-Gitea-Delivery")
+pkg/provider/gitea/detect.go:33:		logger = logger.With("provider", "gitea", "event-id", req.Header.Get("X-Gitea-Delivery"))
+
+## E2, création auto du secret git (défaut) : pkg/params/settings/config.go, l. 82 à 82 (sha256 du fichier 8f2ec0ade3e4d706)
+  82 | 	SecretAutoCreation               bool   `default:"true"                             json:"secret-auto-create"`
+
+## E2, secret git créé dans l'espace du Repository : pkg/pipelineascode/pipelineascode.go, l. 330 à 346 (sha256 du fichier 825d0a3819ddd01c)
+ 330 | 
+     [ligne masquée : motif jeton|token]
+ 332 | 	if p.pacInfo.SecretAutoCreation {
+ 333 | 		if annotation, ok := match.PipelineRun.GetAnnotations()[keys.GitAuthSecret]; ok {
+ 334 | 			gitAuthSecretName = annotation
+ 335 | 			p.debugf("startPR: using git auth secret from annotation=%s", gitAuthSecretName)
+ 336 | 		} else {
+ 337 | 			return nil, fmt.Errorf("cannot get annotation %s as set on PR", keys.GitAuthSecret)
+ 338 | 		}
+ 339 | 
+ 340 | 		authSecret, err := secrets.MakeBasicAuthSecret(p.event, gitAuthSecretName)
+ 341 | 		if err != nil {
+ 342 | 			return nil, fmt.Errorf("making basic auth secret: %s has failed: %w ", gitAuthSecretName, err)
+ 343 | 		}
+ 344 | 
+ 345 | 		if err = p.k8int.CreateSecret(ctx, match.Repo.GetNamespace(), authSecret); err != nil {
+ 346 | 			if errors.IsAlreadyExists(err) {
+
+## E2, PipelineRun créé dans l'espace du Repository : pkg/pipelineascode/pipelineascode.go, l. 384 à 385 (sha256 du fichier 825d0a3819ddd01c)
+ 384 | 	pr, err := p.run.Clients.Tekton.TektonV1().PipelineRuns(match.Repo.GetNamespace()).Create(ctx,
+ 385 | 		match.PipelineRun, metav1.CreateOptions{})
+
+## E2, espace des secrets du fournisseur : Repository, ou Repository global par héritage : pkg/secrets/inherit.go, l. 24 à 34 (sha256 du fichier 691d1084bddd79ef)
+  24 | func ResolveInheritedSecret(repo, globalRepo *v1alpha1.Repository) (string, bool, error) {
+  25 | 	namespace := repo.GetNamespace()
+  26 | 	if globalRepo == nil || repo.Spec.GitProvider == nil || repo.Spec.GitProvider.Secret != nil ||
+  27 | 		globalRepo.Spec.GitProvider == nil || globalRepo.Spec.GitProvider.Secret == nil {
+  28 | 		return namespace, false, nil
+  29 | 	}
+  30 | 	if err := checkInheritedEndpoint(repo, globalRepo); err != nil {
+  31 | 		return namespace, false, err
+  32 | 	}
+  33 | 	return globalRepo.GetNamespace(), true, nil
+  34 | }
+
+## E2, lecture du secret de webhook dans cet espace : pkg/secrets/secret.go, l. 78 à 100 (sha256 du fichier 135c83629f0f8962)
+  78 | 	if s.Repo.Spec.GitProvider.WebhookSecret == nil {
+     [ligne masquée : motif jeton|token]
+  80 | 		// doesn't have webhook support 🙃
+  81 | 		return nil
+  82 | 	}
+  83 | 
+  84 | 	gitProviderWebhookSecretKey := s.Repo.Spec.GitProvider.WebhookSecret.Key
+  85 | 	if gitProviderWebhookSecretKey == "" {
+  86 | 		gitProviderWebhookSecretKey = DefaultGitProviderWebhookSecretKey
+  87 | 	}
+  88 | 	s.Logger.Debugf("secretFromRepository: reading webhook secret=%s key=%s", s.Repo.Spec.GitProvider.WebhookSecret.Name, gitProviderWebhookSecretKey)
+     [ligne masquée : motif jeton|token]
+  90 | 		s.WebhookType,
+  91 | 		s.Repo.Spec.GitProvider.URL,
+  92 | 		s.Repo.Spec.GitProvider.User,
+  93 | 		s.Repo.Spec.GitProvider.Secret.Name,
+  94 | 		gitProviderSecretKey)
+  95 | 	if s.Event.Provider.WebhookSecret, err = s.K8int.GetSecret(ctx, ktypes.GetSecretOpt{
+  96 | 		Namespace: s.Namespace,
+  97 | 		Name:      s.Repo.Spec.GitProvider.WebhookSecret.Name,
+  98 | 		Key:       gitProviderWebhookSecretKey,
+  99 | 	}); err != nil {
+ 100 | 		return fmt.Errorf("%w: error getting webhook secret: %w", ErrSecretNotFound, err)
+
+## E3, embarquement des tâches : seulement si resolver vide : pkg/resolve/resolve.go, l. 142 à 165 (sha256 du fichier 0b6479becf84da6b)
+ 142 | func inlineTasks(tasks []tektonv1.PipelineTask, ropt *Opts, remoteResource FetchedResourcesForRun) ([]tektonv1.PipelineTask, error) {
+ 143 | 	pipelineTasks := []tektonv1.PipelineTask{}
+ 144 | 	for _, task := range tasks {
+ 145 | 		if task.TaskRef != nil &&
+ 146 | 			task.TaskRef.Resolver == "" &&
+ 147 | 			isTektonAPIVersion(task.TaskRef.APIVersion) &&
+ 148 | 			string(task.TaskRef.Kind) != "ClusterTask" &&
+ 149 | 			!slices.Contains(ropt.SkipInlining, task.TaskRef.Name) {
+ 150 | 			taskResolved, ok := remoteResource.Tasks[task.TaskRef.Name]
+ 151 | 			if !ok {
+ 152 | 				return nil, fmt.Errorf("cannot find referenced task %s. if it's a remote task make sure to add it in the annotations", task.TaskRef.Name)
+ 153 | 			}
+ 154 | 			tmd := tektonv1.PipelineTaskMetadata{
+ 155 | 				Annotations: taskResolved.GetObjectMeta().GetAnnotations(),
+ 156 | 				Labels:      taskResolved.GetObjectMeta().GetLabels(),
+ 157 | 			}
+ 158 | 			task.TaskRef = nil
+ 159 | 			task.TaskSpec = &tektonv1.EmbeddedTask{
+ 160 | 				TaskSpec: taskResolved.Spec,
+ 161 | 				Metadata: tmd,
+ 162 | 			}
+ 163 | 		}
+ 164 | 		pipelineTasks = append(pipelineTasks, task)
+ 165 | 	}
+
+## E3, embarquement du pipeline : seulement si resolver vide : pkg/resolve/remote.go, l. 215 à 231 (sha256 du fichier a0a9e61b9a4a6bf8)
+ 215 | 		if pipelinerun.Spec.PipelineRef != nil && pipelinerun.Spec.PipelineRef.Resolver == "" {
+ 216 | 			pipelineResolved := fetchedResourcesForPipelineRun.Pipeline.DeepCopy()
+ 217 | 			turns, err := inlineTasks(pipelineResolved.Spec.Tasks, ropt, fetchedResourcesForPipelineRun)
+ 218 | 			if err != nil {
+ 219 | 				return nil, err
+ 220 | 			}
+ 221 | 			pipelineResolved.Spec.Tasks = turns
+ 222 | 
+ 223 | 			fruns, err := inlineTasks(pipelineResolved.Spec.Finally, ropt, fetchedResourcesForPipelineRun)
+ 224 | 			if err != nil {
+ 225 | 				return nil, err
+ 226 | 			}
+ 227 | 			pipelineResolved.Spec.Finally = fruns
+ 228 | 
+ 229 | 			pipelinerun.Spec.PipelineRef = nil
+ 230 | 			pipelinerun.Spec.PipelineSpec = &pipelineResolved.Spec
+ 231 | 			rt.Logger.Debugf("resolveRemoteResources: pipelinerun=%s inlined pipeline tasks=%d finally=%d", prName, len(pipelineResolved.Spec.Tasks), len(pipelineResolved.Spec.Finally))
+
+## E3, origine de .tekton : source (défaut) ou default_branch : pkg/apis/pipelinesascode/v1alpha1/types.go, l. 111 à 117 (sha256 du fichier b73bb21bf17c99e9)
+ 111 | 	// PipelineRunProvenance configures how PipelineRun definitions are fetched.
+ 112 | 	// Options:
+ 113 | 	// - 'source': Fetch definitions from the event source branch/SHA (default)
+ 114 | 	// - 'default_branch': Fetch definitions from the repository default branch
+ 115 | 	// +optional
+ 116 | 	// +kubebuilder:validation:Enum=source;default_branch
+ 117 | 	PipelineRunProvenance string `json:"pipelinerun_provenance,omitempty"`
+
+## E3, Forgejo ou Gitea : révision lue selon pipelinerun_provenance : pkg/provider/gitea/gitea.go, l. 509 à 518 (sha256 du fichier 87d4044f8e787226)
+ 509 | func (v *Provider) GetTektonDir(_ context.Context, event *info.Event, path, provenance string) (string, error) {
+ 510 | 	v.provenance = provenance
+ 511 | 	// default set provenance from the SHA
+ 512 | 	revision := event.SHA
+ 513 | 	if provenance == "default_branch" {
+ 514 | 		revision = event.DefaultBranch
+ 515 | 		v.Logger.Infof("Using PipelineRun definition from default_branch: %s", event.DefaultBranch)
+ 516 | 	} else {
+ 517 | 		v.Logger.Infof("Using PipelineRun definition from source %s commit SHA: %s", event.TriggerTarget.String(), event.SHA)
+ 518 | 	}
+
+## E4, recherche d'un rattrapage (missed webhook, lost webhook, poll) hors tests :
+pkg/kubeinteraction/wait.go
+
+## E5, droits sur les Secrets (yq et jq sur config/20*.yaml)
+{"f":"config/201-controller-role.yaml","kind":"ClusterRole","name":"pipeline-as-code-controller-clusterrole","secrets":[{"verbs":["get","create","update","delete"],"resourceNames":null}]}
+{"kind":"RoleBinding","name":"pipelines-as-code-controller-binding","role":"pipelines-as-code-controller-role","sa":["pipelines-as-code-controller"]}
+{"kind":"ClusterRoleBinding","name":"pipelines-as-code-controller-clusterbinding","role":"pipeline-as-code-controller-clusterrole","sa":["pipelines-as-code-controller"]}
+{"f":"config/202-watcher-role.yaml","kind":"ClusterRole","name":"pipeline-as-code-watcher-clusterrole","secrets":[{"verbs":["get","create","delete","update"],"resourceNames":null}]}
+{"kind":"RoleBinding","name":"pipelines-as-code-watcher-binding","role":"pipelines-as-code-watcher-role","sa":["pipelines-as-code-watcher"]}
+{"kind":"ClusterRoleBinding","name":"pipelines-as-code-watcher-clusterbinding","role":"pipeline-as-code-watcher-clusterrole","sa":["pipelines-as-code-watcher"]}
+{"f":"config/203-webhook-role.yaml","kind":"Role","name":"pipelines-as-code-webhook-role","secrets":[{"verbs":["list","watch"],"resourceNames":null},{"verbs":["get","update"],"resourceNames":["pipelines-as-code-webhook-certs"]}]}
+{"kind":"RoleBinding","name":"pipelines-as-code-webhook-binding","role":"pipelines-as-code-webhook-role","sa":["pipelines-as-code-webhook"]}
+{"kind":"ClusterRoleBinding","name":"pipelines-as-code-webhook-clusterbinding","role":"pipeline-as-code-webhook-clusterrole","sa":["pipelines-as-code-webhook"]}
+
+## E6, statut de Forgejo : docs/content/docs/installation/requirements.md, l. 189 à 189 (sha256 du fichier efdc283acfe4ed43)
+ 189 | Forgejo support is in Tech Preview and may have limitations or bugs. It is not recommended for production use.
+
+## E6, statut de Forgejo (liste des fournisseurs) : docs/content/docs/dev/_index.md, l. 16 à 16 (sha256 du fichier 098c2a5487948c81)
+  16 | - Forgejo (Webhook - Tech Preview)
+
+# fin 2026-11-18T22:15:17Z

@@ -2,6 +2,7 @@
 Tekton Pipelines	tektoncd/pipeline	orchestration	oui
 Tekton Chains	tektoncd/chains	provenance	oui
 Tekton Triggers	tektoncd/triggers	orchestration	oui
+Tekton Pipelines-as-Code	tektoncd/pipelines-as-code	orchestration	non
 Conforma	conforma/cli	politique	oui
 Conforma policy	conforma/policy	politique	oui
 Kyverno	kyverno/kyverno	politique	oui
