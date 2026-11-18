@@ -1,0 +1,11 @@
+# banc.sh preparer, début 2026-11-18T22:44:56Z
+manifeste Pipelines v1.15.5 : c2fe5c2ac98af2984f2d58199e81ef2056802f671051744d986ec998ad19ba84 (attendu c2fe5c2ac98af2984f2d58199e81ef2056802f671051744d986ec998ad19ba84)
+release.k8s.yaml de PaC v0.54.0 : 74648 octets, sha256 62d6a4ee2ecbd0151ca13913ca9bc346b33df82ee411ecdeb049392b07543f61 (74648 octets d'après l'API de GitHub)
+OK   sha256 égal au digest publié par l'API de GitHub
+image ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-controller:v0.54.0 -> sha256:a9eefe48ae06ce287e899be3c9b351aaa731928e368fac4c9dc268247ccdf452
+OK   contrôleur : digest égal à sante.log
+image ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-watcher:v0.54.0 -> sha256:ded342f642f3201d18cfca58e673ec17e16f070fddfba2b9713bdc8b96417cbe
+image ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-webhook:v0.54.0 -> sha256:99c0bd4820442ae075a3cf549734c9881bcae5ca916217d35dcf49573a5df25d
+release.k8s.yaml épinglé par digest : sha256 76e4a8cf7baee11a9df011a047376c34ad2a8706d4f1f16d6d80055c9c5a3120 ; références par tag restantes : 3
+images par tag dans le manifeste Pipelines : 19
+# fin 2026-11-18T22:44:58Z

@@ -1,0 +1,11 @@
+# banc.sh pac, début 2026-11-18T22:46:21Z
+PaC prêt en 36 s ; secret-auto-create = false
+  pac-controller ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-controller@sha256:a9eefe48ae06ce287e899be3c9b351aaa731928e368fac4c9dc268247ccdf452
+  pac-watcher ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-watcher@sha256:ded342f642f3201d18cfca58e673ec17e16f070fddfba2b9713bdc8b96417cbe
+  pac-watcher ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-watcher@sha256:ded342f642f3201d18cfca58e673ec17e16f070fddfba2b9713bdc8b96417cbe
+  pac-webhook ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-webhook@sha256:99c0bd4820442ae075a3cf549734c9881bcae5ca916217d35dcf49573a5df25d
+## K1 : droits sur les Secrets des ClusterRoles de PaC, dans le cluster
+{"name":"pipeline-as-code-controller-clusterrole","secrets":[{"verbs":["get","create","update","delete"],"resourceNames":null}]}
+{"name":"pipeline-as-code-watcher-clusterrole","secrets":[{"verbs":["get","create","delete","update"],"resourceNames":null}]}
+contrôleur joignable sur 127.0.0.1:8182 : HTTP 200
+# fin 2026-11-18T22:46:59Z

@@ -1,0 +1,7 @@
+# banc.sh demonter, début 2026-11-18T22:52:01Z
+Deleting cluster "banc-pac" ...
+Deleted nodes: ["banc-pac-control-plane"]
+Forgejo arrêté
+KUBECONFIG dédié laissé en place, sans le contexte du cluster supprimé : /home/gigi/.kube/supply-chain-poc-pac.yaml
+clusters kind restants : 
+# fin 2026-11-18T22:52:02Z

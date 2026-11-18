@@ -77,6 +77,8 @@ L'exception autorise le build à déclarer **les noms et digests des sujets** (a
 > - « Au tag v0.54.0, le code donne la même chose » devient : à la lecture, non remesuré. Le contrôleur impose aussi un `generateName` aux PipelineRuns, donc pas d'anti-rejeu par le nom ([lectures complémentaires](../poc/benchmarks/pac/resultats/lecture-complement.log)) ;
 > - la phrase corrigée au §2 a été introduite par `9d530a0` le 28/10/2026, avant A1.
 
+> **Additif du 18/11/2026, 22:53:02 UTC** (banc kind du 18/11/2026, PaC v0.54.0 ; accord du propriétaire « Oui, étapes 1 et 2 » ; [résultats](../poc/benchmarks/pac/README.md)). Mesuré : rejeu accepté (3 → 6 PipelineRuns), aucun rattrapage après un arrêt du contrôleur, Repository global sans Secret dans l'espace du build possible, `env` du `podTemplate` venu de `.tekton/` qui l'emporte sur celui du pas et qui passe l'admission de `builds` du PoC (dry-run serveur). Aucune décision.
+
 **Conclusion.** Aucune autre option auto-hébergeable n'atteint L3. C'est pourquoi le cœur reprend les mêmes briques que Konflux : ce n'est pas du mimétisme, c'est le seul choix possible aujourd'hui.
 
 Sources :

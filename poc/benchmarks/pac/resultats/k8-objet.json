@@ -1,0 +1,88 @@
+{
+  "apiVersion": "tekton.dev/v1",
+  "kind": "PipelineRun",
+  "metadata": {
+    "annotations": {
+      "pipelinesascode.tekton.dev/branch": "refs/heads/main",
+      "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+      "pipelinesascode.tekton.dev/event-type": "push",
+      "pipelinesascode.tekton.dev/git-provider": "gitea",
+      "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+      "pipelinesascode.tekton.dev/on-event": "[push]",
+      "pipelinesascode.tekton.dev/on-target-branch": "[main]",
+      "pipelinesascode.tekton.dev/original-prname": "k-hostile",
+      "pipelinesascode.tekton.dev/repo-url": "http://172.19.0.1:3010/banc/essai",
+      "pipelinesascode.tekton.dev/repository": "essai",
+      "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+      "pipelinesascode.tekton.dev/sender": "banc",
+      "pipelinesascode.tekton.dev/sha": "5ce5800fe895fac268ca4ca62c61a4d054f44aef",
+      "pipelinesascode.tekton.dev/sha-title": "banc PaC : .tekton/ initial\n",
+      "pipelinesascode.tekton.dev/sha-url": "http://172.19.0.1:3010/banc/essai/commit/5ce5800fe895fac268ca4ca62c61a4d054f44aef",
+      "pipelinesascode.tekton.dev/source-branch": "refs/heads/main",
+      "pipelinesascode.tekton.dev/source-repo-url": "http://172.19.0.1:3010/banc/essai",
+      "pipelinesascode.tekton.dev/state": "completed",
+      "pipelinesascode.tekton.dev/url-org": "banc",
+      "pipelinesascode.tekton.dev/url-repository": "essai",
+      "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"essai\",\"commit\":\"5ce5800fe895fac268ca4ca62c61a4d054f44aef\",\"eventType\":\"push\"}"
+    },
+    "finalizers": [
+      "pipelinesascode.tekton.dev/finalizer"
+    ],
+    "generateName": "k-hostile-",
+    "generation": 1,
+    "labels": {
+      "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+      "app.kubernetes.io/version": "nightly",
+      "pipelinesascode.tekton.dev/event-type": "push",
+      "pipelinesascode.tekton.dev/original-prname": "k-hostile",
+      "pipelinesascode.tekton.dev/repository": "essai",
+      "pipelinesascode.tekton.dev/sha": "5ce5800fe895fac268ca4ca62c61a4d054f44aef",
+      "pipelinesascode.tekton.dev/state": "completed",
+      "pipelinesascode.tekton.dev/url-org": "banc",
+      "pipelinesascode.tekton.dev/url-repository": "essai",
+      "tekton.dev/pipeline": "k-hostile"
+    },
+    "namespace": "essai-pac"
+  },
+  "spec": {
+    "pipelineSpec": {
+      "tasks": [
+        {
+          "name": "hostile",
+          "taskSpec": {
+            "metadata": {},
+            "spec": null,
+            "steps": [
+              {
+                "computeResources": {},
+                "env": [
+                  {
+                    "name": "BANC_PAC",
+                    "value": "env-du-pas"
+                  }
+                ],
+                "image": "docker.io/rancher/mirrored-library-busybox@sha256:101b4afd76732482eff9b95cae5f94bcf295e521fbec4e01b69c5421f3f3f3e5",
+                "name": "lire",
+                "script": "echo \"BANC_PAC=$BANC_PAC\""
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "taskRunTemplate": {
+      "podTemplate": {
+        "env": [
+          {
+            "name": "BANC_PAC",
+            "value": "env-du-podTemplate"
+          }
+        ]
+      },
+      "serviceAccountName": "default"
+    },
+    "timeouts": {
+      "pipeline": "1h0m0s"
+    }
+  }
+}

@@ -184,3 +184,45 @@ Installer PaC dans le cluster du PoC. **Accord à part**, car :
   - **étape 2** : un PipelineRun réel de l'EventListener sert de témoin. Si le témoin est refusé, `v-env` n'est pas interprétable et le script s'arrête. Les quatre requêtes passent sous l'identité empruntée `el-forgejo` : leur fenêtre horaire est consignée pour l'audit.
 - **Ordre et horaire.** Le banc tourne **avant** les relances du 19/11, jamais en même temps. Le cluster doit démarrer avant 23:15 UTC, et le démontage se faire avant 23:55 UTC. Sinon, l'étape en cours finit, le démontage suit, et les relances passent.
 - **Prédiction ajoutée** : **K8 bis**, l'`env` du `podTemplate` l'emporte sur celui du pas. Confiance moyenne : c'est la doc de Tekton v1.15.5 citée par la brique 05, jamais mesurée chez nous.
+
+### Résultats du banc, étapes 1 et 2 (18/11/2026, de 22:44:56 à 22:52:02 UTC ; note écrite à 22:52:55 UTC)
+
+Journaux : [`preparer`](resultats/banc-preparer.log), [`cluster`](resultats/banc-cluster.log), [`tekton`](resultats/banc-tekton.log), [`pac`](resultats/banc-pac.log), [`forgejo`](resultats/banc-forgejo.log), [`depot`](resultats/banc-depot.log), [`cas`](resultats/banc-cas.log), [`admission`](resultats/banc-admission.log), [`demonter`](resultats/banc-demonter.log) ; objet de K8 : [`k8-objet.json`](resultats/k8-objet.json).
+
+**Installation.**
+- `release.k8s.yaml` a le sha256 du digest publié (`62d6a4ee…`), et le digest du contrôleur est celui de `sante.log`. Les images qui tournent sont toutes épinglées par digest.
+- Pour Pipelines, les références par tag du manifeste sont des valeurs par défaut de configuration, pas des images lancées. Le compteur du script « références par tag restantes : 3 » est faux : il comptait aussi les lignes à digest.
+- Temps : cluster en 36 s (client v1.35.10, serveur v1.35.8), Tekton en 27 s, PaC en 36 s.
+- Forgejo 15.0.11 est joignable depuis le nœud kind sans règle sur l'hôte.
+
+| Cas | Résultat | Prédiction |
+|---|---|---|
+| K1 | ClusterRoles du contrôleur et du watcher : `get`, `create`, `update` et `delete` sur tous les Secrets, comme à la lecture | tenue |
+| K2 | Sans signature, puis signature fausse : HTTP 202, mais 3 → 3 PipelineRuns. Le contrôleur journalise les deux refus, avec les messages de A1 | tenue |
+| K3 | **Rejeu à l'identique** (même corps, mêmes en-têtes, même `X-Forgejo-Delivery`) : 3 → **6** PipelineRuns, aux noms tous différents (`generateName`) | tenue (non aveugle) |
+| K4 | Contrôleur arrêté pendant un push : une livraison Forgejo, en échec. 180 s après la relance : **0** PipelineRun pour ce commit. **Aucun rattrapage** | tenue |
+| K5 | **L'héritage du Repository global fonctionne** : les PipelineRuns sont créés, et il n'y a **aucun Secret** dans `essai-pac` avant comme après. Les PipelineRuns portent pourtant l'annotation `git-auth-secret` (un nom, sans Secret). Le clone sans identifiant n'est pas mesuré | tenue |
+| K6 | `default_branch` : la PR qui modifie `.tekton/k-pr.yaml` lance la définition de `main` (`marque = main`) | tenue |
+| K7 | `pipelineRef` gardé tel quel (`resolver: bundles`), sans `pipelineSpec` | tenue |
+| K8 | Objet hostile créé tel quel : `env` du `podTemplate` et `taskSpec` en ligne | tenue |
+| **K8 bis** | **Mesuré** : le pas affiche `BANC_PAC=env-du-podTemplate`. L'`env` du `podTemplate` l'emporte sur celui du pas (Tekton v1.15.5, pas en ligne) | tenue |
+
+**Étape 2, cluster du PoC.** Admission de `builds` en dry-run serveur, sous l'identité empruntée `declencheurs:el-forgejo`. Les quatre requêtes ont été faites à 22:51:53 UTC. Aucun objet n'a été créé : 0 `banc-pac-dry-*` dans `builds`.
+- **Témoin** (PipelineRun réel de l'EventListener, `sample-app-86204c58…`, `pipelineRef` par bundle) : **admis**.
+- **`v-env`** (le même, plus un `env` au `podTemplate`) : **admis**. Prédiction tenue.
+- **`v-hostile`** (spec en ligne, étape privilégiée et `hostPath`, ajoutés par `jq`) : refusé par Kyverno (`tekton-references`, test 2 : spec en ligne interdite). Rien n'est conclu sur l'étape privilégiée.
+- **`v-enligne`** (spec en ligne seule) : refusé par le webhook de validation de Tekton (`must not set the field(s): spec.pipelineSpec`).
+- **Portée** : seule l'admission du PipelineRun est mesurée. Aucun pod n'est créé : ni Pod Security, ni les règles Kyverno sur les pods, ni Trusted Resources ne sont exercés.
+
+**Ce que le banc tranche** (critères écrits avant le lancement) :
+- le rejeu n'est pas refusé ;
+- PaC ne rattrape pas un webhook perdu ;
+- l'admission de `builds` ne borne pas l'`env` du `podTemplate`.
+
+**Aucune des conditions qui renverseraient « garder Triggers » n'est remplie.** Concrètement : avec PaC, un dépôt qui écrit dans `.tekton/` un PipelineRun bien formé, `pipelineRef` par bundle signé compris, passe notre admission avec un `env` à lui. Ce dernier l'emporte sur celui des pas des tâches signées (K8 bis, mesuré sur un pas en ligne dans kind ; non mesuré sur une tâche venue d'un bundle). Avec Triggers, le `podTemplate` vient du gabarit, dans la zone Confiance.
+
+**Ce que le banc ouvre pour notre chaîne aussi.** Notre admission laisse passer un `env` au `podTemplate`. Seul l'EventListener peut créer des PipelineRuns dans `builds` (docs/02), si bien que ce n'est pas exploitable par un dépôt. C'est en revanche une règle d'admission qui manque si cet invariant tombe. **Décision au propriétaire**, rien n'est changé.
+
+**Démontage** : cluster `banc-pac` supprimé, Forgejo du banc arrêté (processus absent). Le `KUBECONFIG` dédié reste en place, vide de son contexte. Les dossiers restent dans `~/.cache/supply-chain-poc/pac/banc`.
+
+**Effort** : de 22:44:56 à 22:52:02 UTC pour le banc, et de 22:11:40 UTC (cadre) à 22:52:55 UTC pour toute l'évaluation, préparation comprise. L'estimation était de 0,5 pw à sec, plus 1 pw pour les étapes 1 et 2 ; les heures ne sont pas converties en pw.

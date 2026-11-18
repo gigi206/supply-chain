@@ -1,0 +1,5 @@
+# banc.sh forgejo, début 2026-11-18T22:47:04Z
+jeton : 40 octets, sans saut de ligne final : oui
+Forgejo vu depuis le conteneur du nœud kind : HTTP 200
+Forgejo 15.0.11+gitea-1.22.0 sur 172.19.0.1:3010 (pid 1409885) ; fichiers de secrets : 600 600 600 
+# fin 2026-11-18T22:47:06Z

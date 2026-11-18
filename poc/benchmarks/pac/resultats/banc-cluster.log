@@ -1,0 +1,10 @@
+# banc.sh cluster, début 2026-11-18T22:45:14Z
+Set kubectl context to "kind-banc-pac"
+You can now use your cluster with:
+kubectl cluster-info --context kind-banc-pac --kubeconfig /home/gigi/.kube/supply-chain-poc-pac.yaml
+Not sure what to do next? 😅  Check out https://kind.sigs.k8s.io/docs/user/quick-start/
+cluster banc-pac créé en 36 s ; mémoire plafonnée : 6442450944 octets
+ports publiés : 6443/tcp -> 127.0.0.1:46491 30082/tcp -> 127.0.0.1:8182 
+client v1.35.10 ; serveur v1.35.8
+image du nœud : kindest/node:v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0
+# fin 2026-11-18T22:45:50Z

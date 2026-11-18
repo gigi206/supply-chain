@@ -1,0 +1,7 @@
+# banc.sh depot, début 2026-11-18T22:47:09Z
+dépôt banc/essai créé
+webhook 1 vers http://127.0.0.1:8182 (gitea, push,pull_request,pull_request_assign,pull_request_label,pull_request_milestone,pull_request_comment,pull_request_review_approved,pull_request_review_rejected,pull_request_review_comment,pull_request_sync,pull_request_review_request)
+Repository global pipelines-as-code/pipelines-as-code (secrets dans pipelines-as-code) et local essai-pac/essai (sans secret)
+Secrets dans essai-pac avant tout événement : 0
+push initial : 5ce5800fe895fac268ca4ca62c61a4d054f44aef
+# fin 2026-11-18T22:47:10Z

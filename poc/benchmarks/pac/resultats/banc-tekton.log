@@ -1,0 +1,7 @@
+# banc.sh tekton, début 2026-11-18T22:45:54Z
+Tekton Pipelines prêt en 27 s
+  tekton-events-controller ghcr.io/tektoncd/pipeline/events-a9042f7efb0cbade2a868a1ee5ddd52c@sha256:6375e56fc283f20133b60b6d9ee4427aa4a8909d3b4465f14e9b806368ad0570
+  tekton-pipelines-controller ghcr.io/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@sha256:687a9f10236509fa82f86fc9b10525c418572b5853e18d38cdfec29827f31796
+  webhook ghcr.io/tektoncd/pipeline/webhook-d4749e605405422fd87700164e31b2d1@sha256:e48f0a03067fa8f112d36ab5ad7284871ebcbfe65997018fab7a2749fc064a63
+  controller ghcr.io/tektoncd/pipeline/resolvers-ff86b24f130c42b88983d3c13993056d@sha256:8e98a0e406d3d965531815e8d6b9167a8ebd522d69470599ed07497a59065077
+# fin 2026-11-18T22:46:21Z

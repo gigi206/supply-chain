@@ -1,0 +1,42 @@
+# banc.sh cas, début 2026-11-18T22:47:14Z
+## référence : PipelineRuns du push initial 5ce5800fe895fac268ca4ca62c61a4d054f44aef : 3 (attendu 3 : k-push, k-bundle, k-hostile)
+  k-bundle-g4fwg (generateName k-bundle-, modèle k-bundle)
+  k-hostile-w9rmf (generateName k-hostile-, modèle k-hostile)
+  k-push-nmwt6 (generateName k-push-, modèle k-push)
+## K5 : Secrets dans essai-pac après le push : 0 ; annotation git-auth-secret : 3
+livraison de référence : hook_task 1, réussie True, X-Forgejo-Delivery 30e58cc6-aced-4a67-b992-4da34415893c, en-têtes de signature : ['X-Forgejo-Signature', 'X-Gitea-Signature', 'X-Gogs-Signature', 'X-Hub-Signature', 'X-Hub-Signature-256']
+## K2 sans-signature : HTTP 202, PipelineRuns du push initial : 3 -> 3
+## K2 signature-fausse : HTTP 202, PipelineRuns du push initial : 3 -> 3
+## K3 valides : HTTP 202, PipelineRuns du push initial : 3 -> 6
+  k-bundle-djb4j
+  k-bundle-g4fwg
+  k-hostile-jgz64
+  k-hostile-w9rmf
+  k-push-bpl6z
+  k-push-nmwt6
+refus de PaC (journal du contrôleur, messages de signature seulement) :
+        1 error handling event: client setup failed: could not validate payload, check your webhook secret?: gitea/forgejo webhook signature validation failed
+        1 error handling event: client setup failed: could not validate payload, check your webhook secret?: no signature has been detected, for security reason we are not allowing webhooks without a secret
+## K4 : contrôleur à 0 pendant un push
+push pendant l'arrêt : e12a5e4bcdbbb021419efa3e92f638726e8c8f42
+livraisons Forgejo de e12a5e4bcdbb : 1, réussies : 0
+contrôleur relancé à 22:48:33 ; attente de 180 s
+PipelineRuns de e12a5e4bcdbbb021419efa3e92f638726e8c8f42 : 0 (prédiction : 0)
+## K6 : pipelinerun_provenance default_branch, PR qui modifie .tekton/k-pr.yaml
+remote: 
+remote: Create a new pull request for 'k6':        
+remote:   http://172.19.0.1:3010/banc/essai/compare/main...k6        
+remote: 
+commit de la branche k6 : 36366a134be5d7d53fe13e0eb0de3b361156870c
+PR n° 1 ouverte
+  k-pr-j5r4z : param marque = main
+PipelineRuns de la PR : 1 (prédiction : marque = main)
+## K7 : PipelineRun à pipelineRef par bundle
+{"pipelineRef":{"params":[{"name":"bundle","value":"registre.invalide.test/banc/pipeline@sha256:0000000000000000000000000000000000000000000000000000000000000000"},{"name":"name","value":"banc"},{"name":"kind","value":"pipeline"}],"resolver":"bundles"},"pipelineSpec_present":false}
+## K8 : PipelineRun hostile tel que créé par PaC (archivé, nettoyé)
+{"generateName":"k-hostile-","env":[{"name":"BANC_PAC","value":"env-du-podTemplate"}],"taskSpec_en_ligne":[true],"pipelineRef":null}
+k8-objet.json : sha256 0d7bdc57e27042ff482cd2add4b871cdf71eae81f8e3c8267bbe7f526c9d7de9 ; motifs secret ou token : 0
+## K8 bis : env du podTemplate contre env du pas (journal du pod de k-hostile)
+sortie du pas : BANC_PAC=env-du-podTemplate
+## K5 (fin) : Secrets dans essai-pac : 0
+# fin 2026-11-18T22:51:36Z

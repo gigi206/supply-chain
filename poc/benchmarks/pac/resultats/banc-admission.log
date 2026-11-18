@@ -1,0 +1,19 @@
+# banc.sh admission, début 2026-11-18T22:51:53Z
+PipelineRun réel de référence : sample-app-86204c58527870c29b57ff3162a0c2e84c3dfc07 ; pipelineRef "bundles"
+fenêtre des requêtes sous l'identité empruntée system:serviceaccount:declencheurs:el-forgejo : début 2026-11-18T22:51:53Z
+## dry-run temoin : code 0 ; webhooks cités :  ; politiques citées : 
+   texte : pipelinerun.tekton.dev/banc-pac-dry-qzhtx created (server dry run) 
+
+## dry-run env : code 0 ; webhooks cités :  ; politiques citées : 
+   texte : pipelinerun.tekton.dev/banc-pac-dry-7hfvj created (server dry run) 
+
+## dry-run hostile : code 1 ; webhooks cités : admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references"  ; politiques citées : svc-fail-finegrained-tekton-referenc tekton-referenc 
+   texte : Error from server: error when creating "/home/gigi/.cache/supply-chain-poc/pac/banc/admission/v-hostile.json": admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" denied the request: Policy tekton-references failed: test 2 : spec en ligne interdite (taskSpec, pipelineSpec) 
+
+## dry-run enligne : code 1 ; webhooks cités : admission webhook "validation.webhook.pipeline.tekton.dev"  ; politiques citées : 
+   texte : Error from server (BadRequest): error when creating "/home/gigi/.cache/supply-chain-poc/pac/banc/admission/v-enligne.json": admission webhook "validation.webhook.pipeline.tekton.dev" denied the request: validation failed: must not set the field(s): spec.pipelineSpec, spec.pipelineSpec.tasks[0].taskSpec 
+
+fin des requêtes sous system:serviceaccount:declencheurs:el-forgejo : 2026-11-18T22:51:53Z
+portée : seule l'admission du PipelineRun est mesurée ; aucun pod n'est créé (ni Pod Security, ni règles Kyverno des pods, ni Trusted Resources)
+PipelineRuns banc-pac-dry-* réellement présents dans builds (attendu 0) : 0
+# fin 2026-11-18T22:51:53Z
