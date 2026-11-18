@@ -1,0 +1,14 @@
+# relevé « après » de l'étape pipeline de M4c (lecture seule) : builds/sample-app-rpm, tekton/pipelines/sample-app-rpm, catalogue de Zot, df de / sur sc-stockage, PVC et PipelineRuns m4c-rpm-* de builds
+2026-11-18T15:44:22Z
+## builds/sample-app-rpm
+sha256-07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119.att sha256:40c19b6fbe49b84595c5590259d92c9e2600e1bf0be072a024e40d2cbc9f6ebd
+sha256-07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119.sig sha256:b7275400a50feaaf7bdb86e9115002b79ac946de95855443c7daaa5d10bec5e4
+rc 0
+## tekton/pipelines/sample-app-rpm
+m4c sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+rc 0
+## catalogue : 152 dépôts
+Mounted on        Used      Avail
+/          15595827200 4425089024
+## builds : 20 PVC ; PipelineRuns m4c-rpm-* : m4c-rpm-1 m4c-rpm-2
+2026-11-18T15:44:22Z

@@ -323,3 +323,28 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 - Tout tenu : `comparaison` (rpm tiré de Zot par digest, confronté à M3), puis `provenance`.
 - PL2 ou PL8 non tenue : rien n'est purgé. Les relevés (codes, raisons, journaux) sont lus avant toute relance, qui prendra d'autres noms.
 - PL6 ou PL9 non tenue : la pipeline a publié un rpm différent de M3. L'écart est à expliquer avant `comparaison`.
+
+## Note datée du 18/11/2026, écrite à 15:45:05 UTC : `pipeline` passée, PL1 à PL12 tenues
+
+**Passage** ([journal](m4c-pipeline.log)) : le 18/11/2026, `date -u` avant et après le lancement : 15:39:38 et 15:44:10 UTC, code 0, 61 OK, aucun KO ni écart. Sur `bfeff6c`, `m4c.sh` = `d881b967…`. Journaux de `construire` archivés, masqués ([1](m4c-pipeline-1-construire.log), [2](m4c-pipeline-2-construire.log)) ; ils ne diffèrent que par la durée de mock. Relevés ([avant](m4c-pipeline-zot-avant.log), à 15:37:47 UTC ; [après](m4c-pipeline-zot-apres.log), à 15:44:22 UTC).
+
+**Confrontation aux prédictions**
+- **PL1 tenue** : gardes passées, deux dry-runs admis (code 0).
+- **PL2 tenue** : `m4c-rpm-1` et `m4c-rpm-2` terminés en succès ; code 0.
+- **PL3 tenue** : `preparer-rpm` et `publier-image` sans `runtimeClassName`, `construire-rpm` sous `kata`, tous sur `sc-build`.
+- **PL4 tenue** : résultats de `preparer` égaux aux références, aux deux passages.
+- **PL5 tenue** : écriture refusée, quatre témoins en échec, 222 rpm confrontés au verrou, mock rc 0 (47 et 48 s), aucun repli, aucune ligne http ; 222 paquets du buildroot, aucun écart au verrou.
+- **PL6 tenue** : Source0 `07521c1e…`, src.rpm `c802e60a…` et rpm `864d55f4…`, ceux de M3, aux deux passages.
+- **PL7 tenue** : `invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0` ; capacité de `/w` de 3 059 832 kB, dont 1 456 092 kB utilisés après mock ; aucun « No space left on device ».
+- **PL8 tenue** : `publier-image` (UID 65532) a lu `image.tar` écrit par root sous Kata ; ligne « publiée » ; `DIGEST_CONSTRUIT` = `IMAGE_DIGEST` ; manifeste relu, une couche.
+- **PL9 tenue** : digest `sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119`, celui du pod d'essai, aux deux passages.
+- **PL10 tenue** : les deux PipelineRuns signés par Chains.
+- **PL11 tenue** : `m4c-rpm-1` de 15:39:39 à 15:41:48 UTC (condition relevée), `m4c-rpm-2` de 15:41:55 à 15:44:02 UTC, soit environ 2 min chacun ; étape entière en 4 min 32 s.
+- **PL12 tenue** : `builds/sample-app-rpm` porte les seuls tags `sha256-07b7bd6f….att` et `….sig` ; catalogue de 152 (N + 1) ; 20 PVC dans `builds` ; `m4c-rpm-1` et `m4c-rpm-2` présents ; rien n'est supprimé.
+
+**Relevé, non prédit** : `/` de sc-stockage : 4 443 885 568 octets libres avant `m4c-rpm-1`, 4 428 136 448 après `m4c-rpm-2` (15:39:39 et 15:44:10 UTC).
+
+**Portée.** La pipeline signée de la plateforme a construit, deux fois, sous Kata et sans réseau, le rpm de M3, et l'a publié, signé par Chains. Ce n'est pas encore M4c tenu :
+- `comparaison` doit tirer l'artefact de Zot par digest et confronter son rpm à celui de M3 ;
+- `provenance` doit vérifier les attestations (cosign, sujet, `resolvedDependencies` avec les trois entrées et le commit, Kata dans la spec signée de `construire`, époque `1793229566`).
+- La porte ne connaît toujours pas `construire-rpm` (choix du propriétaire).
