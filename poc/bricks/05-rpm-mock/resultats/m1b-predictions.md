@@ -151,3 +151,17 @@ Journaux : [banc](m1b-repro2.log), et [lecture complémentaire](m1b-repro2-analy
 - **Neutralisation** : aucun moyen de neutraliser ces écarts n'est mesuré ici, ni le choix de la borne des mtimes. Ce sera une carte à part. Si l'un des moyens demande une installation, ou si c'est un vrai choix, la décision reviendra au propriétaire.
 
 **Portée** : ce banc traite l'archive, sur l'hôte, des 222 rpm de vault 9.7. Il ne dit pas si mock fonctionne sans les huit fichiers retirés, ni ce que fera la tâche Kata de la plateforme.
+
+## Corrections et compléments après relecture du conseiller : prédictions écrites avant le lancement (2026-11-18T20:07:49Z UTC)
+
+**Corrections** de la note du relevé des sources :
+- **« Rocky 9.9 est sortie » dépasse la mesure.** Le journal montre seulement que l'index de `pub/rocky` liste `9.9/` et que celui de `vault/rocky` liste `9.8/`. Je n'ai lu ni le contenu de pub/9.9, ni ses métadonnées, ni une annonce. La même correction vaut pour la ligne du README du 2026-11-18T20:05:20Z.
+- **Les révisions des repomd.xml** (10/11/2026 à 03:20:16 UTC pour `archive/epel/9.8`, 18/11/2026 à 01:40:30 UTC pour `pub/epel/9`) ont été lues par une commande sans journal. Elles sont relues et archivées par [`m1b-complements.sh`](m1b-complements.sh), partie 1.
+- **Les 985 fichiers de `usr/include`** : dire que leur mtime vient des en-têtes rpm était une déduction tirée de leur égalité entre les deux arbres. Elle est mesurée ici, partie 2.
+
+**Constat pour le propriétaire** : la règle écrite d'avance n'avait pas prévu qu'une version 9.9 paraisse. Rester sur 9.8 figée, ou suivre 9.9, est un vrai choix. Il est à trancher avant la liste épinglée de M1b, sans recommandation de ma part à ce stade.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| CP1 | Les révisions relues sont 1794280816 pour `archive-9.8` et 1794966030 pour `epel9`, et les sha256 des repomd.xml sont ceux de `m1b-sources.log` | Haute : mêmes fichiers, déjà lus |
+| CP2 | Les 985 fichiers ont une mtime égale à `FILEMTIMES` dans leur en-tête, et appartiennent tous à `kernel-headers` | Haute pour l'égalité ; moyenne pour le paquet, deviné d'après `usr/include/linux` |
