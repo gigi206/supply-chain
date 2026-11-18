@@ -621,3 +621,26 @@ Trois formules dépassent la mesure. Elles sont corrigées ici, le texte d'origi
 3. **« Le pod Kata de la future tâche a `/proc` »** : le pod de l'étape racine de S1 l'avait. Sa ligne « invité » lit `/proc/meminfo` : « invité : 6.18.56, 3 vCPU, 6119664 kB ; /w : tmpfs » ([`s1-racine.log`](s1-racine.log), l. 3). Le pod de la future tâche n'existe pas encore.
 
 **Script** : `m1b-outil.sh` retire désormais lui-même les adresses des identités de clé. Un nouveau passage écrira dans un nouveau journal, car `m1b-outil.log` est commité.
+
+### Ré-archivage sans `etc/machine-id` : lecture et prédictions (écrites à 2026-11-18T21:08:40Z UTC, avant le lancement)
+
+**Lecture faite avant les prédictions** ([script](m1b-machine-id.sh), [journal](m1b-machine-id.log)), sur les 199 fichiers rpm du miroir partiel (`rpm -qp`), sans toucher aux arbres :
+- Un seul paquet déclare `/etc/machine-id` : systemd 252-67.el9_8.6.rocky.0.1, avec les drapeaux `cng` (config, noreplace, ghost), le mode 0444 et une taille de 0 : rpm ne livre pas de contenu.
+- Son scriptlet `%post` lance `systemd-machine-id-setup`, qui écrit l'identifiant. Une autre ligne du même scriptlet lit `/etc/machine-id` pour changer le groupe des dossiers du journal. Aucun autre scriptlet ni trigger des 199 rpm ne cite machine-id.
+- Dans i5, i6 et i7, le fichier fait 33 octets, en mode 0444, avec une mtime à l'heure de l'installation (ex. 1795035511 pour i5), et non à S. L'archive la ramène à S par `--clamp-mtime`.
+
+**Ce qui est lancé** ([`m1b-sans-machine-id.sh`](m1b-sans-machine-id.sh)) : hors ligne, sur les arbres laissés du passage de 20:57:14 UTC, un témoin `t5` (i5 avec les exclusions du passage), puis `b5`, `b6` et `b7` avec `--exclude=./etc/machine-id` en plus. Les archives vont dans un dossier neuf ; les arbres ne sont pas modifiés.
+
+**Prédictions :**
+- **MS1** : `t5.tar` a le sha256 de `a5.tar` du passage (`babac006…`). Les lectures faites depuis (analyse, stat, cat) n'ont pas changé ce que l'archive retient.
+- **MS2** : `b5`, `b6` et `b7` n'ont aucun membre `./etc/machine-id`. `b5` a exactement un membre de moins que `t5`.
+- **MS3** : `b5.tar` et `b6.tar` sont identiques octet à octet.
+- **MS4** : `b5` et `b7` n'ont aucun membre d'un seul côté, et un seul membre différent : `var/lib/rpm/rpmdb.sqlite`.
+
+**Portée, avant le lancement** : même si MS1 à MS4 tiennent, ce banc ne montre qu'une chose : **exclure** ce membre suffit à rendre égales deux installations faites le même jour avec la racine d'outils de `99790c13`. Restent non mesurés :
+- le choix entre un fichier vide et un fichier absent, qui revient à la carte ;
+- un autre jour ;
+- les outils de l'amorce (langues, umask) ;
+- le bootstrap.
+
+Le point 1 A reste non établi.

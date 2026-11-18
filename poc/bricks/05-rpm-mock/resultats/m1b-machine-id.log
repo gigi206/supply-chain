@@ -1,0 +1,13 @@
+# m1b-machine-id.sh, début 2026-11-18T21:07:49Z
+rpm dans le miroir partiel : 199
+## 1. paquets dont la liste cite /etc/machine-id
+     systemd-252-67.el9_8.6.rocky.0.1.x86_64 : /etc/machine-id cng -r--r--r-- 0
+## 2. scriptlets et triggers qui citent machine-id
+     systemd-252-67.el9_8.6.rocky.0.1.x86_64 | postinstall scriptlet (using /bin/sh): | systemd-machine-id-setup &>/dev/null || :
+     systemd-252-67.el9_8.6.rocky.0.1.x86_64 | postinstall scriptlet (using /bin/sh): | machine_id=$(cat /etc/machine-id 2>/dev/null)
+lignes citant machine-id : 2
+## 3. etc/machine-id des arbres (stat seul)
+i5 : 33 octet(s), mode 444, mtime 1795035511
+i6 : 33 octet(s), mode 444, mtime 1795035540
+i7 : 33 octet(s), mode 444, mtime 1795035552
+# fin 2026-11-18T21:07:51Z
