@@ -9,7 +9,7 @@ Protocoles des évaluations définies par l'[ADR 0000](../../docs/adr/0000-assem
 | [`nix/`](nix/) | B : Nix comme moteur de build ? | 3 jours | Partiellement local, second hôte pour B-1 |
 | [`kyverno-seul/`](kyverno-seul/) | C : Kyverno comme moteur de politique unique ? | 2 jours | Local (CLI) ; cluster pour la parité avec l'admission |
 | [`pac/`](pac/) | Hors ADR 0000, sans note (demande du 18/11/2026) : PaC peut-il remplacer Triggers et l'intercepteur HMAC ? | 0,5 pw | À sec : santé et lecture du code |
-| [`deploiement/`](deploiement/) | Hors ADR 0000, sans note (demande du 19/11/2026) : Argo CD, Flux ou helmfile pour déployer la plateforme ? | 0,5 pw | À sec : santé et lecture des manifestes |
+| [`deploiement/`](deploiement/) | Hors ADR 0000, sans note (demande du 18/11/2026, UTC) : Argo CD, Flux ou helmfile pour déployer la plateforme ? | 0,5 pw | À sec : santé et lecture des manifestes |
 
 Règles :
 - chaque mesure est archivée dans `<dossier>/resultats/` (commandes, journaux, sorties) ;

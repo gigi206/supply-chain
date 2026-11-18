@@ -83,3 +83,40 @@ Note écrite à 23:11:29 UTC, le 18/11/2026 (le 19/11 à Paris). Journaux : [`sa
   - les scripts actuels restent la référence.
 
 **Portée.** Tout est lu, rien n'est installé ni exécuté. Les signatures d'image sont relevées par `cosign tree` au tag, sans `cosign verify` d'identité. Aucune décision, aucune recommandation à ce stade. La note « Phase 4 » de docs/00 et le minimum 3.5.4 de docs/04 restent tels qu'ils sont écrits.
+
+### Corrections et compléments datés (18/11/2026, écrits à 23:16:06 UTC, après relecture par le conseiller)
+
+Journal : [`lecture-2.log`](resultats/lecture-2.log), de 23:14:56 à 23:15:17 UTC.
+
+**1. La raison de l'option (b) et de D1 départage.**
+- L'option (b) du 01/11/2026 a été rejouée et mesurée : « aucune liaison vers `cluster-admin` dont un sujet est un compte de service » (README de la 08, l. 647). Le même filtre trouvait `helm-kube-system-cilium` sous le HelmChart.
+- D1 de la 08b, l. 57, retient l'installation depuis l'hôte par Helm, « aucun compte `helm-*` ». Elle écarte les HelmChart de RKE2, qui donneraient des « comptes `helm-*` à `cluster-admin` probables ».
+- **Argo CD et Flux réintroduiraient précisément un compte de service lié à des droits de type `cluster-admin`.** Ils rouvrent donc deux décisions déjà prises. « Pousser », par les scripts actuels ou par helmfile, les prolonge.
+
+**2. Couverture de l'existant.**
+- Aucun des trois ne déploie les services systemd hors cluster (Zot, Forgejo, Alloy sur `sc-stockage`). Ces services restent aux scripts.
+- Pour les manifestes rendus (kustomize), helmfile les transforme en chart local et appelle `kustomize build` (`advanced-features.md`, l. 196 et 209). **Le binaire `kustomize` est donc à auditer en plus**, avec `helm-diff`.
+
+**3. Argo CD : la variante d'installation compte.**
+- Redis, Dex et `argocd-server` valent pour `install.yaml`.
+- `core-install.yaml` n'a ni Dex ni `argocd-server`. Il garde Redis, et le ClusterRole `*` sur `*` de l'`application-controller`.
+- `namespace-install.yaml` n'a **aucun ClusterRole ni ClusterRoleBinding** : il n'a que des Roles, mais il embarque Dex et Redis. Ses droits sur les autres espaces ne sont pas lus.
+- G1 et G2 sont donc « non tenus **par défaut** ». Une installation par espace les borne, avec une portée non lue.
+
+**4. Flux : bornage et symétrie.**
+- Une `Kustomization` ou une `HelmRelease` peut emprunter un compte de service (`.spec.serviceAccountName` ; `kustomizations.md`, l. 543 ; `helmreleases.md`, l. 428). Le drapeau `--no-cross-namespace-refs` existe (l. 146).
+- Les contrôleurs gardent pourtant leur liaison à `cluster-admin`, nécessaire pour emprunter. G1 et G2 sont « non tenus par défaut, bornables par emprunt ». Ce n'est pas mesuré.
+- Ses contrôleurs rendent eux aussi des manifestes (kustomize et Helm), comme le repo-server d'Argo CD.
+- Le manifeste par défaut contient deux contrôleurs d'images (`image-automation`, `image-reflector`) et `source-watcher`, dont la plateforme n'a pas besoin.
+- Les sept images portent une attestation au tag (`cosign tree`), sans `cosign verify` d'identité.
+- L'OpenPGP est archivé : `gitrepositories.md`, l. 634 et 694 à 700.
+
+**5. Corrections du tableau.**
+- **« 5 avis critiques en 2026 dans le repo-server »** est faux. Trois sur cinq le sont (Kustomize Helm, Kustomize remote, Jsonnet), plus un sur les AppProject, tous corrigés en 3.3.15, 3.4.10, 3.5.4 et 3.6.0-rc2. Le cinquième (extraction de Secrets par ServerSideDiff) est corrigé en 3.3.9 et 3.2.11.
+- **« Redis et Dex sans signature »** : c'est ce que montre `cosign tree` au tag, et rien d'autre.
+- **helmfile `verify`** : le champ est porté par un dépôt de charts, avec un `keyring` GPG (`configuration.md`, l. 59 et 60). C'est la provenance de Helm. Qu'il soit transmis à Helm n'est pas lu dans le code.
+- **G5, DP7** : en 19b (L4, le 02/11/2026, sous k3s), les témoins J2 (journaux de pods) et J3 (audit de l'API) ont été lus dans Grafana (README de la 19b, l. 312). Les contrôleurs d'Argo CD et de Flux seraient donc collectés comme tout pod, et le lanceur de helmfile serait tracé par l'audit de l'API. Ce n'est pas remesuré sous RKE2. **DP7 est tenue à la lecture.**
+- **Adoption** (docs/04 la fait peser, et je l'avais omise) : Flux se dit « graduated » à la CNCF dans son README. Le README d'Argo CD ne cite que le code de conduite de la CNCF, donc son statut n'est pas établi par cette lecture. helmfile ne mentionne pas la CNCF. Les verdicts ne changent pas.
+- **Dates** : la demande est du 18/11/2026, 23:0x UTC (le 19/11 à Paris). Le titre du cadre (« 19/11/2026, heure de Paris ») et la ligne d'index sont ramenés à l'UTC.
+
+**6. L'argument écrit pour Argo CD vaut aussi pour Flux.** docs/00, l. 73, donne « releases SLSA L3 ». Flux publie lui aussi `provenance.intoto.jsonl`, des sommes signées par sigstore et des images attestées. Il couvre en plus les commits signés SSH et les artefacts OCI signés par cosign.

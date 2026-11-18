@@ -1,0 +1,135 @@
+# lecture-2.sh (déploiement), début 2026-11-18T23:14:56Z ; dossier /home/gigi/.cache/supply-chain-poc/dep-lecture2-20261118T231456Z
+## Raison de l'option (b) du 01/11/2026 et de D1 (fichiers du dépôt)
+--- poc/bricks/08-trust-plane/README.md, l. 647 à 647
+ 647 | - **Compte `helm-cilium`** ([`preuves-helm_cilium.log`](resultats/preuves-helm_cilium.log), étape réécrite pour l'option (b), prédiction écrite avant) : aucune liaison vers `cluster-admin` dont un sujet est un compte de service (seul `system:masters`, un groupe) ; le même filtre trouve `helm-kube-system-cilium` dans la liaison relevée sous le HelmChart ([`helm-kube-system-cilium.json`](resultats/helm-kube-system-cilium.json), témoin). Un pod portant `helm-cilium` dans `kube-system` est refusé au nom des 9 comptes qui peuvent y créer des pods (« serviceaccount "helm-cilium" not found ») ; témoin : le même pod avec le compte `default`, admis. Les 9 comptes et la source de 
+--- poc/bricks/08b-rke2/README.md, l. 57 à 57
+  57 | | **D1, installation de Cilium, CoreDNS et metrics-server** | (a) depuis l'hôte par Helm, comme Cilium aujourd'hui : `cni: none`, `ingress-controller: none`, `disable:` des charts empaquetés. Tous restent en service. Aucun HelmChart, donc aucun compte `helm-*`. Votre option (b) du 01/11 tient, et les images restent vérifiées | (b) empaquetés par RKE2 : `cni: cilium` et `HelmChartConfig`. Plus simple, mais comptes `helm-*` à `cluster-admin` probables, à accepter en écart, et images Cilium de Rancher, non vérifiées par la chaîne actuelle |
+
+## G5 : témoins J2 (journaux de pods) et J3 (audit de l'API) lus dans Grafana (19b, L4, 02/11/2026, sous k3s)
+--- poc/bricks/19b-journalisation/README.md, l. 312 à 312
+ 312 | | 3 | **Contre-épreuve : marqueur jamais émis absent.** Les dix témoins sont lus par l'auditeur à travers Grafana, **en 2 à 5 s** (J1 sur les trois nœuds, J2 sur `sc-confiance` et `sc-build`, J3, J4, J5, J6, J8). J5 : le chemin `sys/policy/<marqueur>` figure en clair dans l'audit d'OpenBao. J6 : l'étiquette poussée figure dans l'audit de Zot | conforme, prédictions faibles comprises |
+
+## Argo CD v3.6.2 : variantes d'installation
+lu : argoproj/argo-cd manifests/core-install.yaml @ v3.6.2 -> argocd-core-install.yaml (2079093 octets)
+### core-install.yaml : argocd-applicationset-controller argocd-redis argocd-repo-server argocd-application-controller
+      1 image: public.ecr.aws/docker/library/redis:8.10.1-alpine
+      5 image: quay.io/argoproj/argocd:v3.6.2
+{"kind":"Role","name":"argocd-application-controller","rules":[{"apiGroups":[""],"resources":["secrets","configmaps"],"verbs":["get","list","watch"]}]}
+{"kind":"Role","name":"argocd-applicationset-controller","rules":[{"apiGroups":[""],"resources":["secrets","configmaps"],"verbs":["get","list","watch"]}]}
+{"kind":"Role","name":"argocd-redis","rules":[{"apiGroups":[""],"resources":["secrets"],"verbs":["get"]},{"apiGroups":[""],"resources":["secrets"],"verbs":["create"]}]}
+{"kind":"ClusterRole","name":"argocd-application-controller","rules":[{"apiGroups":["*"],"resources":["*"],"verbs":["*"]}]}
+{"kind":"RoleBinding","name":"argocd-application-controller","role":"argocd-application-controller","sa":["argocd-application-controller"]}
+{"kind":"RoleBinding","name":"argocd-applicationset-controller","role":"argocd-applicationset-controller","sa":["argocd-applicationset-controller"]}
+{"kind":"RoleBinding","name":"argocd-redis","role":"argocd-redis","sa":["argocd-redis"]}
+{"kind":"ClusterRoleBinding","name":"argocd-application-controller","role":"argocd-application-controller","sa":["argocd-application-controller"]}
+lu : argoproj/argo-cd manifests/namespace-install.yaml @ v3.6.2 -> argocd-namespace-install.yaml (99961 octets)
+### namespace-install.yaml : argocd-applicationset-controller argocd-dex-server argocd-notifications-controller argocd-redis argocd-repo-server argocd-server argocd-application-controller
+      1 image: ghcr.io/dexidp/dex:v2.46.0
+      1 image: public.ecr.aws/docker/library/redis:8.10.1-alpine
+      8 image: quay.io/argoproj/argocd:v3.6.2
+{"kind":"Role","name":"argocd-application-controller","rules":[{"apiGroups":[""],"resources":["secrets","configmaps"],"verbs":["get","list","watch"]}]}
+{"kind":"Role","name":"argocd-applicationset-controller","rules":[{"apiGroups":[""],"resources":["secrets","configmaps"],"verbs":["get","list","watch"]}]}
+{"kind":"Role","name":"argocd-dex-server","rules":[{"apiGroups":[""],"resources":["secrets","configmaps"],"verbs":["get","list","watch"]}]}
+{"kind":"Role","name":"argocd-notifications-controller","rules":[{"apiGroups":[""],"resources":["configmaps","secrets"],"verbs":["list","watch"]},{"apiGroups":[""],"resources":["secrets"],"verbs":["get"]}]}
+{"kind":"Role","name":"argocd-redis","rules":[{"apiGroups":[""],"resources":["secrets"],"verbs":["get"]},{"apiGroups":[""],"resources":["secrets"],"verbs":["create"]}]}
+{"kind":"Role","name":"argocd-server","rules":[{"apiGroups":[""],"resources":["secrets","configmaps"],"verbs":["create","get","list","watch","update","patch","delete"]}]}
+{"kind":"RoleBinding","name":"argocd-application-controller","role":"argocd-application-controller","sa":["argocd-application-controller"]}
+{"kind":"RoleBinding","name":"argocd-applicationset-controller","role":"argocd-applicationset-controller","sa":["argocd-applicationset-controller"]}
+{"kind":"RoleBinding","name":"argocd-dex-server","role":"argocd-dex-server","sa":["argocd-dex-server"]}
+{"kind":"RoleBinding","name":"argocd-notifications-controller","role":"argocd-notifications-controller","sa":["argocd-notifications-controller"]}
+{"kind":"RoleBinding","name":"argocd-redis","role":"argocd-redis","sa":["argocd-redis"]}
+{"kind":"RoleBinding","name":"argocd-server","role":"argocd-server","sa":["argocd-server"]}
+
+## Flux : bornage des droits (kustomize-controller v1.10.1, helm-controller v1.7.1)
+lu : fluxcd/kustomize-controller docs/spec/v1/kustomizations.md @ v1.10.1 -> kc.md (88873 octets)
+146:by starting kustomize-controller with the `--no-cross-namespace-refs=true` flag.
+542:`.spec.serviceAccountName` is an optional field used to specify the
+543:ServiceAccount to be impersonated while reconciling the Kustomization. For more
+1033:[`.spec.serviceAccountName`](#service-account-reference) are specified,
+1034:the controller will impersonate the ServiceAccount on the target cluster,
+1035:i.e. a ServiceAccount with name `.spec.serviceAccountName` must exist in
+1040:name `.spec.serviceAccountName`. In other words, the namespace of the
+1109:- `.data.serviceAccountName`: The optional name of the Kubernetes
+1113:  used for impersonation, which is specified with
+1114:  [`.spec.serviceAccountName`](#service-account-reference) directly
+1148:  serviceAccountName: apps-sa # optional. must exist in the target cluster. user for impersonation
+1158:  serviceAccountName: apps-iam-role # optional. maps to an AWS IAM Role. used for authentication
+lu : fluxcd/helm-controller docs/spec/v2/helmreleases.md @ v1.7.1 -> hc.md (96496 octets)
+427:`.spec.serviceAccountName` is an optional field used to specify the
+428:Service Account to be impersonated while reconciling the HelmRelease.
+1181:[`.spec.serviceAccountName`](#service-account-reference) are specified,
+1182:the controller will impersonate the ServiceAccount on the target cluster,
+1183:i.e. a ServiceAccount with name `.spec.serviceAccountName` must exist in
+1188:name `.spec.serviceAccountName`. In other words, the namespace of the
+1271:- `.data.serviceAccountName`: The optional name of the Kubernetes
+1275:  used for impersonation, which is specified with
+
+## Flux : OpenPGP (gitrepositories.md, source-controller v1.10.1)
+lu : fluxcd/source-controller docs/spec/v1/gitrepositories.md @ v1.10.1 -> fg.md (47202 octets)
+634:`.spec.verify` is an optional field to enable the verification of Git commit
+694:Exporting armored public keys (`.asc` files) using `gpg`, and generating a
+699:gpg --export --armor 3CB12BA185C47B67 > author1.asc
+700:gpg --export --armor 6A7436E8790F8689 > author2.asc
+
+## Flux v2.10.0 : signatures des sept images du manifeste (cosign tree au tag)
+### ghcr.io/fluxcd/helm-controller:v1.7.1 : Attestations 
+### ghcr.io/fluxcd/image-automation-controller:v1.3.0 : Attestations 
+### ghcr.io/fluxcd/image-reflector-controller:v1.3.0 : Attestations 
+### ghcr.io/fluxcd/kustomize-controller:v1.10.1 : Attestations 
+### ghcr.io/fluxcd/notification-controller:v1.10.0 : Attestations 
+### ghcr.io/fluxcd/source-controller:v1.10.1 : Attestations 
+### ghcr.io/fluxcd/source-watcher:v2.3.1 : Attestations 
+
+## helmfile v1.8.4 : verify et kustomize
+lu : helmfile/helmfile docs/configuration.md @ v1.8.4 -> hfc.md (34054 octets)
+--- /home/gigi/.cache/supply-chain-poc/dep-lecture2-20261118T231456Z/hfc.md, l. 55 à 62
+  55 |   # password is retrieved from the environment with the format <registryNameUpperCase>_PASSWORD for CI usage, here ROBOLL_PASSWORD
+  56 |   password: optional_password
+  57 |   oci: true
+  58 |   passCredentials: true
+  59 |   verify: true
+  60 |   keyring: path/to/keyring.gpg
+  61 | # Advanced configuration: You can use a ca bundle to use an https repo
+  62 | # with a self-signed certificate
+lu : helmfile/helmfile docs/advanced-features.md @ v1.8.4 -> hfa.md (17939 octets)
+--- /home/gigi/.cache/supply-chain-poc/dep-lecture2-20261118T231456Z/hfa.md, l. 188 à 212
+ 188 | If you're curious about how it's designed and how it works, please review the pull request.
+ 189 | 
+ 190 | ## Deploy Kustomizations with Helmfile
+ 191 | 
+ 192 | You can deploy [kustomize](https://github.com/kubernetes-sigs/kustomize) "kustomization"s with Helmfile.
+ 193 | 
+ 194 | Most Kustomize operations are usually done with `kustomize edit` and can be done declaratively via Helm `values.yaml` files.
+ 195 | 
+ 196 | Under the hood, Helmfile transforms the kustomization into a local chart in a temporary directory so that it can be `helm upgrade --install`ed.
+ 197 | 
+ 198 | The transformation is done by generating (1)a temporary kustomization from various options and (2)temporary chart from the temporary kustomization.
+ 199 | 
+ 200 | An example pseudo code for the transformation logic can be written as:
+ 201 | 
+ 202 | ```console
+ 203 | $ TMPCHART=/tmp/sometmpdir
+ 204 | $ mkdir -p ${TMPCHART}/templates
+ 205 | $ somehow_generate_chart_yaml ${TMPCHART}/Chart.yaml
+ 206 | 
+ 207 | $ TMPKUSTOMIZATION=/tmp/sometmpdir2
+ 208 | $ somehow_generate_temp_kustomization_yaml ${TMPKUSTOMIZATION}/kustomization.yaml
+ 209 | $ kustomize build ${TMPKUSTOMIZATION}/kustomization.yaml > ${TMPCHART}/templates/all.yaml
+ 210 | ```
+ 211 | 
+ 212 | Let's say you have a `helmfile.yaml` that looks like the below:
+
+## Adoption : statut CNCF dans les README aux tags
+lu : argoproj/argo-cd README.md @ v3.6.2 -> argo-readme.md (7517 octets)
+54:Participation in the Argo CD project is governed by the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/master/code-of-conduct.md)
+80:1. [GitOps Continuous Delivery with Argo and Codefresh](https://codefresh.io/events/cncf-member-webinar-gitops-continuous-delivery-argo-codefresh/)
+84:1. [Solving configuration drift using GitOps with Argo CD](https://www.cncf.io/blog/2020/12/17/solving-configuration-drift-using-gitops-with-argo-cd/)
+89:1. [Progressive Delivery with Service Mesh – Argo Rollouts with Istio](https://www.cncf.io/blog/2022/12/16/progressive-delivery-with-service-mesh-argo-rollouts-with-istio/)
+lu : fluxcd/flux2 README.md @ v2.10.0 -> flux-readme.md (6251 octets)
+24:Flux is a Cloud Native Computing Foundation ([CNCF](https://www.cncf.io/)) graduated project, used in
+85:    - Second: Talk to us in the #flux channel on [CNCF Slack](https://slack.cncf.io/).
+92:    - [Join the flux-dev mailing list](https://lists.cncf.io/g/cncf-flux-dev).
+lu : helmfile/helmfile README.md @ v1.8.4 -> hf-readme.md (7574 octets)
+helmfile : aucune mention de la CNCF dans le README
+
+# fin 2026-11-18T23:15:17Z

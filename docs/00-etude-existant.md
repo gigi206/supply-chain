@@ -71,6 +71,7 @@ L'exception autorise le build à déclarer **les noms et digests des sujets** (a
 | **Witness** (in-toto) + Archivista | **L2** : s'exécute dans le build, la clé ou l'identité est atteignable | 28 attesteurs (dont `commandrun` avec traçage expérimental), politique multi-étapes (`artifactsFrom`), TSA. v0.12.0 corrige un avis Critical | 0.x, activité faible. Archivista : **Risqué** (voir §5) | **Veille** (complément de trace, jamais source du L3) |
 | Provenance BuildKit (`mode=max`) | L2 : non signée, contrôlée par le client | Gratuite | Docker ne revendique aucun niveau | Indice complémentaire |
 | Argo CD | — (déploiement) | GitOps de la plateforme ; releases SLSA L3 | RCE dans le repo-server corrigée en ≥ 3.3.15 / 3.4.10 / 3.5.4 | Phase 4 |
+| Flux et helmfile (**ajoutés le 18/11/2026**, à sec) | — (déploiement) | Flux : commits signés SSH et OpenPGP, artefacts OCI vérifiés par cosign ou Notation, provenance in-toto. helmfile : poussé depuis l'hôte, sans compte dans le cluster | Flux et Argo CD : contrôleurs liés à des droits de type `cluster-admin` par défaut, ce qui rouvre l'option (b) et D1 de la 08b. helmfile : `helm-diff` et `kustomize` à auditer, épinglage par digest non établi | **Évalués le 18/11/2026, aucune décision** ([détail](../poc/benchmarks/deploiement/README.md)) |
 
 > **Correction datée du 18/11/2026, 22:21:36 UTC** (ligne PaC ci-dessus et note du §2) :
 > - « statuts et commentaires dans la forge » n'est pas relevé dans un journal ;
