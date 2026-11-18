@@ -1,0 +1,4 @@
+# m5.sh invariance, 2026-11-18T19:03:46Z
+OK   enveloppes valides sur l'artefact de M4c (après) : 4
+relevé : TaskRuns du jalon, annotation chains.tekton.dev/signed : m5-intacte=true m5-preparer=true m5-r1=true m5-r2=true m5-r3=true m5-r4=true m5-r5=true m5-r6=true m5-sans-kata=failed
+OK   PipelineRuns de M4c gardés : 2

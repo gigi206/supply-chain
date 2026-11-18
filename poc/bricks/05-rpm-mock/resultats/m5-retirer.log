@@ -1,0 +1,4 @@
+# m5.sh retirer, 2026-11-18T19:03:46Z
+à retirer : 18 objet(s) : taskrun.tekton.dev/m5-intacte taskrun.tekton.dev/m5-preparer taskrun.tekton.dev/m5-r1 taskrun.tekton.dev/m5-r2 taskrun.tekton.dev/m5-r3 taskrun.tekton.dev/m5-r4 taskrun.tekton.dev/m5-r5 taskrun.tekton.dev/m5-r6 taskrun.tekton.dev/m5-sans-kata pod/m5-intacte-pod pod/m5-preparer-pod pod/m5-r1-pod pod/m5-r2-pod pod/m5-r3-pod pod/m5-r4-pod pod/m5-r5-pod pod/m5-r6-pod persistentvolumeclaim/m5-entrees
+OK   objets du jalon restants : 0
+OK   PipelineRuns de M4c gardés : 2

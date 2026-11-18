@@ -1,0 +1,6 @@
+# m5.sh sans_kata, 2026-11-18T19:01:48Z
+taskrun m5-sans-kata créé à 19:01:48
+TaskRun m5-sans-kata terminé à 19:01:50
+statut False|PodAdmissionFailed ; pod :  ; motifs du message : PodSecurity 1, privileged 1, ValidatingAdmissionPolicy 0, kyverno 0, runtimeClassName 0
+OK   R8 : TaskRun refusé à la création du pod : False|PodAdmissionFailed
+OK   R8 : aucun pod : 0

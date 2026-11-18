@@ -169,3 +169,47 @@ Suite : `fermeture`.
 **Réserve** : R4 n'a pas de second test avec un `repodata/` cohérent avec l'altération. Si `repodata/` est refait, la seule barrière restante, déduite et non mesurée dans mock, est la vérification du digest du payload par rpm (refusée hors ligne, PR2).
 
 Suite : `sans_kata`, puis `reseau`.
+
+## Note datée du 18/11/2026, écrite à 19:04:40 UTC : `sans_kata`, `reseau`, `invariance` et `retirer` passées (19:01:48 à 19:03:47 UTC, code 0) ; bilan : M5a tenu, avec un constat
+
+**`sans_kata`** ([journal](m5-sans_kata.log), 2 OK) — **SK1 tenue**. `m5-sans-kata` donne `False|PodAdmissionFailed` en 2 s, et aucun pod n'est créé. Motifs comptés dans le message, qui n'est pas affiché : PodSecurity 1, privileged 1, ValidatingAdmissionPolicy 0, kyverno 0. C'est Pod Security qui refuse, comme N7 de la 06.
+
+**`reseau`** ([journal](m5-reseau.log), 2 OK) : deux pods d'essai Kata privilégiés, image d'outillage, entrées intactes en lecture seule. mock rc 0 dans les deux bras (31 s et 40 s), `m5-reseau-1.0-1.noarch.rpm` produit : **RE4 tenue**.
+
+| Bras | Depuis le pod | Pendant `%build` (mock `--isolation=simple`) |
+|---|---|---|
+| a, sans label de tâche | interfaces `lo eth0`, connexion à Zot **réussie** (code 0) | marqueurs de début et de fin présents ; interfaces `lo eth0` ; connexion à Zot **réussie** (code 0) |
+| b, label `construire-rpm` | connexion refusée (code 124) | marqueurs présents ; interfaces `lo eth0` ; connexion **refusée** (code 124) |
+
+- **RE1 tenue** : depuis le bras a, Zot est joint.
+- **RE2, branche « réussie »** : les marqueurs prouvent que `%build` a tourné, et la connexion y réussit. **mock, en `--isolation=simple`, ne coupe pas le réseau de `%build`** : le paquet voit `eth0` et joint Zot.
+- **RE3 tenue** : sous le label `construire-rpm`, la connexion est refusée depuis le pod comme depuis `%build`. C'est la première mesure d'un refus pendant `%build`, et non avant mock.
+
+**CONSTAT** : sur la voie rpm, **une seule barrière** coupe le réseau pendant la construction, la NetworkPolicy `construction-rpm-sans-sortie` au niveau du pod. Elle ne s'applique qu'au label `tekton.dev/task=construire-rpm`, que Tekton pose depuis le nom de la tâche. La voie deb en a deux : la politique du pod et sbuild `--chroot-mode=unshare`, qui ne laisse que `lo` (N6 de la 06). Ce constat ne change ni la tâche signée ni la politique. Une seconde barrière est une décision qui te revient ; rien n'a été essayé dans ce sens.
+
+**`invariance`** ([journal](m5-invariance.log), 2 OK) — **IN1 tenue**. Toujours 4 enveloppes sur `07b7bd6f…`. Chains a signé les huit TaskRuns qui ont eu un pod (`chains.tekton.dev/signed=true`), aucun n'a publié ; `m5-sans-kata` porte `failed`. Les PipelineRuns de M4c sont gardés.
+
+**`retirer`** ([journal](m5-retirer.log), 2 OK) — **RT1 tenue**. 18 objets au label `poc.test/jalon=m5` supprimés (TaskRuns, pods, PVC), plus aucun ensuite ; PipelineRuns de M4c gardés ; rien n'est retiré de Zot. Les dossiers de travail de l'hôte restent sous `~/.cache/supply-chain-poc/08/travail/m5-05` et `m5banc1-05`.
+
+## Bilan de M5a
+
+| # | Test | Barrière qui refuse (mesurée) | Témoin accepté |
+|---|---|---|---|
+| R1 | rpm substitué | confrontation au verrou de `construire-rpm` (sigmd5) | copie intacte : rpm de M3, artefact `07b7bd6f…` |
+| R2 | fichier en trop | confrontation (objet hors du verrou) | idem |
+| R3 | rpm retiré | confrontation (rpm absent) | idem |
+| R4 | payload altéré, en-tête intact | **pas la confrontation** (sigmd5 stocké inchangé) ; dnf dans mock, « incorrect checksum » contre `primary` | idem |
+| R5 | `manifest.json` de l'image de bootstrap altéré | confrontation (`pull_digest`) | idem |
+| R6 | blob de l'image de bootstrap altéré | copie de l'image dans mock, « Digest did not match », sans repli | idem |
+| R7 | connexion réseau pendant `%build` | NetworkPolicy du pod seule ; **mock ne coupe pas** | bras a : connexion réussie, depuis le pod et depuis `%build` |
+| R8 | `construire-rpm` sans Kata | Pod Security, `PodAdmissionFailed`, aucun pod | témoin de R1 sous Kata |
+
+**M5a tenu** : chaque altération est refusée et chaque témoin est accepté, conformément au critère du tableau des jalons. Prédictions PR1 à PR10, PP1, AL1, AL2, FE1 à FE4, SK1, RE1 à RE4, IN1 et RT1 tenues. RE2 a pris la branche « réussie », écrite d'avance.
+
+**Réserves**
+- **R4** : son refus dépend de `repodata/`, que la confrontation ne contrôle pas. Avec un `repodata/` refait pour le rpm altéré, la dernière barrière serait la vérification du payload par rpm. Elle est mesurée hors ligne seulement (PR2), pas dans mock.
+- **R7** : la coupure pendant `%build` repose sur la seule politique du pod (constat ci-dessus).
+- Les tests ont été lancés par des TaskRuns isolés et des pods d'essai, jamais par la pipeline. Les deux pods de R7 sont des pods d'essai : ce ne sont pas des TaskRuns de `construire-rpm`.
+- Les réserves de M4c demeurent : image d'outillage hors plateforme, BUILDTIME non expliqué, porte sans tâche rpm, vérification par clé.
+
+Suite : M5b (rejeu de zéro, pas avant le 28/11), sur sa propre carte.

@@ -348,3 +348,8 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 - Le rpm publié, seul dans la couche de `builds/sample-app-rpm@sha256:07b7bd6f…`, est égal à celui de M3 à l'octet près (journal de `comparaison`).
 - Chaque PipelineRun a une provenance SLSA signée par Chains, vérifiée par clé sans journal de transparence. La spec signée de `construire-rpm` y porte `runtimeClassName: kata`, celles de `preparer-rpm` et de `publier-image` n'en portent pas (journal de `provenance`).
 - **Conséquence pour cet ADR** : aucune décision ne change. Le build rpm sans réseau tourne dans le pod Kata privilégié retenu, désormais par une TaskRun de la plateforme. La porte ne nomme encore aucune tâche rpm : `construction_kata` ne s'applique pas à cette provenance (« succès à vide », carte de M4), d'où aucun déclencheur avant son extension.
+
+**Additif du 18/11/2026, 19:04 UTC : M5a de la brique 05 tenu** ([détail](../../poc/bricks/05-rpm-mock/resultats/m5-predictions.md)).
+- **Mesuré** : un TaskRun isolé de `construire-rpm` signée, lancé sans `runtimeClassName`, est refusé par Pod Security (`PodAdmissionFailed`, aucun pod ; journal de `sans_kata`). Le pas privilégié ne tourne donc que sous Kata, comme `construire-deb` (N7 de la 06).
+- **Mesuré** : dans un pod Kata privilégié, `mock --isolation=simple` laisse à `%build` l'interface `eth0` et la connexion à Zot (bras a de R7). Sous le label `construire-rpm`, la même connexion est refusée pendant `%build` (bras b).
+- **Conséquence pour cet ADR** : l'isolation réseau du build rpm repose sur la seule NetworkPolicy du pod. Le build deb en a deux, la politique et sbuild `--chroot-mode=unshare`. Aucune décision ne change ici ; une seconde barrière pour la voie rpm reste à décider avec le propriétaire.
