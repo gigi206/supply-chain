@@ -781,3 +781,51 @@ Contrôles demandés par le conseiller après la note de préparation, tous en l
   - rien n'est purgé ;
   - la suite est une décision avec le propriétaire, rien n'est improvisé.
 - **Lancement** en arrière-plan : deux PipelineRuns, chacun avec jusqu'à 3 600 s d'attente et 120 s pour Chains, peuvent dépasser le premier plan.
+
+## Note datée du 18/11/2026, écrite à 11:05:18 UTC : `rpm` passée (accord permanent du 18/11)
+
+**Passage** ([journal](m4b-rpm.log)) : du 18/11/2026 à 11:01:18 UTC jusqu'à 11:04:01 UTC, code 0, 23 OK, aucun KO. Lancement en arrière-plan, sur `bfbb0b8`, `m4b.sh` = `38c39b3e…`. Relevé « après » : [journal](m4b-rpm-zot-apres.log), 11:04:18 UTC.
+
+**Fermeture publiée par la plateforme** : `sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c`.
+- 230 couches pour 317 955 662 octets de fichiers. Les deux PipelineRuns donnent le même digest.
+- Ce digest est **égal à celui calculé à sec** avant le lancement ([journal](m4b-rpm-digest.log), 10:44:07 UTC). Les hypothèses du calcul tiennent donc pour ce passage : l'oras de `publier` sérialise le manifeste comme celui de l'hôte, et `oras cp` ne le change pas.
+- Couche par couche, la fermeture porte donc les chemins (préfixés par `depot/`), les tailles et les sha256 de l'arbre de `final` (déduit de l'égalité des digests et du script de calcul ; l'étape `comparaison` reste à passer).
+
+**Durées** (début et fin lus dans les statuts) :
+
+| | PipelineRun | prefetch | publier |
+|---|---|---|---|
+| `m4b-rpm-1` | 11:01:19 à 11:03:11 (112 s) | 28 s | 84 s |
+| `m4b-rpm-2` | 11:03:19 à 11:03:53 (34 s) | 26 s | 7 s |
+
+Le temps de `publier` tombe de 84 s à 7 s au second passage. Cause probable, non mesurée : les blobs sont déjà dans le dépôt, et oras ne les renvoie pas.
+
+**Confrontation aux prédictions**
+- **RP1 tenue** : gardes passées, 4 481 593 344 octets libres à 11:01:19 UTC.
+- **RP2 tenue** : deux TaskRuns `True|Succeeded` par PipelineRun. La résolution et la vérification des deux bundles, `place-scripts` réel, `publier` sous 512 Mi avec 318 Mo et la PVC de 1 Gi ont tous tenu.
+- **RP3 tenue** : sc-build, `runtimeClassName` vide, labels `prefetch-rpm` et `publier-fermeture`.
+- **RP4 tenue** : `place-scripts` en code 0, `["sh"]`, deux arguments. Le dernier fait 59 869 octets, contre 59 848 reconstruits à sec : 21 octets de plus, non expliqués (le préfixe n'avait pas été lu en entier). La borne mesurée d'un argument est de 131 071 caractères.
+- **RP5 tenue** : `step-prefetch` à 2 CPU et 2 Gi en demande et en limite ; `prepare`, `place-scripts` et `step-publier` aux valeurs de `config-defaults`.
+- **RP6 tenue** : 222 rpm contrôlés, empreinte conforme par gpg, `rpm -K` 222 OK sur 222, `repomd.xml` `239a5a71…`, manifeste `f0ccf105…`, 230 fichiers et 317 984 334 octets ; prefetch en 28 s et 26 s.
+- **RP7 tenue** : `BOOTSTRAP_ARTIFACT_INPUTS` égal à l'attendu, aux deux passages.
+- **RP8 tenue** : ligne `bom.json` sans effet, puis `publiée : …@2a9e2ea7… (230 couches, relue en lecture anonyme)` ; `IMAGE_URL` égal au dépôt.
+- **RP9 tenue** : digest égal au calcul à sec.
+- **RP10 tenue** : 230 couches relues en lecture anonyme.
+- **RP11 tenue** : les deux PipelineRuns sont signés par Chains.
+- **RP12 tenue** : même digest aux deux passages.
+- **RP13 (relevé, pas un critère)** : l'espace libre baisse de 7 540 736 octets pendant `m4b-rpm-1` et de 2 342 912 octets pendant `m4b-rpm-2`. De 11:00:29 à 11:04:18 UTC, `/` a 11 165 696 octets utilisés de plus. C'est loin des 318 Mo d'une copie sans déduplication, mais la part de la brique ne se sépare pas de la dérive non attribuée.
+- **RP14 en partie non tenue** :
+  - `m4b-rpm-2` a duré 34 s, sous la borne basse prédite d'une minute (`publier` en 7 s) ; `m4b-rpm-1` a duré 112 s, dans la plage.
+  - Traces conformes : rien n'est supprimé, deux PipelineRuns restent.
+- **RP15 tenue** : catalogue de 148.
+- **RP16 tenue** : 18 PVC dans `builds`.
+
+**Non prédit, relevé**
+- Le dépôt porte deux tags de Chains : `sha256-2a9e2ea7….att` (attestation) et `sha256-2a9e2ea7….sig`. Le second vient du format `simplesigning` des artefacts OCI (lecture de `chains-config.yaml`), non relu ici.
+- Au relevé de l'étape, les pods `publier` étaient en phase `Running`, alors que leur pas était déjà terminé en code 0. Ils sont en `Succeeded` au relevé « après » (11:04:18 UTC). Cause non relevée.
+
+**Portée.** La plateforme a produit, deux fois, la même fermeture rpm signée par Chains, avec le contenu mesuré en `final`. Ce n'est pas encore M4b tenu :
+- `comparaison` doit tirer la fermeture et la confronter fichier par fichier à l'arbre de `final` (préfixe `depot/`) ;
+- `provenance` doit vérifier les attestations (cosign, sujet, `resolvedDependencies` avec l'image de bootstrap, paramètre `liste`).
+
+Aucun rpm n'a encore été construit à partir de cette fermeture : c'est M4c.
