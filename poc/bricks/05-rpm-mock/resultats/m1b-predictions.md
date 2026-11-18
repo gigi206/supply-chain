@@ -873,3 +873,15 @@ Ce banc montre seulement que le script retrouve les références sur les arbres 
 - Confiance moyenne pour AJ4 à AJ7. Les écarts du même jour sont neutralisés par `SOURCE_DATE_EPOCH`, la borne S et les exclusions. Mais aucune mesure ne couvre une entrée qui ne change qu'avec la date.
 
 **Portée, avant le lancement.** Même si tout tient, les relances montrent seulement ceci : sur ce banc, cet hôte, ces outils et ces sources, deux jours donnent la même archive, à l'intervalle mesuré. Elles ne disent rien du pod Kata, ni d'un autre hôte. **Le point 1 A reste non établi.** Ensuite viendra la question des valeurs de la carte : `en_US` ou toutes les langues, umask 022, machine-id vide ou absent, liste d'exclusions, mode de la racine.
+
+### Banc du script de comparaison (AJ0), 18/11/2026, de 21:54:36 à 21:54:43 UTC, code 0 (note écrite à 2026-11-18T21:55:08Z UTC)
+
+Journal : [`m1b-autre-jour-banc.log`](m1b-autre-jour-banc.log). Lancé sur les quatre dossiers du 18/11 eux-mêmes ; intervalle imprimé : 0 min.
+
+**AJ0 tenue.**
+- 8 « OK » sur 8, sans « ÉCART » :
+  - `b5` et `b6` ré-archivés par le script valent `05d35d64…` (396 861 440 octets, 15 865 membres). La fonction `archive` recopiée redonne donc la référence ;
+  - `a8`, `a9`, `a3`, `a4`, `x1` et `x2` valent leurs références.
+- `b1` et `b2` sont en 775 des deux côtés. Le umask du shell de lancement est 0002.
+
+**Portée.** Le script retrouve les références sur les arbres du 18/11. **La branche « écart »**, qui appelle `m1b-repro2-comparer.py`, **n'a pas été exercée**. Le comparateur lui-même a déjà servi dans les bancs précédents. Aucun autre jour n'est mesuré. Les ré-archives de ce banc restent dans `~/.cache/supply-chain-poc/05/m1b-autre-jour-20261118T215436Z` (environ 800 Mo d'après les tailles du journal).

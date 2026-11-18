@@ -1,0 +1,24 @@
+# m1b-autre-jour.sh, début 2026-11-18T21:54:36Z
+umask du shell de lancement : 0002
+## outillage, outils de 99790c13 (référence 05d35d64)
+outil : dossier de référence m1b-outil-20261118T205714Z, dossier neuf m1b-outil-20261118T205714Z ; intervalle 0 min
+b5.tar : 396861440 octets, 15865 membres, sha256 05d35d64f09692b13bd08af86b405607bca75c72d359550864fcf89a0321a59a
+b6.tar : 396861440 octets, 15865 membres, sha256 05d35d64f09692b13bd08af86b405607bca75c72d359550864fcf89a0321a59a
+OK   outil b5 : sha256 égal à la référence du 18/11 (05d35d64f09692b13bd08af86b405607bca75c72d359550864fcf89a0321a59a)
+OK   outil b6 : sha256 égal à la référence du 18/11 (05d35d64f09692b13bd08af86b405607bca75c72d359550864fcf89a0321a59a)
+archives laissées dans /home/gigi/.cache/supply-chain-poc/05/m1b-autre-jour-20261118T215436Z
+## outillage, outils de l'amorce (référence 06c289ad)
+amorce : dossier de référence m1b-outil-amorce-20261118T212517Z, dossier neuf m1b-outil-amorce-20261118T212517Z ; intervalle 0 min
+OK   amorce a8 : sha256 égal à la référence du 18/11 (06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5)
+OK   amorce a9 : sha256 égal à la référence du 18/11 (06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5)
+## troisième banc (référence 0c00666a)
+repro3 : dossier de référence m1b-repro3-20261118T201556Z, dossier neuf m1b-repro3-20261118T201556Z ; intervalle 0 min
+OK   repro3 a3 : sha256 égal à la référence du 18/11 (0c00666acc4836fd956043fcb3d0f85101b8726c9a7b1747746cc2ecf1d95d89)
+OK   repro3 a4 : sha256 égal à la référence du 18/11 (0c00666acc4836fd956043fcb3d0f85101b8726c9a7b1747746cc2ecf1d95d89)
+## bootstrap (référence 28634a12)
+boot : dossier de référence m1b-boot-20261118T214226Z, dossier neuf m1b-boot-20261118T214226Z ; intervalle 0 min
+stat de b1 : 775 gigi:gigi ; au 18/11 : 775 gigi:gigi
+stat de b2 : 775 gigi:gigi ; au 18/11 : 775 gigi:gigi
+OK   boot x1 : sha256 égal à la référence du 18/11 (28634a12c5e99aae558a0cd6719d8f87fad6bac329724f0afafee252e6b78ab3)
+OK   boot x2 : sha256 égal à la référence du 18/11 (28634a12c5e99aae558a0cd6719d8f87fad6bac329724f0afafee252e6b78ab3)
+# fin 2026-11-18T21:54:43Z
