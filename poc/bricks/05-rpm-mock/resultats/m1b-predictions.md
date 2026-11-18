@@ -608,3 +608,16 @@ Journal : [`m1b-outil.log`](m1b-outil.log). Les adresses e-mail de la clé de Ro
 4. **shadow** : SOURCE_DATE_EPOCH fixe aussi le jour du dernier changement. Sans la variable, ce champ vaut le jour de l'installation.
 
 **Conséquence** : le point 1 A n'est pas neutralisable sur le banc pour l'outillage, à cause de machine-id. Il n'est pas établi non plus. Restent : machine-id, les outils de l'amorce (langues, umask), un autre jour et le bootstrap.
+
+### Corrections du résultat du banc de l'outillage (note écrite à 2026-11-18T21:03:44Z UTC, après relecture par le conseiller)
+
+Trois formules dépassent la mesure. Elles sont corrigées ici, le texte d'origine restant en place.
+1. **« Le point 1 A n'est pas neutralisable sur le banc pour l'outillage »** devient : **machine-id n'a pas été neutralisé sur ce banc.** Le banc n'a tenté aucune neutralisation ; on ne peut donc pas dire qu'elle est impossible.
+2. **Langues et umask** : le banc mesure 2 533 membres en plus et un mode 0775 au lieu de 0755, pas leur cause.
+   - Le umask n'a jamais été varié, et l'amorce `ed654c69` n'a pas été lue.
+   - Le relevé de `override_install_langs` dans le `etc/dnf/dnf.conf` des outils ne départage rien : le banc et S1 passent tous deux `-c` à dnf, qui ne lit donc pas ce fichier.
+   - Pour départager, il faut lire `rpm -E '%_install_langs'` dans l'amorce.
+   - Les mêmes formules du README, de docs/03 et de l'ADR 0007 (« les outils font partie de l'entrée ») sont des hypothèses.
+3. **« Le pod Kata de la future tâche a `/proc` »** : le pod de l'étape racine de S1 l'avait. Sa ligne « invité » lit `/proc/meminfo` : « invité : 6.18.56, 3 vCPU, 6119664 kB ; /w : tmpfs » ([`s1-racine.log`](s1-racine.log), l. 3). Le pod de la future tâche n'existe pas encore.
+
+**Script** : `m1b-outil.sh` retire désormais lui-même les adresses des identités de clé. Un nouveau passage écrira dans un nouveau journal, car `m1b-outil.log` est commité.

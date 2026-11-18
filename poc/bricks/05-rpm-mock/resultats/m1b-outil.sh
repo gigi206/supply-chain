@@ -192,7 +192,8 @@ for i in 5 6 7; do
   fi
   echo "dnf code $rc ; $(wc -l < "$D/dnf-$i.log") lignes de journal"
   echo "lignes « scriptlet », « warning » ou « error » (casse ignorée) : $(grep -Eci 'scriptlet|(^|[^-[:alnum:]])(warning|error)' "$D/dnf-$i.log" || true)"
-  grep -Ei 'importing|import|clé|key' "$D/dnf-$i.log" | grep -vi 'fingerprint\|empreinte' | head -n 6 | sed 's/^/     /' || true
+  # correction (18/11/2026, après le passage de 20:57:14 UTC) : adresses des identités de clé retirées dans le script, pas après coup
+  grep -Ei 'importing|import|clé|key' "$D/dnf-$i.log" | grep -vi 'fingerprint\|empreinte' | head -n 6 | sed -E 's/<[^>]*@[^>]*>/<adresse retirée>/g; s/^/     /' || true
   [ "$rc" = 0 ] || { tail -n 15 "$D/dnf-$i.log"; echo "KO   installation $i en échec" >&2; exit 1; }
   q /usr/bin/rpm --root=/m/i$i -qa --qf '%{NAME}|%{EPOCHNUM}|%{VERSION}|%{RELEASE}|%{ARCH}|%{INSTALLTIME}|%{INSTALLTID}\n' | sort > "$D/i$i.qa"
   echo "## installation $i, fin $(date -u +%FT%TZ)"

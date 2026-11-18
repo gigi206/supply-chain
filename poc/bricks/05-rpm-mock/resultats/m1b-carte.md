@@ -153,3 +153,7 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Écart avec S1** : le banc garde toutes les langues, contre très peu dans S1, et `var/lib/dnf` y a le mode 0775 au lieu de 0755. Les outils de l'amorce comptent donc.
 - **Détail** : [prédictions et résultat](m1b-predictions.md), [journal](m1b-outil.log), [analyse](m1b-outil-analyse.log).
 - **Ce n'est pas un accord** pour une écriture dans le cluster ni dans Zot.
+
+## Correction à la note du banc de l'outillage (écrite à 2026-11-18T21:03:44Z UTC)
+
+« Les outils de l'amorce comptent donc » dépasse la mesure. Le banc mesure des écarts de langues et de mode avec S1, mais il n'a lu ni l'amorce, ni le umask. La cause reste une hypothèse ([corrections](m1b-predictions.md)).
