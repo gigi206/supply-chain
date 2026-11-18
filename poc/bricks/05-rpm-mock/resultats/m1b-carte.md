@@ -116,3 +116,16 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
   4. Un layout OCI écrit à la main, avec des couches non compressées.
 - **Inchangé** : les points 1 A et 1 B restent à mesurer et à relever avant toute tâche ; le verdict de dnf dans docs/04 reste à vérifier.
 - **Suite**, sous l'accord permanent : le banc de reproductibilité du point 1 A, hors ligne sur l'hôte.
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T20:23:29Z UTC : décision « Oui 9.8 »
+
+**Décision du propriétaire** (réponse reçue avant 2026-11-18T20:23:29Z UTC, heure exacte non relevée) : « Oui 9.8 ». La question était : « Pour l'outillage de M1b, rester sur Rocky 9.8 figée, ou suivre 9.9 ? ».
+- **Retenu** : l'outillage de M1b reste sur Rocky 9.8 figée.
+  - Les 190 rpm de Rocky viennent de `vault/rocky/9.8`, aux repomd signés, identiques à ceux du 17/11 ([relevé](m1b-sources.log)).
+  - Les 9 rpm d'EPEL viennent de `pub/archive/epel/9.8` (révision du 10/11/2026), qui n'a pas de métadonnées signées.
+- **Inchangé** :
+  - le verdict de dnf dans docs/04 reste à établir avant toute tâche ;
+  - l'instantané `archive/epel/9.8` reste à relire avant d'épingler ;
+  - la liste complète à installer reste à retirer de la base rpm de la racine archivée ;
+  - les quatre angles morts du troisième banc restent à mesurer.
+- **Ce n'est pas un accord** pour une écriture dans le cluster ni dans Zot.
