@@ -8,6 +8,7 @@ Protocoles des évaluations définies par l'[ADR 0000](../../docs/adr/0000-assem
 | [`obs/`](obs/) | A2 : adopter OBS pour le packaging ? | 3 jours | Hôte avec KVM |
 | [`nix/`](nix/) | B : Nix comme moteur de build ? | 3 jours | Partiellement local, second hôte pour B-1 |
 | [`kyverno-seul/`](kyverno-seul/) | C : Kyverno comme moteur de politique unique ? | 2 jours | Local (CLI) ; cluster pour la parité avec l'admission |
+| [`pac/`](pac/) | Hors ADR 0000, sans note (demande du 18/11/2026) : PaC peut-il remplacer Triggers et l'intercepteur HMAC ? | 0,5 pw | À sec : santé et lecture du code |
 
 Règles :
 - chaque mesure est archivée dans `<dossier>/resultats/` (commandes, journaux, sorties) ;
