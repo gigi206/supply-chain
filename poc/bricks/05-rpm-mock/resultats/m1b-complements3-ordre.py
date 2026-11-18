@@ -9,7 +9,9 @@ it = []
 for l in open(sys.argv[1], encoding='utf-8'):
     t, n = l.split()
     m = re.match(r'^(\d+):(.*)-([^-]+)-([^-]+)$', n)
-    it.append((int(t), f'{m.group(2)}-{m.group(1)}:{m.group(3)}-{m.group(4)}' if m else n))
+    # seconde correction (18/11/2026, après le passage de 20:20:43 UTC) : dnf n'écrit pas une époque nulle, que rpm écrit « 0: »
+    it.append((int(t), f'{m.group(2)}-{m.group(1)}:{m.group(3)}-{m.group(4)}' if m and m.group(1) != '0'
+               else f'{m.group(2)}-{m.group(3)}-{m.group(4)}' if m else n))
 it.sort()
 tx = []
 for l in open(sys.argv[2], encoding='utf-8', errors='replace'):

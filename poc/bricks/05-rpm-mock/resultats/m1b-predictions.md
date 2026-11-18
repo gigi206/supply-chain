@@ -253,3 +253,9 @@ Journal : [`m1b-complements3.log`](m1b-complements3.log).
 - **C3a tenue** : la racine d'outils a rpm-4.16.1.3-40.el9 et l'arbre i3 p11-kit-0.25.3-3.el9_5. La chaîne `SOURCE_DATE_EPOCH` figure une fois dans `librpm.so.9` (voisine de « rpmts.c ») et quatre fois dans `/usr/bin/trust`.
 - **C3b tenue** : S, calculé par `rpm -qp` sur les 222 fichiers avant toute installation, vaut 1778610852, comme dans le banc. La tâche pourra donc le calculer sur les rpm qu'elle reçoit. Pour le bootstrap, il faudra aussi couvrir la base de l'image : c'est à mesurer.
 - **C3c non conclue : mon comparateur était défectueux.** Il confondait deux écritures du même paquet. rpm écrit `1:gmp-6.2.0-13.el9.x86_64` et le journal de dnf `gmp-1:6.2.0-13.el9.x86_64`. Il ne tenait pas compte non plus des noms que dnf tronque dans sa colonne (rang 104). Les 50 rangs « différents » ne disent donc rien de l'ordre. **La prédiction C3c est inchangée.** Elle est remesurée sur les fichiers déjà écrits par le banc, avec un comparateur corrigé, [`m1b-complements3-ordre.py`](m1b-complements3-ordre.py), commité avant le lancement.
+
+### Comparateur corrigé, premier passage (18/11/2026, 20:20:43 UTC, code 0 ; note écrite à 2026-11-18T20:21:08Z)
+
+Journal : [`m1b-complements3-ordre.log`](m1b-complements3-ordre.log), remplacé par le passage suivant. Ce premier passage est conservé dans l'historique de git, dans le commit qui ajoute cette note.
+- **Résultat** : 199 rangs donnent le même nom, et 2 un nom tronqué par dnf. Les 21 autres rangs ne sont pas conclus : **le comparateur était encore défectueux**. Les 20 rangs affichés portent tous une époque nulle, que rpm écrit `perl-B-0:1.80-…` et que dnf omet (`perl-B-1.80-…`). Le 21e n'est pas affiché.
+- **Seconde correction**, écrite avant le passage suivant : une époque nulle est retirée de l'écriture de rpm. **La prédiction C3c est inchangée.**
