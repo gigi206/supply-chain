@@ -48,3 +48,20 @@ R4, R6 et R7 ont chacune trois issues : refus, acceptation, non mesuré. Leurs b
 | PR10 | Code 0 ; moins de deux minutes | Moyenne |
 
 **Après le passage** : PR8 non tenue, le motif du refus est compté (Pod Security, ValidatingAdmissionPolicy, Kyverno), jamais affiché ; l'objet est corrigé avant toute création, avec une note datée.
+
+## Note datée du 18/11/2026, écrite à 18:42:01 UTC : premier passage de `prealables` arrêté par mon script ; correction, relance
+
+**Premier passage** : 18:40:08 à 18:41:11 UTC, code 1 ([journal](m5-prealables-1.log)). 30 OK, puis un KO :
+- toute la partie hôte, PR1 à PR3, passe comme au banc ;
+- la lecture passe jusqu'aux objets rendus : pipeline, bundles, liste revue, paramètres figés, politiques, absence d'objets `m5-*` ;
+- **le KO vient de mon attendu, pas du cluster** : le contexte de sécurité du conteneur des pods de R7 a les mêmes cinq valeurs que celui du pas signé, mais dans un autre ordre de clés (`yq` sur la tâche signée contre l'ordre du gabarit rendu dans `m4c.sh`) ;
+- rien n'a été admis à blanc, et les enveloppes n'ont pas été comptées.
+
+**Correction** (`m5.sh` = `3d629090…`) :
+- comparaison en JSON trié des deux côtés ;
+- relevé des politiques qui sélectionnent un pod sans label de tâche : le type n'est plus imprimé deux fois ;
+- un dossier de banc hôte par passage (`banc-hote-<heure UTC>`), pour relancer sous le même préfixe sans rien purger. Les objets du cluster n'existent toujours pas.
+
+Prédictions PR1 à PR10 inchangées. Relance de `prealables` sous `m5`.
+
+**Erreur de procédure** : la correction a été commitée (`b17168f`) sans cette note, car la commande ne s'arrêtait pas sur l'échec de son script d'écriture (compte de OK faux : 30, et non 33). La note est ajoutée par le commit suivant, avant la relance.
