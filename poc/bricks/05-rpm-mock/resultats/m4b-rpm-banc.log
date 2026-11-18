@@ -1,0 +1,124 @@
+# m4b-rpm-banc.sh, 2026-11-18T10:53:10Z ; m4b.sh avant 8402b2b720fb24ebbb1d3c127c88e41e080f357f2e6c18c07be00aa408eaa061 ; m4b.sh 38c39b3e70ecfbfe026cd368c0aadf3e9b410e6357746e2d13e2d407becee4f5
+## A : insertions seules, noms neufs, syntaxe, shellcheck
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+noms définis par l'ajout : ARGS_RECONSTRUIT DIGEST_CALCULE LIBRE_MIN PIPELINE_REF PREFETCH_REF attendre_pr etape_rpm libre_zot pr_rpm releve_pod statut_pr
+OK   noms de l'ajout déjà définis avant : 0
+OK   bash -n : ok
+OK   shellcheck : mêmes codes avant et après : mêmes
+## B : etape_rpm, faux kubectl et faux oras
+### cas succes : code 0 ; créations 2 ; suppressions 0 ; sentinelles 0
+     OK   prefetch : repomd.xml V2 : 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+     OK   prefetch : résultat BOOTSTRAP_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6","uri":"oci://sc-stockage.poc.test:5000/essais-
+     digest relevé sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c ; calculé à sec sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c : égaux (relevé, non 
+     OK   dépôt publié : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+     OK   publier : 230 couches dans le journal : 1
+     OK   manifeste relu dans Zot (lecture anonyme) : couches : 230
+     OK   PipelineRun m4b-rpm-2 signé par Chains : true
+     OK   deux exécutions, même fermeture : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+OK   succes : aucune suppression : 0
+OK   succes : ni message de condition ni variable d'environnement affichés : 0
+### cas digest_autre : code 0 ; créations 2 ; suppressions 0 ; sentinelles 0
+     OK   prefetch : repomd.xml V2 : 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+     OK   prefetch : résultat BOOTSTRAP_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6","uri":"oci://sc-stockage.poc.test:5000/essais-
+     digest relevé sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ; calculé à sec sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c : différents (relevé,
+     OK   dépôt publié : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+     OK   publier : 230 couches dans le journal : 1
+     OK   manifeste relu dans Zot (lecture anonyme) : couches : 230
+     OK   PipelineRun m4b-rpm-2 signé par Chains : true
+     OK   deux exécutions, même fermeture : sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+OK   digest_autre : aucune suppression : 0
+OK   digest_autre : ni message de condition ni variable d'environnement affichés : 0
+### cas echec_prefetch : code 1 ; créations 1 ; suppressions 0 ; sentinelles 0
+     OK   prefetch-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+     OK   dépôt sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm absent avant le premier PipelineRun : 1
+     OK   m4b-rpm-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+          conteneur place-scripts : terminated code 0 raison Completed
+          conteneur step-prefetch : terminated code 137 raison OOMKilled
+          ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+          place-scripts : commande ["sh"], 2 argument(s), dernier argument 59848 octets (reconstruit à sec : 59848)
+     KO   PipelineRun m4b-rpm-1 : False|Failed (attendu : True|Succeeded)
+OK   echec_prefetch : aucune suppression : 0
+OK   echec_prefetch : ni message de condition ni variable d'environnement affichés : 0
+### cas existe : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+     OK   pipeline relue dans Zot au tag m4b (lecture anonyme) : sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+     OK   prefetch-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+     OK   dépôt sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm absent avant le premier PipelineRun : 1
+     KO   m4b-rpm-1 existe déjà : rien n'est purgé, décision avant toute relance
+OK   existe : aucune suppression : 0
+OK   existe : ni message de condition ni variable d'environnement affichés : 0
+### cas depot_present : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+     OK   pipeline relue dans Zot au tag m4b (lecture anonyme) : sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+     OK   prefetch-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+     KO   dépôt sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm absent avant le premier PipelineRun : 0 (attendu : 1)
+OK   depot_present : aucune suppression : 0
+OK   depot_present : ni message de condition ni variable d'environnement affichés : 0
+### cas plein : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+     OK   pipeline relue dans Zot au tag m4b (lecture anonyme) : sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+     OK   prefetch-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+     OK   dépôt sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm absent avant le premier PipelineRun : 1
+     KO   espace libre illisible ou sous la garde sur sc-stockage
+OK   plein : aucune suppression : 0
+OK   plein : ni message de condition ni variable d'environnement affichés : 0
+### cas pipeline_autre : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+     KO   pipeline relue dans Zot au tag m4b (lecture anonyme) : sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc (
+OK   pipeline_autre : aucune suppression : 0
+OK   pipeline_autre : ni message de condition ni variable d'environnement affichés : 0
+### cas divergents : code 1 ; créations 2 ; suppressions 0 ; sentinelles 0
+     OK   prefetch : repomd.xml V2 : 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+     OK   prefetch : résultat BOOTSTRAP_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6","uri":"oci://sc-stockage.poc.test:5000/essais-
+     digest relevé sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb ; calculé à sec sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c : différents (relevé,
+     OK   dépôt publié : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+     OK   publier : 230 couches dans le journal : 1
+     OK   manifeste relu dans Zot (lecture anonyme) : couches : 230
+     OK   PipelineRun m4b-rpm-2 signé par Chains : true
+     KO   deux exécutions, même fermeture : sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb (attendu : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c)
+OK   divergents : aucune suppression : 0
+OK   divergents : ni message de condition ni variable d'environnement affichés : 0
+### cas couches229 : code 1 ; créations 1 ; suppressions 0 ; sentinelles 0
+     OK   PipelineRun m4b-rpm-1 : True|Succeeded
+     OK   prefetch : rpm -K : 1
+     OK   prefetch : repomd.xml V2 : 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+     OK   prefetch : résultat BOOTSTRAP_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6","uri":"oci://sc-stockage.poc.test:5000/essais-
+     digest relevé sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c ; calculé à sec sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c : égaux (relevé, non 
+     OK   dépôt publié : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+     OK   publier : 230 couches dans le journal : 1
+     KO   manifeste relu dans Zot (lecture anonyme) : couches : 229 (attendu : 230)
+OK   couches229 : aucune suppression : 0
+OK   couches229 : ni message de condition ni variable d'environnement affichés : 0
+### cas en_cours : code 1 ; créations 1 ; suppressions 0 ; sentinelles 0
+     OK   prefetch-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+     OK   dépôt sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm absent avant le premier PipelineRun : 1
+     OK   m4b-rpm-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+          conteneur place-scripts : terminated code 0 raison Completed
+          conteneur step-prefetch : terminated code 0 raison Completed
+          ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+          place-scripts : commande ["sh"], 2 argument(s), dernier argument 59848 octets (reconstruit à sec : 59848)
+     KO   PipelineRun m4b-rpm-1 : Unknown|Running (attendu : True|Succeeded)
+OK   en_cours : aucune suppression : 0
+OK   en_cours : ni message de condition ni variable d'environnement affichés : 0
+OK   succes : code, créations : 0 2
+OK   succes : deux exécutions, même fermeture : 1
+OK   succes : digest égal au calcul, relevé deux fois : 2
+OK   succes : place-scripts relevé (59848 octets) : 4
+OK   succes : lignes de repomd.xml imprimé non répétées : 0
+OK   succes : OK : 23
+OK   digest_autre : passe, digest différent du calcul relevé : 0 2
+OK   echec_prefetch : code, créations : 1 1
+OK   echec_prefetch : OOMKilled imprimé avant le KO : avant
+OK   echec_prefetch : KO : KO   PipelineRun m4b-rpm-1 : False|Failed (attendu : True|Succeeded)
+OK   existe : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   depot_present : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   plein : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   pipeline_autre : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   existe : KO : KO   m4b-rpm-1 existe déjà : rien n'est purgé, décision avant toute relance
+OK   plein : KO : KO   espace libre illisible ou sous la garde sur sc-stockage
+OK   divergents : code, créations, KO final : 1 2 1
+OK   couches229 : code, créations, KO : 1 1 1
+OK   en_cours : code, créations, KO après relevé : 1 1 1
+OK   en_cours : attente de 1800 lectures : 1802
+# bilan : 45 OK, 0 KO ; fin 2026-11-18T10:53:49Z

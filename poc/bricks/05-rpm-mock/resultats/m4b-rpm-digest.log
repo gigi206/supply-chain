@@ -1,0 +1,11 @@
+# m4b-rpm-digest.py, début 2026-11-18T10:44:07Z ; script 8bce0cf4e5a71a941776e626703b8c09711d99bc90385eb7d2b9eaa2482e2339 ; arbre de final fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+manifeste local (prealables_taches) : sha256:f550faf1ac13286d7f498349c7765fad868bd301d1bf9de080fcfe8cdef21a12, 59913 octets
+remplacé : depot/repodata/152feb18d71a8880aff41cce804bf2a6949dba4955aa62014d9a8e446345ddd7-filelists.xml.gz : sha256:bcef8e12c043… 110 -> sha256:152feb18d71a… 231414
+remplacé : depot/repodata/82ecf122061ff6969c76ee80363011022d54941e70d22f4b81268832dea2181d-primary.xml.gz : sha256:0a3f4138655b… 108 -> sha256:82ecf122061f… 88633
+remplacé : depot/repodata/8d40856db0aeb2f1ee4aaa49b2ef7342279da1473825c08bb45f8014975b376e-other.xml.gz : sha256:448441109584… 106 -> sha256:8d40856db0ae… 347241
+remplacé : depot/repodata/repomd.xml : sha256:b565fe3ecc24… 39 -> sha256:239a5a71c887… 1528
+couches : 230, octets des fichiers : 317955662
+manifeste calculé : 59923 octets
+digest attendu : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+code 0
+# fin 2026-11-18T10:44:07Z

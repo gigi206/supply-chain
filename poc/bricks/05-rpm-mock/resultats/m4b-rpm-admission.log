@@ -1,0 +1,7 @@
+# m4b-rpm-admission.sh, début 2026-11-18T10:54:10Z ; m4b.sh 38c39b3e70ecfbfe026cd368c0aadf3e9b410e6357746e2d13e2d407becee4f5
+PipelineRun rendu : {"name":"m4b-rpm-1","bundle":"sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db","podTemplate":{"nodeSelector":{"zone":"build"},"tolerations":[{"key":"zone","operator":"Equal","value":"build","effect":"NoSchedule"}],"securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}},"ws":{"requests":{"storage":"1Gi"}}}
+dry-run serveur : code 0 ; pipelinerun.tekton.dev/m4b-rpm-1 created (server dry run) 
+PipelineRuns de builds : code 0 ; 28 au total, dont m4b-rpm-* : 0
+dépôt builds/fermetures/sample-app-rpm : 1 ligne « name unknown »
+pipeline au tag m4b : sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db (attendu sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db)
+# fin 2026-11-18T10:54:10Z

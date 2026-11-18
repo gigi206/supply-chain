@@ -649,3 +649,102 @@ Passe lancée sous l'accord permanent du 18/11, `m4b.sh` à `8402b2b7…`, de 09
 - **Paramètre `dossier`** de la pipeline signée : `sc-stockage.poc.test@sha256:f0ccf105…`. Ce n'est pas un défaut : c'est le nom du dossier `dir:` que mock calcule (`config.py:844-846`, coupure au premier « : », donc au port), déjà mesuré en `final`, et le script signé le compare à la source.
 - **Disque de sc-stockage** : utilisés 15 535 173 632 o au relevé avant, 15 535 861 760 o au relevé après (+688 128 o), non attribués.
 - **Suite** : étape `rpm` (premier PipelineRun), dont les prédictions restent à écrire (ressources du pod, `place-scripts`).
+
+## Note datée du 18/11/2026, écrite à 10:56:02 UTC : étape `rpm` préparée à sec et ajoutée à `m4b.sh` (accord permanent du 18/11), NON LANCÉE
+
+**Étape.** `m4b.sh` passe de `8402b2b7…` à `38c39b3e…`, par insertions seules : 10 lignes d'en-tête et un bloc de 102 lignes avant `lancer`. Le modèle est `executer` de `s4b.sh` (06).
+- Deux PipelineRuns de `prefetch-rpm-sample-app`, `m4b-rpm-1` puis `m4b-rpm-2`, avec le podTemplate de S4b : runc, `nodeSelector` `zone=build`, UID 65532, aucune variable d'environnement. Workspace de 1 Gi par `volumeClaimTemplate`.
+- Gardes avant toute création :
+  - pipeline relue dans Zot au tag `m4b`, égale à `9b89b029…` ;
+  - `prefetch-rpm` (`9afe09db…`) dans la liste revue ;
+  - dépôt `builds/fermetures/sample-app-rpm` absent (avant le premier seulement) ;
+  - aucun PipelineRun du même nom ;
+  - au moins 1 Gio libre sur `/` de sc-stockage ;
+  - dry-run serveur.
+- **Aucune purge.** `purger_pr` n'est pas appelé : un PipelineRun échoué reste lisible, et toute relance est une décision.
+- **Tout est imprimé avant les assertions**, parce qu'une écriture dans Zot est définitive :
+  - raisons des conditions, jamais les messages ;
+  - pods : nœud, `runtimeClassName`, label, état et code de chaque conteneur d'initialisation et de pas, ressources effectives ;
+  - `place-scripts` : commande, nombre d'arguments, longueur en octets du dernier ;
+  - journaux des pas, sans les lignes de `repomd.xml` imprimé ;
+  - résultats des TaskRuns et du PipelineRun.
+- Le digest relevé est affiché à côté du digest calculé à sec, sans condition. Le critère est l'égalité des deux exécutions, plus « 230 couches » dans le journal de `publier` et dans le manifeste relu.
+- Les PipelineRuns et leurs PVC restent dans `builds`, pour l'étape `provenance`.
+
+**Banc** ([script](m4b-rpm-banc.sh), [journal](m4b-rpm-banc.log), 10:53:10 à 10:53:49 UTC) : 45 OK, 0 KO.
+- Insertions seules, aucun nom déjà défini, `bash -n`, shellcheck aux mêmes codes. Un premier passage, non archivé, avait trouvé un SC2015 de plus (`A && B || C`) ; il est corrigé par deux `if`.
+- La vraie `etape_rpm`, avec un faux `kubectl`, un faux `oras` et un faux `sleep`, est jouée dans dix cas :
+  - succès ;
+  - digest autre que le calcul (passe) ;
+  - échec de prefetch par OOMKilled : la preuve sort avant le KO ;
+  - PipelineRun déjà présent, dépôt déjà présent, espace sous la garde, pipeline autre : arrêt avant toute création et tout dry-run ;
+  - digests divergents ;
+  - 229 couches relues ;
+  - PipelineRun jamais terminé : 1 800 lectures, puis KO.
+- Dans les dix cas : aucun `kubectl delete`, et ni le message sentinelle des conditions ni la variable d'environnement sentinelle du pod n'apparaissent.
+- Non couvert : Tekton (résolveur, Trusted Resources, pods réels, `place-scripts` réel), Kyverno, Chains, Zot, réseau.
+
+**Mesures et lectures archivées avant le lancement**
+- **Digest calculé à sec** ([script](m4b-rpm-digest.py), [journal](m4b-rpm-digest.log), 10:44:07 UTC) : `sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c`.
+  - Méthode : manifeste du layout local de `prealables_taches` (`f550faf1…`, 59 913 octets ; section d'envoi de la version signée, oras de l'hôte). Les quatre descripteurs factices de `repodata` y sont remplacés, octet pour octet, par le sha256 et la taille mesurés en `final` ; les 226 autres couches sont contrôlées égales à `final`.
+  - Ce n'est pas une mesure. Il suppose que l'oras de l'image `outils-horodatage@c7bebae2…` sérialise le manifeste comme oras 1.3.6 de l'hôte, et qu'`oras cp` le recopie sans le changer.
+  - La version 1.3.6 et l'empreinte de son archive sont épinglées dans `tsa.sh` (vérifié dans le dépôt). Que cette archive soit celle de l'image en service est une lecture : non relu dans l'image.
+  - S'il tient, la fermeture publiée a déjà, couche par couche, le contenu de `final`, avec le préfixe `depot/`. L'étape `comparaison` devient alors surtout une confirmation.
+- **Admission et état** ([script](m4b-rpm-admission.sh), [journal](m4b-rpm-admission.log), 10:54:10 UTC) :
+  - `m4b-rpm-1`, rendu par `pr_rpm`, est admis en dry-run serveur (code 0). Ce dry-run ne couvre ni le résolveur, ni la vérification des signatures, ni l'admission des pods.
+  - 28 PipelineRuns dans `builds`, aucun `m4b-rpm-*` ; dépôt de la fermeture inconnu de Zot ; pipeline au tag `m4b` égale à `9b89b029…`.
+- **Lectures dans le dépôt.**
+  - La `VerificationPolicy` `taches-plateforme` couvre `tekton/(tasks|pipelines)/[a-z0-9-]+`, donc les deux bundles.
+  - Chains stocke en `oci` seul : ni annotation, ni plafond de 256 Ko. L'inspection profonde des PipelineRuns est active.
+  - La tâche signée porte `runAsGroup` 65532.
+  - `dedupe` est à `true` dans `zot.json` (une ligne comptée, valeurs non lues).
+  - `config-defaults` donne par défaut 1 CPU et 512 Mi en limite, 50m et 64 Mi en demande (`m4a-releve.log`).
+- **Lecture dans le cluster, non archivée** : le compte de service `build` a `automountServiceAccountToken` à `false`, comme au pod d'essai.
+- **Liste revue dans le cluster (lecture du dépôt).** `cm_porte` (`politique.sh` de la 08) copie `taches.yml` dans la ConfigMap `porte`. La copie en service n'est pas relue et date probablement d'avant `05e2fe8`. Rien dans Tekton ni dans l'admission de `builds` ne la lit ; elle est à republier avant toute évaluation de la porte sur cette fermeture (M4c).
+
+**Disque de sc-stockage : l'engagement de 09:30:06 UTC.** La note de 09:30:06 UTC demandait d'attribuer la croissance de `/` avant `rpm`.
+- L'attribution reste ouverte. Sans sudo, les arbres lisibles n'expliquent pas la croissance, et `/var/lib/zot`, `/var/lib/loki`, `/var/lib/prometheus` sont illisibles. Le relevé avec sudo est confié au propriétaire.
+- Relevé frais ([journal](m4b-disque-sc-stockage.log), 10:54:10 UTC) : 4 463 099 904 octets libres. Depuis 09:48:54 UTC, 4 890 624 octets de plus sont utilisés en 3 916 s, dont 688 128 octets mesurés pendant la seconde passe de `taches`.
+- **Pourquoi l'étape passe quand même :**
+  - ses écritures dans Zot sont bornées : environ 318 Mo au plus sans déduplication, quelques centaines de Ko avec elle (lecture : comportement de `dedupe` non vérifié) ;
+  - l'espace libre en couvre plus de dix fois la borne haute ;
+  - une garde arrête l'étape sous 1 Gio libre, avant chaque PipelineRun.
+- C'est un écart à l'engagement écrit, consigné ici, pas un abandon : l'attribution reste à faire.
+
+**Écarts entre le pod d'essai et le TaskRun, jamais mesurés :**
+- script lancé par son shebang (`#!/bin/sh`) depuis `/tekton/scripts`, par l'entrypoint de Tekton, et non par `sh -s` ;
+- conteneurs d'initialisation de Tekton, dont `place-scripts` avec le script en base64 dans un seul argument ;
+- résolveur `bundles` et vérification des signatures ;
+- vrai chemin du résultat, sous `/tekton/results/` ;
+- PVC de 1 Gi par `volumeClaimTemplate`, au lieu d'un volume éphémère de 4 Gi ;
+- `publier-fermeture` sous 512 Mi avec 318 Mo et 230 couches ; le deb ne portait que 194 Mo et 167 couches.
+
+### Prédictions de `rpm` (RP1 à RP14)
+
+Chaque prédiction porte sa confiance. Un écart arrête la lecture, pas la publication déjà faite : rien n'est retiré de Zot, et toute relance est une décision.
+
+- **RP1, gardes** : pipeline `9b89b029…`, `prefetch-rpm` listée, dépôt absent, aucun `m4b-rpm-*`, au moins 1 Gio libre, dry-run en code 0. Confiance haute : tout est mesuré à 10:54:10 UTC.
+- **RP2, `m4b-rpm-1`** : `True|Succeeded`. Deux TaskRuns, `m4b-rpm-1-prefetch` et `m4b-rpm-1-publier`, chacun `True|Succeeded`. Confiance moyenne à haute.
+  - Risques nommés : résolution et vérification de ces deux bundles, jamais exercées ; `place-scripts` réel ; `publier` sous 512 Mi ; PVC de 1 Gi.
+- **RP3, pods** : sur sc-build, `runtimeClassName` vide, labels `tekton.dev/task` `prefetch-rpm` et `publier-fermeture`. Confiance haute (podTemplate de S4b, label mesuré en J7).
+- **RP4, `place-scripts`** : terminé en code 0, commande `["sh"]`, deux arguments, le dernier de 59 848 octets à quelques centaines d'octets près. Confiance moyenne sur la longueur : le préfixe et le script de débogage ne sont pas lus en entier dans `convertScripts`. C'est un relevé : un écart de longueur n'arrête pas l'étape.
+- **RP5, ressources effectives** :
+  - `step-prefetch` : 2 CPU et 2 Gi en demande et en limite, comme signé ;
+  - `prepare`, `place-scripts` et `step-publier` : les valeurs de `config-defaults` (50m et 64 Mi en demande, 1 CPU et 512 Mi en limite).
+  - Confiance moyenne : déduit de `limites-obligatoires` en `Deny` et de la réussite du deb, non relu sur un pod de Tekton.
+- **RP6, journal de prefetch** :
+  - 222 rpm téléchargés et contrôlés ; empreinte de la clé conforme (gpg) ; `rpm -K : rc 0, 222 OK sur 222` ;
+  - `repomd.xml` `239a5a71…` ; manifeste de l'image de bootstrap `f0ccf105…` ;
+  - fermeture de 230 fichiers et 317 984 334 octets (`du -sb`, comme à `essai_tache`).
+  - Durée du TaskRun, du début à la fin, sous 2 min (17 s à `essai_tache`, 28 s par passage en `final`, sans le démarrage de Tekton). Confiance moyenne sur la durée, haute sur le reste.
+- **RP7, résultat `BOOTSTRAP_ARTIFACT_INPUTS`** : `{"digest":"sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6","uri":"oci://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap"}` (clés triées). Confiance haute (mesuré à `essai_tache`).
+- **RP8, journal de `publier`** : une ligne « can't open bom.json », sans effet, puis `publiée : <dépôt>@<digest> (230 couches, relue en lecture anonyme)`. `IMAGE_URL` égal à `sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm`. Confiance moyenne à haute (le risque est la mémoire, RP2).
+- **RP9, digest** : égal au calcul à sec, `2a9e2ea7…`. Confiance moyenne à haute, sous les hypothèses ci-dessus. Un écart n'est pas un échec de l'étape : il sera expliqué à `comparaison`.
+- **RP10, manifeste relu dans Zot** en lecture anonyme : 230 couches. Confiance haute si RP8 tient.
+- **RP11, Chains** : PipelineRun signé (`true`) dans les 120 s. Confiance moyenne à haute.
+  - Le risque est la taille de la provenance : la liste fait 39 938 octets et l'inspection profonde embarque les TaskRuns. Le stockage `oci` n'a pas de plafond connu (lecture).
+- **RP12, `m4b-rpm-2`** : RP2 à RP11 de nouveau, et même digest que `m4b-rpm-1`. Confiance haute : `final` a donné le même arbre dans deux pods neufs.
+- **RP13, Zot** : espace libre relevé avant et après chaque PipelineRun. Avec la déduplication (lecture), la baisse due à la brique serait de quelques Mo au plus au premier, et presque nulle au second. Confiance basse : la dérive non attribuée se mêle à la mesure. C'est un relevé, pas un critère.
+- **RP14, durée et traces** : chaque PipelineRun prend entre 1 et 5 min de la création à la condition finale (le deb : environ 46 s). Rien n'est supprimé ; deux PipelineRuns et deux PVC de 1 Gi restent dans `builds`. Confiance moyenne sur la durée, haute sur les traces.
+
+**Lancement** : `m4b.sh rpm`, sans `SIGNER`. Contrôle d'état juste avant (rien de `m4b-rpm-*` dans `builds`, dépôt absent), puis le lancement dans la forme convenue. Les écritures dans Zot (fermeture, attestations de Chains) sont définitives.
