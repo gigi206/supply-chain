@@ -162,7 +162,7 @@ politique_relue() { # m4c.sh : construction-rpm-sans-sortie relue, aucune politi
   attendu "politiques de builds qui sélectionnent $LABEL_CONSTRUIRE et autorisent du trafic" "$(jq -r -L "$here" --arg l "$LABEL_CONSTRUIRE" \
     'include "selecteurs"; [.items[] | select(selectionne({"tekton.dev/task": $l}) and autorise) | nom] | join(", ")' "$t")" ""
   echo "relevé : politiques de builds qui sélectionnent un pod sans label de tâche : $(jq -r -L "$here" --arg j "$N" \
-    'include "selecteurs"; [.items[] | select(selectionne({"poc.test/jalon": $j})) | "\(.kind) \(nom)"] | join(", ")' "$t")"
+    'include "selecteurs"; [.items[] | select(selectionne({"poc.test/jalon": $j})) | nom] | join(", ")' "$t")"
 }
 enveloppes() { # nombre d'enveloppes valides (clé de Chains, sans journal de transparence, lecture anonyme) sur l'artefact de M4c
   cosign verify-attestation --key "$CLE_CHAINS" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" \
@@ -170,7 +170,7 @@ enveloppes() { # nombre d'enveloppes valides (clé de Chains, sans journal de tr
 }
 
 etape_prealables() {
-  local b=$T/banc-hote c o r m k
+  local b=$T/banc-hote-$(date -u +%Y%m%dT%H%M%SZ) c o r m k   # correction du 18/11 : un dossier par passage (relance sous le même préfixe)
   echo "## hôte, hors ligne"
   attendu "rpm du rootfs de l'image d'outillage (m5-sigmd5.sh)" "$(dans_racine "$h05" /usr/bin/rpm --version)" "RPM version 4.16.1.3"
   echo "m5-alterer.py $(sha256sum < "$ALTERER" | cut -c1-64) ; m5-reseau.spec $(sha256sum < "$SPEC_SONDE" | cut -c1-64)"
@@ -242,8 +242,8 @@ etape_prealables() {
     "$(for c in $CAS sans-kata; do jq -r '.spec.podTemplate.runtimeClassName // "-"' "$T/tr-$N-$c.json"; done | paste -sd' ')" "kata kata kata kata kata kata kata -"
   attendu "pods d'essai de R7 : labels de tâche (a, b)" \
     "$(for c in a b; do jq -r '.metadata.labels["tekton.dev/task"] // "-"' "$T/pod-$N-reseau-$c.json"; done | paste -sd' ')" "- $LABEL_CONSTRUIRE"
-  attendu "pods d'essai de R7 : contexte du conteneur, celui du pas signé" "$(jq -c '.spec.containers[0].securityContext' "$T/pod-$N-reseau-a.json")" \
-    '{"privileged":true,"allowPrivilegeEscalation":true,"runAsUser":0,"runAsGroup":0,"runAsNonRoot":false}'
+  attendu "pods d'essai de R7 : contexte du conteneur, celui du pas signé (JSON trié)" "$(jq -cS '.spec.containers[0].securityContext' "$T/pod-$N-reseau-a.json")" \
+    '{"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0}'   # correction du 18/11 : ordre des clés
   for o in $(objets); do a_blanc "$o"; done
   echo "relevé : PipelineRuns de M4c gardés : $(kubectl get pipelinerun -n builds m4c-rpm-1 m4c-rpm-2 -o name < /dev/null | paste -sd' ')"
   attendu "enveloppes valides sur l'artefact de M4c (état de départ)" "$(enveloppes)" 4

@@ -1,0 +1,70 @@
+# m5.sh prealables, 2026-11-18T18:40:08Z
+## hôte, hors ligne
+OK   rpm du rootfs de l'image d'outillage (m5-sigmd5.sh) : RPM version 4.16.1.3
+m5-alterer.py 8bc019dc46a7f28f7f9df2915471e17c9ff31e0cd5260a76e9bb555efd6b26bd ; m5-reseau.spec 1dd1ad3ba811137806d99e93949b6afea343cc3dd7db16295e24311d52652750
+OK   source locale entrees/ (m4c.sh prealables) : empreinte avant : d3a610bbd9e1ba6fa56abaaaec4e54addf7a4669d3c9e252b0f6ff65041be8e7
+     r1 : zlib-1.2.11-40.el9.x86_64.rpm remplacé par le contenu de alternatives-1.24-2.el9.x86_64.rpm
+     r2 : m5-en-trop.rpm ajouté à la racine de depot/
+     r3 : zlib-1.2.11-40.el9.x86_64.rpm retiré
+     r4 : zlib-1.2.11-40.el9.x86_64.rpm, octet 88091 inversé, taille inchangée (92187 octets)
+     r5 : manifest.json du dossier dir: suivi d'un saut de ligne
+     r6 : fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99, octet 48871296 inversé, taille inchangée (97742593 octets)
+     source : 273 fichiers, empreinte d3a610bbd9e1ba6fa56abaaaec4e54addf7a4669d3c9e252b0f6ff65041be8e7
+     OK   intacte : 273 fichiers ; écarts à la source : aucun
+     OK   r1 : 273 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (contenu)
+     OK   r2 : 274 fichiers ; écarts à la source : fermeture/depot/m5-en-trop.rpm (en plus)
+     OK   r3 : 272 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (absent)
+     OK   r4 : 273 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (contenu)
+     OK   r5 : 273 fichiers ; écarts à la source : fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/manifest.json (contenu)
+     OK   r6 : 273 fichiers ; écarts à la source : fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99 (contenu)
+OK   copies : chacune ne diffère de la source que par l'objet voulu (code, lignes OK) : 0 7
+OK   source locale : empreinte après (liens durs rompus à chaque altération) : d3a610bbd9e1ba6fa56abaaaec4e54addf7a4669d3c9e252b0f6ff65041be8e7
+confrontation tirée de construire-rpm signée : 51 lignes, sha256 681477b83b580578027c025a3eedab9979bb38c76279157bc265c7c2d5ee537d
+OK   confrontation : appel de rpm -qp --qf %{SIGMD5} : 1
+## confrontation jouée dans le rootfs, avec le vrai rpm, sur chaque copie
+     intacte : code 0 : fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet sc-stockage.poc.tes
+OK   confrontation sur intacte : code, ligne attendue : 0 1
+     r1 : code 1 : sigmd5 différent du verrou : zlib-1.2.11-40.el9.x86_64.rpm (5832caf6730301817da8e513d9fca84f) 
+OK   confrontation sur r1 : code, ligne attendue : 1 1
+     r2 : code 1 : fermeture : 1 objet(s) hors du verrou, de repodata/ et du dossier dir: : ['m5-en-trop.rpm'] 
+OK   confrontation sur r2 : code, ligne attendue : 1 1
+     r3 : code 1 : fermeture : 1 rpm du verrou absent(s) : ['zlib-1.2.11-40.el9.x86_64.rpm'] 
+OK   confrontation sur r3 : code, ligne attendue : 1 1
+     r4 : code 0 : fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet sc-stockage.poc.tes
+OK   confrontation sur r4 : code, ligne attendue : 0 1
+     r5 : code 1 : manifest.json du dossier dir: différent du pull_digest : sha256:4462461083b09d1dadb59531076429c71845fdd63d60a37bae05d12d0dc85482 
+OK   confrontation sur r5 : code, ligne attendue : 1 1
+     r6 : code 0 : fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet sc-stockage.poc.tes
+OK   confrontation sur r6 : code, ligne attendue : 0 1
+## relevé : rpm -i --test (racine vide, --nodeps) sur la cible intacte et sur R4
+     intacte : code 0 : warning: /mnt/alt/intacte/entrees/fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 350d275d: NOKEY 
+     r4 : code 1 : warning: /mnt/alt/r4/entrees/fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 350d275d: NOKEY 	package zlib-1.2.11-40.el9.x86_64 does not verify: Payload SHA256 ALT digest: BAD (Expected d9bf4f166516b7f0
+## sonde de m5-reseau.spec (%build) jouée par sh -e sous unshare -rn
+     M5-SONDE début de %build
+     M5-SONDE interfaces : lo 
+     M5-SONDE tcp 192.168.161.13/5000 code 1
+     M5-SONDE fin de %build
+OK   sonde : code, marqueurs de début et de fin : 0 1 1
+OK   sonde sans réseau : interfaces vues : lo 
+OK   sonde sans réseau : connexion refusée (code non nul) : 1
+## lecture : cluster et Zot
+OK   clé publique de Chains (sha256) : 1e7b2a03f9d5d289898e63b57410aeafa4e3680e86474d4f35aaa4e01f0c5e65
+OK   pipeline signée exportée de Zot : nom, tâches : sample-app-rpm preparer:preparer-rpm construire:construire-rpm publier:publier-image
+OK   pipeline : bundle de preparer : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   pipeline : bundle de construire : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+OK   paramètres de preparer, figés (triés par nom) : commit=6391fd437f26696847041be3226bbbf633f55a2f depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git fermeture-rpm=sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c fermeture-sources=sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 packaging=sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   paramètres de construire : [{"name":"epoque","value":"1793229566"}]
+politiques de builds : NetworkPolicy builder-sans-sortie, NetworkPolicy construction-deb-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
+OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+relevé : politiques de builds qui sélectionnent un pod sans label de tâche : CiliumNetworkPolicy CiliumNetworkPolicy builds-sans-internet
+relevé : classe de stockage par défaut : local-path (rancher.io/local-path)
+relevé : nœuds de la zone build, stockage éphémère allouable : sc-build 29916549507
+OK   objets du jalon déjà présents (TaskRuns, pods, PVC au label poc.test/jalon=m5) : 0
+OK   aucun objet de builds ne porte un nom du jalon
+OK   objets rendus : variables de pipeline restantes : 0
+OK   TaskRuns de construire : runtimeClassName (7 sous Kata, sans-kata sans) : kata kata kata kata kata kata kata -
+OK   pods d'essai de R7 : labels de tâche (a, b) : - construire-rpm
+KO   pods d'essai de R7 : contexte du conteneur, celui du pas signé : {"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0} (attendu : {"privileged":true,"allowPrivilegeEscalation":true,"runAsUser":0,"runAsGroup":0,"runAsNonRoot":false})
