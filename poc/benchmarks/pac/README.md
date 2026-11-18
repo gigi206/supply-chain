@@ -243,3 +243,7 @@ Journal : [`controles-apres.log`](resultats/controles-apres.log), 22:55:16 UTC, 
   - **défaut trouvé** : `hook.json`, qui contient le secret du webhook du banc, était en 664 (créé hors du `umask 077`). Son dossier était en 700. Je l'ai passé en 600 à 22:55:21 UTC ;
   - `admin.token`, `webhook.secret`, `entete-api` et `hook.json` restent dans `~/.cache/supply-chain-poc/pac/banc/forgejo/`, à ne jamais lire.
 - **Audit, identité empruntée** : en plus des quatre dry-run de 22:51:53 UTC, deux requêtes `kubectl auth can-i … --as=…el-forgejo` ont été faites entre 22:36:29 et 22:40:22 UTC. La première heure est celle du `date -u` qui précède, la seconde celle du `date -u` qui suit : l'heure exacte n'est pas relevée.
+
+### Décision du propriétaire (2026-11-18T23:00:29Z) : « Garder Triggers »
+
+Réponse à « Que décides-tu pour PaC ? », après les résultats du banc. Tekton Triggers, l'intercepteur HMAC et le rattrapage restent le déclencheur. PaC n'est pas retenu, et l'étape 3 n'a pas lieu. Reste ouvert, sans décision : une règle d'admission contre l'`env` du `podTemplate` dans `builds`, à poser plus tard avec la question des valeurs de la carte.
