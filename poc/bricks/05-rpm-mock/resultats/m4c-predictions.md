@@ -204,3 +204,26 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 - TS3 non tenue : rien n'est versionné ni poussé. Le gabarit ou le contrôle est corrigé, puis le banc est rejoué.
 - TS4 non tenue (garde) : rien n'est versionné ni poussé. Décision sur le disque de sc-stockage.
 - TS9 non tenue : écart relevé avant la revue, à expliquer avant toute autre écriture.
+
+## Note datée du 18/11/2026, écrite à 14:53:18 UTC : `SIGNER=1 taches` passée, TS0 à TS10 tenues ; revue de `taches.yml` à demander
+
+**Passage** ([journal](m4c-taches-signer.log)) : le 18/11/2026, `date -u` avant et après le lancement : 14:52:19 et 14:52:23 UTC, code 0, 31 OK, aucun KO. Sur `be3fa84`, `m4c.sh` = `d2d895d9…`. Relevés de Zot ([avant](m4c-taches-zot-avant.log), à 14:52:11 UTC ; [après](m4c-taches-zot-apres.log), à 14:52:31 UTC).
+
+**Confrontation aux prédictions**
+- **TS0 tenue** : les trois dépôts en `NAME_UNKNOWN` ; catalogue de 148 dépôts (N = 148).
+- **TS1 tenue** : `publier-image` lue dans la liste, égale à `d21931f3…` ; trois gabarits égaux à ceux des essais.
+- **TS2 tenue** : `preparer-rpm`, `construire-rpm` et `sample-app-rpm` rendues admises en dry-run serveur (code 0) ; témoin refusé avec le message de M4b.
+- **TS3 tenue** : les deux tâches signées relues, normalisées, égales au rendu ; champs de sécurité conformes ; quatre scripts égaux aux sha256 des essais.
+- **TS4 tenue** : 4 420 063 232 octets libres sur `/` de sc-stockage avant les poussées.
+- **TS5 tenue** : deux nouvelles signatures, conformes :
+  - `construction/preparer-rpm.signee.yaml` = `b32d073f…` ;
+  - `construction/construire-rpm.signee.yaml` = `faab95fd…`.
+- **TS6 tenue** : deux bundles poussés sous le tag `m4c`, deux lignes « à ajouter », « pipeline non signée », code 0, 31 OK. Références :
+  - `sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f` ;
+  - `sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164`.
+- **TS7 tenue** : `$T/auth` absent après la passe (`test -e`).
+- **TS8 tenue** : `kubectl get tasks.tekton.dev,pipelines.tekton.dev -n builds -o name` ne rend aucune ligne (14:52 UTC, non archivé).
+- **TS9 tenue** : chaque dépôt de tâche porte le seul tag `m4c`, au digest affiché par l'étape ; pipeline toujours en `NAME_UNKNOWN` ; catalogue de 150 dépôts (N + 2). `df` : +749 568 octets utilisés entre les deux relevés.
+- **TS10 tenue** : 4 s entre les deux `date -u`.
+
+**Suite** : revue de `taches.yml` par le propriétaire, pour les deux références ci-dessus, dans un commit à part. C'est un arrêt. La seconde passe (TP1 à TP4) attend ce commit.

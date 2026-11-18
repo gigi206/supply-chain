@@ -1,0 +1,15 @@
+# relevé « avant » de taches SIGNER=1 (lecture seule) : tags et digests de tekton/tasks/preparer-rpm, tekton/tasks/construire-rpm et tekton/pipelines/sample-app-rpm, catalogue de Zot, df de / sur sc-stockage
+2026-11-18T14:52:11Z
+## tekton/tasks/preparer-rpm
+Error: reading tags for 192.168.161.13:5000/tekton/tasks/preparer-rpm: GET https://192.168.161.13:5000/v2/tekton/tasks/preparer-rpm/tags/list?n=1000: NAME_UNKNOWN: repository name not known to registry; map[description:This is returned if the name used during an operation is unknown to the registry. name:tekton/tasks/preparer-rpm]
+rc 1
+## tekton/tasks/construire-rpm
+Error: reading tags for 192.168.161.13:5000/tekton/tasks/construire-rpm: GET https://192.168.161.13:5000/v2/tekton/tasks/construire-rpm/tags/list?n=1000: NAME_UNKNOWN: repository name not known to registry; map[description:This is returned if the name used during an operation is unknown to the registry. name:tekton/tasks/construire-rpm]
+rc 1
+## tekton/pipelines/sample-app-rpm
+Error: reading tags for 192.168.161.13:5000/tekton/pipelines/sample-app-rpm: GET https://192.168.161.13:5000/v2/tekton/pipelines/sample-app-rpm/tags/list?n=1000: NAME_UNKNOWN: repository name not known to registry; map[description:This is returned if the name used during an operation is unknown to the registry. name:tekton/pipelines/sample-app-rpm]
+rc 1
+## catalogue : 148 dépôts
+Mounted on        Used      Avail
+/          15600369664 4420546560
+2026-11-18T14:52:11Z
