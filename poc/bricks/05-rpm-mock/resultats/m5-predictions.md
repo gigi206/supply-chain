@@ -89,3 +89,37 @@ Prédictions PR1 à PR10 inchangées. Relance de `prealables` sous `m5`.
 - Les PipelineRuns `m4c-rpm-1` et `m4c-rpm-2` sont gardés.
 
 Suite : écrire les étapes `temoin`, `alterer`, `fermeture`, `reseau`, `sans_kata`, `invariance` et `retirer`, avec leur banc et leurs prédictions, avant tout lancement.
+
+## Note datée du 18/11/2026, écrite à 18:48:06 UTC : étapes du cluster ajoutées à `m5.sh` à sec, NON LANCÉES ; prédictions des étapes du cluster
+
+**Ajouté à `m5.sh`** (`5d8d8737…`, accord permanent du 18/11) : `banc_juges`, `preparer`, `alterer`, `fermeture`, `sans_kata`, `reseau`, `invariance` et `retirer`.
+- Chaque objet porte le label `poc.test/jalon=m5`. Une garde d'absence précède chaque création, et rien n'est jamais purgé.
+- `retirer` ne vise que ce label, jamais les PipelineRuns `m4c-rpm-*`.
+- Aucun message de condition ni d'Event n'est affiché. Pour R8, seuls des motifs du message sont comptés.
+- **Banc** `banc_juges` : [journal](m5-banc_juges.log), 5 OK. Les juges des constructions ont tourné sur des TaskRuns et des journaux fabriqués, un par issue : refus par la confrontation, accepté, refus dans mock, non mesuré (deux cas).
+- Script de R7 rendu et contrôlé (`bash -n`). Son début, joué sous `unshare -rn` sur l'hôte, voit `lo` seule et une connexion refusée.
+
+**Ordre** : `preparer`, `alterer`, `fermeture`, `sans_kata`, `reseau`, `invariance`, `retirer`.
+
+**Prédictions**
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| PP1 | `preparer` : `True|Succeeded`, pod au label `preparer-rpm`, sans Kata ; résultats `CHAINS-GIT_*` et les trois `*_ARTIFACT_INPUTS` égaux aux références | Haute : même bundle qu'en `pipeline` (PL) ; admis à blanc (PR8) |
+| AL1 | `alterer` : empreinte de `entrees/` sur le PVC égale à la source locale `d3a610bb…` | Moyenne-haute : l'essai de `preparer-rpm` a donné un arbre égal à celui de `prealables` (contenu, modes, types) ; l'empreinte n'a jamais été calculée dans le cluster |
+| AL2 | 7 copies conformes, source inchangée | Haute : banc (PR1), même script |
+| FE1 | Témoin `m5-intacte` : `True|Succeeded`, label `construire-rpm`, Kata ; écriture refusée, trois témoins TCP en échec ; rpm `864d55f4…` (M3), `DIGEST_CONSTRUIT` `07b7bd6f…` ; rien n'est publié | Haute : mêmes entrées et même époque que les deux PipelineRuns de M4c |
+| FE2 | R1, R2, R3, R5 : `refus-confrontation`, avec les messages du banc, mock jamais lancé | Haute : PR1, même code, même rpm |
+| FE3 | **R4** (payload altéré) : la confrontation passe, mock refuse (`refus-mock`). Barrière attendue dans le journal : rpm (« does not verify » ou « Payload SHA256 … BAD »), ou dnf (somme de contrôle du paquet contre `primary`). Lequel des deux vient en premier n'est pas prédit. Autres issues : **accepté**, à remonter comme constat, avec le sha256 du rpm contre `864d55f4…` ; **non mesuré**, échec avant mock | Moyenne-haute pour le refus : `rpm -i --test` le refuse (PR2) ; jamais joué dans mock |
+| FE4 | **R6** (blob de l'image de bootstrap altéré) : la confrontation passe, mock refuse au chargement de l'image (`refus-mock`). Barrière attendue : une ligne de digest de l'image. Autres issues : **accepté**, dont un repli de mock sur un bootstrap fait de paquets (lignes « fallback » imprimées) : constat ; **non mesuré** | Moyenne : le chargement d'un `dir:` altéré n'a jamais été mesuré |
+| SK1 | R8 : `False|PodAdmissionFailed`, aucun pod ; motif « PodSecurity » compté dans le message | Moyenne-haute : N7 de la 06, même contexte privilégié |
+| RE1 | R7, bras a (sans label de tâche) : depuis le pod, connexion à Zot réussie (code 0) | Moyenne-haute : seule `builds-sans-internet` le sélectionne (relevé de `prealables`) ; témoin de N6 de la 06 |
+| RE2 | R7, bras a, `%build` : début et fin de la sonde imprimés. Connexion : **refusée, interfaces `lo` seule** (mock coupe le réseau de `%build`), ou **réussie** (mock ne coupe pas, la politique du pod est la seule barrière, constat). Sans les marqueurs : **non mesuré** | Moyenne pour les marqueurs (mock hermétique d'une spec minimale jamais joué) ; aucun pari sur la coupure par mock |
+| RE3 | R7, bras b (label `construire-rpm`) : connexion refusée depuis le pod ; refusée aussi pendant `%build` si les marqueurs sont imprimés | Haute : témoins de chaque build depuis M3 |
+| RE4 | mock rc 0 dans les deux bras, `m5-reseau-1.0-1.noarch.rpm` produit (relevé) | Moyenne |
+| IN1 | 4 enveloppes sur `07b7bd6f…` après les étapes ; aucun TaskRun du jalon ne publie | Moyenne-haute : S5a de la 06, aucune enveloppe nouvelle |
+| RT1 | `retirer` : aucun objet du jalon restant ; PipelineRuns de M4c gardés | Haute |
+
+**Durées** (non exigées) : `preparer` et `alterer`, quelques minutes ; `fermeture`, de l'ordre de 15 à 30 min (trois mock complets au plus, intacte, R4 et R6) ; `reseau`, deux mock hermétiques.
+
+**Après le passage** : une prédiction non tenue est lue dans le journal avant toute correction. Une acceptation de R4, de R6 ou du bras a de R7 est un constat que je remonte, sans modifier de tâche signée.

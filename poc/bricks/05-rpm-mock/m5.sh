@@ -11,7 +11,20 @@
 #               Lecture (cluster, Zot) : pipeline signée exportée, références des tâches et paramètres figés ; politiques de
 #               builds relues ; aucun objet $N-* ; TaskRuns, PVC et pods rendus et admis à blanc côté serveur ; enveloppes
 #               de l'artefact de M4c comptées (état de départ)
-# Les étapes suivantes (temoin, alterer, fermeture, reseau, sans_kata, invariance, retirer) viendront après prealables.
+#   banc_juges  ajoutée le 18/11/2026 après prealables, comme les suivantes (préparées à sec, accord permanent du 18/11) ; hôte
+#               seul : juges des constructions sur des TaskRuns et journaux fabriqués (refus, accepté, refus dans mock, non mesuré)
+#   preparer    cluster : PVC $N-entrees, puis TaskRun isolé de preparer-rpm (runc), qui tire les entrées de Zot par digest ;
+#               résultats relus
+#   alterer     cluster : pod runc (UID 65532) sur le PVC ; empreinte de entrees/ égale à la source locale ; sept copies par liens
+#               durs (m5-alterer.py), preuves avant et après ; pod supprimé
+#   fermeture   cluster : TaskRuns isolés de construire-rpm sous Kata, sur la copie intacte (témoin : rpm de M3, digest de M4c,
+#               rien n'est publié), puis sur R1 à R6 ; R1, R2, R3, R5 refusées par la confrontation ; R4, R6 classées (refus dans
+#               mock, accepté, non mesuré), lignes qui nomment la barrière imprimées
+#   sans_kata   cluster : R8, TaskRun isolé de construire-rpm sans runtimeClassName ; PodAdmissionFailed, aucun pod
+#   reseau      cluster : R7, deux pods d'essai Kata privilégiés (a sans label de tâche, b au label construire-rpm) ; TCP vers Zot
+#               depuis le pod, puis mock --hermetic-build de m5-reseau.spec, sonde de %build lue dans build.log ; pods supprimés
+#   invariance  lecture : 4 enveloppes sur l'artefact de M4c ; annotations de Chains des TaskRuns du jalon ; PipelineRuns de M4c
+#   retirer     cluster : TaskRuns, pods et PVC au label poc.test/jalon=$N supprimés, jamais ceux de M4c ; rien n'est retiré de Zot
 # $N (PREFIXE, m5 par défaut) préfixe chaque objet : une relance se fait sous un autre préfixe, jamais en purgeant.
 # Aucun secret en argument de commande ; journaux filtrés (jeton|token) ; jamais le message d'une condition ni d'un Event.
 # Usage (racine du dépôt) : DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/m5.sh <étape>… (journal : resultats/m5-<étape>.log)
@@ -247,6 +260,225 @@ etape_prealables() {
   for o in $(objets); do a_blanc "$o"; done
   echo "relevé : PipelineRuns de M4c gardés : $(kubectl get pipelinerun -n builds m4c-rpm-1 m4c-rpm-2 -o name < /dev/null | paste -sd' ')"
   attendu "enveloppes valides sur l'artefact de M4c (état de départ)" "$(enveloppes)" 4
+}
+
+# --- M5a, étapes du cluster (ajoutées le 18/11/2026 après prealables, préparées à sec sous l'accord permanent du 18/11) -------
+RPM_M3_SHA=864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f   # m3_comparaison, M4c
+ZOT_CIBLE=192.168.161.13/5000   # première cible des témoins de construire-rpm, sonde de m5-reseau.spec
+present() { kubectl get "$1" -n builds "$2" -o name < /dev/null > /dev/null 2>&1; }   # type nom
+creer() { # fichier type nom : garde d'absence (jamais de purge), puis création
+  ! present "$2" "$3" || echec "$2 $3 déjà présent : relancer sous un autre PREFIXE"
+  kubectl create -f "$1" < /dev/null > /dev/null
+  echo "$2 $3 créé à $(date -u +%H:%M:%S)"
+}
+tr_attendre() { # nom : fin du TaskRun (3600 s au plus) ; TaskRun, pod et journaux filtrés dans $T ; « statut|raison »
+  local st="" p
+  for _ in $(seq 1800); do
+    st=$(kubectl get taskrun -n builds "$1" -o jsonpath='{.status.conditions[?(@.type=="Succeeded")].status}' < /dev/null 2> /dev/null || true)
+    [ -n "$st" ] && [ "$st" != Unknown ] && break; sleep 2
+  done
+  kubectl get taskrun -n builds "$1" -o json < /dev/null > "$T/$1.tr.json"
+  p=$(jq -r '.status.podName // ""' "$T/$1.tr.json")
+  if [ -n "$p" ] && present pod "$p"; then
+    kubectl logs -n builds "$p" --all-containers < /dev/null 2>&1 | filtre > "$T/$1.log"
+    kubectl get pod -n builds "$p" -o json < /dev/null > "$T/$1.pod.json"
+  else : > "$T/$1.log"; echo '{}' > "$T/$1.pod.json"; fi
+  echo "TaskRun $1 terminé à $(date -u +%H:%M:%S)" >&2
+  jq -r '.status.conditions[] | select(.type == "Succeeded") | "\(.status)|\(.reason)"' "$T/$1.tr.json"
+}
+tr_resultat() { jq -r --arg r "$2" '[.status.results[]? | select(.name == $r) | .value][0] // ""' "$T/$1.tr.json"; }
+tr_pod() { jq -r '"\(.metadata.labels["tekton.dev/task"] // "-")|\(.spec.nodeName // "-")|\(.spec.runtimeClassName // "-")"' "$T/$1.pod.json"; }
+nb() { grep -cF -- "$2" "$1" 2> /dev/null || true; }   # fichier motif : nombre de lignes qui contiennent le motif
+motifs_message() { # nom : motifs comptés dans le message de la condition Succeeded, jamais affiché ni écrit
+  local m
+  m=$(jq -r '.status.conditions[] | select(.type == "Succeeded") | .message' "$T/$1.tr.json")
+  echo "PodSecurity $(grep -ci 'podsecurity\|pod security' <<< "$m" || true), privileged $(grep -ci 'privileged' <<< "$m" || true), ValidatingAdmissionPolicy $(grep -ci 'validatingadmissionpolicy' <<< "$m" || true), kyverno $(grep -ci kyverno <<< "$m" || true), runtimeClassName $(grep -ci runtimeclass <<< "$m" || true)"
+}
+# Juge d'une construction (fichiers $T/<nom>.tr.json et $T/<nom>.log) : « statut|raison|confrontation passée|ligne de refus|rc de mock|
+# sha256 du rpm|DIGEST_CONSTRUIT », puis classe : refus-confrontation, refus-mock, accepte, non-mesure
+juger_construction() { # nom motif-de-refus|-
+  local f=$T/$1.log s rc sha d conf ref
+  s=$(jq -r '.status.conditions[] | select(.type == "Succeeded") | "\(.status)|\(.reason)"' "$T/$1.tr.json")
+  conf=$(nb "$f" "fermeture confrontée au verrou : 222 rpm (noms et sigmd5)")
+  if [ "$2" = - ]; then ref=0; else ref=$(nb "$f" "$2"); fi
+  rc=$(sed -n 's/^mock --hermetic-build : rc \([0-9]*\) en .*/\1/p' "$f" | head -n 1)
+  sha=$(sed -n 's/^rpm : sample-app-[^ ]*\.x86_64\.rpm sha256 \([0-9a-f]\{64\}\) .*/\1/p' "$f" | head -n 1)
+  d=$(tr_resultat "$1" DIGEST_CONSTRUIT)
+  echo "$s|$conf|$ref|${rc:--}|${sha:--}|${d:--}"
+}
+classer() { # ligne de juger_construction : classe
+  local s conf ref rc
+  IFS='|' read -r s _ conf ref rc _ _ <<< "$1"
+  if [ "$s" = True ]; then echo accepte
+  elif [ "$s" = False ] && [ "$conf" = 0 ] && [ "$ref" = 1 ] && [ "$rc" = - ]; then echo refus-confrontation
+  elif [ "$s" = False ] && [ "$conf" = 1 ] && [ "$rc" != - ] && [ "$rc" != 0 ]; then echo refus-mock
+  else echo non-mesure; fi
+}
+barriere() { # nom : lignes du journal qui nomment une barrière (digest, somme de contrôle, vérification), filtrées et coupées
+  grep -iE 'digest|checksum|verify|BAD|mismatch|corrupt|signature|fallback' "$T/$1.log" | grep -v '^paquet ' | head -n 15 | cut -c1-240 | sed 's/^/     /' || true
+}
+etape_banc_juges() { # hôte seul : juger_construction et classer sur des TaskRuns et journaux fabriqués, un par issue
+  local n l c m
+  for n in refus succes mock avant; do
+    case $n in
+      succes) jq -n --arg d "$DIGEST_ESSAI" '{status: {conditions: [{type: "Succeeded", status: "True", reason: "Succeeded"}], results: [{name: "DIGEST_CONSTRUIT", value: $d}]}}' ;;
+      *) jq -n '{status: {conditions: [{type: "Succeeded", status: "False", reason: "Failed"}], results: []}}' ;;
+    esac > "$T/banc-$n.tr.json"
+  done
+  printf 'invité : x\nsigmd5 différent du verrou : %s (5832caf6)\nconfrontation au verrou en échec\n' "$CIBLE" > "$T/banc-refus.log"
+  printf 'fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image\nmock --hermetic-build : rc 0 en 200 s\nrpm : sample-app-1.0.0-2.el9.x86_64.rpm sha256 %s (1 octets) ; NEVRA x\n' "$RPM_M3_SHA" > "$T/banc-succes.log"
+  printf 'fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image\nmock --hermetic-build : rc 30 en 20 s\nmock en échec\n' > "$T/banc-mock.log"
+  printf 'invité : x\nKO   192.168.161.13/5000 joint\n' > "$T/banc-avant.log"
+  while IFS='#' read -r c m l; do
+    attendu "juge sur banc-$c (motif « ${m:0:40} »)" "$(juger_construction "banc-$c" "$m")|$(classer "$(juger_construction "banc-$c" "$m")")" "$l"
+  done <<EOF
+refus#sigmd5 différent du verrou : $CIBLE#False|Failed|0|1|-|-|-|refus-confrontation
+succes#-#True|Succeeded|1|0|0|$RPM_M3_SHA|$DIGEST_ESSAI|accepte
+mock#-#False|Failed|1|0|30|-|-|refus-mock
+avant#-#False|Failed|0|0|-|-|-|non-mesure
+refus#-#False|Failed|0|0|-|-|-|non-mesure
+EOF
+}
+
+etape_preparer() { # PVC $N-entrees, puis TaskRun isolé de preparer-rpm (runc) qui remplit entrees/ ; résultats relus
+  local n=$N-preparer s a
+  rendre_tout
+  attendu "enveloppes valides sur l'artefact de M4c (avant)" "$(enveloppes)" 4
+  creer "$T/pvc-$N-entrees.json" pvc "$N-entrees"
+  creer "$T/tr-$n.json" taskrun "$n"
+  s=$(tr_attendre "$n")
+  echo "pod : $(tr_pod "$n") ; journal : $(wc -l < "$T/$n.log") lignes"
+  grep -v '^paquet ' "$T/$n.log" | tail -n 12 | cut -c1-220 | sed 's/^/     /'
+  attendu "TaskRun $n" "$s" "True|Succeeded"
+  attendu "pod de $n : label de tâche, runtimeClassName" "$(tr_pod "$n" | cut -d'|' -f1,3)" "$LABEL_PREPARER|-"
+  attendu "résultat CHAINS-GIT_URL" "$(tr_resultat "$n" CHAINS-GIT_URL)" "$DEPOT_GIT"
+  attendu "résultat CHAINS-GIT_COMMIT" "$(tr_resultat "$n" CHAINS-GIT_COMMIT)" "$COMMIT"
+  for a in "FERMETURE_RPM $FERMETURE_RPM" "FERMETURE_SOURCES $FERMETURE_SOURCES" "PACKAGING $PACKAGING"; do
+    set -- $a
+    attendu "résultat $1_ARTIFACT_INPUTS" "$(tr_resultat "$n" "$1_ARTIFACT_INPUTS")" "{\"uri\":\"oci://${2%@*}\",\"digest\":\"${2#*@}\"}"
+  done
+  echo "relevé : annotation de Chains sur $n : $(kubectl get taskrun -n builds "$n" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}' < /dev/null)"
+}
+
+etape_alterer() { # pod runc sur le PVC : empreinte de entrees/ (égale à la source locale), sept copies, preuves ; pod supprimé
+  local p=$N-alterer r
+  present taskrun "$N-preparer" || echec "lancer d'abord preparer"
+  rendre_tout
+  creer "$T/pod-$p.json" pod "$p"
+  kubectl wait -n builds "pod/$p" --for=condition=Ready --timeout=300s < /dev/null > /dev/null || echec "pod $p non prêt"
+  kubectl exec -i -n builds "$p" -- sh -c 'cat > /tmp/a.py' < "$ALTERER"
+  attendu "m5-alterer.py dans le pod (sha256)" "$(kubectl exec -n builds "$p" -- python3 -I -c 'import hashlib; print(hashlib.sha256(open("/tmp/a.py", "rb").read()).hexdigest())' < /dev/null)" "$(sha256sum < "$ALTERER" | cut -c1-64)"
+  attendu "entrees/ du PVC (preparer-rpm) : empreinte, égale à la source locale" "$(kubectl exec -n builds "$p" -- python3 -I /tmp/a.py empreinte /m/entrees < /dev/null)" "$SOURCE_EMPREINTE"
+  kubectl exec -n builds "$p" -- python3 -I /tmp/a.py faire /m/entrees /m/alt < /dev/null | cut -c1-240 | sed 's/^/     /'
+  r=0; kubectl exec -n builds "$p" -- python3 -I /tmp/a.py comparer /m/entrees /m/alt < /dev/null > "$T/comparer.txt" || r=$?
+  cut -c1-240 "$T/comparer.txt" | sed 's/^/     /'
+  attendu "copies : chacune ne diffère de la source que par l'objet voulu (code, lignes OK)" "$r $(grep -c '^OK ' "$T/comparer.txt")" "0 7"
+  attendu "entrees/ du PVC : empreinte après" "$(kubectl exec -n builds "$p" -- python3 -I /tmp/a.py empreinte /m/entrees < /dev/null)" "$SOURCE_EMPREINTE"
+  echo "relevé : PVC : $(kubectl exec -n builds "$p" -- df -k /m < /dev/null | awk 'NR == 2 {print $3 " kB utilisés sur " $2}')"
+  kubectl delete pod -n builds "$p" --wait=true < /dev/null > /dev/null; echo "pod $p supprimé"
+}
+
+etape_fermeture() { # témoin puis R1 à R6 : TaskRuns isolés de construire-rpm sous Kata sur chaque copie ; rien n'est publié
+  local c n s l k m
+  ! present pod "$N-alterer" || echec "pod $N-alterer encore présent"
+  [ -s "$T/comparer.txt" ] && [ "$(grep -c '^OK ' "$T/comparer.txt")" = 7 ] || echec "lancer d'abord alterer"
+  rendre_tout
+  for c in $CAS; do
+    n=$N-$c
+    echo "## $c"
+    creer "$T/tr-$n.json" taskrun "$n"
+    s=$(tr_attendre "$n")
+    echo "pod : $(tr_pod "$n") ; statut $s"
+    grep -v '^paquet ' "$T/$n.log" | grep -E 'confront|sigmd5|objet|absent|manifest|mock|rpm :|écriture refusée|témoin' | cut -c1-220 | sed 's/^/     /' || true
+    case $c in
+      intacte|r4|r6) m=- ;;
+      r1) m="sigmd5 différent du verrou : $CIBLE" ;;
+      r2) m="fermeture : 1 objet(s) hors du verrou, de repodata/ et du dossier dir: : ['m5-en-trop.rpm']" ;;
+      r3) m="fermeture : 1 rpm du verrou absent(s) : ['$CIBLE']" ;;
+      r5) m="manifest.json du dossier dir: différent du pull_digest" ;;
+    esac
+    l=$(juger_construction "$n" "$m"); k=$(classer "$l")
+    echo "juge : $l ; classe : $k"
+    attendu "pod de $n : label de tâche, runtimeClassName" "$(tr_pod "$n" | cut -d'|' -f1,3)" "$LABEL_CONSTRUIRE|kata"
+    attendu "$n : écriture refusée sur les entrées, témoins TCP atteints" "$(grep -c '^invité : .*, écriture refusée$' "$T/$n.log") $(grep -c '^témoin TCP .* : échec, code [0-9]* (attendu)$' "$T/$n.log")" "1 3"
+    case $c in
+      intacte)
+        attendu "témoin : TaskRun, classe" "$s $k" "True|Succeeded accepte"
+        attendu "témoin : rpm égal à celui de M3" "$(cut -d'|' -f6 <<< "$l")" "$RPM_M3_SHA"
+        attendu "témoin : DIGEST_CONSTRUIT égal à l'artefact de M4c" "$(cut -d'|' -f7 <<< "$l")" "$DIGEST_ESSAI" ;;
+      r1|r2|r3|r5)
+        attendu "$c : classe (refus par la confrontation, mock jamais lancé)" "$k" refus-confrontation ;;
+      r4|r6)
+        echo "relevé : $c, classe : $k (refus-mock, accepte ou non-mesure ; prédictions écrites avant le lancement)"
+        echo "lignes qui nomment une barrière :"; barriere "$n"
+        [ "$k" != accepte ] || echo "CONSTAT : $c accepté ; rpm $(cut -d'|' -f6 <<< "$l") (M3 : $RPM_M3_SHA), DIGEST_CONSTRUIT $(cut -d'|' -f7 <<< "$l")" ;;
+    esac
+  done
+}
+
+etape_sans_kata() { # R8 : TaskRun isolé de construire-rpm sans runtimeClassName, sur la copie intacte
+  local n=$N-sans-kata s
+  present taskrun "$N-intacte" || echec "lancer d'abord fermeture"
+  rendre_tout
+  creer "$T/tr-$n.json" taskrun "$n"
+  s=$(tr_attendre "$n")
+  echo "statut $s ; pod : $(jq -r '.status.podName // "-"' "$T/$n.tr.json") ; motifs du message : $(motifs_message "$n")"
+  attendu "R8 : TaskRun refusé à la création du pod" "$s" "False|PodAdmissionFailed"
+  attendu "R8 : aucun pod" "$(kubectl get pod -n builds -l "tekton.dev/taskRun=$n" -o name < /dev/null | wc -l)" 0
+}
+
+etape_reseau() { # R7 : deux pods d'essai Kata privilégiés (a : sans label de tâche ; b : label construire-rpm), entrées intactes
+  # en lecture seule ; connexion TCP à Zot depuis le pod, puis mock --hermetic-build de m5-reseau.spec ; sonde lue dans build.log
+  local c p r
+  present taskrun "$N-intacte" || echec "lancer d'abord fermeture"
+  rendre_tout
+  cat > "$T/reseau-pod.sh" <<EOF
+set -u
+echo "M5-POD uid \$(id -u) ; interfaces : \$(sed -n '3,\$ s/:.*//p' /proc/net/dev | tr -d ' ' | tr '\n' ' ')"
+r=0; timeout 10 bash -c 'exec 3<>/dev/tcp/$ZOT_CIBLE' 2> /dev/null || r=\$?
+echo "M5-POD tcp $ZOT_CIBLE code \$r"
+mkdir -p /w/src /w/fermeture && cp -a /e/fermeture/. /w/fermeture/ && cp /e/verrou-rpm.json /w/verrou.json || { echo "M5-POD copie des entrées en échec"; exit 1; }
+t=\$(date +%s); r=0
+mock --hermetic-build /w/verrou.json /w/fermeture/depot --isolation=simple --no-cleanup-after --config-opts=basedir=/w/mock \\
+  --config-opts=cache_topdir=/w/mock-cache --resultdir=/w/res --spec /w/m5-reseau.spec --sources /w/src > /w/mock.out 2>&1 || r=\$?
+echo "M5-POD mock rc \$r en \$((\$(date +%s) - t)) s"
+grep '^M5-SONDE' /w/res/build.log 2> /dev/null || echo "M5-POD aucune ligne M5-SONDE dans build.log"
+[ \$r = 0 ] || { echo "----- fin de mock.out -----"; tail -n 30 /w/mock.out; }
+ls /w/res/*.rpm 2> /dev/null | sed 's/^/M5-POD produit : /'
+EOF
+  for c in a b; do
+    p=$N-reseau-$c
+    echo "## bras $c ($(jq -r '.metadata.labels["tekton.dev/task"] // "sans label de tâche"' "$T/pod-$p.json"))"
+    creer "$T/pod-$p.json" pod "$p"
+    kubectl wait -n builds "pod/$p" --for=condition=Ready --timeout=300s < /dev/null > /dev/null || echec "pod $p non prêt"
+    echo "pod prêt sur $(kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}, runtimeClassName {.spec.runtimeClassName}' < /dev/null)"
+    kubectl exec -i -n builds "$p" -- sh -c 'cat > /w/m5-reseau.spec' < "$SPEC_SONDE"
+    kubectl exec -i -n builds "$p" -- sh -c 'cat > /w/s.sh' < "$T/reseau-pod.sh"
+    attendu "$p : spec et script copiés (sha256)" "$(kubectl exec -n builds "$p" -- sh -c 'sha256sum /w/m5-reseau.spec /w/s.sh | cut -c1-64 | paste -sd" "' < /dev/null)" \
+      "$(sha256sum < "$SPEC_SONDE" | cut -c1-64) $(sha256sum < "$T/reseau-pod.sh" | cut -c1-64)"
+    r=0; timeout 1800 kubectl exec -n builds "$p" -- bash /w/s.sh < /dev/null 2>&1 | filtre > "$T/reseau-$c.log" || r=$?
+    cut -c1-220 "$T/reseau-$c.log" | sed 's/^/     /'
+    kubectl delete pod -n builds "$p" --wait=false < /dev/null > /dev/null; echo "pod $p supprimé (code de l'exec : $r)"
+    echo "relevé : bras $c : pod tcp $(sed -n "s#^M5-POD tcp $ZOT_CIBLE code ##p" "$T/reseau-$c.log") ; %build : début $(nb "$T/reseau-$c.log" 'M5-SONDE début de %build'), fin $(nb "$T/reseau-$c.log" 'M5-SONDE fin de %build'), tcp $(sed -n "s#^M5-SONDE tcp $ZOT_CIBLE code ##p" "$T/reseau-$c.log"), interfaces « $(sed -n 's/^M5-SONDE interfaces : //p' "$T/reseau-$c.log") »"
+  done
+}
+
+etape_invariance() { # lecture : enveloppes sur l'artefact de M4c ; annotations de Chains des TaskRuns du jalon ; PipelineRuns de M4c
+  attendu "enveloppes valides sur l'artefact de M4c (après)" "$(enveloppes)" 4
+  echo "relevé : TaskRuns du jalon, annotation chains.tekton.dev/signed : $(kubectl get taskrun -n builds -l "poc.test/jalon=$N" -o json < /dev/null | jq -r '[.items[] | "\(.metadata.name)=\(.metadata.annotations["chains.tekton.dev/signed"] // "-")"] | join(" ")')"
+  attendu "PipelineRuns de M4c gardés" "$(kubectl get pipelinerun -n builds m4c-rpm-1 m4c-rpm-2 -o name < /dev/null | wc -l)" 2
+}
+
+etape_retirer() { # TaskRuns, pods et PVC du jalon (label poc.test/jalon=$N) supprimés ; rien d'autre ; rien n'est retiré de Zot
+  local o
+  o=$(kubectl get taskrun,pod,pvc -n builds -l "poc.test/jalon=$N" -o name < /dev/null)
+  echo "à retirer : $(echo "$o" | grep -c .) objet(s) : $(echo "$o" | paste -sd' ')"
+  ! grep -q 'm4c-rpm' <<< "$o" || echec "un objet de M4c porte le label du jalon"
+  kubectl delete taskrun -n builds -l "poc.test/jalon=$N" --wait=true < /dev/null > /dev/null
+  kubectl delete pod -n builds -l "poc.test/jalon=$N" --wait=true < /dev/null > /dev/null
+  kubectl delete pvc -n builds -l "poc.test/jalon=$N" --wait=true < /dev/null > /dev/null
+  attendu "objets du jalon restants" "$(kubectl get taskrun,pod,pvc -n builds -l "poc.test/jalon=$N" -o name < /dev/null | wc -l)" 0
+  attendu "PipelineRuns de M4c gardés" "$(kubectl get pipelinerun -n builds m4c-rpm-1 m4c-rpm-2 -o name < /dev/null | wc -l)" 2
 }
 
 lancer m5 "05 M5a" "$@"
