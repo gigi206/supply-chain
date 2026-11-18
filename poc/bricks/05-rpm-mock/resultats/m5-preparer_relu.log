@@ -1,0 +1,9 @@
+# m5.sh preparer_relu, 2026-11-18T18:49:09Z
+OK   TaskRun m5-preparer : True|Succeeded
+OK   pod de m5-preparer : label de tâche, runtimeClassName : preparer-rpm|-
+OK   résultat CHAINS-GIT_URL : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+OK   résultat CHAINS-GIT_COMMIT : 6391fd437f26696847041be3226bbbf633f55a2f
+OK   résultat FERMETURE_RPM_ARTIFACT_INPUTS (JSON trié) : {"digest":"sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c","uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm"}
+OK   résultat FERMETURE_SOURCES_ARTIFACT_INPUTS (JSON trié) : {"digest":"sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21","uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources"}
+OK   résultat PACKAGING_ARTIFACT_INPUTS (JSON trié) : {"digest":"sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8","uri":"oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm"}
+relevé : annotation de Chains sur m5-preparer : true

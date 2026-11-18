@@ -137,3 +137,12 @@ Suite : écrire les étapes `temoin`, `alterer`, `fermeture`, `reseau`, `sans_ka
 - étape **`preparer_relu`**, en lecture seule : elle relit le TaskRun existant et refait tous ses contrôles, sans rien recréer (garde d'absence).
 
 PP1 sera jugée sur `preparer_relu`. Suite : `preparer_relu`, puis `alterer`.
+
+## Note datée du 18/11/2026, écrite à 18:50:12 UTC : `preparer_relu` et `alterer` passées (18:49:09 à 18:49:50 UTC, code 0) ; PP1, AL1 et AL2 tenues
+
+- **PP1 tenue** ([journal](m5-preparer_relu.log), 7 OK) : `m5-preparer` `True|Succeeded`, label `preparer-rpm`, sans Kata ; `CHAINS-GIT_URL`, `CHAINS-GIT_COMMIT` et les trois `*_ARTIFACT_INPUTS` (en JSON trié) égaux aux références. Relevé : Chains a signé ce TaskRun (`chains.tekton.dev/signed=true`).
+- **AL1 tenue** ([journal](m5-alterer.log), 4 OK) : l'empreinte de `entrees/` remplie par `preparer-rpm` sur le PVC est `d3a610bb…`, égale à la source locale de `m4c.sh prealables`. 273 fichiers.
+- **AL2 tenue** : 7 copies conformes, chacune ne diffère que par l'objet voulu ; empreinte de la source inchangée après les altérations.
+- Relevé : le PVC `local-path` voit le disque du nœud, 16 874 396 kB utilisés sur 30 753 032.
+
+Suite : `fermeture`.

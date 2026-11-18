@@ -1,0 +1,22 @@
+# m5.sh alterer, 2026-11-18T18:49:09Z
+pod m5-alterer créé à 18:49:09
+OK   m5-alterer.py dans le pod (sha256) : 8bc019dc46a7f28f7f9df2915471e17c9ff31e0cd5260a76e9bb555efd6b26bd
+OK   entrees/ du PVC (preparer-rpm) : empreinte, égale à la source locale : d3a610bbd9e1ba6fa56abaaaec4e54addf7a4669d3c9e252b0f6ff65041be8e7
+     r1 : zlib-1.2.11-40.el9.x86_64.rpm remplacé par le contenu de alternatives-1.24-2.el9.x86_64.rpm
+     r2 : m5-en-trop.rpm ajouté à la racine de depot/
+     r3 : zlib-1.2.11-40.el9.x86_64.rpm retiré
+     r4 : zlib-1.2.11-40.el9.x86_64.rpm, octet 88091 inversé, taille inchangée (92187 octets)
+     r5 : manifest.json du dossier dir: suivi d'un saut de ligne
+     r6 : fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99, octet 48871296 inversé, taille inchangée (97742593 octets)
+     source : 273 fichiers, empreinte d3a610bbd9e1ba6fa56abaaaec4e54addf7a4669d3c9e252b0f6ff65041be8e7
+     OK   intacte : 273 fichiers ; écarts à la source : aucun
+     OK   r1 : 273 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (contenu)
+     OK   r2 : 274 fichiers ; écarts à la source : fermeture/depot/m5-en-trop.rpm (en plus)
+     OK   r3 : 272 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (absent)
+     OK   r4 : 273 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (contenu)
+     OK   r5 : 273 fichiers ; écarts à la source : fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/manifest.json (contenu)
+     OK   r6 : 273 fichiers ; écarts à la source : fermeture/depot/sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99 (contenu)
+OK   copies : chacune ne diffère de la source que par l'objet voulu (code, lignes OK) : 0 7
+OK   entrees/ du PVC : empreinte après : d3a610bbd9e1ba6fa56abaaaec4e54addf7a4669d3c9e252b0f6ff65041be8e7
+relevé : PVC : 16874396 kB utilisés sur 30753032
+pod m5-alterer supprimé
