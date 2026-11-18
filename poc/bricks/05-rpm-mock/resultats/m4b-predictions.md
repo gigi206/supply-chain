@@ -446,3 +446,125 @@ Point « à lire avant `taches` » de la note de 22:59:14 UTC le 17/11.
   - L'origine n'est pas relevée. Elle est à attribuer avant `rpm`, en commençant par des `du -sx` espacés sur les arbres lisibles sans sudo ; sinon le relevé revient au propriétaire.
 
 *Correction datée du 18/11/2026, écrite à 09:30:18 UTC.* La note précédente place les trois passages non archivés « entre 09:26:20 et 09:26:29 UTC ». Le premier, arrêté au chargement de `commun.sh`, n'a rien imprimé, pas même `date -u` : son heure n'est pas connue, sinon qu'il précède 09:26:20 UTC. Les deux autres ont commencé à 09:26:20 UTC (le deuxième, heure lue à l'écran, non archivée) et se sont terminés au plus tard à 09:26:29 UTC (le troisième).
+
+## Note datée du 18/11/2026, écrite à 09:49:32 UTC : étape `taches` préparée à sec et appliquée à `m4b.sh` (accord permanent du 18/11), NON LANCÉE
+
+**Ordre du cycle, corrigé.** Le message précédent au propriétaire annonçait un arrêt « pour votre revue de `taches.yml` avant toute signature ». Le cycle de S4a et S4b, repris ici, fait l'inverse (vérifié dans `s4b.sh`, `signer_tache`, et dans `s4a-predictions.md`, A2) :
+- la passe `SIGNER=1` signe la tâche, versionne la signature et pousse le bundle dans Zot ;
+- c'est seulement ensuite que le digest à relire existe, et que la revue de `taches.yml` peut avoir lieu ;
+- la poussée est définitive : le compte d'écriture n'a aucun droit de suppression.
+
+Ce tour s'arrête donc avant `SIGNER=1`, comme annoncé. La suite est annoncée au propriétaire, sans question oui/non : `SIGNER=1 taches`, puis arrêt pour la revue de `taches.yml`.
+
+**Fichiers**
+- [`../m4b.sh`](../m4b.sh) passe de `5e08bef0…` à `8402b2b7…` (appliqué à 09:46:26 UTC), par insertions seules, en trois blocs :
+  - 10 lignes d'en-tête ;
+  - 2 lignes au niveau haut : dossier `$T/auth` en 077 et `trap` qui le retire à la sortie, sur le modèle de `m4a.sh` et `s4b.sh` ;
+  - 85 lignes de code avant `lancer` : `echec`, `ref_revue` (reprise de `s4b.sh`), `admission`, `controler_signee`, `etape_taches`.
+- [`m4b-taches-admission.sh`](m4b-taches-admission.sh) et son [journal](m4b-taches-admission.log) : mesure de l'admission, faite le 18/11/2026 à 09:40:04 UTC (début et fin du journal).
+- [`m4b-taches-signer-banc.sh`](m4b-taches-signer-banc.sh) et son [journal](m4b-taches-signer-banc.log) : banc de l'étape.
+
+**L'étape `taches`** (en-tête de `m4b.sh`) :
+1. Contrôle de la liste. La référence de `publier-fermeture` est lue dans la liste revue de la 08 et comparée au digest complet `7fa92ad3…`.
+2. Gabarits rendus, avec une référence factice pour `prefetch-rpm`.
+3. Dry-run serveur dans `builds` : la tâche et la pipeline sont admises, et le témoin est refusé, avec le message mesuré.
+4. `tkn task sign` avec la clé des tâches, que le script ne lit jamais. La sortie est contrôlée **avant tout versionnement** :
+   - signature, nom, image et paramètres ;
+   - ressources de 2 CPU et 2 Gi sous `resources`, sans aucun `computeResources` ;
+   - contexte de sécurité et `env` ;
+   - résultat objet `BOOTSTRAP_ARTIFACT_INPUTS` ;
+   - script substitué comme Tekton le fera, dont le sha256 doit être `572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145`, celui joué dans `essai_tache`.
+5. Avec `SIGNER=1`, la signature n'est versionnée dans [`../fermeture/prefetch-rpm.signee.yaml`](../fermeture/) que si son contenu a changé. Cela évite l'erreur de S4a : une re-signature inutile, qui donne un autre digest.
+6. Bundle `tekton/tasks/prefetch-rpm:m4b`. En `SIGNER=1`, le digest est seulement affiché, à ajouter à la liste revue, et la pipeline n'est pas signée.
+7. Sans `SIGNER`, une fois le digest dans la liste revue :
+   - la pipeline est rendue avec les deux références de la liste, admise, signée et relue (références, liste, source, dossier, empreinte, `repomd`, `subPath`, dépôt) ;
+   - puis son bundle est poussé : `tekton/pipelines/prefetch-rpm-sample-app:m4b`.
+
+**Admission, mesurée** (09:40:04 UTC, kubectl client v1.35.10, serveur v1.35.9+rke2r1) :
+- `prefetch-rpm` et `prefetch-rpm-sample-app` rendues : `created (server dry run)`, code 0.
+- Le témoin met `computeResources`, le nom du champ en v1, dans le pas v1beta1. Il est refusé en code 1 par l'API, pas par un webhook : « strict decoding error: unknown field "spec.steps[0].computeResources" ». Le dry-run contrôle donc le nom du champ des ressources.
+- Ensuite, aucune tâche ni pipeline dans `builds`.
+- Limite : l'admission ne prouve pas que le pod du pas reçoit 2 CPU et 2 Gi. Aucune tâche en service lue jusqu'ici ne déclare des `resources` non vides. Ce sera prédit et lu à `rpm`, sur le conteneur du pas dans le pod.
+
+**Banc** ([journal](m4b-taches-signer-banc.log)) : tenu, 59 OK, 0 KO, dans le dossier `banc-taches-signer-4`, sur le dépôt après application. La même copie a donné 59 OK dans `banc-taches-signer-3`.
+- A : insertions seules (3 blocs, 97 lignes), `bash -n`, mêmes codes de shellcheck avant et après.
+- B : la vraie fonction `etape_taches`, jouée dans la forme de `lancer`. Le banc utilise :
+  - le vrai `tkn` 0.46.2, avec une clé P-256 jetable du banc (jamais `taches.key`) ;
+  - les vrais gabarits, la vraie liste, le vrai verrou et la vraie liste revue ;
+  - de faux `kubectl` (dry-run seulement, avec le message mesuré), `bundle`, `listee` et `auth_zot`.
+- Cas couverts par B :
+  - **`SIGNER=1`, première passe** : 13 lignes OK, nouvelle signature, référence « à ajouter », une seule poussée (`tekton/tasks/prefetch-rpm:m4b`), pipeline non signée ; signature vérifiée par `tkn task verify` avec la clé publique du banc.
+  - **Après l'aller-retour de `tkn`, les clés du pas sont `env`, `image`, `name`, `resources`, `script`, `volumeMounts`** : le champ `resources` survit à la signature.
+  - **`SIGNER=1`, rejouée sans changement** : pas de nouvelle signature, fichier versionné et digest inchangés.
+  - **Sans `SIGNER`** :
+    - digest absent de la liste : refus ;
+    - digest présent : 28 lignes OK, poussées de la tâche puis de la pipeline, signature de la pipeline vérifiée par `tkn pipeline verify`, références exactes.
+  - Une tâche signée puis altérée est refusée par `tkn task verify` (témoin).
+  - Code 1 dans chacun de ces cas :
+    - gabarit modifié depuis la signature : refus, aucune poussée ;
+    - script altéré ou ressources retirées : refus, ni versionnement ni poussée ;
+    - témoin admis : refus avant `tkn` ;
+    - tâche refusée à l'admission : refus.
+  - Dans chaque cas : `$T/auth` absent à la fin, aucun appel de `kubectl` hors dry-run serveur.
+- C : l'ancien banc ([`m4b-taches-banc.sh`](m4b-taches-banc.sh)), rejoué sur la copie. Ses sections B à D (`prealables_taches`, script de la tâche, `essai_tache`) donnent 35 OK. Ses trois KO sont dans sa section A et propres à l'ajout précédent : deux blocs et 179 lignes attendus, et l'écart SC2016 attendu.
+- **Un défaut trouvé par le banc, avant tout passage.** Les sorties des passages 1 et 2 ne sont pas archivées ; elles sont dans le scratchpad de la session, et les dossiers `banc-taches-signer-1` et `-2` restent sous `~/.cache/supply-chain-poc/05/`. Le bloc appelait `ko`, qui n'existe pas au niveau haut de `m4b.sh` : ses deux `ko()` sont dans les scripts heredoc du pod. Deux cas se terminaient en code 127 au lieu de 1. Le bloc définit maintenant `echec`. Le deuxième passage (`banc-taches-signer-2`) avait un seul KO, le compte de lignes du banc lui-même, que je n'avais pas mis à jour.
+- Non couvert : Zot (vrais bundles et leur digest), la clé des tâches réelle, Tekton (résolution des bundles, Trusted Resources) et la porte.
+
+**Constat à signaler au propriétaire, hors M4** (carte de `taches`, point 3, lecture) :
+- L'`env` du `podTemplate` d'un PipelineRun l'emporte sur celui des pas des tâches signées (documentation de Tekton v1.15.5).
+- Le test 2 de l'admission de la 08 n'interdit pas `env` au `podTemplate`.
+- `prefetch-rpm` ne lit aucune valeur de contrôle dans une variable : les paramètres passent par substitution dans le script. Mais `PATH` et `LD_PRELOAD` restent remplaçables pour toute tâche signée, et `prefetch-deb`, en service, lit `INSTANTANE`, `INRELEASE` et `LISTE` par variable.
+- Rien n'est corrigé d'office.
+
+**Bundle poussé avant la revue** (lecture, non mesuré) :
+- L'en-tête de `taches.yml` réserve la liste revue à la porte et au déploiement des déclencheurs (`politique.sh declencheurs`).
+- Tekton, lui, vérifie la signature par la clé (Trusted Resources), pas la liste.
+- Entre `SIGNER=1` et la revue, le bundle signé de `prefetch-rpm` est donc résoluble par un PipelineRun créé dans `builds`. Ses provenances seraient refusées par la porte, faute de liste.
+- Le même ordre a été suivi pour les tâches de S4a, S4b et S4d (`SIGNER=1` avant la revue, vérifié dans leurs prédictions).
+
+**Relevés de Zot, hors étape**, archivés à part comme pour `publier` : avant et après chaque passe. Ils portent sur les tags de `tekton/tasks/prefetch-rpm` et `tekton/pipelines/prefetch-rpm-sample-app`, le nombre de dépôts du catalogue et `df` de `/` sur sc-stockage.
+
+**Prédictions de `SIGNER=1 taches`**
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| TS0 | Relevé avant : `tekton/tasks/prefetch-rpm` et `tekton/pipelines/prefetch-rpm-sample-app` absents (`NAME_UNKNOWN`) ; catalogue de 145 dépôts | Haute : 145 après `publier` (09:24:51 UTC), aucune écriture dans Zot depuis, d'après les journaux de la brique |
+| TS1 | Liste `95541ee8…` ; `publier-fermeture` de la liste revue = `7fa92ad3…` complet | Haute |
+| TS2 | Tâche et pipeline rendues admises (code 0) ; témoin refusé, message « strict decoding error: unknown field "spec.steps[0].computeResources" » | Haute : mesuré à 09:40:04 UTC, mêmes gabarits |
+| TS3 | Contrôles de la tâche signée tenus, dont le sha256 du script substitué `572fb78c…` complet | Haute : banc avec le vrai `tkn` 0.46.2 sur les mêmes gabarits, liste et verrou ; seule la clé diffère, et elle ne touche que l'annotation |
+| TS4 | « SIGNER : nouvelle signature » ; `fermeture/prefetch-rpm.signee.yaml` écrite, conforme au gabarit rendu, signature exceptée | Haute : fichier absent du dépôt aujourd'hui |
+| TS5 | Bundle `tekton/tasks/prefetch-rpm:m4b` poussé ; « à ajouter à politique/porte/taches.yml » avec sa référence ; « pipeline non signée » ; code 0 ; 13 lignes OK. Aucune valeur pariée pour le digest : la signature ECDSA change à chaque signature | Haute (banc) |
+| TS6 | `$T/auth` absent après la passe (`test -e`, sans lister) | Haute (banc, modèle de `m4a.sh`) |
+| TS7 | Rien dans le cluster : aucune tâche ni pipeline dans `builds` | Haute (dry-run seulement ; mesuré après les dry-runs de 09:40:04 UTC) |
+| TS8 | Relevé après : `tekton/tasks/prefetch-rpm` avec le seul tag `m4b`, au digest affiché par l'étape ; pipeline toujours absente ; catalogue de 146 dépôts | Moyenne : forme de S4a et S4b, mais le catalogue n'y était pas compté |
+| TS9 | Durée de l'étape sous 60 s | Moyenne : le banc entier prend 36 s, mais sans Zot ni API |
+
+**Prédictions de la seconde passe** (`taches` sans `SIGNER`, après la revue et le commit de `taches.yml` par le propriétaire)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| TP1 | `prefetch-rpm` dans la liste revue ; pas de nouvelle signature ; même digest de bundle qu'en `SIGNER=1` (bundle reproductible, date de création fixe selon `commun.sh`) | Haute : forme au banc ; en S4a, `prefetch-deb` a été repoussée depuis le même fichier versionné à chaque passe et est restée à `4dac0609` (`s4a-predictions.md`) |
+| TP2 | Pipeline rendue avec les deux références de la liste, admise, signée, relue ; bundle `tekton/pipelines/prefetch-rpm-sample-app:m4b` ; code 0 ; 28 lignes OK | Haute (banc) |
+| TP3 | Relevé après : dépôt de la pipeline créé avec le seul tag `m4b` ; tag `m4b` de la tâche inchangé ; catalogue de 147 dépôts | Moyenne, comme TS8 |
+
+**À prédire pour `rpm`** : les ressources du conteneur du pas, lues dans le pod (2 CPU et 2 Gi en demandes et en limites) ; `place-scripts` dans un vrai TaskRun (taille mesurée sur l'hôte seulement).
+
+**Ce que chaque issue permet**
+- TS tenues : revue de `taches.yml` par le propriétaire, dans un commit à part. C'est un arrêt.
+- TS2 non tenue (témoin admis) : l'étape s'arrête avant `tkn`. Il faut décider si le contrôle du nom du champ reste exigé.
+- TS3 non tenue : rien n'est versionné ni poussé. Le gabarit est corrigé, puis le banc rejoué.
+- TS8 non tenue : écart relevé avant la revue, à expliquer avant toute autre écriture.
+
+**Disque de sc-stockage, sans sudo** ([script](m4b-disque-sc-stockage.sh), [journal](m4b-disque-sc-stockage.log)) : deux relevés, à 09:34:34 et 09:48:54 UTC, soit 860 s d'écart.
+- `df /` : de 15 551 459 328 à 15 552 925 696 octets utilisés, soit +1 466 368 octets. Sur cette fenêtre, cela fait environ 147 Mo par jour (calcul), loin des 1,19 Go par jour de la fenêtre de 09:07:08 à 09:29:51 UTC. Le rythme n'est donc pas constant.
+- Arbres lisibles par le compte `poc`, environ 3,4 Go en tout :
+  - seul `/var/log/journal` a grossi : +3 465 216 octets, plus que `df` lui-même ;
+  - `/var/lib/rancher`, `/var/lib/apt`, `/var/lib/dpkg`, `/var/cache`, `/opt` et `/home` n'ont pas bougé.
+- Prometheus, d'après ses propres métriques :
+  - environ 89 Mo en tout (blocs, WAL et tête) ;
+  - le WAL a pris +793 624 octets ;
+  - sa donnée la plus ancienne date du 13/11/2026 à 12:36:38 UTC.
+- Le reste d'environ 12 Go se trouve dans des arbres que le compte `poc` ne peut pas lire (lecture) : `/var/lib/zot`, `/var/lib/loki`, `/var/lib/forgejo`, `/var/lib/kubelet`, `/var/log/pods`, `/var/log/zot`, et d'autres. Le journal les nomme tous.
+- Le journal et le WAL ont pris plus que `df`. Un autre arbre a donc diminué pendant la fenêtre (déduction, non attribuée).
+- **Conclusion (lecture) :** la croissance n'est attribuable ni à la brique ni aux arbres lisibles, hormis le journal de systemd. Pour l'attribuer, il faut `du` en root sur les arbres illisibles, deux fois à au moins une heure d'écart. Cette commande revient au propriétaire.
+- Rien ne bloque `taches`, qui pousse deux bundles de quelques dizaines de kilo-octets (calcul : tâche signée de 6 398 octets au banc, liste de 39 938 octets dans la pipeline). Avant `rpm`, qui écrit environ 318 Mo, l'espace libre sera relevé de nouveau : 4,47 Go libres à 09:48:54 UTC.

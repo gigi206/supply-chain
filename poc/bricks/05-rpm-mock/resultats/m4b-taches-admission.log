@@ -1,0 +1,8 @@
+# m4b-taches-admission.sh, début 2026-11-18T09:40:04Z ; m4b.sh 5e08bef058e6a6d0f0bd5328be77f52e202ad1b6a4e5d488e2f7410e52f2d084
+# kubectl client v1.35.10 ; serveur v1.35.9+rke2r1
+témoin : clés du pas ["name","image","env","volumeMounts","script","computeResources"]
+prefetch-rpm.yaml : code 0 ; task.tekton.dev/prefetch-rpm created (server dry run) 
+prefetch-rpm-sample-app.yaml : code 0 ; pipeline.tekton.dev/prefetch-rpm-sample-app created (server dry run) 
+temoin-v1beta1.yaml : code 1 ; Error from server (BadRequest): error when creating "~/.cache/supply-chain-poc/08/travail/m4b-05/admission/temoin-v1beta1.yaml": Task in version "v1beta1" cannot be handled as a Task: strict decoding error: unknown field "spec.steps[0].computeResources" 
+tâches et pipelines dans builds après les dry-runs : code 0 ; 0 ligne(s) : 
+# fin 2026-11-18T09:40:04Z

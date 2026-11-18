@@ -38,6 +38,16 @@
 #               code 0, repomd.xml égal à l'attendu, résultat BOOTSTRAP_ARTIFACT_INPUTS relu, arbre égal à celui de final ; puis
 #               le même script avec un repomd.xml attendu faux, dans un sous-dossier neuf : refus attendu avant la copie de
 #               l'image ; retrait du pod et de sa PVC relus.
+#   taches      ajoutée le 18/11/2026 (préparée à sec, accord permanent du 18/11), NON LANCÉE ; écritures dans Zot (bundles, compte
+#               poc-ecriture), rien dans le cluster (dry-run serveur seulement) : publier-fermeture lue dans la liste revue
+#               (7fa92ad3) ; gabarits rendus admis en dry-run serveur dans builds, témoin refusé (computeResources, nom du champ
+#               en v1, dans un pas v1beta1 : refus mesuré dans resultats/m4b-taches-admission.log) ; prefetch-rpm signée par tkn
+#               avec la clé des tâches (jamais lue ici), contrôlée avant tout versionnement (signature, image, paramètres,
+#               ressources, sécurité, env, résultat objet, script substitué égal à celui de essai_tache) ; avec SIGNER=1 :
+#               signature versionnée dans fermeture/prefetch-rpm.signee.yaml si le contenu a changé, bundle
+#               tekton/tasks/prefetch-rpm:m4b, digest à ajouter à la liste revue de la 08 après revue du propriétaire, pipeline
+#               non signée ; sans SIGNER : bundle de la tâche présent dans la liste revue, pipeline rendue avec les deux références
+#               de la liste, admise, signée, relue, bundle tekton/pipelines/prefetch-rpm-sample-app:m4b.
 # Usage (racine du dépôt) : DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/m4b.sh <étape>…
 # (journal : resultats/m4b-<étape>.log)
 set -euo pipefail
@@ -50,6 +60,8 @@ R=$h05/resultats
 T=$W/m4b-05
 T1=$W/s1-05            # cache de s1.sh : primary et repomd.xml de vault 9.7 (hote97) ; fichiers désignés par leur nom
 mkdir -p "$T"
+(umask 077 && mkdir -p "$T/auth")
+trap 'rm -rf "$T/auth"' EXIT   # copie du secret de Zot (étape taches), retirée même en cas d'échec ; comme m4a.sh
 umask 022
 
 VERROU_SRC=$R/s1-verrou_derivee.json
@@ -585,6 +597,91 @@ etape_essai_tache() { # pod d'essai : le script substitué de la tâche, tel qu'
   rc=0; kubectl get pods,pvc -n builds -o name < /dev/null > "$T/m4b-essai-tache-objets.txt" 2>&1 || rc=$?
   attendu "objets de builds relus (code de kubectl)" "$rc" 0
   attendu "pods et PVC restants au nom de $POD" "$(grep -c -F "$POD" "$T/m4b-essai-tache-objets.txt" || true)" 0
+}
+
+# Brique 05, M4b, étape taches (préparée à sec le 18/11/2026, accord permanent du 18/11) : signature de prefetch-rpm, bundles.
+SCRIPT_ESSAI_SHA=572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145   # script substitué de prealables_taches et essai_tache
+PUBLIER_REF=$REG/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135   # liste revue
+echec() { echo "KO   $*" >&2; exit 1; }   # les ko() de ce fichier sont dans les scripts heredoc du pod, pas au niveau haut
+ref_revue() { # dépôt-de-tâche préfixe-du-digest : référence complète lue dans la liste revue de la 08 (une seule ; s4b.sh de la 06)
+  local r
+  r=$(awk -v d="oci://$REG/tekton/tasks/$1:" -v p="sha256:$2" '$1 == d {b = 1; next} b && /^  [^ ]/ {b = 0}
+    b && $1 == "-" && $2 == "ref:" && index($3, p) == 1 {print $3}' "$here/politique/porte/taches.yml")
+  [ "$(grep -c . <<< "$r")" = 1 ] && [ -n "$r" ] || { echo "KO   $1 $2 : absente de la liste revue ou ambiguë" >&2; exit 1; }
+  echo "$REG/tekton/tasks/$1@$r"
+}
+admission() { # fichier : kubectl create --dry-run=server dans builds (rien n'est créé) ; code de kubectl, sortie dans $T/admission.out
+  local rc=0
+  kubectl create --dry-run=server -n builds -f "$1" < /dev/null > "$T/admission.out" 2>&1 || rc=$?
+  echo "$rc"
+}
+controler_signee() { # tâche-signée pipeline-rendue : contenu signé relu (signature, ressources, script substitué comme Tekton)
+  attendu "tâche signée : annotation de signature" "$(yq '.metadata.annotations["tekton.dev/signature"] | length > 0' "$1")" true
+  attendu "tâche signée : nom, image, paramètres" "$(yq -o=json -I=0 '[.metadata.name, .spec.steps[0].image, [.spec.params[].name]]' "$1")" \
+    "[\"prefetch-rpm\",\"$IMAGE\",[\"liste\",\"source\",\"dossier\",\"empreinte\",\"repomd\"]]"
+  attendu "tâche signée : ressources du pas (resources de v1beta1, clés triées), aucun computeResources" \
+    "$(yq -o=json -I=0 '[(.spec.steps[0].resources | sort_keys(..)), ([.. | select(tag == "!!map") | keys[] | select(. == "computeResources")] | length)]' "$1")" \
+    '[{"limits":{"cpu":"2","memory":"2Gi"},"requests":{"cpu":"2","memory":"2Gi"}},0]'
+  attendu "tâche signée : UID, runAsNonRoot, capacités, élévation" \
+    "$(yq '.spec.stepTemplate.securityContext | [.runAsUser, .runAsNonRoot, .capabilities.drop[0], .allowPrivilegeEscalation] | join(" ")' "$1")" "65532 true ALL false"
+  attendu "tâche signée : variables d'environnement du pas" "$(yq -o=json -I=0 '.spec.steps[0].env' "$1")" '[{"name":"HOME","value":"/tmp"}]'
+  attendu "tâche signée : résultat objet BOOTSTRAP_ARTIFACT_INPUTS (uri, digest)" \
+    "$(yq -o=json -I=0 '[.spec.results[0].name, .spec.results[0].type, (.spec.results[0].properties | keys | sort)]' "$1")" '["BOOTSTRAP_ARTIFACT_INPUTS","object",["digest","uri"]]'
+  substituer "$1" "$2" /workspace/sortie /tmp/resultat-bootstrap.json "$T/script-signe.sh"
+  attendu "script de la tâche signée, substitué comme à l'essai (sha256)" "$(sha256sum < "$T/script-signe.sh" | cut -c1-64)" "$SCRIPT_ESSAI_SHA"
+}
+
+etape_taches() { # SIGNER=1 : prefetch-rpm signée, contrôlée, versionnée, bundle, à ajouter à la liste revue ; sinon : de plus la pipeline
+  attendu "liste des rpm (sha256)" "$(sha256sum < "$LISTE" | cut -c1-64)" "$LISTE_SHA"
+  [ -s "$S/taches.key" ] || echec "clé des tâches absente"
+  local src dos v=$TACHES/prefetch-rpm.signee.yaml r rc p
+  src=$(jq -r '.config.bootstrap_image' "$VERROU_SRC"); dos=${src%%:*}@$(jq -r '.bootstrap.pull_digest' "$VERROU_SRC")
+  attendu "publier-fermeture, lue dans la liste revue" "$(ref_revue publier-fermeture 7fa92ad3)" "$PUBLIER_REF"
+  echo "## gabarits rendus (prefetch-rpm factice) ; admission en dry-run serveur, rien n'est créé"
+  rendre_taches "$REG/tekton/tasks/prefetch-rpm@$FACTICE" "$PUBLIER_REF" "$src" "$dos"
+  attendu "tâche rendue admise (code de kubectl)" "$(admission "$T/prefetch-rpm.yaml")" 0
+  attendu "pipeline rendue admise (code de kubectl)" "$(admission "$T/prefetch-rpm-sample-app.yaml")" 0
+  yq '.spec.steps[0].computeResources = .spec.steps[0].resources | del(.spec.steps[0].resources)' "$T/prefetch-rpm.yaml" > "$T/temoin-v1beta1.yaml"
+  rc=$(admission "$T/temoin-v1beta1.yaml")
+  [ "$rc" != 0 ] || echec "témoin (computeResources dans un pas v1beta1) admis : le dry-run ne contrôle plus le nom du champ"
+  attendu "témoin refusé : champ inconnu (mesuré le 18/11, m4b-taches-admission.log)" \
+    "$(grep -c -F 'strict decoding error: unknown field "spec.steps[0].computeResources"' "$T/admission.out")" 1
+  echo "## signature de prefetch-rpm (tkn $(tkn version --component client)), contrôlée avant tout versionnement"
+  tkn task sign "$T/prefetch-rpm.yaml" -K "$S/taches.key" -f "$T/prefetch-rpm-signee.yaml" > /dev/null
+  controler_signee "$T/prefetch-rpm-signee.yaml" "$T/prefetch-rpm-sample-app.yaml"
+  if [ -n "${SIGNER:-}" ] && ! { [ -s "$v" ] && cmp -s <(grep -v 'tekton.dev/signature:' "$T/prefetch-rpm-signee.yaml") <(grep -v 'tekton.dev/signature:' "$v"); }; then
+    cp "$T/prefetch-rpm-signee.yaml" "$v"; echo "SIGNER : nouvelle signature dans fermeture/prefetch-rpm.signee.yaml"
+  fi
+  [ -s "$v" ] || echec "signature versionnée absente : SIGNER=1, puis revue de la liste"
+  attendu "signature versionnée conforme au gabarit rendu, signature exceptée" \
+    "$(cmp -s <(grep -v 'tekton.dev/signature:' "$T/prefetch-rpm-signee.yaml") <(grep -v 'tekton.dev/signature:' "$v") && echo conforme || echo différente)" conforme
+  echo "fermeture/prefetch-rpm.signee.yaml : sha256 $(sha256sum < "$v" | cut -c1-64)"
+  mkdir -p "$T/auth/docker" && auth_zot "$T/auth/docker/config.json"   # bundles (commun.sh), compte poc-ecriture
+  r=$REG/tekton/tasks/prefetch-rpm@$(bundle "$v" tekton/tasks/prefetch-rpm m4b)
+  echo "$r" > "$T/prefetch-rpm.ref"
+  if listee "$r"; then echo "OK   prefetch-rpm dans la liste revue : $r"
+  elif [ -n "${SIGNER:-}" ]; then echo "SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : $r"
+    echo "SIGNER : pipeline non signée tant que la liste revue n'a pas été acceptée"; return 0
+  else echec "prefetch-rpm absente de la liste revue : $r"; fi
+  echo "## pipeline prefetch-rpm-sample-app, tâches de la liste revue"
+  rendre_taches "$r" "$PUBLIER_REF" "$src" "$dos"
+  attendu "pipeline rendue (références réelles) admise (code de kubectl)" "$(admission "$T/prefetch-rpm-sample-app.yaml")" 0
+  attendu "pipeline : références des tâches" \
+    "$(yq '[.spec.tasks[].taskRef.params[] | select(.name == "bundle") | .value] | join(" ")' "$T/prefetch-rpm-sample-app.yaml")" "$r $PUBLIER_REF"
+  controler_signee "$v" "$T/prefetch-rpm-sample-app.yaml"
+  tkn pipeline sign "$T/prefetch-rpm-sample-app.yaml" -K "$S/taches.key" -f "$T/prefetch-rpm-sample-app-signee.yaml" > /dev/null
+  attendu "pipeline signée : annotation de signature" \
+    "$(yq '.metadata.annotations["tekton.dev/signature"] | length > 0' "$T/prefetch-rpm-sample-app-signee.yaml")" true
+  attendu "pipeline signée : références des tâches" \
+    "$(yq '[.spec.tasks[].taskRef.params[] | select(.name == "bundle") | .value] | join(" ")' "$T/prefetch-rpm-sample-app-signee.yaml")" "$r $PUBLIER_REF"
+  attendu "pipeline signée : liste égale à la liste" \
+    "$(yq '.spec.tasks[0].params[] | select(.name == "liste") | .value' "$T/prefetch-rpm-sample-app-signee.yaml" | sed '/^$/d' | cmp -s - "$LISTE" && echo égale || echo différente)" égale
+  attendu "pipeline signée : source, dossier, empreinte, repomd" \
+    "$(yq '[.spec.tasks[0].params[] | select(.name != "liste") | .value] | join(" ")' "$T/prefetch-rpm-sample-app-signee.yaml")" "$src $dos $FP_ROCKY $REPOMD_V2"
+  attendu "pipeline signée : subPath de prefetch, racine pour publier ; dépôt de la fermeture" \
+    "$(yq -o=json -I=0 '[[.spec.tasks[].workspaces[0].subPath], .spec.tasks[1].params[0].value]' "$T/prefetch-rpm-sample-app-signee.yaml")" "[[\"fermeture\",null],\"$DEPOT_FERMETURE\"]"
+  p=$REG/tekton/pipelines/prefetch-rpm-sample-app@$(bundle "$T/prefetch-rpm-sample-app-signee.yaml" tekton/pipelines/prefetch-rpm-sample-app m4b)
+  echo "$p" | tee "$T/prefetch-rpm-sample-app.ref"
 }
 
 lancer m4b "05 M4b" "$@"

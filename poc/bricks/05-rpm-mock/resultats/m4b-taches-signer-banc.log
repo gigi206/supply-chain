@@ -1,0 +1,71 @@
+# m4b-taches-signer-banc.sh, 2026-11-18T09:46:26Z ; m4b.sh avant 5e08bef058e6a6d0f0bd5328be77f52e202ad1b6a4e5d488e2f7410e52f2d084 ; copie 8402b2b720fb24ebbb1d3c127c88e41e080f357f2e6c18c07be00aa408eaa061
+# gabarits : prefetch-rpm.yaml 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c ; prefetch-rpm-sample-app.yaml ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+# tkn 0.46.2 ; yq v4.54.3 ; liste revue cdac17f17549350b8dd01ef61cd16af062cc422851803d3a0a6306200196b920
+## A : insertions seules, syntaxe, shellcheck
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 3
+OK   lignes insérées (en-tête 10, auth 2, bloc 85) : 97
+OK   bash -n : ok
+OK   shellcheck : mêmes codes avant et après : mêmes
+OK   clé jetable du banc (P-256) : 1
+## B : vraie fonction etape_taches, vrai tkn, clé jetable
+OK   SIGNER=1, première passe (code 0)
+OK   SIGNER=1, première passe : $T/auth absent à la fin : absent
+OK   SIGNER=1, première passe : appels de kubectl hors dry-run serveur : 0
+OK   première passe : nouvelle signature, à ajouter : 2
+OK   première passe : lignes OK de l'étape : 13
+OK   première passe : témoin refusé, message mesuré : 1
+OK   première passe : poussées (tâche seule, tag m4b) : tekton/tasks/prefetch-rpm:m4b
+OK   première passe : signature versionnée écrite, pipeline non signée : écrite non-signée
+OK   première passe : signature de la tâche vérifiée par tkn (clé publique du banc) : vérifiée
+OK   première passe : digest poussé = fichier versionné : a9ee62ee14d4b024921cb126c14857fd900df9e97946456f84a98ebb6d38d9f7
+OK   première passe : référence affichée : 1
+première passe : tâche signée du banc, 6398 octets ; clés du pas ["env","image","name","resources","script","volumeMounts"]
+OK   SIGNER=1, rejouée sans changement (code 0)
+OK   SIGNER=1, rejouée sans changement : $T/auth absent à la fin : absent
+OK   SIGNER=1, rejouée sans changement : appels de kubectl hors dry-run serveur : 0
+OK   rejouée : pas de nouvelle signature : 0
+OK   rejouée : fichier versionné inchangé : a9ee62ee14d4b024921cb126c14857fd900df9e97946456f84a98ebb6d38d9f7
+OK   rejouée : même digest poussé : a9ee62ee14d4b024921cb126c14857fd900df9e97946456f84a98ebb6d38d9f7
+OK   sans SIGNER, digest absent de la liste revue : refusé (code 1)
+OK   sans SIGNER, digest absent de la liste revue : refusé : $T/auth absent à la fin : absent
+OK   sans SIGNER, digest absent de la liste revue : refusé : appels de kubectl hors dry-run serveur : 0
+OK   sans SIGNER, digest dans la liste revue : pipeline signée (code 0)
+OK   sans SIGNER, digest dans la liste revue : pipeline signée : $T/auth absent à la fin : absent
+OK   sans SIGNER, digest dans la liste revue : pipeline signée : appels de kubectl hors dry-run serveur : 0
+OK   pipeline : lignes OK de l'étape : 28
+OK   pipeline : poussées (tâche, puis pipeline) : tekton/tasks/prefetch-rpm:m4b tekton/pipelines/prefetch-rpm-sample-app:m4b
+OK   pipeline : signature vérifiée par tkn (clé publique du banc) : vérifiée
+OK   pipeline : références des tâches signées : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:a9ee62ee14d4b024921cb126c14857fd900df9e97946456f84a98ebb6d38d9f7 sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+OK   témoin de vérification : tâche altérée après signature refusée par tkn : refusée
+OK   gabarit modifié depuis la signature : refusé (code 1)
+OK   gabarit modifié depuis la signature : refusé : $T/auth absent à la fin : absent
+OK   gabarit modifié depuis la signature : refusé : appels de kubectl hors dry-run serveur : 0
+OK   gabarit modifié : aucune poussée : 0
+OK   script altéré : gabarit du banc modifié : modifié
+OK   script altéré, SIGNER=1 : refusé (code 1)
+OK   script altéré, SIGNER=1 : refusé : $T/auth absent à la fin : absent
+OK   script altéré, SIGNER=1 : refusé : appels de kubectl hors dry-run serveur : 0
+OK   script altéré : ni versionnement ni poussée : non 0
+OK   ressources retirées : gabarit du banc sans resources : 0
+OK   ressources retirées, SIGNER=1 : refusé (code 1)
+OK   ressources retirées, SIGNER=1 : refusé : $T/auth absent à la fin : absent
+OK   ressources retirées, SIGNER=1 : refusé : appels de kubectl hors dry-run serveur : 0
+OK   ressources retirées : ni versionnement ni poussée : non 0
+OK   témoin admis : refusé avant tkn (code 1)
+OK   témoin admis : refusé avant tkn : $T/auth absent à la fin : absent
+OK   témoin admis : refusé avant tkn : appels de kubectl hors dry-run serveur : 0
+OK   témoin admis : aucune signature produite : aucune 0
+OK   tâche refusée à l'admission : refusé (code 1)
+OK   tâche refusée à l'admission : refusé : $T/auth absent à la fin : absent
+OK   tâche refusée à l'admission : refusé : appels de kubectl hors dry-run serveur : 0
+OK   tâche refusée : aucune poussée : 0
+## C : ancien banc (prealables_taches, script, essai_tache) rejoué sur la copie
+     KO   blocs insérés : 3 (attendu : 2)
+     KO   lignes insérées (en-tête 14, bloc 165) : 97 (attendu : 179)
+     KO   shellcheck : écarts (SC2016 seulement) :  (attendu : < SC2016 > SC2016)
+OK   ancien banc : KO de sa section A (blocs, lignes, écart de shellcheck attendu pour l'ajout précédent) : 3
+OK   ancien banc : KO de sa section A, libellés : KO   blocs insérés|KO   lignes insérées (en-tête 14, bloc 165)|KO   shellcheck
+OK   ancien banc : sections B à D, OK : 35
+ancien banc : # bilan : NON TENU, 38 OK, 3 KO, fin 2026-11-18T09:47:02Z
+# bilan : tenu, 59 OK, 0 KO, fin 2026-11-18T09:47:02Z

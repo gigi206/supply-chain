@@ -1,0 +1,28 @@
+## relevé, début 2026-11-18T09:34:34Z
+df / : utilisés 15551459328 ; libres 4469456896
+du /var/log/journal 301080576
+du /var/lib/rancher 1393959722
+du /var/lib/apt 170227736
+du /var/lib/dpkg 8517939
+du /var/cache 119911902
+du /opt 1440247347
+du /home 4654
+prometheus prometheus_tsdb_storage_blocks_bytes 65603169
+prometheus prometheus_tsdb_wal_storage_size_bytes 22101433
+prometheus prometheus_tsdb_head_chunks_storage_size_bytes 1339340
+illisibles pour poc : /var/lib/alertmanager /var/lib/alloy /var/lib/cni /var/lib/forgejo /var/lib/grafana /var/lib/kubelet /var/lib/loki /var/lib/private /var/lib/prometheus /var/lib/synchro /var/lib/zot /var/log/pods /var/log/private /var/log/unattended-upgrades /var/log/zot
+## relevé, fin 2026-11-18T09:34:35Z
+## relevé, début 2026-11-18T09:48:54Z
+df / : utilisés 15552925696 ; libres 4467990528
+du /var/log/journal 304545792
+du /var/lib/rancher 1393959722
+du /var/lib/apt 170227736
+du /var/lib/dpkg 8517939
+du /var/cache 119911902
+du /opt 1440247347
+du /home 4654
+prometheus prometheus_tsdb_storage_blocks_bytes 65603169
+prometheus prometheus_tsdb_wal_storage_size_bytes 22895057
+prometheus prometheus_tsdb_head_chunks_storage_size_bytes 1339340
+illisibles pour poc : /var/lib/alertmanager /var/lib/alloy /var/lib/cni /var/lib/forgejo /var/lib/grafana /var/lib/kubelet /var/lib/loki /var/lib/private /var/lib/prometheus /var/lib/synchro /var/lib/zot /var/log/pods /var/log/private /var/log/unattended-upgrades /var/log/zot
+## relevé, fin 2026-11-18T09:48:54Z
