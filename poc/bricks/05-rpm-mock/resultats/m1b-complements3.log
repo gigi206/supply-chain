@@ -1,0 +1,37 @@
+# m1b-complements3.sh, début 2026-11-18T20:20:11Z
+## 1. versions et chaînes
+racine d'outils : rpm-4.16.1.3-40.el9.x86_64 python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch 
+arbre i3 : p11-kit-0.25.3-3.el9_5.x86_64 p11-kit-trust-0.25.3-3.el9_5.x86_64 ca-certificates-2025.2.80_v9.0.305-91.el9.noarch 
+outils, usr/lib64/librpm.so.9 -> librpm.so.9.1.3 : lignes contenant SOURCE_DATE_EPOCH 1
+outils, usr/lib64/librpmbuild.so.9 -> librpmbuild.so.9.1.3 : lignes contenant SOURCE_DATE_EPOCH 2
+outils, usr/lib64/librpmio.so.9 -> librpmio.so.9.1.3 : lignes contenant SOURCE_DATE_EPOCH 0
+outils, librpm.so.9 : trois lignes avant et après la chaîne :
+     %d:%s-%s
+     rpmts.c
+     ts != NULL
+     SOURCE_DATE_EPOCH
+     %{?_transaction_color}
+     %{?_prefer_color}
+     %{_netsharedpath}
+i3, usr/bin/trust : lignes contenant SOURCE_DATE_EPOCH 4
+i3, usr/bin/p11-kit : lignes contenant SOURCE_DATE_EPOCH 0
+i3, update-ca-trust, ligne java-cacerts : 1
+## 2. S calculé sur les fichiers rpm, avant toute installation
+fichiers lus : 222 ; erreurs de rpm -qp : 0 lignes
+S par rpm -qp : 1778610852 (2026-05-12T18:34:12Z) ; S du banc : 1778610852 ; égaux : oui
+## 3. ordre des INSTALLTIME de i3 et ordre de la transaction (journal de dnf de i3)
+paquets par INSTALLTIME : 222 ; lignes « Installing » du journal : 222 ; rangs du journal 1 à 222 sans trou : True
+INSTALLTIME distincts : 222 ; de 1778610852 à 1778611073
+mêmes noms : False ; même ordre : False
+rangs où les deux ordres diffèrent : 50
+     rang 30 : INSTALLTIME 1:gmp-6.2.0-13.el9.x86_64 ; journal gmp-1:6.2.0-13.el9.x86_64
+     rang 75 : INSTALLTIME 1:gdbm-libs-1.23-1.el9.x86_64 ; journal gdbm-libs-1:1.23-1.el9.x86_64
+     rang 90 : INSTALLTIME 1:make-4.3-8.el9.x86_64 ; journal make-1:4.3-8.el9.x86_64
+     rang 98 : INSTALLTIME 1:findutils-4.8.0-7.el9.x86_64 ; journal findutils-1:4.8.0-7.el9.x86_64
+     rang 100 : INSTALLTIME 2:shadow-utils-4.9-15.el9.x86_64 ; journal shadow-utils-2:4.9-15.el9.x86_64
+     rang 103 : INSTALLTIME 2:tar-1.34-9.el9_7.x86_64 ; journal tar-2:1.34-9.el9_7.x86_64
+     rang 104 : INSTALLTIME elfutils-default-yama-scope-0.193-1.el9.rocky.0.1.noarch ; journal elfutils-default-yama-scope-0.193-1.el9.rocky.0.
+     rang 115 : INSTALLTIME 1:openssl-fips-provider-3.5.1-7.el9_7.x86_64 ; journal openssl-fips-provider-1:3.5.1-7.el9_7.x86_64
+     rang 116 : INSTALLTIME 1:openssl-libs-3.5.1-7.el9_7.x86_64 ; journal openssl-libs-1:3.5.1-7.el9_7.x86_64
+     rang 124 : INSTALLTIME 1:openssl-3.5.1-7.el9_7.x86_64 ; journal openssl-1:3.5.1-7.el9_7.x86_64
+# fin 2026-11-18T20:20:11Z
