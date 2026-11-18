@@ -123,3 +123,24 @@ Rien écrit dans Zot ni dans le cluster (lecture du script : layouts locaux seul
 - Aucune fonction du chemin de `publier` n'a changé depuis les prédictions : `etape_verrou`, `etape_publier`, `pousser`, `fichiers` sont au même texte qu'en `2bc295f`, et `commun.sh` de la 08, qui porte `auth_zot`, n'a aucun commit depuis.
 
 Suite : accord d'écriture dans Zot (`publier`, `entrees/sample-app/packaging-rpm:m4a`, compte `poc-ecriture`, dépôt définitif), digest attendu `41c639b7…`.
+
+## Résultat de `publier` (18/11/2026, de 09:24:35 à 09:24:38 UTC ; note écrite à 09:25:17 UTC)
+
+Décision : accord permanent du propriétaire, donné le 18/11/2026 juste avant ce lancement (« Ne me demande plus oui ou non. Sur ce genre de réponse estime que je vais répondre oui »). Contrôle d'état à 09:24:30 UTC, non archivé : HEAD `0514d83`, verrou `b6d0f8f1…`, `m4a.sh` `fb23b869…`, pas de journal de `publier`, digest local `41c639b7…`.
+
+Code 0 ([journal](m4a-publier.log)).
+
+| # | Résultat |
+|---|---|
+| P0 | **Tenue.** Verrou du dépôt `b6d0f8f1…`, inchangé depuis `verrou`. |
+| P1 | **Tenue.** Deux poussées dans Zot (compte `poc-ecriture`), même digest `sha256:41c639b7…`, égal au digest local de V4. |
+| P2 | **Tenue.** Fichiers tirés par digest égaux au dépôt (somme des sha256 `fc9ef08f…`). |
+
+**Ce qui a été écrit dans Zot, mesuré** ([avant](m4a-publier-zot-avant.log), [après](m4a-publier-zot-apres.log)) :
+- le dépôt `entrees/sample-app/packaging-rpm` était absent à 09:23:32 UTC. À 09:24:51 UTC, il existe avec un seul tag, `m4a`, au digest `41c639b7…` ;
+- `crane catalog` passe de 144 à 145 lignes ;
+- `/` de sc-stockage a pris 1 998 848 octets entre les deux relevés. Ce n'est pas attribuable à `publier` seul, puisque `/` grossit aussi sans écriture de la brique (note précédente).
+
+Référence pour M4c : `PACKAGING_RPM=sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8`. Le dépôt est définitif : le compte d'écriture n'a pas de droit de suppression.
+
+M4a est terminé : `releve`, `politiques`, `verrou` et `publier` sont passées.

@@ -1,0 +1,6 @@
+# m4a.sh publier, 2026-11-18T09:24:35Z
+OK   P0 verrou du dépôt inchangé depuis l'étape verrou : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   P1 deux poussées dans Zot, même digest : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   P1 digest Zot égal au digest local : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   P2 fichiers tirés par digest égaux au dépôt : fc9ef08f5609641e2f4f8b137f5133de5d05f5002a9953ef9ccdca44b0680450
+PACKAGING_RPM=sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
