@@ -1,0 +1,31 @@
+# m4b.sh comparaison, 2026-11-18T12:29:30Z
+## gardes
+OK   arbre de final (sha256) : fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+OK   arbre de final : fichiers : 230
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   verrou (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+## IMAGE_DIGEST relu sur les deux PipelineRuns (relevé ; le tirage prend le digest épinglé)
+OK   IMAGE_DIGEST de m4b-rpm-1 : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+OK   IMAGE_DIGEST de m4b-rpm-2 : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+## manifeste (relevé : redit l'égalité des digests mesurée à rpm)
+OK   manifeste : sha256 des octets lus : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+artifactType application/vnd.supply-chain.deps-closure.v1 ; couches par type : application/vnd.supply-chain.deps-closure.file.v1 x230
+couches : 230, sans titre : 0 ; égales à l'arbre de final préfixé : oui (relevé, non exigé)
+## tirage par digest, lecture anonyme, dossier neuf
+tirée en 1 s ; du -sb : 317955662 octets (dossiers compris, relevé)
+## confrontation à l'arbre de final
+fichiers tirés : 230 (référence : 230) ; octets, somme des fichiers : 317955662 ; hors de depot/ : 0 ; ni fichier ni dossier : 0
+écarts (comm -3 ; sans retrait : tiré seul ; avec retrait : référence seule) : 0, 20 premiers :
+OK   fichiers tirés : 230
+OK   fichiers hors de depot/ : 0
+OK   objets ni fichier ni dossier : 0
+OK   arbre tiré égal à l'arbre de final préfixé par depot/ (sha256 des listes) : 4e8a4dcc1fb6da8e97832cceaf11eb08e2d69b97343bc3525ddd7e01e005efa9
+## au-delà de l'arbre de final
+OK   rpm tirés au premier niveau de depot/ : 222
+OK   rpm égaux à la liste (nom, taille, sha256) : 4d836331fe759af560537313a72c4b5e0059b238923ff888c584f358d3c88c75
+OK   repomd.xml : 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+OK   dossier de l'image de bootstrap (sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6) : 1
+OK   image de bootstrap : manifest.json : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+OK   image de bootstrap : blob 22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99 nommé par son sha256 : 22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99
+OK   image de bootstrap : blob 7bf628be885bd8d1f02d62fe280703e185e2f6b6e049e6c5361d832f67b72698 nommé par son sha256 : 7bf628be885bd8d1f02d62fe280703e185e2f6b6e049e6c5361d832f67b72698
+dossier tiré laissé : ~/.cache/supply-chain-poc/08/travail/m4b-05/comparaison/tiree (317955662 octets)

@@ -1,0 +1,7 @@
+# m4b comparaison, relevés après l étape, lecture seule, hôte ; 2026-11-18T12:30:12Z
+ORAS_CACHE dans m4b.sh, commun.sh, mise.toml : 0 mention ; dans l environnement de ce shell : 0
+identifiants d oras sur l hôte : ~/.docker/config.json absent ; DOCKER_CONFIG non posé ; ~/.config/containers/auth.json absent
+système de fichiers du dossier tiré : ext2/ext3
+dossiers : 4 ; taille apparente des dossiers (find %s) : 32768
+du -sb : 317955662 ; somme des tailles des fichiers : 317955662
+du : du (uutils coreutils) 0.10.0

@@ -874,3 +874,32 @@ La note de résultat dit, sous RP2, que la résolution et la vérification des d
 | CP8 | Étape en code 0, en moins de 3 minutes. Aucune écriture dans Zot ni dans le cluster (par construction ; non relu par l'étape). | haute pour le code ; moyenne pour la durée |
 
 **Portée.** Si CP5 tient, la fermeture tirée de Zot restitue, octet pour octet, l'arbre de `final` sous `depot/`. Cela ne dit rien du build par mock (M4c) ni des attestations (étape `provenance`).
+
+## Note datée du 18/11/2026, écrite à 12:30:52 UTC : `comparaison` passée (accord permanent du 18/11)
+
+**Passage** ([journal](m4b-comparaison.log)) : le 18/11/2026 de 12:29:30 à 12:29:31 UTC, code 0, 18 OK, aucun KO, sur `7354322` (`m4b.sh` = `af9f2961…`). Lancement au premier plan, après contrôle d'état (commit, empreinte du script, deux `m4b-rpm-*` présents).
+
+**Résultat.** La fermeture `builds/fermetures/sample-app-rpm@sha256:2a9e2ea7…`, tirée de Zot par digest dans un dossier neuf, restitue fichier par fichier l'arbre de `final` sous `depot/` :
+- 230 fichiers pour 230, chemin, taille et sha256 recalculé sur l'hôte ;
+- aucun écart, aucun fichier hors de `depot/`, aucun autre objet ;
+- sha256 des deux listes : `4e8a4dcc…`.
+
+**Confrontation aux prédictions**
+- **CP1 tenue** : arbre `fc556539…` (230 lignes), liste, verrou.
+- **CP2 tenue** : `IMAGE_DIGEST` des deux PipelineRuns égal à `2a9e2ea7…`.
+- **CP3 tenue** (relevé) : sha256 des octets du manifeste égal au digest ; `artifactType` `application/vnd.supply-chain.deps-closure.v1` ; 230 couches de type `…deps-closure.file.v1`, aucune sans titre ; liste des couches égale à l'arbre préfixé.
+- **CP4 tenue** : `oras pull` en code 0, en 1 s. Lecture anonyme et sans cache, relevées après l'étape ([relevé](m4b-comparaison-releve.log), 12:30:12 UTC) : ni `~/.docker/config.json`, ni `DOCKER_CONFIG`, ni `~/.config/containers/auth.json` sur l'hôte ; `ORAS_CACHE` absent de `m4b.sh`, de `commun.sh`, de `mise.toml` et de l'environnement du shell du relevé.
+- **CP5 tenue** : voir le résultat.
+- **CP6 en partie non tenue** :
+  - la somme des tailles, 317 955 662 octets, est tenue ;
+  - en revanche, `du -sb` ne donne pas plus : il donne exactement la même somme, alors que les quatre dossiers ont 32 768 octets de taille apparente sur l'ext4 de l'hôte.
+  - Le `du` de l'hôte est celui d'uutils coreutils 0.10.0 ; qu'il n'ajoute pas la taille des dossiers est déduit, non vérifié.
+  - L'écart de 28 672 octets entre le `du -sb` du pod (317 984 334) et la somme des fichiers reste non expliqué. Il vient probablement des dossiers, dans l'outil et le système de fichiers du pod (non relevés).
+- **CP7 tenue** : 222 rpm égaux à la liste (`4d836331…`, même valeur qu'au banc sur la référence) ; `repomd.xml` `239a5a71…` ; un dossier de bootstrap, `manifest.json` `f0ccf105…`, deux blobs nommés par leur sha256.
+- **CP8 tenue** : code 0, en 1 s. Aucune écriture dans Zot ni dans le cluster par construction (lecture du script ; non relu après l'étape).
+
+**Portée.** La fermeture produite et publiée par la plateforme est, octet pour octet, celle mesurée en `final`. Elle contient les 222 rpm de la liste, `repodata` en variante V2 et l'image de bootstrap dérivée. Ce n'est pas encore M4b tenu :
+- `provenance` doit vérifier les attestations de Chains (cosign, sujet, `resolvedDependencies` avec l'image de bootstrap et les tâches, paramètre `liste`) ;
+- aucun rpm n'a été construit à partir de cette fermeture (M4c).
+
+Dossier tiré laissé sous `~/.cache/supply-chain-poc/08/travail/m4b-05/comparaison/tiree` (317 955 662 octets).
