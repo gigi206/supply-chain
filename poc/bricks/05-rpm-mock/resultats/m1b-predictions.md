@@ -54,3 +54,24 @@ Je n'ai mesuré aucun moyen de les neutraliser, par exemple borner les mtimes à
 
 - **Les 25 lignes du comptage** étaient en partie non lues : le journal du banc n'en imprimait que 10. Je les ai relues et archivées ([relevé](m1b-repro-scriptlets.log)). Les 25 sont toutes des lignes « Running scriptlet », dans chacun des deux passages. Aucune ne porte « warning » ni « error ». Les deux journaux de dnf sont identiques, aux espaces de fin de ligne près. Rien n'y montre l'échec d'un scriptlet. Cela ne prouve pas qu'aucun scriptlet n'a été gêné par l'absence de `/dev` et de `/proc` : `dev/null` est devenu un fichier ordinaire.
 - **Le constat sur la ligne 377 de `s1.sh`** vaut pour le tar de l'hôte, avec lequel le banc a archivé, pas pour celui d'un pod.
+
+## Relevé des sources de l'outillage (point 1 B de la carte) : prédictions écrites avant le lancement (2026-11-18T19:58:19Z UTC)
+
+**Relevé** : [`m1b-sources.sh`](m1b-sources.sh), en lecture publique seule. Il reprend les 199 rpm du 17/11 ([`s1-racine.log`](s1-racine.log), l. 11 à 209) et cherche, pour chacun, le même nom de fichier avec le même sha256. Les dépôts interrogés sont pub/9.8 de Rocky (BaseOS, AppStream), vault/9.8 s'il existe, EPEL 9, chaque instantané 9.x de `pub/archive/epel`, et kojipkgs (chemin de construction, chemin signé, `sigcache`). Le repomd.xml de Rocky doit être signé par la clé de `s1.sh` ; sinon le relevé s'arrête. Seul un code HTTP 404 vaut « absent » : tout autre code est imprimé tel quel. Rien ne touche au cluster, à Zot ni aux dépôts de la brique.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| SB1 | `pub/rocky` liste 9.8, et `vault/rocky` ne la liste pas | Moyenne : la date de sortie de 9.9 n'a pas été lue |
+| SB2 | Les repomd.xml de BaseOS et d'AppStream de pub/9.8 diffèrent de ceux du 17/11 (`abac8b17…`, `a3ca4230…`) | Faible : un jour et demi d'écart |
+| SB3 | Les 190 rpm de Rocky (169 et 21) sont encore dans le primary actuel de pub/9.8 avec le même sha256, et leurs 190 adresses répondent 200 | Moyenne : je crois que Rocky garde les versions antérieures dans un même dépôt mineur, sans l'avoir relu |
+| SB4 | Le repomd.xml d'EPEL 9 diffère de celui du 17/11 (`8190707a…`) | Haute : il a changé à chaque relevé de S1 |
+| SB5 | Le repomd.xml d'EPEL 9 n'a toujours pas de `.asc` | Haute : relevé de `s1-hote.log`, l. 20 |
+| SB6 | Au moins un des 9 rpm d'EPEL n'est plus dans le primary actuel d'EPEL 9 | Faible : un jour et demi d'écart |
+| SB7 | Au chemin signé de kojipkgs, les 9 rpm d'EPEL répondent 200 avec le sha256 du 17/11 | Moyenne : forme du chemin (`data/signed/<id>/`) citée de mémoire |
+| SB8 | Au chemin de construction de kojipkgs, les 9 rpm répondent 200 avec un sha256 différent : ce sont les rpm non signés, la différence est attendue par construction et n'est pas une divergence | Moyenne : même réserve |
+| SB9 | `pub/archive/epel` n'a aucun instantané 9.x servant un repomd.xml | Moyenne : index jamais lu |
+
+**Règle de lecture, écrite d'avance** :
+- **Adresse figée** : seule une archive déclarée comme telle par son éditeur compte, c'est-à-dire vault de Rocky, ou un instantané de `pub/archive/epel`. La présence constatée dans pub/9.8 ou dans EPEL 9 prouve seulement que les octets sont servis ce jour.
+- **kojipkgs** : un 200 avec le bon sha256 prouve que les octets sont récupérables ce jour, sans métadonnées signées. La vérification reposerait alors sur `rpm -K` avec la clé d'EPEL 9 et sur une liste de sha256 tenue dans git. Ce n'est pas une adresse figée au sens de D2 (a). Un échec au chemin signé n'est pas concluant tant que `sigcache` n'est pas lu.
+- **Conflit avec D4 (a)** : si Rocky 9.8 n'a pas de vault, ou si EPEL 9 n'a ni instantané ni adresse figée, le conflit avec D4 (a) est rouvert. C'est un **vrai choix du propriétaire**, hors de l'accord permanent : je le consignerai et je le poserai, sans le trancher.
