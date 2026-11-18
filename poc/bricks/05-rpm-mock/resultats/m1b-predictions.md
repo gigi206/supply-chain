@@ -344,3 +344,20 @@ Journal : [`m1b-dnf-complements.log`](m1b-dnf-complements.log).
 **Fait à porter à la question** : dnf tourne déjà dans la chaîne rpm hors de M1b. mock s'en sert, dans le bootstrap, pour installer le buildroot (S1, `verrou_brut` : « dnf rocky.0.1 »). Le verdict ne concerne donc pas que M1b. Je ne l'ai pas encore relu dans les journaux de M3 et de M4c.
 
 **Note du 18/11/2026, écrite à 2026-11-18T20:26:50Z UTC** : relu dans [`s1-m3_build1-mock.log`](s1-m3_build1-mock.log), l. 46 à 54 : mock y écrit « Package manager dnf4 detected and used (direct choice) », puis installe le buildroot minimal avec dnf (python3-dnf 4.14.0-31 dans le bootstrap). **M3 a donc exécuté dnf 4.** Les journaux de M4c ne sont pas relus.
+
+## Corrections après relecture du conseiller, et portée de dnf : prédictions écrites avant le lancement (2026-11-18T20:28:59Z UTC)
+
+**Corrections** de la note des compléments du relevé de dnf (20:26 UTC) :
+- **« Le paquet de Rocky est reconstruit par la distribution (4.14.0-34.el9_8) »** dépasse la mesure. Je l'ai tiré d'un nom de fichier, dans une liste qui n'est pas signée. La date de construction et le changelog sont mesurés ici, partie 1, hors ligne.
+- **« libsolv ne tombe sous aucun critère Risqué »** dépasse aussi la mesure. 95 des 100 dernières fusions viennent d'une seule personne. Le soutien d'un employeur n'est déduit que du domaine de son adresse (suse.de). Correction : **mainteneur unique, soutien non mesuré**. Le verdict de libsolv reste ouvert, comme celui de dnf.
+- **Le seuil était déjà franchi au premier usage.** La dernière release de dnf date du 21/10/2025. Au premier passage de `racine` en S1, le 17/11/2026, dnf avait donc déjà plus de 12 mois sans release. Le relevé de santé du 5/11/2026 ne couvrait pas dnf. C'est un manque de ma part, antérieur à M1b.
+- **Conséquence** : je n'utilise pas dnf dans M1b avant ta réponse. La relance du troisième banc le 19/11 et le banc du bootstrap sont suspendus.
+
+**Mesure de la portée** : [`m1b-dnf-portee.sh`](m1b-dnf-portee.sh), sur l'hôte, hors ligne, en lecture seule.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| DP1 | La racine d'outils a python3-dnf-4.14.0-34.el9_8.rocky.0.1, construit en 2026. La première entrée de son changelog date aussi de 2026 | Moyenne : suffixe el9_8 ; la date n'est pas lue |
+| DP2 | L'arbre i3 (buildroot) n'a pas dnf | Moyenne : le buildroot minimal de mock ne demande pas dnf, et je ne l'ai pas lu |
+| DP3 | « Package manager dnf4 detected » apparaît au moins dans les journaux de mock de S1 (essais, verrous) et de M3. `installroot` ou `dnf-3` apparaît au moins dans les journaux de `racine`, `boot_racine` et M2 | Haute : liste des fichiers déjà vue sans journal |
+| DP4 | Aucun journal archivé de M4b ni de M4c ne contient ces motifs, car mock y a tourné dans des pods dont les journaux ne sont pas archivés ici. Ce n'est pas une preuve que dnf n'y a pas tourné | Moyenne |
