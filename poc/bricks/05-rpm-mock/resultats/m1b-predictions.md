@@ -75,3 +75,58 @@ Je n'ai mesuré aucun moyen de les neutraliser, par exemple borner les mtimes à
 - **Adresse figée** : seule une archive déclarée comme telle par son éditeur compte, c'est-à-dire vault de Rocky, ou un instantané de `pub/archive/epel`. La présence constatée dans pub/9.8 ou dans EPEL 9 prouve seulement que les octets sont servis ce jour.
 - **kojipkgs** : un 200 avec le bon sha256 prouve que les octets sont récupérables ce jour, sans métadonnées signées. La vérification reposerait alors sur `rpm -K` avec la clé d'EPEL 9 et sur une liste de sha256 tenue dans git. Ce n'est pas une adresse figée au sens de D2 (a). Un échec au chemin signé n'est pas concluant tant que `sigcache` n'est pas lu.
 - **Conflit avec D4 (a)** : si Rocky 9.8 n'a pas de vault, ou si EPEL 9 n'a ni instantané ni adresse figée, le conflit avec D4 (a) est rouvert. C'est un **vrai choix du propriétaire**, hors de l'accord permanent : je le consignerai et je le poserai, sans le trancher.
+
+## Second banc (point 1 A) : prédictions écrites avant le lancement (2026-11-18T20:01:10Z UTC)
+
+**Banc** : [`m1b-repro2.sh`](m1b-repro2.sh), avec [`m1b-repro2-comparer.py`](m1b-repro2-comparer.py), [`m1b-repro2-rpmdb.py`](m1b-repro2-rpmdb.py) et [`m1b-repro2-cacerts.py`](m1b-repro2-cacerts.py). Il reprend les deux arbres du premier banc sans réinstaller et sans les écrire :
+- **Borne** : E est le plus grand `BUILDTIME` des paquets installés.
+- **Archives** : options normalisées du premier banc, mtimes bornées à E (`--mtime=@E --clamp-mtime`), sans huit fichiers :
+  - les quatre journaux de dnf ;
+  - `history.sqlite` et ses fichiers `-shm` et `-wal` ;
+  - `aux-cache`.
+- **Comparaison** : membre par membre.
+- **Base rpm** : lue sur une copie, en-tête par en-tête et table par table.
+- **`cacerts`** : lu champ par champ.
+
+Les archives vont dans un dossier neuf, `~/.cache/supply-chain-poc/05/m1b-repro2-<UTC>`, et les copies des bases rpm dans la racine d'outils du premier banc (`m/repro2-<UTC>`), hors des arbres.
+
+**Portée** : retirer ces huit fichiers et borner les mtimes, ce n'est ici qu'un traitement de l'archive. Le banc ne dit pas si mock fonctionne sans eux, ni ce que fera la tâche de la plateforme.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| RD1 | E est le même pour les deux arbres | Haute : mêmes 222 paquets |
+| RD2 | Dans chaque arbre, au moins 3332 entrées ont une mtime supérieure à E | Moyenne : je suppose que rpm pose des mtimes au plus égales au `BUILDTIME`, sans l'avoir vérifié |
+| RD3 | Témoin : l'arbre 1 archivé deux fois donne deux fichiers identiques octet à octet | Haute : RB3t, options normalisées |
+| RD4 | Les deux archives diffèrent, et les seuls membres différents sont `var/lib/rpm/rpmdb.sqlite` et `etc/pki/ca-trust/extracted/java/cacerts`, par leur seul contenu | Moyenne : d'autres en-têtes pax ou un fichier de la base rpm peuvent différer |
+| RD5 | Les en-têtes des 222 paquets ne diffèrent que par `Installtime` et `Installtid` | Moyenne : noms des étiquettes dans la sortie `--xml` non lus |
+| RD6 | Dans `rpmdb.sqlite`, les blobs de `Packages` diffèrent (222 sur 222) avec les mêmes `hnum`, et les autres tables sont identiques | Moyenne : ordre d'insertion supposé identique |
+| RD7 | `cacerts` est au format JKS, avec les mêmes alias et les mêmes certificats ; seuls les horodatages des entrées et l'empreinte finale diffèrent | Moyenne : générateur (p11-kit) non lu |
+
+**Ce qui est décidé d'avance** :
+- Si RD4 tient, le point 1 A se réduit à deux fichiers, mais il **n'est pas établi pour autant**. Aucun moyen de neutraliser la base rpm ni `cacerts` n'est mesuré ici. Ces moyens feront l'objet d'une carte à part. Si l'un d'eux demande une installation, ou si c'est un vrai choix, la décision reviendra au propriétaire.
+- Si d'autres membres diffèrent, je les liste et je ne conclus pas.
+- Sans le témoin RD3, je ne conclus pas sur les archives.
+
+## Résultat du relevé des sources, du 18/11/2026, de 19:58:32 à 20:01:09 UTC, code 0 (note écrite à 2026-11-18T20:02:39Z)
+
+Journal : [`m1b-sources.log`](m1b-sources.log). Le dossier `~/.cache/supply-chain-poc/05/m1b-sources-20261118T195832Z` est laissé en place. Les quatre repomd.xml de Rocky sont signés par la clé de `s1.sh`. La clé d'EPEL 9 a la même empreinte que dans `s1-hote.log`.
+
+- **SB1 non tenue** : Rocky 9.9 est sortie. `pub/rocky` liste 9.8 et 9.9, et `vault/rocky` liste 9.8.
+- **SB2 non tenue** : les repomd.xml de BaseOS et d'AppStream de pub/9.8 sont ceux du 17/11 (`abac8b17…`, `a3ca4230…`). Ceux de vault/9.8 aussi.
+- **SB3 tenue**, et de même dans vault : les 190 rpm de Rocky (169 et 21) y sont avec le même sha256, et leurs adresses répondent 200, dans pub/9.8 comme dans vault/9.8.
+- **SB4 tenue** : le repomd.xml d'EPEL 9 est `ace203bb…`, révision du 18/11/2026 à 01:40:30 UTC.
+- **SB5 tenue** : il n'a pas de `.asc`.
+- **SB6 non tenue** : les 9 rpm d'EPEL sont encore dans son primary actuel, avec le même sha256.
+- **SB7 tenue** : au chemin signé de kojipkgs (`data/signed/3228467c/`), les 9 rpm répondent 200 avec le sha256 du 17/11. Les 9 fichiers de `sigcache` répondent aussi 200.
+- **SB8 tenue** : au chemin de construction, les 9 rpm répondent 200 avec un sha256 différent. Je n'ai pas vérifié qu'ils sont non signés : il n'y a pas de `rpm` sur l'hôte.
+- **SB9 non tenue** : 12 instantanés 9.x de `pub/archive/epel` servent un repomd.xml. Celui de **9.8** a la révision du 10/11/2026 à 03:20:16 UTC (`e86fdcd8…`). Il contient **les 9 rpm avec le même sha256**, et ses 9 adresses répondent 200. Il n'a pas de `.asc`, comme les autres. Les instantanés de 9.1 à 9.7 en contiennent de 2 à 5.
+
+**Lecture, selon la règle écrite d'avance** :
+- **Rocky** : `vault/rocky/9.8` est une adresse figée. C'est une archive déclarée par l'éditeur, avec un repomd.xml signé, identique à celui du 17/11, et elle contient les 190 rpm.
+- **EPEL** : `pub/archive/epel/9.8` est une adresse figée au sens de la règle, puisque c'est une archive déclarée par Fedora. Elle contient les 9 rpm. Ses métadonnées ne sont pas signées, comme celles de `pub/epel` le 17/11 : la vérification resterait celle de S1, `rpm -K` avec la clé d'EPEL 9, plus des sha256 tenus dans git.
+- **Le conflit avec D4 (a) n'est donc pas rouvert.** Les 199 rpm de l'outillage du 17/11 sont servis aujourd'hui à deux adresses figées.
+
+**Ce que le relevé ne montre pas** :
+- **La durée de conservation des archives** : j'ai seulement constaté que les instantanés d'EPEL depuis le 09/05/2023 et vault depuis 8.3 sont encore servis. Je n'ai lu aucun engagement de durée.
+- **La fin des mises à jour de 9.8** : elle est déduite de la sortie de 9.9, je ne l'ai pas lue. Si elle se confirme, l'outillage épinglé sur 9.8 ne recevra plus de correctifs, comme le bootstrap sur vault 9.7 (D2 a). Je le signale, sans le trancher.
+- **La liste des paquets** : la liste complète à installer reste à retirer de la base rpm de la racine archivée (201 paquets), selon la leçon de S4a.

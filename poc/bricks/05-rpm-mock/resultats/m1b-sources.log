@@ -1,0 +1,208 @@
+# m1b-sources.sh, début 2026-11-18T19:58:32Z
+journal de référence : s1-racine.log, sha256 e79aa82905072c15ceab0cf9ab6c06db63ccc7c1ba4b425d62ba9f939f536ea3
+rpm attendus : 199 (appstream98 21 baseos98 169 epel9 9 )
+## index
+pub/rocky : HTTP 200 : ../ 10/ 10.0/ 10.1/ 10.2/ 10.3/ 8/ 8.10/ 8.4/ 8.5/ 8.6/ 8.7/ 8.8/ 8.9/ 9/ 9.0/ 9.1/ 9.2/ 9.3/ 9.4/ 9.5/ 9.6/ 9.7/ 9.8/ 9.9/ 
+vault/rocky : HTTP 200 : ../ 10.0/ 10.1/ 10.2/ 8.3/ 8.4/ 8.4-RC1/ 8.5/ 8.6/ 8.7/ 8.8/ 8.9/ 9.0/ 9.0-ISO/ 9.1/ 9.2/ 9.3/ 9.4/ 9.5/ 9.6/ 9.7/ 9.8/ 
+pub/archive/epel : HTTP 200 : 10.0/ 10.1/ 10.2/ 4/ 4AS/ 4ES/ 4WS/ 5/ 5Client/ 5Server/ 6.2017-11-07/ 6/ 7.2019-05-29/ 7.2020-04-20/ 7.2020-10-05/ 7.7/ 7.8/ 7.9/ 7/ 8.1.2020-04-22/ 8.1/ 8.2.2020-11-04/ 8.2/ 8.3.2021-05-20/ 8.3/ 8.4.2021-11-30/ 8.4/ 8.5.2022-05-10/ 8.5/ 8.7.2023-05-09/ 8.7/ 8.8.2023-11-14/ 8.8/ 8.9-2024-05-22/ 8.9/ 8/ 9.1.2023-05-09/ 9.1/ 9.2.2023-11-05/ 9.2/ 9.3-2024-04-30/ 9.3/ 9.4-2024-11-12/ 9.4/ 9.5/ 9.6/ 9.7/ 9.8/ playground/ testing/ http://get.fedoraproject.org/ 
+## clés
+OK   clé de Rocky : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   clé d'EPEL 9 : FF8AD1344597106ECE813B918A3872BF3228467C (égale au relevé de s1-hote.log)
+identifiant court de la clé d'EPEL 9 : 3228467c
+## Rocky 9.8, pub
+pub98-baseos98 : repomd.xml sha256 abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+pub98-baseos98 : repomd.xml.asc présent, signataire valide : 21CB256AE16FC54C6E652949702D426D350D275D
+pub98-baseos98 : primary contrôlé par repomd.xml
+baseos98 dans https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os : 169 attendus ; même fichier et même sha256 : 169 ; même fichier, autre sha256 : 0 ; absents : 0
+pub98-baseos98 : HEAD sur les 169 adresses trouvées : 169 en 200, 0 autres
+pub98-appstream98 : repomd.xml sha256 a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+pub98-appstream98 : repomd.xml.asc présent, signataire valide : 21CB256AE16FC54C6E652949702D426D350D275D
+pub98-appstream98 : primary contrôlé par repomd.xml
+appstream98 dans https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os : 21 attendus ; même fichier et même sha256 : 21 ; même fichier, autre sha256 : 0 ; absents : 0
+pub98-appstream98 : HEAD sur les 21 adresses trouvées : 21 en 200, 0 autres
+## Rocky 9.8, vault
+vault98-baseos98 : repomd.xml sha256 abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+vault98-baseos98 : repomd.xml.asc présent, signataire valide : 21CB256AE16FC54C6E652949702D426D350D275D
+vault98-baseos98 : primary contrôlé par repomd.xml
+baseos98 dans https://dl.rockylinux.org/vault/rocky/9.8/BaseOS/x86_64/os : 169 attendus ; même fichier et même sha256 : 169 ; même fichier, autre sha256 : 0 ; absents : 0
+vault98-baseos98 : HEAD sur les 169 adresses trouvées : 169 en 200, 0 autres
+vault98-appstream98 : repomd.xml sha256 a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+vault98-appstream98 : repomd.xml.asc présent, signataire valide : 21CB256AE16FC54C6E652949702D426D350D275D
+vault98-appstream98 : primary contrôlé par repomd.xml
+appstream98 dans https://dl.rockylinux.org/vault/rocky/9.8/AppStream/x86_64/os : 21 attendus ; même fichier et même sha256 : 21 ; même fichier, autre sha256 : 0 ; absents : 0
+vault98-appstream98 : HEAD sur les 21 adresses trouvées : 21 en 200, 0 autres
+## EPEL 9, pub
+epel9 : repomd.xml sha256 ace203bb4039ce422abab605c9835aab768dd03d002bc2814e7cd1640de8cdf8
+epel9 : repomd.xml.asc absent
+epel9 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 9 ; même fichier, autre sha256 : 0 ; absents : 0
+epel9 : HEAD sur les 9 adresses trouvées : 9 en 200, 0 autres
+## EPEL 9, instantanés de pub/archive/epel (entrées commençant par 9)
+archive 9.1.2023-05-09 : repomd.xml HTTP 200
+archive-9.1.2023-05-09 : repomd.xml sha256 c0b771d935121c48f52fa4b4298f5c2e0c0f9392877b267cae9312a63e0273a5
+archive-9.1.2023-05-09 : repomd.xml.asc absent
+archive-9.1.2023-05-09 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.1.2023-05-09/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 2 ; même fichier, autre sha256 : 0 ; absents : 7
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm
+     absent : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+     absent : python3-templated-dictionary-1.5-1.el9.noarch.rpm
+archive-9.1.2023-05-09 : HEAD sur les 2 adresses trouvées : 2 en 200, 0 autres
+archive 9.1 : repomd.xml HTTP 200
+archive-9.1 : repomd.xml sha256 c0b771d935121c48f52fa4b4298f5c2e0c0f9392877b267cae9312a63e0273a5
+archive-9.1 : repomd.xml.asc absent
+archive-9.1 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.1/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 2 ; même fichier, autre sha256 : 0 ; absents : 7
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm
+     absent : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+     absent : python3-templated-dictionary-1.5-1.el9.noarch.rpm
+archive-9.1 : HEAD sur les 2 adresses trouvées : 2 en 200, 0 autres
+archive 9.2.2023-11-05 : repomd.xml HTTP 200
+archive-9.2.2023-11-05 : repomd.xml sha256 b22d51eac961738522e277b55a5a516b443340f98611e4d56622a596e16c2771
+archive-9.2.2023-11-05 : repomd.xml.asc absent
+archive-9.2.2023-11-05 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.2.2023-11-05/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 2 ; même fichier, autre sha256 : 0 ; absents : 7
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm
+     absent : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+     absent : python3-templated-dictionary-1.5-1.el9.noarch.rpm
+archive-9.2.2023-11-05 : HEAD sur les 2 adresses trouvées : 2 en 200, 0 autres
+archive 9.2 : repomd.xml HTTP 200
+archive-9.2 : repomd.xml sha256 b22d51eac961738522e277b55a5a516b443340f98611e4d56622a596e16c2771
+archive-9.2 : repomd.xml.asc absent
+archive-9.2 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.2/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 2 ; même fichier, autre sha256 : 0 ; absents : 7
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm
+     absent : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+     absent : python3-templated-dictionary-1.5-1.el9.noarch.rpm
+archive-9.2 : HEAD sur les 2 adresses trouvées : 2 en 200, 0 autres
+archive 9.3-2024-04-30 : repomd.xml HTTP 200
+archive-9.3-2024-04-30 : repomd.xml sha256 102e9b0ae38b10118010f706624714269464152e913d80ff4d0179ba7182499f
+archive-9.3-2024-04-30 : repomd.xml.asc absent
+archive-9.3-2024-04-30 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.3-2024-04-30/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 2 ; même fichier, autre sha256 : 0 ; absents : 7
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm
+     absent : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+     absent : python3-templated-dictionary-1.5-1.el9.noarch.rpm
+archive-9.3-2024-04-30 : HEAD sur les 2 adresses trouvées : 2 en 200, 0 autres
+archive 9.3 : repomd.xml HTTP 200
+archive-9.3 : repomd.xml sha256 102e9b0ae38b10118010f706624714269464152e913d80ff4d0179ba7182499f
+archive-9.3 : repomd.xml.asc absent
+archive-9.3 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.3/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 2 ; même fichier, autre sha256 : 0 ; absents : 7
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm
+     absent : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+     absent : python3-templated-dictionary-1.5-1.el9.noarch.rpm
+archive-9.3 : HEAD sur les 2 adresses trouvées : 2 en 200, 0 autres
+archive 9.4-2024-11-12 : repomd.xml HTTP 200
+archive-9.4-2024-11-12 : repomd.xml sha256 9db512b00f98b70fc4562239425190a84b751532844f9b91b0b0655281d88a73
+archive-9.4-2024-11-12 : repomd.xml.asc absent
+archive-9.4-2024-11-12 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.4-2024-11-12/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 3 ; même fichier, autre sha256 : 0 ; absents : 6
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm
+     absent : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+archive-9.4-2024-11-12 : HEAD sur les 3 adresses trouvées : 3 en 200, 0 autres
+archive 9.4 : repomd.xml HTTP 200
+archive-9.4 : repomd.xml sha256 9db512b00f98b70fc4562239425190a84b751532844f9b91b0b0655281d88a73
+archive-9.4 : repomd.xml.asc absent
+archive-9.4 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.4/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 3 ; même fichier, autre sha256 : 0 ; absents : 6
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm
+     absent : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+archive-9.4 : HEAD sur les 3 adresses trouvées : 3 en 200, 0 autres
+archive 9.5 : repomd.xml HTTP 200
+archive-9.5 : repomd.xml sha256 6a4f9ef7fdf2a1dda7a1d504e27552980b47fb994a52f12eca9cac90d29999f2
+archive-9.5 : repomd.xml.asc absent
+archive-9.5 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.5/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 5 ; même fichier, autre sha256 : 0 ; absents : 4
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+archive-9.5 : HEAD sur les 5 adresses trouvées : 5 en 200, 0 autres
+archive 9.6 : repomd.xml HTTP 200
+archive-9.6 : repomd.xml sha256 89002d20b0f5d2cc99ce2c62f43e06ca880c4a9c5cda05a235d672e15a8f02de
+archive-9.6 : repomd.xml.asc absent
+archive-9.6 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.6/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 5 ; même fichier, autre sha256 : 0 ; absents : 4
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+archive-9.6 : HEAD sur les 5 adresses trouvées : 5 en 200, 0 autres
+archive 9.7 : repomd.xml HTTP 200
+archive-9.7 : repomd.xml sha256 b83e147f889e1aa28a1ace1ef7b09734040d07507fbb11fa50b9ec759aa264da
+archive-9.7 : repomd.xml.asc absent
+archive-9.7 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.7/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 5 ; même fichier, autre sha256 : 0 ; absents : 4
+     absent : distribution-gpg-keys-1.123-1.el9.noarch.rpm
+     absent : mock-6.9-1.el9.noarch.rpm
+     absent : mock-core-configs-45.2-1.el9.noarch.rpm
+     absent : mock-filesystem-6.9-1.el9.noarch.rpm
+archive-9.7 : HEAD sur les 5 adresses trouvées : 5 en 200, 0 autres
+archive 9.8 : repomd.xml HTTP 200
+archive-9.8 : repomd.xml sha256 e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61
+archive-9.8 : repomd.xml.asc absent
+archive-9.8 : primary contrôlé par repomd.xml
+epel9 dans https://dl.fedoraproject.org/pub/archive/epel/9.8/Everything/x86_64 : 9 attendus ; même fichier et même sha256 : 9 ; même fichier, autre sha256 : 0 ; absents : 0
+archive-9.8 : HEAD sur les 9 adresses trouvées : 9 en 200, 0 autres
+instantanés 9.x interrogés : 12
+## EPEL 9, kojipkgs (chemin de construction et chemin signé)
+construction : distribution-gpg-keys-1.123-1.el9.noarch.rpm : HTTP 200, sha256 différent (0a481f171b43e5b3803df0dc51cedb15830f5ef18142364858becaf5f156a2aa)
+signe : distribution-gpg-keys-1.123-1.el9.noarch.rpm : HTTP 200, sha256 égal au 17/11
+sigcache : distribution-gpg-keys-1.123-1.el9.noarch.rpm.sig : HTTP 200
+construction : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm : HTTP 200, sha256 différent (409e06266741fb5be3cdd66a102230cb4e00bca4d96faa798d06e8bac019df51)
+signe : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm : HTTP 200, sha256 égal au 17/11
+sigcache : iptables-legacy-1.8.10-11.1.el9.x86_64.rpm.sig : HTTP 200
+construction : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm : HTTP 200, sha256 différent (705c2653441e0ca2ccc678de343982ba49cdd481fe5f71a2b2cd4e719a8b917a)
+signe : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm : HTTP 200, sha256 égal au 17/11
+sigcache : iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm.sig : HTTP 200
+construction : mock-6.9-1.el9.noarch.rpm : HTTP 200, sha256 différent (6ad86044293f849df9c98cdd1b434ac5eca8455a1b3bba87ca5a6f791c6f1b9a)
+signe : mock-6.9-1.el9.noarch.rpm : HTTP 200, sha256 égal au 17/11
+sigcache : mock-6.9-1.el9.noarch.rpm.sig : HTTP 200
+construction : mock-core-configs-45.2-1.el9.noarch.rpm : HTTP 200, sha256 différent (59492a008cb7d6ec98691d525ae14d49197a7f593b5681468303b0021b3455a8)
+signe : mock-core-configs-45.2-1.el9.noarch.rpm : HTTP 200, sha256 égal au 17/11
+sigcache : mock-core-configs-45.2-1.el9.noarch.rpm.sig : HTTP 200
+construction : mock-filesystem-6.9-1.el9.noarch.rpm : HTTP 200, sha256 différent (44a7f2f94cf53c9722706dd6cd54eb5408ef17818fa05c02cf3864aa7dc88236)
+signe : mock-filesystem-6.9-1.el9.noarch.rpm : HTTP 200, sha256 égal au 17/11
+sigcache : mock-filesystem-6.9-1.el9.noarch.rpm.sig : HTTP 200
+construction : python3-backoff-2.2.1-1.el9.noarch.rpm : HTTP 200, sha256 différent (5cef3fc9f66e0f6d7fdcde831443a1e711251bcab3ce40090b52024946901215)
+signe : python3-backoff-2.2.1-1.el9.noarch.rpm : HTTP 200, sha256 égal au 17/11
+sigcache : python3-backoff-2.2.1-1.el9.noarch.rpm.sig : HTTP 200
+construction : python3-pyroute2-0.5.14-3.el9.noarch.rpm : HTTP 200, sha256 différent (86e9c1646f1628f3680557ce459bed826814a24345a09b07dc8541419ec1c027)
+signe : python3-pyroute2-0.5.14-3.el9.noarch.rpm : HTTP 200, sha256 égal au 17/11
+sigcache : python3-pyroute2-0.5.14-3.el9.noarch.rpm.sig : HTTP 200
+construction : python3-templated-dictionary-1.5-1.el9.noarch.rpm : HTTP 200, sha256 différent (1dbe5afec71b12083df4795f5d6dfe4fb7be1e1ebe56a7927d20e41f3bcb9a6f)
+signe : python3-templated-dictionary-1.5-1.el9.noarch.rpm : HTTP 200, sha256 égal au 17/11
+sigcache : python3-templated-dictionary-1.5-1.el9.noarch.rpm.sig : HTTP 200
+# fin 2026-11-18T20:01:09Z
