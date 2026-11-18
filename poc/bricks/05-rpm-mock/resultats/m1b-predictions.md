@@ -825,3 +825,51 @@ Relevé en lecture seule : [`m1b-boot-modes.sh`](m1b-boot-modes.sh), journal [`m
 2. **« Il y faut `SOURCE_DATE_EPOCH=S`, la borne S et les exclusions »** dépasse la mesure. Le banc montre que ces conditions **suffisent** sur le banc. Il n'a aucun témoin sans `SOURCE_DATE_EPOCH` ni sans borne pour le bootstrap. Seules les 8 exclusions dont les membres diffèrent entre `c1` et `c2` sont montrées nécessaires.
 3. **« Dans S1, il vient de `cp -a "$m/." "$R/"` »** est une hypothèse tirée de la lecture de `s1.sh`, pas une mesure.
 4. **Exclusions** : `x1` a 10 membres de moins que `c1`. Ce sont les 8 membres qui diffèrent, plus `./etc/machine-id` et `./var/cache/dnf`, membres de la base, égaux dans `c1` et `c2`, que S1 gardait. La liste minimale mesurée a donc 8 membres ; le reste est un choix de carte. La référence `28634a12…` vaut pour la liste large du banc de l'outillage.
+
+### Relances d'un autre jour : plan et prédictions (note écrite à 2026-11-18T21:54:22Z UTC, le 18/11, après relecture du plan par le conseiller, avant tout lancement)
+
+**Objet.** Les quatre références du 18/11 valent pour un seul jour : `05d35d64…` (outils de `99790c13`), `06c289ad…` (outils de l'amorce), `0c00666a…` (troisième banc, 222 rpm) et `28634a12…` (bootstrap). Les relances mesurent si une sortie dépend du jour. Une entrée qui ne change qu'avec la date, et pas avec l'heure, passe inaperçue le même jour.
+
+**Écart de méthode (outils de `99790c13`).** [`m1b-sans-machine-id.sh`](m1b-sans-machine-id.sh) fixe en dur les arbres du 18/11 (l. 12). Relancé tel quel, il ré-archiverait ces arbres sans rien mesurer d'un autre jour. Le passage ne se fait donc pas à « scripts inchangés ».
+- [`m1b-outil.sh`](m1b-outil.sh) est relancé inchangé, avec un dossier neuf et sa phase réseau.
+- Le script neuf [`m1b-autre-jour.sh`](m1b-autre-jour.sh) archive ensuite `i5` et `i6` du dossier neuf. Il reprend la fonction `archive` et la liste `EXCL` de `m1b-sans-machine-id.sh` (l. 20 à 28, recopie contrôlée par `diff`, identique à l'indentation près), plus `--exclude=./etc/machine-id`.
+- Les trois autres bancs sont relancés inchangés. `m1b-autre-jour.sh` lit ensuite leurs archives (aucune réinstallation) et compare chaque sha256 à sa référence. Sur un écart, il compare membre à membre avec l'archive du 18/11 restée sur disque (`m1b-repro2-comparer.py`). Il relève aussi le umask du shell de lancement et le mode de `b1` et `b2`.
+
+**Relecture des scripts (chemins en dur, dossiers neufs, journaux lus).**
+- Chaque banc crée un dossier neuf horodaté, et s'arrête si ce dossier existe.
+- Tous relisent des journaux commités du 18/11 ou d'avant, sans les écrire : `m1b-sources.log`, `s1-hote97.log`, `s1-boot_racine.log`, `m1b-outil.log`.
+- Entrées fixées au 18/11, en lecture seule :
+  - `m1b-outil-amorce.sh` lit le miroir partiel du banc de 20:57:14 UTC ;
+  - `m1b-repro3.sh` lit le premier banc ;
+  - `m1b-boot.sh` lit `a8.tar` du 18/11. Sa relance ne dépend pas de celle de l'outillage.
+- Ont une phase réseau : `m1b-outil.sh` (vault 9.8 et l'instantané d'EPEL 9.8) et `m1b-boot.sh` (vault 9.7 BaseOS). Les deux autres bancs sont hors ligne.
+- Les lignes « Usage » des scripts nomment les journaux du 18/11. **Elles ne servent pas** : chaque relance écrit dans un journal neuf (`-j2.log`), et aucun journal commité n'est écrasé.
+
+**Lancement (à partir du 19/11).**
+- Chaque commande commence par une garde : `[ "$(date -u +%F)" != 2026-11-18 ]`.
+- `df` de `/home` avant chaque banc. Place libre et taille des quatre dossiers du 18/11 relevées ce soir dans [`m1b-autre-jour-disque.log`](m1b-autre-jour-disque.log) : 30G libres sur /home (95% occupé) ; 3,6G pour m1b-outil-20261118T205714Z, 4,3G pour m1b-outil-amorce-20261118T212517Z, 5,2G pour m1b-repro3-20261118T201556Z, 2,6G pour m1b-boot-20261118T214226Z. Rien n'est supprimé.
+- Ordre :
+  1. `m1b-outil-amorce.sh` → `m1b-outil-amorce-j2.log` ;
+  2. `m1b-boot.sh` → `m1b-boot-j2.log` ;
+  3. `m1b-outil.sh` → `m1b-outil-j2.log` ;
+  4. `m1b-repro3.sh` → `m1b-repro3-j2.log` ;
+  5. `m1b-autre-jour.sh`, avec les quatre dossiers neufs → `m1b-autre-jour.log`.
+- L'intervalle réel entre deux dossiers est imprimé par le script, en minutes. Un passage à 00:05 UTC fait un autre jour à environ 2 h 30 d'écart, pas à 24 h. La note de résultat le dira.
+
+**Banc du script, ce soir (AJ0).** `m1b-autre-jour.sh` est lancé sur les quatre dossiers du 18/11 eux-mêmes, journal [`m1b-autre-jour-banc.log`](m1b-autre-jour-banc.log). Prédiction :
+- 8 « OK » : `b5` et `b6` ré-archivés égaux à `05d35d64…`, `a8`, `a9`, `a3`, `a4`, `x1` et `x2` égaux à leurs références ;
+- `stat` de `b1` et `b2` à 775 des deux côtés ;
+- umask 0002.
+Ce banc montre seulement que le script retrouve les références sur les arbres du 18/11. Il ne mesure aucun autre jour.
+
+**Prédictions des relances.**
+- **AJ1** : la garde de date passe, et chaque banc rend le code 0.
+- **AJ2** : dans `m1b-outil-j2.log`, les `repomd.xml` sont égaux aux copies du 18/11, et la signature de vault est valide. Confiance haute : vault et `archive/epel/9.8` sont des instantanés. **Si un `repomd.xml` a changé, le script s'arrête : c'est un résultat à consigner, pas un défaut à corriger.**
+- **AJ3** : dans `m1b-boot-j2.log`, `repomd.xml` de vault 9.7 a le sha256 `fa6d5054…`, et les dix rpm ont les sha256 de `s1-hote97.log`. Confiance haute, même raison ; même règle en cas de changement.
+- **AJ4** : `m1b-outil-j2.log` donne `S = 1793914619`. `b5` et `b6` du dossier neuf valent `05d35d64…`.
+- **AJ5** : `a8` et `a9` du dossier neuf valent `06c289ad…`.
+- **AJ6** : `a3` et `a4` du dossier neuf valent `0c00666a…`.
+- **AJ7** : `b1` et `b2` du dossier neuf sont en 775 (umask 0002 du shell de lancement), et `x1` et `x2` valent `28634a12…`. Si le umask du shell change, le mode de la racine change. `x1` différerait alors pour une cause sans rapport avec le jour ; le relevé du `stat` le montrera.
+- Confiance moyenne pour AJ4 à AJ7. Les écarts du même jour sont neutralisés par `SOURCE_DATE_EPOCH`, la borne S et les exclusions. Mais aucune mesure ne couvre une entrée qui ne change qu'avec la date.
+
+**Portée, avant le lancement.** Même si tout tient, les relances montrent seulement ceci : sur ce banc, cet hôte, ces outils et ces sources, deux jours donnent la même archive, à l'intervalle mesuré. Elles ne disent rien du pod Kata, ni d'un autre hôte. **Le point 1 A reste non établi.** Ensuite viendra la question des valeurs de la carte : `en_US` ou toutes les langues, umask 022, machine-id vide ou absent, liste d'exclusions, mode de la racine.

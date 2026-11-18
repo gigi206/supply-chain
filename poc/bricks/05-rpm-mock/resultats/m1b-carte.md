@@ -210,3 +210,9 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Mesure archivée** : les modes de la racine et la composition de la couche sont relevés dans [`m1b-boot-modes.log`](m1b-boot-modes.log).
 - **Portée** : `SOURCE_DATE_EPOCH`, la borne S et les exclusions suffisent sur le banc. Seules 8 exclusions sont montrées nécessaires (journaux de dnf, `history.sqlite*`, `aux-cache`). `etc/machine-id` et `var/cache/dnf` viennent de la base et sont exclus par choix. La référence `28634a12…` vaut pour la liste large.
 - **Origine du 0555 de S1** : c'est une hypothèse (lecture de `s1.sh`), non mesurée.
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T21:54:22Z UTC : relances d'un autre jour, plan et prédictions
+
+- **Plan** : à partir du 19/11, relancer sans modification `m1b-outil-amorce.sh`, `m1b-boot.sh`, `m1b-outil.sh` et `m1b-repro3.sh`, chacun vers un journal neuf (`-j2.log`). Comparer ensuite aux quatre références du 18/11 avec [`m1b-autre-jour.sh`](m1b-autre-jour.sh).
+- **Écart de méthode** : `m1b-sans-machine-id.sh` fixe en dur les arbres du 18/11. La référence `05d35d64…` se compare donc par un ré-archivage dans `m1b-autre-jour.sh`, avec la même fonction et les mêmes exclusions.
+- **Prédictions** : AJ0 (banc du script, ce soir) et AJ1 à AJ7 ([détail](m1b-predictions.md)). Le point 1 A reste non établi.
