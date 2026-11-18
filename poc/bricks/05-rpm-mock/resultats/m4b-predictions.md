@@ -748,3 +748,36 @@ Chaque prédiction porte sa confiance. Un écart arrête la lecture, pas la publ
 - **RP14, durée et traces** : chaque PipelineRun prend entre 1 et 5 min de la création à la condition finale (le deb : environ 46 s). Rien n'est supprimé ; deux PipelineRuns et deux PVC de 1 Gi restent dans `builds`. Confiance moyenne sur la durée, haute sur les traces.
 
 **Lancement** : `m4b.sh rpm`, sans `SIGNER`. Contrôle d'état juste avant (rien de `m4b-rpm-*` dans `builds`, dépôt absent), puis le lancement dans la forme convenue. Les écritures dans Zot (fermeture, attestations de Chains) sont définitives.
+
+## Note datée du 18/11/2026, écrite à 11:01:08 UTC : contrôles avant le lancement de `rpm`, relevé « avant », précision de portée
+
+Contrôles demandés par le conseiller après la note de préparation, tous en lecture seule. `m4b.sh` est inchangé (`38c39b3e…`).
+
+- **Relevés de `etape_rpm` joués sur de vrais objets de Tekton** ([script](m4b-rpm-releve-reel.sh), [journal](m4b-rpm-releve-reel.log), 10:59:58 UTC).
+  - `releve_pod`, `statut_pr` et les `jq` des résultats, repris tels quels de `m4b.sh`, passent sans erreur sur le PipelineRun `s4b-deb-1` de la 06, ses deux TaskRuns et leurs pods.
+  - Forme réelle mesurée :
+    - conteneurs d'initialisation `prepare` et `place-scripts`, terminés en code 0 ;
+    - `place-scripts` lancé par `["sh"]` avec deux arguments ; le dernier fait 3 229 octets (prefetch-deb) et 1 893 octets (publier) ;
+    - ressources de `prepare` et `place-scripts` : celles de `config-defaults` (50m et 64 Mi en demande, 1 CPU et 512 Mi en limite) ;
+    - même valeur pour les pas sans ressources déclarées ;
+    - résultats objet (`INSTANTANE_ARTIFACT_INPUTS`) relus en JSON.
+  - RP4 (commande, deux arguments) et RP5 (conteneurs d'initialisation, `step-publier`) reposent désormais sur cette mesure faite sur le deb. La longueur du dernier argument et les 2 CPU et 2 Gi de `step-prefetch` restent à mesurer sur `rpm`.
+- **Écritures de la tâche dans le workspace** (script signé relu, `fermeture/prefetch-rpm.signee.yaml`) : `SORTIE` n'est utilisé que pour `D=$SORTIE/depot`. Tout le reste va dans `/tmp`. `publier` publie `fermeture/`, qui ne contiendra donc que `depot/` : pas de couche hors des 230 de `final` (lecture du script).
+- **Précision de portée** de la phrase de la note de préparation sur la ConfigMap `porte`. Elle reposait sur une recherche limitée aux `.sh` et `.yaml` de la 08.
+  - Recherche élargie à tout `poc/` (`.sh`, `.yaml`, `.yml`, `.rego`, `.py`, `.tmpl`) : la liste revue est lue sur l'hôte par les scripts (`listee`, bancs), et dans le cluster par le Job de jugement de la porte (`porte-job.yaml`, ConfigMap `porte`, lancé à la demande).
+  - Les autres mentions sont des commentaires, le gabarit de la réserve C (non décidée) et des essais.
+  - La phrase tient avec cette portée : rien sur le chemin de Tekton ni de l'admission de `builds` (lecture du dépôt).
+- **Relevé « avant »** ([journal](m4b-rpm-zot-avant.log), 11:00:29 UTC) :
+  - `builds/fermetures/sample-app-rpm` inconnu de Zot (`NAME_UNKNOWN`) ;
+  - pipeline au tag `m4b` : `9b89b029…` ;
+  - catalogue de 147 dépôts ;
+  - aucun `m4b-rpm-*` et 16 PVC dans `builds` ;
+  - `/` de sc-stockage : 15 548 968 960 octets utilisés, 4 471 947 264 libres (8 847 360 octets de moins utilisés qu'à 10:54:10 UTC, sans cause relevée).
+- **Prédictions ajoutées.**
+  - **RP15** : catalogue de 148 après l'étape. Le seul dépôt neuf est `builds/fermetures/sample-app-rpm` ; les attestations de Chains vont dans ce même dépôt (stockage `oci`). Confiance moyenne : le stockage de Chains pour un TaskRun sans image en sortie n'est pas relu.
+  - **RP16** : 18 PVC dans `builds` après l'étape, soit une par PipelineRun. Confiance haute.
+- **Arrêt entre les deux PipelineRuns.** Un retard de Chains, un ssh en échec ou une autre garde peut arrêter l'étape après la publication de `m4b-rpm-1`. Il n'y a pas de chemin de reprise :
+  - la garde « dépôt absent » refuse une relance entière ;
+  - rien n'est purgé ;
+  - la suite est une décision avec le propriétaire, rien n'est improvisé.
+- **Lancement** en arrière-plan : deux PipelineRuns, chacun avec jusqu'à 3 600 s d'attente et 120 s pour Chains, peuvent dépasser le premier plan.

@@ -1,0 +1,14 @@
+# relevé « avant » de l étape rpm (lecture seule) : dépôt de la fermeture, pipeline au tag m4b, catalogue de Zot, PipelineRuns et PVC de builds, df de / sur sc-stockage
+2026-11-18T11:00:29Z
+## builds/fermetures/sample-app-rpm
+Error: reading tags for 192.168.161.13:5000/builds/fermetures/sample-app-rpm: GET https://192.168.161.13:5000/v2/builds/fermetures/sample-app-rpm/tags/list?n=1000: NAME_UNKNOWN: repository name not kn
+rc 1
+## tekton/pipelines/prefetch-rpm-sample-app:m4b
+sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+## catalogue
+147
+## builds : PipelineRuns m4b-rpm-*, PVC
+PipelineRuns m4b-rpm-* : 0 ; PVC : 16
+Mounted on        Used      Avail
+/          15548968960 4471947264
+2026-11-18T11:00:30Z

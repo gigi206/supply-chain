@@ -1,0 +1,29 @@
+# m4b-rpm-releve-reel.sh, début 2026-11-18T10:59:58Z ; m4b.sh 38c39b3e70ecfbfe026cd368c0aadf3e9b410e6357746e2d13e2d407becee4f5
+PipelineRun s4b-deb-1 : « True|Succeeded »
+     début 2026-11-14T22:22:28Z ; fin 2026-11-14T22:23:06Z
+### TaskRun s4b-deb-1-prefetch : True|Succeeded ; début 2026-11-14T22:22:29Z ; fin 2026-11-14T22:22:57Z
+     résultat INSTANTANE_ARTIFACT_INPUTS : {"digest":"sha256:0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675","uri":"http://snapshot.debian.org/archive/debian/20261105T000000Z/dists/trixie/InRelease"}
+     pod s4b-deb-1-prefetch-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task prefetch-deb, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-prefetch : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-prefetch : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     place-scripts : commande ["sh"], 2 argument(s), dernier argument 3229 octets (reconstruit à sec : 59848)
+     conteneurs de pas : step-prefetch
+### TaskRun s4b-deb-1-publier : True|Succeeded ; début 2026-11-14T22:22:57Z ; fin 2026-11-14T22:23:06Z
+     résultat IMAGE_DIGEST : sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+     résultat IMAGE_URL : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb
+     pod s4b-deb-1-publier-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-publier : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-publier : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     place-scripts : commande ["sh"], 2 argument(s), dernier argument 1893 octets (reconstruit à sec : 59848)
+     conteneurs de pas : step-publier
+résultat de IMAGE_URL : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb
+résultat de IMAGE_DIGEST : sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+# fin 2026-11-18T10:59:58Z
