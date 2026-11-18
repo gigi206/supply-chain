@@ -31,6 +31,11 @@
 #               gardes avant toute création (pipeline relue au tag m4c, trois tâches dans la liste revue, politiques de builds,
 #               dépôt builds/sample-app-rpm absent, aucun PipelineRun du même nom, disque de sc-stockage, dry-run serveur) ; rien
 #               n'est purgé ; preuve imprimée avant toute assertion ; rpm comparé à celui de M3, artefact au digest du pod d'essai
+#   comparaison ajoutée le 18/11/2026 (préparée à sec, accord permanent du 18/11), NON LANCÉE ; lecture seule (cluster lu, Zot
+#               lu anonymement, rien n'est créé ni supprimé) : IMAGE_DIGEST des deux PipelineRuns relu, égal au digest de l'essai ;
+#               artefact tiré une fois, par ce digest épinglé, dans un dossier neuf ; manifeste, configuration et couche égaux à ceux
+#               de l'essai, couche au seul rpm ; rpm comparé à celui de M3 (sha256 et cmp) ; paquets du buildroot des deux
+#               journaux archivés de construire contre le verrou
 # Les étapes suivantes (taches, pipeline, comparaison, provenance) seront ajoutées après les essais.
 # Usage (racine du dépôt) : DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/m4c.sh <étape>…
 # (journal : resultats/m4c-<étape>.log)
@@ -772,6 +777,75 @@ etape_pipeline() { # deux PipelineRuns de sample-app-rpm (m4c-rpm-1, puis m4c-rp
     echo "/ de sc-stockage : $(libre_zot) octets libres à $(date -u +%H:%M:%S)"
   done
   mesure "deux exécutions, même artefact" "$(cat "$T/rpm-2.digest")" "$(cat "$T/rpm-1.digest")"
+  echo "écarts : $ECARTS"
+  [ "$ECARTS" = 0 ]
+}
+
+# Brique 05, M4c, étape comparaison (préparée à sec le 18/11/2026, accord permanent du 18/11) : lecture seule, sur le modèle de
+# etape_comparaison (s4d.sh de la 06) ; les deux PipelineRuns ont publié le même digest : un seul tirage, par la constante épinglée.
+COUCHE_ESSAI=sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4   # couche du pod d'essai (tar 1.34 de l'image)
+COUCHE_TAILLE=2181120
+CONFIG_ESSAI=sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688b351a53aa0cc4   # configuration du pod d'essai
+RPM_NOM=sample-app-1.0.0-2.el9.x86_64.rpm
+RPM_TAILLE=2173376
+confronter_artefact() { # layout travail : manifeste, configuration, couche et rpm confrontés à l'essai et à M3 ; hors ligne (banc)
+  local L=$1 a=$2 m g l
+  m=$L/blobs/sha256/${DIGEST_ESSAI#sha256:}
+  echo "blobs : $(find "$L/blobs" -type f | wc -l) ; index : $(jq -c '[.manifests[]? | {mediaType, digest}]' "$L/index.json" 2>&1)"
+  [ -f "$m" ] || echec "manifeste $DIGEST_ESSAI absent du layout"
+  echo "manifeste : $(jq -c '{mediaType, config: (.config | {mediaType, digest, size}), layers: [.layers[]? | {mediaType, digest, size}]}' "$m" 2>&1)"
+  attendu "manifeste : sha256 des octets lus" "sha256:$(sha256sum < "$m" | cut -c1-64)" "$DIGEST_ESSAI"
+  attendu "blobs du layout" "$(find "$L/blobs" -type f | wc -l)" 3
+  attendu "manifeste : types, nombre de couches" "$(jq -r '[.mediaType, .config.mediaType, (.layers | length), .layers[0].mediaType] | join(" ")' "$m")" \
+    "application/vnd.oci.image.manifest.v1+json application/vnd.oci.image.config.v1+json 1 application/vnd.oci.image.layer.v1.tar"
+  attendu "manifeste : couche (digest et taille), celle de l'essai" "$(jq -r '.layers[0] | "\(.digest) \(.size)"' "$m")" "$COUCHE_ESSAI $COUCHE_TAILLE"
+  attendu "manifeste : configuration, celle de l'essai" "$(jq -r '.config.digest' "$m")" "$CONFIG_ESSAI"
+  g=$L/blobs/sha256/${CONFIG_ESSAI#sha256:}; l=$L/blobs/sha256/${COUCHE_ESSAI#sha256:}
+  [ -f "$g" ] && [ -f "$l" ] || echec "configuration ou couche absente du layout"
+  echo "configuration : $(jq -c . "$g" 2>&1)"
+  attendu "configuration : sha256 et taille des octets lus" "sha256:$(sha256sum < "$g" | cut -c1-64) $(stat -c %s "$g")" "$CONFIG_ESSAI $(jq -r .config.size "$m")"
+  attendu "configuration : diff_ids, la couche non compressée" "$(jq -c '.rootfs.diff_ids' "$g")" "[\"$COUCHE_ESSAI\"]"
+  attendu "couche : sha256 et taille des octets lus" "sha256:$(sha256sum < "$l" | cut -c1-64) $(stat -c %s "$l")" "$COUCHE_ESSAI $COUCHE_TAILLE"
+  TZ=UTC tar -tvf "$l" > "$a/membres.txt" 2>&1 || true
+  echo "membres de la couche ($(wc -l < "$a/membres.txt")) :"; sed 's/^/     /' "$a/membres.txt"
+  attendu "couche : un membre, le rpm seul (mode, propriétaire, taille, date, nom)" "$(awk '{print $1, $2, $3, $4, $5, $6}' "$a/membres.txt")" \
+    "-rw-r--r-- 0/0 $RPM_TAILLE 1970-01-01 00:00 $RPM_NOM"
+  mkdir -p "$a/rpm"; tar -xf "$l" -C "$a/rpm" || echec "extraction de la couche"
+  echo "rpm tiré : $RPM_NOM, $(stat -c %s "$a/rpm/$RPM_NOM") octets, sha256 $(sha256sum < "$a/rpm/$RPM_NOM" | cut -c1-64)"
+  mesure "rpm tiré égal à celui de M3 (sha256)" "$(sha256sum < "$a/rpm/$RPM_NOM" | cut -c1-64)" "$RPM_M3_SHA"
+  mesure "rpm tiré égal au fichier de M3 (cmp)" "$(cmp -s "$a/rpm/$RPM_NOM" "$RPM_M3" && echo égal || echo différent)" égal
+}
+etape_comparaison() { # lecture seule : artefact tiré par digest (lecture anonyme) dans un dossier neuf, confronté à l'essai et à M3
+  local c=$T/comparaison i x n
+  rm -rf -- "${c:?}"; mkdir -p "$c/travail"
+  echo "## gardes"
+  attendu "rpm de M3 (build 1)" "$(sha256sum < "$RPM_M3" | cut -c1-64)" "$RPM_M3_SHA"
+  attendu "verrou (sha256)" "$(sha256sum < "$VERROU" | cut -c1-64)" "$VERROU_SHA"
+  for i in 1 2; do
+    x=$R/m4c-pipeline-$i-construire.log
+    [ -s "$x" ] || echec "journal archivé de construire absent : $x"
+    attendu "journal $i de construire : couche, configuration et manifeste" \
+      "$(lignes "^couche $COUCHE_ESSAI ($COUCHE_TAILLE octets) ; configuration $CONFIG_ESSAI ; manifeste $DIGEST_ESSAI$" "$x")" 1
+    attendu "IMAGE_DIGEST de m4c-rpm-$i (relu dans le cluster)" \
+      "$(kubectl get pipelinerun -n builds "m4c-rpm-$i" -o json < /dev/null | jq -r '.status.results[]? | select(.name == "IMAGE_DIGEST") | .value')" "$DIGEST_ESSAI"
+  done
+  echo "## buildroot des deux PipelineRuns contre le verrou (journaux archivés de construire)"
+  jq -r '.buildroot.rpms[] | "paquet \(.name) \(.version) \(.release) \(.arch) \(.sigmd5)"' "$VERROU" | sort > "$c/verrou.txt"
+  for i in 1 2; do
+    grep '^paquet ' "$R/m4c-pipeline-$i-construire.log" > "$c/paquets-$i.txt" || true
+    n=$(diff "$c/paquets-$i.txt" "$c/verrou.txt" | grep -c '^[<>]' || true)
+    echo "m4c-rpm-$i : paquets imprimés $(wc -l < "$c/paquets-$i.txt") ; lignes d'écart au verrou $n ; 5 premières :"
+    diff "$c/paquets-$i.txt" "$c/verrou.txt" | grep '^[<>]' | sed -n '1,5p' | cut -c1-200 | sed 's/^/     /' || true
+    mesure "m4c-rpm-$i : paquets du buildroot" "$(wc -l < "$c/paquets-$i.txt")" 222
+    mesure "m4c-rpm-$i : lignes d'écart au verrou (nom, version, release, arch, sigmd5)" "$n" 0
+  done
+  echo "## tirage par digest, lecture anonyme, dossier neuf"
+  oras cp --no-tty --from-ca-file "$P/ca-poc.crt" "${IMAGE/$REG/$REG_HOTE}@$DIGEST_ESSAI" --to-oci-layout "$c/layout:a" < /dev/null > "$c/cp.out" 2>&1 \
+    || { sed -n '1,5p' "$c/cp.out" >&2; echec "oras cp de l'artefact"; }
+  echo "tiré : $DIGEST_ESSAI ; du -sb du layout : $(du -sb "$c/layout" | cut -f1) octets (relevé)"
+  echo "## confrontation à l'essai et à M3"
+  confronter_artefact "$c/layout" "$c/travail"
+  echo "dossier tiré laissé : $c"
   echo "écarts : $ECARTS"
   [ "$ECARTS" = 0 ]
 }

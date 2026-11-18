@@ -1,0 +1,124 @@
+# m4c-comparaison-banc.sh, 2026-11-18T17:44:02Z ; m4c.sh avant d881b9671c61808a2bc1ea914fb6dab85ed7d3b2ab59ad70374e5284a1d0794c ; m4c.sh 150f2dda43782e84988745a99c1c075d31c6f9805d141ad64c5f6d5a794776fc
+## A : insertions seules, noms neufs, syntaxe, shellcheck
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+noms définis par l'ajout : CONFIG_ESSAI COUCHE_ESSAI COUCHE_TAILLE RPM_NOM RPM_TAILLE confronter_artefact etape_comparaison
+OK   noms de l'ajout déjà définis avant : 0
+OK   bash -n : ok
+OK   shellcheck : mêmes codes avant et après : mêmes
+## layouts du banc, tirés du layout réel de l'essai
+OK   image.tar de l'essai (sha256) : cf482963d8e29726700e81d3b46ee9f09552542c0ae5cca1efafb1e6b62bbae8
+OK   rpm de la couche de l'essai = rpm de M3 (sha256) : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+layouts écrits : base blob_en_plus config_alteree couche_alteree couche_autre couche_autre.env couches2
+OK   layout de base : blobs : 3
+## B : etape_comparaison, faux kubectl et faux oras
+### cas succes : code 0 ; tirages 1 ; appels hors lecture 0 ; sentinelles 0
+     OK   couche : un membre, le rpm seul (mode, propriétaire, taille, date, nom) : -rw-r--r-- 0/0 2173376 1970-01-01 00:00 sample-app-1.0.0-2.el9.x86_64.rpm
+     OK   rpm tiré égal à celui de M3 (sha256) : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+     OK   rpm tiré égal au fichier de M3 (cmp) : égal
+     écarts : 0
+OK   succes : appels de lecture seulement : 0
+OK   succes : message de condition jamais affiché : 0
+### cas digest_pr : code 1 ; tirages 0 ; appels hors lecture 0 ; sentinelles 0
+     OK   journal 1 de construire : couche, configuration et manifeste : 1
+     OK   IMAGE_DIGEST de m4c-rpm-1 (relu dans le cluster) : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   journal 2 de construire : couche, configuration et manifeste : 1
+     KO   IMAGE_DIGEST de m4c-rpm-2 (relu dans le cluster) : sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb (attendu : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7
+OK   digest_pr : appels de lecture seulement : 0
+OK   digest_pr : message de condition jamais affiché : 0
+### cas pr_absent : code 1 ; tirages 0 ; appels hors lecture 0 ; sentinelles 0
+     OK   rpm de M3 (build 1) : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+     OK   verrou (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+     OK   journal 1 de construire : couche, configuration et manifeste : 1
+     KO   IMAGE_DIGEST de m4c-rpm-1 (relu dans le cluster) :  (attendu : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119)
+OK   pr_absent : appels de lecture seulement : 0
+OK   pr_absent : message de condition jamais affiché : 0
+### cas journal_absent : code 1 ; tirages 0 ; appels hors lecture 0 ; sentinelles 0
+     OK   verrou (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+     OK   journal 1 de construire : couche, configuration et manifeste : 1
+     OK   IMAGE_DIGEST de m4c-rpm-1 (relu dans le cluster) : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     KO   journal archivé de construire absent : /home/gigi/.cache/supply-chain-poc/05/banc-m4c-comparaison-copie/journal_absent/W/resultats/m4c-pipeline-2-construire.log
+OK   journal_absent : appels de lecture seulement : 0
+OK   journal_absent : message de condition jamais affiché : 0
+### cas journal_autre : code 1 ; tirages 0 ; appels hors lecture 0 ; sentinelles 0
+     OK   rpm de M3 (build 1) : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+     OK   verrou (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+     KO   journal 1 de construire : couche, configuration et manifeste : 0 (attendu : 1)
+OK   journal_autre : appels de lecture seulement : 0
+OK   journal_autre : message de condition jamais affiché : 0
+### cas paquet_hors_verrou : code 1 ; tirages 1 ; appels hors lecture 0 ; sentinelles 0
+     OK   couche : un membre, le rpm seul (mode, propriétaire, taille, date, nom) : -rw-r--r-- 0/0 2173376 1970-01-01 00:00 sample-app-1.0.0-2.el9.x86_64.rpm
+     OK   rpm tiré égal à celui de M3 (sha256) : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+     OK   rpm tiré égal au fichier de M3 (cmp) : égal
+     écarts : 1
+OK   paquet_hors_verrou : appels de lecture seulement : 0
+OK   paquet_hors_verrou : message de condition jamais affiché : 0
+### cas oras_echec : code 1 ; tirages 1 ; appels hors lecture 0 ; sentinelles 0
+     OK   m4c-rpm-1 : lignes d'écart au verrou (nom, version, release, arch, sigmd5) : 0
+     OK   m4c-rpm-2 : paquets du buildroot : 222
+     OK   m4c-rpm-2 : lignes d'écart au verrou (nom, version, release, arch, sigmd5) : 0
+     KO   oras cp de l'artefact
+OK   oras_echec : appels de lecture seulement : 0
+OK   oras_echec : message de condition jamais affiché : 0
+### cas couches2 : code 1 ; tirages 1 ; appels hors lecture 0 ; sentinelles 0
+     OK   m4c-rpm-1 : lignes d'écart au verrou (nom, version, release, arch, sigmd5) : 0
+     OK   m4c-rpm-2 : paquets du buildroot : 222
+     OK   m4c-rpm-2 : lignes d'écart au verrou (nom, version, release, arch, sigmd5) : 0
+     KO   manifeste : sha256 des octets lus : sha256:c5646b2c33f5ddc12816c66a6ff01ad7a40869d4b224bb566ea38ac824b44762 (attendu : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119)
+OK   couches2 : appels de lecture seulement : 0
+OK   couches2 : message de condition jamais affiché : 0
+### cas blob_en_plus : code 1 ; tirages 1 ; appels hors lecture 0 ; sentinelles 0
+     OK   m4c-rpm-2 : paquets du buildroot : 222
+     OK   m4c-rpm-2 : lignes d'écart au verrou (nom, version, release, arch, sigmd5) : 0
+     OK   manifeste : sha256 des octets lus : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     KO   blobs du layout : 4 (attendu : 3)
+OK   blob_en_plus : appels de lecture seulement : 0
+OK   blob_en_plus : message de condition jamais affiché : 0
+### cas config_alteree : code 1 ; tirages 1 ; appels hors lecture 0 ; sentinelles 0
+     OK   manifeste : types, nombre de couches : application/vnd.oci.image.manifest.v1+json application/vnd.oci.image.config.v1+json 1 application/vnd.oci.image.layer.v1.tar
+     OK   manifeste : couche (digest et taille), celle de l'essai : sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4 2181120
+     OK   manifeste : configuration, celle de l'essai : sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688b351a53aa0cc4
+     KO   configuration : sha256 et taille des octets lus : sha256:26b257e030740f1350384cb5f4f6a717ebb5c1bf5cd6e757f782dc06b8ee7438 151 (attendu : sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688
+OK   config_alteree : appels de lecture seulement : 0
+OK   config_alteree : message de condition jamais affiché : 0
+### cas couche_alteree : code 1 ; tirages 1 ; appels hors lecture 0 ; sentinelles 0
+     OK   manifeste : configuration, celle de l'essai : sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688b351a53aa0cc4
+     OK   configuration : sha256 et taille des octets lus : sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688b351a53aa0cc4 151
+     OK   configuration : diff_ids, la couche non compressée : ["sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4"]
+     KO   couche : sha256 et taille des octets lus : sha256:d600e2d819211387272623fe430bdead1990bbad64d52e96a793f8bd7ce97d19 2181120 (attendu : sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda8
+OK   couche_alteree : appels de lecture seulement : 0
+OK   couche_alteree : message de condition jamais affiché : 0
+### cas m3_modifie : code 1 ; tirages 0 ; appels hors lecture 0 ; sentinelles 0
+     KO   rpm de M3 (build 1) : 740b1454280f9f116d81b3c86b52f3616aac5551e74fad955899370e87f81dca (attendu : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f)
+OK   m3_modifie : appels de lecture seulement : 0
+OK   m3_modifie : message de condition jamais affiché : 0
+OK   succes : code, tirages, OK, ÉCART ou KO : 0 1 21 0
+OK   succes : appels (deux lectures de PipelineRun, un tirage) : 3
+OK   succes : membres imprimés, rpm tiré, écarts : 1 1 écarts : 0
+OK   succes : paquets confrontés au verrou : 2
+OK   succes : rpm extrait dans le dossier de travail : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+OK   digest_pr : code, tirages, KO : 1 0 KO   IMAGE_DIGEST de m4c-rpm-2 (relu dans le cluster) : sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb (attendu : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119)
+OK   pr_absent : code, tirages, KO : 1 0 KO   IMAGE_DIGEST de m4c-rpm-1 (relu dans le cluster) :  (attendu : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119)
+OK   journal_absent : code, tirages, KO : 1 0 KO   journal archivé de construire absent : /home/gigi/.cache/supply-chain-poc/05/banc-m4c-comparaison-copie/journal_absent/W/resultats/m4c-pipeline-2-construire.log
+OK   journal_autre : code, tirages, KO : 1 0 KO   journal 1 de construire : couche, configuration et manifeste : 0 (attendu : 1)
+OK   paquet_hors_verrou : code, tirages, ÉCART, OK, écarts : 1 1 ÉCART m4c-rpm-1 : lignes d'écart au verrou (nom, version, release, arch, sigmd5) : 2 (attendu : 0) / 20 écarts : 1
+OK   paquet_hors_verrou : lignes d'écart imprimées : 2
+OK   oras_echec : code, KO, erreur d'oras imprimée avant : 1 KO   oras cp de l'artefact avant
+OK   couches2 : code, KO, manifeste à deux couches imprimé avant : 1 1 avant
+OK   blob_en_plus : code, KO : 1 KO   blobs du layout : 4 (attendu : 3)
+OK   config_alteree : code, KO : 1 1
+OK   couche_alteree : code, KO : 1 1
+OK   m3_modifie : code, tirages, KO : 1 0 1
+## C : confronter_artefact seule
+     /home/gigi/.cache/supply-chain-poc/05/banc-m4c-comparaison-copie/C/rpm_autre.out:OK   configuration : diff_ids, la couche non compressée : ["sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95b
+     /home/gigi/.cache/supply-chain-poc/05/banc-m4c-comparaison-copie/C/rpm_autre.out:OK   couche : sha256 et taille des octets lus : sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4
+     /home/gigi/.cache/supply-chain-poc/05/banc-m4c-comparaison-copie/C/rpm_autre.out:membres de la couche (1) :
+     /home/gigi/.cache/supply-chain-poc/05/banc-m4c-comparaison-copie/C/rpm_autre.out:     -rw-r--r-- 0/0         2173376 1970-01-01 00:00 sample-app-1.0.0-2.el9.x86_64.rpm
+     /home/gigi/.cache/supply-chain-poc/05/banc-m4c-comparaison-copie/C/rpm_autre.out:OK   couche : un membre, le rpm seul (mode, propriétaire, taille, date, nom) : -rw-r--r-- 0/0 2173376 1970-01-01 00:00
+     /home/gigi/.cache/supply-chain-poc/05/banc-m4c-comparaison-copie/C/rpm_autre.out:ÉCART rpm tiré égal à celui de M3 (sha256) : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f (atte
+     /home/gigi/.cache/supply-chain-poc/05/banc-m4c-comparaison-copie/C/rpm_autre.out:ÉCART rpm tiré égal au fichier de M3 (cmp) : différent (attendu : égal)
+     /home/gigi/.cache/supply-chain-poc/05/banc-m4c-comparaison-copie/C/rpm_autre.out:écarts : 2
+OK   couche_autre : code, OK avant le KO, membres imprimés avant : 1 8 avant
+OK   couche_autre : rien d'extrait : 0
+OK   rpm_autre : code, ÉCART, KO, écarts : 0 2 0 écarts : 2
+# bilan : 52 OK, 0 KO ; fin 2026-11-18T17:44:04Z

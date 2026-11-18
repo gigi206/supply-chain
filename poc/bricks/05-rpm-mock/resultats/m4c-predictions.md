@@ -348,3 +348,60 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 - `comparaison` doit tirer l'artefact de Zot par digest et confronter son rpm à celui de M3 ;
 - `provenance` doit vérifier les attestations (cosign, sujet, `resolvedDependencies` avec les trois entrées et le commit, Kata dans la spec signée de `construire`, époque `1793229566`).
 - La porte ne connaît toujours pas `construire-rpm` (choix du propriétaire).
+
+## Note datée du 18/11/2026, écrite à 17:45:09 UTC : étape `comparaison` préparée à sec et appliquée (accord permanent du 18/11), NON LANCÉE ; prédictions CM1 à CM8
+
+**Modèle** : `etape_comparaison` de `s4d.sh` (06), avec les gardes de celle de M4b. Lecture seule : le cluster est lu (`kubectl get pipelinerun`), Zot est lu anonymement (`oras cp` vers un layout local) ; rien n'est créé, poussé ni supprimé.
+
+**Ce que fait l'étape**
+1. **Gardes** (`attendu`, arrêt) :
+   - sha256 du rpm de M3 et du verrou ;
+   - dans chacun des deux journaux archivés de `construire` (`m4c-pipeline-1` et `-2-construire.log`), la ligne de couche, de configuration et de manifeste de l'essai ;
+   - `IMAGE_DIGEST` de `m4c-rpm-1` et `m4c-rpm-2`, relu dans le cluster, égal au digest de l'essai (`07b7bd6f…`).
+2. **Buildroot** (`mesure`) : lignes « paquet » des deux journaux archivés contre le verrou (nom, version, release, arch, sigmd5) ; 222 paquets et aucune ligne d'écart attendus. C'était un simple relevé dans `pipeline`.
+3. **Tirage** : `oras cp` par le digest épinglé `DIGEST_ESSAI`, et non par les fichiers de `$T`, vers un layout dans un dossier neuf. Un seul tirage, puisque les deux PipelineRuns ont publié le même digest.
+4. **Confrontation** (`attendu`, preuve imprimée avant) :
+   - sha256 du manifeste lu ; 3 blobs (nombre imprimé avant d'être exigé) ;
+   - types du manifeste et de la configuration, une couche `…layer.v1.tar` ;
+   - couche `ac3e3ef1…` (2 181 120 octets) et configuration `48c5e332…`, celles de l'essai, relues octet par octet ; `diff_ids` égal à la couche ;
+   - un seul membre : `-rw-r--r-- 0/0 2173376 1970-01-01 00:00 sample-app-1.0.0-2.el9.x86_64.rpm`.
+5. **Rpm** (`mesure`) : extrait seulement après le contrôle du membre ; sha256 égal à `864d55f4…` et `cmp` égal au fichier de M3.
+
+**Préparation**
+- `m4c.sh` passe de `d881b967…` à `150f2dda…` par deux insertions (5 lignes d'en-tête, 69 lignes avant `lancer`), appliquées à 17:44:19 UTC (`date -u` de la commande de copie).
+- Banc [m4c-comparaison-banc.sh](m4c-comparaison-banc.sh) (`b3761320…`) :
+  - vrais : la fonction de l'étape et `confronter_artefact`, le verrou, les deux journaux archivés de `construire`, et le layout réel du pod d'essai (`image.tar`, digest `07b7bd6f…`), d'où le rpm de M3 du banc, contrôlé par son sha256 ;
+  - faux : `kubectl` (lecture des PipelineRuns, message de condition sentinelle) et `oras cp` (copie d'un layout du banc) ;
+  - **52 OK** sur la copie ([journal](m4c-comparaison-banc.log)), puis **52 OK** sur le dépôt ([journal](m4c-comparaison-banc-applique.log)), du premier coup.
+- **14 cas** au banc :
+  - succès (21 OK) ;
+  - arrêts avant tirage : `IMAGE_DIGEST` divergent, PipelineRun absent, journal absent, ligne de couche absente du journal, rpm de M3 altéré ;
+  - écart mesuré, sans arrêt : paquet hors verrou ;
+  - arrêts après tirage : échec d'`oras` (erreur imprimée avant), manifeste à deux couches (imprimé avant), blob en plus, configuration altérée, couche altérée ;
+  - `confronter_artefact` seule : couche à deux membres (membres imprimés avant le KO, rien d'extrait) ; rpm de référence autre (deux ÉCART, aucun KO).
+
+  Dans chaque cas : seuls des appels de lecture (`kubectl get pipelinerun`, `oras cp`), et le message de condition n'est jamais affiché.
+- Non couvert par le banc : Zot (lecture anonyme réelle, forme du layout écrit par `oras cp`), Tekton, Chains, réseau.
+- Pas de relevé avant : l'étape n'écrit ni dans le cluster ni dans Zot.
+
+**Ce que l'étape ne mesure pas**
+- L'hôte n'a pas `rpm` : ni NEVRA, ni BUILDTIME ne sont lus sur le rpm tiré. Les journaux de `construire` donnent `BUILDTIME 1794787200`, qui n'est pas l'époque `1793229566` de l'option (i) ; rien n'est prédit sur leur rapport.
+- La couche n'est pas refaite avec le `tar` de l'hôte : son digest serait `4af5e17f…`, propre à l'hôte (note de l'essai).
+
+**Prédictions de `comparaison`**
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| CM1 | Gardes passées : rpm de M3 et verrou conformes ; ligne de couche présente dans les deux journaux ; `IMAGE_DIGEST` des deux PipelineRuns égal à `07b7bd6f…` | Haute : journaux archivés relus au banc ; PL9 |
+| CM2 | 222 paquets et aucune ligne d'écart au verrou, aux deux PipelineRuns | Haute : relevé de `pipeline` |
+| CM3 | `oras cp` réussit en lecture anonyme | Haute : `oras manifest fetch` anonyme réussi dans `pipeline` ; même forme qu'en S4d (06) |
+| CM4 | Layout de 3 blobs | Moyenne : forme du layout écrit par `oras cp` jamais comptée dans cette brique |
+| CM5 | Manifeste, configuration et couche égaux à ceux de l'essai, relus octet par octet ; `diff_ids` égal à la couche | Haute : adressage par contenu, manifeste `07b7bd6f…` égal à celui de l'essai |
+| CM6 | Un seul membre, le rpm, `-rw-r--r-- 0/0`, 2 173 376 octets, date 0 | Haute : [comparaison des couches](m4c-essai-couches.log) de l'essai |
+| CM7 | Rpm tiré égal à celui de M3 (sha256 `864d55f4…` et `cmp`) | Haute : suit CM5 et CM6 |
+| CM8 | Code 0, 21 OK, aucun écart ; moins d'une minute | Moyenne-haute : banc ; un seul tirage d'environ 2 Mo |
+
+**Après le passage**
+- Tout tenu : `provenance` (attestations de Chains sur `07b7bd6f…`), puis bilan de M4c et additif ADR.
+- CM4 seule non tenue (autre nombre de blobs) : lire le layout écrit par `oras cp` avant toute correction.
+- CM5 à CM7 non tenues : l'artefact de Zot n'est pas celui qu'a relevé `pipeline`. Arrêt, et décision avec le propriétaire avant `provenance`.
