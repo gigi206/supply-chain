@@ -1,0 +1,13 @@
+# relevé « avant » de l'étape pipeline de M4c (lecture seule) : builds/sample-app-rpm, tekton/pipelines/sample-app-rpm, catalogue de Zot, df de / sur sc-stockage, PVC et PipelineRuns m4c-rpm-* de builds
+2026-11-18T15:37:47Z
+## builds/sample-app-rpm
+Error: reading tags for 192.168.161.13:5000/builds/sample-app-rpm: GET https://192.168.161.13:5000/v2/builds/sample-app-rpm/tags/list?n=1000: NAME_UNKNOWN: repository name not known to registry; map[description:This is returned if the name used during an operation is unknown to the registry. name:builds/sample-app-rpm]
+rc 1
+## tekton/pipelines/sample-app-rpm
+m4c sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+rc 0
+## catalogue : 151 dépôts
+Mounted on        Used      Avail
+/          15573082112 4447834112
+## builds : 18 PVC ; PipelineRuns m4c-rpm-* : 
+2026-11-18T15:37:48Z

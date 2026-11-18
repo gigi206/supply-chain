@@ -1,0 +1,208 @@
+# m4c-pipeline-banc.sh, 2026-11-18T15:36:22Z ; m4c.sh avant d2d895d979b78cddd40a49898709f3a72070f7e79fadccef765d13508d0b42e9 ; m4c.sh d881b9671c61808a2bc1ea914fb6dab85ed7d3b2ab59ad70374e5284a1d0794c
+## A : insertions seules, noms neufs, syntaxe, shellcheck
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+noms définis par l'ajout : CONSTRUIRE_REF DIGEST_ESSAI MASQUE PIPELINE_REF PREPARER_REF PVC_TAILLE attendre_pr etape_pipeline lignes pr_m4c releve_pod statut_pr
+OK   noms de l'ajout déjà définis avant : 0
+OK   bash -n : ok
+OK   shellcheck : mêmes codes avant et après : mêmes
+## B : etape_pipeline, faux kubectl et faux oras
+### cas succes : code 0 ; créations 2 ; suppressions 0 ; sentinelles 0
+     OK   publier : ligne de publication : 1
+     OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 1
+     OK   digest de l'artefact égal à celui du pod d'essai : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   PipelineRun m4c-rpm-2 signé par Chains : true
+     OK   deux exécutions, même artefact : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     écarts : 0
+OK   succes : aucune suppression : 0
+OK   succes : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas digest_autre : code 1 ; créations 2 ; suppressions 0 ; sentinelles 0
+     OK   publier : ligne de publication : 1
+     OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 1
+     ÉCART digest de l'artefact égal à celui du pod d'essai : sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa (attendu : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f
+     OK   PipelineRun m4c-rpm-2 signé par Chains : true
+     OK   deux exécutions, même artefact : sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+     écarts : 2
+OK   digest_autre : aucune suppression : 0
+OK   digest_autre : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas divergents : code 1 ; créations 2 ; suppressions 0 ; sentinelles 0
+     OK   publier : ligne de publication : 1
+     OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb 1
+     ÉCART digest de l'artefact égal à celui du pod d'essai : sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb (attendu : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f
+     OK   PipelineRun m4c-rpm-2 signé par Chains : true
+     ÉCART deux exécutions, même artefact : sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb (attendu : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119)
+     écarts : 2
+OK   divergents : aucune suppression : 0
+OK   divergents : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas rpm_autre : code 1 ; créations 2 ; suppressions 0 ; sentinelles 0
+     OK   publier : ligne de publication : 1
+     OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 1
+     OK   digest de l'artefact égal à celui du pod d'essai : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   PipelineRun m4c-rpm-2 signé par Chains : true
+     OK   deux exécutions, même artefact : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     écarts : 2
+OK   rpm_autre : aucune suppression : 0
+OK   rpm_autre : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas echec_construire : code 1 ; créations 1 ; suppressions 0 ; sentinelles 0
+     OK   m4c-rpm-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+          conteneur step-sources : terminated code 0 raison Completed
+          conteneur step-entrees : terminated code 0 raison Completed
+          conteneur step-assemblage : terminated code 0 raison Completed
+          conteneur step-construire : terminated code 1 raison Error
+     KO   PipelineRun m4c-rpm-1 : False|Failed (attendu : True|Succeeded)
+OK   echec_construire : aucune suppression : 0
+OK   echec_construire : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas echec_publier : code 1 ; créations 1 ; suppressions 0 ; sentinelles 0
+          conteneur step-sources : terminated code 0 raison Completed
+          conteneur step-entrees : terminated code 0 raison Completed
+          conteneur step-assemblage : terminated code 0 raison Completed
+          conteneur step-construire : terminated code 0 raison Completed
+          conteneur step-publier : terminated code 1 raison Error
+     KO   PipelineRun m4c-rpm-1 : False|Failed (attendu : True|Succeeded)
+OK   echec_publier : aucune suppression : 0
+OK   echec_publier : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas sans_kata : code 1 ; créations 1 ; suppressions 0 ; sentinelles 0
+          conteneur step-assemblage : terminated code 0 raison Completed
+          conteneur step-construire : terminated code 0 raison Completed
+          conteneur step-publier : terminated code 0 raison Completed
+     OK   PipelineRun m4c-rpm-1 : True|Succeeded
+     OK   m4c-rpm-1, preparer : tekton.dev/task|runtimeClassName|nœud : preparer-rpm||sc-build
+     KO   m4c-rpm-1, construire : tekton.dev/task|runtimeClassName|nœud : construire-rpm||sc-build (attendu : construire-rpm|kata|sc-build)
+OK   sans_kata : aucune suppression : 0
+OK   sans_kata : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas label_faux : code 1 ; créations 1 ; suppressions 0 ; sentinelles 0
+          conteneur step-entrees : terminated code 0 raison Completed
+          conteneur step-assemblage : terminated code 0 raison Completed
+          conteneur step-construire : terminated code 0 raison Completed
+          conteneur step-publier : terminated code 0 raison Completed
+     OK   PipelineRun m4c-rpm-1 : True|Succeeded
+     KO   m4c-rpm-1, preparer : tekton.dev/task|runtimeClassName|nœud : preparer-deb||sc-build (attendu : preparer-rpm||sc-build)
+OK   label_faux : aucune suppression : 0
+OK   label_faux : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas temoin_manquant : code 1 ; créations 1 ; suppressions 0 ; sentinelles 0
+     OK   preparer : CHAINS-GIT_URL et CHAINS-GIT_COMMIT : CHAINS-GIT_COMMIT=6391fd437f26696847041be3226bbbf633f55a2f CHAINS-GIT_URL=https://sc-stockage.poc.test:3000/workspace/sample-app.git
+     OK   preparer : FERMETURE_RPM_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c","uri":"oci://sc-stockage.poc.test:5000/builds/fermet
+     OK   preparer : FERMETURE_SOURCES_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21","uri":"oci://sc-stockage.poc.test:5000/builds/fe
+     OK   preparer : PACKAGING_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8","uri":"oci://sc-stockage.poc.test:5000/entrees/sample-ap
+     OK   construire : écriture refusée sur les entrées (ligne du script atteinte) : 1
+     KO   construire : témoins réseau en échec : 3 (attendu : 4)
+OK   temoin_manquant : aucune suppression : 0
+OK   temoin_manquant : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas couches2 : code 1 ; créations 1 ; suppressions 0 ; sentinelles 0
+     OK   construire : src.rpm égal à celui de M3 : c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128
+     OK   construire : rpm égal à celui de M3 : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+     OK   dépôt publié : sc-stockage.poc.test:5000/builds/sample-app-rpm
+     OK   construire : DIGEST_CONSTRUIT égal au digest publié : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   publier : ligne de publication : 1
+     KO   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 2 (attendu : sha256:07b7bd6feb489bff10aa92b7fd
+OK   couches2 : aucune suppression : 0
+OK   couches2 : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas existe : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+     OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+     OK   dépôt sc-stockage.poc.test:5000/builds/sample-app-rpm absent avant le premier PipelineRun : 1
+     KO   m4c-rpm-1 existe déjà : rien n'est purgé, décision avant toute relance
+OK   existe : aucune suppression : 0
+OK   existe : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas depot_present : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+     OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+     KO   dépôt sc-stockage.poc.test:5000/builds/sample-app-rpm absent avant le premier PipelineRun : 0 (attendu : 1)
+OK   depot_present : aucune suppression : 0
+OK   depot_present : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas plein : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+     OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+     OK   dépôt sc-stockage.poc.test:5000/builds/sample-app-rpm absent avant le premier PipelineRun : 1
+     KO   espace libre illisible ou sous la garde sur sc-stockage
+OK   plein : aucune suppression : 0
+OK   plein : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas pipeline_autre : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   pipeline écrite par l'étape taches : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+     KO   pipeline relue dans Zot au tag m4c (lecture anonyme) : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc (attendu :
+OK   pipeline_autre : aucune suppression : 0
+OK   pipeline_autre : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas ref_autre : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     KO   pipeline écrite par l'étape taches : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd (attendu : sc-stockage.poc
+OK   ref_autre : aucune suppression : 0
+OK   ref_autre : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas non_listee : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   pipeline écrite par l'étape taches : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+     OK   pipeline relue dans Zot au tag m4c (lecture anonyme) : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+     KO   absente de la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+OK   non_listee : aucune suppression : 0
+OK   non_listee : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas politique_absente : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   pipeline écrite par l'étape taches : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+     OK   pipeline relue dans Zot au tag m4c (lecture anonyme) : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     KO   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [] (attendu : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]])
+OK   politique_absente : aucune suppression : 0
+OK   politique_absente : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas refus_admission : code 1 ; créations 0 ; suppressions 0 ; sentinelles 0
+     OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+     OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+     OK   dépôt sc-stockage.poc.test:5000/builds/sample-app-rpm absent avant le premier PipelineRun : 1
+     OK   m4c-rpm-1 : podTemplate commun sans env ; Kata pour construire seule : [false,["construire:kata"]]
+     KO   m4c-rpm-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 1 (attendu : 0)
+OK   refus_admission : aucune suppression : 0
+OK   refus_admission : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+### cas en_cours : code 1 ; créations 1 ; suppressions 0 ; sentinelles 0
+     OK   m4c-rpm-1 : podTemplate commun sans env ; Kata pour construire seule : [false,["construire:kata"]]
+     OK   m4c-rpm-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+          conteneur step-sources : terminated code 0 raison Completed
+          conteneur step-entrees : terminated code 0 raison Completed
+          conteneur step-assemblage : terminated code 0 raison Completed
+     KO   PipelineRun m4c-rpm-1 : Unknown|Running (attendu : True|Succeeded)
+OK   en_cours : aucune suppression : 0
+OK   en_cours : ni message de condition, ni variable d'environnement, ni ligne de jeton affichés ou archivés : 0
+OK   succes : code, créations, dry-run : 0 2 2
+OK   succes : OK : 61
+OK   succes : aucun ÉCART ni KO : 0
+OK   succes : deux exécutions, même artefact : 1
+OK   succes : journaux de construire archivés (deux), masqués : m4c-pipeline-1-construire.log m4c-pipeline-2-construire.log 1
+OK   succes : lignes « paquet » non répétées dans la sortie : 0
+OK   succes : relevé des écarts au verrou : 2
+OK   succes : podTemplate de construire avec Kata, envoyé au dry-run puis créé : [{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"tolerations":[{"key":"zone","operator":"Equal","value":"build","effect":"NoSchedule"}],"securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"runtimeClassName":"kata"}}]
+OK   digest_autre : code, créations, ÉCART, écarts : 1 2 2 écarts : 2
+OK   divergents : code, créations, ÉCART : 1 2 1 écarts : 2
+OK   rpm_autre : code, créations, ÉCART : 1 2 2
+OK   echec_construire : code, créations, KO : 1 1 KO   PipelineRun m4c-rpm-1 : False|Failed (attendu : True|Succeeded)
+OK   echec_publier : code, créations, KO : 1 1 KO   PipelineRun m4c-rpm-1 : False|Failed (attendu : True|Succeeded)
+OK   echec_construire : code 1 et journal imprimés avant le KO : avant
+OK   echec_construire : journal archivé : 1
+OK   echec_publier : refus de lecture imprimé avant le KO : avant
+OK   sans_kata : KO : KO   m4c-rpm-1, construire : tekton.dev/task|runtimeClassName|nœud : construire-rpm||sc-build (attendu : construire-rpm|kata|sc-build)
+OK   label_faux : KO : KO   m4c-rpm-1, preparer : tekton.dev/task|runtimeClassName|nœud : preparer-deb||sc-build (attendu : preparer-rpm||sc-build)
+OK   temoin_manquant : KO : KO   construire : témoins réseau en échec : 3 (attendu : 4)
+OK   couches2 : KO : KO   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 2 (attendu : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 1)
+OK   sans_kata : code, créations : 1 1
+OK   label_faux : code, créations : 1 1
+OK   temoin_manquant : code, créations : 1 1
+OK   couches2 : code, créations : 1 1
+OK   existe : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   depot_present : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   plein : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   pipeline_autre : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   ref_autre : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   non_listee : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   politique_absente : arrêt avant toute création (code, créations, dry-run) : 1 0 0
+OK   existe : KO : KO   m4c-rpm-1 existe déjà : rien n'est purgé, décision avant toute relance
+OK   plein : KO : KO   espace libre illisible ou sous la garde sur sc-stockage
+OK   non_listee : KO : KO   absente de la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+OK   politique_absente : KO : KO   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [] (attendu : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]])
+OK   refus_admission : code, créations, dry-run : 1 0 1
+OK   en_cours : code, créations, KO après relevé : 1 1 1
+OK   en_cours : attente de 1800 lectures : 1801
+# bilan : 81 OK, 0 KO ; fin 2026-11-18T15:37:09Z

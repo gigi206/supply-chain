@@ -241,3 +241,85 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 - **TP4 tenue** : dépôt de la pipeline créé avec le seul tag `m4c`, au digest affiché ; tags des tâches inchangés ; catalogue de 150 à 151 dépôts.
 
 **Suite** : étape `pipeline` (deux PipelineRuns), à préparer à sec. Points ouverts : PVC sous `subPath` et Kata, `env` et `HOME` de Tekton, lecture par `publier-image` (UID 65532) de ce que root a écrit. La porte ne connaît pas encore `construire-rpm` : choix du propriétaire.
+
+## Note datée du 18/11/2026, écrite à 15:39:14 UTC : étape `pipeline` préparée à sec et appliquée (accord permanent du 18/11), NON LANCÉE ; prédictions PL1 à PL12
+
+**Modèle**
+- Déroulé de `etape_rpm` de `m4b.sh` : gardes avant toute création, aucune purge, preuve imprimée avant toute assertion, jamais le message d'une condition.
+- Forme du PipelineRun de `s4d.sh` de la 06 : Kata pour la seule tâche `construire`, par `taskRunSpecs` ; podTemplate de M4b, sans `env`.
+- Trois lignes de `s4d.sh` ne sont pas reprises : `purger_pr` ; `fin_pr`, qui imprime le message de la condition ; le filtre `grep -viE`, remplacé par le masquage de règle.
+
+**Ce que fait l'étape**
+1. **Gardes, avant toute création :**
+   - `$T/sample-app-rpm.ref` égal à `PIPELINE_REF` (`ca874375…`), pipeline relue au tag `m4c` en lecture anonyme ;
+   - `preparer-rpm`, `construire-rpm` et `publier-image` dans la liste revue (`listee`) ;
+   - politiques de builds relues : `construction-rpm-sans-sortie` présente, aucune autre ne laisse passer `construire-rpm` ;
+   - pour chaque PipelineRun : dépôt `builds/sample-app-rpm` absent (au premier seulement), aucun PipelineRun du même nom, au moins 1 Gio libre sur `/` de sc-stockage, podTemplate sans `env` et Kata pour `construire` seule, dry-run serveur.
+2. **`m4c-rpm-1`, puis `m4c-rpm-2`** : création, attente de 3 600 s au plus, puis relevés :
+   - de chaque TaskRun : condition, résultats ;
+   - de chaque pod : nœud, `runtimeClassName`, label, états et ressources des conteneurs ;
+   - des journaux de chaque pas, masqués. Celui de `construire` est archivé, masqué, sous `resultats/m4c-pipeline-<i>-construire.log`.
+3. **Exigé** (`attendu`, arrêt) :
+   - PipelineRun `True|Succeeded` ;
+   - pour chaque pod : label, nœud `sc-build`, `runtimeClassName` (`kata` pour `construire-rpm` seule) ;
+   - résultats de `preparer` : dépôt, commit, trois entrées par digest ;
+   - dans le journal de `construire` : écriture refusée sur les entrées, quatre témoins réseau en échec, 222 rpm confrontés au verrou, `mock --hermetic-build` rc 0, aucun repli en chroot, aucune ligne http, dernière ligne atteinte ;
+   - `DIGEST_CONSTRUIT` égal au digest publié, ligne de publication de `publier-image`, manifeste relu dans Zot (descripteur, une couche) ;
+   - signature de Chains.
+4. **Mesuré sans arrêt** (`mesure`, code 1 à la fin en cas d'écart) :
+   - Source0, src.rpm et rpm, contre M3 ;
+   - digest de l'artefact, contre celui du pod d'essai (`07b7bd6f…`, et non `7b17e7e7…`, celui de `prealables`) ;
+   - même artefact aux deux PipelineRuns.
+
+**Préparation**
+- `m4c.sh` passe de `d2d895d9…` à `d881b967…` par deux insertions (5 lignes d'en-tête, 144 lignes avant `lancer`), appliquées à 15:36:22 UTC (`date -u` de la commande de copie).
+- PVC de 2 Gi, contre 1 Gi en M4b : `entrees/` de `prealables` pèse 318 609 833 octets, et `image.tar` de l'essai 2 191 360.
+- Banc [m4c-pipeline-banc.sh](m4c-pipeline-banc.sh) (`b61e5e48…`) :
+  - vrais : la fonction de l'étape, le verrou, la liste revue, `listee`, `selecteurs.jq`, et le journal réel du pod d'essai pour `construire` ;
+  - faux : `kubectl`, `oras`, `sur`, `signe`, `sleep` ;
+  - **81 OK** sur la copie ([journal](m4c-pipeline-banc.log)), puis **81 OK** sur le dépôt ([journal](m4c-pipeline-banc-applique.log)) ;
+  - un premier passage donnait 79 OK et 2 KO ([journal](m4c-pipeline-banc-passage1.log)). Deux contrôles du banc coupaient le message attendu (`cut -c`, en octets). Ils ont été corrigés dans le banc ; l'étape n'a pas changé.
+- **19 cas** au banc :
+  - succès ;
+  - écarts mesurés : digest autre que l'essai, digests divergents, rpm autre que M3 ;
+  - échecs : `construire`, puis `publier`, preuve imprimée avant le KO ; `construire` sans Kata ; label faux ; témoin réseau absent ; deux couches ;
+  - arrêts avant création : PipelineRun déjà présent, dépôt déjà présent, disque bas, pipeline autre au tag `m4c`, référence de `taches` autre, tâche hors de la liste revue, politique de M3 absente ;
+  - refus à l'admission ; PipelineRun jamais terminé.
+
+  Dans chaque cas : aucune suppression. Le message de condition, la variable d'environnement et la ligne de jeton sentinelles ne sont jamais affichés ni archivés.
+- Non couvert par le banc : Tekton (résolveur, Trusted Resources, pods et montages réels), Kata, Kyverno, Chains, Zot, réseau.
+
+**Relevé avant** ([journal](m4c-pipeline-zot-avant.log), 15:37:47 UTC)
+- `builds/sample-app-rpm` en `NAME_UNKNOWN` ; pipeline au seul tag `m4c` (`ca874375…`) ; catalogue de 151 dépôts.
+- 4 447 834 112 octets libres sur `/` de sc-stockage.
+- 18 PVC dans `builds`, aucun PipelineRun `m4c-rpm-*`.
+
+**Ce qui diffère de l'essai** (lecture, non mesuré)
+- **VM plus petite.** Le pod de `construire` n'a qu'un conteneur de pas ; l'essai avait en plus `remplir` (1 CPU, 1 Gi).
+  - Sous Tekton, le journal de `construire-deb` (06) donne 3 vCPU et 6 119 664 kB ; l'essai rpm, 4 vCPU et 7 151 664 kB.
+  - La capacité de `/w` (tmpfs, moitié de la mémoire) passerait d'environ 3,58 à 3,06 Go. L'essai en utilisait 1,46 Go après mock.
+- **Lancement.** Tekton lance le script depuis `/tekton/scripts`, par son shebang, et non par `kubectl exec bash`. Le script n'utilise ni `HOME` ni chemin relatif ; `preparer-rpm` et `publier-image` fixent `HOME=/tmp`.
+- **Entrées.** Elles sont écrites par `preparer-rpm` (UID 65532) sur le PVC, et non déballées dans un `emptyDir`. Root les lit sous Kata, via `subPath`, en lecture seule.
+- **Première mesure.** `publier-image` (UID 65532, runc) lit `image.tar` que root a écrit sous Kata (umask 022), via virtiofs, dans le sous-dossier `image/`. À l'essai, c'est root qui l'a relu. En 06, `construire-deb` écrivait en UID 1000.
+
+**Prédictions de `pipeline`**
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| PL1 | Gardes passées : pipeline `ca874375…` au tag `m4c`, trois tâches listées, politiques conformes, dépôt absent, disque au-dessus de la garde, deux dry-runs admis | Haute : relevé avant ; forme de dry-run de s4d (06) |
+| PL2 | `m4c-rpm-1` et `m4c-rpm-2` terminés en succès (statut `True`, raison `Succeeded`) ; code 0 | Moyenne : première exécution de ces tâches sous Tekton ; voir PL8 |
+| PL3 | `preparer-rpm` et `publier-image` sans `runtimeClassName`, `construire-rpm` sous `kata`, tous sur `sc-build`, labels conformes | Haute : forme de s4d (06) |
+| PL4 | Résultats de `preparer` égaux aux références (dépôt, commit, trois entrées) | Haute : essai_preparer |
+| PL5 | Journal de `construire` : écriture refusée, quatre témoins en échec, 222 rpm, mock rc 0, aucun repli, aucune ligne http | Haute : essai ; mêmes script, image et entrées |
+| PL6 | Source0 `07521c1e…`, src.rpm `c802e60a…` et rpm `864d55f4…` (M3) aux deux PipelineRuns | Moyenne : VM plus petite qu'à l'essai (PL7) ; effet du nombre de vCPU sur le rpm non mesuré |
+| PL7 | Relevé, non exigé : ligne `invité` à 3 vCPU et environ 6 119 664 kB ; capacité de `/w` vers 3,06 Go ; aucun « No space left on device » | Moyenne : lecture du journal deb (06) |
+| PL8 | `publier-image` lit `image.tar` et publie : ligne « publiée », `DIGEST_CONSTRUIT` = `IMAGE_DIGEST`, manifeste relu, une couche | Moyenne : premier fichier écrit par root via virtiofs et lu en UID 65532 |
+| PL9 | Digest de l'artefact = `07b7bd6f…` (essai) aux deux PipelineRuns ; même artefact | Moyenne : suit PL6 |
+| PL10 | Les deux PipelineRuns signés par Chains | Haute : M4b, 06 |
+| PL11 | Chaque PipelineRun dure entre 1 et 8 min de la création à la condition finale ; l'étape entière, moins de 20 min | Moyenne : essai de preparer en 8 s, mock en 54 s ; démarrage de Kata et copie de la fermeture non mesurés sous Tekton |
+| PL12 | Relevé après : `builds/sample-app-rpm` porte les tags de Chains `sha256-07b7bd6f….att` et `.sig` (forme de M4b), et aucun autre ; catalogue de 152 (N + 1) ; 20 PVC dans `builds` ; deux PipelineRuns `m4c-rpm-*` ; rien n'est supprimé | Moyenne : forme de M4b |
+
+**Ce que chaque issue permet**
+- Tout tenu : `comparaison` (rpm tiré de Zot par digest, confronté à M3), puis `provenance`.
+- PL2 ou PL8 non tenue : rien n'est purgé. Les relevés (codes, raisons, journaux) sont lus avant toute relance, qui prendra d'autres noms.
+- PL6 ou PL9 non tenue : la pipeline a publié un rpm différent de M3. L'écart est à expliquer avant `comparaison`.
