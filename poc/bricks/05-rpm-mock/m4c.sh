@@ -147,6 +147,8 @@ FIN
 
 etape_prealables() { # hôte seul, hors ligne, sans cluster ni Zot
   local x=$T/prealables e f a s d
+  # Corrigé le 18/11/2026 après le second passage (rm refusé : le cache de modules de go est en lecture seule, comme sources.sh) :
+  [ ! -d "$x" ] || chmod -R u+w "$x"
   rm -rf -- "${x:?}"; mkdir -p "$x"
   echo "## références épinglées"
   attendu "verrou du dépôt (sha256)" "$(sha256sum < "$VERROU" | cut -c1-64)" "$VERROU_SHA"

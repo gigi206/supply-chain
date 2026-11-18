@@ -96,3 +96,9 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 **Si ES2 ne tient pas** (refus d'admission) : la cause est relevée sans lire les messages des Events. La suite est une décision.
 
 **Non couvert par les essais** : le PVC sous `subPath` et Kata, l'`env` et le `HOME` posés par Tekton, l'image d'entrée de Tekton et ses scripts, `publier-image`, Chains. Ce sera à `pipeline`.
+
+## Note datée du 18/11/2026, écrite à 14:12:04 UTC : `prealables` rejouée sur le gabarit corrigé ; un échec de nettoyage, corrigé
+
+- **Second passage, 14:10:48 UTC, code 1** ([journal](m4c-prealables-passage2.log)) : arrêt dès le nettoyage. Le retrait récursif du dossier de travail n'a pas pu enlever le cache de modules de go laissé par le premier passage, que go extrait en lecture seule (170 lignes « Permission denied »). Aucun contrôle n'a tourné. C'est un défaut de `m4c.sh` au second passage, non prédit, que le premier passage ne pouvait pas montrer.
+- **Correction** : les droits d'écriture sont rendus avant le retrait (`chmod -R u+w`, comme le piège de `sources.sh`). `m4c.sh` passe de `08b29ab5…` à `b5a7f79d…`, par cette seule insertion de trois lignes ; les gabarits ne changent pas.
+- **Troisième passage, 14:11:15 à 14:11:26 UTC, code 0, 62 OK** ([journal](m4c-prealables.log)) : journal identique ligne pour ligne au premier ([journal du premier passage](m4c-prealables-passage1.log)), sauf l'en-tête et la ligne de `entrees.tar` (nouveau sha256 `b84f68ee…`, même taille, 318 842 880 octets). La prédiction de rejeu tient : PR1 à PR10, digest attendu `7b17e7e7…`.

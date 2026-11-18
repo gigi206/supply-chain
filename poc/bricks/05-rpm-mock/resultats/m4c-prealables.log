@@ -1,4 +1,4 @@
-# m4c.sh prealables, 2026-11-18T14:01:46Z
+# m4c.sh prealables, 2026-11-18T14:11:15Z
 ## références épinglées
 OK   verrou du dépôt (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
 OK   spec du dépôt (sha256) : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6
@@ -83,4 +83,4 @@ OK   couche : le rpm seul, en 0644, propriétaire 0 : -rw-r--r-- 0/0 sample-app-
 OK   rpm de la couche égal au rpm de M3 : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
 digest attendu de l'artefact, si le rpm est 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f et le tar de l'image d'outillage écrit la même couche : sha256:7b17e7e7fcff3383a7dab3db34c03940320126d89fa3fbfe20f6d2eee1bfa697
 ## entrées du pod d'essai
-entrees.tar : 318842880 octets, sha256 1334e4a483427e7f9f807af3f7d6b3c33d0c1f5bad44a2fe537a6c8c24fdda3f
+entrees.tar : 318842880 octets, sha256 b84f68ee0ac565a4b3f7ec7f55c6b11ae4a0e5a709e38daef97b9d7369f5f284
