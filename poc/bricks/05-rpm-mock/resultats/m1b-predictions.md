@@ -49,3 +49,8 @@ Ce que le banc montre, et rien de plus : sur ces versions, une racine installée
 Je n'ai mesuré aucun moyen de les neutraliser, par exemple borner les mtimes à l'archivage, retirer les journaux, ou traiter la base rpm et `cacerts`.
 
 **Portée** : ce sont 222 rpm de vault 9.7, avec rpm 4.16.1.3 et dnf 4.14.0 de l'image d'essai, hors de Kata. Ce n'est pas l'ensemble de l'outillage de M1b, ni dnf de l'amorce 9.8.
+
+## Note de portée du 18/11/2026, écrite à 2026-11-18T19:49:19Z UTC, après relecture du conseiller
+
+- **Les 25 lignes du comptage** étaient en partie non lues : le journal du banc n'en imprimait que 10. Je les ai relues et archivées ([relevé](m1b-repro-scriptlets.log)). Les 25 sont toutes des lignes « Running scriptlet », dans chacun des deux passages. Aucune ne porte « warning » ni « error ». Les deux journaux de dnf sont identiques, aux espaces de fin de ligne près. Rien n'y montre l'échec d'un scriptlet. Cela ne prouve pas qu'aucun scriptlet n'a été gêné par l'absence de `/dev` et de `/proc` : `dev/null` est devenu un fichier ordinaire.
+- **Le constat sur la ligne 377 de `s1.sh`** vaut pour le tar de l'hôte, avec lequel le banc a archivé, pas pour celui d'un pod.
