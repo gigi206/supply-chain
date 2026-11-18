@@ -84,3 +84,23 @@ trusted_tasks:
   # script substitué égal à celui joué dans le pod d'essai (sha256 572fb78c)
   oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm:
     - ref: sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+  # Brique 05, M4c (signées le 18/11/2026 entre 14:52:19 et 14:52:23 UTC, chrono.tsv ; accord permanent du 18/11) :
+  # 05-rpm-mock/construction/preparer-rpm.signee.yaml, pod runc restreint (UID 65532, runAsNonRoot, capacités retirées, sans
+  # élévation) sans secret, images d'outils plateforme/outils-prefetch@68e0ae70 et plateforme/outils-horodatage@c7bebae2 ;
+  # sortie limitée par builds-sans-internet de la 08c (adresses privées : Forgejo, Zot). Clone le commit ; tire par digest la
+  # fermeture rpm (M4b), la fermeture applicative (S4b de la 06) et l'artefact de packaging (M4a) fixés par la pipeline
+  # sample-app-rpm ; reconstitue vendor/ (go mod vendor, GOPROXY=off) et marked (integrity du lockfile) ; place le spec et le
+  # verrou sous entrees/ ; déclare ses entrées à Chains. Jouée dans un pod d'essai avant signature (14:12:26 UTC : arbre
+  # entrees/ égal à celui de prealables) ; scripts signés égaux à ceux de l'essai
+  oci://sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm:
+    - ref: sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+  # Brique 05, M4c : 05-rpm-mock/construction/construire-rpm.signee.yaml, pas privilégié en root (Kata posé par le PipelineRun,
+  # taskRunSpecs), mock --isolation=simple --hermetic-build, 2 CPU et 6 Gi, image d'outillage de M3 par digest
+  # (essais-05/mock-rocky9@99790c13, « Option 1 ») ; sans aucune entrée ni sortie réseau (NetworkPolicy
+  # construction-rpm-sans-sortie, M3) ; entrées en lecture seule, fermeture rpm confrontée au verrou avant mock (nom et sigmd5 de
+  # chaque rpm), Source0 refaite et datée par l'époque fixée dans la pipeline ; artefact : le rpm binaire seul, en manifeste
+  # d'image OCI que publier-image pousse. Jouée dans un pod d'essai avant signature (14:12:44 à 14:15:23 UTC : rpm 864d55f4 et
+  # src.rpm c802e60a, ceux de M3) ; script signé égal à celui de l'essai. Tâche privilégiée : la porte ne connaît pas encore son
+  # nom (ni construction_kata, ni appariement à preparer-rpm)
+  oci://sc-stockage.poc.test:5000/tekton/tasks/construire-rpm:
+    - ref: sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
