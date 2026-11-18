@@ -46,3 +46,53 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 **Portée.** Tout a tourné sur l'hôte. Rien ne dit encore que le vrai `rpm`, le `tar` et le `gzip` de Rocky, mock dans un pas de Tekton, les pulls par `oras`, le réseau ou l'admission se comportent de même : c'est le rôle des pods d'essai. `entrees.tar` (318 842 880 octets, `1334e4a4…`) est prêt pour le pod d'essai de `construire-rpm`.
 
 **Suite** : préparer à sec `essai_preparer` et `essai`, sur le modèle de `s4d.sh`, avec leurs prédictions.
+
+## Note datée du 18/11/2026, écrite à 14:10:35 UTC : `essai_preparer` et `essai` préparées à sec (accord permanent du 18/11), NON LANCÉES ; `prealables` à rejouer
+
+**Avis du conseiller** (après `prealables`) : rien de bloquant. Il demande :
+- de garder lisibles les journaux de mock en cas d'échec ;
+- de donner au pod d'essai Kata la forme que Tekton produira ;
+- de comparer la Source0 en relevé, pas en KO.
+
+**Changements**
+- **`construire-rpm.yaml`** (`e88f5521…`) : en cas d'échec de mock, la fin de `mock.out`, `root.log` et `build.log` va au journal. Le reste du script est inchangé. `preparer-rpm.yaml` reste à `a7dfa37e…`.
+- **`m4c.sh`** (`08b29ab5…`) : deux étapes ajoutées par insertion, `essai_preparer` et `essai`, sur le modèle de `s4d.sh`.
+- **`prealables` sera rejouée** sur le gabarit corrigé avant les essais. Prédiction : PR1 à PR10 tenues de nouveau, 62 OK, même digest attendu `7b17e7e7…`. Le sha256 de `entrees.tar` n'est pas prédit : les dates des fichiers changent d'un passage à l'autre.
+
+**`essai_preparer`** (cluster, pod d'essai, rien dans Zot)
+- Pod runc restreint, au label `preparer-rpm`, avec les trois pas en initContainers : images, scripts rendus, montages et contexte de la tâche.
+- Le clone de Forgejo et les pulls dans Zot sont réels.
+- Les résultats sont lus, et l'arbre `entrees/` est comparé à celui de `prealables`.
+- Les politiques de `builds` sont relues avant. Le pod est supprimé à la fin.
+
+| | Prédiction | Confiance |
+|---|---|---|
+| EP1 | `construction-rpm-sans-sortie` relue telle que posée en M3 ; aucune politique de `builds` n'autorise de trafic à `construire-rpm`. Relevé : politiques qui sélectionnent `preparer-rpm`. | haute : mesuré en M3 ; l'état actuel n'est pas relu avant l'essai |
+| EP2 | Pod admis en dry-run serveur, puis `Succeeded`. | haute pour l'admission (forme de `preparer-deb`) ; moyenne-haute pour le passage |
+| EP3 | Pas `sources` : clone de Forgejo, commit `6391fd43…`, arbre `30e808ff…`. Pas `entrees` : trois pulls par l'`oras` de l'image d'outils, dont les chemins à « : » et « @ » du dossier `dir:`, et quatre contrôles passés sous son busybox. Pas `assemblage` : `vendor/` et `marked` comme sur l'hôte. | moyenne-haute : `publier-fermeture` a poussé ces chemins avec la même image ; le pull dans un pod n'est pas mesuré ; aucune politique ne nomme `preparer-deb`, qui a joint Forgejo et Zot (lecture) |
+| EP4 | Résultats `CHAINS-GIT_URL`, `CHAINS-GIT_COMMIT` et les trois `*_ARTIFACT_INPUTS` égaux à l'attendu. | haute |
+| EP5 | Arbre `entrees/` du pod égal à celui de `prealables`, en contenu, modes et types (273 fichiers : 230 de la fermeture, 41 sous `src`, le spec et le verrou). | moyenne-haute : mesuré pour le deb en S4d1 ; ici, les 230 fichiers de la fermeture viennent de l'`oras` de l'hôte d'un côté, de celui de l'image de l'autre |
+
+**`essai`** (cluster, pod d'essai, rien dans Zot)
+- Pod Kata au label `construire-rpm`. Le contexte du `podTemplate` (UID 65532, `runAsNonRoot`) est posé au niveau du pod, le pas root privilégié du gabarit au niveau du conteneur.
+- `entrees.tar` est copié par morceaux de 64 Mio dans un volume à part, et déballé par un second conteneur en UID 65532. Ce volume est monté en lecture seule pour mock.
+- Le script du gabarit est joué tel quel ; seules les trois lignes à variables de Tekton sont substituées.
+- Les politiques sont relues avant. Le pod est supprimé à la fin.
+
+| | Prédiction | Confiance |
+|---|---|---|
+| ES1 | Politiques relues comme EP1. | haute |
+| ES2 | Pod admis en dry-run serveur, puis prêt sous `kata` sur sc-build. | moyenne : un pod root au niveau du pod a été admis en M3 ; la surcharge par le conteneur d'un `runAsNonRoot` posé au niveau du pod n'a jamais été soumise à l'admission |
+| ES3 | Copie de `entrees.tar` en 5 morceaux, sha256 conforme ; 273 fichiers déballés par l'UID 65532. | haute |
+| ES4 | Outils de l'image présents ; ligne « invité » atteinte, donc écriture refusée sur les entrées (montage relevé). | moyenne-haute : la lecture seule d'un `emptyDir` monté `readOnly` sous Kata n'est pas mesurée ; celle du PVC sous `subPath` l'a été pour le deb dans la pipeline (lecture) |
+| ES5 | Les quatre témoins réseau échouent. | haute : M3, même politique |
+| ES6 | Confrontation avec le vrai `rpm` : même sortie et même message que dans `prealables`. | haute, étant donné PR6 |
+| ES7 | **Discriminant** : Source0, faite par le `tar` 1.34 et le `gzip` 1.12 de Rocky, égale à `07521c1e…`. Comparée en relevé : mock tourne quand même. | moyenne-haute : même commande, même époque, même arbre (PR8) ; les sorties de ces versions n'ont jamais été comparées |
+| ES8 | mock `--hermetic-build` en code 0 ; « Using container image: dir: » et « Checking image digest: 18d64b03… » une fois chacune dans la sortie et dans `root.log` ; aucun repli, ni « Expected digest », ni « No space » ; aucune ligne `http(s)://` dans les trois journaux ; 222 paquets au buildroot, aucun écart au verrou. | moyenne-haute : mesuré en M3 et en `m4b_mock_v2`, mais par `kubectl exec` dans un pod root au niveau du pod ; le contexte de Tekton n'y est pas |
+| ES9 | **Si ES7 tient** : src.rpm égal à `c802e60a…`, rpm égal à `864d55f4…`, digest de l'artefact égal à `7b17e7e7…`. **Si ES7 ne tient pas** : rien n'est prédit pour le rpm. | moyenne-haute si ES7 tient : même verrou, mêmes `repodata` V2, même image que `m4b_mock_v2` (MV tenues) ; la couche est écrite par le `tar` de Rocky, pas par celui de l'hôte |
+| ES10 | Code 0 et 0 écart, en moins de 15 minutes. | moyenne |
+
+**Si ES7 ne tient pas** (Source0 différente) : l'option (i) supposait M3 comme référence. La suite revient au propriétaire. Je n'applique aucun correctif de mon chef (avis du conseiller).
+**Si ES2 ne tient pas** (refus d'admission) : la cause est relevée sans lire les messages des Events. La suite est une décision.
+
+**Non couvert par les essais** : le PVC sous `subPath` et Kata, l'`env` et le `HOME` posés par Tekton, l'image d'entrée de Tekton et ses scripts, `publier-image`, Chains. Ce sera à `pipeline`.

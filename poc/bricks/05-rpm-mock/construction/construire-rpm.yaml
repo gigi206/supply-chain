@@ -16,6 +16,7 @@
 #     (configuration d'image, une couche tar non compressée qui contient le rpm), pour que publier-image (inchangée) fonctionne
 #     sans changement ; le sha256 et le NEVRA du src.rpm restent dans le journal du TaskRun ;
 #   - travail sur un emptyDir en mémoire (/w) ; témoins réseau qui doivent échouer, comme construire-deb.
+# En cas d'échec de mock, la fin de mock.out, root.log et build.log va au journal du TaskRun (avis du conseiller, 18/11/2026).
 # @IMAGE@ : m4c.sh. Signée une fois, versionnée (construire-rpm.signee.yaml), digest dans la liste revue de la 08.
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -162,7 +163,13 @@ spec:
         echo "lignes « $m » : sortie $(grep -c -F -e "$m" /w/mock.out || true) ; root.log $(grep -c -F -e "$m" /w/res/root.log 2> /dev/null || true)"
       done
       for f in /w/mock.out /w/res/root.log /w/res/build.log; do echo "lignes http ou https de ${f##*/} : $(grep -c -E 'https?://' "$f" 2> /dev/null || true)"; done
-      [ $r = 0 ] || { tail -n 80 /w/mock.out >&2; echo "mock en échec" >&2; exit 1; }
+      if [ $r != 0 ]; then   # journaux de mock lisibles dans le TaskRun : /w disparaît avec le pod
+        echo "----- fin de mock.out -----" >&2; tail -n 80 /w/mock.out >&2
+        for f in /w/res/root.log /w/res/build.log; do
+          [ ! -e "$f" ] || { echo "----- fin de ${f##*/} -----" >&2; tail -n 60 "$f" >&2; }
+        done
+        echo "mock en échec" >&2; exit 1
+      fi
       rpm -qa --root /w/mock/hermetic-build/root --qf 'paquet %{NAME} %{VERSION} %{RELEASE} %{ARCH} %{SIGMD5}\n' | sort
       echo "paquets du buildroot (rpm --root) : $(rpm -qa --root /w/mock/hermetic-build/root | wc -l)"
       df -k /w | awk 'NR == 2 {print "après mock (buildroot gardé), capacité de /w : " $2 " kB ; utilisés : " $3 " kB"}'

@@ -12,7 +12,16 @@
 #               verrou (rpm simulé par une lecture Python du sigmd5 de l'en-tête de signature, l'hôte n'a pas rpm), avec des cas
 #               altérés ; archive Source0 comparée à celle de sources.sh ; layout écrit avec le rpm de M3, d'où le digest attendu
 #               de l'artefact ; entrees.tar pour le pod d'essai
-# Les étapes suivantes (essai_preparer, essai, taches, pipeline, comparaison, provenance) seront ajoutées après prealables.
+#   essai_preparer  ajoutée le 18/11/2026 (préparée à sec, accord permanent du 18/11), NON LANCÉE ; cluster (pod d'essai, rien dans
+#               Zot) : pod runc restreint au label preparer-rpm ; les trois pas en initContainers, avec leurs images, leurs scripts
+#               rendus et les montages de la tâche ; vrai clone de Forgejo et vrais pulls dans Zot ; résultats lus ; arbre entrees/
+#               comparé à celui de prealables (contenu, modes, types) ; politiques de builds relues ; pod supprimé
+#   essai       ajoutée de même, NON LANCÉE ; cluster (pod d'essai, rien dans Zot) : pod Kata au label construire-rpm, à la forme
+#               que Tekton produira (contexte du podTemplate au niveau du pod, pas root privilégié au niveau du conteneur) ;
+#               entrees.tar de prealables copié par morceaux de 64 Mio dans un volume à part, déballé par un second conteneur en UID
+#               65532, monté en lecture seule pour mock ; script de construire-rpm tiré du gabarit rendu, variables de Tekton seules
+#               substituées ; Source0, src.rpm, rpm et digest de l'artefact relevés contre M3 sans arrêter ; pod supprimé
+# Les étapes suivantes (taches, pipeline, comparaison, provenance) seront ajoutées après les essais.
 # Usage (racine du dépôt) : DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/m4c.sh <étape>…
 # (journal : resultats/m4c-<étape>.log)
 set -euo pipefail
@@ -292,6 +301,191 @@ etape_prealables() { # hôte seul, hors ligne, sans cluster ni Zot
   echo "## entrées du pod d'essai"
   tar -C "$e" --sort=name -cf "$T/entrees.tar" fermeture sample-app.spec src verrou-rpm.json
   echo "entrees.tar : $(stat -c %s "$T/entrees.tar") octets, sha256 $(sha256sum < "$T/entrees.tar" | cut -c1-64)"
+}
+
+# Brique 05, M4c, étapes essai_preparer et essai (préparées à sec le 18/11/2026, accord permanent du 18/11) : pods d'essai avant
+# toute signature (levier du 10/11/2026), sur le modèle de s4d.sh ; rien n'est écrit dans Zot.
+LABEL_PREPARER=preparer-rpm
+LABEL_CONSTRUIRE=construire-rpm   # sélectionné par construction-rpm-sans-sortie (M3)
+SRPM_M3_SHA=c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128   # m3_comparaison
+MORCEAU_MIO=64
+ECARTS=0
+mesure() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "ÉCART $1 : $2 (attendu : $3)"; ECARTS=$((ECARTS + 1)); }; }
+pod_retirer() { kubectl delete pod -n builds "$1" --wait=false < /dev/null > /dev/null; echo "pod $1 supprimé"; }
+copier_pod() { # pod conteneur fichier-hôte chemin-pod : par morceaux de 64 Mio, taille relevée après chaque morceau, sha256 final
+  local n i k e m=$((MORCEAU_MIO * 1048576)) nb
+  n=$(stat -c %s "$3"); nb=$(( (n + m - 1) / m )); [ "$nb" -gt 0 ] || nb=1
+  kubectl exec -n builds "$1" -c "$2" -- sh -c ": > $4" < /dev/null
+  for ((i = 0; i < nb; i++)); do
+    k=$(( n - i * m < m ? n - i * m : m ))
+    dd if="$3" bs=1M skip=$((i * MORCEAU_MIO)) count=$MORCEAU_MIO status=none \
+      | timeout 120 kubectl exec -i -n builds "$1" -c "$2" -- sh -c "head -c $k >> $4" \
+      || { pod_retirer "$1"; echo "KO   copie de ${3##*/}, morceau $((i + 1)) sur $nb" >&2; exit 1; }
+    e=$(kubectl exec -n builds "$1" -c "$2" -- stat -c %s "$4" < /dev/null)
+    [ "$e" = "$(( i * m + k ))" ] || { pod_retirer "$1"; echo "KO   copie de ${3##*/} : $e octets après le morceau $((i + 1))" >&2; exit 1; }
+  done
+  e=$(kubectl exec -n builds "$1" -c "$2" -- sha256sum "$4" < /dev/null | cut -c1-64)
+  [ "$e" = "$(sha256sum < "$3" | cut -c1-64)" ] && echo "OK   copie de ${3##*/} dans le pod : $n octets en $nb morceau(x), sha256 conforme" \
+    || { pod_retirer "$1"; echo "KO   copie de ${3##*/} : sha256 dans le pod $e" >&2; exit 1; }
+}
+liste_arbre() { # dans le répertoire courant : empreinte de chaque fichier, puis mode, type et chemin de chaque objet ; de s4d.sh
+  echo 'find . -type f | xargs sha256sum | sort -k2; find . | xargs stat -c "%a %F %n" | sort -k3'
+}
+politique_relue() { # politiques de builds relues dans le cluster, lecture seule ; KO si construire-rpm n'est pas coupé (s1.sh, M3)
+  local t=$T/politiques.json
+  { kubectl get networkpolicy -n builds -o json < /dev/null | jq '.items[] | .kind = "NetworkPolicy"'
+    kubectl get ciliumnetworkpolicy -n builds -o json < /dev/null | jq '.items[] | .kind = "CiliumNetworkPolicy"'; } | jq -s '{items: .}' > "$t"
+  echo "politiques de builds : $(jq -r '[.items[] | "\(.kind) \(.metadata.name)"] | join(", ")' "$t")"
+  attendu "construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie" \
+    "$(jq -c '[.items[] | select(.kind == "NetworkPolicy" and .metadata.name == "construction-rpm-sans-sortie")
+      | [.spec.podSelector, (.spec.policyTypes | sort), (.spec.ingress // []), (.spec.egress // [])]]' "$t")" \
+    "[[{\"matchLabels\":{\"tekton.dev/task\":\"$LABEL_CONSTRUIRE\"}},[\"Egress\",\"Ingress\"],[],[]]]"
+  attendu "politiques de builds qui sélectionnent $LABEL_CONSTRUIRE et autorisent du trafic" "$(jq -r -L "$here" --arg l "$LABEL_CONSTRUIRE" \
+    'include "selecteurs"; [.items[] | select(selectionne({"tekton.dev/task": $l}) and autorise) | nom] | join(", ")' "$t")" ""
+  echo "relevé : politiques de builds qui sélectionnent $LABEL_PREPARER : $(jq -r -L "$here" --arg l "$LABEL_PREPARER" \
+    'include "selecteurs"; [.items[] | select(selectionne({"tekton.dev/task": $l})) | "\(.kind) \(nom)"] | join(", ")' "$t")"
+}
+
+etape_essai_preparer() { # pod runc restreint au label preparer-rpm ; les trois pas en initContainers, images et montages de la tâche ;
+  # vrai clone de Forgejo et vrais pulls dans Zot ; résultats lus ; arbre entrees/ comparé à celui de prealables ; pod supprimé
+  local p=m4c-essai-preparer x=$T/essai-preparer a c r
+  [ -d "$T/prealables/ws/entrees" ] || { echo "KO   lancer d'abord prealables" >&2; exit 1; }
+  rm -rf "$x"; mkdir -p "$x"
+  rendre_taches
+  for a in sources entrees assemblage; do
+    script_etape "$T/preparer-rpm.yaml" "$a" | sed -e 's#\$(workspaces.sortie.path)#/workspace/sortie#g' \
+      -e 's#\$(results\.\([A-Z_-]*\)\.path)#/resultats/\1#g' > "$x/$a.sh"
+    attendu "script $a : variables Tekton restantes" "$(grep -c '\$(\(params\|workspaces\|results\)\.' "$x/$a.sh" || true)" 0
+  done
+  attendu "images des pas (gabarit rendu)" "$(yq '[.spec.steps[].image] | join(" ")' "$T/preparer-rpm.yaml")" "$PREFETCH_IMAGE $OUTILS_IMAGE $PREFETCH_IMAGE"
+  politique_relue
+  jq -n --arg n "$p" --arg lb "$LABEL_PREPARER" --arg pi "$PREFETCH_IMAGE" --arg oi "$OUTILS_IMAGE" --arg depot "$DEPOT_GIT" --arg commit "$COMMIT" \
+    --arg fr "$FERMETURE_RPM" --arg fs "$FERMETURE_SOURCES" --arg pk "$PACKAGING" \
+    --rawfile s1 "$x/sources.sh" --rawfile s2 "$x/entrees.sh" --rawfile s3 "$x/assemblage.sh" --arg liste "$(liste_arbre)" '
+    {runAsUser: 65532, runAsNonRoot: true, allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}} as $sc
+    | [{name: "ca-poc", mountPath: "/etc/ca-poc", readOnly: true}, {name: "tmp", mountPath: "/tmp"},
+       {name: "sortie", mountPath: "/workspace/sortie"}, {name: "resultats", mountPath: "/resultats"}] as $vm
+    | {requests: {cpu: "100m", memory: "128Mi"}, limits: {cpu: "1", memory: "1Gi"}} as $res
+    | {apiVersion: "v1", kind: "Pod", metadata: {name: $n, namespace: "builds", labels: {"tekton.dev/task": $lb}},
+      spec: {restartPolicy: "Never", serviceAccountName: "build", automountServiceAccountToken: false, nodeSelector: {zone: "build"},
+        tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
+        securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: "RuntimeDefault"}},
+        volumes: [{name: "ca-poc", configMap: {name: "ca-poc"}}, {name: "tmp", emptyDir: {}}, {name: "sortie", emptyDir: {}}, {name: "resultats", emptyDir: {}}],
+        initContainers: [
+          {name: "sources", image: $pi, command: ["/bin/sh", "-c", $s1], env: [{name: "DEPOT", value: $depot}, {name: "COMMIT", value: $commit}],
+            securityContext: $sc, volumeMounts: $vm, resources: $res},
+          {name: "entrees", image: $oi, command: ["/busybox/sh", "-c", $s2],
+            env: [{name: "FERMETURE_RPM", value: $fr}, {name: "FERMETURE_SOURCES", value: $fs}, {name: "PACKAGING", value: $pk}],
+            securityContext: $sc, volumeMounts: $vm, resources: $res},
+          {name: "assemblage", image: $pi, command: ["/bin/sh", "-c", $s3], securityContext: $sc, volumeMounts: $vm, resources: $res}],
+        containers: [{name: "liste", image: $oi, securityContext: $sc, volumeMounts: $vm, resources: $res,
+          command: ["/busybox/sh", "-c", ("set -eu; for f in /resultats/*; do echo \"résultat ${f##*/} : $(cat \"$f\")\"; done; cd /workspace/sortie/entrees; echo ----- liste -----; " + $liste + "; echo ----- fin de la liste -----")]}]}}' > "$x/pod.json"
+  trap 'kubectl delete pod -n builds m4c-essai-preparer --ignore-not-found --wait=false < /dev/null > /dev/null 2>&1 || true' EXIT
+  kubectl delete pod -n builds "$p" --ignore-not-found --wait=true < /dev/null > /dev/null
+  kubectl create --dry-run=server -f "$x/pod.json" < /dev/null > /dev/null || { echo "KO   pod $p refusé en dry-run serveur" >&2; exit 1; }
+  echo "OK   pod $p admis en dry-run serveur"
+  kubectl create -f "$x/pod.json" < /dev/null > /dev/null
+  echo "pod $p créé à $(date -u +%H:%M:%S)"
+  r=""
+  for _ in $(seq 300); do
+    r=$(kubectl get pod -n builds "$p" -o jsonpath='{.status.phase}' < /dev/null)
+    case $r in Succeeded|Failed) break ;; esac; sleep 2
+  done
+  echo "pod $p : $r à $(date -u +%H:%M:%S), sur $(kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}, runtimeClassName « {.spec.runtimeClassName} »' < /dev/null)"
+  for c in sources entrees assemblage liste; do
+    kubectl logs -n builds "$p" -c "$c" < /dev/null 2>&1 | sed '/jeton\|token/I c\[ligne masquée : motif jeton|token]' > "$x/$c.log" || true
+    echo "### $c (code $(kubectl get pod -n builds "$p" -o json < /dev/null | jq -r --arg c "$c" '[.status.initContainerStatuses[]?, .status.containerStatuses[]?] | map(select(.name == $c)) | .[0].state.terminated.exitCode // "-"'))"
+    if [ "$c" = liste ]; then grep -v -e '^-----' -e '^[0-9a-f]\{64\} ' -e '^[0-7]\{3,4\} ' "$x/$c.log" | sed 's/^/     /' || true
+    else sed 's/^/     /' "$x/$c.log" | tail -n 12; fi
+  done
+  cat "$x"/{sources,entrees,assemblage,liste}.log > "$R/m4c-essai-preparer-pod.log"
+  pod_retirer "$p"
+  attendu "pod d'essai de preparer-rpm" "$r" Succeeded
+  attendu "résultat CHAINS-GIT_URL" "$(sed -n 's/^résultat CHAINS-GIT_URL : //p' "$x/liste.log")" "$DEPOT_GIT"
+  attendu "résultat CHAINS-GIT_COMMIT" "$(sed -n 's/^résultat CHAINS-GIT_COMMIT : //p' "$x/liste.log")" "$COMMIT"
+  for a in "FERMETURE_RPM $FERMETURE_RPM" "FERMETURE_SOURCES $FERMETURE_SOURCES" "PACKAGING $PACKAGING"; do
+    set -- $a
+    attendu "résultat $1_ARTIFACT_INPUTS" "$(sed -n "s/^résultat $1_ARTIFACT_INPUTS : //p" "$x/liste.log")" "{\"uri\":\"oci://${2%@*}\",\"digest\":\"${2#*@}\"}"
+  done
+  sed -n '/^----- liste -----$/,/^----- fin de la liste -----$/p' "$x/liste.log" | sed '1d;$d' > "$x/arbre-pod.txt"
+  (cd "$T/prealables/ws/entrees" && sh -c "$(liste_arbre)") > "$x/arbre-hote.txt"
+  echo "arbre entrees/ : $(grep -c '^[0-9a-f]\{64\} ' "$x/arbre-pod.txt") fichiers dans le pod, $(grep -c '^[0-9a-f]\{64\} ' "$x/arbre-hote.txt") dans prealables"
+  diff "$x/arbre-hote.txt" "$x/arbre-pod.txt" | head -n 20 | cut -c1-200 | sed 's/^/     /' || true
+  attendu "arbre entrees/ du pod égal à celui de prealables (contenu, modes, types)" "$(cmp -s "$x/arbre-hote.txt" "$x/arbre-pod.txt" && echo égal || echo différent)" égal
+}
+
+etape_essai() { # pod Kata au label construire-rpm, à la forme que Tekton produira : contexte du podTemplate au niveau du pod (UID
+  # 65532, runAsNonRoot), pas root privilégié au niveau du conteneur ; entrées sur un volume à part, remplies par un second
+  # conteneur en UID 65532 et montées en lecture seule dans le conteneur de mock ; script de construire-rpm tiré du gabarit rendu,
+  # variables de Tekton seules substituées ; image.tar rapatrié ; écarts à M3 relevés sans arrêter ; pod supprimé
+  local p=m4c-essai x=$T/essai rc=0 d s
+  [ -s "$T/entrees.tar" ] && [ -s "$T/digest-attendu" ] || { echo "KO   lancer d'abord prealables" >&2; exit 1; }
+  rm -rf "$x"; mkdir -p "$x"
+  rendre_taches
+  script_etape "$T/construire-rpm.yaml" construire \
+    | sed -e 's#\$(workspaces.entrees.path)#/e#g' -e 's#\$(workspaces.sortie.path)#/o#g' -e 's#\$(results.DIGEST_CONSTRUIT.path)#/w/digest#g' > "$x/construire.sh"
+  attendu "script d'essai : variables Tekton restantes" "$(grep -c '\$(\(params\|workspaces\|results\)\.' "$x/construire.sh" || true)" 0
+  attendu "script d'essai : égal au script du gabarit, variables de Tekton exceptées" \
+    "$(diff <(script_etape "$T/construire-rpm.yaml" construire) "$x/construire.sh" | grep -c '^>' || true)" 3
+  politique_relue
+  jq -n --arg n "$p" --arg lb "$LABEL_CONSTRUIRE" --arg i "$IMAGE_OUTILLAGE" --arg ep "$EPOQUE" \
+    --argjson sc "$(yq -o=json -I=0 '.spec.steps[0].securityContext' "$T/construire-rpm.yaml")" \
+    --argjson res "$(yq -o=json -I=0 '.spec.steps[0].resources' "$T/construire-rpm.yaml")" '{
+    apiVersion: "v1", kind: "Pod", metadata: {name: $n, namespace: "builds", labels: {"tekton.dev/task": $lb}},
+    spec: {restartPolicy: "Never", serviceAccountName: "build", automountServiceAccountToken: false, nodeSelector: {zone: "build"},
+      runtimeClassName: "kata",
+      tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
+      securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: "RuntimeDefault"}},
+      volumes: [{name: "w", emptyDir: {medium: "Memory", sizeLimit: "4Gi"}}, {name: "e", emptyDir: {}}, {name: "o", emptyDir: {}}],
+      containers: [
+        {name: "essai", image: $i, command: ["sleep", "7200"], securityContext: $sc, resources: $res, env: [{name: "EPOQUE", value: $ep}],
+          volumeMounts: [{name: "w", mountPath: "/w"}, {name: "e", mountPath: "/e", readOnly: true}, {name: "o", mountPath: "/o"}]},
+        {name: "remplir", image: $i, command: ["sleep", "7200"],
+          securityContext: {runAsUser: 65532, runAsNonRoot: true, allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}},
+          resources: {requests: {cpu: "100m", memory: "256Mi"}, limits: {cpu: "1", memory: "1Gi"}},
+          volumeMounts: [{name: "e", mountPath: "/e"}]}]}}' > "$x/pod.json"
+  attendu "pod d'essai : contexte du pas égal à celui du gabarit" "$(jq -c '.spec.containers[0].securityContext' "$x/pod.json")" \
+    '{"privileged":true,"allowPrivilegeEscalation":true,"runAsUser":0,"runAsGroup":0,"runAsNonRoot":false}'
+  kubectl delete pod -n builds "$p" --ignore-not-found --wait=true < /dev/null > /dev/null
+  trap 'kubectl delete pod -n builds m4c-essai --ignore-not-found --wait=false < /dev/null > /dev/null 2>&1 || true' EXIT
+  kubectl create --dry-run=server -f "$x/pod.json" < /dev/null > /dev/null || { echo "KO   pod $p refusé en dry-run serveur" >&2; exit 1; }
+  echo "OK   pod $p admis en dry-run serveur"
+  kubectl create -f "$x/pod.json" < /dev/null > /dev/null
+  echo "pod $p créé à $(date -u +%H:%M:%S) (image $IMAGE_OUTILLAGE)"
+  kubectl wait -n builds "pod/$p" --for=condition=Ready --timeout=300s < /dev/null > /dev/null \
+    || { pod_retirer "$p"; echo "KO   pod $p non prêt" >&2; exit 1; }
+  echo "pod prêt sur $(kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}, runtimeClassName {.spec.runtimeClassName}' < /dev/null)"
+  copier_pod "$p" remplir "$T/entrees.tar" /e/entrees.tar
+  kubectl exec -n builds "$p" -c remplir -- sh -c 'tar --no-same-owner -xf /e/entrees.tar -C /e && rm /e/entrees.tar && echo "entrées déballées par uid $(id -u) : $(find /e -type f | wc -l) fichiers"' < /dev/null \
+    || { pod_retirer "$p"; echo "KO   déballage des entrées" >&2; exit 1; }
+  # Le script est un fichier dans le pod, comme sous Tekton, et rien n'arrive sur son entrée standard (s4d.sh)
+  copier_pod "$p" essai "$x/construire.sh" /w/construire.sh
+  echo "## script de construire-rpm dans le pod ($(date -u +%H:%M:%S))"
+  timeout 1800 kubectl exec -n builds "$p" -c essai -- bash /w/construire.sh < /dev/null > "$x/construire.log" 2>&1 || rc=$?
+  echo "fin à $(date -u +%H:%M:%S)"
+  sed '/jeton\|token/I c\[ligne masquée : motif jeton|token]' "$x/construire.log" > "$R/m4c-essai-construire.log"
+  grep -v '^paquet ' "$R/m4c-essai-construire.log" | cut -c1-220 | sed 's/^/     /'
+  echo "     (code de l'exec : $rc ; journal complet : resultats/m4c-essai-construire.log)"
+  if [ $rc = 0 ]; then
+    kubectl exec -n builds "$p" -c essai -- cat /o/image.tar < /dev/null > "$x/image.tar"
+    attendu "image.tar rapatrié (sha256 dans le pod)" "$(sha256sum < "$x/image.tar" | cut -c1-64)" "$(kubectl exec -n builds "$p" -c essai -- sha256sum /o/image.tar < /dev/null | cut -c1-64)"
+    d=$(kubectl exec -n builds "$p" -c essai -- cat /w/digest < /dev/null)
+  fi
+  pod_retirer "$p"
+  attendu "écriture refusée sur les entrées (ligne du script atteinte)" "$(grep -c '^invité : .*, écriture refusée$' "$x/construire.log" || true)" 1
+  echo "relevé : montage des entrées vu dans le pod : $(sed -n 's/^invité : .* entrees : \(.*\), écriture refusée$/\1/p' "$x/construire.log")"
+  s=$(sed -n 's/^Source0 sample-app-1.0.0.tar.gz (époque [0-9]*) : \([0-9a-f]\{64\}\) ;.*/\1/p' "$x/construire.log")
+  mesure "Source0 faite par le tar et le gzip de l'image d'outillage, égale à l'archive de sources.sh" "$s" "$ARCHIVE_SHA"
+  [ $rc = 0 ] || { echo "KO   script de construire-rpm : code $rc" >&2; exit 1; }
+  attendu "dernière ligne du script atteinte (image.tar)" "$(grep -c '^image.tar : [0-9]* octets$' "$x/construire.log" || true)" 1
+  mesure "src.rpm construit dans le pod d'essai" "$(sed -n 's/^rpm : [^ ]*\.src\.rpm sha256 \([0-9a-f]\{64\}\) .*/\1/p' "$x/construire.log")" "$SRPM_M3_SHA"
+  mkdir -p "$x/lu"; tar -xf "$x/image.tar" -C "$x/lu"
+  attendu "index.json lu comme publier-image : égal au résultat" "$(sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p' "$x/lu/index.json")" "$d"
+  mesure "rpm construit dans le pod d'essai (couche)" "$(tar -xOf "$x/lu/blobs/sha256/$(jq -r '.layers[0].digest' "$x/lu/blobs/sha256/${d#sha256:}" | cut -d: -f2)" | sha256sum | cut -c1-64)" "$RPM_M3_SHA"
+  mesure "digest de l'artefact" "$d" "$(cat "$T/digest-attendu")"
+  echo "relevé : paquets du buildroot imprimés : $(grep -c '^paquet ' "$x/construire.log" || true) ; écarts au verrou (nom, version, release, arch, sigmd5) : $(diff <(grep '^paquet ' "$x/construire.log") <(jq -r '.buildroot.rpms[] | "paquet \(.name) \(.version) \(.release) \(.arch) \(.sigmd5)"' "$VERROU" | sort) | grep -c '^[<>]' || true)"
+  echo "écarts : $ECARTS"
+  [ "$ECARTS" = 0 ]
 }
 
 lancer m4c "05 M4c" "$@"
