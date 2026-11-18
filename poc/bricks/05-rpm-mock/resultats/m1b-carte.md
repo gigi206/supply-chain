@@ -196,3 +196,11 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Banc** : [`m1b-boot.sh`](m1b-boot.sh). La base `ee90dc0e` et les dix lignes sont installées deux fois, hors réseau, avec les outils de `a8` (`dnf-3`, comme S1). Les dix rpm et les métadonnées de BaseOS sont d'abord téléchargés depuis vault 9.7, puis vérifiés.
 - **Prédictions** : BT1 à BT10 ([détail](m1b-predictions.md)), écrites avant le lancement.
 - **Ce n'est pas un accord** pour une écriture dans le cluster ni dans Zot.
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T21:44:13Z UTC : banc du bootstrap, résultat
+
+- **Passages** : le premier (21:41:38 UTC) s'est arrêté sur un défaut du script, avant toute installation ([`m1b-boot-1.log`](m1b-boot-1.log)). Le second a duré de 21:42:26 à 21:42:48 UTC, code 0.
+- **Résultat** : BT1 à BT8 tenues. Avec les exclusions du banc de l'outillage, deux installations donnent la même archive, `28634a12…`, référence du 18/11 pour le bootstrap. Les langues et la liste `rpm -qa` sont celles de S1.
+- **Écart non prévu** (BT9 en partie) : le mode de la racine de l'archive, 0775 sur le banc (`mkdir` de l'hôte) et 0555 dans S1. C'est une valeur de plus à choisir dans la carte.
+- **Autre jour** : relancer `m1b-boot.sh` inchangé et comparer `x1` à `28634a12…`.
+- **Détail** : [résultat](m1b-predictions.md), [journal](m1b-boot.log).

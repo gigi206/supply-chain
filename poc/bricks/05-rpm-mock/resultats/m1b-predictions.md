@@ -787,3 +787,32 @@ Journal : [`m1b-a10-b5.log`](m1b-a10-b5.log).
 - **Ce qu'il a mesuré** : BT1 tenue (réseau). Pour BT2 : `a8.tar` au bon sha256, `/usr/bin/dnf` et la macro de langue absents, umask 0022, `%_install_langs` à `all`, rpm 4.16.1.3 et dnf-3 4.14.0. `rpm -K` n'a pas tourné.
 - **Cause de l'arrêt** : un défaut du script. `rpm -q … dnf …` rend 1 parce que dnf n'est pas installé dans les outils, et `pipefail` a arrêté le script. Aucune installation n'a eu lieu.
 - **Correction** : `|| true` sur cette ligne, et sur le `grep` du résumé de la transaction, qui avait le même défaut. Rien d'autre ne change dans [`m1b-boot.sh`](m1b-boot.sh), ni dans les prédictions BT1 à BT10. Le second passage écrit dans `m1b-boot.log`, avec un dossier neuf.
+
+### Résultat du banc du bootstrap, 18/11/2026, de 21:42:26 à 21:42:48 UTC, code 0 (note écrite à 2026-11-18T21:44:13Z UTC)
+
+Journal : [`m1b-boot.log`](m1b-boot.log). Dossier : `~/.cache/supply-chain-poc/05/m1b-boot-20261118T214226Z`, laissé en place.
+
+**BT1 à BT8 tenues.**
+- `rpm -K` donne 10 sur 10.
+- La couche a 11 170 membres. Son mtime maximal est 1763921880 (23/11/2025). Aucun membre n'est au-delà de S, et la couche n'a ni `.wh.`, ni fichier spécial, ni xattr.
+- S vaut 1766985142 ; il vient des `FILEMTIMES` des dix rpm.
+- Les extractions nues `n1` et `n2` sont égales (`1827fa72…`).
+- Chaque installation prend 3 s (761 s dans S1, cause toujours inconnue). Elle fait 6 installations et 4 montées, et sa liste `rpm -qa` est égale à celle de S1.
+- `c1` et `c2` diffèrent par 8 membres, tous dans la liste d'exclusions du banc de l'outillage : les 4 journaux de dnf, `history.sqlite`, `-shm`, `-wal` et `aux-cache`.
+- `c1` est égale à `c1b`.
+- **`x1` est égale à `x2`** : `28634a12c5e99aae558a0cd6719d8f87fad6bac329724f0afafee252e6b78ab3`, 241 981 440 octets, 11 472 membres. C'est la référence du 18/11 pour le bootstrap, avec ces outils, ce miroir et ces exclusions.
+
+**BT9 en partie tenue.**
+- `c1` et `boot-racine.tar` ont les mêmes 11 482 membres, dont 2 608 sous `usr/share/locale` (1 239 `.mo`) des deux côtés. Les langues sont donc celles de S1.
+- Les écarts prévus sont là : `rpmdb.sqlite`, les 4 journaux, `history.sqlite*` et `aux-cache`.
+- **Un écart n'était pas prévu : le mode de `.`**, 0775 dans `c1` et 0555 dans `boot-racine.tar`. La couche n'a pas de membre `.` : les archives nues en ont 11 171, la couche 11 170.
+  - Dans le banc, ce mode vient du `mkdir` du dossier `b1` sur l'hôte (umask 0002, `stat` à 775). `x1` et `x2` ont le même.
+  - Dans S1, il vient de `cp -a "$m/." "$R/"`, depuis la racine montée par podman. L'origine de 0555 n'est pas lue.
+
+**BT10 (lecture).** La transaction ajoute 311 membres et en change 34 : les `.pyc` de dnf (montée de version), `etc/ld.so.cache`, `rpmdb.sqlite`, `aux-cache`, l'historique et les journaux. Le journal ne montre que les 20 premiers ajouts et les 40 premiers écarts.
+
+**Observations** :
+- dnf affiche « Importing GPG key 0x350D275D » à chaque installation. La base porte pourtant déjà `gpg-pubkey-350d275d`, et la liste `rpm -qa` reste égale à celle de S1, à 153 lignes.
+- Les 4 lignes comptées dans chaque journal de dnf sont des « Running scriptlet ».
+
+**Lecture** : sur le banc, deux installations du bootstrap faites le même jour donnent la même archive. Il y faut `SOURCE_DATE_EPOCH=S`, la borne S et les exclusions du banc de l'outillage. Le mode de la racine de l'archive est une entrée de plus, à fixer ; sa valeur (0555 comme S1, ou une autre) revient à la carte. Rien n'est mesuré un autre jour, ni dans le pod Kata, ni avec les outils de `99790c13`, ni avec les quatre dépôts. Le point 1 A reste non établi.

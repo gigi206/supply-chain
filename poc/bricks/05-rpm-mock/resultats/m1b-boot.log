@@ -1,0 +1,166 @@
+# m1b-boot.sh, début 2026-11-18T21:42:26Z
+OK   paquets demandés = ceux de boot_racine de S1 : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+umask de l'hôte (pour mémoire) : 0002
+## 1. clé, métadonnées de vault 9.7 BaseOS et dix rpm (réseau, lecture publique)
+OK   RPM-GPG-KEY-Rocky-9 : empreinte : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   baseos97 : repomd.xml, sha256 égal à hote97 : fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+OK   baseos97 : signataire de repomd.xml : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   baseos97 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml, 25984 kB
+OK   rpm épinglés dans s1-hote97.log : 10
+OK   dix rpm au sha256 de hote97 : 10, 1984355 octets
+fin du réseau : 2026-11-18T21:42:28Z ; la suite tourne sans réseau (unshare -n)
+## 2. racine d'outils (a8), témoins, signatures et borne S
+OK   a8.tar : sha256 : 06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5
+extraction de a8 : code 0, 0 ligne(s) d'erreur
+témoin /usr/bin/dnf dans la racine d'outils : absent
+témoin macros.image-language-conf : absent
+témoin umask (dans la racine d'outils) : 0022
+témoin %_install_langs (dans la racine d'outils) : [all]
+outils : RPM version 4.16.1.3 ; dnf-3 4.14.0
+     rpm-4.16.1.3-40.el9.x86_64
+     package dnf is not installed
+     python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch
+     libsolv-0.7.24-6.el9_8.x86_64
+     libdnf-0.69.0-18.el9.rocky.0.1.x86_64
+rpm -K : 10 « digests signatures OK » sur 10
+## 3. base rockylinux:9.7 (ee90dc0e)
+OK   manifeste ee90dc0e : sha256 : ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+OK   couche 812c44127102 : sha256 : 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+couche : 11170 membres ; mtime max 1763921880 ; au-delà de S (1766985142) : 0 ; .wh. : 0 ; spéciaux : 0 ; avec xattrs : 0
+extraction b1 : code 0, 0 ligne(s) d'erreur
+b1 avant : rpm -qa 147 ligne(s), stderr 0 ligne(s) ; gpg-pubkey : 1
+extraction b2 : code 0, 0 ligne(s) d'erreur
+b2 avant : rpm -qa 147 ligne(s), stderr 0 ligne(s) ; gpg-pubkey : 1
+dix rpm : BUILDTIME max 1766985105, FILEMTIMES max 1766985142 ; base : BUILDTIME max 1763684820, FILEMTIMES max 1763684833
+OK   S (2025-12-29T05:12:22Z) : 1766985142
+## 4. archives bornées à S et installations
+n1.tar : 242667520 octets, 11171 membres, sha256 1827fa72ca985d239a066ced1178d0f55ffe44ee05c6a073d8aa4451cdad35b4
+n2.tar : 242667520 octets, 11171 membres, sha256 1827fa72ca985d239a066ced1178d0f55ffe44ee05c6a073d8aa4451cdad35b4
+OK   témoin : n1.tar et n2.tar (extractions nues) identiques octet à octet
+dnf97.conf : sha256 7f49d5d39d0f1b1b232482a2b9e416c235ece7885a6858256bae0a2692e9f5ef
+## installation b1, début 2026-11-18T21:42:32Z
+dnf-3 code 0 en 3 s ; 85 lignes de journal
+lignes « scriptlet », « warning » ou « error » (casse ignorée) : 4
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+résumé de la transaction : Install  6 Packages
+résumé de la transaction : Upgrade  4 Packages
+b1 après : rpm -qa 153 ligne(s), stderr 0 ligne(s)
+## installation b1, fin 2026-11-18T21:42:35Z
+## installation b2, début 2026-11-18T21:42:40Z
+dnf-3 code 0 en 3 s ; 85 lignes de journal
+lignes « scriptlet », « warning » ou « error » (casse ignorée) : 4
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+résumé de la transaction : Install  6 Packages
+résumé de la transaction : Upgrade  4 Packages
+b2 après : rpm -qa 153 ligne(s), stderr 0 ligne(s)
+## installation b2, fin 2026-11-18T21:42:43Z
+OK   liste rpm -qa de b1 égale à celle de S1 (153 lignes)
+OK   liste rpm -qa de b2 égale à celle de S1 (153 lignes)
+c1.tar : 246384640 octets, 11482 membres, sha256 447ece2b645add4de28b44d893a28b3ce6eb6dff3ff342ea8ff07c005f0ca90a
+c2.tar : 246384640 octets, 11482 membres, sha256 15d5abf377857006a3a49cc6fd98a439499998a4ed9bbe3fea2afb04334ad8d0
+c1b.tar : 246384640 octets, 11482 membres, sha256 447ece2b645add4de28b44d893a28b3ce6eb6dff3ff342ea8ff07c005f0ca90a
+x1.tar : 241981440 octets, 11472 membres, sha256 28634a12c5e99aae558a0cd6719d8f87fad6bac329724f0afafee252e6b78ab3
+x2.tar : 241981440 octets, 11472 membres, sha256 28634a12c5e99aae558a0cd6719d8f87fad6bac329724f0afafee252e6b78ab3
+## 5. comparaisons
+## 5a. c1 et c2 (n'excluent que ./m)
+ÉCART c1.tar et c2.tar différents
+membres : c1 11482 ; c2 11482
+c1 : 2608 membres sous usr/share/locale, dont 1239 fichiers .mo ; 0 membre(s) avec xattrs
+c2 : 2608 membres sous usr/share/locale, dont 1239 fichiers .mo ; 0 membre(s) avec xattrs
+seulement dans c1 : 0 ; seulement dans c2 : 0 ; présents des deux côtés et différents : 8
+     écart : ./var/cache/ldconfig/aux-cache (sha256)
+     écart : ./var/lib/dnf/history.sqlite (sha256)
+     écart : ./var/lib/dnf/history.sqlite-shm (sha256)
+     écart : ./var/lib/dnf/history.sqlite-wal (sha256)
+     écart : ./var/log/dnf.librepo.log (sha256)
+     écart : ./var/log/dnf.log (sha256)
+     écart : ./var/log/dnf.rpm.log (sha256)
+     écart : ./var/log/hawkey.log (sha256)
+champs en cause : sha256 8
+## 5b. témoin : c1 et c1b
+OK   c1.tar et c1b.tar identiques octet à octet
+## 5c. x1 et x2 (exclusions du banc de l'outillage)
+OK   x1.tar et x2.tar identiques octet à octet
+## 5d. contenu seul : c1 contre boot-racine.tar de S1
+OK   boot-racine.tar de S1 : sha256 égal à boot-racine.sha256 : 8ae17f92b27377fff20009d0a88740b1bf9045d533f0506949d6e209c970f1f2
+membres : c1 11482 ; boot-racine.tar 11482
+c1 : 2608 membres sous usr/share/locale, dont 1239 fichiers .mo ; 0 membre(s) avec xattrs
+boot-racine.tar : 2608 membres sous usr/share/locale, dont 1239 fichiers .mo ; 0 membre(s) avec xattrs
+seulement dans c1 : 0 ; seulement dans boot-racine.tar : 0 ; présents des deux côtés et différents : 10
+     écart : . (mode)
+     écart : ./var/cache/ldconfig/aux-cache (sha256)
+     écart : ./var/lib/dnf/history.sqlite (sha256)
+     écart : ./var/lib/dnf/history.sqlite-shm (sha256)
+     écart : ./var/lib/dnf/history.sqlite-wal (sha256)
+     écart : ./var/lib/rpm/rpmdb.sqlite (sha256)
+     écart : ./var/log/dnf.librepo.log (taille, sha256)
+     écart : ./var/log/dnf.log (taille, sha256)
+     écart : ./var/log/dnf.rpm.log (taille, sha256)
+     écart : ./var/log/hawkey.log (taille, sha256)
+champs en cause : mode 1, sha256 9, taille 4
+## 5e. contenu seul : n1 (base nue) contre c1
+membres : n1 11171 ; c1 11482
+n1 : 2576 membres sous usr/share/locale, dont 1207 fichiers .mo ; 0 membre(s) avec xattrs
+c1 : 2608 membres sous usr/share/locale, dont 1239 fichiers .mo ; 0 membre(s) avec xattrs
+seulement dans n1 : 0 ; seulement dans c1 : 311 ; présents des deux côtés et différents : 34
+     seul dans c1 : ./etc/dnf/plugins/copr.conf
+     seul dans c1 : ./etc/dnf/plugins/copr.d
+     seul dans c1 : ./etc/dnf/plugins/debuginfo-install.conf
+     seul dans c1 : ./usr/lib/.build-id/03/363522752a364e1aa924f7ede3a5927f05dd39
+     seul dans c1 : ./usr/lib/.build-id/57/b8a5867e5f562f337b5f826c6621df1b3e7cba
+     seul dans c1 : ./usr/lib/.build-id/67
+     seul dans c1 : ./usr/lib/.build-id/67/b99c8b55f3f9394e62c29aeb94a29a0a35edc2
+     seul dans c1 : ./usr/lib/.build-id/8d
+     seul dans c1 : ./usr/lib/.build-id/8d/1116ce8d770c820898d4c2d60a78671d059312
+     seul dans c1 : ./usr/lib/.build-id/9d/c07bd4e5962975ead5387e2d2f50f193baaa36
+     seul dans c1 : ./usr/lib/.build-id/a7/b2fba9294850ea0418ead342a7ea3d6417cc66
+     seul dans c1 : ./usr/lib/.build-id/da/d1f98a135c11a1bb890df74d05637ddbf03bbb
+     seul dans c1 : ./usr/lib/.build-id/f8/0ead408f1fe76449a557bfd98f7713e7b7ac6a
+     seul dans c1 : ./usr/lib/python3.9/site-packages/__pycache__/six.cpython-39.opt-1.pyc
+     seul dans c1 : ./usr/lib/python3.9/site-packages/__pycache__/six.cpython-39.pyc
+     seul dans c1 : ./usr/lib/python3.9/site-packages/dateutil
+     seul dans c1 : ./usr/lib/python3.9/site-packages/dateutil/__init__.py
+     seul dans c1 : ./usr/lib/python3.9/site-packages/dateutil/__pycache__
+     seul dans c1 : ./usr/lib/python3.9/site-packages/dateutil/__pycache__/__init__.cpython-39.opt-1.pyc
+     seul dans c1 : ./usr/lib/python3.9/site-packages/dateutil/__pycache__/__init__.cpython-39.pyc
+     écart : ./etc/ld.so.cache (taille, sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/base.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/base.cpython-39.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/const.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/exceptions.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/package.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/plugin.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/query.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/repo.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/repodict.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/util.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/__pycache__/util.cpython-39.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/cli/__pycache__/cli.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/cli/__pycache__/cli.cpython-39.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/cli/__pycache__/completion_helper.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/cli/__pycache__/option_parser.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/cli/__pycache__/output.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/cli/__pycache__/output.cpython-39.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/cli/commands/__pycache__/remove.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/cli/commands/__pycache__/repoquery.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/conf/__pycache__/config.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/conf/__pycache__/substitutions.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/db/__pycache__/history.cpython-39.opt-1.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/db/__pycache__/history.cpython-39.pyc (sha256)
+     écart : ./usr/lib/python3.9/site-packages/dnf/rpm/__pycache__/__init__.cpython-39.opt-1.pyc (sha256)
+     écart : ./var/cache/ldconfig/aux-cache (taille, sha256)
+     écart : ./var/lib/dnf/history.sqlite (sha256)
+     écart : ./var/lib/dnf/history.sqlite-shm (sha256)
+     écart : ./var/lib/dnf/history.sqlite-wal (sha256)
+     écart : ./var/lib/rpm/rpmdb.sqlite (taille, sha256)
+     écart : ./var/log/dnf.librepo.log (taille, sha256)
+     écart : ./var/log/dnf.log (taille, sha256)
+     écart : ./var/log/dnf.rpm.log (taille, sha256)
+     écart : ./var/log/hawkey.log (taille, sha256)
+champs en cause : sha256 34, taille 7
+arbres et archives laissés dans /home/gigi/.cache/supply-chain-poc/05/m1b-boot-20261118T214226Z
+# fin 2026-11-18T21:42:48Z
