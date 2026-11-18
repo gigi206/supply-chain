@@ -21,6 +21,11 @@
 #               entrees.tar de prealables copié par morceaux de 64 Mio dans un volume à part, déballé par un second conteneur en UID
 #               65532, monté en lecture seule pour mock ; script de construire-rpm tiré du gabarit rendu, variables de Tekton seules
 #               substituées ; Source0, src.rpm, rpm et digest de l'artefact relevés contre M3 sans arrêter ; pod supprimé
+#   taches      ajoutée le 18/11/2026 (préparée à sec, accord permanent du 18/11), NON LANCÉE ; Zot (bundles), rien dans le
+#               cluster hors dry-run serveur : gabarits égaux à ceux des essais ; tâches et pipeline rendues admises, témoin
+#               computeResources refusé ; preparer-rpm et construire-rpm signées et relues toutes deux (égalité au rendu, champs
+#               de sécurité, scripts égaux à ceux des essais) avant tout versionnement sous construction/ et toute poussée (tag
+#               m4c) ; SIGNER=1 : arrêt tant que la liste revue de la 08 ne porte pas les deux ; sinon : pipeline signée, bundle
 # Les étapes suivantes (taches, pipeline, comparaison, provenance) seront ajoutées après les essais.
 # Usage (racine du dépôt) : DISTRO=rke2 KUBECONFIG=… mise exec -- poc/bricks/05-rpm-mock/m4c.sh <étape>…
 # (journal : resultats/m4c-<étape>.log)
@@ -488,6 +493,137 @@ etape_essai() { # pod Kata au label construire-rpm, à la forme que Tekton produ
   echo "relevé : paquets du buildroot imprimés : $(grep -c '^paquet ' "$x/construire.log" || true) ; écarts au verrou (nom, version, release, arch, sigmd5) : $(diff <(grep '^paquet ' "$x/construire.log") <(jq -r '.buildroot.rpms[] | "paquet \(.name) \(.version) \(.release) \(.arch) \(.sigmd5)"' "$VERROU" | sort) | grep -c '^[<>]' || true)"
   echo "écarts : $ECARTS"
   [ "$ECARTS" = 0 ]
+}
+
+# Brique 05, M4c, étape taches (préparée à sec le 18/11/2026, accord permanent du 18/11) : sur le modèle de l'étape taches de M4b
+# (contenu signé relu avant tout versionnement), pour deux tâches : les deux sont signées et relues avant que l'une soit versionnée
+# ou poussée. Gabarits : ceux des essais (f66229a), à l'octet près. Scripts : ceux joués dans les pods d'essai (resultats/m4c-essai-scripts).
+GABARITS_SHA="preparer-rpm.yaml:a7dfa37e23948209c6b63c815eef1d41fc9ae5404fed3de4708e4167920ad9bc
+construire-rpm.yaml:e88f5521ede87f5b03330683939fd3494f5ff58544ded9a9326014e30b8d0f88
+sample-app-rpm.yaml:a9917a65c994421f25735c03971906e99aac7982821185a135535910f0e8f7cd"   # construction/ à f66229a, inchangés aux essais
+SCRIPTS_ESSAI_SHA="preparer-rpm-sources:3f33ababe1f86b396db5df57f5f78e197014f25e5711ac4fdf152ff2cebc7681
+preparer-rpm-entrees:6a33e3b1cf31b5240eda0a956746692b33592635272d6f4b9ff69acfe7129728
+preparer-rpm-assemblage:554e0dba399a26bc596c5ae749e940c549b590f6067d6857eafc0a4abd35306d
+construire-rpm-construire:0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c"   # $T/essai-preparer/*.sh, $T/essai/construire.sh
+LIBRE_MIN=1073741824   # garde : octets libres sur / de sc-stockage (porte /var/lib/zot) avant toute poussée, comme l'étape rpm de M4b
+echec() { echo "KO   $*" >&2; exit 1; }
+admission() { # fichier : kubectl create --dry-run=server dans builds (rien n'est créé) ; code de kubectl, sortie dans $T/admission.out (m4b.sh)
+  local rc=0
+  kubectl create --dry-run=server -n builds -f "$1" < /dev/null > "$T/admission.out" 2>&1 || rc=$?
+  echo "$rc"
+}
+libre_zot() { sur sc-stockage 'df -B1 --output=avail / | tail -n 1' < /dev/null | tr -d ' '; }   # m4b.sh
+normaliser() { # fichier : JSON sans la signature ni les « resources: {} », « description: "" » et « annotations: {} » que tkn écrit
+  # (mesuré au banc du 18/11), clés triées
+  yq -o=json -I=0 'del(.metadata.annotations["tekton.dev/signature"]) | del(.. | select(tag == "!!map" and length == 0 and (path | .[-1]) == "resources"))
+    | del(.. | select(tag == "!!str" and . == "" and (path | .[-1]) == "description"))
+    | del(.metadata.annotations | select(length == 0)) | sort_keys(..)' "$1"
+}
+scripts_substitues() { # tâche dossier : scripts des pas, variables de Tekton substituées par les expressions des essais
+  local a
+  case $(yq .metadata.name "$1") in
+    preparer-rpm) for a in sources entrees assemblage; do
+        script_etape "$1" "$a" | sed -e 's#\$(workspaces.sortie.path)#/workspace/sortie#g' \
+          -e 's#\$(results\.\([A-Z_-]*\)\.path)#/resultats/\1#g' > "$2/preparer-rpm-$a.sh"; done ;;
+    construire-rpm) script_etape "$1" construire \
+        | sed -e 's#\$(workspaces.entrees.path)#/e#g' -e 's#\$(workspaces.sortie.path)#/o#g' -e 's#\$(results.DIGEST_CONSTRUIT.path)#/w/digest#g' \
+        > "$2/construire-rpm-construire.sh" ;;
+  esac
+}
+controler_tache() { # tâche-signée : contenu signé relu (signature, égalité au rendu, champs de sécurité, scripts des essais)
+  local f=$1 n e s x=$T/scripts-signes o
+  n=$(yq .metadata.name "$f"); mkdir -p "$x"; o=$x/$n.json
+  attendu "$n signée : annotation de signature" "$(yq '.metadata.annotations["tekton.dev/signature"] | length > 0' "$f")" true
+  normaliser "$f" > "$o"
+  attendu "$n signée : égale à la tâche rendue, signature exceptée (normalisées)" "$(cmp -s "$o" <(normaliser "$T/$n.yaml") && echo égale || echo différente)" égale
+  case $n in
+    "$LABEL_PREPARER")
+      attendu "$n signée : images des pas" "$(yq -p=json -o=yaml '[.spec.steps[].image] | join(" ")' "$o")" "$PREFETCH_IMAGE $OUTILS_IMAGE $PREFETCH_IMAGE"
+      attendu "$n signée : contexte et montages du stepTemplate" "$(yq -p=json -o=json -I=0 '.spec.stepTemplate' "$o")" \
+        '{"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":65532},"volumeMounts":[{"mountPath":"/etc/ca-poc","name":"ca-poc","readOnly":true},{"mountPath":"/tmp","name":"tmp"}]}'
+      attendu "$n signée : pas (contexte, ressources, computeResources, env, montages propres)" \
+        "$(yq -p=json -o=json -I=0 '[.spec.steps[] | [.name, has("securityContext"), has("resources"), has("computeResources"), ((.env // []) | map(.name + "=" + .value)), (.volumeMounts // [])]]' "$o")" \
+        '[["sources",false,false,false,["DEPOT=$(params.depot)","COMMIT=$(params.commit)"],[]],["entrees",false,false,false,["FERMETURE_RPM=$(params.fermeture-rpm)","FERMETURE_SOURCES=$(params.fermeture-sources)","PACKAGING=$(params.packaging)"],[]],["assemblage",false,false,false,[],[]]]'
+      attendu "$n signée : paramètres, workspaces, résultats, volumes" \
+        "$(yq -p=json -o=json -I=0 '[[.spec.params[].name], .spec.workspaces, [.spec.results[] | .name + ":" + .type + ":" + ((.properties // {}) | keys | join(","))], .spec.volumes]' "$o")" \
+        '[["depot","commit","fermeture-rpm","fermeture-sources","packaging"],[{"name":"sortie"}],["CHAINS-GIT_URL:string:","CHAINS-GIT_COMMIT:string:","FERMETURE_RPM_ARTIFACT_INPUTS:object:digest,uri","FERMETURE_SOURCES_ARTIFACT_INPUTS:object:digest,uri","PACKAGING_ARTIFACT_INPUTS:object:digest,uri"],[{"configMap":{"name":"ca-poc"},"name":"ca-poc"},{"emptyDir":{},"name":"tmp"}]]' ;;
+    "$LABEL_CONSTRUIRE")
+      attendu "$n signée : image du pas" "$(yq -p=json -o=yaml '[.spec.steps[].image] | join(" ")' "$o")" "$IMAGE_OUTILLAGE"
+      attendu "$n signée : contexte du pas (root privilégié, comme l'essai), aucun stepTemplate" \
+        "$(yq -p=json -o=json -I=0 '[.spec.steps[0].securityContext, (.spec | has("stepTemplate"))]' "$o")" \
+        '[{"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0},false]'
+      attendu "$n signée : ressources du pas (resources de v1beta1), aucun computeResources" \
+        "$(yq -p=json -o=json -I=0 '[.spec.steps[0].resources, ([.. | select(tag == "!!map") | keys[] | select(. == "computeResources")] | length)]' "$o")" \
+        '[{"limits":{"cpu":"2","memory":"6Gi"},"requests":{"cpu":"2","memory":"6Gi"}},0]'
+      attendu "$n signée : env et montages du pas" "$(yq -p=json -o=json -I=0 '[.spec.steps[] | [.name, ((.env // []) | map(.name + "=" + .value)), .volumeMounts]]' "$o")" \
+        '[["construire",["EPOQUE=$(params.epoque)"],[{"mountPath":"/w","name":"w"}]]]'
+      attendu "$n signée : paramètres, workspaces (entrées en lecture seule), résultats, volumes" \
+        "$(yq -p=json -o=json -I=0 '[[.spec.params[].name], .spec.workspaces, [.spec.results[] | .name + ":" + .type], .spec.volumes]' "$o")" \
+        '[["epoque"],[{"name":"entrees","readOnly":true},{"name":"sortie"}],["DIGEST_CONSTRUIT:string"],[{"emptyDir":{"medium":"Memory","sizeLimit":"4Gi"},"name":"w"}]]' ;;
+    *) echec "tâche signée inattendue : $n" ;;
+  esac
+  scripts_substitues "$f" "$x"
+  for e in $SCRIPTS_ESSAI_SHA; do
+    case ${e%%:*} in "$n"-*) ;; *) continue ;; esac
+    s=$(sha256sum < "$x/${e%%:*}.sh" | cut -c1-64)
+    attendu "$n signée : script ${e%%:*}, substitué, égal à celui joué à l'essai (sha256)" "$s" "${e#*:}"
+  done
+}
+versionner() { # tâche : signature versionnée sous construction/ (SIGNER=1 : écrite si absente ou si le contenu hors signature change)
+  local n=$1 v=$C/$1.signee.yaml
+  if [ -n "${SIGNER:-}" ] && ! { [ -s "$v" ] && cmp -s <(grep -v 'tekton.dev/signature:' "$T/$n-signee.yaml") <(grep -v 'tekton.dev/signature:' "$v"); }; then
+    cp "$T/$n-signee.yaml" "$v"; echo "SIGNER : nouvelle signature dans construction/$n.signee.yaml"
+  fi
+  [ -s "$v" ] || echec "$n : signature versionnée absente : SIGNER=1, puis revue de la liste"
+  attendu "$n : signature versionnée conforme au gabarit rendu, signature exceptée" \
+    "$(cmp -s <(grep -v 'tekton.dev/signature:' "$T/$n-signee.yaml") <(grep -v 'tekton.dev/signature:' "$v") && echo conforme || echo différente)" conforme
+  echo "construction/$n.signee.yaml : sha256 $(sha256sum < "$v" | cut -c1-64)"
+}
+
+etape_taches() { # SIGNER=1 : preparer-rpm et construire-rpm signées, relues, versionnées, bundles, à ajouter à la liste revue ;
+  # une fois les deux listées : de plus la pipeline sample-app-rpm, rendue avec leurs références, signée, relue, bundle
+  local e n r l=0 libre p
+  [ -s "$S/taches.key" ] || echec "clé des tâches absente"
+  attendu "publier-image, lue dans la liste revue" "$(ref_revue publier-image d21931f3)" "$PUBLIER_REF"
+  for e in $GABARITS_SHA; do
+    attendu "gabarit ${e%%:*} égal à celui des essais (sha256)" "$(sha256sum < "$C/${e%%:*}" | cut -c1-64)" "${e#*:}"
+  done
+  echo "## gabarits rendus (tâches factices dans la pipeline) ; admission en dry-run serveur, rien n'est créé"
+  rendre_taches
+  rendre_pipeline "$REG/tekton/tasks/preparer-rpm@$FACTICE" "$REG/tekton/tasks/construire-rpm@$FACTICE" "$PUBLIER_REF"
+  for n in preparer-rpm construire-rpm sample-app-rpm; do attendu "$n rendue admise (code de kubectl)" "$(admission "$T/$n.yaml")" 0; done
+  yq '.spec.steps[0].computeResources = .spec.steps[0].resources | del(.spec.steps[0].resources)' "$T/construire-rpm.yaml" > "$T/temoin-v1beta1.yaml"
+  [ "$(admission "$T/temoin-v1beta1.yaml")" != 0 ] || echec "témoin (computeResources dans un pas v1beta1) admis : le dry-run ne contrôle plus le nom du champ"
+  attendu "témoin refusé : champ inconnu (message mesuré le 18/11 en M4b, m4b-taches-admission.log)" \
+    "$(grep -c -F 'strict decoding error: unknown field "spec.steps[0].computeResources"' "$T/admission.out")" 1
+  echo "## signatures (tkn $(tkn version --component client)) ; les deux tâches relues avant tout versionnement et toute poussée"
+  for n in preparer-rpm construire-rpm; do tkn task sign "$T/$n.yaml" -K "$S/taches.key" -f "$T/$n-signee.yaml" > /dev/null; done
+  for n in preparer-rpm construire-rpm; do controler_tache "$T/$n-signee.yaml"; done
+  libre=$(libre_zot)
+  echo "relevé : octets libres sur / de sc-stockage (porte /var/lib/zot) avant les poussées : $libre"
+  [ "$libre" -ge "$LIBRE_MIN" ] 2> /dev/null || echec "octets libres sur / de sc-stockage sous $LIBRE_MIN : $libre"
+  for n in preparer-rpm construire-rpm; do versionner "$n"; done
+  mkdir -p "$T/auth/docker" && auth_zot "$T/auth/docker/config.json"   # bundles (commun.sh), compte poc-ecriture
+  for n in preparer-rpm construire-rpm; do
+    r=$REG/tekton/tasks/$n@$(bundle "$C/$n.signee.yaml" "tekton/tasks/$n" m4c)
+    echo "$r" > "$T/$n.ref"
+    if listee "$r"; then echo "OK   $n dans la liste revue : $r"; l=$((l + 1))
+    elif [ -n "${SIGNER:-}" ]; then echo "SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : $r"
+    else echec "$n absente de la liste revue : $r"; fi
+  done
+  [ "$l" = 2 ] || { echo "SIGNER : pipeline non signée tant que la liste revue n'a pas été acceptée"; return 0; }
+  echo "## pipeline sample-app-rpm, tâches de la liste revue"
+  rendre_pipeline "$(cat "$T/preparer-rpm.ref")" "$(cat "$T/construire-rpm.ref")" "$PUBLIER_REF"
+  attendu "pipeline rendue (références réelles) admise (code de kubectl)" "$(admission "$T/sample-app-rpm.yaml")" 0
+  attendu "pipeline : références des tâches" \
+    "$(yq '[.spec.tasks[].taskRef.params[] | select(.name == "bundle") | .value] | join(" ")' "$T/sample-app-rpm.yaml")" \
+    "$(cat "$T/preparer-rpm.ref") $(cat "$T/construire-rpm.ref") $PUBLIER_REF"
+  tkn pipeline sign "$T/sample-app-rpm.yaml" -K "$S/taches.key" -f "$T/sample-app-rpm-signee.yaml" > /dev/null
+  attendu "pipeline signée : annotation de signature" "$(yq '.metadata.annotations["tekton.dev/signature"] | length > 0' "$T/sample-app-rpm-signee.yaml")" true
+  attendu "pipeline signée : égale à la pipeline rendue et relue, signature exceptée" \
+    "$(cmp -s <(normaliser "$T/sample-app-rpm-signee.yaml") <(normaliser "$T/sample-app-rpm.yaml") && echo égale || echo différente)" égale
+  p=$REG/tekton/pipelines/sample-app-rpm@$(bundle "$T/sample-app-rpm-signee.yaml" tekton/pipelines/sample-app-rpm m4c)
+  echo "$p" | tee "$T/sample-app-rpm.ref"
 }
 
 lancer m4c "05 M4c" "$@"

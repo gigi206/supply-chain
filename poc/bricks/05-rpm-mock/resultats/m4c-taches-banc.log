@@ -1,0 +1,97 @@
+# m4c-taches-banc.sh, 2026-11-18T14:49:24Z ; m4c.sh avant b5a7f79d725334441fbac1284cc4b2e184c9bf6e4a5a9cb99f1ced05637b6cb2 ; copie d2d895d979b78cddd40a49898709f3a72070f7e79fadccef765d13508d0b42e9
+# gabarits : preparer-rpm a7dfa37e23948209 ; construire-rpm e88f5521ede87f5b ; sample-app-rpm a9917a65c994421f ; 
+# tkn 0.46.2 ; yq v4.54.3 ; liste revue 6a78e5f5db7aca41f8c6a5090101ea5bcc7a027571116085d34d2fe1de2b10b0
+## A : insertions seules, syntaxe, shellcheck, scripts archivés
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+OK   lignes insérées (en-tête 5, bloc 131) : 136
+OK   bash -n : ok
+OK   shellcheck : écarts (nombre de SC2016 seulement) : < SC2016 > SC2016
+OK   scripts archivés des essais : sha256 égaux aux constantes de la copie : construire-rpm-construire:0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c preparer-rpm-assemblage:554e0dba399a26bc596c5ae749e940c549b590f6067d6857eafc0a4abd35306d preparer-rpm-entrees:6a33e3b1cf31b5240eda0a956746692b33592635272d6f4b9ff69acfe7129728 preparer-rpm-sources:3f33ababe1f86b396db5df57f5f78e197014f25e5711ac4fdf152ff2cebc7681
+OK   clé jetable du banc (P-256) : 1
+## B : vraie fonction etape_taches, vrai tkn, clé jetable
+OK   SIGNER=1, première passe (code 0)
+OK   SIGNER=1, première passe : $T/auth absent à la fin : absent
+OK   SIGNER=1, première passe : appels de kubectl hors dry-run serveur : 0
+OK   première passe : nouvelles signatures : 2
+OK   première passe : références à ajouter : 2
+OK   première passe : lignes OK de l'étape : 31
+OK   première passe : scripts relus égaux à ceux des essais : 4
+OK   première passe : témoin refusé, message mesuré : 1
+OK   première passe : relevé du disque avant les poussées : 1
+OK   première passe : poussées (deux tâches, tag m4c) : tekton/tasks/preparer-rpm:m4c tekton/tasks/construire-rpm:m4c
+OK   première passe : signatures versionnées, pipeline non signée : [preparer-rpm construire-rpm] non-signée
+OK   première passe : preparer-rpm vérifiée par tkn (clé publique du banc) : vérifiée
+OK   première passe : preparer-rpm, digest poussé = fichier versionné : 6228fb80f6dc05b2bbcf9cc25f2390ff26a9f422afe02f3c3daa904bf11fbbb1
+première passe : preparer-rpm signée du banc, 7465 octets ; clés de metadata ["annotations","name"]
+OK   première passe : construire-rpm vérifiée par tkn (clé publique du banc) : vérifiée
+OK   première passe : construire-rpm, digest poussé = fichier versionné : e27253ce9e6a6157c0a99e3c2092d8b788c5d4b61f4a6aece573ed1b8d3e4c71
+première passe : construire-rpm signée du banc, 10890 octets ; clés de metadata ["annotations","name"]
+OK   première passe : scripts substitués de la copie = scripts archivés des essais : égal
+OK   SIGNER=1, rejouée sans changement (code 0)
+OK   SIGNER=1, rejouée sans changement : $T/auth absent à la fin : absent
+OK   SIGNER=1, rejouée sans changement : appels de kubectl hors dry-run serveur : 0
+OK   rejouée : pas de nouvelle signature : 0
+OK   rejouée : fichiers versionnés et digests poussés inchangés : 6228fb80f6dc05b2bbcf9cc25f2390ff26a9f422afe02f3c3daa904bf11fbbb1 e27253ce9e6a6157c0a99e3c2092d8b788c5d4b61f4a6aece573ed1b8d3e4c71 6228fb80f6dc05b2bbcf9cc25f2390ff26a9f422afe02f3c3daa904bf11fbbb1 e27253ce9e6a6157c0a99e3c2092d8b788c5d4b61f4a6aece573ed1b8d3e4c71
+OK   sans SIGNER, absentes de la liste revue : refusé (code 1)
+OK   sans SIGNER, absentes de la liste revue : refusé : $T/auth absent à la fin : absent
+OK   sans SIGNER, absentes de la liste revue : refusé : appels de kubectl hors dry-run serveur : 0
+OK   sans SIGNER, construire-rpm absente : refusé (code 1)
+OK   sans SIGNER, construire-rpm absente : refusé : $T/auth absent à la fin : absent
+OK   sans SIGNER, construire-rpm absente : refusé : appels de kubectl hors dry-run serveur : 0
+OK   SIGNER=1, une seule listée : pipeline non signée (code 0)
+OK   SIGNER=1, une seule listée : pipeline non signée : $T/auth absent à la fin : absent
+OK   SIGNER=1, une seule listée : pipeline non signée : appels de kubectl hors dry-run serveur : 0
+OK   une seule listée : OK de preparer-rpm, construire-rpm à ajouter, aucune pipeline : 1 1 aucune
+OK   sans SIGNER, les deux listées : pipeline signée (code 0)
+OK   sans SIGNER, les deux listées : pipeline signée : $T/auth absent à la fin : absent
+OK   sans SIGNER, les deux listées : pipeline signée : appels de kubectl hors dry-run serveur : 0
+OK   pipeline : lignes OK de l'étape : 41
+OK   pipeline : poussées (deux tâches, puis la pipeline) : tekton/tasks/preparer-rpm:m4c tekton/tasks/construire-rpm:m4c tekton/pipelines/sample-app-rpm:m4c
+OK   pipeline : signature vérifiée par tkn (clé publique du banc) : vérifiée
+OK   pipeline signée : références des tâches : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:6228fb80f6dc05b2bbcf9cc25f2390ff26a9f422afe02f3c3daa904bf11fbbb1 sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:e27253ce9e6a6157c0a99e3c2092d8b788c5d4b61f4a6aece573ed1b8d3e4c71 sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   pipeline signée : entrées par digest, époque, subPath : [["sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c","sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21","sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8"],[{"name":"epoque","value":"1793229566"}],[null,"entrees","image","image"]]
+OK   pipeline : référence écrite sous $T/sample-app-rpm.ref, aucun pipeline.ref : 1 absent
+OK   témoin de vérification : tâche altérée après signature refusée par tkn : refusée
+OK   gabarit modifié : refusé avant toute signature (code 1)
+OK   gabarit modifié : refusé avant toute signature : $T/auth absent à la fin : absent
+OK   gabarit modifié : refusé avant toute signature : appels de kubectl hors dry-run serveur : 0
+OK   gabarit modifié : ni versionnement ni poussée : [] 0
+OK   gabarit modifié : aucune tâche signée : 0
+OK   script altéré : gabarit du banc modifié : modifié
+OK   script de construire-rpm altéré, SIGNER=1 : refusé (code 1)
+OK   script de construire-rpm altéré, SIGNER=1 : refusé : $T/auth absent à la fin : absent
+OK   script de construire-rpm altéré, SIGNER=1 : refusé : appels de kubectl hors dry-run serveur : 0
+OK   script altéré : ni versionnement ni poussée : [] 0
+OK   contexte du pas de construire-rpm altéré, SIGNER=1 : refusé (code 1)
+OK   contexte du pas de construire-rpm altéré, SIGNER=1 : refusé : $T/auth absent à la fin : absent
+OK   contexte du pas de construire-rpm altéré, SIGNER=1 : refusé : appels de kubectl hors dry-run serveur : 0
+OK   contexte altéré : ni versionnement ni poussée : [] 0
+OK   stepTemplate de preparer-rpm altéré, SIGNER=1 : refusé (code 1)
+OK   stepTemplate de preparer-rpm altéré, SIGNER=1 : refusé : $T/auth absent à la fin : absent
+OK   stepTemplate de preparer-rpm altéré, SIGNER=1 : refusé : appels de kubectl hors dry-run serveur : 0
+OK   stepTemplate altéré : ni versionnement ni poussée : [] 0
+OK   contenu modifié depuis la signature versionnée, sans SIGNER : refusé (code 1)
+OK   contenu modifié depuis la signature versionnée, sans SIGNER : refusé : $T/auth absent à la fin : absent
+OK   contenu modifié depuis la signature versionnée, sans SIGNER : refusé : appels de kubectl hors dry-run serveur : 0
+OK   contenu modifié : aucune poussée : 0
+OK   témoin admis : refusé avant tkn (code 1)
+OK   témoin admis : refusé avant tkn : $T/auth absent à la fin : absent
+OK   témoin admis : refusé avant tkn : appels de kubectl hors dry-run serveur : 0
+OK   témoin admis : aucune tâche signée : 0
+OK   témoin admis : ni versionnement ni poussée : [] 0
+OK   construire-rpm refusée à l'admission : refusé (code 1)
+OK   construire-rpm refusée à l'admission : refusé : $T/auth absent à la fin : absent
+OK   construire-rpm refusée à l'admission : refusé : appels de kubectl hors dry-run serveur : 0
+OK   tâche refusée : ni versionnement ni poussée : [] 0
+OK   disque de Zot bas : refusé avant tout versionnement (code 1)
+OK   disque de Zot bas : refusé avant tout versionnement : $T/auth absent à la fin : absent
+OK   disque de Zot bas : refusé avant tout versionnement : appels de kubectl hors dry-run serveur : 0
+OK   disque bas : ni versionnement ni poussée : [] 0
+OK   octets libres illisibles : refusé (code 1)
+OK   octets libres illisibles : refusé : $T/auth absent à la fin : absent
+OK   octets libres illisibles : refusé : appels de kubectl hors dry-run serveur : 0
+OK   octets illisibles : ni versionnement ni poussée : [] 0
+OK   gabarits du dépôt inchangés par le banc : a7dfa37e23948209 e88f5521ede87f5b a9917a65c994421f
+OK   aucune signature versionnée dans le dépôt : 0
+# bilan : tenu, 89 OK, 0 KO, fin 2026-11-18T14:49:41Z

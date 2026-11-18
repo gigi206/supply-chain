@@ -1,0 +1,118 @@
+# m4c-taches-banc.sh, 2026-11-18T14:45:50Z ; m4c.sh avant b5a7f79d725334441fbac1284cc4b2e184c9bf6e4a5a9cb99f1ced05637b6cb2 ; copie 3f344fb601367f5922ab431e6c966f55db69ad5327245626095ba444a6e1cebb
+# gabarits : preparer-rpm a7dfa37e23948209 ; construire-rpm e88f5521ede87f5b ; sample-app-rpm a9917a65c994421f ; 
+# tkn 0.46.2 ; yq v4.54.3 ; liste revue 6a78e5f5db7aca41f8c6a5090101ea5bcc7a027571116085d34d2fe1de2b10b0
+## A : insertions seules, syntaxe, shellcheck, scripts archivés
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+OK   lignes insérées (en-tête 5, bloc 126) : 131
+OK   bash -n : ok
+OK   shellcheck : écarts (nombre de SC2016 seulement) : < SC2016 > SC2016
+OK   scripts archivés des essais : sha256 égaux aux constantes de la copie : construire-rpm-construire:0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c preparer-rpm-assemblage:554e0dba399a26bc596c5ae749e940c549b590f6067d6857eafc0a4abd35306d preparer-rpm-entrees:6a33e3b1cf31b5240eda0a956746692b33592635272d6f4b9ff69acfe7129728 preparer-rpm-sources:3f33ababe1f86b396db5df57f5f78e197014f25e5711ac4fdf152ff2cebc7681
+OK   clé jetable du banc (P-256) : 1
+## B : vraie fonction etape_taches, vrai tkn, clé jetable
+KO   SIGNER=1, première passe : code 1, attendu 0 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   SIGNER=1, première passe : $T/auth absent à la fin : absent
+OK   SIGNER=1, première passe : appels de kubectl hors dry-run serveur : 0
+KO   première passe : nouvelles signatures : 0 (attendu : 2)
+KO   première passe : références à ajouter : 0 (attendu : 2)
+KO   première passe : lignes OK de l'étape : 13 (attendu : 33)
+KO   première passe : scripts relus égaux à ceux des essais : 0 (attendu : 4)
+OK   première passe : témoin refusé, message mesuré : 1
+KO   première passe : relevé du disque avant les poussées : 0 (attendu : 1)
+KO   première passe : poussées (deux tâches, tag m4c) :  (attendu : tekton/tasks/preparer-rpm:m4c tekton/tasks/construire-rpm:m4c)
+KO   première passe : signatures versionnées, pipeline non signée : [] non-signée (attendu : [preparer-rpm construire-rpm] non-signée)
+KO   première passe : preparer-rpm vérifiée par tkn (clé publique du banc) : refusée (attendu : vérifiée)
+poc/bricks/05-rpm-mock/resultats/m4c-taches-banc.sh: line 122: ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/c1/preparer-rpm.signee.yaml: No such file or directory
+OK   première passe : preparer-rpm, digest poussé = fichier versionné : 
+cp: cannot stat '~/.cache/supply-chain-poc/05/banc-m4c-taches-1/c1/preparer-rpm.signee.yaml': No such file or directory
+poc/bricks/05-rpm-mock/resultats/m4c-taches-banc.sh: line 124: ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/preparer-rpm-signee-1.yaml: No such file or directory
+Error: open ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/preparer-rpm-signee-1.yaml: no such file or directory
+première passe : preparer-rpm signée du banc,  octets ; clés de metadata 
+KO   première passe : construire-rpm vérifiée par tkn (clé publique du banc) : refusée (attendu : vérifiée)
+poc/bricks/05-rpm-mock/resultats/m4c-taches-banc.sh: line 122: ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/c1/construire-rpm.signee.yaml: No such file or directory
+OK   première passe : construire-rpm, digest poussé = fichier versionné : 
+cp: cannot stat '~/.cache/supply-chain-poc/05/banc-m4c-taches-1/c1/construire-rpm.signee.yaml': No such file or directory
+poc/bricks/05-rpm-mock/resultats/m4c-taches-banc.sh: line 124: ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/construire-rpm-signee-1.yaml: No such file or directory
+Error: open ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/construire-rpm-signee-1.yaml: no such file or directory
+première passe : construire-rpm signée du banc,  octets ; clés de metadata 
+KO   première passe : scripts substitués de la copie = scripts archivés des essais : différent construire-rpm-construire.sh
+différent preparer-rpm-assemblage.sh
+différent preparer-rpm-entrees.sh
+différent preparer-rpm-sources.sh (attendu : égal)
+poc/bricks/05-rpm-mock/resultats/m4c-taches-banc.sh: line 128: ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/c1/preparer-rpm.signee.yaml: No such file or directory
+poc/bricks/05-rpm-mock/resultats/m4c-taches-banc.sh: line 128: ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/c1/construire-rpm.signee.yaml: No such file or directory
+KO   SIGNER=1, rejouée sans changement : code 1, attendu 0 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   SIGNER=1, rejouée sans changement : $T/auth absent à la fin : absent
+OK   SIGNER=1, rejouée sans changement : appels de kubectl hors dry-run serveur : 0
+OK   rejouée : pas de nouvelle signature : 0
+poc/bricks/05-rpm-mock/resultats/m4c-taches-banc.sh: line 132: ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/c1/preparer-rpm.signee.yaml: No such file or directory
+poc/bricks/05-rpm-mock/resultats/m4c-taches-banc.sh: line 132: ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/c1/construire-rpm.signee.yaml: No such file or directory
+KO   rejouée : fichiers versionnés et digests poussés inchangés :    (attendu :    )
+KO   sans SIGNER, absentes de la liste revue : refusé : code 1, attendu 1 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   sans SIGNER, absentes de la liste revue : refusé : $T/auth absent à la fin : absent
+OK   sans SIGNER, absentes de la liste revue : refusé : appels de kubectl hors dry-run serveur : 0
+KO   sans SIGNER, construire-rpm absente : refusé : code 1, attendu 1 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   sans SIGNER, construire-rpm absente : refusé : $T/auth absent à la fin : absent
+OK   sans SIGNER, construire-rpm absente : refusé : appels de kubectl hors dry-run serveur : 0
+KO   SIGNER=1, une seule listée : pipeline non signée : code 1, attendu 0 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   SIGNER=1, une seule listée : pipeline non signée : $T/auth absent à la fin : absent
+OK   SIGNER=1, une seule listée : pipeline non signée : appels de kubectl hors dry-run serveur : 0
+KO   une seule listée : OK de preparer-rpm, construire-rpm à ajouter, aucune pipeline : 0 0 aucune (attendu : 1 1 aucune)
+KO   sans SIGNER, les deux listées : pipeline signée : code 1, attendu 0 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   sans SIGNER, les deux listées : pipeline signée : $T/auth absent à la fin : absent
+OK   sans SIGNER, les deux listées : pipeline signée : appels de kubectl hors dry-run serveur : 0
+KO   pipeline : lignes OK de l'étape : 13 (attendu : 42)
+KO   pipeline : poussées (deux tâches, puis la pipeline) :  (attendu : tekton/tasks/preparer-rpm:m4c tekton/tasks/construire-rpm:m4c tekton/pipelines/sample-app-rpm:m4c)
+KO   pipeline : signature vérifiée par tkn (clé publique du banc) : refusée (attendu : vérifiée)
+Error: open ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/O-W6/travail/m4c-05/sample-app-rpm-signee.yaml: no such file or directory
+KO   pipeline signée : références des tâches :  (attendu : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256: sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256: sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b)
+Error: open ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/O-W6/travail/m4c-05/sample-app-rpm-signee.yaml: no such file or directory
+KO   pipeline signée : entrées par digest, époque, subPath :  (attendu : [["sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c","sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21","sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8"],[{"name":"epoque","value":"1793229566"}],[null,"entrees","image","image"]])
+grep: ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/O-W6/travail/m4c-05/sample-app-rpm.ref: No such file or directory
+KO   pipeline : référence écrite sous $T/sample-app-rpm.ref, aucun pipeline.ref :  absent (attendu : 1 absent)
+sed: can't read ~/.cache/supply-chain-poc/05/banc-m4c-taches-1/construire-rpm-signee-1.yaml: No such file or directory
+OK   témoin de vérification : tâche altérée après signature refusée par tkn : refusée
+OK   gabarit modifié : refusé avant toute signature (code 1)
+OK   gabarit modifié : refusé avant toute signature : $T/auth absent à la fin : absent
+OK   gabarit modifié : refusé avant toute signature : appels de kubectl hors dry-run serveur : 0
+OK   gabarit modifié : ni versionnement ni poussée : [] 0
+OK   gabarit modifié : aucune tâche signée : 0
+OK   script altéré : gabarit du banc modifié : modifié
+KO   script de construire-rpm altéré, SIGNER=1 : refusé : code 1, attendu 1 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   script de construire-rpm altéré, SIGNER=1 : refusé : $T/auth absent à la fin : absent
+OK   script de construire-rpm altéré, SIGNER=1 : refusé : appels de kubectl hors dry-run serveur : 0
+OK   script altéré : ni versionnement ni poussée : [] 0
+KO   contexte du pas de construire-rpm altéré, SIGNER=1 : refusé : code 1, attendu 1 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   contexte du pas de construire-rpm altéré, SIGNER=1 : refusé : $T/auth absent à la fin : absent
+OK   contexte du pas de construire-rpm altéré, SIGNER=1 : refusé : appels de kubectl hors dry-run serveur : 0
+OK   contexte altéré : ni versionnement ni poussée : [] 0
+KO   stepTemplate de preparer-rpm altéré, SIGNER=1 : refusé : code 1, attendu 1 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   stepTemplate de preparer-rpm altéré, SIGNER=1 : refusé : $T/auth absent à la fin : absent
+OK   stepTemplate de preparer-rpm altéré, SIGNER=1 : refusé : appels de kubectl hors dry-run serveur : 0
+OK   stepTemplate altéré : ni versionnement ni poussée : [] 0
+cp: cannot stat '~/.cache/supply-chain-poc/05/banc-m4c-taches-1/preparer-rpm-signee-1.yaml': No such file or directory
+cp: cannot stat '~/.cache/supply-chain-poc/05/banc-m4c-taches-1/construire-rpm-signee-1.yaml': No such file or directory
+KO   contenu modifié depuis la signature versionnée, sans SIGNER : refusé : code 1, attendu 1 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   contenu modifié depuis la signature versionnée, sans SIGNER : refusé : $T/auth absent à la fin : absent
+OK   contenu modifié depuis la signature versionnée, sans SIGNER : refusé : appels de kubectl hors dry-run serveur : 0
+OK   contenu modifié : aucune poussée : 0
+OK   témoin admis : refusé avant tkn (code 1)
+OK   témoin admis : refusé avant tkn : $T/auth absent à la fin : absent
+OK   témoin admis : refusé avant tkn : appels de kubectl hors dry-run serveur : 0
+OK   témoin admis : aucune tâche signée : 0
+OK   témoin admis : ni versionnement ni poussée : [] 0
+OK   construire-rpm refusée à l'admission : refusé (code 1)
+OK   construire-rpm refusée à l'admission : refusé : $T/auth absent à la fin : absent
+OK   construire-rpm refusée à l'admission : refusé : appels de kubectl hors dry-run serveur : 0
+OK   tâche refusée : ni versionnement ni poussée : [] 0
+KO   disque de Zot bas : refusé avant tout versionnement : code 1, attendu 1 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   disque de Zot bas : refusé avant tout versionnement : $T/auth absent à la fin : absent
+OK   disque de Zot bas : refusé avant tout versionnement : appels de kubectl hors dry-run serveur : 0
+OK   disque bas : ni versionnement ni poussée : [] 0
+KO   octets libres illisibles : refusé : code 1, attendu 1 ; sortie : *Warning*: This is an experimental command, its usage and behavior can change in the next release(s) OK   preparer-rpm signée : annotation de signature : true KO   preparer-rpm signée : égale à la tâche rendue, signature exceptée : différente (attendu : égale) 
+OK   octets libres illisibles : refusé : $T/auth absent à la fin : absent
+OK   octets libres illisibles : refusé : appels de kubectl hors dry-run serveur : 0
+OK   octets illisibles : ni versionnement ni poussée : [] 0
+OK   gabarits du dépôt inchangés par le banc : a7dfa37e23948209 e88f5521ede87f5b a9917a65c994421f
+OK   aucune signature versionnée dans le dépôt : 0
+# bilan : NON TENU, 59 OK, 30 KO, fin 2026-11-18T14:45:59Z

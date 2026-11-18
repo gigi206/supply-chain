@@ -142,3 +142,65 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 - Aucune correction du gabarit n'est demandée par cet essai. `construire-rpm.yaml` (`e88f5521…`) et `preparer-rpm.yaml` sont prêts pour la signature (étape `taches`, à préparer), puis pour la revue de `taches.yml`.
 
 **Non couvert** : le PVC sous `subPath` et Kata, l'`env` et le `HOME` de Tekton, `publier-image`, Chains, la provenance.
+
+## Note datée du 18/11/2026, écrite à 14:51:48 UTC : étape `taches` préparée à sec et appliquée (accord permanent du 18/11), NON LANCÉE ; prédictions TS0 à TS10 et TP1 à TP4
+
+**Modèle** : l'étape `taches` de M4b (contenu signé relu avant tout versionnement), étendue à deux tâches. Les deux sont signées et relues **avant** que l'une soit versionnée ou poussée. `signer_tache` de la 06 n'est pas repris : il poussait la première tâche avant d'avoir relu la seconde.
+
+**Ce que fait l'étape**
+1. Clé des tâches présente (`test -s`) ; `publier-image` lue dans la liste revue, égale à `d21931f3…` ; les trois gabarits égaux, à l'octet près, à ceux des essais (`construction/` à `f66229a`, inchangé depuis).
+2. Tâches et pipeline rendues (références factices dans la pipeline), admises en dry-run serveur ; témoin `computeResources` dans un pas v1beta1, refusé avec le message mesuré en M4b.
+3. `tkn task sign` des deux tâches, puis relecture de chacune, normalisée :
+   - égale à la tâche rendue, signature exceptée ;
+   - `preparer-rpm` : images, `stepTemplate` (UID 65532, `runAsNonRoot`, capacités retirées, sans élévation), aucun contexte ni ressource au niveau des pas, env, paramètres, résultats, volumes ;
+   - `construire-rpm` : image, contexte root privilégié du pas, aucun `stepTemplate`, ressources 2 CPU et 6 Gi, aucun `computeResources`, env, workspace d'entrées en lecture seule, volume mémoire de 4Gi ;
+   - les quatre scripts, substitués par les expressions des essais, égaux à ceux joués dans les pods d'essai. Ceux-ci sont archivés sous [m4c-essai-scripts](m4c-essai-scripts/) (construire-rpm-construire.sh, preparer-rpm-assemblage.sh, preparer-rpm-entrees.sh, preparer-rpm-sources.sh), relevés dans `$T` (dates de 14:12:26 et 14:12:44 UTC).
+4. Garde : au moins 1 Gio libre sur `/` de sc-stockage, relevé imprimé ; puis versionnement sous `construction/<tâche>.signee.yaml` (une nouvelle signature seulement si le contenu hors signature change) ; puis bundles sous le tag `m4c`, et `listee` de `commun.sh`.
+5. Sous `SIGNER=1`, arrêt tant que la liste revue ne porte pas les deux tâches. Sinon : pipeline rendue avec les références réelles, admise, signée, relue ; bundle ; référence écrite dans `$T/sample-app-rpm.ref`.
+
+**Préparation**
+- `m4c.sh` passe de `b5a7f79d…` à `d2d895d9…` par deux insertions (5 lignes d'en-tête, 131 lignes avant `lancer`), appliquées à 14:49:53 UTC (`date -u` de la commande de copie).
+- Banc [m4c-taches-banc.sh](m4c-taches-banc.sh) (`4bcebebf…`), avec le vrai `tkn` 0.46.2, une clé P-256 jetable et le vrai `commun.sh` (dossier de confiance du banc) ; faux `kubectl`, `bundle`, `listee`, `auth_zot` et `sur`. **89 OK** sur la copie ([journal](m4c-taches-banc.log)), puis **89 OK** sur le dépôt ([journal](m4c-taches-banc-applique.log)).
+- Cas du banc : première passe et rejeu sans nouvelle signature ; refus si une seule tâche, ou aucune, est listée ; pipeline signée si les deux le sont ; refus, sans versionnement ni poussée d'aucune des deux tâches, sur un gabarit modifié, un script altéré, le contexte du pas de `construire-rpm` ou le `stepTemplate` de `preparer-rpm` altérés, un témoin admis, une tâche refusée à l'admission, un disque bas ou illisible.
+- **Mesuré au banc**, quatre passages ([1](m4c-taches-banc-passage1.log), [2](m4c-taches-banc-passage2.log), [3](m4c-taches-banc-passage3.log), [4](m4c-taches-banc-passage4.log)) : `tkn` 0.46.2 réécrit l'objet qu'il signe.
+  - Il réordonne les clés et ajoute `resources: {}` au `stepTemplate` et aux pas sans ressources, `annotations: {}`, et `description: ""` aux paramètres de la pipeline.
+  - La comparaison au rendu se fait donc après normalisation (fonction `normaliser`). Le passage 1 refusait toute signature, le passage 2 la pipeline seule. Les passages 3 et 4 ont corrigé le compte des lignes OK, puis un avertissement de `yq`.
+
+**Relevés de Zot, hors étape**, archivés à part comme en M4b, avant et après chaque passe : tags et digests de `tekton/tasks/preparer-rpm`, `tekton/tasks/construire-rpm` et `tekton/pipelines/sample-app-rpm`, nombre de dépôts du catalogue (N au relevé avant), `df` de `/` sur sc-stockage.
+
+**Prédictions de `SIGNER=1 taches`**
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| TS0 | Relevé avant : les trois dépôts absents (`NAME_UNKNOWN`) | Haute : aucune étape n'y a écrit (journaux de la brique) |
+| TS1 | `publier-image` de la liste = `d21931f3…` complet ; trois gabarits égaux à ceux des essais | Haute |
+| TS2 | Les trois objets rendus admis (code 0) ; témoin refusé avec le message de M4b | Moyenne : premier dry-run serveur de ces objets. Les essais ont admis des pods, jamais une Task v1beta1 avec `volumes`, un workspace `readOnly` et des résultats objets |
+| TS3 | Relecture des deux tâches signées tenue, dont les quatre scripts égaux aux sha256 des essais | Haute : banc avec le vrai `tkn` sur les mêmes gabarits ; seule la clé diffère, et elle ne touche que l'annotation |
+| TS4 | Octets libres sur `/` de sc-stockage entre 1 Gio et 4,5 Go ; garde passée | Moyenne : 4 495 519 744 octets libres à 09:57 UTC, et `/` grossit sans écriture de la brique, à un rythme non constant |
+| TS5 | Deux « SIGNER : nouvelle signature » ; `construction/preparer-rpm.signee.yaml` et `construction/construire-rpm.signee.yaml` écrites, conformes | Haute : fichiers absents du dépôt |
+| TS6 | Bundles `tekton/tasks/preparer-rpm:m4c` puis `tekton/tasks/construire-rpm:m4c` poussés ; deux « à ajouter à politique/porte/taches.yml » avec leurs références ; « pipeline non signée » ; code 0 ; 31 lignes OK. Aucun digest parié : la signature ECDSA change à chaque signature | Haute (banc) |
+| TS7 | `$T/auth` absent après la passe (`test -e`, sans lister) | Haute (banc) |
+| TS8 | Rien dans le cluster : aucune tâche ni pipeline créée dans `builds` (dry-run seulement) | Haute |
+| TS9 | Relevé après : deux dépôts de tâches, chacun avec le seul tag `m4c` au digest affiché ; pipeline toujours absente ; catalogue de N + 2 | Moyenne : forme de M4b (TS8 de M4b tenue) |
+| TS10 | Durée sous 60 s | Moyenne : le banc entier a pris 17 et 18 s (journaux), sans Zot ni API |
+
+**Prédictions de la seconde passe** (`taches` sans `SIGNER`, après la revue et le commit de `taches.yml` par le propriétaire)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| TP1 | Les deux tâches dans la liste revue ; pas de nouvelle signature ; mêmes digests de bundle qu'en `SIGNER=1` | Haute : TP1 de M4b tenue sur la même forme |
+| TP2 | Pipeline rendue avec les trois références, admise, signée, relue (normalisée) ; bundle `tekton/pipelines/sample-app-rpm:m4c` ; code 0 ; 41 lignes OK | Haute (banc) |
+| TP3 | Référence de la pipeline dans `$T/sample-app-rpm.ref` | Haute (banc) |
+| TP4 | Relevé après : dépôt de la pipeline créé avec le seul tag `m4c` ; tags des tâches inchangés ; catalogue de N + 3 | Moyenne |
+
+**Points pour la revue de `taches.yml`** (lecture, non mesuré)
+- `construire-rpm` tourne en root privilégié sous Kata, comme `construire-image` et `construire-builder`, déjà dans la liste revue.
+- **La porte ne connaît pas encore `construire-rpm`** : `porte.rego` ne la nomme ni dans `_constructions` (règle `construction_kata`) ni dans `_appariement` (préparation exigée). Une fois le digest listé, la porte accepterait une provenance qui la contient sans exiger Kata ni `preparer-rpm`. C'était le cas de `construire-deb` avant S4d2a. Étendre la porte est un choix du propriétaire ; rien n'est fait ici.
+- Comme en M4b, le bundle signé est résoluble par Tekton (Trusted Resources vérifie la clé, pas la liste) entre `SIGNER=1` et la revue.
+
+**Ce que chaque issue permet**
+- TS tenues : revue de `taches.yml` par le propriétaire, dans un commit à part. C'est un arrêt.
+- TS2 non tenue : rien n'est signé. L'objet refusé est corrigé, puis le banc est rejoué.
+- TS3 non tenue : rien n'est versionné ni poussé. Le gabarit ou le contrôle est corrigé, puis le banc est rejoué.
+- TS4 non tenue (garde) : rien n'est versionné ni poussé. Décision sur le disque de sc-stockage.
+- TS9 non tenue : écart relevé avant la revue, à expliquer avant toute autre écriture.
