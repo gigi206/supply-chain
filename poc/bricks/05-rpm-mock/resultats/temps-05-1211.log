@@ -31,3 +31,8 @@ premier commit : 196ee34 ; dernier : 312efce
 # nouveau relevé, même méthode (date d auteur, écarts <= 1 h), 2026-11-18T13:47:13Z à HEAD bdbe204, avant la carte de M4c ; contrôle de la méthode : 140 commits, 18.83 h à 312efce, égal au relevé ci-dessus ; les relevés ci-dessus ne sont pas réécrits
 premier commit : 196ee34 ; dernier : bdbe204
 167 commits, 21.93 h
+# nouveau relevé, même méthode (date d auteur, écarts <= 1 h), 2026-11-18T18:21:34Z à HEAD c2c5809, avant la carte de M5 ; contrôle de la méthode : 167 commits, 21.93 h à bdbe204, égal au relevé ci-dessus ; les relevés ci-dessus ne sont pas réécrits
+premier commit : 196ee34 ; dernier : c2c5809
+185 commits, 24.89 h
+# M4c seule, même méthode : de 4b0816a (carte de M4c) à c2c5809 : 18 commits, 2.3 h (écarts <= 1 h), 4.29 h de bout en bout
+# S5a de la 06, dates d auteur : d516ad2 (préparation, 2026-11-11T21:24:41Z) à afa9bfe (résultat, 2026-11-11T21:51:32Z) : 0.45 h, préparation antérieure non comptée

@@ -1,0 +1,24 @@
+2026-11-18T18:24:32Z
+couche e48fc4d689daa5ec7af47350d996f93d76a138ff7267aed6972feefe3e4526bd : sha256 e48fc4d689daa5ec7af47350d996f93d76a138ff7267aed6972feefe3e4526bd ; type gzip compressed data, max speed, origina
+couche fd00cdb1ac39ed07d03836b05bd7c24cf435e68a2b29d63403e5dfc4610ac157 : sha256 fd00cdb1ac39ed07d03836b05bd7c24cf435e68a2b29d63403e5dfc4610ac157 ; type gzip compressed data, max speed, origina
+octet 88091 inversé (taille du fichier inchangée)
+sha256 intact fcd8ca717c72aeb3… ; altéré 644b83a91c12b8d2… ; cmp : /home/gigi/.cache/supply-chain-poc/05/m5-sigmd5/racine/m/intact.rpm /home/gigi/.cache/supply-chain-poc/05/m5-sigmd5/racine/m/payload.rpm sont différents: octet 88092, ligne 316
+rpm de l'image : RPM version 4.16.1.3
+intact : rpm -qp SIGMD5 = 769b855a81f624aff2c4d5d5f7b85874 ; code 0 ; stderr 0 ligne(s) : 
+payload : rpm -qp SIGMD5 = 769b855a81f624aff2c4d5d5f7b85874 ; code 0 ; stderr 0 ligne(s) : 
+intact : rpm -Kv code 0 :
+    /m/intact.rpm:
+        Header V4 RSA/SHA256 Signature, key ID 350d275d: OK
+        Header SHA256 digest: OK
+        Header SHA1 digest: OK
+        Payload SHA256 digest: OK
+        MD5 digest: OK
+payload : rpm -Kv code 1 :
+    /m/payload.rpm:
+        Header V4 RSA/SHA256 Signature, key ID 350d275d: OK
+        Header SHA256 digest: OK
+        Header SHA1 digest: OK
+        Payload SHA256 ALT digest: BAD (Expected d9bf4f166516b7f052e1601125f805cc2ed5daef7be57082f5ad0b668fd7ad75 != fd9634cc6bb445d86c9d04d7b0e6691c6ca36c7bf55de10c5f9ec338369d6522)
+        Payload SHA256 digest: BAD (Expected 4af681cff3af4d8fb813a4530d67ddef6ac91efeddb78585afffdfdfa038f673 != fd9634cc6bb445d86c9d04d7b0e6691c6ca36c7bf55de10c5f9ec338369d6522)
+        MD5 digest: BAD (Expected 769b855a81f624aff2c4d5d5f7b85874 != 8fc0f583322871c516ed0c9972c646dd)
+2026-11-18T18:24:34Z
