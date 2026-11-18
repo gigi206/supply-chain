@@ -172,3 +172,21 @@ L'essai porte sur les trois charts installés depuis l'hôte : Cilium 1.20.4, Co
 - **HE5** (descriptive) : le `helmfile.yaml` fait une vingtaine de lignes et remplace les quatre appels `upgrade --install`. Les vérifications des archives et des valeurs restent dans les scripts.
 
 **Ce que l'essai ne mesure pas** : `apply` et `diff` contre un cluster, puisqu'il faudrait `helm-diff` ; un rejeu ; l'audit de santé de `helm-diff` et `kustomize`.
+
+### Compléments datés au cadre de l'essai (18/11/2026, écrits à 23:29:55 UTC, avant toute installation, après relecture par le conseiller)
+
+Journal : [`essai-helmfile-lecture.log`](resultats/essai-helmfile-lecture.log), 23:29:36 UTC. Les citations du cadre y sont archivées : `init.go`, `app.go`, `templating.md`, `configuration.md`, le registre aqua au commit `64b29808…`, et les appels réels de `cilium.sh` et `rke2.sh`.
+
+- **Gabarit renommé `helmfile.yaml.gotmpl`.** En v1, `helmfile.yaml` n'est rendu comme gabarit Go qu'avec l'extension `.gotmpl`, ou avec `HELMFILE_RENDER_YAML=true` (`templating.md`, l. 86).
+- **Binaires** : `essai.sh` résout `helm` et `helmfile` en chemins absolus par `mise which`, depuis la racine du dépôt, et passe `--helm-binary`.
+- **Témoin** : chaque référence est rendue deux fois par `helm template`. Si les deux rendus diffèrent (certificats générés par un chart, par exemple), HE4 se juge hors des objets instables.
+- **Portée de HE5 corrigée.** Le fichier décrit les trois releases d'`etape_rendu`, pas les installations réelles.
+  - `cilium.sh` (l. 116 à 120) ajoute la couche `VALEURS_08C` de la 08c et `--reset-values`.
+  - Les trois installations passent `--server-side=true --wait=watcher --timeout 5m --hide-notes`.
+  - helmfile peut porter des arguments par `args` ou `syncArgs`, et `forceConflicts` vaut pour Helm 4 seulement (`configuration.md`, l. 96 à 111 et 469). Ce n'est ni écrit dans le fichier, ni mesuré.
+- **Greffons de l'hôte, à signaler** (décision du propriétaire, rien n'est retiré) :
+  - **trois** greffons sont installés : `diff` 3.11.0, `helm-git` 1.3.0 et `secrets` 4.6.3, tous de provenance « unknown » ou « unsigned », dans `~/.local/share/helm/plugins` ;
+  - ni `cilium.sh`, ni `rke2.sh`, ni les scripts de la 08c ne fixent `HELM_PLUGINS`. **Les installations mesurées de Cilium, CoreDNS et metrics-server ont donc tourné avec ces greffons visibles par Helm** ;
+  - la ligne « deux greffons » du cadre est corrigée ici.
+- **Ordre** : l'installation de helmfile modifie `mise.toml` et `mise.lock`. Elle se fera **après** les quatre relances du 19/11 et `m1b-autre-jour.sh`, qui mesurent des scripts inchangés, même si l'accord arrive avant.
+- **Prédiction ajoutée** : **HE0**, les deux rendus de référence sont identiques pour CoreDNS et metrics-server. Pour Cilium, l'issue est incertaine (certificats générés possibles). Confiance moyenne pour les deux premiers, faible pour Cilium.

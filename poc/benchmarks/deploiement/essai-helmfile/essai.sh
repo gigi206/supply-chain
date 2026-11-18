@@ -13,32 +13,41 @@ W=$HOME/.cache/supply-chain-poc/dep-helmfile-$(date -u +%Y%m%dT%H%M%SZ)
 [ ! -e "$W" ] || { echo "KO   $W existe" >&2; exit 1; }
 mkdir -p "$W/greffons" "$W/ref" "$W/hf" "$W/cache" "$W/config" "$W/data"
 ns() { unshare --map-auto --map-root-user -n "$@"; }
+HELM=$(cd "$r" && mise which helm) HELMFILE=$(cd "$r" && mise which helmfile)   # chemins absolus résolus à la racine du dépôt (mise.toml)
+echo "greffons Helm de l'hôte avant isolement (helm plugin list) :"; "$HELM" plugin list 2>&1 | sed 's/^/  /'
 export HELM_PLUGINS=$W/greffons HELM_CACHE_HOME=$W/cache HELM_CONFIG_HOME=$W/config HELM_DATA_HOME=$W/data
 export CHART_CILIUM=$HOME/.cache/supply-chain-poc/08/telechargements/cilium/cilium-1.20.4.tgz
 export CHART_COREDNS=$HOME/.cache/supply-chain-poc/08b/telechargements/rke2-coredns-1.47.102.tgz
 export CHART_METRICS=$HOME/.cache/supply-chain-poc/08b/telechargements/rke2-metrics-server-3.14.001.tgz
 export VALEURS_CILIUM=$W/valeurs.yaml VALEURS_CILIUM_RKE2=$r/poc/bricks/08b-rke2/config/valeurs-cilium.yaml VALEURS_COREDNS=$r/poc/bricks/08b-rke2/config/valeurs-coredns.yaml
 echo "# essai.sh (helmfile), début $(date -u +%FT%TZ) ; dossier $W"
-echo "helm : $(command -v helm) $(helm version --short) ; helmfile : $(command -v helmfile) $(helmfile version -o short 2>/dev/null || helmfile --version 2>&1 | head -1)"
-echo "greffons Helm vus avec HELM_PLUGINS vide : [$(helm plugin list 2>/dev/null | tail -n +2 | awk '{print $1}' | tr '\n' ' ')]"
-for f in "$CHART_CILIUM" "$CHART_COREDNS" "$CHART_METRICS" "$VALEURS_CILIUM_RKE2" "$VALEURS_COREDNS" "$here/helmfile.yaml"; do echo "entrée $(basename "$f") : sha256 $(sha256sum < "$f" | cut -c1-16)"; done
+echo "helm : $HELM $("$HELM" version --short) ; helmfile : $HELMFILE $("$HELMFILE" version -o short 2>/dev/null || "$HELMFILE" --version 2>&1 | head -1)"
+echo "greffons Helm vus avec HELM_PLUGINS vide : [$("$HELM" plugin list 2>/dev/null | tail -n +2 | awk '{print $1}' | tr '\n' ' ')]"
+for f in "$CHART_CILIUM" "$CHART_COREDNS" "$CHART_METRICS" "$VALEURS_CILIUM_RKE2" "$VALEURS_COREDNS" "$here/helmfile.yaml.gotmpl"; do echo "entrée $(basename "$f") : sha256 $(sha256sum < "$f" | cut -c1-16)"; done
 # valeurs de Cilium rendues exactement comme rke2.sh, l. 191
 sed -e 's/^#.*//' -e 's#@CILIUM_AMD64@#sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54#' -e 's#@OPERATOR_AMD64@#sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1#' \
   "$r/poc/bricks/08-trust-plane/cilium/valeurs.yaml" > "$VALEURS_CILIUM"
-echo "## références : helm template, comme rke2.sh (sans réseau)"
-ns helm template cilium "$CHART_CILIUM" --namespace kube-system -f "$VALEURS_CILIUM" -f "$VALEURS_CILIUM_RKE2" > "$W/ref/cilium.yaml"
-ns helm template rke2-coredns "$CHART_COREDNS" --namespace kube-system -f "$VALEURS_COREDNS" > "$W/ref/rke2-coredns.yaml"
-ns helm template rke2-metrics-server "$CHART_METRICS" --namespace kube-system > "$W/ref/rke2-metrics-server.yaml"
+echo "## références : helm template, comme rke2.sh (sans réseau), rendues deux fois (témoin de stabilité)"
+for k in 1 2; do
+  ns "$HELM" template cilium "$CHART_CILIUM" --namespace kube-system -f "$VALEURS_CILIUM" -f "$VALEURS_CILIUM_RKE2" > "$W/ref/cilium.$k"
+  ns "$HELM" template rke2-coredns "$CHART_COREDNS" --namespace kube-system -f "$VALEURS_COREDNS" > "$W/ref/rke2-coredns.$k"
+  ns "$HELM" template rke2-metrics-server "$CHART_METRICS" --namespace kube-system > "$W/ref/rke2-metrics-server.$k"
+done
+for n in cilium rke2-coredns rke2-metrics-server; do
+  if cmp -s "$W/ref/$n.1" "$W/ref/$n.2"; then echo "OK   témoin $n : deux rendus identiques"; else echo "INSTABLE $n : $(diff "$W/ref/$n.1" "$W/ref/$n.2" | grep -c '^[<>]') lignes diffèrent entre deux helm template ; 6 premières (valeurs masquées) :"; diff "$W/ref/$n.1" "$W/ref/$n.2" | grep '^[<>]' | head -6 | sed -E 's/(: ).*/\1<valeur masquée>/' | cut -c1-120; fi
+  cp "$W/ref/$n.1" "$W/ref/$n.yaml"
+done
 for n in cilium rke2-coredns rke2-metrics-server; do echo "ref $n : $(wc -l < "$W/ref/$n.yaml") lignes, sha256 $(sha256sum < "$W/ref/$n.yaml" | cut -c1-16)"; done
 echo "## helmfile template, une release à la fois (sans réseau, sans greffon)"
 for n in cilium rke2-coredns rke2-metrics-server; do
-  rc=0; ( cd "$W" && ns helmfile --file "$here/helmfile.yaml" --selector "name=$n" template --skip-deps > "$W/hf/$n.yaml" 2> "$W/hf/$n.err" ) || rc=$?
+  rc=0; ( cd "$W" && ns "$HELMFILE" --helm-binary "$HELM" --file "$here/helmfile.yaml.gotmpl" --selector "name=$n" template --skip-deps > "$W/hf/$n.yaml" 2> "$W/hf/$n.err" ) || rc=$?
   echo "helmfile $n : code $rc ; $(wc -l < "$W/hf/$n.yaml") lignes, sha256 $(sha256sum < "$W/hf/$n.yaml" | cut -c1-16) ; stderr : $(wc -l < "$W/hf/$n.err") lignes"
   sed -E 's/[0-9a-f]{40,}/<hex>/g' "$W/hf/$n.err" | head -5 | sed 's/^/   stderr : /'
   if cmp -s "$W/ref/$n.yaml" "$W/hf/$n.yaml"; then echo "OK   $n : sortie identique octet pour octet à helm template"
-  else echo "ÉCART $n : $(diff "$W/ref/$n.yaml" "$W/hf/$n.yaml" | grep -c '^[<>]') lignes différentes ; 10 premières :"; diff "$W/ref/$n.yaml" "$W/hf/$n.yaml" | grep '^[<>]' | head -10 | cut -c1-160; fi
+  else echo "ÉCART $n : $(diff "$W/ref/$n.yaml" "$W/hf/$n.yaml" | grep -c '^[<>]') lignes différentes ; 10 premières (valeurs masquées) :"; diff "$W/ref/$n.yaml" "$W/hf/$n.yaml" | grep '^[<>]' | head -10 | sed -E 's/(: ).*/\1<valeur masquée>/' | cut -c1-120
+    cmp -s "$W/ref/$n.1" "$W/ref/$n.2" || echo "     ($n est instable entre deux helm template : écart à juger hors des objets instables)"; fi
 done
 echo "## taille : helmfile.yaml contre les appels qu'il remplacerait"
-echo "helmfile.yaml : $(grep -vc '^#' "$here/helmfile.yaml") lignes hors commentaires ; appels helm upgrade --install des scripts : rke2.sh l. 166 à 169, cilium.sh $(grep -cE '\bhelm (upgrade|install)' "$r/poc/bricks/08-trust-plane/cilium.sh")"
+echo "helmfile.yaml.gotmpl : $(grep -vc '^#' "$here/helmfile.yaml.gotmpl") lignes hors commentaires ; appels helm upgrade --install des scripts : rke2.sh l. 166 à 169, cilium.sh $(grep -cE '\bhelm (upgrade|install)' "$r/poc/bricks/08-trust-plane/cilium.sh")"
 echo "greffons après l'essai : [$(ls "$HELM_PLUGINS" | tr '\n' ' ')]"
 echo "# fin $(date -u +%FT%TZ)"

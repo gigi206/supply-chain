@@ -1,0 +1,108 @@
+# lecture.sh (essai helmfile), début 2026-11-18T23:29:33Z
+lu : helmfile/helmfile pkg/app/init.go @ v1.8.4 -> init.go (7583 octets)
+--- /home/gigi/.cache/supply-chain-poc/dep-hf-lecture-20261118T232933Z/init.go, l. 20 à 57
+  20 | const (
+  21 | 	HelmRequiredVersion            = "v3.18.6" // Minimum required version (supports Helm 3.x and 4.x)
+  22 | 	HelmDiffRecommendedVersion     = "v3.15.13"
+  23 | 	HelmRecommendedVersion         = "v4.3.1" // Recommended Helm 4 version
+  24 | 	HelmSecretsRecommendedVersion  = "v4.7.4" // v4.7.0+ works with both Helm 3 (single plugin) and Helm 4 (split plugin architecture)
+  25 | 	HelmGitRecommendedVersion      = "v1.3.0"
+  26 | 	HelmS3RecommendedVersion       = "v0.16.3"
+  27 | 	HelmUnittestRecommendedVersion = "v1.0.3"
+  28 | 	HelmInstallCommand             = "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3" // Default to Helm 3 script for compatibility
+  29 | )
+  30 | 
+  31 | var (
+  32 | 	manuallyInstallCode   = 1
+  33 | 	windowPackageManagers = map[string]string{
+  34 | 		"scoop": fmt.Sprintf("scoop install helm@%s", strings.TrimLeft(HelmRecommendedVersion, "v")),
+  35 | 		"choco": fmt.Sprintf("choco install kubernetes-helm --version %s", strings.TrimLeft(HelmRecommendedVersion, "v")),
+  36 | 	}
+  37 | 	helmPlugins = []helmRecommendedPlugin{
+  38 | 		{
+  39 | 			name:    "diff",
+  40 | 			version: HelmDiffRecommendedVersion,
+  41 | 			repo:    "https://github.com/databus23/helm-diff",
+  42 | 		},
+  43 | 		{
+  44 | 			name:    "secrets",
+  45 | 			version: HelmSecretsRecommendedVersion,
+  46 | 			repo:    "https://github.com/jkroepke/helm-secrets",
+  47 | 		},
+  48 | 		{
+  49 | 			name:    "s3",
+  50 | 			version: HelmS3RecommendedVersion,
+  51 | 			repo:    "https://github.com/hypnoglow/helm-s3.git",
+  52 | 		},
+  53 | 		{
+  54 | 			name:    "helm-git",
+  55 | 			version: HelmGitRecommendedVersion,
+  56 | 			repo:    "https://github.com/aslafy-z/helm-git.git",
+  57 | 		},
+lu : helmfile/helmfile pkg/app/app.go @ v1.8.4 -> app.go (89481 octets)
+--- app.go : lignes qui citent helm-diff ou une préparation pour diff
+191:		prepErr := run.WithPreparedCharts("diff", state.ChartPrepareOptions{
+2015:	// helm must be 2.11+ and helm-diff should be provided `--detailed-exitcode` in order for `helmfile apply` to work properly
+2274:// This prevents helm-diff from falling back to v1.20.0 (issue #2275).
+2289:		// If detection fails, we silently continue - helm-diff will handle it
+--- app.go : fonction Template
+255:func (a *App) Template(c TemplateConfigProvider) error {
+lu : helmfile/helmfile docs/templating.md @ v1.8.4 -> templating.md (11103 octets)
+--- /home/gigi/.cache/supply-chain-poc/dep-hf-lecture-20261118T232933Z/templating.md, l. 86 à 86
+  86 | * `HELMFILE_RENDER_YAML` - force helmfile.yaml to be rendered as a Go template regardless of file extension, expecting `true` lower case. Useful for migrating from v0 to v1 without renaming files to `.gotmpl`
+lu : helmfile/helmfile docs/configuration.md @ v1.8.4 -> configuration.md (34054 octets)
+--- /home/gigi/.cache/supply-chain-poc/dep-hf-lecture-20261118T232933Z/configuration.md, l. 96 à 111
+  96 |   args:
+  97 |     - "--set k=v"
+  98 |   diffArgs:
+  99 |     - "--suppress-secrets"
+ 100 |   syncArgs:
+ 101 |     - "--labels=app.kubernetes.io/managed-by=helmfile"
+ 102 |   # extra args appended to the helm template / helm diff rendering (default "").
+ 103 |   # most commonly "--dry-run=server" to enable the helm lookup() function.
+ 104 |   # overridden by the --template-args CLI flag on a per-invocation basis.
+ 105 |   templateArgs:
+ 106 |     - "--dry-run=server"
+ 107 |   # verify the chart before upgrading (only works with packaged charts not directories) (default false)
+ 108 |   verify: true
+ 109 |   keyring: path/to/keyring.gpg
+ 110 |   #  --skip-schema-validation flag to helm 'install', 'upgrade' and 'lint' (default false)
+ 111 |   skipSchemaValidation: false
+--- /home/gigi/.cache/supply-chain-poc/dep-hf-lecture-20261118T232933Z/configuration.md, l. 469 à 469
+ 469 | | `forceConflicts` | bool | false | Force server-side apply changes against conflicts (Helm 4 only) |
+lu : aquaproj/aqua-registry pkgs/helmfile/helmfile/registry.yaml @ 64b298080684cb72318b2d239d996f7cd4e208e0 -> aqua.yaml (1116 octets)
+registre aqua au commit 64b298080684cb72318b2d239d996f7cd4e208e0
+--- /home/gigi/.cache/supply-chain-poc/dep-hf-lecture-20261118T232933Z/aqua.yaml, l. 17 à 27
+  17 |           algorithm: sha256
+  18 |       - version_constraint: "true"
+  19 |         asset: helmfile_{{trimV .Version}}_{{.OS}}_{{.Arch}}.{{.Format}}
+  20 |         format: tar.gz
+  21 |         checksum:
+  22 |           type: github_release
+  23 |           asset: helmfile_{{trimV .Version}}_checksums.txt
+  24 |           algorithm: sha256
+  25 |         github_artifact_attestations:
+  26 |           signer_workflow: helmfile/helmfile/.github/workflows/releaser.yaml
+
+## installations réelles des scripts
+--- poc/bricks/08-trust-plane/cilium.sh, l. 116 à 120
+ 116 |   local supp=()
+ 117 |   [ "$DISTRO" = k3s ] || supp=(-f "$here/../08b-rke2/config/valeurs-cilium.yaml")   # kubeProxyReplacement sous RKE2 (brique 08b)
+ 118 |   [ -z "${VALEURS_08C:-}" ] || supp+=(-f "$VALEURS_08C")   # pare-feu d'hôte, posé par durcissement.sh (brique 08c)
+ 119 |   helm upgrade --install cilium "$D/cilium-$CILIUM_VER.tgz" --namespace kube-system -f "$T/valeurs.yaml" "${supp[@]}" --reset-values \
+ 120 |     --server-side=true --wait=watcher --timeout 5m --hide-notes
+--- poc/bricks/08b-rke2/rke2.sh, l. 166 à 169
+ 166 |   helm upgrade --install rke2-coredns "$A/$COREDNS.tgz" --namespace kube-system -f "$C/valeurs-coredns.yaml" \
+ 167 |     --server-side=true --wait=watcher --timeout 5m --hide-notes
+ 168 |   helm upgrade --install rke2-metrics-server "$A/$METRICS.tgz" --namespace kube-system \
+ 169 |     --server-side=true --wait=watcher --timeout 5m --hide-notes
+HELM_PLUGINS fixé dans cilium.sh, rke2.sh ou les scripts de la 08c : [fin]
+
+## greffons Helm de l'hôte (HELM_PLUGINS par défaut)
+  NAME    	VERSION	TYPE     	APIVERSION	PROVENANCE	SOURCE 
+  diff    	3.11.0 	cli/v1   	legacy    	unknown   	unknown
+  helm-git	1.3.0  	getter/v1	legacy    	unsigned  	unknown
+  secrets 	4.6.3  	getter/v1	legacy    	unknown   	unknown
+dossier des greffons : /home/gigi/.local/share/helm/plugins
+
+# fin 2026-11-18T23:29:36Z
