@@ -102,3 +102,16 @@ Code 0 ([journal](m4a-politiques.log), `f38fc773…`), lecture seule. La ligne d
 | PO4 | **Tenue.** Code 0. |
 
 **Lacune de `releve` comblée.** Les neuf politiques d'admission de Kyverno en service sont celles du dépôt, celles de la 08c en `Deny`. Avec `releve`, l'état en service dont M4 dépend est relevé, sauf gabarits et déclencheurs (hors de M4). `verrou` et `publier` attendent la carte de M4b.
+
+## Résultat de `verrou` (18/11/2026, à 09:19:18 UTC, « Oui » ; note écrite à 09:19:45 UTC)
+
+Code 0, en moins d'une seconde ([journal](m4a-verrou.log)). `m4a.sh` = `fb23b869…` : seulement des ajouts depuis les prédictions (l'étape `politiques`), `etape_verrou` inchangée. Ordre consigné dans la [carte de M4b](m4b-carte.md) : après `essai_tache`, passée le même jour.
+
+| # | Résultat |
+|---|---|
+| V1 | **Tenue.** Verrou de `verrou_derivee` `b6d0f8f1…`. |
+| V2 | **Tenue.** Version 1.1.0, 222 rpm, 222 nom.arch distincts, aucune URL hors de vault 9.7, `pull_digest` `f0ccf105…`, `image_digest` `18d64b03…`, `bootstrap_image_ready` vrai. |
+| V3 | **Tenue.** [`poc/packaging/verrou-rpm.json`](../../../packaging/verrou-rpm.json) écrit, sha256 `b6d0f8f1…`. |
+| V4 | **Tenue.** Artefact : `sample-app.spec` (`918a83f5…`) et `verrou-rpm.json`. Deux poussées en layout local, même digest `sha256:41c639b7…`, celui de l'essai à sec. |
+
+Rien écrit dans Zot ni dans le cluster (lecture du script : layouts locaux seulement). Reste `publier` (P0 à P2), qui écrit dans Zot ; accord à part.

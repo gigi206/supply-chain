@@ -1,0 +1,10 @@
+# m4a.sh verrou, 2026-11-18T09:19:18Z
+OK   V1 verrou de verrou_derivee (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   V2 verrou : version 1.1.0, 222 rpm (222 nom.arch distincts), 0 URL hors de vault 9.7, pull_digest sha256:f0ccf10541c7…, image_digest 18d64b0330fe…, bootstrap_image_ready True
+verrou écrit : poc/packaging/verrou-rpm.json
+OK   V3 sha256 de poc/packaging/verrou-rpm.json : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+artefact : sample-app.spec verrou-rpm.json
+     918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6  sample-app.spec
+     b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f  verrou-rpm.json
+OK   V4 deux poussées locales, même digest : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+digest attendu dans Zot : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
