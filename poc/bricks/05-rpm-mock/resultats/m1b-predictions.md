@@ -412,3 +412,30 @@ Journal : [`m1b-dnf5.log`](m1b-dnf5.log).
 - **dnf5 n'est l'outil de la distribution ni pour Rocky 9, ni pour Rocky 10**, d'après ces listes non signées et d'après les gabarits de mock. L'outil que Rocky livre et que mock choisit pour EL est dnf 4.
 - **Employer dnf5 ici** voudrait dire l'apporter hors de la distribution. Ce n'est pas mesuré.
 - **Le verdict de dnf 4 reste au propriétaire.**
+
+## Recommandation du conseiller sur dnf 4, et ses conditions : prédictions écrites avant le lancement (2026-11-18T20:41:01Z UTC)
+
+**Demande du propriétaire** (reçue avant 2026-11-18T20:41:01Z UTC) : « Que recommande l'advisor ».
+
+**Recommandation du conseiller**, rapportée comme la sienne : « À surveiller, chemin critique », par décision datée du propriétaire, sous une condition non mesurée.
+- **Pour** :
+  - le critère « Risqué » vise l'abandon, or le dépôt n'est pas archivé : 7 commits en 90 jours, 11 fusionneurs sur 100 PR ;
+  - ce qui s'exécute est le paquet de Rocky, pas la release amont, et docs/04 juge déjà rpm ainsi ;
+  - aucun autre outil n'existe dans la distribution (relevé dnf5).
+- **Contre** :
+  - ce serait une première : la pondération de docs/04 porte sur un critère « À surveiller » ;
+  - l'amont décline : les releases s'espacent, puis cessent depuis 13 mois, et le README renvoie à DNF5 ;
+  - aucun plan de sortie n'est mesuré.
+- **Condition** : l'argument « maintenu par la distribution » ne repose que sur une date de construction et une entrée propre à Rocky. S'il n'y a aucun correctif de la distribution sur 12 mois, la recommandation tombe.
+- **libsolv** : son verdict bloque autant que celui de dnf. Ma formule « mainteneur unique » est corrigée : le journal montre deux fusionneurs, mlschroe (95) et igor-raits (5). La date des fusions du second départage « bus factor de 2 » et « mainteneur unique ».
+
+**Mesure** : [`m1b-dnf-conditions.sh`](m1b-dnf-conditions.sh).
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| K1 | Le changelog de python3-dnf (4.14.0-34) a, outre l'entrée de Rocky, au moins une entrée de la distribution amont depuis un an | Moyenne : passage de la -31 (9.7) à la -34 (9.8), contenu non lu |
+| K2 | Au moins une de ces entrées porte un correctif (référence RHEL- ou CVE, ou mot « fix ») | Moyenne |
+| K3 | libdnf, librepo et libsolv ont chacun au moins une entrée depuis un an | Moyenne : librepo construit le 29/12/2025, mais d'une version 1.19.0 peut-être ancienne |
+| K4 | Les 5 fusions d'igor-raits sur libsolv sont toutes plus anciennes que les 95 de mlschroe | Basse : je n'en sais rien |
+
+**Ce qui est décidé d'avance** : je rapporterai la recommandation et le résultat de sa condition, sans rien écrire dans docs/04, et sans reprendre dnf avant un oui explicite du propriétaire.
