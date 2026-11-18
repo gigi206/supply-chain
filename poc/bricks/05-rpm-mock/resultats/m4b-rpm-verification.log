@@ -1,0 +1,9 @@
+# conditions des TaskRuns et PipelineRuns de rpm : type, statut, raison (jamais les messages) ; lecture seule
+2026-11-18T11:06:47Z
+PipelineRun m4b-rpm-1 : [{"type":"Succeeded","status":"True","reason":"Succeeded"},{"type":"TrustedResourcesVerified","status":"True","reason":null}]
+TaskRun m4b-rpm-1-prefetch : [{"type":"Succeeded","status":"True","reason":"Succeeded"},{"type":"TrustedResourcesVerified","status":"True","reason":null}]
+TaskRun m4b-rpm-1-publier : [{"type":"Succeeded","status":"True","reason":"Succeeded"},{"type":"TrustedResourcesVerified","status":"True","reason":null}]
+PipelineRun m4b-rpm-2 : [{"type":"Succeeded","status":"True","reason":"Succeeded"},{"type":"TrustedResourcesVerified","status":"True","reason":null}]
+TaskRun m4b-rpm-2-prefetch : [{"type":"Succeeded","status":"True","reason":"Succeeded"},{"type":"TrustedResourcesVerified","status":"True","reason":null}]
+TaskRun m4b-rpm-2-publier : [{"type":"Succeeded","status":"True","reason":"Succeeded"},{"type":"TrustedResourcesVerified","status":"True","reason":null}]
+2026-11-18T11:06:47Z

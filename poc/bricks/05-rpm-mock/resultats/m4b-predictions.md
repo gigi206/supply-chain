@@ -829,3 +829,12 @@ Le temps de `publier` tombe de 84 s à 7 s au second passage. Cause probable, no
 - `provenance` doit vérifier les attestations (cosign, sujet, `resolvedDependencies` avec l'image de bootstrap, paramètre `liste`).
 
 Aucun rpm n'a encore été construit à partir de cette fermeture : c'est M4c.
+
+## Note datée du 18/11/2026, écrite à 11:06:58 UTC : vérification des signatures relue (portée de RP2)
+
+La note de résultat dit, sous RP2, que la résolution et la vérification des deux bundles « ont tous tenu ». L étape ne lisait que la condition `Succeeded` : la vérification était déduite de `no-match-policy=fail` et du motif de la `VerificationPolicy`, pas mesurée.
+- **Relevé** ([journal](m4b-rpm-verification.log), 11:06:47 UTC, lecture seule ; type, statut et raison, jamais les messages).
+- La condition `TrustedResourcesVerified` est à `True` sur les deux PipelineRuns et les quatre TaskRuns, sans raison renseignée.
+- La phrase de RP2 est désormais mesurée.
+- **ADR** : aucun additif pour cette étape. Les étapes de M4a et de M4b (`publier`, `final`, `taches`) n en ont pas reçu ; l additif de l ADR 0001 viendra quand M4b sera tenu.
+
