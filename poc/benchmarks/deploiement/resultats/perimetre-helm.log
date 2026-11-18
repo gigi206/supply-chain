@@ -1,0 +1,6 @@
+# périmètre de Helm dans les scripts du PoC, 2026-11-18T23:24:23Z (grep sur les fichiers du dépôt, HEAD 2cc5990)
+poc/bricks/08b-rke2/rke2.sh : 251 lignes ; appels helm : 6 (upgrade/install 2, template 4) ; lignes cosign ou sha256sum : 8
+poc/bricks/08-trust-plane/cilium.sh : 200 lignes ; appels helm : 2 (upgrade/install 2, template 0) ; lignes cosign ou sha256sum : 8
+poc/bricks/08c-durcissement/durcissement.sh : 926 lignes ; appels helm : 4 (upgrade/install 0, template 4) ; lignes cosign ou sha256sum : 0
+poc/bricks/08c-durcissement/sortie-builds.sh : 273 lignes ; appels helm : 2 (upgrade/install 0, template 2) ; lignes cosign ou sha256sum : 0
+# fin 2026-11-18T23:24:23Z
