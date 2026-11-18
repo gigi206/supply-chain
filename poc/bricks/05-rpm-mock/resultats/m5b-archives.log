@@ -1,0 +1,8 @@
+# m5b-archives.sh, début 2026-11-18T19:25:23Z
+     racine.tar : 361758720 octets, sha256 d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+     attendu (s1-racine.log) : 361758720 octets, sha256 d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+OK   racine.tar égal au journal archivé
+     boot-racine.tar : 258129920 octets, sha256 8ae17f92b27377fff20009d0a88740b1bf9045d533f0506949d6e209c970f1f2
+     attendu (s1-boot_racine.log) : 258129920 octets, sha256 8ae17f92b27377fff20009d0a88740b1bf9045d533f0506949d6e209c970f1f2
+OK   boot-racine.tar égal au journal archivé
+# fin 2026-11-18T19:25:23Z, code 0
