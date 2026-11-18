@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: k-hostile
+  annotations:
+    pipelinesascode.tekton.dev/on-event: "[push]"
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+spec:
+  taskRunTemplate:
+    podTemplate:
+      env:
+      - name: BANC_PAC
+        value: env-du-podTemplate
+  pipelineSpec:
+    tasks:
+    - name: hostile
+      taskSpec:
+        steps:
+        - name: lire
+          image: @BUSYBOX@
+          env:
+          - name: BANC_PAC
+            value: env-du-pas
+          script: echo "BANC_PAC=$BANC_PAC"

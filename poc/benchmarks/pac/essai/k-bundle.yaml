@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: k-bundle
+  annotations:
+    pipelinesascode.tekton.dev/on-event: "[push]"
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+spec:
+  pipelineRef:
+    resolver: bundles
+    params:
+    - name: bundle
+      value: registre.invalide.test/banc/pipeline@sha256:0000000000000000000000000000000000000000000000000000000000000000
+    - name: name
+      value: banc
+    - name: kind
+      value: pipeline

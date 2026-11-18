@@ -167,3 +167,20 @@ Installer PaC dans le cluster du PoC. **Accord à part**, car :
   - **`env` du `podTemplate` admis**, d'après la brique 05 ([`m4b-predictions.md`](../../bricks/05-rpm-mock/resultats/m4b-predictions.md), l. 515).
 
   Confiance moyenne : le dry-run n'a jamais été essayé sur ce cluster.
+
+### Note datée avant lancement (18/11/2026, écrite à 22:44:42 UTC) : accord « Oui, étapes 1 et 2 », écarts au protocole de `b25fc9d`
+
+- **Accord du propriétaire** : « Oui, étapes 1 et 2 ». Script : [`banc.sh`](banc.sh), relu par le conseiller avant lancement. Modèles du dépôt d'essai : [`essai/`](essai/).
+- **Vérifications faites avant d'écrire le script** :
+  - kind 0.33.0 liste `kindest/node:v1.35.8@sha256:07b2536e…` dans ses notes de release : c'est le nœud retenu, compatible avec `kubectl` 1.35.10 ;
+  - l'API de GitHub publie le digest de `release.k8s.yaml` (`62d6a4ee…`), que le script compare au fichier téléchargé ;
+  - dans le cluster du PoC, tous les webhooks d'admission déclarent `sideEffects` `None` ou `NoneOnDryRun`, donc le dry-run est accepté ;
+  - mon identité peut emprunter `declencheurs:el-forgejo`, et ce compte peut créer des PipelineRuns dans `builds`.
+- **Écarts au protocole** :
+  - **Une seule configuration pour tous les cas : celle de K5.** Repository global dans `pipelines-as-code`, avec les secrets ; Repository local sans secret ; `secret-auto-create: false`. La configuration par défaut n'est pas remesurée : A1 l'a vue, avec le secret `pac-gitauth-…` dans la provenance. **Si l'héritage du Repository global échoue**, le script s'arrête en KO à la référence. Ce sera le résultat de K5, et les autres cas repasseront avec un secret local, dans des journaux neufs ;
+  - **K8 n'a pas d'étape privilégiée.** Elle tournerait vraiment dans le nœud kind. Le modèle hostile porte un `env` au `podTemplate`, un `taskSpec` en ligne et un `env` du même nom dans le pas : le journal du pod dira lequel l'emporte. L'étape privilégiée et `hostPath: /` sont ajoutés par `jq` à l'étape 2. Ils ne sont donc pas produits par PaC (A1 a mesuré qu'il les laisse passer). Comme la spec en ligne suffit à faire refuser l'objet, `v-hostile` ne prouve rien de plus que `v-enligne` sur l'étape privilégiée ;
+  - **nœud en v1.35.8** au lieu de v1.37.0 ;
+  - **le `KUBECONFIG` dédié reste en place** au démontage, vidé du contexte par kind (règle : pas de `rm` sur une variable) ;
+  - **étape 2** : un PipelineRun réel de l'EventListener sert de témoin. Si le témoin est refusé, `v-env` n'est pas interprétable et le script s'arrête. Les quatre requêtes passent sous l'identité empruntée `el-forgejo` : leur fenêtre horaire est consignée pour l'audit.
+- **Ordre et horaire.** Le banc tourne **avant** les relances du 19/11, jamais en même temps. Le cluster doit démarrer avant 23:15 UTC, et le démontage se faire avant 23:55 UTC. Sinon, l'étape en cours finit, le démontage suit, et les relances passent.
+- **Prédiction ajoutée** : **K8 bis**, l'`env` du `podTemplate` l'emporte sur celui du pas. Confiance moyenne : c'est la doc de Tekton v1.15.5 citée par la brique 05, jamais mesurée chez nous.
