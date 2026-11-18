@@ -1,0 +1,8 @@
+# m1b-repro2-analyse.py, début 2026-11-18T20:03:51Z
+au-dessus de E : 4317 ; mtime égale entre les arbres : 985 ; mtime différente : 3332
+mtime égale, par type : fichier 985
+mtime égale, par préfixe (trois composants) : usr/include/asm 64, usr/include/asm-generic 37, usr/include/cpuidle.h 1, usr/include/drm 29, usr/include/fwctl 2, usr/include/linux 769, usr/include/misc 8, usr/include/mtd 5, usr/include/powercap.h 1, usr/include/rdma 28, usr/include/scsi 10, usr/include/sound 24, usr/include/video 3, usr/include/xen 4
+mtime égale : de 2026-05-12T18:33:40Z à 2026-05-12T18:34:12Z ; valeurs distinctes : 3
+base rpm de l'arbre 1 : .rpm.lock 0 o, rpmdb.sqlite 11022336 o, rpmdb.sqlite-shm 32768 o, rpmdb.sqlite-wal 0 o
+base rpm de l'arbre 2 : .rpm.lock 0 o, rpmdb.sqlite 11022336 o, rpmdb.sqlite-shm 32768 o, rpmdb.sqlite-wal 0 o
+# fin 2026-11-18T20:03:51Z

@@ -1,0 +1,63 @@
+# m1b-repro2.sh, début 2026-11-18T20:02:56Z
+copie de la base rpm de l'arbre 1 : rpmdb.sqlite rpmdb.sqlite-shm rpmdb.sqlite-wal 
+copie de la base rpm de l'arbre 2 : rpmdb.sqlite rpmdb.sqlite-shm rpmdb.sqlite-wal 
+## 1. borne des mtimes
+OK   E = 1778602708 (2026-05-12T16:18:28Z), égal des deux côtés
+i1 : entrées dont la mtime dépasse E : 4317 (fichier 1167, lien 326, répertoire 2824)
+i2 : entrées dont la mtime dépasse E : 4317 (fichier 1167, lien 326, répertoire 2824)
+## 2. archives bornées, sans journaux ni historique de dnf ni aux-cache
+a1.tar : 776755200 octets, sha256 f89341db2f2fe63ccebdb3079b21ffe23baf7dc4deb90d55bbb7224ca1001c83
+a2.tar : 776755200 octets, sha256 89465527baa8d4849af4e4b92d87886625a3b9df5101ce978152bada26fb14c9
+a1b.tar : 776755200 octets, sha256 f89341db2f2fe63ccebdb3079b21ffe23baf7dc4deb90d55bbb7224ca1001c83
+exclu, absent de a1.tar : var/log/dnf.log (0 occurrence)
+exclu, absent de a1.tar : var/log/dnf.librepo.log (0 occurrence)
+exclu, absent de a1.tar : var/log/dnf.rpm.log (0 occurrence)
+exclu, absent de a1.tar : var/log/hawkey.log (0 occurrence)
+exclu, absent de a1.tar : var/lib/dnf/history.sqlite (0 occurrence)
+exclu, absent de a1.tar : var/lib/dnf/history.sqlite-shm (0 occurrence)
+exclu, absent de a1.tar : var/lib/dnf/history.sqlite-wal (0 occurrence)
+exclu, absent de a1.tar : var/cache/ldconfig/aux-cache (0 occurrence)
+## 3. comparaison des deux archives, membre par membre
+membres : 26533 et 26533
+seulement d'un côté : 0 ; présents des deux côtés et différents : 2
+     écart : ./etc/pki/ca-trust/extracted/java/cacerts (sha256)
+     écart : ./var/lib/rpm/rpmdb.sqlite (sha256)
+champs en cause : sha256 2
+## témoin : a1.tar et a1b.tar
+OK   a1.tar et a1b.tar identiques octet à octet
+## 4. base rpm
+en-têtes : 222 et 222 ; mêmes paquets : True
+paquets dont l'en-tête diffère : 222 ; étiquettes en cause : Installtid 222, Installtime 222
+tables : ['Basenames', 'Conflictname', 'Dirnames', 'Enhancename', 'Filetriggername', 'Group', 'Installtid', 'Name', 'Obsoletename', 'Packages', 'Providename', 'Recommendname', 'Requirename', 'Sha1header', 'Sigmd5', 'Suggestname', 'Supplementname', 'Transfiletriggername', 'Triggername', 'sqlite_sequence', 'sqlite_stat1'] ; mêmes tables : True
+     Basenames : 42849 et 42849 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Conflictname : 73 et 73 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Dirnames : 5923 et 5923 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Enhancename : 0 et 0 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Filetriggername : 0 et 0 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Group : 222 et 222 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Installtid : 222 et 222 lignes ; mêmes lignes dans le même ordre : False ; mêmes ensembles : False
+     Name : 222 et 222 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Obsoletename : 54 et 54 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Packages : 222 et 222 lignes ; mêmes lignes dans le même ordre : False ; mêmes ensembles : False
+     Providename : 1458 et 1458 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Recommendname : 8 et 8 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Requirename : 3081 et 3081 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Sha1header : 222 et 222 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Sigmd5 : 222 et 222 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Suggestname : 12 et 12 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Supplementname : 12 et 12 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Transfiletriggername : 10 et 10 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     Triggername : 6 et 6 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     sqlite_sequence : 1 et 1 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+     sqlite_stat1 : 7 et 7 lignes ; mêmes lignes dans le même ordre : True ; mêmes ensembles : True
+Packages : mêmes hnum : True ; blobs égaux : 0 sur 222 ; mêmes tailles de blob : 222
+pragmas de la base 1 : page_size 4096, journal_mode delete, page_count 2691, freelist_count 0
+pragmas de la base 2 : page_size 4096, journal_mode delete, page_count 2691, freelist_count 0
+## 5. cacerts
+cacerts : magic 0xfeedfeed et 0xfeedfeed ; tailles 162985 et 162985
+version 2 et 2 ; entrées 146 et 146 ; octets après l'empreinte : 0 et 0
+entrées différentes, par champ : alias 0, horodatage 146, type 0, certificat 0
+horodatages de 1 : 1 valeur(s) distincte(s), de 2026-11-18T19:44:59.000000Z à 2026-11-18T19:44:59.000000Z
+horodatages de 2 : 1 valeur(s) distincte(s), de 2026-11-18T19:45:14.000000Z à 2026-11-18T19:45:14.000000Z
+empreinte finale égale : False
+# fin 2026-11-18T20:03:12Z

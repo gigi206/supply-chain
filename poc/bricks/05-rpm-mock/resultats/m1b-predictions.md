@@ -130,3 +130,24 @@ Journal : [`m1b-sources.log`](m1b-sources.log). Le dossier `~/.cache/supply-chai
 - **La durée de conservation des archives** : j'ai seulement constaté que les instantanés d'EPEL depuis le 09/05/2023 et vault depuis 8.3 sont encore servis. Je n'ai lu aucun engagement de durée.
 - **La fin des mises à jour de 9.8** : elle est déduite de la sortie de 9.9, je ne l'ai pas lue. Si elle se confirme, l'outillage épinglé sur 9.8 ne recevra plus de correctifs, comme le bootstrap sur vault 9.7 (D2 a). Je le signale, sans le trancher.
 - **La liste des paquets** : la liste complète à installer reste à retirer de la base rpm de la racine archivée (201 paquets), selon la leçon de S4a.
+
+## Résultat du second banc, du 18/11/2026, de 20:02:56 à 20:03:12 UTC, code 0 (note écrite à 2026-11-18T20:04:50Z)
+
+Journaux : [banc](m1b-repro2.log), et [lecture complémentaire](m1b-repro2-analyse.log) par [`m1b-repro2-analyse.py`](m1b-repro2-analyse.py), à 20:03:51 UTC. Les archives sont dans `~/.cache/supply-chain-poc/05/m1b-repro2-20261118T200256Z`, laissées en place.
+
+- **RD1 tenue** : E vaut 1778602708 (12/05/2026, 16:18:28 UTC), dans les deux arbres.
+- **RD2 tenue** : 4317 entrées dépassent E dans chaque arbre. Parmi elles :
+  - 3332 ont une mtime différente d'un arbre à l'autre : ce sont les écarts du premier banc ;
+  - **985 ont la même mtime des deux côtés**. Ce sont toutes des fichiers sous `usr/include`, dont 769 sous `usr/include/linux`, datés du 12/05/2026 entre 18:33:40 et 18:34:12 UTC. Leur mtime vient donc des en-têtes rpm, et elle est postérieure au plus grand `BUILDTIME`. Le paquet n'a pas été lu.
+  - **Conséquence** : borner à E change la mtime de 985 fichiers livrés par rpm. `rpm -V` les signalerait sans doute, mais c'est déduit, pas mesuré. Une autre borne reste à choisir.
+- **RD3 tenue** : l'arbre 1 archivé deux fois donne deux fichiers identiques octet à octet (`f89341db…`).
+- **RD4 tenue** : les deux archives diffèrent (`f89341db…`, `89465527…`), avec 26 533 membres chacune et la même taille, 776 755 200 octets. **Seuls deux membres diffèrent, par leur seul contenu** : `var/lib/rpm/rpmdb.sqlite` et `etc/pki/ca-trust/extracted/java/cacerts`. Les huit fichiers exclus sont bien absents.
+- **RD5 tenue** : les en-têtes des 222 paquets ne diffèrent que par `Installtime` et `Installtid`.
+- **RD6 en partie** : les 222 blobs de `Packages` diffèrent, avec les mêmes `hnum` et les mêmes tailles. **Mais la table `Installtid` diffère aussi**, puisqu'elle indexe cette étiquette. Les 19 autres tables sont identiques. Le WAL est vide (0 octet) des deux côtés : la lecture en `immutable=1` n'a rien manqué.
+- **RD7 tenue** : `cacerts` est au format JKS (version 2), avec 146 entrées, et les mêmes alias et certificats des deux côtés. Chaque magasin a un seul horodatage, celui de sa génération pendant la transaction (19:44:59 et 19:45:14 UTC). L'empreinte finale diffère.
+
+**Lecture, selon la règle écrite d'avance** : RD4 tient, et le point 1 A se réduit à deux fichiers. **Il n'est pas établi pour autant.**
+- **Origine des écarts** : tous ceux que le banc a lus viennent de l'heure de l'installation, `Installtime` et `Installtid` dans la base rpm, l'horodatage des entrées dans `cacerts`.
+- **Neutralisation** : aucun moyen de neutraliser ces écarts n'est mesuré ici, ni le choix de la borne des mtimes. Ce sera une carte à part. Si l'un des moyens demande une installation, ou si c'est un vrai choix, la décision reviendra au propriétaire.
+
+**Portée** : ce banc traite l'archive, sur l'hôte, des 222 rpm de vault 9.7. Il ne dit pas si mock fonctionne sans les huit fichiers retirés, ni ce que fera la tâche Kata de la plateforme.
