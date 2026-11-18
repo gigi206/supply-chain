@@ -1,0 +1,41 @@
+# m1b-dnf-complements.sh, début 2026-11-18T20:26:08Z
+## 1. étiquettes les plus récentes, par date du commit
+rpm-software-management/dnf :
+  4.24.0 : commit du 2025-10-21
+  4.23.0 : commit du 2025-03-07
+  4.22.0 : commit du 2024-11-12
+  4.21.1 : commit du 2024-08-14
+  4.21.0 : commit du 2024-06-18
+rpm-software-management/libdnf :
+  0.76.0 : commit du 2026-09-16
+  0.75.0 : commit du 2025-10-20
+  0.74.0 : commit du 2025-03-06
+  0.73.4 : commit du 2024-11-12
+  0.73.3 : commit du 2024-08-14
+rpm-software-management/librepo :
+  1.22.0 : commit du 2026-10-22
+  1.21.3 : commit du 2026-10-22
+  1.21.2 : commit du 2026-09-28
+  1.21.1 : commit du 2026-09-09
+  1.21.0 : commit du 2026-07-07
+openSUSE/libsolv :
+  0.7.41 : commit du 2026-10-23
+  0.7.40 : commit du 2026-09-21
+  0.7.39 : commit du 2026-05-28
+  0.7.38 : commit du 2026-05-26
+  0.7.37 : commit du 2026-04-23
+## 2. dix dernières releases GitHub de dnf
+  4.24.0 du 2025-10-21 ; pré-version false ; brouillon false
+  4.23.0 du 2025-03-07 ; pré-version false ; brouillon false
+  4.22.0 du 2024-11-12 ; pré-version false ; brouillon false
+  4.21.1 du 2024-08-15 ; pré-version false ; brouillon false
+  4.21.0 du 2024-06-18 ; pré-version false ; brouillon false
+  4.20.0 du 2024-04-24 ; pré-version false ; brouillon false
+  4.19.2 du 2024-03-29 ; pré-version false ; brouillon false
+  4.19.1 du 2024-03-28 ; pré-version false ; brouillon false
+  4.19.0 du 2024-02-08 ; pré-version false ; brouillon false
+  4.18.2 du 2023-12-08 ; pré-version false ; brouillon false
+## 3. README de dnf : lignes citant dnf5 ou la maintenance
+lignes du README : 134 ; lignes citant dnf5 ou maintenance (casse ignorée) : 1
+  ⚠️ **Notice:** This repository is for **DNF4** only. The current DNF version (DNF5) has its `own repo <https://github.com/rpm-software-management/dnf5>`_.
+# fin 2026-11-18T20:26:11Z

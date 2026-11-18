@@ -328,3 +328,17 @@ Journal : [`sante-dnf.log`](sante-dnf.log).
 **Ce qui est décidé d'avance** :
 - **Si DC1 tient**, dnf remplit le critère « Risqué » de docs/04 au sens littéral (aucune release depuis plus de 12 mois). Je ne l'utiliserai pas, et je poserai la question au propriétaire. Le dnf de Rocky 9.8 est maintenu par la distribution (4.14.0-34.el9_8), et docs/04 dit que « la criticité et l'adoption pondèrent le verdict ». Mais pondérer ce critère, ou le lever, n'est pas à moi de le décider.
 - **Si une étiquette postérieure existe**, dnf n'est pas « Risqué » par ce critère. Je proposerai alors une ligne « À surveiller », avec un plan de sortie.
+
+## Résultat des compléments du relevé de dnf, du 18/11/2026, de 20:26:08 à 20:26:11 UTC, code 0 (note écrite à 2026-11-18T20:26:36Z)
+
+Journal : [`m1b-dnf-complements.log`](m1b-dnf-complements.log).
+- **DC1 tenue** : la plus récente étiquette de dnf est la 4.24.0, avec un commit du 21/10/2025. C'est aussi la dernière release GitHub : 4.23.0 date du 7/03/2025 et 4.22.0 du 12/11/2024.
+- **DC2 tenue** : les étiquettes les plus récentes sont celles des dernières releases :
+  - libdnf : 0.76.0 (commit du 16/09/2026) ;
+  - librepo : 1.22.0 (22/10/2026) ;
+  - libsolv : 0.7.41 (23/10/2026).
+- **DC3 tenue** : le README de dnf dit que le dépôt ne sert qu'à DNF4, et que la version courante, DNF5, a son propre dépôt.
+
+**Lecture, selon la règle écrite d'avance** : **dnf 4 remplit le critère « Risqué » de docs/04 au sens littéral.** Il n'a aucune release depuis plus de 12 mois (21/10/2025, soit 12 mois et 28 jours au jour du relevé). Le dépôt a pourtant 7 commits en 90 jours, et le paquet de Rocky est reconstruit par la distribution (4.14.0-34.el9_8). **Je n'utilise pas dnf dans M1b, et la question revient au propriétaire.** libdnf, librepo et libsolv ne tombent sous aucun critère « Risqué ». libsolv a un bus factor de 1 (« À surveiller »).
+
+**Fait à porter à la question** : dnf tourne déjà dans la chaîne rpm hors de M1b. mock s'en sert, dans le bootstrap, pour installer le buildroot (S1, `verrou_brut` : « dnf rocky.0.1 »). Le verdict ne concerne donc pas que M1b. Je ne l'ai pas encore relu dans les journaux de M3 et de M4c.
