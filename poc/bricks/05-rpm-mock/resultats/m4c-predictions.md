@@ -227,3 +227,17 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 - **TS10 tenue** : 4 s entre les deux `date -u`.
 
 **Suite** : revue de `taches.yml` par le propriétaire, pour les deux références ci-dessus, dans un commit à part. C'est un arrêt. La seconde passe (TP1 à TP4) attend ce commit.
+
+## Note datée du 18/11/2026, écrite à 15:16:54 UTC : liste revue acceptée, seconde passe de `taches` passée, TP1 à TP4 tenues
+
+**Revue** : le propriétaire a répondu « Oui » aux deux entrées proposées (réponse lue avant 15:16:02 UTC). Elles sont ajoutées telles quelles à `politique/porte/taches.yml` de la 08, dans le commit à part `1d5e27d`.
+
+**Passage** ([journal](m4c-taches.log)) : le 18/11/2026, `date -u` avant et après le lancement : 15:16:19 et 15:16:23 UTC, code 0, 41 OK, aucun KO. Sur `1d5e27d`, `m4c.sh` = `d2d895d9…`, sans `SIGNER`. Relevés de Zot ([avant](m4c-taches-pipeline-zot-avant.log), à 15:16:19 UTC ; [après](m4c-taches-pipeline-zot-apres.log), à 15:16:29 UTC).
+
+**Confrontation aux prédictions**
+- **TP1 tenue** : les deux tâches dans la liste revue, aucune nouvelle signature, mêmes digests de bundle qu'en `SIGNER=1` (`2f65f390…`, `d7f01398…`).
+- **TP2 tenue** : pipeline rendue avec les trois références, admise, signée, égale au rendu après normalisation ; bundle `tekton/pipelines/sample-app-rpm:m4c` ; code 0 ; 41 OK.
+- **TP3 tenue** : `$T/sample-app-rpm.ref` = `sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be`. `$T/auth` absent après la passe.
+- **TP4 tenue** : dépôt de la pipeline créé avec le seul tag `m4c`, au digest affiché ; tags des tâches inchangés ; catalogue de 150 à 151 dépôts.
+
+**Suite** : étape `pipeline` (deux PipelineRuns), à préparer à sec. Points ouverts : PVC sous `subPath` et Kata, `env` et `HOME` de Tekton, lecture par `publier-image` (UID 65532) de ce que root a écrit. La porte ne connaît pas encore `construire-rpm` : choix du propriétaire.

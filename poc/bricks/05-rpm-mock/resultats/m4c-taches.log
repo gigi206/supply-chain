@@ -1,0 +1,52 @@
+# m4c.sh taches, 2026-11-18T15:16:19Z
+OK   publier-image, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   gabarit preparer-rpm.yaml égal à celui des essais (sha256) : a7dfa37e23948209c6b63c815eef1d41fc9ae5404fed3de4708e4167920ad9bc
+OK   gabarit construire-rpm.yaml égal à celui des essais (sha256) : e88f5521ede87f5b03330683939fd3494f5ff58544ded9a9326014e30b8d0f88
+OK   gabarit sample-app-rpm.yaml égal à celui des essais (sha256) : a9917a65c994421f25735c03971906e99aac7982821185a135535910f0e8f7cd
+## gabarits rendus (tâches factices dans la pipeline) ; admission en dry-run serveur, rien n'est créé
+OK   pipeline : subPath des workspaces (preparer, construire, publier) : [null,"entrees","image","image"]
+OK   pipeline : entrées de preparer fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   pipeline : époque de construire (chaîne) : [{"name":"epoque","value":"1793229566"}]
+OK   pipeline : tâches (nom, tâche du bundle) : preparer:preparer-rpm construire:construire-rpm publier:publier-image
+OK   preparer-rpm rendue admise (code de kubectl) : 0
+OK   construire-rpm rendue admise (code de kubectl) : 0
+OK   sample-app-rpm rendue admise (code de kubectl) : 0
+OK   témoin refusé : champ inconnu (message mesuré le 18/11 en M4b, m4b-taches-admission.log) : 1
+## signatures (tkn 0.46.2) ; les deux tâches relues avant tout versionnement et toute poussée
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   preparer-rpm signée : annotation de signature : true
+OK   preparer-rpm signée : égale à la tâche rendue, signature exceptée (normalisées) : égale
+OK   preparer-rpm signée : images des pas : sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0 sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   preparer-rpm signée : contexte et montages du stepTemplate : {"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":65532},"volumeMounts":[{"mountPath":"/etc/ca-poc","name":"ca-poc","readOnly":true},{"mountPath":"/tmp","name":"tmp"}]}
+OK   preparer-rpm signée : pas (contexte, ressources, computeResources, env, montages propres) : [["sources",false,false,false,["DEPOT=$(params.depot)","COMMIT=$(params.commit)"],[]],["entrees",false,false,false,["FERMETURE_RPM=$(params.fermeture-rpm)","FERMETURE_SOURCES=$(params.fermeture-sources)","PACKAGING=$(params.packaging)"],[]],["assemblage",false,false,false,[],[]]]
+OK   preparer-rpm signée : paramètres, workspaces, résultats, volumes : [["depot","commit","fermeture-rpm","fermeture-sources","packaging"],[{"name":"sortie"}],["CHAINS-GIT_URL:string:","CHAINS-GIT_COMMIT:string:","FERMETURE_RPM_ARTIFACT_INPUTS:object:digest,uri","FERMETURE_SOURCES_ARTIFACT_INPUTS:object:digest,uri","PACKAGING_ARTIFACT_INPUTS:object:digest,uri"],[{"configMap":{"name":"ca-poc"},"name":"ca-poc"},{"emptyDir":{},"name":"tmp"}]]
+OK   preparer-rpm signée : script preparer-rpm-sources, substitué, égal à celui joué à l'essai (sha256) : 3f33ababe1f86b396db5df57f5f78e197014f25e5711ac4fdf152ff2cebc7681
+OK   preparer-rpm signée : script preparer-rpm-entrees, substitué, égal à celui joué à l'essai (sha256) : 6a33e3b1cf31b5240eda0a956746692b33592635272d6f4b9ff69acfe7129728
+OK   preparer-rpm signée : script preparer-rpm-assemblage, substitué, égal à celui joué à l'essai (sha256) : 554e0dba399a26bc596c5ae749e940c549b590f6067d6857eafc0a4abd35306d
+OK   construire-rpm signée : annotation de signature : true
+OK   construire-rpm signée : égale à la tâche rendue, signature exceptée (normalisées) : égale
+OK   construire-rpm signée : image du pas : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+OK   construire-rpm signée : contexte du pas (root privilégié, comme l'essai), aucun stepTemplate : [{"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0},false]
+OK   construire-rpm signée : ressources du pas (resources de v1beta1), aucun computeResources : [{"limits":{"cpu":"2","memory":"6Gi"},"requests":{"cpu":"2","memory":"6Gi"}},0]
+OK   construire-rpm signée : env et montages du pas : [["construire",["EPOQUE=$(params.epoque)"],[{"mountPath":"/w","name":"w"}]]]
+OK   construire-rpm signée : paramètres, workspaces (entrées en lecture seule), résultats, volumes : [["epoque"],[{"name":"entrees","readOnly":true},{"name":"sortie"}],["DIGEST_CONSTRUIT:string"],[{"emptyDir":{"medium":"Memory","sizeLimit":"4Gi"},"name":"w"}]]
+OK   construire-rpm signée : script construire-rpm-construire, substitué, égal à celui joué à l'essai (sha256) : 0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c
+relevé : octets libres sur / de sc-stockage (porte /var/lib/zot) avant les poussées : 4425912320
+OK   preparer-rpm : signature versionnée conforme au gabarit rendu, signature exceptée : conforme
+construction/preparer-rpm.signee.yaml : sha256 b32d073f75ca03aa48100f7052a23316297b8d5e318e7796ebc8a729b1d7acf9
+OK   construire-rpm : signature versionnée conforme au gabarit rendu, signature exceptée : conforme
+construction/construire-rpm.signee.yaml : sha256 faab95fd9464d437aa0c0a98b63fce8fe0dd6a2e4f5c173fb2bcd632e6e2b70c
+OK   preparer-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   construire-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+## pipeline sample-app-rpm, tâches de la liste revue
+OK   pipeline : subPath des workspaces (preparer, construire, publier) : [null,"entrees","image","image"]
+OK   pipeline : entrées de preparer fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   pipeline : époque de construire (chaîne) : [{"name":"epoque","value":"1793229566"}]
+OK   pipeline : tâches (nom, tâche du bundle) : preparer:preparer-rpm construire:construire-rpm publier:publier-image
+OK   pipeline rendue (références réelles) admise (code de kubectl) : 0
+OK   pipeline : références des tâches : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164 sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   pipeline signée : annotation de signature : true
+OK   pipeline signée : égale à la pipeline rendue et relue, signature exceptée : égale
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be

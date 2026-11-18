@@ -1,0 +1,15 @@
+# relevé « après » de la seconde passe de taches (lecture seule) : tags et digests de tekton/tasks/preparer-rpm, tekton/tasks/construire-rpm et tekton/pipelines/sample-app-rpm, catalogue de Zot, df de / sur sc-stockage
+2026-11-18T15:16:29Z
+## tekton/tasks/preparer-rpm
+m4c sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+rc 0
+## tekton/tasks/construire-rpm
+m4c sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+rc 0
+## tekton/pipelines/sample-app-rpm
+m4c sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+rc 0
+## catalogue : 151 dépôts
+Mounted on        Used      Avail
+/          15595204608 4425711616
+2026-11-18T15:16:30Z
