@@ -190,3 +190,7 @@ Journal : [`essai-helmfile-lecture.log`](resultats/essai-helmfile-lecture.log), 
   - la ligne « deux greffons » du cadre est corrigée ici.
 - **Ordre** : l'installation de helmfile modifie `mise.toml` et `mise.lock`. Elle se fera **après** les quatre relances du 19/11 et `m1b-autre-jour.sh`, qui mesurent des scripts inchangés, même si l'accord arrive avant.
 - **Prédiction ajoutée** : **HE0**, les deux rendus de référence sont identiques pour CoreDNS et metrics-server. Pour Cilium, l'issue est incertaine (certificats générés possibles). Confiance moyenne pour les deux premiers, faible pour Cilium.
+
+### Accord d'installation de helmfile (2026-11-18T23:31:27Z)
+
+« Oui, après relances », en réponse à « J'ajoute helmfile 1.8.4 à mise.toml après les relances ? ». helmfile 1.8.4 sera ajouté à `mise.toml` et `mise.lock`, et son attestation revérifiée, **une fois finis** les quatre relances du 19/11 et `m1b-autre-jour.sh`. L'essai `essai.sh` passera ensuite, dans un journal neuf.
