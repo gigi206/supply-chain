@@ -1,0 +1,37 @@
+# m4c.sh comparaison, 2026-11-18T17:45:24Z
+## gardes
+OK   rpm de M3 (build 1) : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+OK   verrou (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   journal 1 de construire : couche, configuration et manifeste : 1
+OK   IMAGE_DIGEST de m4c-rpm-1 (relu dans le cluster) : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+OK   journal 2 de construire : couche, configuration et manifeste : 1
+OK   IMAGE_DIGEST de m4c-rpm-2 (relu dans le cluster) : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+## buildroot des deux PipelineRuns contre le verrou (journaux archivés de construire)
+m4c-rpm-1 : paquets imprimés 222 ; lignes d'écart au verrou 0 ; 5 premières :
+OK   m4c-rpm-1 : paquets du buildroot : 222
+OK   m4c-rpm-1 : lignes d'écart au verrou (nom, version, release, arch, sigmd5) : 0
+m4c-rpm-2 : paquets imprimés 222 ; lignes d'écart au verrou 0 ; 5 premières :
+OK   m4c-rpm-2 : paquets du buildroot : 222
+OK   m4c-rpm-2 : lignes d'écart au verrou (nom, version, release, arch, sigmd5) : 0
+## tirage par digest, lecture anonyme, dossier neuf
+tiré : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 ; du -sb du layout : 2181997 octets (relevé)
+## confrontation à l'essai et à M3
+blobs : 3 ; index : [{"mediaType":"application/vnd.oci.image.manifest.v1+json","digest":"sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119"}]
+manifeste : {"mediaType":"application/vnd.oci.image.manifest.v1+json","config":{"mediaType":"application/vnd.oci.image.config.v1+json","digest":"sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688b351a53aa0cc4","size":151},"layers":[{"mediaType":"application/vnd.oci.image.layer.v1.tar","digest":"sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4","size":2181120}]}
+OK   manifeste : sha256 des octets lus : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+OK   blobs du layout : 3
+OK   manifeste : types, nombre de couches : application/vnd.oci.image.manifest.v1+json application/vnd.oci.image.config.v1+json 1 application/vnd.oci.image.layer.v1.tar
+OK   manifeste : couche (digest et taille), celle de l'essai : sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4 2181120
+OK   manifeste : configuration, celle de l'essai : sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688b351a53aa0cc4
+configuration : {"architecture":"amd64","os":"linux","rootfs":{"type":"layers","diff_ids":["sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4"]}}
+OK   configuration : sha256 et taille des octets lus : sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688b351a53aa0cc4 151
+OK   configuration : diff_ids, la couche non compressée : ["sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4"]
+OK   couche : sha256 et taille des octets lus : sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4 2181120
+membres de la couche (1) :
+     -rw-r--r-- 0/0         2173376 1970-01-01 00:00 sample-app-1.0.0-2.el9.x86_64.rpm
+OK   couche : un membre, le rpm seul (mode, propriétaire, taille, date, nom) : -rw-r--r-- 0/0 2173376 1970-01-01 00:00 sample-app-1.0.0-2.el9.x86_64.rpm
+rpm tiré : sample-app-1.0.0-2.el9.x86_64.rpm, 2173376 octets, sha256 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+OK   rpm tiré égal à celui de M3 (sha256) : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+OK   rpm tiré égal au fichier de M3 (cmp) : égal
+dossier tiré laissé : ~/.cache/supply-chain-poc/08/travail/m4c-05/comparaison
+écarts : 0
