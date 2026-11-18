@@ -482,3 +482,25 @@ Journal : [`m1b-dnf-conditions.log`](m1b-dnf-conditions.log).
 - **Consigné** : ligne au §3 de docs/04 et plan de sortie au §6, ce dernier marqué « non mesuré ».
 - **Conséquence** : dnf n'est plus suspendu dans M1b. La relance du troisième banc, à partir du 19/11, et le banc du bootstrap reprennent.
 - **Ce n'est pas un accord** pour une écriture dans le cluster ni dans Zot.
+
+## Listes complètes de l'outillage et du bootstrap : prédictions écrites avant le lancement (2026-11-18T20:49:39Z UTC)
+
+**Objet** : retirer la liste complète de l'outillage de la base rpm de `racine.tar`, comme le demande la leçon de S4a. C'est le préalable au banc de l'outillage, qui demandera de télécharger les 199 rpm. Le même passage lit `boot-racine.tar`, sans rien installer, pour préparer les prédictions du bootstrap.
+- **Ordre** : choisi avec le conseiller, consulté avant la mesure.
+- **Ce qui n'est pas supposé** : l'écart entre 201 paquets en base et 199 rpm téléchargés (`s1-racine.log`) est mesuré, pas attribué d'avance.
+
+**Mesure** : [`m1b-listes.sh`](m1b-listes.sh), hors ligne, sur l'hôte seul. Les deux archives ne sont que lues.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| L1 | `racine.tar` fait 361 758 720 octets, `d7433a05…` ; `boot-racine.tar` fait 258 129 920 octets, `8ae17f92…` | Haute : sha256 égaux le 18/11 (`m5b-archives.log`) |
+| L2 | La base de l'outillage a 201 entrées : 199 se rapprochent une à une d'une ligne « rpm » de `s1-racine.log`, et les 2 autres sont des gpg-pubkey (Rocky 9 et EPEL 9). Aucune entrée sans ligne, aucune ligne sans entrée | Moyenne : l'écart de 2 n'a jamais été lu |
+| L3 | Les 199 entrées de l'outillage ont un seul INSTALLTID, le 17/11/2026 entre 08:44:02 et 10:21:00 UTC ; leurs INSTALLTIME prennent plusieurs valeurs | Moyenne : installation de 5694 s, sans SOURCE_DATE_EPOCH |
+| L4 | Le S de l'outillage est au moins le 19/05/2026 (construction de python3-dnf 4.14.0-34, lue dans cette racine) et avant le 10/11/2026 (révision de l'instantané EPEL) ; il diffère donc du S du buildroot (1778610852) | Haute pour la borne basse, moyenne pour la haute |
+| L5 | La base du bootstrap a au moins 2 INSTALLTID. Celui du 17/11/2026 (entre 14:31:54 et 14:45:36 UTC) porte exactement 10 entrées, et il n'y a qu'une gpg-pubkey, venue de l'image | Moyenne : boot_racine a compté les dix NEVRA, pas les INSTALLTID |
+| L6 | rpm n'écrit rien sur stderr en lisant les deux bases | Moyenne |
+
+**Ce qui est décidé d'avance** :
+- Si L2 n'est pas tenue, la liste écrite ne garde que les entrées rapprochées, et l'écart est consigné.
+- Rien n'est épinglé avant la relecture de l'instantané `archive/epel/9.8`.
+- Le banc de l'outillage, qui télécharge les 199 rpm, aura ses propres prédictions.
