@@ -1,0 +1,8 @@
+# état après taches SIGNER=1 (lecture seule) : dossier auth de l'étape (test -e, sans lister), tâches et pipelines dans builds, sortie réseau de prefetch-rpm
+2026-11-18T10:01:21Z
+auth : absent
+tâches et pipelines dans builds (lignes de -o name) : 0
+rc 0
+ciliumnetworkpolicy.cilium.io/prefetch-rpm-sortie
+[{"operator":"NotIn","values":["prefetch-gomod","prefetch-deb","prefetch-rpm"]}]
+2026-11-18T10:01:21Z

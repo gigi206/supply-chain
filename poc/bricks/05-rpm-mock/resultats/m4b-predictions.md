@@ -624,3 +624,10 @@ Passe lancée sous l'accord permanent du 18/11, `m4b.sh` à `8402b2b7…`, de 09
 - **Bundle poussé avant la revue** : il est dans Zot, absent de la liste revue. La porte et `politique.sh declencheurs` le refusent tant que la liste n'est pas modifiée (lecture, comme en S4a).
 - **Sortie réseau** lue dans le cluster à 2026-11-18T09:59:16Z : `prefetch-rpm-sortie` présente dans `builds`, et `prefetch-rpm` dans le `NotIn` de `builds-sans-internet` (avec `prefetch-gomod` et `prefetch-deb`).
 - **Suite** : l'ajout de `prefetch-rpm@sha256:9afe09db…` à `politique/porte/taches.yml` (08) est proposé au propriétaire. ARRÊT jusqu'à sa revue ; la seconde passe (TP1 à TP3) n'est pas lancée.
+
+
+## Note datée du 18/11/2026, 2026-11-18T10:01:44Z UTC : corrections à la note de 09:59:16 UTC (`taches` en `SIGNER=1`)
+
+- **Heure de la lecture du cluster** : « lue dans le cluster à 2026-11-18T09:59:16Z » est faux. 09:59:16 est l'heure d'écriture de la note ; la lecture de la sortie réseau a eu lieu dans une commande sans `date -u`, entre 09:58:16 et 09:59:16 UTC (non archivée).
+- **TS6, TS7 et la sortie réseau** n'étaient archivées dans aucun journal à l'écriture de la note (lectures vues à l'écran). Elles sont rejouées en lecture seule et archivées dans `m4b-taches-etat-apres.log`, à 10:01:21 UTC : `auth` absent (`test -e`), 0 ligne pour les tâches et pipelines de `builds` (code 0), `prefetch-rpm-sortie` présente, `NotIn` de `builds-sans-internet` = `prefetch-gomod`, `prefetch-deb`, `prefetch-rpm`. Les verdicts de TS6 et TS7 restent « tenue », sur cette mesure de 10:01:21 UTC, postérieure de 3 min 29 s à la fin de la passe.
+- **Baisse de la place utilisée** : 15 552 925 696 o au relevé de 09:48:54 UTC (`m4b-disque-sc-stockage.log`), 15 525 396 480 o au relevé avant de 09:57:30 UTC, soit 27 529 216 o de moins entre ces deux instants. Cause inconnue.
