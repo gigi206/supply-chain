@@ -164,3 +164,10 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Mesure** : sans ce membre, deux installations de l'outillage faites le même jour donnent la même archive, `05d35d64…`. C'est la référence du 18/11 pour la relance d'un autre jour.
 - **À trancher dans la carte** : faut-il un fichier vide ou un fichier absent ? Ce banc n'a mesuré que l'exclusion.
 - **Détail** : [prédictions et résultat](m1b-predictions.md), [lecture](m1b-machine-id.log), [journal](m1b-sans-machine-id.log).
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T21:11:17Z UTC : lecture de l'amorce
+
+- **Correction** : l'amorce `ed654c69`, comme l'image du bootstrap `ee90dc0e`, est en local, dans le cache OCI de `s1.sh amorce`. Les notes qui disent le contraire sont fausses.
+- **Langues** : `%_install_langs` vaut `en_US` dans l'amorce (`macros.image-language-conf`) et `all` dans la racine d'outils de `99790c13`.
+- **Suite** : refaire le banc de l'outillage avec la racine de l'amorce, sous `umask 022`.
+- **Détail** : [lecture](m1b-predictions.md), [journal](m1b-amorce-lecture.log).

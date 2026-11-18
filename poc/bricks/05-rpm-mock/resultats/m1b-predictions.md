@@ -664,3 +664,15 @@ Restent non mesurés :
 - le bootstrap.
 
 Le point 1 A reste non établi.
+
+### Lecture de l'amorce `ed654c69`, 18/11/2026, de 21:10:51 à 21:10:52 UTC, code 0 (note écrite à 2026-11-18T21:11:17Z UTC)
+
+**Correction** : plusieurs notes du 18/11 disent que l'amorce « n'est pas en local » : l'en-tête de `m1b-outil-analyse.sh`, les prédictions du troisième banc (point 3, « Mauvais installeur ») et le résultat du banc de l'outillage (lecture, point 2). **C'est faux.** `s1.sh amorce` l'a copiée dans le cache OCI `~/.cache/supply-chain-poc/08/telechargements/oci/amont/rockylinux/rockylinux` (voir [`s1-amorce.log`](s1-amorce.log), l. 2). Je ne l'avais pas cherchée là. Le manifeste, la configuration et l'unique couche y sont présents, et leur sha256 est égal à leur nom. C'est aussi le cas de `ee90dc0e`, l'image du bootstrap : manifeste, configuration et couche `812c4412…`, vérifiés à la main avant ce script.
+
+**Lecture** ([script](m1b-amorce-lecture.sh), [journal](m1b-amorce-lecture.log)), hors ligne, dans la couche extraite :
+- **Versions** : rpm 4.16.1.3-40.el9, dnf 4.14.0-34.el9_8.rocky.0.1, libsolv 0.7.24-4.el9, libdnf 0.69.0-18.el9.rocky.0.1.
+- **Langues** : `%_install_langs` vaut `en_US` dans l'amorce. Il est posé par `/etc/rpm/macros.image-language-conf`. La racine d'outils de `99790c13` donne `all`, et aucun de ses fichiers ne cite `install_langs`.
+- **dnf.conf** : celui de l'amorce a `tsflags=nodocs`. S1 et le banc passent `-c` à dnf ; ce fichier n'est donc pas lu à l'installation (lecture du script, non mesurée).
+- **umask** : la configuration de l'image n'en porte pas (Env `container=oci`, Cmd `/bin/bash`). Il vient du lanceur, et il n'est pas lu ici.
+
+**Ce que cela change** : l'hypothèse « langues des outils » a désormais une cause lisible : `en_US` contre `all`. Le lien avec les 34 membres de `racine.tar` reste à mesurer. Il faut refaire le banc de l'outillage avec la racine de l'amorce comme outils, sous `umask 022`, après des prédictions commitées. La racine extraite est laissée dans `~/.cache/supply-chain-poc/05/m1b-amorce-20261118T211051Z/racine`.

@@ -1,0 +1,29 @@
+# m1b-amorce-lecture.sh, début 2026-11-18T21:10:51Z
+## 1. blobs
+OK   manifeste ed654c69 : sha256 égal
+OK   configuration 686e4558d0a5 : sha256 égal, 1006 octets
+OK   couche 99c753a880cc : sha256 égal, 87572693 octets
+configuration : Env ['container=oci'] ; User '' ; Cmd ['/bin/bash'] ; créée 2026-05-25T20:19:03.81230907Z
+## 2. racine de l'amorce
+RPM version 4.16.1.3
+rpm-4.16.1.3-40.el9.x86_64
+dnf-4.14.0-34.el9_8.rocky.0.1.noarch
+python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch
+libsolv-0.7.24-4.el9.x86_64
+libdnf-0.69.0-18.el9.rocky.0.1.x86_64
+%_install_langs (amorce) : [en_US]
+fichiers qui citent install_langs (amorce) :
+     /etc/rpm/macros.image-language-conf:1:%_install_langs en_US
+/etc/dnf/dnf.conf (amorce) :
+     [main]
+     gpgcheck=1
+     installonly_limit=3
+     clean_requirements_on_remove=True
+     best=True
+     skip_if_unavailable=False
+     tsflags=nodocs
+## 3. racine d'outils de 99790c13
+%_install_langs (outils) : [all]
+     (aucun)
+racine de l'amorce laissée dans /home/gigi/.cache/supply-chain-poc/05/m1b-amorce-20261118T211051Z/racine
+# fin 2026-11-18T21:10:52Z
