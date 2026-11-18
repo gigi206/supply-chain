@@ -398,3 +398,17 @@ Journal : [`m1b-dnf-portee.log`](m1b-dnf-portee.log).
 | F5 | dnf5 n'est pas archivé et a une release de moins de 6 mois | Haute |
 
 **Ce qui est décidé d'avance** : la réponse au propriétaire ne donnera que les faits mesurés. Si F2 à F4 tiennent, dnf5 n'est pas l'outil de la distribution, ni pour Rocky 9, ni pour Rocky 10. Le verdict de dnf 4 reste au propriétaire.
+
+## Résultat du relevé sur dnf5, du 18/11/2026, de 20:37:22 à 20:37:29 UTC, code 0 (note écrite à 2026-11-18T20:37:55Z)
+
+Journal : [`m1b-dnf5.log`](m1b-dnf5.log).
+- **F1 tenue** : mock-core-configs 45.2 pose `package_manager = 'dnf'` (dnf 4) pour rhel, rocky et centos-stream, en 9 comme en 10. Il ne choisit `dnf5` que pour Fedora (à partir de 40, et rawhide), et pour quelques distributions hors EL (Amazon Linux 2027, Azure Linux 4, Mageia, openSUSE Tumbleweed).
+- **F2 tenue** : les listes de Rocky 9.8 (BaseOS et AppStream) n'ont aucun fichier dnf5. Seul figure `dnf-4.14.0-34.el9_8.rocky.0.1`.
+- **F3 tenue** : la liste d'EPEL 9.8 (archive) n'a aucun fichier dnf5.
+- **F4 tenue** : la liste de BaseOS de Rocky 10 a `dnf-4.20.0-28.el10.rocky.0.1`, et ni BaseOS ni AppStream n'ont de dnf5.
+- **F5 tenue** : dnf5 n'est pas archivé. Sa dernière release est la 5.4.8.0, du 11/11/2026, avec 227 commits en 90 jours.
+
+**Lecture** :
+- **dnf5 n'est l'outil de la distribution ni pour Rocky 9, ni pour Rocky 10**, d'après ces listes non signées et d'après les gabarits de mock. L'outil que Rocky livre et que mock choisit pour EL est dnf 4.
+- **Employer dnf5 ici** voudrait dire l'apporter hors de la distribution. Ce n'est pas mesuré.
+- **Le verdict de dnf 4 reste au propriétaire.**

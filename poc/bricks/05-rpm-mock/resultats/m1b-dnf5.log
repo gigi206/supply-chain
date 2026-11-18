@@ -1,0 +1,30 @@
+# m1b-dnf5.sh, début 2026-11-18T20:37:22Z ; listes dans /home/gigi/.cache/supply-chain-poc/05/m1b-dnf5-7YKxHq
+## 1. mock-core-configs : package_manager par gabarit
+mock-core-configs : mock-core-configs-45.2-1.el9.noarch mock-6.9-1.el9.noarch 
+  rhel-9.tpl : config_opts['package_manager'] = 'dnf'
+  rocky-9.tpl : config_opts['package_manager'] = 'dnf'
+  centos-stream-9.tpl : config_opts['package_manager'] = 'dnf'
+  rhel-10.tpl : config_opts['package_manager'] = 'dnf'
+  rocky-10.tpl : config_opts['package_manager'] = 'dnf'
+  centos-stream-10.tpl : config_opts['package_manager'] = 'dnf'
+  fedora-branched.tpl : config_opts['package_manager'] = '{% if releasever|int >= 40 %}dnf5{% else %}dnf{% endif %}'
+  fedora-rawhide.tpl : config_opts['package_manager'] = 'dnf5'
+gabarits qui citent dnf5 : amazonlinux-2027.tpl azure-linux-4.tpl fedora-branched-riscv64.tpl fedora-branched.tpl fedora-eln.tpl fedora-rawhide-riscv64.tpl fedora-rawhide.tpl mageia-branched.tpl mageia-cauldron.tpl opensuse-tumbleweed.tpl 
+## 2. fichiers dnf5 et dnf dans les dépôts
+  rocky98-baseos : dnf5 
+  rocky98-baseos : dnf dnf-4.14.0-34.el9_8.rocky.0.1.noarch.rpm 
+  rocky98-appstream : dnf5 
+  rocky98-appstream : dnf 
+  epel98 : dnf5 
+  epel98 : dnf 
+  rocky10-baseos : dnf5 
+  rocky10-baseos : dnf dnf-4.20.0-28.el10.rocky.0.1.noarch.rpm 
+  rocky10-appstream : dnf5 
+  rocky10-appstream : dnf 
+## 3. santé de dnf5
+nom final rpm-software-management/dnf5, archivé false, licence NOASSERTION, dernier push 2026-11-18
+dernière release : 5.4.8.0 du 2026-11-11
+commits depuis 2026-08-20 : 227
+fusionneurs des 100 dernières PR : Conan-Kudo 4, evan-goode 14, fhbash 6, jrohel 6, kontura 32, m-blaha 18, pkratoch 7, ppisar 13
+SECURITY.md : absent
+# fin 2026-11-18T20:37:29Z
