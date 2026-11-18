@@ -72,6 +72,7 @@ L'exception autorise le build à déclarer **les noms et digests des sujets** (a
 | Provenance BuildKit (`mode=max`) | L2 : non signée, contrôlée par le client | Gratuite | Docker ne revendique aucun niveau | Indice complémentaire |
 | Argo CD | — (déploiement) | GitOps de la plateforme ; releases SLSA L3 | RCE dans le repo-server corrigée en ≥ 3.3.15 / 3.4.10 / 3.5.4 | Phase 4 |
 | Flux et helmfile (**ajoutés le 18/11/2026**, à sec) | — (déploiement) | Flux : commits signés SSH et OpenPGP, artefacts OCI vérifiés par cosign ou Notation, provenance in-toto. helmfile : poussé depuis l'hôte, sans compte dans le cluster | Flux et Argo CD : contrôleurs liés à des droits de type `cluster-admin` par défaut, ce qui rouvre l'option (b) et D1 de la 08b. helmfile : `helm-diff` et `kustomize` à auditer, épinglage par digest non établi | **Évalués le 18/11/2026, aucune décision** ([détail](../poc/benchmarks/deploiement/README.md)) |
+| _Décision du propriétaire (2026-11-18T23:21:11Z)_ | « Garder les scripts » : déploiement poussé depuis l'hôte (scripts et Helm). Argo CD, Flux et helmfile non retenus ; la « Phase 4 » d'Argo CD ci-dessus est caduque pour le PoC | | | |
 
 > **Correction datée du 18/11/2026, 22:21:36 UTC** (ligne PaC ci-dessus et note du §2) :
 > - « statuts et commentaires dans la forge » n'est pas relevé dans un journal ;

@@ -133,3 +133,7 @@ Journal : [`lecture-2.log`](resultats/lecture-2.log), de 23:14:56 à 23:15:17 UT
 - **Limites** : tout est lu, rien n'est mesuré. helmfile n'a pas été exercé avec Helm 4.3.1. Le bornage des droits de Flux et d'Argo CD n'est pas mesuré.
 - **Correction** : mon message précédent disait de helmfile qu'il « prolonge nos décisions ». C'est le fait de pousser qui les prolonge, par les scripts actuels ; helmfile n'est pas en service.
 - **Besoin ouvert lié, non tranché** : « Opérateur Kubernetes » (transmis le 06/11/2026, à définir avec le propriétaire). Pour cette note de besoin, c'est « pas maintenant ; à réexaminer avec le multi-projets ». Elle cite « Helm ou Kustomize avec GitOps » parmi les alternatives non évaluées.
+
+### Décision du propriétaire (2026-11-18T23:21:11Z) : « Garder les scripts »
+
+En réponse à « Quel modèle de déploiement retiens-tu ? », après la recommandation du conseiller. La plateforme continue d'être poussée depuis l'hôte, par les scripts de brique et Helm, ce qui prolonge l'option (b) et D1 de la 08b. Ni Argo CD, ni Flux, ni helmfile ne sont retenus. Si une correction continue des dérives est exigée un jour, la question se rouvrira (Flux, banc, option (b) rouverte explicitement). La ligne « Phase 4 » d'Argo CD dans docs/00 et son minimum 3.5.4 dans docs/04 sont caducs pour le PoC, et rien n'est effacé.
