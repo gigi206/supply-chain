@@ -714,3 +714,25 @@ Le point 1 A reste non établi.
 **Confiance** : AO1 à AO4 sont des relectures. AO5 suit le ré-archivage de 21:08:52 UTC, mais avec d'autres outils. AO6 à AO9 sont le vrai test de l'hypothèse « langues et umask des outils ». AO8 et AO9 sont moyennes : d'autres membres (dossiers créés par des scriptlets, base rpm) peuvent bouger avec la macro ou le umask. Si AO6 ne tient pas, la cause des 2 533 membres reste ouverte.
 
 **Portée, avant le lancement** : même si tout tient, ce banc montre seulement trois choses, le même jour. Avec les outils de l'amorce sous `umask 022`, deux installations donnent la même archive. Ces outils donnent les mêmes membres de langues que `racine.tar`. Et, dans ces outils, masquer la seule macro `macros.image-language-conf` suffit à ramener toutes les langues. Ce dernier point attribue l'écart à cette macro **sur le banc** ; il ne dit rien du pod Kata. Le umask du pod Kata reste non mesuré ; le témoin `i11` montre seulement l'effet d'un umask sur ce banc. Écart connu avec S1 : le banc tourne dans un chroot sous `unshare`, pas dans un pod Kata. Si AO5 tient, `a8.tar` devient la référence du 18/11 pour cette configuration, distincte de `05d35d64`. Restent non mesurés : un autre jour, le choix entre fichier vide et fichier absent pour machine-id, et le bootstrap. Le point 1 A reste non établi.
+
+### Résultat du banc avec les outils de l'amorce, 18/11/2026, de 21:25:17 à 21:27:20 UTC, code 0 (note écrite à 2026-11-18T21:28:20Z UTC)
+
+Journal : [`m1b-outil-amorce.log`](m1b-outil-amorce.log). Modes de `var/lib/dnf`, relus après le passage : [`m1b-outil-amorce-modes.sh`](m1b-outil-amorce-modes.sh), [journal](m1b-outil-amorce-modes.log) (21:27:39 UTC). Arbres et archives laissés dans `~/.cache/supply-chain-poc/05/m1b-outil-amorce-20261118T212517Z`.
+
+**AO1 à AO9 tenues.**
+- **AO1** : les trois `repomd.xml` du miroir copié sont égaux aux copies du 18/11, et ceux de vault sont signés par la clé de Rocky. Les métadonnées et les 199 rpm (113 665 783 octets) ont le sha256 attendu.
+- **AO2** : dans la racine d'outils, le umask vaut `0022` et `%_install_langs` vaut `en_US`. Témoins : `0002` pour `i11`, et `all` quand la macro de l'image est masquée. Versions : rpm 4.16.1.3-40.el9, dnf 4.14.0-34.el9_8.rocky.0.1.
+- **AO3** : 199 « digests signatures OK » sur 199, et S = 1793914619.
+- **AO4** : dnf rend 0 pour les quatre installations. Chacune a 201 entrées : les 199 NEVRA de `racine.tar` et 2 gpg-pubkey.
+- **AO5** : `a8.tar` et `a9.tar` sont identiques octet à octet, et le témoin `a8b.tar` aussi : 13 332 membres, sha256 `06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5`. **C'est la référence du 18/11 pour l'outillage fait avec les outils de l'amorce sous `umask 022`**, distincte de `05d35d64`.
+- **AO6** : `a8` et `racine.tar` ont chacun 34 membres sous `usr/share/locale`, dont 7 `.mo`. Aucun membre n'est seulement dans `a8`.
+- **AO7** : 9 membres ne sont que dans `racine.tar` : les 8 fichiers exclus et `etc/machine-id`. 4 membres communs diffèrent, tous par leur contenu : le `cacerts` de Java, `etc/shadow`, `etc/shadow-` et `rpmdb.sqlite`. Aucun écart de mode : `var/lib/dnf` est en 0755 des deux côtés.
+- **AO8** : `a10` (macro masquée) a 2 567 membres sous `usr/share/locale`, dont 1 157 `.mo`. Il a 2 533 membres de plus que `a8`, aucun de moins, et seul `rpmdb.sqlite` diffère.
+- **AO9** : `a11` (umask 0002) a les mêmes membres que `a8`. Seul `var/lib/dnf` diffère, par son mode : 0775 contre 0755.
+
+**Lecture**, sans conclusion au-delà de la mesure :
+1. **Langues** : sur ce banc, avec les outils de l'amorce, masquer la seule macro `macros.image-language-conf` fait passer de 34 à 2 567 membres de langues. Les 2 533 membres en plus du banc de 20:57:14 UTC s'expliquent donc, sur le banc, par cette macro des outils.
+2. **umask** : sur ce banc, le umask des outils décide du mode de `var/lib/dnf`, et de lui seul. `racine.tar` a 0755, ce qui va avec un umask de 022 dans le pod. Le umask du pod Kata reste non mesuré.
+3. **Écart restant avec S1** : à part `etc/machine-id` et les fichiers exclus, seuls 4 contenus diffèrent. Ce sont ceux qui dépendent de l'heure d'installation : S1 tournait sans `SOURCE_DATE_EPOCH`. Pour `shadow`, c'est mesuré (banc de 20:57:14 UTC) ; pour `cacerts` et `rpmdb.sqlite`, c'est l'hypothèse des bancs précédents, non isolée ici.
+
+**Conséquence** : la tâche future devra fixer ses outils (l'amorce par digest, avec sa macro de langue), son umask (022) et `SOURCE_DATE_EPOCH`, et écarter `etc/machine-id` et les fichiers listés. Avec cela, deux installations du même jour donnent la même archive. Restent non mesurés : un autre jour (à partir du 19/11, à comparer à `06c289ad…`), le choix entre fichier vide et fichier absent pour machine-id, le bootstrap, et le pod Kata lui-même. **Le point 1 A reste non établi.**

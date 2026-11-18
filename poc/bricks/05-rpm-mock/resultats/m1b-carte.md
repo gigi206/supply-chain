@@ -176,3 +176,11 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 
 - **Portée** : `05d35d64…` ne vaut que pour les outils de `99790c13`, sous le umask de l'hôte (0002). Elle ne sert pas de référence à un banc fait avec les outils de l'amorce, qui en aura une à lui, faite le même jour.
 - **ee90dc0e** : sa présence en local est désormais archivée ([journal](m1b-images-locales.log)).
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T21:28:20Z UTC : outils de l'amorce, résultat
+
+- **Étape racine de S1** : le pod a tourné sur l'amorce `ed654c69` nue (`s1.sh` du passage, `ad16fc99`) ; son umask n'est pas relevé.
+- **Banc** (21:25:17 à 21:27:20 UTC, AO1 à AO9 tenues) : avec les outils de l'amorce sous `umask 022`, deux installations donnent la même archive `06c289ad…`, nouvelle référence du 18/11. Elle a les 34 membres de langues de `racine.tar` et le même mode de `var/lib/dnf`.
+- **Témoins** : macro de langue masquée → 2 567 membres de langues ; umask 0002 → `var/lib/dnf` en 0775, rien d'autre.
+- **Reste** : un autre jour, machine-id (vide ou absent), bootstrap, pod Kata. Point 1 A non établi.
+- **Détail** : [résultat](m1b-predictions.md), [journal](m1b-outil-amorce.log).

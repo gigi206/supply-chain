@@ -1,0 +1,5 @@
+# m1b-outil-amorce-modes.sh, début 2026-11-18T21:27:39Z
+a8.tar : ./var/lib/dnf mode 0755
+a11.tar : ./var/lib/dnf mode 0775
+racine.tar : ./var/lib/dnf mode 0755
+# fin 2026-11-18T21:27:40Z
