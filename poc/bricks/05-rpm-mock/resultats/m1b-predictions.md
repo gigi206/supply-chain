@@ -780,3 +780,10 @@ Journal : [`m1b-a10-b5.log`](m1b-a10-b5.log).
 - **BT10** (lecture) : `n1` contre `c1` dit ce que la transaction ajoute et change.
 
 **Portée** : la référence ne vaut que pour le 18/11, avec ces outils et ce miroir. Le pod Kata n'est pas mesuré, et le point 1 A reste non établi. Les valeurs à retenir (`en_US`, 022, machine-id, exclusions) reviennent à la carte.
+
+### Premier passage du banc du bootstrap, interrompu (note écrite à 2026-11-18T21:42:21Z UTC, avant le second passage)
+
+- **Passage** : 18/11/2026, début à 21:41:38 UTC, code 1, sans ligne de fin. Journal : [`m1b-boot-1.log`](m1b-boot-1.log), dossier `~/.cache/supply-chain-poc/05/m1b-boot-20261118T214138Z`, laissé en place.
+- **Ce qu'il a mesuré** : BT1 tenue (réseau). Pour BT2 : `a8.tar` au bon sha256, `/usr/bin/dnf` et la macro de langue absents, umask 0022, `%_install_langs` à `all`, rpm 4.16.1.3 et dnf-3 4.14.0. `rpm -K` n'a pas tourné.
+- **Cause de l'arrêt** : un défaut du script. `rpm -q … dnf …` rend 1 parce que dnf n'est pas installé dans les outils, et `pipefail` a arrêté le script. Aucune installation n'a eu lieu.
+- **Correction** : `|| true` sur cette ligne, et sur le `grep` du résumé de la transaction, qui avait le même défaut. Rien d'autre ne change dans [`m1b-boot.sh`](m1b-boot.sh), ni dans les prédictions BT1 à BT10. Le second passage écrit dans `m1b-boot.log`, avec un dossier neuf.

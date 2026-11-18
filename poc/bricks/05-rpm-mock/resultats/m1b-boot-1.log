@@ -1,0 +1,24 @@
+# m1b-boot.sh, début 2026-11-18T21:41:38Z
+OK   paquets demandés = ceux de boot_racine de S1 : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+umask de l'hôte (pour mémoire) : 0002
+## 1. clé, métadonnées de vault 9.7 BaseOS et dix rpm (réseau, lecture publique)
+OK   RPM-GPG-KEY-Rocky-9 : empreinte : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   baseos97 : repomd.xml, sha256 égal à hote97 : fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+OK   baseos97 : signataire de repomd.xml : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   baseos97 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml, 25984 kB
+OK   rpm épinglés dans s1-hote97.log : 10
+OK   dix rpm au sha256 de hote97 : 10, 1984355 octets
+fin du réseau : 2026-11-18T21:41:40Z ; la suite tourne sans réseau (unshare -n)
+## 2. racine d'outils (a8), témoins, signatures et borne S
+OK   a8.tar : sha256 : 06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5
+extraction de a8 : code 0, 0 ligne(s) d'erreur
+témoin /usr/bin/dnf dans la racine d'outils : absent
+témoin macros.image-language-conf : absent
+témoin umask (dans la racine d'outils) : 0022
+témoin %_install_langs (dans la racine d'outils) : [all]
+outils : RPM version 4.16.1.3 ; dnf-3 4.14.0
+     rpm-4.16.1.3-40.el9.x86_64
+     package dnf is not installed
+     python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch
+     libsolv-0.7.24-6.el9_8.x86_64
+     libdnf-0.69.0-18.el9.rocky.0.1.x86_64

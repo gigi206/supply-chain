@@ -102,7 +102,7 @@ echo "témoin macros.image-language-conf : $([ -e "$D/outils/etc/rpm/macros.imag
 echo "témoin umask (dans la racine d'outils) : $(q bash -c umask)"
 echo "témoin %_install_langs (dans la racine d'outils) : [$(q /usr/bin/rpm -E '%_install_langs')]"
 echo "outils : $(q /usr/bin/rpm --version) ; dnf-3 $(q /usr/bin/dnf-3 --version 2>/dev/null | head -1)"
-q bash -c 'rpm -q --qf "%{NEVRA}\n" rpm dnf python3-dnf libsolv libdnf 2>&1' | sed 's/^/     /'
+q bash -c 'rpm -q --qf "%{NEVRA}\n" rpm dnf python3-dnf libsolv libdnf 2>&1 || true' | sed 's/^/     /'   # dnf absent : rpm -q rend 1
 mkdir -p "$D/outils/m/clesdb"
 q /usr/bin/rpm --dbpath /m/clesdb --import /m/cles/RPM-GPG-KEY-Rocky-9
 q bash -c 'rpm --dbpath /m/clesdb -K /m/rpms/*.rpm' > "$D/k.log" 2>&1 || true
@@ -180,7 +180,7 @@ for i in 1 2; do
   echo "lignes « scriptlet », « warning » ou « error » (casse ignorée) : $(grep -Eci 'scriptlet|(^|[^-[:alnum:]])(warning|error)' "$D/dnf-$i.log" || true)"
   grep -Ei 'importing|import|clé|key' "$D/dnf-$i.log" | grep -vi 'fingerprint\|empreinte' | head -n 6 | masque | sed 's/^/     /' || true
   [ "$rc" = 0 ] || { tail -n 15 "$D/dnf-$i.log" | masque; echo "KO   installation b$i en échec" >&2; exit 1; }
-  grep -E "^(Install|Upgrade|Remove|Downgrade|Reinstall|Skip) +[0-9]+ Package" "$D/dnf-$i.log" | sed "s/^/résumé de la transaction : /"
+  grep -E "^(Install|Upgrade|Remove|Downgrade|Reinstall|Skip) +[0-9]+ Package" "$D/dnf-$i.log" | sed "s/^/résumé de la transaction : /" || true
   q bash -c "rpm --root /m/b$i -qa --qf '$Q' 2>/m/apres-$i.err | sort > /m/apres-$i.txt"
   echo "b$i après : rpm -qa $(wc -l < "$D/outils/m/apres-$i.txt") ligne(s), stderr $(wc -l < "$D/outils/m/apres-$i.err") ligne(s)"
   echo "## installation b$i, fin $(date -u +%FT%TZ)"
