@@ -1,0 +1,16 @@
+# relevé « après » de la seconde passe de taches (lecture seule) : tags et digests des deux dépôts, catalogue de Zot, df de / sur sc-stockage, dossier auth (test -e), tâches et pipelines dans builds
+2026-11-18T10:16:41Z
+## tekton/tasks/prefetch-rpm
+m4b
+rc 0
+sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+## tekton/pipelines/prefetch-rpm-sample-app
+m4b
+rc 0
+sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+147
+Mounted on        Used      Avail
+/          15535861760 4485054464
+auth : absent
+tâches et pipelines dans builds (lignes de -o name) : 0
+2026-11-18T10:16:42Z

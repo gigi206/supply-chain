@@ -1,0 +1,13 @@
+# relevé « avant » de la seconde passe de taches (lecture seule) : tags et digest de tekton/tasks/prefetch-rpm, dépôt de la pipeline, catalogue de Zot, df de / sur sc-stockage
+2026-11-18T10:16:10Z
+## tekton/tasks/prefetch-rpm
+m4b
+rc 0
+sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+## tekton/pipelines/prefetch-rpm-sample-app
+Error: reading tags for 192.168.161.13:5000/tekton/pipelines/prefetch-rpm-sample-app: GET https://192.168.161.13:5000/v2/tekton/pipelines/prefetch-rpm-sample-app/tags/list?n=1000: NAME_UNKNOWN: reposi
+rc 1
+146
+Mounted on        Used      Avail
+/          15535173632 4485742592
+2026-11-18T10:16:11Z

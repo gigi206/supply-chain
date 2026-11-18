@@ -1,0 +1,36 @@
+# m4b.sh taches, 2026-11-18T10:16:12Z
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   publier-fermeture, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+## gabarits rendus (prefetch-rpm factice) ; admission en dry-run serveur, rien n'est créé
+OK   tâche rendue admise (code de kubectl) : 0
+OK   pipeline rendue admise (code de kubectl) : 0
+OK   témoin refusé : champ inconnu (mesuré le 18/11, m4b-taches-admission.log) : 1
+## signature de prefetch-rpm (tkn 0.46.2), contrôlée avant tout versionnement
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   tâche signée : annotation de signature : true
+OK   tâche signée : nom, image, paramètres : ["prefetch-rpm","sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771",["liste","source","dossier","empreinte","repomd"]]
+OK   tâche signée : ressources du pas (resources de v1beta1, clés triées), aucun computeResources : [{"limits":{"cpu":"2","memory":"2Gi"},"requests":{"cpu":"2","memory":"2Gi"}},0]
+OK   tâche signée : UID, runAsNonRoot, capacités, élévation : 65532 true ALL false
+OK   tâche signée : variables d'environnement du pas : [{"name":"HOME","value":"/tmp"}]
+OK   tâche signée : résultat objet BOOTSTRAP_ARTIFACT_INPUTS (uri, digest) : ["BOOTSTRAP_ARTIFACT_INPUTS","object",["digest","uri"]]
+OK   script de la tâche signée, substitué comme à l'essai (sha256) : 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+OK   signature versionnée conforme au gabarit rendu, signature exceptée : conforme
+fermeture/prefetch-rpm.signee.yaml : sha256 4123539575b1f7986f82f648913ee147348c7198399018f3520c7037eeade199
+OK   prefetch-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+## pipeline prefetch-rpm-sample-app, tâches de la liste revue
+OK   pipeline rendue (références réelles) admise (code de kubectl) : 0
+OK   pipeline : références des tâches : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+OK   tâche signée : annotation de signature : true
+OK   tâche signée : nom, image, paramètres : ["prefetch-rpm","sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771",["liste","source","dossier","empreinte","repomd"]]
+OK   tâche signée : ressources du pas (resources de v1beta1, clés triées), aucun computeResources : [{"limits":{"cpu":"2","memory":"2Gi"},"requests":{"cpu":"2","memory":"2Gi"}},0]
+OK   tâche signée : UID, runAsNonRoot, capacités, élévation : 65532 true ALL false
+OK   tâche signée : variables d'environnement du pas : [{"name":"HOME","value":"/tmp"}]
+OK   tâche signée : résultat objet BOOTSTRAP_ARTIFACT_INPUTS (uri, digest) : ["BOOTSTRAP_ARTIFACT_INPUTS","object",["digest","uri"]]
+OK   script de la tâche signée, substitué comme à l'essai (sha256) : 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   pipeline signée : annotation de signature : true
+OK   pipeline signée : références des tâches : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+OK   pipeline signée : liste égale à la liste : égale
+OK   pipeline signée : source, dossier, empreinte, repomd : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 21CB256AE16FC54C6E652949702D426D350D275D 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+OK   pipeline signée : subPath de prefetch, racine pour publier ; dépôt de la fermeture : [["fermeture",null],"sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm"]
+sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db

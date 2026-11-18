@@ -631,3 +631,21 @@ Passe lancée sous l'accord permanent du 18/11, `m4b.sh` à `8402b2b7…`, de 09
 - **Heure de la lecture du cluster** : « lue dans le cluster à 2026-11-18T09:59:16Z » est faux. 09:59:16 est l'heure d'écriture de la note ; la lecture de la sortie réseau a eu lieu dans une commande sans `date -u`, entre 09:58:16 et 09:59:16 UTC (non archivée).
 - **TS6, TS7 et la sortie réseau** n'étaient archivées dans aucun journal à l'écriture de la note (lectures vues à l'écran). Elles sont rejouées en lecture seule et archivées dans `m4b-taches-etat-apres.log`, à 10:01:21 UTC : `auth` absent (`test -e`), 0 ligne pour les tâches et pipelines de `builds` (code 0), `prefetch-rpm-sortie` présente, `NotIn` de `builds-sans-internet` = `prefetch-gomod`, `prefetch-deb`, `prefetch-rpm`. Les verdicts de TS6 et TS7 restent « tenue », sur cette mesure de 10:01:21 UTC, postérieure de 3 min 29 s à la fin de la passe.
 - **Baisse de la place utilisée** : 15 552 925 696 o au relevé de 09:48:54 UTC (`m4b-disque-sc-stockage.log`), 15 525 396 480 o au relevé avant de 09:57:30 UTC, soit 27 529 216 o de moins entre ces deux instants. Cause inconnue.
+
+
+## Note datée du 18/11/2026, 2026-11-18T10:17:07Z UTC : liste revue acceptée, seconde passe de `taches` passée
+
+- **Revue du propriétaire** : réponse « Oui » à la question « J'ajoute prefetch-rpm@9afe09db à taches.yml et je commite ? », lue avant 10:15:42 UTC. Entrée appliquée telle que proposée (patch `e7b6d132`, fichier égal à la proposition par `cmp`), commit `05e2fe8`.
+- **Relevé avant** à 10:16:10 UTC (`m4b-taches-pipeline-zot-avant.log`) : tâche au seul tag `m4b`, digest `9afe09db…` ; pipeline en `NAME_UNKNOWN` ; catalogue de 146.
+- **Passe** sans `SIGNER`, `m4b.sh` à `8402b2b7…`, de 10:16:12 à 10:16:14 UTC (`chrono.tsv`), code 0. Journal : `m4b-taches.log`.
+
+| Prédiction | Mesure | Verdict |
+| --- | --- | --- |
+| TP1 | « OK prefetch-rpm dans la liste revue » avec `9afe09db…` complet ; aucune ligne `SIGNER` ; `prefetch-rpm.signee.yaml` inchangé (`41235395…`) ; même digest de bundle qu'en `SIGNER=1` | Tenue |
+| TP2 | Pipeline rendue avec les deux références de la liste, admise, signée, relue ; bundle `tekton/pipelines/prefetch-rpm-sample-app@sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db` ; code 0 ; 28 lignes OK, aucun KO | Tenue |
+| TP3 | Relevé après à 10:16:41 UTC (`m4b-taches-pipeline-zot-apres.log`) : pipeline au seul tag `m4b`, digest égal à celui de l'étape ; tâche toujours `m4b` à `9afe09db…` ; catalogue de 147 | Tenue |
+
+- **Même relevé après** : `auth` absent (`test -e`), 0 tâche ou pipeline dans `builds`. La pipeline signée n'est pas versionnée dans le dépôt : elle n'existe que dans `$T` et dans Zot.
+- **Paramètre `dossier`** de la pipeline signée : `sc-stockage.poc.test@sha256:f0ccf105…`. Ce n'est pas un défaut : c'est le nom du dossier `dir:` que mock calcule (`config.py:844-846`, coupure au premier « : », donc au port), déjà mesuré en `final`, et le script signé le compare à la source.
+- **Disque de sc-stockage** : utilisés 15 535 173 632 o au relevé avant, 15 535 861 760 o au relevé après (+688 128 o), non attribués.
+- **Suite** : étape `rpm` (premier PipelineRun), dont les prédictions restent à écrire (ressources du pod, `place-scripts`).
