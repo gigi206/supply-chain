@@ -165,3 +165,9 @@ Journaux : [banc](m1b-repro2.log), et [lecture complémentaire](m1b-repro2-analy
 |---|---|---|
 | CP1 | Les révisions relues sont 1794280816 pour `archive-9.8` et 1794966030 pour `epel9`, et les sha256 des repomd.xml sont ceux de `m1b-sources.log` | Haute : mêmes fichiers, déjà lus |
 | CP2 | Les 985 fichiers ont une mtime égale à `FILEMTIMES` dans leur en-tête, et appartiennent tous à `kernel-headers` | Haute pour l'égalité ; moyenne pour le paquet, deviné d'après `usr/include/linux` |
+
+## Résultat des compléments, du 18/11/2026 à 20:07:51 UTC, code 0 (note écrite à 2026-11-18T20:08:11Z)
+
+Journal : [`m1b-complements.log`](m1b-complements.log).
+- **CP1 tenue** : `archive-9.8` est à la révision 1794280816 (10/11/2026, 03:20:16 UTC) et `epel9` à la révision 1794966030 (18/11/2026, 01:40:30 UTC). Leurs sha256 sont ceux de `m1b-sources.log`. Les repomd.xml de Rocky portent la révision « 9.8 » et non une date.
+- **CP2 tenue** : les 985 fichiers ont une mtime égale à `FILEMTIMES` dans leur en-tête, et appartiennent tous à `kernel-headers`. Leur mtime vient donc bien de l'en-tête rpm. Borner les mtimes à E change donc des métadonnées livrées par rpm. Que `rpm -V` le signale reste déduit, pas mesuré.
