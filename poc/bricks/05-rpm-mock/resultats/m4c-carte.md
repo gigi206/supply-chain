@@ -83,3 +83,12 @@ Le contenu de l'artefact signé (point 6) : le rpm seul, ou le rpm et le src.rpm
 Le sha256 du src.rpm irait au journal du TaskRun.
 
 **Question suivante** : la date de `Source0` (point 4). Ma recommandation, relue par le conseiller, sera l'option (i) pour M4c, par parité avec le deb, comparé à S3, et avec la limite inscrite.
+
+## Note datée du 18/11/2026, écrite à 13:52:55 UTC : décision « rpm seul » sur le contenu de l'artefact (point 6)
+
+**Décision du propriétaire** : « Ok » (réponse reçue avant 13:52:55 UTC, heure exacte non relevée). Elle répond à la question « Retenez-vous le rpm seul ? », posée après le rappel de l'avis du conseiller. Ce n'est un accord pour aucune mesure ni aucune écriture.
+- L'artefact signé contient **le rpm binaire seul**, dans un manifeste d'image OCI écrit à la main (une couche tar non compressée), comme le deb (décision (a) du 11/11/2026). `publier-image` est inchangée.
+- Le src.rpm n'est pas publié. Son sha256 et son NEVRA vont au journal du TaskRun de `construire-rpm`.
+- Conséquence : le point 4 (date de `Source0`) ne pèse plus sur le sujet signé. Il ne pèse que sur la comparaison avec M3 : le src.rpm (`c802e60a…`) et, selon la mesure, le rpm (`864d55f4…`).
+
+**Question suivante** : la date de `Source0` (point 4), options (i), (ii) et (iii).
