@@ -1,0 +1,93 @@
+# Brique 05, M4c (carte de M4c, décisions « rpm seul » et « option (i) » du 18/11/2026) : pipeline de construction du rpm de
+# sample-app, signée par la clé des tâches et publiée en bundle (tekton/pipelines/sample-app-rpm), sur le modèle de sample-app-deb
+# (06, S4d1). Ses tâches sont tirées de leurs bundles signés, épinglés par digest, et ses entrées hors du dépôt sont fixées ici par
+# digest : fermeture rpm (M4b), fermeture applicative (S4b de la 06), artefact de packaging rpm (M4a, spec et verrou), ainsi que
+# l'époque de l'archive Source0 (celle de poc/packaging/sources.sh ; limite : elle ne suit pas le commit construit). La signature
+# de la pipeline couvre ces choix, que le créateur du PipelineRun ne peut pas changer. Le créateur fournit le commit, le dépôt de
+# Forgejo, le workspace sortie (PVC) et le runtimeClassName de la tâche construire (taskRunSpecs). En M4c, le créateur est m4c.sh,
+# depuis l'hôte : ni webhook ni rattrapage, et la porte n'est pas étendue à la voie rpm (« Hors M4 », carte de M4).
+# Un seul workspace, lié par sous-dossier : preparer écrit entrees/ à la racine ; construire lit entrees/ en lecture seule et écrit
+# image/ ; publier lit image/.
+# @PREPARER@, @CONSTRUIRE@, @PUBLIER@, @FERMETURE_RPM@, @FERMETURE_SOURCES@, @PACKAGING@, @EPOQUE@, @IMAGE@ : m4c.sh.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: sample-app-rpm
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  workspaces:
+  - name: sortie
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: preparer
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PREPARER@
+      - name: name
+        value: preparer-rpm
+      - name: kind
+        value: task
+    params:
+    - name: depot
+      value: $(params.depot)
+    - name: commit
+      value: $(params.commit)
+    - name: fermeture-rpm
+      value: @FERMETURE_RPM@
+    - name: fermeture-sources
+      value: @FERMETURE_SOURCES@
+    - name: packaging
+      value: @PACKAGING@
+    workspaces:
+    - name: sortie
+      workspace: sortie
+  - name: construire
+    runAfter: [preparer]
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @CONSTRUIRE@
+      - name: name
+        value: construire-rpm
+      - name: kind
+        value: task
+    params:
+    - name: epoque
+      value: "@EPOQUE@"
+    workspaces:
+    - name: entrees
+      workspace: sortie
+      subPath: entrees
+    - name: sortie
+      workspace: sortie
+      subPath: image
+  - name: publier
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PUBLIER@
+      - name: name
+        value: publier-image
+      - name: kind
+        value: task
+    params:
+    - name: image
+      value: @IMAGE@
+    - name: digest
+      value: $(tasks.construire.results.DIGEST_CONSTRUIT)
+    workspaces:
+    - name: sortie
+      workspace: sortie
+      subPath: image
