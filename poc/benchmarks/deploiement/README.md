@@ -137,3 +137,38 @@ Journal : [`lecture-2.log`](resultats/lecture-2.log), de 23:14:56 à 23:15:17 UT
 ### Décision du propriétaire (2026-11-18T23:21:11Z) : « Garder les scripts »
 
 En réponse à « Quel modèle de déploiement retiens-tu ? », après la recommandation du conseiller. La plateforme continue d'être poussée depuis l'hôte, par les scripts de brique et Helm, ce qui prolonge l'option (b) et D1 de la 08b. Ni Argo CD, ni Flux, ni helmfile ne sont retenus. Si une correction continue des dérives est exigée un jour, la question se rouvrira (Flux, banc, option (b) rouverte explicitement). La ligne « Phase 4 » d'Argo CD dans docs/00 et son minimum 3.5.4 dans docs/04 sont caducs pour le PoC, et rien n'est effacé.
+
+## Essai à sec de helmfile : cadre et prédictions (18/11/2026, note écrite à 23:26:34 UTC, avant toute installation)
+
+**Demande du propriétaire.** Remarque : « je pense que helmfile serait plus propre pourtant que nos scripts ? », puis accord : « Oui, essai à sec ». La décision « Garder les scripts » reste en vigueur tant qu'aucune autre n'est prise. docs/00 et docs/04 ne sont pas touchés.
+
+**Périmètre** ([`perimetre-helm.log`](resultats/perimetre-helm.log)) :
+- quatre scripts appellent Helm, pour 1 650 lignes et 14 appels ;
+- seuls 4 appels installent (`upgrade --install`, dans `rke2.sh` et `cilium.sh`) ;
+- les 10 autres sont des `helm template`.
+
+L'essai porte sur les trois charts installés depuis l'hôte : Cilium 1.20.4, CoreDNS (`rke2-coredns-1.47.102`) et metrics-server (`rke2-metrics-server-3.14.001`).
+
+**Forme.**
+- [`essai-helmfile/helmfile.yaml`](essai-helmfile/helmfile.yaml) déclare les trois releases avec les mêmes archives sur disque, les mêmes valeurs et le même ordre : Cilium d'abord (`needs`).
+- [`essai-helmfile/essai.sh`](essai-helmfile/essai.sh) rend chaque release par `helm template`, comme `etape_rendu` de `rke2.sh` (l. 188 à 193), puis par `helmfile template`, et compare les sorties octet pour octet.
+- L'essai se fait sans cluster et sans réseau (`unshare -n`).
+- Il se fait aussi sans greffon Helm : `HELM_PLUGINS` pointe vers un dossier vide. **`helm-diff` 3.11.0 et `helm-git` 1.3.0, de provenance inconnue, sont déjà installés sur l'hôte** (`helm plugin list`) ; ils ne sont pas audités et sont tenus à l'écart.
+
+**Lu avant** (helmfile v1.8.4, fichiers de travail dans le cache) :
+- `pkg/app/init.go` : `helmfile init` propose d'installer depuis GitHub trois greffons, `diff` (v3.15.13), `secrets` (v4.7.4) et `helm-git`. Il ne sera pas lancé ;
+- `pkg/app/app.go` : `helm-diff` sert à `diff` et à `apply`, et rien n'est trouvé pour `template` ;
+- registre aqua de helmfile : à partir de 1.8.1, somme sha256 (`checksums.txt`) **et** attestation d'artefact de GitHub, signée par le workflow `helmfile/helmfile/.github/workflows/releaser.yaml`.
+
+**Installation, accord à part et non encore donné.** `"aqua:helmfile/helmfile" = "1.8.4"` dans `mise.toml`, verrouillé dans `mise.lock`. L'attestation est revérifiée par `gh attestation verify`, avec le workflow signataire exact.
+
+**Estimation : 0,25 pw**, borne 0,5 pw.
+
+**Prédictions (avant toute installation).**
+- **HE1** : la somme sha256 du tarball `linux_amd64` est dans `checksums.txt`, et l'attestation est valide pour `releaser.yaml`. Confiance haute (registre aqua).
+- **HE2** : `helmfile template` rend le code 0 sans aucun greffon Helm. Confiance moyenne (lecture de `app.go` seulement).
+- **HE3** : il tourne sans réseau. Confiance moyenne : il appelle peut-être `helm repo` ou `helm dependency` même pour des archives locales ; `--skip-deps` est passé.
+- **HE4** : la sortie de chaque release est identique octet pour octet à `helm template`. Confiance moyenne : helmfile peut ajouter des arguments ou des étiquettes.
+- **HE5** (descriptive) : le `helmfile.yaml` fait une vingtaine de lignes et remplace les quatre appels `upgrade --install`. Les vérifications des archives et des valeurs restent dans les scripts.
+
+**Ce que l'essai ne mesure pas** : `apply` et `diff` contre un cluster, puisqu'il faudrait `helm-diff` ; un rejeu ; l'audit de santé de `helm-diff` et `kustomize`.
