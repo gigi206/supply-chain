@@ -56,6 +56,8 @@ Scorecard	ossf/scorecard	santé	non
 OBS	openSUSE/open-build-service	packaging	non
 Konflux	konflux-ci/konflux-ci	socle	non
 Argo CD	argoproj/argo-cd	déploiement	non
+Flux CD	fluxcd/flux2	déploiement	non
+helmfile	helmfile/helmfile	déploiement	non
 Prometheus	prometheus/prometheus	observabilité	non
 Alertmanager	prometheus/alertmanager	observabilité	non
 Grafana	grafana/grafana	observabilité	non

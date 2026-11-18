@@ -1,0 +1,91 @@
+# releve-sante.sh (déploiement), début 2026-11-18T23:08:32Z ; activité depuis 2026-08-20T23:08:32Z
+## Scorecard (API publique, via tools/health/scorecard.sh, lignes de projects.tsv)
+Relevé du 2026-11-18 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| Argo CD | argoproj/argo-cd | déploiement | non | 8.9 | 2026-11-18 | 10 | 10 | 10 | 0 |
+| Flux CD | fluxcd/flux2 | déploiement | non | 9.4 | 2026-11-17 | 10 | 10 | 10 | 6 |
+| helmfile | helmfile/helmfile | déploiement | non | n/d | — | — | — | — | — |
+| Flux source-controller | fluxcd/source-controller | déploiement | non | 8.1 | 2026-11-16 | 10 | 10 | 10 | ? |
+| Flux kustomize-controller | fluxcd/kustomize-controller | déploiement | non | 8.1 | 2026-11-16 | 10 | 10 | 10 | ? |
+| Flux helm-controller | fluxcd/helm-controller | déploiement | non | 8.8 | 2026-11-16 | 10 | 10 | 10 | ? |
+| Flux notification-controller | fluxcd/notification-controller | déploiement | non | 8 | 2026-11-16 | 10 | 10 | 10 | ? |
+
+## argoproj/argo-cd, tag v3.6.2
+archivé false ; licence Apache-2.0 ; branche master ; dernier push 2026-11-18T21:20:59Z
+releases publiées depuis 6 mois : 40
+release v3.6.2 du 2026-11-18T19:55:54Z, pré-release false ; fichiers : argocd-cli.intoto.jsonl argocd-darwin-amd64 argocd-darwin-arm64 argocd-linux-amd64 argocd-linux-arm64 argocd-linux-ppc64le argocd-linux-s390x argocd-sbom.intoto.jsonl argocd-windows-amd64.exe cli_checksums.txt sbom.tar.gz
+tag léger
+commit 8e8268ef2f3df99ca95663f5080fa6056f156805 ; vérification GitHub : true (valid)
+commits sur 90 jours (branche par défaut) : 717 ; auteurs distincts : 182 ; commits de robots : 247
+domaines d'adresse (auteurs distincts, commits) :
+  users.noreply.github.com : 87 auteurs, 472 commits
+  gmail.com : 54 auteurs, 161 commits
+  akuity.io : 1 auteurs, 13 commits
+  redhat.com : 4 auteurs, 12 commits
+  intuit.com : 1 auteurs, 7 commits
+  octopus.com : 1 auteurs, 6 commits
+  proton.me : 2 auteurs, 5 commits
+  codefresh.io : 1 auteurs, 4 commits
+présent : SECURITY.md
+{"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/contents#get-repository-content","status":"404"}absent : .github/SECURITY.md
+avis publiés (GHSA), 2026 seulement :
+  GHSA-fw5c-w8rc-j7fx	critical	2026-10-07	A Kustomize Helm config home can run commands in the repo-server
+  GHSA-9v9p-x54c-58gc	critical	2026-10-07	A Kustomize remote ref can run commands in the repo-server
+  GHSA-m3vr-7329-44ww	critical	2026-10-07	A Jsonnet import can read files from the repo-server
+  GHSA-fmxq-cgp8-87wp	critical	2026-10-07	AppProject restrictions bypassed by PreDelete/PostDelete resource hooks
+  GHSA-w996-f2wq-x9c6	medium	2026-10-07	An oversized OCI manifest can exhaust repo-server memory
+  GHSA-j6cw-g6p4-7hch	high	2026-10-07	Command injection via a repository proxy URL on SSH Git repositories
+  GHSA-rg3g-4rw9-gqrp	medium	2026-05-13	Kubernetes Secret Extraction via ArgoCD ServerSideDiff via sensitive annotations
+  GHSA-h98r-wv3h-fr38	high	2026-05-13	Stored XSS in application link annotations enables developer-to-admin privilege escalation
+  GHSA-g3ff-q88g-chrj	medium	2026-10-07	Extension proxy RBAC ignores application namespace when applications-in-any-namespace is e
+  GHSA-3v3m-wc6v-x4x3	critical	2026-05-01	Kubernetes Secret Extraction via ArgoCD ServerSideDiff
+  GHSA-4439-h7jw-5cjj	high	2026-10-07	Login failure rate limit can be bypassed via concurrent requests
+avis publiés (GHSA), total : 60
+
+## fluxcd/flux2, tag v2.10.0
+archivé false ; licence Apache-2.0 ; branche main ; dernier push 2026-11-18T14:08:50Z
+releases publiées depuis 6 mois : 9
+release v2.10.0 du 2026-10-26T15:37:42Z, pré-release false ; fichiers : crd-schemas.tar.gz flux_2.10.0_checksums.txt flux_2.10.0_checksums.txt.sigstore.json flux_2.10.0_darwin_amd64.tar.gz flux_2.10.0_darwin_arm64.tar.gz flux_2.10.0_linux_amd64.tar.gz flux_2.10.0_linux_arm.tar.gz flux_2.10.0_linux_arm64.tar.gz flux_2.10.0_sbom.spdx.json flux_2.10.0_source_code.tar.gz flux_2.10.0_windows_386.zip flux_2.10.0_windows_amd64.zip flux_2.10.0_windows_arm64.zip install.yaml manifests.tar.gz provenance.intoto.jsonl
+tag annoté ; vérification GitHub du tag : true (valid)
+commit 3fa784edd773d56630bb9f62645e08f70c2cff0a ; vérification GitHub : true (valid)
+commits sur 90 jours (branche par défaut) : 164 ; auteurs distincts : 23 ; commits de robots : 2
+domaines d'adresse (auteurs distincts, commits) :
+  gmail.com : 8 auteurs, 131 commits
+  users.noreply.github.com : 9 auteurs, 18 commits
+  control-plane.io : 1 auteurs, 6 commits
+  bugqore.com : 1 auteurs, 4 commits
+  ryc.li : 1 auteurs, 2 commits
+  sopho.tech : 1 auteurs, 1 commits
+  sap.com : 1 auteurs, 1 commits
+  lex.la : 1 auteurs, 1 commits
+{"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/contents#get-repository-content","status":"404"}absent : SECURITY.md
+{"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/contents#get-repository-content","status":"404"}absent : .github/SECURITY.md
+avis publiés (GHSA), 2026 seulement :
+  GHSA-mwcp-qpcg-fr7c	high	2026-08-11	Improper network isolation allows event spoofing, DoS and unauthorized status updates
+avis publiés (GHSA), total : 7
+
+## helmfile/helmfile, tag v1.8.4
+archivé false ; licence MIT ; branche main ; dernier push 2026-11-18T10:24:20Z
+releases publiées depuis 6 mois : 15
+release v1.8.4 du 2026-11-13T01:16:52Z, pré-release false ; fichiers : helmfile_1.8.4_checksums.txt helmfile_1.8.4_darwin_amd64.tar.gz helmfile_1.8.4_darwin_arm64.tar.gz helmfile_1.8.4_linux_386.tar.gz helmfile_1.8.4_linux_amd64.tar.gz helmfile_1.8.4_linux_arm64.tar.gz helmfile_1.8.4_windows_386.tar.gz helmfile_1.8.4_windows_amd64.tar.gz helmfile_1.8.4_windows_arm64.tar.gz packslip.sigstore.json
+tag léger
+commit 119a9effecb99764a4aa196cb90c1176753516a8 ; vérification GitHub : true (valid)
+commits sur 90 jours (branche par défaut) : 129 ; auteurs distincts : 26 ; commits de robots : 73
+domaines d'adresse (auteurs distincts, commits) :
+  users.noreply.github.com : 13 auteurs, 113 commits
+  gmail.com : 6 auteurs, 8 commits
+  bk.ru : 1 auteurs, 2 commits
+  vincentcui.de : 1 auteurs, 1 commits
+  unwired.at : 1 auteurs, 1 commits
+  inherentlaboratories.com : 1 auteurs, 1 commits
+  erwandaniel.fr : 1 auteurs, 1 commits
+  dominik-schmidt.de : 1 auteurs, 1 commits
+présent : SECURITY.md
+{"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/contents#get-repository-content","status":"404"}absent : .github/SECURITY.md
+avis publiés (GHSA), 2026 seulement :
+avis publiés (GHSA), total : 0
+
+fichiers de travail laissés dans /home/gigi/.cache/supply-chain-poc/dep-tsv-dWsUN3
+# fin 2026-11-18T23:09:03Z

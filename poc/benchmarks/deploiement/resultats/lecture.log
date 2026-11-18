@@ -1,0 +1,154 @@
+# lecture.sh (déploiement), début 2026-11-18T23:10:02Z ; dossier /home/gigi/.cache/supply-chain-poc/dep-lecture-20261118T231002Z
+lu : argoproj/argo-cd manifests/install.yaml @ v3.6.2 -> argocd-install.yaml (2115275 octets, sha256 c948064d38294d85)
+lu : install.yaml de la release flux2 v2.10.0 (383901 octets, sha256 a8c838ccd9be5d30)
+lu : argoproj/argo-cd docs/user-guide/source-integrity.md @ v3.6.2 -> argocd-integrity.md (1767 octets, sha256 48b9c514bae58691)
+lu : argoproj/argo-cd docs/user-guide/gpg-verification.md @ v3.6.2 -> argocd-gpg.md (249 octets, sha256 8e15f58c274262e2)
+lu : argoproj/argo-cd docs/user-guide/oci.md @ v3.6.2 -> argocd-oci.md (5542 octets, sha256 c47d262ea8f4a5dc)
+lu : fluxcd/source-controller docs/spec/v1/gitrepositories.md @ v1.10.1 -> flux-git.md (47202 octets, sha256 ebbdd50b63d54d5b)
+lu : fluxcd/source-controller docs/spec/v1/ocirepositories.md @ v1.10.1 -> flux-oci.md (46886 octets, sha256 302bb2bf6d5b8df8)
+lu : helmfile/helmfile README.md @ v1.8.4 -> helmfile-readme.md (7574 octets, sha256 ec819c0353b510a3)
+lu : helmfile/helmfile docs/index.md @ v1.8.4 -> helmfile-index.md (14345 octets, sha256 0a01731643614d9f)
+lu : helmfile/helmfile docs/configuration.md @ v1.8.4 -> helmfile-config.md (34054 octets, sha256 8bded55e58d30a3b)
+lu : helmfile/helmfile go.mod @ v1.8.4 -> helmfile-go.mod (21632 octets, sha256 39a56826f3878a91)
+
+## G1, G2 : ClusterRoles larges (ressource * ou secrets) et leurs liaisons, manifestes par défaut
+### argocd-install.yaml
+{"name":"argocd-application-controller","rules":[{"apiGroups":["*"],"resources":["*"],"verbs":["*"]}]}
+{"name":"argocd-applicationset-controller","rules":[{"apiGroups":[""],"resources":["secrets","configmaps"],"verbs":["get","list","watch"]}]}
+{"name":"argocd-server","rules":[{"apiGroups":["*"],"resources":["*"],"verbs":["delete","get","patch"]}]}
+{"name":"argocd-application-controller","role":"argocd-application-controller","sa":["argocd-application-controller"]}
+{"name":"argocd-applicationset-controller","role":"argocd-applicationset-controller","sa":["argocd-applicationset-controller"]}
+{"name":"argocd-server","role":"argocd-server","sa":["argocd-server"]}
+### flux-install.yaml
+{"name":"crd-controller","rules":[{"apiGroups":["source.toolkit.fluxcd.io"],"resources":["*"],"verbs":["*"]},{"apiGroups":["kustomize.toolkit.fluxcd.io"],"resources":["*"],"verbs":["*"]},{"apiGroups":["helm.toolkit.fluxcd.io"],"resources":["*"],"verbs":["*"]},{"apiGroups":["notification.toolkit.fluxcd.io"],"resources":["*"],"verbs":["*"]},{"apiGroups":["image.toolkit.fluxcd.io"],"resources":["*"],"verbs":["*"]},{"apiGroups":["source.extensions.fluxcd.io"],"resources":["*"],"verbs":["*"]},{"apiGroups":[""],"resources":["namespaces","secrets","configmaps","serviceaccounts"],"verbs":["get","list","watch"]}]}
+{"name":"flux-edit","rules":[{"apiGroups":["notification.toolkit.fluxcd.io","source.toolkit.fluxcd.io","source.extensions.fluxcd.io","helm.toolkit.fluxcd.io","image.toolkit.fluxcd.io","kustomize.toolkit.fluxcd.io"],"resources":["*"],"verbs":["create","delete","deletecollection","patch","update"]}]}
+{"name":"flux-view","rules":[{"apiGroups":["notification.toolkit.fluxcd.io","source.toolkit.fluxcd.io","source.extensions.fluxcd.io","helm.toolkit.fluxcd.io","image.toolkit.fluxcd.io","kustomize.toolkit.fluxcd.io"],"resources":["*"],"verbs":["get","list","watch"]}]}
+{"name":"cluster-reconciler","role":"cluster-admin","sa":["kustomize-controller","helm-controller"]}
+{"name":"crd-controller","role":"crd-controller","sa":["kustomize-controller","helm-controller","source-controller","notification-controller","image-reflector-controller","image-automation-controller","source-watcher"]}
+
+## G6, G8 : composants et images des manifestes par défaut
+### argocd-install.yaml : argocd-applicationset-controller argocd-dex-server argocd-notifications-controller argocd-redis argocd-repo-server argocd-server argocd-application-controller
+      1 image: ghcr.io/dexidp/dex:v2.46.0
+      1 image: public.ecr.aws/docker/library/redis:8.10.1-alpine
+      8 image: quay.io/argoproj/argocd:v3.6.2
+### flux-install.yaml : helm-controller image-automation-controller image-reflector-controller kustomize-controller notification-controller source-controller source-watcher
+      1 image: ghcr.io/fluxcd/helm-controller:v1.7.1
+      1 image: ghcr.io/fluxcd/image-automation-controller:v1.3.0
+      1 image: ghcr.io/fluxcd/image-reflector-controller:v1.3.0
+      1 image: ghcr.io/fluxcd/kustomize-controller:v1.10.1
+      1 image: ghcr.io/fluxcd/notification-controller:v1.10.0
+      1 image: ghcr.io/fluxcd/source-controller:v1.10.1
+      1 image: ghcr.io/fluxcd/source-watcher:v2.3.1
+
+## G6 : signatures des images au tag (cosign tree, lecture du registre)
+### quay.io/argoproj/argocd:v3.6.2
+  └── 💾 Attestations for an image tag: quay.io/argoproj/argocd:sha256-bbcc3b6e79c5963439bdc5170f6e20a52365b41878133fac5ce8d6810d2641dc.att
+### ghcr.io/dexidp/dex:v2.46.0
+  (aucune ligne de signature, d'attestation ni de SBOM)
+### public.ecr.aws/docker/library/redis:8.10.1-alpine
+  (aucune ligne de signature, d'attestation ni de SBOM)
+### ghcr.io/fluxcd/kustomize-controller:v1.10.1
+  └── 💾 Attestations for an image tag: ghcr.io/fluxcd/kustomize-controller:sha256-37db29b25dae35b881a5e064acedb0cc954442da453a39eaa0eab7a90dbecc4e.att
+### ghcr.io/fluxcd/helm-controller:v1.7.1
+  └── 💾 Attestations for an image tag: ghcr.io/fluxcd/helm-controller:sha256-54526cc6ed1202d71d44c310676448065664f3255ad671d9a69ac26f904e617a.att
+### ghcr.io/fluxcd/source-controller:v1.10.1
+  └── 💾 Attestations for an image tag: ghcr.io/fluxcd/source-controller:sha256-611b6bca3eae95bcff471414d1fb14a4ab83d7f14e609cccef2bd389c121f37e.att
+
+## G4, Argo CD : intégrité des sources
+--- argocd-integrity.md, l. 1 à 29
+   1 | # Overview
+   2 | 
+   3 | Argo CD permits declaring criteria for application sources integrity that, when not met, will prevent an application from syncing with a `ResourceComparison` error.
+   4 | This is useful to verify the sources have not been tampered with by an unauthorized contributor.
+   5 | 
+   6 | Each Application Project can have its criteria configured in `AppProject`'s `.spec.sourceIntegrity`.
+   7 | The criteria distinguish a type of verification they perform, and to which sources they apply.
+   8 | 
+   9 | Each application can be a subject of multiple checks, and the sync will be enabled only when all criteria are met.
+  10 | 
+  11 | > [!NOTE]
+  12 | > Source Integrity Verification is only configured through `AppProject` manifests or CLI. UI is not supported yet.
+  13 | 
+  14 | > [!NOTE]
+  15 | > Signature verification is not supported for the Application Sets populated by the git generator when they have the `project` field templated.
+  16 | 
+  17 | > [!WARNING]
+  18 | > If source integrity is enforced, you will not be able to sync from local sources (i.e. `argocd app sync --local`) anymore.
+  19 | 
+  20 | ## Supported methods
+  21 | 
+  22 | - [Git GnuPG verification](./source-integrity-git-gpg.md) verifies that Git commits are GnuPG Signed. This is a modern method of the commit signature verification originally configured in `AppProjects`'s `signatureKeys`.
+  23 | 
+  24 | ## Multi-source applications
+  25 | 
+  26 | Each individual application source can be a subject of a different set of source integrity criteria, if desirable.
+  27 | This is necessary if the sources are of a different type, such as Git and Helm.
+  28 | But even different repositories of the same type can utilize different methods of verification, or their different configurations.
+  29 | This is useful when an application combines sources maintained by different groups of people, or according to different contribution (and signing) guidelines.
+--- argocd-gpg.md, l. 1 à 6
+   1 | # GnuPG signature verification
+   2 | 
+   3 | > [!NOTE]
+   4 | > **GPG Signature verification is deprecated and will be removed in the next major Argo CD version.**
+   5 | >
+   6 | > Consult [Source Integrity Verification](./source-integrity.md) for the new and expanded alternative.
+--- argocd-oci.md : lignes qui citent signature, cosign, verif ou digest
+50:* `targetRevision`: Use this field to specify the desired image tag or digest.
+
+## G4, Flux : vérification des commits (gitrepositories.md)
+632:### Verification
+667:    mode: HEAD
+710:SSH-signed commits and tags can also be verified. Store SSH public keys in
+--- flux-git.md, l. 706 à 716
+ 706 | ```
+ 707 | 
+ 708 | #### SSH verification
+ 709 | 
+ 710 | SSH-signed commits and tags can also be verified. Store SSH public keys in
+ 711 | `authorized_keys` format under keys with the `.sshpub` suffix in the same
+ 712 | Secret:
+ 713 | 
+ 714 | ```yaml
+ 715 | ---
+ 716 | apiVersion: v1
+
+## G4, Flux : vérification des artefacts OCI (ocirepositories.md)
+--- flux-oci.md, l. 611 à 616
+ 611 | `.spec.verify` is an optional field to enable the verification of [Cosign](https://github.com/sigstore/cosign)
+ 612 | or [Notation](https://github.com/notaryproject/notation)
+ 613 | signatures. The field offers three subfields:
+ 614 | 
+ 615 | - `.provider`, to specify the verification provider. The supported options are `cosign` and `notation` at present.
+ 616 | - `.secretRef.name`, to specify a reference to a Secret in the same namespace as
+--- flux-oci.md : épinglage par digest
+64:       Digest:            sha256:d7e924b4882e55b97627355c7b3d2e711e9b54303afa2f50c25377f4df66a83b
+482:(`.tag`, `.semver`, `.digest`), with latter listed fields taking
+554:To pull a specific digest, use `.spec.ref.digest`:
+564:    digest: "sha256:<SHA-value>"
+1066:    digest: sha256:9f3bc0f341d4ecf2bab460cc59320a2a9ea292f01d7b96e32740a9abfd341088
+
+## G4, G3, G8 : helmfile
+39:- [helm-diff](https://github.com/databus23/helm-diff)
+76:> Make sure to run `helmfile init` once after installation. Helmfile uses the [helm-diff](https://github.com/databus23/helm-diff) plugin.
+42:**NOTE**: Helmfile supports both Helm 3.x and Helm 4.x.
+87:* [Helm 3+](https://helm.sh/docs/intro/install/) installed (`helm version` to verify)
+52:	helm.sh/helm/v3 v3.22.1
+53:	helm.sh/helm/v4 v4.3.1
+59:  verify: true
+108:  verify: true
+251:    verify: true
+--- helmfile-config.md : épinglage par digest (@sha256 ou digest)
+(aucune mention)
+
+## G6 : versions corrigées des avis critiques d'Argo CD publiés en 2026
+GHSA-fw5c-w8rc-j7fx	2026-10-07	corrigé en :  ; 3.3.15, 3.4.10, 3.5.4, 3.6.0-rc2
+GHSA-9v9p-x54c-58gc	2026-10-07	corrigé en :  ; 3.3.15, 3.4.10, 3.5.4, 3.6.0-rc2
+GHSA-m3vr-7329-44ww	2026-10-07	corrigé en :  ;  ; 3.3.15, 3.4.10, 3.5.4, 3.6.0-rc2
+GHSA-fmxq-cgp8-87wp	2026-10-07	corrigé en :  ; 3.3.15, 3.4.10, 3.5.4, 3.6.0-rc2
+GHSA-3v3m-wc6v-x4x3	2026-05-01	corrigé en : 3.3.9, 3.2.11
+
+## SECURITY.md de l'organisation fluxcd
+fluxcd/.github : SECURITY.md
+fluxcd/community : SECURITY.md
+
+# fin 2026-11-18T23:10:23Z

@@ -45,4 +45,41 @@
 
 ## Résultats
 
-À venir.
+Note écrite à 23:11:29 UTC, le 18/11/2026 (le 19/11 à Paris). Journaux : [`sante.log`](resultats/sante.log) (23:08:32 à 23:09:03 UTC) et [`lecture.log`](resultats/lecture.log) (fin à 23:10:23 UTC). Versions lues : **Argo CD v3.6.2** (18/11/2026), **Flux v2.10.0** (26/10/2026 ; contrôleurs source v1.10.1, kustomize v1.10.1, helm v1.7.1), **helmfile v1.8.4** (13/11/2026).
+
+| Critère | Argo CD v3.6.2 | Flux v2.10.0 | helmfile v1.8.4 |
+|---|---|---|---|
+| **G1, G2** : droits par défaut | **Non tenu** : `application-controller` a `*` sur `*` dans tout le cluster ; `argocd-server` a `get`, `patch` et `delete` sur `*`, Secrets compris | **Non tenu** : `kustomize-controller` et `helm-controller` sont liés à `cluster-admin` (`cluster-reconciler`) | Sans objet dans le cluster : aucun composant ; les droits sont ceux du `KUBECONFIG` du lanceur, comme aujourd'hui |
+| **G3** : digests | Charts OCI par tag ou par digest (`oci.md`, l. 50) | `OCIRepository` par `.spec.ref.digest` | **Non établi** : la doc de configuration ne mentionne pas d'épinglage par digest |
+| **G4** : commits signés | **GnuPG seulement** (seule méthode de `source-integrity.md`) ; **pas de SSH** | **OpenPGP et SSH** (`gitrepositories.md`, l. 710) | Rien côté git (fichiers locaux) |
+| **G4** : sources OCI signées | Rien dans `oci.md` | **cosign et Notation** (`ocirepositories.md`, l. 615) | Champ `verify: true` (doc de configuration), passé à Helm d'après la doc ; non lu dans le code |
+| **G6** : santé | Scorecard 8,9. 40 releases en 6 mois. Commit du tag signé. Provenance in-toto de la CLI. Image principale avec attestation (`cosign tree`). 182 auteurs sur 90 jours, plusieurs entreprises. **60 avis, dont 5 critiques en 2026**, presque tous dans le repo-server (Kustomize, Jsonnet), corrigés en 3.3.15, 3.4.10, 3.5.4 et 3.6.0-rc2 | Scorecard 9,4 (contrôleurs : 8,0 à 8,8). 9 releases en 6 mois. Tag et commit signés. `provenance.intoto.jsonl` et sommes signées par sigstore. Images des contrôleurs avec attestation. 23 auteurs sur 90 jours : **8 adresses gmail font 131 commits sur 164**, employeurs non vérifiables. SECURITY.md de l'organisation. 7 avis | Scorecard **n/d**. 15 releases en 6 mois. Commit du tag signé. `packslip.sigstore.json` dans la release (non vérifié). 26 auteurs, dont 73 commits de robots ; adresses noreply surtout. SECURITY.md présent. 0 avis |
+| **G7** : amorçage | Cilium d'abord depuis l'hôte, puis Argo CD depuis l'hôte (lecture logique, non mesurée) | Pareil | Tout depuis l'hôte, Cilium compris : le chemin d'aujourd'hui |
+| **G8** : composants à auditer en plus | Redis (`public.ecr.aws`) et Dex (`ghcr.io`) : **aucune signature ni attestation** vue par `cosign tree`. Le repo-server rend les manifestes, plugins compris | Sept contrôleurs, tous `ghcr.io/fluxcd` ; aucun service externe dans le manifeste | Greffon **`helm-diff`** exigé (`helmfile init`), à auditer. Helm 3 et 4 pris en charge, et Helm 4.3.1 est déjà dans `mise.toml` |
+| **G5** : journaux | Pods dans le cluster. Collecte par Alloy des journaux de pods **non relue** pour cette note | Pareil | Audit de l'API (19b, J3, sous k3s). La sortie du lanceur n'est collectée que si on la prévoit |
+| **Décrits sans être jugés** | Réconciliation continue, dérive corrigée, interface web | Réconciliation continue, dérive corrigée, pas d'interface | Lancement ponctuel, aucune correction de dérive entre deux lancements |
+
+**Prédictions** :
+- **tenues** : DP1, DP3 (à la lecture), DP6 (à la lecture), DP8 ;
+- **tenue en partie** : DP2. Pour Argo CD, GnuPG seulement, comme prévu. La vérification SSH, laissée incertaine pour les deux, existe chez Flux ;
+- **non tenue pour helmfile** : DP4 (pas d'épinglage par digest trouvé) ;
+- **DP5** :
+  - Argo CD « Sain » : inchangé ;
+  - Flux « Sain » **non établi** : la diversité des employeurs n'est pas vérifiable ;
+  - helmfile au moins « À surveiller » : tenue (Scorecard n/d, employeurs non vérifiés) ;
+- **DP7 : non vérifiée.**
+
+**Ce qui départage, et revient au propriétaire.** Aucune exigence écrite ne demande une réconciliation continue.
+- **Si elle est voulue (modèle « tirer »)** :
+  - Argo CD et Flux ont tous deux des droits de type `cluster-admin`, donc G1 et G2 ne tiennent pour aucun ;
+  - Flux couvre mieux nos exigences de source : commits signés **SSH**, c'est la menace B de docs/01, et artefacts OCI vérifiés par **cosign**, c'est la chaîne Zot et cosign du PoC ;
+  - Flux a moins de composants à auditer ;
+  - Argo CD ne vérifie que le GnuPG, embarque Redis et Dex sans signature, et a eu 5 avis critiques en 2026 dans le repo-server ;
+  - pour Flux, la diversité des employeurs n'est pas établie.
+- **Sinon (modèle « pousser », celui d'aujourd'hui)** :
+  - helmfile ajoute une déclaration ordonnée au-dessus de Helm, déjà utilisé, sans aucun droit dans le cluster ;
+  - il faut auditer `helm-diff` ;
+  - l'épinglage par digest n'est pas établi, et rien ne vérifie les sources git ;
+  - les scripts actuels restent la référence.
+
+**Portée.** Tout est lu, rien n'est installé ni exécuté. Les signatures d'image sont relevées par `cosign tree` au tag, sans `cosign verify` d'identité. Aucune décision, aucune recommandation à ce stade. La note « Phase 4 » de docs/00 et le minimum 3.5.4 de docs/04 restent tels qu'ils sont écrits.
