@@ -101,3 +101,18 @@ L'état du cluster et de l'hôte aura bougé d'ici le 28/11. Rien de ce qui suit
 ## Question posée
 
 **La dette des images d'essai au rejeu** : A, B, C ou D (point 1). Rien ne change dans `rejeu.sh` avant ta réponse.
+
+## Note datée du 18/11/2026, écrite à 19:33:32 UTC : décision « C »
+
+**Décision du propriétaire** (réponse reçue avant 19:33:32 UTC, heure exacte non relevée) : « C », sur la question « La dette des images d'essai au rejeu : A, B, C ou D ». Elle va contre ma recommandation, qui était A. Ce n'est un accord pour aucun lancement ni aucune écriture. `rejeu.sh` reste inchangé.
+- **Option C** (point 1) : les deux images, outillage et bootstrap, seront construites par la plateforme, sans réseau, sur le modèle de l'option 3 de la carte de M4. Ce sera un jalon à part, avec sa propre carte et sa propre estimation, compté dans la règle des 2×.
+- **Lecture** : la question portait sur les images utilisées « au rejeu ». Je lis donc que le rejeu de M5b se fera avec les images construites par la plateforme, une fois ce jalon tenu, et non avec les images d'essai `99790c13…` et `f0ccf105…`. A, B et D ne sont pas retenues.
+- **Conséquences attendues**, écrites au point 1 et non mesurées :
+  - nouveaux digests d'images ;
+  - verrou (`pull_digest`, `image_digest`) et fermeture rpm à refaire ;
+  - nouveaux bundles pour `prefetch-rpm` et `construire-rpm`, avec une nouvelle revue de `taches.yml` ;
+  - builds de M3 et de M4 à recomparer.
+  
+  L'estimation de 1,5 jour du point 5 ne vaut que pour l'option A. Elle sera refaite dans la carte du jalon des images.
+- **Inchangé** : le rejeu reste exclu avant le 28/11. Les réserves du point 4 restent ouvertes, dont la seconde barrière réseau du build rpm, qui n'est pas tranchée.
+- **Suite** : carte du jalon des images, préparée à sec sous l'accord permanent du 18/11.
