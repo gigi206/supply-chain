@@ -233,3 +233,16 @@ Il faut aussi retirer les huit fichiers du second banc (journaux et historique d
 4. **Miroir partiel** au lieu de fichiers locaux : `var/cache/dnf` et `var/lib/dnf`.
 
 **Portée** : ce sont des installations sur l'hôte, des 222 rpm de vault 9.7, avec rpm 4.16.1.3-40. Le banc ne dit pas si mock fonctionne sans les huit fichiers retirés. Il ne dit pas non plus ce que fera la tâche Kata. Les replis (réécrire la base rpm, retirer ou régénérer `cacerts`) restent non mesurés et sans objet tant que la variable suffit. Le choix de S est le mien : c'est la plus petite borne qui ne change aucune mtime livrée par rpm. Il ne devient une recommandation qu'après relecture du conseiller.
+
+## Corrections du troisième banc après relecture du conseiller, et compléments C3a à C3c : prédictions écrites avant le lancement (2026-11-18T20:20:09Z UTC)
+
+**Corrections** de la note du résultat du troisième banc :
+- **Lectures sans journal** : l'en-tête du banc annonce une lecture préalable « reprise ici », mais le banc ne relance aucun `strings`. Les versions rpm 4.16.1.3-40 et p11-kit 0.25.3-3.el9_5 citées dans les notes ne sont pas non plus dans son journal : il ne porte que « RPM version 4.16.1.3 ». Elles sont relues et archivées par [`m1b-complements3.sh`](m1b-complements3.sh), partie 1.
+- **« S + rang du paquet » dépasse la mesure** (README et additif de l'ADR 0007 de 20:17 UTC) : le journal montre 222 valeurs consécutives, de S à S + 221, une par paquet, et la même suite dans i3 et i4. Il ne montre pas que la suite suit l'ordre de la transaction. C'est mesuré ici, partie 3.
+- **S a été lu dans la base d'une installation antérieure** (i1). Or la tâche devra le connaître avant d'installer. Partie 2 : calcul sur les fichiers rpm eux-mêmes.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| C3a | La racine d'outils a rpm-4.16.1.3-40.el9. L'arbre i3 a p11-kit-0.25.3-3.el9_5. La chaîne `SOURCE_DATE_EPOCH` est présente dans `librpm.so.9` et dans `/usr/bin/trust`, comme à la lecture sans journal | Haute : mêmes binaires, déjà lus |
+| C3b | S calculé par `rpm -qp` sur les 222 fichiers vaut 1778610852, comme dans le banc | Haute : mêmes en-têtes |
+| C3c | Trier les paquets de i3 par `INSTALLTIME` donne l'ordre des lignes « Installing » du journal de dnf de i3 | Moyenne : je suppose une seconde de plus à chaque élément de la transaction, sans l'avoir lu |
