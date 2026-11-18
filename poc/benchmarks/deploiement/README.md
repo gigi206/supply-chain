@@ -120,3 +120,16 @@ Journal : [`lecture-2.log`](resultats/lecture-2.log), de 23:14:56 à 23:15:17 UT
 - **Dates** : la demande est du 18/11/2026, 23:0x UTC (le 19/11 à Paris). Le titre du cadre (« 19/11/2026, heure de Paris ») et la ligne d'index sont ramenés à l'UTC.
 
 **6. L'argument écrit pour Argo CD vaut aussi pour Flux.** docs/00, l. 73, donne « releases SLSA L3 ». Flux publie lui aussi `provenance.intoto.jsonl`, des sommes signées par sigstore et des images attestées. Il couvre en plus les commits signés SSH et les artefacts OCI signés par cosign.
+
+### Recommandation (18/11/2026, écrite à 23:20:33 UTC, produite par le conseiller à la demande du propriétaire : « que recommande l'advisor ? »)
+
+- **Pousser depuis l'hôte, avec les scripts actuels et Helm, sans adopter helmfile maintenant.** Si le propriétaire veut un jour tirer : **Flux plutôt qu'Argo CD**.
+- **Appuis, tous archivés** :
+  - pousser prolonge l'option (b) du 01/11 et D1 de la 08b, mesurées sans compte de service à `cluster-admin` ;
+  - aucune exigence écrite ne demande la réconciliation continue, et la phase 4 n'est définie nulle part ;
+  - helmfile apporte peu aujourd'hui : Helm ne sert que pour trois charts (Cilium, CoreDNS, metrics-server), le reste est en manifestes rendus et en services systemd. helmfile ajoute `helm-diff` et `kustomize` à auditer, son Scorecard est n/d, l'épinglage par digest n'est pas établi, et il changerait un chemin de rejeu déjà mesuré ;
+  - Flux plutôt qu'Argo CD : commits signés SSH, artefacts OCI vérifiés par cosign, moins de composants.
+- **Ce qui la renverserait** : une exigence de correction continue des dérives, ou une phase 4 à plusieurs clusters. Ce serait alors Flux avec emprunt de compte : un banc, et l'option (b) rouverte explicitement.
+- **Limites** : tout est lu, rien n'est mesuré. helmfile n'a pas été exercé avec Helm 4.3.1. Le bornage des droits de Flux et d'Argo CD n'est pas mesuré.
+- **Correction** : mon message précédent disait de helmfile qu'il « prolonge nos décisions ». C'est le fait de pousser qui les prolonge, par les scripts actuels ; helmfile n'est pas en service.
+- **Besoin ouvert lié, non tranché** : « Opérateur Kubernetes » (transmis le 06/11/2026, à définir avec le propriétaire). Pour cette note de besoin, c'est « pas maintenant ; à réexaminer avec le multi-projets ». Elle cite « Helm ou Kustomize avec GitOps » parmi les alternatives non évaluées.
