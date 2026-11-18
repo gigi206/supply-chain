@@ -129,3 +129,11 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
   - la liste complète à installer reste à retirer de la base rpm de la racine archivée ;
   - les quatre angles morts du troisième banc restent à mesurer.
 - **Ce n'est pas un accord** pour une écriture dans le cluster ni dans Zot.
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T20:43:19Z UTC : décision « À surveiller » pour dnf 4 et libsolv
+
+**Décision du propriétaire** (réponse reçue avant 2026-11-18T20:43:19Z UTC, heure exacte non relevée) : « À surveiller ». La question portait sur dnf 4 et libsolv : « « À surveiller » par pondération, ou « Risqué » ? ».
+- **Contexte** : elle suit la recommandation du conseiller, rapportée à la demande du propriétaire, et la mesure de sa condition (correctifs de la distribution en 12 mois).
+- **Consigné** : ligne au §3 de docs/04 et plan de sortie au §6, ce dernier marqué « non mesuré ».
+- **Conséquence** : dnf n'est plus suspendu dans M1b. La relance du troisième banc, à partir du 19/11, et le banc du bootstrap reprennent.
+- **Ce n'est pas un accord** pour une écriture dans le cluster ni dans Zot.

@@ -474,3 +474,11 @@ Journal : [`m1b-dnf-conditions.log`](m1b-dnf-conditions.log).
 - **K4 tenue** : les 5 fusions d'igor-raits datent de 2019 (25/03 au 13/08). Depuis août 2019, toutes les fusions des 100 dernières PR sont de mlschroe. libsolv a donc un mainteneur unique de fait ; son soutien (adresse suse.de) n'est pas mesuré.
 
 **Lecture** : la condition du conseiller est remplie. dnf 4 et ses bibliothèques reçoivent des correctifs de la distribution sur les 12 derniers mois. La recommandation du conseiller (« À surveiller » par décision du propriétaire) tient donc. Le verdict reste au propriétaire. Il porte aussi sur libsolv : le critère « mainteneur unique sans soutien » se joue sur le soutien, qui n'est pas mesuré. Rien n'est écrit dans docs/04, et dnf n'est pas repris.
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T20:43:19Z UTC : décision « À surveiller » pour dnf 4 et libsolv
+
+**Décision du propriétaire** (réponse reçue avant 2026-11-18T20:43:19Z UTC, heure exacte non relevée) : « À surveiller ». La question portait sur dnf 4 et libsolv : « « À surveiller » par pondération, ou « Risqué » ? ».
+- **Contexte** : elle suit la recommandation du conseiller, rapportée à la demande du propriétaire, et la mesure de sa condition (correctifs de la distribution en 12 mois).
+- **Consigné** : ligne au §3 de docs/04 et plan de sortie au §6, ce dernier marqué « non mesuré ».
+- **Conséquence** : dnf n'est plus suspendu dans M1b. La relance du troisième banc, à partir du 19/11, et le banc du bootstrap reprennent.
+- **Ce n'est pas un accord** pour une écriture dans le cluster ni dans Zot.
