@@ -1,0 +1,12 @@
+2026-11-18T09:26:36Z
+script.go v1.15.5 : 12575 octets, sha256 88c3ac71b582b286af7f092ab92c8a9ea5d8f7217f995a827e90f35fe01c22bf
+script substitué : 44751 octets, sha256 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+shebang présent : pas de préambule ajouté par Tekton
+base64 : 59668 caractères ; Args[1] reconstruit : 59848 octets
+décodage local égal au script : égal
+_EOF_ absent du base64 : 0
+getconf ARG_MAX sur sc-build : 2097152
+sur sc-build, sh -c avec un argument unique de 60848 caractères : 60848 rc 0 
+borne, sur sc-build, argument unique de 131071 caractères : 131071  rc 0 
+borne, sur sc-build, argument unique de 131072 caractères : bash: line 1: /usr/bin/sh: Argument list too long  rc 126 
+2026-11-18T09:26:37Z

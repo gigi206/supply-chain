@@ -417,3 +417,19 @@ Passage du 18/11/2026 de 09:16:37 à 09:17:47 UTC, code 0 ([journal](m4b-essai_t
 - l'envoi vers Zot.
 
 Restent avant `taches` : `verrou` et `publier` de M4a (ordre consigné), puis la lecture de `pkg/pod/script.go` et la taille de `/var/lib/zot` elle-même ; chacune sur son accord.
+
+## Note datée du 18/11/2026, écrite à 09:27:06 UTC : passage du script de `prefetch-rpm` dans un pod de Tekton (`pkg/pod/script.go`)
+
+Point « à lire avant `taches` » de la note de 22:59:14 UTC le 17/11.
+
+**Lecture** de `pkg/pod/script.go`, téléchargé au tag v1.15.5 depuis `raw.githubusercontent.com/tektoncd/pipeline` : 12 575 octets, sha256 `88c3ac71…`, copie sous `~/.cache/supply-chain-poc/05/tekton-v1.15.5-source/`.
+- `placeScriptInContainer` code chaque script Linux en base64 (`encodeScript`). Le résultat est ajouté à `Args[1]` du conteneur d'initialisation `place-scripts`, lancé par `sh -c`. Ce script d'initialisation écrit le base64 dans un heredoc terminé par `_EOF_`, puis appelle `/tekton/bin/entrypoint decode-script`.
+- Le script du pas est donc dans **un seul argument** d'`execve`, avec ceux des autres pas de la tâche (un seul pas ici).
+- Un script qui commence par `#!` ne reçoit pas de préambule : c'est le cas de `prefetch-rpm`.
+
+**Mesure** ([script](m4b-script-tekton.sh), [journal](m4b-script-tekton.log), 09:26:30 à 09:26:37 UTC) :
+- Script substitué de 44 751 octets (`572fb78c…`, celui d'`essai_tache`). Son base64 fait 59 668 caractères. `Args[1]`, reconstruit au format lu, fait 59 848 octets. Le décodage local redonne le script, et `_EOF_` n'apparaît pas dans le base64.
+- Sur sc-build : `getconf ARG_MAX` vaut 2 097 152. Un argument unique de 60 848 caractères passe à `sh -c` (code 0). La borne d'un argument unique est mesurée : 131 071 caractères passent, 131 072 échouent (« Argument list too long », code 126).
+- Marge : environ ×2,19. Un script substitué jusqu'à 98 168 octets environ resterait sous la borne (calcul, non mesuré).
+
+**Limites.** La mesure est faite par ssh sur l'hôte sc-build, pas dans un pod. Les pods en runc partagent le noyau de l'hôte (lecture), mais `place-scripts` dans un vrai TaskRun n'est pas mesuré : ce sera fait au premier PipelineRun de `rpm`. Le reste de `Args[1]` (préfixe de `place-scripts`, script de débogage) n'est pas lu en entier dans `convertScripts`. Ce point est clos pour la taille, sans bloquer `taches`.
