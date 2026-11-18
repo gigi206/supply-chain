@@ -1,0 +1,91 @@
+# m1b-dnf-portee.sh, début 2026-11-18T20:29:00Z
+## 1. paquets dnf
+racine d'outils :
+  dnf : non installé
+  python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch ; BUILDTIME Tue May 19 22:37:16 2026 (1779230236)
+  dnf-data-4.14.0-34.el9_8.rocky.0.1.noarch ; BUILDTIME Tue May 19 22:37:16 2026 (1779230236)
+  libdnf-0.69.0-18.el9.rocky.0.1.x86_64 ; BUILDTIME Mon Feb 16 05:58:16 2026 (1771221496)
+  python3-libdnf-0.69.0-18.el9.rocky.0.1.x86_64 ; BUILDTIME Mon Feb 16 05:58:16 2026 (1771221496)
+  python3-hawkey-0.69.0-18.el9.rocky.0.1.x86_64 ; BUILDTIME Mon Feb 16 05:58:16 2026 (1771221496)
+  librepo-1.19.0-1.el9.x86_64 ; BUILDTIME Mon Dec 29 01:05:21 2025 (1766970321)
+  libsolv-0.7.24-6.el9_8.x86_64 ; BUILDTIME Tue Jul 14 23:49:25 2026 (1784072965)
+--root=/m/i3 :
+  dnf : non installé
+  python3-dnf : non installé
+  dnf-data : non installé
+  libdnf : non installé
+  python3-libdnf : non installé
+  python3-hawkey : non installé
+  librepo : non installé
+  libsolv : non installé
+racine d'outils, première entrée du changelog de python3-dnf :
+  Tue May 19 12:00:00 2026 ; Release Engineering <adresse retirée> - 4.14.0-34.rocky.0.1
+  - Add Rocky bugtracker
+  ----
+## 2. journaux archivés de la brique : 262 fichiers
+motif « Package manager dnf4 detected » :
+  s1-essais-mock.log : 1 ligne(s)
+  s1-essais.log : 1 ligne(s)
+  s1-m3_build1-mock.log : 4 ligne(s)
+  s1-m3_build2-mock.log : 4 ligne(s)
+  s1-m3_buildv2-mock.log : 4 ligne(s)
+  s1-verrou.log : 1 ligne(s)
+  s1-verrou_brut-mock.log : 2 ligne(s)
+  s1-verrou_derivee-mock.log : 2 ligne(s)
+motif « installing minimal buildroot with dnf » :
+  s1-m3_build1-mock.log : 2 ligne(s)
+  s1-m3_build2-mock.log : 2 ligne(s)
+  s1-m3_buildv2-mock.log : 2 ligne(s)
+motif « dnf-3 » :
+  m2-releve6.log : 1 ligne(s)
+  m2-releve9-essai-local-premier.log : 32 ligne(s)
+  m2-releve9-essai-local.log : 32 ligne(s)
+  m2-releve9-premier-passage.log : 2 ligne(s)
+  m2-releve9.log : 2 ligne(s)
+  s1-boot_racine.log : 1 ligne(s)
+  s1-derivee-banc-applique.log : 6 ligne(s)
+  s1-derivee-banc-passage3.log : 6 ligne(s)
+  s1-derivee-banc-passage4.log : 6 ligne(s)
+  s1-derivee-banc.log : 6 ligne(s)
+  s1-essais-mock.log : 2 ligne(s)
+  s1-essais.log : 3 ligne(s)
+  s1-m3_build1-mock.log : 4 ligne(s)
+  s1-m3_build2-mock.log : 4 ligne(s)
+  s1-m3_buildv2-mock.log : 4 ligne(s)
+  s1-verrou-derivee-banc-applique.log : 2 ligne(s)
+  s1-verrou-derivee-banc.log : 2 ligne(s)
+  s1-verrou-mock.log : 3 ligne(s)
+  s1-verrou_brut-mock.log : 1 ligne(s)
+  s1-verrou_derivee-mock.log : 1 ligne(s)
+motif « installroot » :
+  m2-releve2.log : 1 ligne(s)
+  m2-releve3.log : 1 ligne(s)
+  m2-releve5.log : 1 ligne(s)
+  m2-releve6.log : 14 ligne(s)
+  m2-releve9-essai-local-premier.log : 128 ligne(s)
+  m2-releve9-essai-local.log : 128 ligne(s)
+  m2-releve9-premier-passage.log : 8 ligne(s)
+  m2-releve9.log : 8 ligne(s)
+  s1-hermetique.log : 1 ligne(s)
+  s1-m2-banc-applique.log : 2 ligne(s)
+  s1-m2-banc.log : 2 ligne(s)
+  s1-m3-2-banc-applique.log : 6 ligne(s)
+  s1-m3-2-banc-passage1.log : 6 ligne(s)
+  s1-m3-2-banc-passage2.log : 6 ligne(s)
+  s1-m3-2-banc.log : 6 ligne(s)
+  s1-m3-banc-passage1.log : 5 ligne(s)
+  s1-m3-banc-passage2.log : 5 ligne(s)
+  s1-m3-banc.log : 6 ligne(s)
+  s1-m3_build1-mock.log : 4 ligne(s)
+  s1-m3_build1.log : 1 ligne(s)
+  s1-m3_build2-mock.log : 4 ligne(s)
+  s1-m3_build2.log : 1 ligne(s)
+  s1-m3_buildv2-mock.log : 4 ligne(s)
+  s1-m3_comparaison.log : 2 ligne(s)
+  s1-m4b-v2-banc-m3-applique.log : 6 ligne(s)
+  s1-m4b-v2-banc-m3.log : 6 ligne(s)
+  s1-m4b_mock_v2.log : 1 ligne(s)
+  s1-verrou-mock.log : 2 ligne(s)
+  s1-verrou_brut-mock.log : 1 ligne(s)
+  s1-verrou_derivee-mock.log : 1 ligne(s)
+# fin 2026-11-18T20:29:00Z

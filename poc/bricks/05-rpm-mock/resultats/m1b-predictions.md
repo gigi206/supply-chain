@@ -361,3 +361,19 @@ Journal : [`m1b-dnf-complements.log`](m1b-dnf-complements.log).
 | DP2 | L'arbre i3 (buildroot) n'a pas dnf | Moyenne : le buildroot minimal de mock ne demande pas dnf, et je ne l'ai pas lu |
 | DP3 | « Package manager dnf4 detected » apparaît au moins dans les journaux de mock de S1 (essais, verrous) et de M3. `installroot` ou `dnf-3` apparaît au moins dans les journaux de `racine`, `boot_racine` et M2 | Haute : liste des fichiers déjà vue sans journal |
 | DP4 | Aucun journal archivé de M4b ni de M4c ne contient ces motifs, car mock y a tourné dans des pods dont les journaux ne sont pas archivés ici. Ce n'est pas une preuve que dnf n'y a pas tourné | Moyenne |
+
+## Résultat de la portée de dnf, du 18/11/2026 à 20:29:00 UTC, code 0 (note écrite à 2026-11-18T20:29:30Z)
+
+Journal : [`m1b-dnf-portee.log`](m1b-dnf-portee.log).
+- **DP1 en partie** :
+  - **Image d'outillage** : `python3-dnf-4.14.0-34.el9_8.rocky.0.1` a été construit le 19/05/2026 ; `dnf-data` aussi. Le paquet `dnf` lui-même n'est pas installé : l'image n'a que `python3-dnf` et `dnf-3`.
+  - **Changelog** : sa première entrée (19/05/2026) est celle de Rocky (« Add Rocky bugtracker »). Les entrées de l'amont de la distribution ne sont pas lues : la date de construction ne dit pas quels correctifs y sont.
+  - **Autres bibliothèques** : libdnf a été construit le 16/02/2026, librepo le 29/12/2025 et libsolv le 14/07/2026.
+- **DP2 tenue** : l'arbre i3 (buildroot) n'a aucun de ces paquets.
+- **DP3 en partie** :
+  - `Package manager dnf4 detected` apparaît dans les journaux de mock de S1 (essais, verrou, `verrou_brut`, `verrou_derivee`) et de M3 (`build1`, `build2`, `buildv2`).
+  - `dnf-3` ou `installroot` apparaît dans `boot_racine`, M2 (relevés 2 à 9) et `s1-m4b_mock_v2`.
+  - **`s1-racine.log` ne contient aucun des quatre motifs**, alors que `racine` a installé l'outillage avec dnf (carte de M1b, point 2). Son journal n'archive pas cette commande.
+- **DP4 non tenue** : `s1-m4b_mock_v2.log`, l'étape `m4b_mock_v2` de M4b, contient `installroot`. Aucun journal dont le nom cite M4c ne contient ces motifs. Ce n'est pas une preuve que dnf n'y a pas tourné : mock y a tourné dans des pods.
+
+**Lecture** : dnf 4 a tourné dans la brique 05 au moins en S1, M2, M3 et M4b, par mock et par nos étapes. Le verdict ne concerne donc pas seulement M1b. Il appartient au propriétaire.
