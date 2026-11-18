@@ -32,7 +32,10 @@ DEPOTS=("baseos98 $VAULT/BaseOS/x86_64/os vault98-baseos98 $FP_ROCKY" "appstream
         "epel9 $EPA archive-9.8 -")
 NOMS="mock-6.9-1.el9 mock-core-configs-45.2-1.el9 podman-5.8.2-8.el9_8 skopeo-1.22.2-9.el9_8 rocky-release shadow-utils"   # étape racine de S1
 ns() { unshare --map-auto --map-root-user -n "$@"; }
-q() { ns chroot "$D/outils" "$@"; }
+# correction (18/11/2026, après le passage de 20:54:47 UTC, m1b-outil-1.log et m1b-outil-diag.log) : sans /proc, gpgconf ne lit pas
+# /proc/self/exe et gpgme rejette le moteur (repo_gpgcheck). La racine d'outils reçoit /dev (lié) et /proc, dans un espace de
+# montage propre qui disparaît avec la commande ; HOME=/root, au lieu du HOME de l'hôte.
+q() { ns -m -p --fork bash -c 'mount --rbind /dev "$1/dev" && mount -t proc proc "$1/proc" || exit 97; export HOME=/root; exec chroot "$@"' _ "$D/outils" "$@"; }
 get() { curl -fsSL --max-time 300 -o "$1" "$2"; }
 echo "# m1b-outil.sh, début $(date -u +%FT%TZ)"
 [ ! -e "$D" ] || { echo "KO   dossier déjà présent : $D" >&2; exit 1; }
@@ -149,7 +152,7 @@ E=$(q bash -c 'rpm -qp --nosignature --qf "%{BUILDTIME}\n" /m/rpms/*.rpm' 2>/dev
 F=$(q bash -c 'rpm -qp --nosignature --qf "[%{FILEMTIMES}\n]" /m/rpms/*.rpm' 2>/dev/null | grep -E '^[0-9]+$' | sort -n | tail -n 1)
 S=$(( E > F ? E : F ))
 echo "plus grand BUILDTIME E = $E ($(date -u -d "@$E" +%FT%TZ)) ; plus grande FILEMTIMES F = $F ($(date -u -d "@$F" +%FT%TZ))"
-echo "S = $S ($(date -u -d "@$S" +%FT%TZ)) ; porteur de F : $(q bash -c 'rpm -qp --nosignature --qf "[%{FILEMTIMES} %{NEVRA}\n]" /m/rpms/*.rpm' 2>/dev/null | awk -v f="$F" '$1 == f {print $2}' | sort -u | tr '\n' ' ')"
+echo "S = $S ($(date -u -d "@$S" +%FT%TZ)) ; porteur de F : $(q bash -c 'rpm -qp --nosignature --qf "[%{FILEMTIMES} %{=NEVRA}\n]" /m/rpms/*.rpm' 2>/dev/null | awk -v f="$F" '$1 == f {print $2}' | sort -u | tr '\n' ' ')"
 
 echo "## 4. installations"
 cat > "$D/outils/m/dnf.conf" <<'EOF'

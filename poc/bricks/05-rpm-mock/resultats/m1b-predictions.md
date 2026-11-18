@@ -554,3 +554,26 @@ Journal : [`m1b-listes.log`](m1b-listes.log). Liste épinglée : [`m1b-listes-ou
 - Si O1 n'est pas tenue pour EPEL, le banc s'arrête et l'instantané est déclaré mobile. Rien n'est épinglé.
 - Si O7 est tenue, j'écrirai « neutralisable sur le banc pour l'outillage », jamais « établi » : il resterait un autre jour, le rpm et le dnf de l'amorce, et le bootstrap.
 - Rien n'est écrit dans le cluster ni dans Zot.
+
+### Premier passage du banc de l'outillage (18/11/2026, de 20:54:47 à 20:55:47 UTC, code 1 ; note écrite à 2026-11-18T20:57:10Z)
+
+Journal : [`m1b-outil-1.log`](m1b-outil-1.log). **Le passage s'arrête à la première installation.**
+- **Avant l'arrêt** : O1, O2 et O3 sont tenues.
+  - Les trois `repomd.xml` sont égaux aux copies du 18/11, et ceux de vault ont une signature valide de la clé de Rocky. L'instantané d'EPEL (`e86fdcd8…`) n'a pas bougé.
+  - Les 199 rpm (113 665 783 octets) ont le sha256 de la liste et des primary, et `rpm -K` donne 199 « digests signatures OK ».
+  - S vaut 1793914619.
+- **Arrêt** : dnf rend 1 sur baseos98, avec « repomd.xml GPG signature verification error » et « Invalid crypto engine » (gpgme).
+- **Défaut secondaire** : le porteur de la plus grande FILEMTIMES est vide, car la balise NEVRA d'un format tableau doit s'écrire `%{=NEVRA}`.
+
+**Diagnostic** : [`m1b-outil-diag.sh`](m1b-outil-diag.sh), [journal](m1b-outil-diag.log), lecture seule sur la racine d'outils du passage.
+- La racine d'outils n'a ni `/dev` (exclu à l'extraction des couches, comme au troisième banc) ni `/proc`. Sans `/proc`, gpgconf ne lit pas `/proc/self/exe`.
+- Avec `/dev` lié et `/proc` monté, gpgme trouve `/usr/bin/gpg` 2.3.3, et aucun montage ne reste après la sortie.
+- Le troisième banc n'avait pas rencontré ce défaut : il installait des fichiers locaux, sans vérification de dépôt.
+- gpgconf donne pour homedir le HOME de l'hôte, hérité dans la racine.
+
+**Correction**, écrite avant le passage suivant :
+- La racine d'outils reçoit `/dev` (lié) et `/proc`, dans un espace de montage et de processus propre, qui disparaît avec chaque commande.
+- `HOME=/root`.
+- Le porteur s'écrit `%{=NEVRA}`.
+
+**Effet sur les prédictions** : O1 à O9 sont inchangées, et O1 à O3 seront relues au passage corrigé. Le troisième banc tournait sans `/proc`, et les scriptlets peuvent s'y comporter autrement : la comparaison avec lui n'est donc pas directe. Le pod Kata de la future tâche a `/proc`.

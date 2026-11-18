@@ -1,0 +1,14 @@
+# m1b-outil-diag.sh, début 2026-11-18T20:56:23Z
+/dev de la racine : 0 entrée(s) ; /proc : 0 entrée(s)
+## A. sans /dev ni /proc (forme du premier passage)
+gpgconf: error reading symlink '/proc/self/exe': No such file or directory
+/home/gigi/.gnupg
+code 0
+1.15.1
+## B. avec /dev lié et /proc monté (espace de montage propre)
+/home/gigi/.gnupg
+code 0
+1.15.1
+moteur : /usr/bin/gpg 2.3.3
+montages laissés sur la racine après sortie : 0
+# fin 2026-11-18T20:56:23Z

@@ -1,0 +1,62 @@
+# m1b-outil.sh, début 2026-11-18T20:54:47Z
+liste épinglée : 199 rpm, sha256 c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f
+## 1. clés et repomd.xml
+OK   RPM-GPG-KEY-Rocky-9 : empreinte 21CB256AE16FC54C6E652949702D426D350D275D
+OK   RPM-GPG-KEY-EPEL-9 : empreinte FF8AD1344597106ECE813B918A3872BF3228467C
+baseos98 : repomd.xml sha256 abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163 ; copie du 18/11 (vault98-baseos98) : abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+OK   baseos98 : repomd.xml égal à la copie du 18/11
+OK   baseos98 : signature de repomd.xml valide (21CB256AE16FC54C6E652949702D426D350D275D)
+appstream98 : repomd.xml sha256 a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b ; copie du 18/11 (vault98-appstream98) : a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+OK   appstream98 : repomd.xml égal à la copie du 18/11
+OK   appstream98 : signature de repomd.xml valide (21CB256AE16FC54C6E652949702D426D350D275D)
+epel9 : repomd.xml sha256 e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61 ; copie du 18/11 (archive-9.8) : e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61
+OK   epel9 : repomd.xml égal à la copie du 18/11
+epel9 : repomd.xml non signé (instantané d'EPEL) ; ancre : sha256 de la copie du 18/11 et de la liste épinglée
+## 2. métadonnées et rpm du miroir partiel
+écarté primary_db -
+écarté filelists_db -
+écarté other_db -
+     baseos98 : primary, 45549029 octets, sha256 conforme
+     baseos98 : filelists, 3142076 octets, sha256 conforme
+     baseos98 : other, 4188483 octets, sha256 conforme
+     baseos98 : group, 289672 octets, sha256 conforme
+     baseos98 : group_xz, 55504 octets, sha256 conforme
+     baseos98 : updateinfo, 703963 octets, sha256 conforme
+OK   baseos98 : 6 fichier(s) de métadonnées, 53928727 octets, sha256 conformes à repomd.xml
+écarté primary_db -
+écarté filelists_db -
+écarté other_db -
+     appstream98 : primary, 2700960 octets, sha256 conforme
+     appstream98 : filelists, 27736973 octets, sha256 conforme
+     appstream98 : other, 3040878 octets, sha256 conforme
+     appstream98 : group, 539964 octets, sha256 conforme
+     appstream98 : group_xz, 89984 octets, sha256 conforme
+     appstream98 : modules, 15640 octets, sha256 conforme
+     appstream98 : updateinfo, 1968043 octets, sha256 conforme
+OK   appstream98 : 7 fichier(s) de métadonnées, 36092442 octets, sha256 conformes à repomd.xml
+écarté primary_db -
+écarté filelists_db -
+écarté other_db -
+     epel9 : primary, 4565620 octets, sha256 conforme
+     epel9 : filelists, 14623676 octets, sha256 conforme
+     epel9 : other, 1982292 octets, sha256 conforme
+     epel9 : group, 30404 octets, sha256 conforme
+     epel9 : updateinfo, 2026129 octets, sha256 conforme
+OK   epel9 : 5 fichier(s) de métadonnées, 23228121 octets, sha256 conformes à repomd.xml
+OK   199 rpm de la liste trouvés dans les primary, même sha256 : 199
+OK   rpm téléchargés, sha256 égal à la liste et au primary : 199, 113665783 octets
+## 3. racine d'outils, signatures et borne S
+OK   couche e48fc4d689daa5ec7af47350d996f93d76a138ff7267aed6972feefe3e4526bd : sha256 égal à son nom
+OK   couche fd00cdb1ac39ed07d03836b05bd7c24cf435e68a2b29d63403e5dfc4610ac157 : sha256 égal à son nom
+outils : RPM version 4.16.1.3 ; dnf 4.14.0
+rpm -K : 199 « digests signatures OK » sur 199
+plus grand BUILDTIME E = 1793913216 (2026-11-05T21:13:36Z) ; plus grande FILEMTIMES F = 1793914619 (2026-11-05T21:36:59Z)
+S = 1793914619 (2026-11-05T21:36:59Z) ; porteur de F : 
+## 4. installations
+dnf.conf : sha256 d554fb1ce168663fbfbfaffa175056f049506a2fa33675acb63dedf2969d03cc
+## installation 5, début 2026-11-18T20:55:47Z
+dnf code 1 ; 2 lignes de journal
+lignes « scriptlet », « warning » ou « error » (casse ignorée) : 1
+Rocky 9.8 BaseOS                                132 kB/s | 833  B     00:00    
+Error: Failed to download metadata for repo 'baseos98': repomd.xml GPG signature verification error: gpgme_engine_check_version() error: Invalid crypto engine
+KO   installation 5 en échec
