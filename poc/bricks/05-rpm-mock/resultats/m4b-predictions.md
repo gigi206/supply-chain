@@ -379,3 +379,17 @@ Passage du 18/11/2026 de 09:07:03 à 09:07:08 UTC, code 0 ([journal](m4b-prealab
 - l'origine des 338 518 016 octets.
 
 Accord suivant : `essai_tache`. Le sha256 du script substitué qu'elle imprimera doit être `572fb78c…`.
+
+## Note datée du 18/11/2026, écrite à 09:10:30 UTC : portée de « rien dans le cluster ni dans Zot » et de PT7
+
+Relecture du conseiller. Le texte commité en `0158c9b` reste ; il se lit avec ces corrections.
+- **« Rien écrit dans le cluster ni dans Zot » est une lecture, pas une mesure.** C'est le cas dans la note précédente, dans la ligne du README, dans la note de docs/03 et dans le message de commit. Les éléments lus :
+  - l'étape ne lance que des commandes locales (yq, jq, oras sur des layouts locaux) et un `df` par ssh ;
+  - elle n'appelle `kubectl` nulle part.
+
+  Aucun relevé de Zot ni du cluster n'a été fait avant et après le passage. Cela vaut « (lecture) », comme FN9.
+- **PT7 : le `df` ne mesure pas Zot.**
+  - Relevé archivé à 09:10:08 UTC ([journal](m4b-zot-fs.log)) : `/var/lib/zot` n'a pas de montage dédié. Il est sur `/`, soit `/dev/vda1` en ext4 de 20 922 114 048 octets.
+  - Les 338 518 016 octets de plus peuvent donc venir de tout le système de sc-stockage, pas seulement de Zot. Entre 09:07 et 09:10 UTC, sans écriture de la brique, l'occupation a encore pris 8 712 192 octets.
+  - Le relevé de M2 de comparaison est « après l'envoi 2 » de `s1-fermeture.log`, et non « la fin de M2 ».
+- **Conséquence.** `essai_tache` n'écrit pas dans Zot (lecture) : pas d'effet sur elle. En revanche, `publier`, `taches` et `rpm` écrivent dans Zot. Avant elles, il faudra relever la taille de `/var/lib/zot` elle-même (`du`, ce qui demande sudo ou l'utilisateur zot, à décider) en plus du `df`.

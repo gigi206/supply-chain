@@ -1,0 +1,7 @@
+# relevé de lecture, sans sudo, sur sc-stockage : système de fichiers qui porte /var/lib/zot
+# 2026-11-18T09:10:08Z
+Filesystem     Type Mounted on   1B-blocks        Used      Avail
+/dev/vda1      ext4 /          20922114048 15538589696 4482326528
+/dev/vda1      ext4 /          20922114048 15538589696 4482326528
+/ /dev/vda1
+# 2026-11-18T09:10:08Z
