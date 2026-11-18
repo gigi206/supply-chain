@@ -393,3 +393,27 @@ Relecture du conseiller. Le texte commité en `0158c9b` reste ; il se lit avec c
   - Les 338 518 016 octets de plus peuvent donc venir de tout le système de sc-stockage, pas seulement de Zot. Entre 09:07 et 09:10 UTC, sans écriture de la brique, l'occupation a encore pris 8 712 192 octets.
   - Le relevé de M2 de comparaison est « après l'envoi 2 » de `s1-fermeture.log`, et non « la fin de M2 ».
 - **Conséquence.** `essai_tache` n'écrit pas dans Zot (lecture) : pas d'effet sur elle. En revanche, `publier`, `taches` et `rpm` écrivent dans Zot. Avant elles, il faudra relever la taille de `/var/lib/zot` elle-même (`du`, ce qui demande sudo ou l'utilisateur zot, à décider) en plus du `df`.
+
+## Note datée du 18/11/2026, écrite à 09:18:20 UTC : `essai_tache` passée (« Oui »)
+
+Passage du 18/11/2026 de 09:16:37 à 09:17:47 UTC, code 0 ([journal](m4b-essai_tache.log)). `m4b.sh` = `5e08bef0…`. État relu juste avant, à 09:16:33 UTC : ni journal, ni pod, ni PVC `m4b-05-essai-tache`, trois nœuds prêts (non archivé).
+
+| # | Mesure | Verdict |
+|---|---|---|
+| ET1 | Scripts nominal et refusé : 3 lignes d'écart ; sha256 du nominal `572fb78c…`, le même que dans `prealables_taches` | Tenue |
+| ET2 | Pod admis en dry-run serveur ; prêt sur `sc-build`, `runtimeClassName` vide (runc) | Tenue |
+| ET3 | Nominal : 222 rpm téléchargés et contrôlés ; empreinte conforme (gpg) ; `rpm -K` 222 OK sur 222 ; `repomd.xml` `239a5a71…`, contrôle passé ; manifeste `f0ccf105…` ; 230 fichiers, 317 984 334 octets ; code 0 ; pas de 17 s | Tenue |
+| ET4 | Résultat `{"uri":"oci://sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap","digest":"sha256:f0ccf105…"}` | Tenue |
+| ET5 | Arbre égal à celui de `final` | Tenue |
+| ET6 | Cas refusé : `repomd.xml` calculé `239a5a71…`, puis « repomd.xml différent de l'attendu (fixé par la pipeline) », code 1 ; ni dossier `dir:` ni résultat | Tenue |
+| ET7 | Retrait du pod code 0, PVC `m4b-05-essai-tache-w` retirée, aucun pod ni PVC restant | Tenue |
+| ET8 | Rien écrit dans Zot | Lecture seulement (aucun relevé de Zot avant et après) |
+
+**Ce que cela établit** : le script de `prefetch-rpm`, substitué comme il le sera, produit dans un pod neuf sous runc, sans root, au label de la tâche, la fermeture de `final` au fichier près. Il émet le résultat attendu pour Chains. Il refuse un `repomd.xml` qui n'est pas celui fixé par la pipeline, avant la copie de l'image.
+
+**Ce que cela n'établit pas** :
+- Tekton lui-même : substitution réelle, script d'environ 45 Ko passé au pod (`pkg/pod/script.go` à lire), workspace en PVC, chemin réel du résultat, admission d'un pod de TaskRun ;
+- `publier-fermeture` dans son pod sous 512 Mi ;
+- l'envoi vers Zot.
+
+Restent avant `taches` : `verrou` et `publier` de M4a (ordre consigné), puis la lecture de `pkg/pod/script.go` et la taille de `/var/lib/zot` elle-même ; chacune sur son accord.
