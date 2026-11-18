@@ -115,3 +115,11 @@ Code 0, en moins d'une seconde ([journal](m4a-verrou.log)). `m4a.sh` = `fb23b869
 | V4 | **Tenue.** Artefact : `sample-app.spec` (`918a83f5…`) et `verrou-rpm.json`. Deux poussées en layout local, même digest `sha256:41c639b7…`, celui de l'essai à sec. |
 
 Rien écrit dans Zot ni dans le cluster (lecture du script : layouts locaux seulement). Reste `publier` (P0 à P2), qui écrit dans Zot ; accord à part.
+
+**Relevé « avant » de `publier`** (note du 2026-11-18, écrite à 09:23:48 UTC ; lecture seule ; [relevé](m4a-publier-zot-avant.log)) :
+- À 09:23:32 UTC, le dépôt `entrees/sample-app/packaging-rpm` n'existait pas : `crane ls` répond `NAME_UNKNOWN`, code 1.
+- `crane catalog` compte 144 lignes (même méthode qu'au relevé de `boot_image`, `s1-boot-image-zot-avant.log`).
+- `/` de sc-stockage, qui porte `/var/lib/zot` : 15 544 553 472 octets utilisés, 4 476 362 752 libres. C'est 5 963 776 octets de plus qu'à 09:10:08 UTC ([relevé](m4b-zot-fs.log)), sans écriture de la brique entre les deux ; l'origine n'est pas relevée.
+- Aucune fonction du chemin de `publier` n'a changé depuis les prédictions : `etape_verrou`, `etape_publier`, `pousser`, `fichiers` sont au même texte qu'en `2bc295f`, et `commun.sh` de la 08, qui porte `auth_zot`, n'a aucun commit depuis.
+
+Suite : accord d'écriture dans Zot (`publier`, `entrees/sample-app/packaging-rpm:m4a`, compte `poc-ecriture`, dépôt définitif), digest attendu `41c639b7…`.
