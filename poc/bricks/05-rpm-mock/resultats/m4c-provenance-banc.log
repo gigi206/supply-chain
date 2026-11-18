@@ -1,0 +1,606 @@
+# m4c-provenance-banc.sh, 2026-11-18T18:00:19Z ; m4c.sh avant 150f2dda43782e84988745a99c1c075d31c6f9805d141ad64c5f6d5a794776fc ; m4c.sh 0ee6511746699a863352b9ef2d7d498c73af230f2cae70b1764adb0cf759cc18
+## A : insertions seules, noms neufs, syntaxe, shellcheck
+OK   lignes retirées ou changées : 0
+OK   blocs insérés : 2
+noms définis par l'ajout : CLE_CHAINS CLE_CHAINS_SHA KATA_ATTENDU controler_prov etape_provenance lire_prov prov_attendue
+OK   noms de l'ajout déjà définis avant : 0
+OK   commun.sh lisible : oui
+OK   noms de l'ajout déjà définis dans commun.sh : 0
+OK   bash -n : ok
+OK   shellcheck : mêmes codes avant et après : mêmes
+## B : controler_prov sur des enveloppes fausses (contenu des pipelineTask : vrais TaskRuns archivés)
+OK   fonctions extraites (attendu, echec, lire_prov, controler_prov, prov_attendue) : 5
+OK   constantes extraites : 17
+OK   attendu : dépendances, paramètres : 11 8
+     pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+     pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+     pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+     pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+     - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+     - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+     inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+     inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+     inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+     preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+     preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+     preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+     preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+     preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+     construire-rpm epoque 1793229566
+     publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+OK   TaskRun archivé m4c-rpm-1-preparer lisible : TaskRun
+OK   TaskRun archivé m4c-rpm-1-construire lisible : TaskRun
+OK   TaskRun archivé m4c-rpm-1-publier lisible : TaskRun
+OK   TaskRun archivé m4c-rpm-2-preparer lisible : TaskRun
+OK   TaskRun archivé m4c-rpm-2-construire lisible : TaskRun
+OK   TaskRun archivé m4c-rpm-2-publier lisible : TaskRun
+OK   provenances fausses bâties (deux uid) : 95d9debd-0000-4000-8000-000000000001 95d9debd-0000-4000-8000-000000000002
+OK   contenus pipelineTask : TaskRuns archivés (noms) : m4c-rpm-1-construire m4c-rpm-1-preparer m4c-rpm-1-publier
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source (dépendance git : uri et commit) : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : b51e4019f3ad763495df8f6a27649f90a991a99b80342250af5be46ddcc7d6db
+     OK   paramètres des tâches égaux à l'attendu (sha256 des listes triées) : 4b263062c50af1c93d5ebd0b60511c7150b4cc95d5d3ad30adf06a8118df41d7
+     OK   runtimeClassName des tâches dans la spec signée : construire-rpm:kata preparer-rpm:- publier-image:-
+OK   nominal : code : 0
+OK   nominal : OK, aucun KO : 7 0
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 0
+     sujet : 
+     buildType :  ; builder.id :  (relevé)
+     début et fin :  (relevé)
+     resolvedDependencies (0) :
+     paramètres des tâches (0) :
+     runtimeClassName des tâches (spec signée) : 
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+          	- oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          	- oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          	- oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          	inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          	inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          	inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          	inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          	pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          	pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          	pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          	pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+          	construire-rpm epoque 1793229566
+          	preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          	preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          	preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          	preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          	preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          	publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          	publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     KO   enveloppes de l'invocation : 0 (attendu : 1)
+OK   aucune : code : 1
+OK   aucune : KO attendu : 1
+OK   aucune : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 2
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb48
+     buildType : https://tekton.dev/chains/v2/slsa-tekton https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (0) :
+     paramètres des tâches (0) :
+     runtimeClassName des tâches (spec signée) : 
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+          	- oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          	- oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          	- oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          	inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          	inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          	inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          	inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          	pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          	pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          	pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          	pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+          	construire-rpm epoque 1793229566
+          	preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          	preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          	preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          	preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          	preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          	publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          	publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     KO   enveloppes de l'invocation : 2 (attendu : 1)
+OK   deux : code : 1
+OK   deux : KO attendu : 1
+OK   deux : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:0000000000000000000000000000000000000000000000000000000000000000
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+     OK   enveloppes de l'invocation : 1
+     KO   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:0000000000000000000000000000000000000000000000000000000000000000 (attendu : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha
+OK   sujet : code : 1
+OK   sujet : KO attendu : 1
+OK   sujet : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     KO   buildType : https://tekton.dev/chains/v2/slsa (attendu : https://tekton.dev/chains/v2/slsa-tekton)
+OK   buildtype : code : 1
+OK   buildtype : KO attendu : 1
+OK   buildtype : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (10) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+          	inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     KO   source (dépendance git : uri et commit) :  (attendu : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f)
+OK   git_absente : code : 1
+OK   git_absente : KO attendu : 1
+OK   git_absente : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:1111111111111111111111111111111111111111
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:1111111111111111111111111111111111111111
+          	inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     KO   source (dépendance git : uri et commit) : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:1111111111111111111111111111111111111111 (attendu : git+https://sc-stockage.poc
+OK   commit_faux : code : 1
+OK   commit_faux : KO attendu : 1
+OK   commit_faux : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:2222222222222222222222222222222222222222222222222222222222222222
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:2222222222222222222222222222222222222222222222222222222222222222
+          	inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source (dépendance git : uri et commit) : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     KO   resolvedDependencies égales à l'attendu (sha256 des listes triées) : 8a59e1abd076d983df925ebe9f8955c154dc57ec94400d305f5694e275e68c98 (attendu : b51e4019f3ad763495df8f6a27649f90a991a99b80
+OK   entree_digest : code : 1
+OK   entree_digest : KO attendu : 1
+OK   entree_digest : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:3333333333333333333333333333333333333333333333333333333333333333
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:3333333333333333333333333333333333333333333333333333333333333333
+          	- oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source (dépendance git : uri et commit) : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     KO   resolvedDependencies égales à l'attendu (sha256 des listes triées) : b58918099b9b2a3718ce6f11a9530cf830b6f6452a3c7cfab1ca8bd5aaeb7c01 (attendu : b51e4019f3ad763495df8f6a27649f90a991a99b80
+OK   image_pas : code : 1
+OK   image_pas : KO attendu : 1
+OK   image_pas : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (12) :
+          - oci://sc-stockage.poc.test:5000/autre sha256:4444444444444444444444444444444444444444444444444444444444444444
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+          - oci://sc-stockage.poc.test:5000/autre sha256:4444444444444444444444444444444444444444444444444444444444444444
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source (dépendance git : uri et commit) : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     KO   resolvedDependencies égales à l'attendu (sha256 des listes triées) : b0bcc23db395cf51cfe6d517a080d0371688249c6e54bedb82a3e055a149c571 (attendu : b51e4019f3ad763495df8f6a27649f90a991a99b80
+OK   dep_en_trop : code : 1
+OK   dep_en_trop : KO attendu : 1
+OK   dep_en_trop : écarts imprimés avant le KO : oui
+OK   epoque : valeur changée dans l'enveloppe : 1793229566 1794787200
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1794787200
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+          	construire-rpm epoque 1793229566
+          construire-rpm epoque 1794787200
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source (dépendance git : uri et commit) : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : b51e4019f3ad763495df8f6a27649f90a991a99b80342250af5be46ddcc7d6db
+     KO   paramètres des tâches égaux à l'attendu (sha256 des listes triées) : 0cc6385c73bfa66fbf22fc9d5c432a85d2d08e784816cc5c93b670d391fd05cd (attendu : 4b263062c50af1c93d5ebd0b60511c7150b4cc95
+OK   epoque : code : 1
+OK   epoque : KO attendu : 1
+OK   epoque : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:5555555555555555555555555555555555555555555555555555555555555555
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+          	publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image digest sha256:5555555555555555555555555555555555555555555555555555555555555555
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source (dépendance git : uri et commit) : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : b51e4019f3ad763495df8f6a27649f90a991a99b80342250af5be46ddcc7d6db
+     KO   paramètres des tâches égaux à l'attendu (sha256 des listes triées) : f2b35dc5d119d4954cef39262e97ddd69182f8ac7dc02bead39bef3e9570d93c (attendu : 4b263062c50af1c93d5ebd0b60511c7150b4cc95
+OK   digest_publier : code : 1
+OK   digest_publier : KO attendu : 1
+OK   digest_publier : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:- preparer-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source (dépendance git : uri et commit) : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : b51e4019f3ad763495df8f6a27649f90a991a99b80342250af5be46ddcc7d6db
+     OK   paramètres des tâches égaux à l'attendu (sha256 des listes triées) : 4b263062c50af1c93d5ebd0b60511c7150b4cc95d5d3ad30adf06a8118df41d7
+     KO   runtimeClassName des tâches dans la spec signée : construire-rpm:- preparer-rpm:- publier-image:- (attendu : construire-rpm:kata preparer-rpm:- publier-image:-)
+OK   kata_retire : code : 1
+OK   kata_retire : KO attendu : 1
+OK   kata_retire : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 95d9debd-0000-4000-8000-000000000001 : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://tekton.dev/chains/v2 (relevé)
+     début et fin : 2026-11-18T15:39:39Z 2026-11-18T15:41:00Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/essais-05/mock-rocky9 sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-rpm sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (8) :
+          construire-rpm epoque 1793229566
+          preparer-rpm commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-rpm depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-rpm fermeture-rpm sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+          preparer-rpm fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-rpm packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+          publier-image digest sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-rpm
+     runtimeClassName des tâches (spec signée) : construire-rpm:kata preparer-rpm:- publier-image:kata
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source (dépendance git : uri et commit) : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : b51e4019f3ad763495df8f6a27649f90a991a99b80342250af5be46ddcc7d6db
+     OK   paramètres des tâches égaux à l'attendu (sha256 des listes triées) : 4b263062c50af1c93d5ebd0b60511c7150b4cc95d5d3ad30adf06a8118df41d7
+     KO   runtimeClassName des tâches dans la spec signée : construire-rpm:kata preparer-rpm:- publier-image:kata (attendu : construire-rpm:kata preparer-rpm:- publier-image:-)
+OK   kata_ailleurs : code : 1
+OK   kata_ailleurs : KO attendu : 1
+OK   kata_ailleurs : écarts imprimés avant le KO : oui
+## C : constantes de l'étape contre les objets archivés par pipeline
+OK   clé de Chains (sha256) : 1e7b2a03f9d5d289898e63b57410aeafa4e3680e86474d4f35aaa4e01f0c5e65
+OK   m4c-rpm-1 : dépendances dérivées des objets égales à l'attendu (sha256 des listes triées) : b51e4019f3ad763495df8f6a27649f90a991a99b80342250af5be46ddcc7d6db
+OK   m4c-rpm-1 : paramètres des specs des TaskRuns égaux à l'attendu (sha256 des listes triées) : 4b263062c50af1c93d5ebd0b60511c7150b4cc95d5d3ad30adf06a8118df41d7
+OK   m4c-rpm-1 : runtimeClassName des specs des TaskRuns : construire-rpm:kata preparer-rpm:- publier-image:-
+OK   m4c-rpm-2 : dépendances dérivées des objets égales à l'attendu (sha256 des listes triées) : b51e4019f3ad763495df8f6a27649f90a991a99b80342250af5be46ddcc7d6db
+OK   m4c-rpm-2 : paramètres des specs des TaskRuns égaux à l'attendu (sha256 des listes triées) : 4b263062c50af1c93d5ebd0b60511c7150b4cc95d5d3ad30adf06a8118df41d7
+OK   m4c-rpm-2 : runtimeClassName des specs des TaskRuns : construire-rpm:kata preparer-rpm:- publier-image:-
+OK   images des pas de preparer-rpm signée : sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0 sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   image du pas de construire-rpm signée : sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+OK   image du pas de publier-image signée (08) : sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+OK   preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f dans la liste revue : oui
+OK   construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164 dans la liste revue : oui
+OK   publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b dans la liste revue : oui
+OK   pipeline d'etape_taches (copie locale) : référence : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+## D : forme réelle, attestations de l'artefact deb de s4d-deb-1 (06), lecture seule
+s4d-deb-1 : uid 4bb7e150-670f-40a7-97d1-9391b5b8eefb ; artefact sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+attendu deb dérivé des objets : 11 dépendances, 7 paramètres ; construire-deb:kata preparer-deb:- publier-image:- ; git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     - oci://sc-stockage.poc.test:5000/builds/builders/sbuild-debian13 sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+     - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+     - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+     inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+     inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+     inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
+     pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb sha256:d1fb3871ec550f0fb49bc81b7fe6be932417ddd76297d5698e61d20e5ad7df26
+     pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-deb sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+     pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-deb sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+     pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   recoupement : entrées et image de build de s4d.sh dans l'attendu dérivé : 1 1 1 1
+OK   recoupement : source égale à celle de m4c.sh : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   recoupement : runtimeClassName des TaskRuns deb : construire-deb:kata preparer-deb:- publier-image:-
+OK   cosign verify-attestation (clé de Chains) sur l'artefact deb : code : 0
+enveloppes valides : 8 ; invocationId : 13b2cee0-5dcc-4113-af0d-1b8b4ea9b2fd 36fbbebc-d459-4921-8e14-e07f11d67e0c 4bb7e150-670f-40a7-97d1-9391b5b8eefb 576b7e61-391a-4a28-9d97-36ab54e9dec0 c3d27e05-b4cd-487b-8980-7a40b3336ffc c9479fdb-6b6d-4a58-a072-1510a2b45b43 cdd6707c-9a3b-4337-b041-df1a0108de2d e45d0438-6ed2-44be-bedc-dcbb11e485cd (relevé)
+contenu des pipelineTask de s4d-deb-1 : clés de premier niveau, kind (relevé) : metadata,spec,status -
+     enveloppes de l'invocation 4bb7e150-670f-40a7-97d1-9391b5b8eefb : 1
+     sujet : sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://supply-chain.example/builders/tekton-chains@v1 (relevé)
+     début et fin : 2026-11-14T22:58:43Z 2026-11-14T23:04:48Z (relevé)
+     resolvedDependencies (11) :
+          - oci://sc-stockage.poc.test:5000/builds/builders/sbuild-debian13 sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+          inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+          inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb sha256:d1fb3871ec550f0fb49bc81b7fe6be932417ddd76297d5698e61d20e5ad7df26
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-deb sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-deb sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (7) :
+          preparer-deb commit 6391fd437f26696847041be3226bbbf633f55a2f
+          preparer-deb depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+          preparer-deb fermeture-deb sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+          preparer-deb fermeture-sources sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+          preparer-deb packaging sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
+          publier-image digest sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+          publier-image image sc-stockage.poc.test:5000/builds/sample-app-deb
+     runtimeClassName des tâches (spec signée) : construire-deb:kata preparer-deb:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source (dépendance git : uri et commit) : git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+     OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : 7ca4a741d66c25074df3bb523ff77b6d46d9c0b23d9a08f7711bccafd53ab061
+     OK   paramètres des tâches égaux à l'attendu (sha256 des listes triées) : f52c4f6caceedd45741304ffe1b1f7df1ab43ef92606cef508058ab717b15150
+     OK   runtimeClassName des tâches dans la spec signée : construire-deb:kata preparer-deb:- publier-image:-
+OK   controler_prov sur s4d-deb-1 : code, OK, KO : 0 7 0
+# bilan : 79 OK, 0 KO ; fin 2026-11-18T18:00:23Z

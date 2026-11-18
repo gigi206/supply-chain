@@ -424,3 +424,45 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 - `provenance` reste à passer : attestations de Chains sur `07b7bd6f…` (cosign, sujet, `resolvedDependencies` avec les trois entrées et le commit, Kata dans la spec signée de `construire`, époque `1793229566`) ;
 - l'hôte n'a pas `rpm` : NEVRA et BUILDTIME du rpm tiré ne sont pas lus ici ;
 - la porte ne connaît toujours pas `construire-rpm` (choix du propriétaire).
+
+## Note datée du 18/11/2026, écrite à 18:01:38 UTC : étape `provenance` préparée à sec et appliquée (accord permanent du 18/11), NON LANCÉE ; prédictions PV1 à PV11
+
+**Modèle** : `etape_provenance` de `m4b.sh` (enveloppes séparées par `invocationId`, listes triées comparées à un attendu) et de `s4d.sh` de la 06 (source git, entrées, Kata dans la spec signée). Lecture seule : le cluster est lu (`kubectl get`), Zot est lu anonymement (`cosign verify-attestation`, `cosign verify`) ; rien n'est créé, poussé ni supprimé.
+
+**Ce que fait l'étape**
+1. **Gardes** (`attendu`, arrêt) : sha256 de la clé publique de Chains ; `IMAGE_DIGEST` de `m4c-rpm-1` et `m4c-rpm-2`, relu dans le cluster, égal à `07b7bd6f…`.
+2. **Attendu** tiré des références épinglées de `m4c.sh` :
+   - 11 dépendances : la pipeline, les trois tâches (`preparer-rpm`, `construire-rpm`, `publier-image`), les trois images des pas (`outils-prefetch`, `outils-horodatage`, `mock-rocky9`), le commit git et les trois entrées (fermeture rpm de M4b, fermeture applicative de la 06, packaging de M4a) ;
+   - 8 paramètres : les cinq de `preparer-rpm`, l'époque `1793229566` de `construire-rpm`, l'image et le digest de `publier-image`.
+3. **`cosign verify-attestation`** avec la clé de Chains, sans journal de transparence, sur `builds/sample-app-rpm@07b7bd6f…` ; `invocationId` des enveloppes imprimés et rattachés aux objets de `pipeline`.
+4. **Par PipelineRun** (`controler_prov`, tout imprimé, puis `attendu`) : une enveloppe à son uid ; sujet ; buildType ; source git (uri et commit) ; dépendances et paramètres égaux à l'attendu (sha256 des listes triées, écarts imprimés avant) ; `runtimeClassName` de chaque tâche dans la spec signée : `construire-rpm:kata preparer-rpm:- publier-image:-`.
+5. **Relevé** : signature simplesigning (`cosign verify`), non exigée. **Refus** : vérification avec une autre clé.
+
+**Préparation**
+- `m4c.sh` passe de `150f2dda…` à `0ee65117…` par deux insertions (6 lignes d'en-tête, 111 lignes avant `lancer`), appliquées à 18:00:40 UTC (`date -u` de la commande de copie).
+- Banc [m4c-provenance-banc.sh](m4c-provenance-banc.sh) (`afd3a132…`) : **79 OK** sur la copie ([journal](m4c-provenance-banc.log)), puis **79 OK** sur le dépôt ([journal](m4c-provenance-banc-applique.log)), du premier coup.
+  - **B** : les vraies fonctions de l'étape sur des enveloppes fausses, dont le contenu des `pipelineTask` est l'un des vrais TaskRuns archivés par `pipeline`. 14 cas : nominal (7 OK) ; aucune enveloppe ou deux à l'uid ; sujet ; buildType ; dépendance git absente ; commit faux ; digest d'une entrée faux ; digest d'une image de pas faux ; dépendance en trop ; époque changée ; digest de `publier-image` changé ; Kata retiré de `construire-rpm` ; Kata posé sur `publier-image`. Chaque cas donne le libellé de KO attendu, écarts imprimés avant.
+  - **C** : sur les objets archivés des deux exécutions, les dépendances dérivées (refSource, images des pas, `*_ARTIFACT_INPUTS`, `CHAINS-GIT_*`), les paramètres et les `runtimeClassName` des specs des TaskRuns sont égaux à l'attendu ; images des pas des trois tâches signées et références de la liste revue conformes.
+  - **D**, lecture seule réelle : sur `s4d-deb-1` (06, artefact `60f25f5c…`, 8 enveloppes valides), l'attendu dérivé des objets Tekton par les mêmes fonctions qu'en C, recoupé avec les constantes de `s4d.sh`, passe `controler_prov` (7 OK). Le contenu d'une `pipelineTask` est le TaskRun (`metadata`, `spec`, `status`, sans `kind`), spec résolue : paramètres substitués, `podTemplate` de `taskRunSpecs`.
+- Non couvert par le banc : les attestations réelles de `07b7bd6f…`.
+
+**Prédictions de `provenance`**
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| PV1 | Gardes passées : clé de Chains conforme ; `IMAGE_DIGEST` des deux PipelineRuns égal à `07b7bd6f…` | Haute : CM1 |
+| PV2 | `cosign verify-attestation` réussit avec la clé de Chains, en lecture anonyme | Haute : PipelineRuns signés par Chains (PL) ; même forme qu'en M4b |
+| PV3 | 4 enveloppes valides : les deux PipelineRuns et les deux TaskRuns `publier` (relevé, non exigé) | Moyenne-haute : 4 en M4b (deux PipelineRuns, deux TaskRuns de publication) ; seuls ces TaskRuns publient `IMAGE_URL` et `IMAGE_DIGEST` |
+| PV4 | Une enveloppe par `invocationId` de PipelineRun ; sujet `builds/sample-app-rpm@07b7bd6f…` ; buildType `slsa-tekton` | Haute : M4b ; forme deb (banc D) |
+| PV5 | Source : `git+…/workspace/sample-app.git`, `sha1:6391fd43…` | Haute : `CHAINS-GIT_*` relus dans `pipeline` ; forme deb |
+| PV6 | 11 `resolvedDependencies`, égales à l'attendu | Haute : dérivation des objets archivés égale à l'attendu (C), dérivation égale à la provenance réelle deb (D) |
+| PV7 | 8 paramètres égaux à l'attendu, dont l'époque `1793229566` et le digest `07b7bd6f…` de `publier-image` | Haute : specs des TaskRuns archivés (C) ; paramètres résolus dans la forme deb (D) |
+| PV8 | `runtimeClassName` dans la spec signée : `kata` pour `construire-rpm` seule | Haute : specs archivées (C) ; forme deb (D) |
+| PV9 | `cosign verify` : code 0, une signature valide, sur `07b7bd6f…` (relevé, non exigé) | Moyenne : une seule en M4b pour deux PipelineRuns au même digest |
+| PV10 | Refus avec une autre clé (« no matching attestations ») | Haute : M4b, S4d |
+| PV11 | Code 0, 19 OK ; moins d'une minute | Moyenne-haute : banc ; lecture seule |
+
+**Après le passage**
+- Tout tenu : bilan de M4c (rpm de M3 reconstruit par la plateforme, publié, comparé et attesté), puis additif ADR 0001 et `docs/03`.
+- PV6 ou PV7 non tenue : lire les écarts imprimés avant toute correction ; aucun attendu n'est changé sans décision.
+- PV3 ou PV9 autres : simple relevé, noté.
