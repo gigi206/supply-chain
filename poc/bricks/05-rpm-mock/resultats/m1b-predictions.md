@@ -171,3 +171,36 @@ Journaux : [banc](m1b-repro2.log), et [lecture complémentaire](m1b-repro2-analy
 Journal : [`m1b-complements.log`](m1b-complements.log).
 - **CP1 tenue** : `archive-9.8` est à la révision 1794280816 (10/11/2026, 03:20:16 UTC) et `epel9` à la révision 1794966030 (18/11/2026, 01:40:30 UTC). Leurs sha256 sont ceux de `m1b-sources.log`. Les repomd.xml de Rocky portent la révision « 9.8 » et non une date.
 - **CP2 tenue** : les 985 fichiers ont une mtime égale à `FILEMTIMES` dans leur en-tête, et appartiennent tous à `kernel-headers`. Leur mtime vient donc bien de l'en-tête rpm. Borner les mtimes à E change donc des métadonnées livrées par rpm. Que `rpm -V` le signale reste déduit, pas mesuré.
+
+## Troisième banc (neutralisation par SOURCE_DATE_EPOCH) : prédictions écrites avant le lancement (2026-11-18T20:15:41Z UTC)
+
+**Lecture préalable, sans journal** (18/11/2026, reprise dans l'en-tête du banc) : la chaîne `SOURCE_DATE_EPOCH` est présente dans `librpm.so.9` de l'image d'outillage (rpm 4.16.1.3-40.el9), au voisinage de « rpmts.c ». Elle l'est aussi dans `/usr/bin/trust` de p11-kit 0.25.3-3.el9_5, que le scriptlet de `ca-certificates` appelle par `update-ca-trust` pour écrire `cacerts`. **Ce que la variable fixe n'est pas lu** : le banc le mesure, et la lecture des sources ne viendra que si le résultat est partiel.
+
+**Banc** : [`m1b-repro3.sh`](m1b-repro3.sh). Il utilise les mêmes outils (couches de `99790c13`) et les mêmes 222 rpm que le premier banc, dans un dossier neuf (`~/.cache/supply-chain-poc/05/m1b-repro3-<UTC>`). Il ne fait que lire le premier banc.
+- **Borne** : S = max(plus grand `BUILDTIME`, plus grande `FILEMTIMES` des en-têtes installés). Ainsi, aucune mtime livrée par rpm ne dépasse la borne, par construction.
+- **Installations** : i3 et i4, avec `SOURCE_DATE_EPOCH=S`, 5 s d'écart.
+- **Archives** : bornées à S, sans les huit fichiers du second banc. Deux témoins : i3 archivé deux fois, et i1 (installé sans la variable) archivé de la même façon.
+- **Comparaisons** : archives membre par membre, base rpm et `cacerts`.
+- **Jour près** : troisième champ de `etc/shadow` dans i1 et i3.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| RT1 | S est supérieur ou égal à E (1778602708), et S est le plus grand `FILEMTIMES` (au moins 12/05/2026, 18:34:12 UTC) | Haute : 985 fichiers de `kernel-headers` au-dessus de E (CP2) |
+| RT2 | dnf rend 0 aux deux installations, avec 222 paquets et la même liste triée qu'au premier banc | Haute : mêmes rpm, mêmes outils |
+| RT3 | Dans i3 comme dans i4, `INSTALLTIME` et `INSTALLTID` valent S pour les 222 paquets (un seul couple) | Moyenne : chaîne présente près de `rpmts.c`, usage non lu ; l'heure d'installation pourrait venir d'ailleurs que de la transaction |
+| RT4 | Dans i3 comme dans i4, environ 3332 entrées dépassent encore S : ce sont celles que l'installation crée ou touche (4317 au-dessus de E au second banc, moins les 985 de `kernel-headers`) | Moyenne : je suppose que la variable ne change pas les mtimes du système de fichiers |
+| RT5 | `cacerts` est identique entre i3 et i4, et ses 146 entrées portent l'horodatage S | Moyenne-basse : suppose que l'environnement passe de dnf au scriptlet, puis à `update-ca-trust` et à `trust`, et que `trust` s'en sert pour les horodatages |
+| RT6 | Témoin : i3 archivé deux fois donne deux fichiers identiques octet à octet | Haute : RD3 |
+| RT7 | a3.tar et a4.tar sont identiques octet à octet | Moyenne-basse : conjonction de RT3 et de RT5, et rien d'autre ne diffère |
+| RT8 | Témoin sans la variable (a1s.tar contre a3.tar) : seuls `rpmdb.sqlite` et `cacerts` diffèrent | Moyenne : la variable pourrait changer autre chose, et c'est ce que ce témoin doit montrer |
+| RT9 | Le troisième champ de `etc/shadow` a les mêmes valeurs dans i1 et i3 | Haute, mais sans portée : même jour |
+
+**Ce qui est décidé d'avance** :
+- **Si RT7 tient**, j'écrirai « neutralisable sur le banc », **et non « établi »**. Quatre angles morts restent à mesurer :
+  1. **Jour différent** : à 15 s d'écart, un champ au jour près reste invisible, et le rejeu aura lieu après le 28/11. Fausser l'horloge demanderait une installation.
+  2. **Mauvais jeu de paquets** : ces 222 rpm forment le buildroot. Il reste à mesurer les 201 paquets de l'outillage, et le bootstrap (base 9.7 plus dix lignes : heures d'installation mêlées, `cacerts` peut-être jamais régénéré).
+  3. **Mauvais installeur** : le banc utilise rpm -40, de l'image d'outillage. La tâche retenue utilisera le dnf de l'amorce `ed654c69`, que je n'ai pas en local et dont je n'ai pas lu la version de rpm.
+  4. **Dépôt et non fichiers locaux** : sur un miroir partiel, dnf écrira sous `var/cache/dnf` et `var/lib/dnf`, ce qu'aucun banc n'a vu.
+- **Si seul un des deux fichiers devient stable**, c'est un résultat à noter, pas un échec. Je lirai alors les sources de rpm ou de p11-kit, sur leurs SRPM signés.
+- **Si RT8 montre d'autres membres**, je les liste et je ne conclus pas.
+- **Les replis** (réécrire la base rpm après l'installation, retirer ou régénérer `cacerts`) restent non mesurés. Ils ne seront listés dans la carte que comme tels.
