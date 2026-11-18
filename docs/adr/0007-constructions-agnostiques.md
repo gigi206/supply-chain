@@ -131,3 +131,5 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Portée** : il reste à mesurer un autre jour, les paquets de l'outillage et du bootstrap, le rpm de l'amorce et un miroir partiel au lieu de fichiers locaux.
 
 **Correction du 18/11/2026, 20:20 UTC, à l'additif du troisième banc de M1b** : « `INSTALLTIME` à S plus le rang du paquet » dépasse la mesure. Le banc montre 222 valeurs consécutives, de S à S + 221, et la même suite dans les deux installations. Il ne montre pas le lien avec l'ordre de la transaction.
+
+**Note du 18/11/2026, 20:21 UTC** : le lien avec l'ordre de la transaction est mesuré sur l'installation i3. Trier les paquets par `INSTALLTIME` redonne l'ordre des lignes « Installing » du journal de dnf. S se calcule aussi avant l'installation, par `rpm -qp` sur les fichiers rpm.

@@ -259,3 +259,9 @@ Journal : [`m1b-complements3.log`](m1b-complements3.log).
 Journal : [`m1b-complements3-ordre.log`](m1b-complements3-ordre.log), remplacé par le passage suivant. Ce premier passage est conservé dans l'historique de git, dans le commit qui ajoute cette note.
 - **Résultat** : 199 rangs donnent le même nom, et 2 un nom tronqué par dnf. Les 21 autres rangs ne sont pas conclus : **le comparateur était encore défectueux**. Les 20 rangs affichés portent tous une époque nulle, que rpm écrit `perl-B-0:1.80-…` et que dnf omet (`perl-B-1.80-…`). Le 21e n'est pas affiché.
 - **Seconde correction**, écrite avant le passage suivant : une époque nulle est retirée de l'écriture de rpm. **La prédiction C3c est inchangée.**
+
+### Comparateur corrigé, second passage (18/11/2026, 20:21:10 UTC, code 0 ; note écrite à 2026-11-18T20:21:29Z)
+
+Journal : [`m1b-complements3-ordre.log`](m1b-complements3-ordre.log).
+- **C3c tenue** : 220 rangs donnent le même nom, et 2 un nom que dnf tronque (préfixe du nom de rpm). Aucun autre écart. **Trier les paquets par `INSTALLTIME` redonne l'ordre de la transaction** du journal de dnf : `INSTALLTIME` vaut S plus le rang du paquet dans la transaction, moins un.
+- **Conséquence** : la formule corrigée à 20:20 UTC est maintenant mesurée, sur une installation. La reproductibilité de `INSTALLTIME` dépend donc aussi de l'ordre de la transaction, et cet ordre était le même dans i3 et i4.

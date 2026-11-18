@@ -1,24 +1,4 @@
-# m1b-complements3-ordre.py, début 2026-11-18T20:20:43Z
-rangs comparés : 222 ; même nom : 199 ; nom du journal tronqué, préfixe du nom de rpm : 2 ; autres : 21
-     rang 136 : INSTALLTIME perl-B-0:1.80-481.1.el9_6.x86_64 ; journal perl-B-1.80-481.1.el9_6.x86_64
-     rang 137 : INSTALLTIME perl-FileHandle-0:2.03-481.1.el9_6.noarch ; journal perl-FileHandle-2.03-481.1.el9_6.noarch
-     rang 140 : INSTALLTIME perl-AutoLoader-0:5.74-481.1.el9_6.noarch ; journal perl-AutoLoader-5.74-481.1.el9_6.noarch
-     rang 141 : INSTALLTIME perl-base-0:2.27-481.1.el9_6.noarch ; journal perl-base-2.27-481.1.el9_6.noarch
-     rang 143 : INSTALLTIME perl-if-0:0.60.800-481.1.el9_6.noarch ; journal perl-if-0.60.800-481.1.el9_6.noarch
-     rang 152 : INSTALLTIME perl-Class-Struct-0:0.66-481.1.el9_6.noarch ; journal perl-Class-Struct-0.66-481.1.el9_6.noarch
-     rang 153 : INSTALLTIME perl-POSIX-0:1.94-481.1.el9_6.x86_64 ; journal perl-POSIX-1.94-481.1.el9_6.x86_64
-     rang 155 : INSTALLTIME perl-IPC-Open3-0:1.21-481.1.el9_6.noarch ; journal perl-IPC-Open3-1.21-481.1.el9_6.noarch
-     rang 156 : INSTALLTIME perl-subs-0:1.03-481.1.el9_6.noarch ; journal perl-subs-1.03-481.1.el9_6.noarch
-     rang 162 : INSTALLTIME perl-SelectSaver-0:1.02-481.1.el9_6.noarch ; journal perl-SelectSaver-1.02-481.1.el9_6.noarch
-     rang 163 : INSTALLTIME perl-Symbol-0:1.08-481.1.el9_6.noarch ; journal perl-Symbol-1.08-481.1.el9_6.noarch
-     rang 164 : INSTALLTIME perl-File-stat-0:1.09-481.1.el9_6.noarch ; journal perl-File-stat-1.09-481.1.el9_6.noarch
-     rang 167 : INSTALLTIME perl-Fcntl-0:1.13-481.1.el9_6.x86_64 ; journal perl-Fcntl-1.13-481.1.el9_6.x86_64
-     rang 169 : INSTALLTIME perl-mro-0:1.23-481.1.el9_6.x86_64 ; journal perl-mro-1.23-481.1.el9_6.x86_64
-     rang 170 : INSTALLTIME perl-IO-0:1.43-481.1.el9_6.x86_64 ; journal perl-IO-1.43-481.1.el9_6.x86_64
-     rang 171 : INSTALLTIME perl-overloading-0:0.02-481.1.el9_6.noarch ; journal perl-overloading-0.02-481.1.el9_6.noarch
-     rang 173 : INSTALLTIME perl-Errno-0:1.30-481.1.el9_6.x86_64 ; journal perl-Errno-1.30-481.1.el9_6.x86_64
-     rang 174 : INSTALLTIME perl-File-Basename-0:2.85-481.1.el9_6.noarch ; journal perl-File-Basename-2.85-481.1.el9_6.noarch
-     rang 175 : INSTALLTIME perl-Getopt-Std-0:1.12-481.1.el9_6.noarch ; journal perl-Getopt-Std-1.12-481.1.el9_6.noarch
-     rang 180 : INSTALLTIME perl-overload-0:1.31-481.1.el9_6.noarch ; journal perl-overload-1.31-481.1.el9_6.noarch
-ordre par INSTALLTIME égal à l'ordre du journal : False
-# fin 2026-11-18T20:20:43Z
+# m1b-complements3-ordre.py, début 2026-11-18T20:21:10Z
+rangs comparés : 222 ; même nom : 220 ; nom du journal tronqué, préfixe du nom de rpm : 2 ; autres : 0
+ordre par INSTALLTIME égal à l'ordre du journal : True
+# fin 2026-11-18T20:21:10Z
