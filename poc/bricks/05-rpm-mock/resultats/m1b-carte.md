@@ -105,3 +105,14 @@ Les tâches signées épinglent l'image d'outillage par digest : `prefetch-rpm`,
 5. Lecture du seuil de 5 pw.
 
 Suite sans attendre la réponse, sous l'accord permanent : le banc de reproductibilité du point 1 A, hors ligne sur l'hôte.
+
+## Note datée du 18/11/2026, écrite à 19:39:49 UTC : décision « Oui »
+
+**Décision du propriétaire** (réponse reçue avant 19:39:49 UTC, heure exacte non relevée) : « Oui », sur la question « retiens-tu les quatre transpositions du point 2 ». Ce n'est un accord pour aucune écriture dans le cluster ni dans Zot. Chaque changement du point 4 garde son accord.
+- **Retenues** :
+  1. Publication dans `builds/builders/mock-rocky9` et `builds/builders/rocky9-bootstrap` par `publier-image` inchangée.
+  2. Une tâche runc sans root qui télécharge et vérifie (gpgv sur `repomd.xml`, sha256 contre `primary`) et reconstitue un miroir partiel avec les métadonnées amont, puis une tâche Kata privilégiée, sans aucune sortie, qui lance `dnf --installroot` sur ce miroir.
+  3. Le dnf de l'amorce `rockylinux:9.8` (`ed654c69`).
+  4. Un layout OCI écrit à la main, avec des couches non compressées.
+- **Inchangé** : les points 1 A et 1 B restent à mesurer et à relever avant toute tâche ; le verdict de dnf dans docs/04 reste à vérifier.
+- **Suite**, sous l'accord permanent : le banc de reproductibilité du point 1 A, hors ligne sur l'hôte.
