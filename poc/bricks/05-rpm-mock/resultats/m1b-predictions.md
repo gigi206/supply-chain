@@ -377,3 +377,24 @@ Journal : [`m1b-dnf-portee.log`](m1b-dnf-portee.log).
 - **DP4 non tenue** : `s1-m4b_mock_v2.log`, l'étape `m4b_mock_v2` de M4b, contient `installroot`. Aucun journal dont le nom cite M4c ne contient ces motifs. Ce n'est pas une preuve que dnf n'y a pas tourné : mock y a tourné dans des pods.
 
 **Lecture** : dnf 4 a tourné dans la brique 05 au moins en S1, M2, M3 et M4b, par mock et par nos étapes. Le verdict ne concerne donc pas seulement M1b. Il appartient au propriétaire.
+
+## Question du propriétaire sur dnf5 : prédictions écrites avant le lancement (2026-11-18T20:37:21Z UTC)
+
+**Question** (reçue avant 2026-11-18T20:37:21Z UTC, heure exacte non relevée) : « et dnf5 ? il faut utiliser le bon outil avec la bonne distribution, non ? »
+
+**Lecture préalable, sans journal**, reprise par le relevé : les gabarits `rhel-9.tpl` et `rocky-9.tpl` de mock-core-configs posent `package_manager = 'dnf'`, de même que `rhel-10.tpl` et `rocky-10.tpl`. Seul `fedora-branched.tpl` choisit `dnf5`, à partir de la version 40.
+
+**Relevé** : [`m1b-dnf5.sh`](m1b-dnf5.sh). Il fait trois lectures :
+- les gabarits de mock, hors ligne ;
+- les listes de fichiers de Rocky 9.8, d'EPEL 9.8 et de Rocky 10, en lecture publique, non signées ;
+- la santé de dnf5.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| F1 | mock-core-configs choisit `dnf` (dnf 4) pour rhel et rocky 9 et 10, et `dnf5` seulement pour Fedora à partir de 40 (et d'autres distributions hors EL) | Haute : déjà lu sans journal |
+| F2 | Rocky 9.8 (BaseOS et AppStream) n'a aucun paquet dnf5 | Haute |
+| F3 | EPEL 9.8 n'a aucun paquet dnf5 | Moyenne : je ne l'ai jamais lu |
+| F4 | Rocky 10 a dnf (4.x) dans BaseOS et aucun dnf5 | Moyenne : je crois que RHEL 10 a gardé dnf 4, sans l'avoir lu |
+| F5 | dnf5 n'est pas archivé et a une release de moins de 6 mois | Haute |
+
+**Ce qui est décidé d'avance** : la réponse au propriétaire ne donnera que les faits mesurés. Si F2 à F4 tiennent, dnf5 n'est pas l'outil de la distribution, ni pour Rocky 9, ni pour Rocky 10. Le verdict de dnf 4 reste au propriétaire.
