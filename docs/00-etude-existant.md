@@ -72,6 +72,11 @@ L'exception autorise le build à déclarer **les noms et digests des sujets** (a
 | Provenance BuildKit (`mode=max`) | L2 : non signée, contrôlée par le client | Gratuite | Docker ne revendique aucun niveau | Indice complémentaire |
 | Argo CD | — (déploiement) | GitOps de la plateforme ; releases SLSA L3 | RCE dans le repo-server corrigée en ≥ 3.3.15 / 3.4.10 / 3.5.4 | Phase 4 |
 
+> **Correction datée du 18/11/2026, 22:21:36 UTC** (ligne PaC ci-dessus et note du §2) :
+> - « statuts et commentaires dans la forge » n'est pas relevé dans un journal ;
+> - « Au tag v0.54.0, le code donne la même chose » devient : à la lecture, non remesuré. Le contrôleur impose aussi un `generateName` aux PipelineRuns, donc pas d'anti-rejeu par le nom ([lectures complémentaires](../poc/benchmarks/pac/resultats/lecture-complement.log)) ;
+> - la phrase corrigée au §2 a été introduite par `9d530a0` le 28/10/2026, avant A1.
+
 **Conclusion.** Aucune autre option auto-hébergeable n'atteint L3. C'est pourquoi le cœur reprend les mêmes briques que Konflux : ce n'est pas du mimétisme, c'est le seul choix possible aujourd'hui.
 
 Sources :

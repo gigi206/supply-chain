@@ -1,0 +1,59 @@
+# lecture-complement.sh, début 2026-11-18T22:21:00Z ; HEAD bb2df3052556e2c7516eb1146a02e3ece5c4f252 ; tag v0.54.0 ; état [0 lignes]
+
+## E1, le contrôleur résout avec GenerateName: true : pkg/pipelineascode/match.go, l. 408 à 412
+ 408 | 		pipelineRuns, err = resolve.Resolve(ctx, p.run, p.logger, p.vcx, types, p.event, &resolve.Opts{
+ 409 | 			GenerateName:       true,
+ 410 | 			RemoteTasks:        true,
+ 411 | 			RepositoryRevision: repositoryRevision,
+ 412 | 		})
+
+## E1, effet : name remplacé par generateName : pkg/resolve/remote.go, l. 250 à 256
+ 250 | 		// Add a GenerateName based on the pipeline name and a "-"
+ 251 | 		// if we already have a GenerateName then just keep it like this
+ 252 | 		if ropt.GenerateName && pipelinerun.GenerateName == "" {
+ 253 | 			pipelinerun.GenerateName = pipelinerun.Name + "-"
+ 254 | 			pipelinerun.Name = ""
+ 255 | 			rt.Logger.Debugf("resolveRemoteResources: pipelinerun=%s set generateName=%s", prName, pipelinerun.GenerateName)
+ 256 | 		}
+
+## E1, filtre des PipelineRuns existants : seulement /retest et /ok-to-test : pkg/matcher/annotation_matcher.go, l. 482 à 487
+ 482 | 	if len(matchedPRs) > 0 {
+ 483 | 		// Filter out templates that already have successful PipelineRuns for /retest and /ok-to-test
+ 484 | 		if event.EventType == opscomments.RetestAllCommentEventType.String() ||
+ 485 | 			event.EventType == opscomments.OkToTestCommentEventType.String() {
+ 486 | 			logger.Debugf("MatchPipelinerunByAnnotation: filtering successful templates for event_type=%s", event.EventType)
+ 487 | 			filtered := filterSuccessfulTemplates(ctx, logger, cs, event, repo, vcx, matchedPRs)
+
+## E1, ce filtre ne retient que les runs réussis du même SHA : pkg/matcher/annotation_matcher.go, l. 501 à 512
+ 501 | // filterSuccessfulTemplates filters out templates that already have successful PipelineRuns
+ 502 | // when executing /ok-to-test or /retest gitops commands, implementing per-template checking.
+ 503 | func filterSuccessfulTemplates(ctx context.Context, logger *zap.SugaredLogger, cs *params.Run, event *info.Event, repo *apipac.Repository, vcx provider.Interface, matchedPRs []Match) []Match {
+ 504 | 	if event.SHA == "" {
+ 505 | 		return matchedPRs
+ 506 | 	}
+ 507 | 
+ 508 | 	// Get all existing PipelineRuns for this SHA
+ 509 | 	labelSelector := fmt.Sprintf("%s=%s", keys.SHA, formatting.CleanValueKubernetes(event.SHA))
+ 510 | 	existingPRs, err := cs.Clients.Tekton.TektonV1().PipelineRuns(repo.GetNamespace()).List(ctx, metav1.ListOptions{
+ 511 | 		LabelSelector: labelSelector,
+ 512 | 	})
+
+## E7, cosign tree des trois images de release.yaml au tag
+### pipelines-as-code-controller:v0.54.0
+  📦 Supply Chain Security Related artifacts for an image: ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-controller:v0.54.0
+  └── 📦 SBOMs for an image tag: ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-controller:sha256-a9eefe48ae06ce287e899be3c9b351aaa731928e368fac4c9dc268247ccdf452.sbom
+     └── 🍒 sha256:20af15cc04b7bf072e25f76b1f535d2caadb6dae68904f75917a24a24719f0ed
+### pipelines-as-code-watcher:v0.54.0
+  📦 Supply Chain Security Related artifacts for an image: ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-watcher:v0.54.0
+  └── 📦 SBOMs for an image tag: ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-watcher:sha256-ded342f642f3201d18cfca58e673ec17e16f070fddfba2b9713bdc8b96417cbe.sbom
+     └── 🍒 sha256:2e0ad9cae832385fbf2754ec893365c8a558d0235bfc79622b71a82545a48d24
+### pipelines-as-code-webhook:v0.54.0
+  📦 Supply Chain Security Related artifacts for an image: ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-webhook:v0.54.0
+  └── 📦 SBOMs for an image tag: ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-webhook:sha256-99c0bd4820442ae075a3cf549734c9881bcae5ca916217d35dcf49573a5df25d.sbom
+     └── 🍒 sha256:c564ce7adfa262a12de46ee12f76d05bfec19b5f6bd3f5868c81fd449694428b
+
+## docs/00 : commit qui a introduit « sans vérification de signature des webhooks »
+c8c1efc 2026-11-18T23:18:27+01:00 Évaluation PaC (18/11/2026, à sec, v0.54.0 bb2df305) : santé « À surveiller » (Scorecard 5,2, releases et images non sig
+9d530a0 2026-10-28T21:24:06Z Phase 1 : étude de l'existant, exigences, architecture et audit de santé
+
+# fin 2026-11-18T22:21:05Z

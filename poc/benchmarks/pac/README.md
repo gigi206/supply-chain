@@ -70,3 +70,25 @@ Note écrite à 22:18:13 UTC, le 18/11/2026. Journaux : [`sante.log`](resultats/
 **Bilan des prédictions** : PA1, PA2, PA5, PA6, PA7 et PA8 tenues ; PA4 tenue en partie ; PA3 non tenue.
 
 **Portée.** Tout est lu, sauf E1 (mesuré sur v0.50.0 en A1) et E8 (A1). Rien n'a été installé ni exécuté. La lecture porte sur le seul fournisseur Forgejo ou Gitea, au tag v0.54.0. **Aucune recommandation ni décision** à ce stade. Effort : 18/11/2026, de 22:11:40 (cadre) à 22:18:13 UTC, pour 0,5 pw estimé.
+
+### Corrections datées du 18/11/2026, écrites à 22:21:36 UTC (après relecture par le conseiller)
+
+Journal : [`lecture-complement.log`](resultats/lecture-complement.log), 22:21:00 à 22:21:05 UTC.
+
+- **Cadre, « avant tout relevé »** : c'est trop fort. Avant le cadre, j'avais déjà lu deux choses par l'API de GitHub : les huit dernières releases (v0.54.0 du 12/11/2026 en tête) et la liste des fichiers de la racine du dépôt (SECURITY.md n'y figure pas). Les prédictions PA1 et PA7 ne sont donc pas tout à fait aveugles.
+- **E1, recherche d'un anti-rejeu.** Les 35 occurrences de `lecture-code.log` (l. 53 à 89) sont sans rapport avec un rejeu de webhook : déduplication des OWNERS, des fichiers modifiés et des dépendances de groupes, commentaires de GitHub, nouvel essai HTTP vers la forge. **Deux lectures complètent E1** :
+  - Le contrôleur résout les PipelineRuns avec `GenerateName: true` (`match.go` l. 409). Le `name` d'un PipelineRun de `.tekton/` est alors remplacé par un `generateName` (`remote.go` l. 252 à 254). **Notre parade, un nom par commit et `AlreadyExists` au rejeu, n'est donc pas disponible avec PaC**.
+  - Le filtre des PipelineRuns existants pour un même SHA ne vaut que pour `/retest` et `/ok-to-test` (`annotation_matcher.go` l. 482 à 487), et ne retient que les runs réussis.
+
+  E1 reste **non tenue**, et n'est pas tenable par un nom de PipelineRun. Non remesuré sur v0.54.0.
+- **E3, « champs choisis par le dépôt »** : `types.go` dit d'où vient le fichier, pas que ses champs passent. La preuve que les champs passent est la **mesure de A1**, sur PaC v0.50.0 sous Konflux : une PR a déclaré dans `.tekton/` un PipelineRun hostile, avec un `taskSpec` en ligne (test 2) et une étape privilégiée, uid 0, `hostPath: /` (test 4). PaC l'a créé, et rien ne l'a refusé à l'admission ([résultats de A1](../konflux/resultats/README.md), tests 2 et 4). Chez nous, Kyverno refuserait ces deux formes, ce qui n'est pas mesuré avec PaC. Rien ne borne en revanche l'`env` du `podTemplate`.
+- **PA5** : « **non contredite** », et non « tenue ». L'absence n'a été cherchée qu'avec trois mots-clés.
+- **Santé** :
+  - le délai de correction des CVE **n'a pas été relevé** ;
+  - « sans signature ni attestation » ne vaut que pour ce que `cosign tree` montre, au tag, des **trois** images de `release.yaml` (contrôleur, watcher, webhook) : un SBOM seulement, ni signature ni attestation. Les attestations de GitHub (`gh attestation`) n'ont pas été relevées.
+- **docs/00, correction du §2** :
+  - « le code donne la même chose » devient « à la lecture, non remesuré » ;
+  - « cette phrase date d'avant A1 » est vérifié : elle a été introduite par le commit `9d530a0` du 28/10/2026, la veille de A1.
+- **docs/00, ligne PaC du §3** : « statuts et commentaires dans la forge » ne repose sur aucun journal archivé. Ce n'est pas relevé.
+- **Verdict « À surveiller »** : c'est l'application littérale des critères de docs/04, pas une décision du propriétaire.
+- **Non touchés** : docs/03, qui valide les briques, et les ADR. PaC n'est ni une brique ni une évaluation de l'ADR 0000, dont les grilles sont figées, et aucune ADR ne porte sur le déclencheur.
