@@ -92,3 +92,11 @@ Le sha256 du src.rpm irait au journal du TaskRun.
 - Conséquence : le point 4 (date de `Source0`) ne pèse plus sur le sujet signé. Il ne pèse que sur la comparaison avec M3 : le src.rpm (`c802e60a…`) et, selon la mesure, le rpm (`864d55f4…`).
 
 **Question suivante** : la date de `Source0` (point 4), options (i), (ii) et (iii).
+
+## Note datée du 18/11/2026, écrite à 13:54:20 UTC : décision « option (i) » sur la date de `Source0` (point 4)
+
+**Décision du propriétaire** : « Ok » (réponse reçue avant 13:54:20 UTC, heure exacte non relevée). Elle répond à la question « Retenez-vous l'option (i) ? », posée après le rappel de l'avis du conseiller. Ce n'est un accord pour aucune mesure ni aucune écriture.
+- L'archive `Source0` est datée par une époque **fixée dans la pipeline signée**, égale à celle de `sources.sh` : 1793229566 (28/10/2026 23:19:26 UTC, dernier commit de `poc/sample-app` du dépôt principal, `3da431db`).
+- **Limite inscrite** : la date ne suit pas le commit construit. Construire un autre commit demande une nouvelle pipeline, signée et revue.
+- Ce que le conseiller a dit, et rien de plus : ne pas prédire l'égalité du rpm à M3 (`864d55f4…`) sans mesure. Le `tar` 1.34 et le `gzip` 1.12 de Rocky peuvent aussi produire une archive différente de celle de l'hôte (`07521c1e…`), ce qui est à mesurer dans le pod d'essai. L'option (iii) venait de moi ; il ne l'a pas commentée.
+- Les deux vrais choix de la carte sont tranchés. La suite est la préparation à sec des tâches et de `m4c.sh` (accord permanent du 18/11), avec les prédictions commitées avant tout lancement.
