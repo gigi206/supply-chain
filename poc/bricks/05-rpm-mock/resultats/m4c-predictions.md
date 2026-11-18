@@ -466,3 +466,41 @@ Script : [`../m4c.sh`](../m4c.sh) (`e0c62169…`), préparé à sec sous l'accor
 - Tout tenu : bilan de M4c (rpm de M3 reconstruit par la plateforme, publié, comparé et attesté), puis additif ADR 0001 et `docs/03`.
 - PV6 ou PV7 non tenue : lire les écarts imprimés avant toute correction ; aucun attendu n'est changé sans décision.
 - PV3 ou PV9 autres : simple relevé, noté.
+
+## Note datée du 18/11/2026, écrite à 18:05:54 UTC : `provenance` passée, PV1 à PV11 tenues ; M4c tenu, preuve de M4 tenue
+
+**Passage** ([journal](m4c-provenance.log)) : le 18/11/2026, `date -u` avant et après le lancement : 18:01:56 et 18:01:56 UTC, code 0, 19 OK, aucun KO. Sur `1469d5a`, `m4c.sh` = `0ee65117…`. Dossier de travail laissé sous `$W/m4c-05/provenance`.
+
+**Confrontation aux prédictions**
+- **PV1 tenue** : clé de Chains conforme ; `IMAGE_DIGEST` de `m4c-rpm-1` et `m4c-rpm-2`, relu dans le cluster, égal à `07b7bd6f…`.
+- **PV2 tenue** : `cosign verify-attestation` réussi avec la clé de Chains, en lecture anonyme.
+- **PV3 tenue** : 4 enveloppes valides, rattachées aux PipelineRuns `m4c-rpm-1` et `m4c-rpm-2` et aux TaskRuns `m4c-rpm-1-publier` et `m4c-rpm-2-publier`.
+- **PV4 tenue** : une enveloppe par `invocationId` de PipelineRun ; sujet `builds/sample-app-rpm@07b7bd6f…` ; buildType `https://tekton.dev/chains/v2/slsa-tekton`.
+- **PV5 tenue** : source `git+https://sc-stockage.poc.test:3000/workspace/sample-app.git`, `sha1:6391fd43…`, aux deux.
+- **PV6 tenue** : 11 `resolvedDependencies`, égales à l'attendu aux deux (sha256 des listes triées `b51e4019…`, celui des objets archivés au banc C). Dont `inputs/result` pour la fermeture rpm `2a9e2ea7…`, la fermeture applicative `50dc73f7…` et le packaging `41c639b7…`.
+- **PV7 tenue** : 8 paramètres égaux à l'attendu aux deux (`4b263062…`), dont l'époque `1793229566` de `construire-rpm` et le digest `07b7bd6f…` de `publier-image`.
+- **PV8 tenue** : spec signée : `construire-rpm:kata preparer-rpm:- publier-image:-`, aux deux.
+- **PV9 tenue** : `cosign verify` en code 0, une signature valide, sur `07b7bd6f…` (relevé).
+- **PV10 tenue** : refus avec une autre clé, « no matching attestations ».
+- **PV11 tenue** : code 0, 19 OK ; les deux `date -u` donnent la même seconde.
+
+**M4c tenu** (carte de M4c : pipeline `sample-app-rpm` qui enchaîne `preparer-rpm`, `construire-rpm` sous Kata et `publier-image`, provenance signée par Chains), par les sept étapes de la carte : `prealables`, `essai_preparer`, `essai`, `taches`, `pipeline`, `comparaison`, `provenance`.
+
+**Preuve de M4 tenue, aux deux écarts écrits dans la [carte de M4](m4-carte.md)** (tableau des jalons : « Sujet rpm signé, digest de la fermeture dans `resolvedDependencies` ») :
+- sujet signé : le manifeste OCI `builds/sample-app-rpm@07b7bd6f…`, attesté par Chains (journal de `provenance`) ; le rpm est dans sa couche, seul, et égal à celui de M3 à l'octet près (journal de `comparaison`) ;
+- fermeture rpm `2a9e2ea7…` en `inputs/result` de chaque provenance (journal de `provenance`) ;
+- écarts de la carte de M4 : dépôt `builds/sample-app-rpm` et non `artifacts/sample-app/rpm` ; sujet = manifeste OCI qui porte le rpm. La ligne M4 du tableau n'est pas réécrite.
+
+**Deux liens à lire**
+- Le sha256 du rpm n'est pas dans la provenance : le lien entre le sujet et le rpm passe par `comparaison` (couche au seul rpm, relue octet par octet).
+- La chaîne jusqu'au prefetch passe par la provenance de la fermeture `2a9e2ea7…` ([M4b](m4b-predictions.md), étape `provenance`) : liste revue des 222 rpm, image de bootstrap, tâche `prefetch-rpm`.
+
+**Réserves**
+- `essais-05/mock-rocky9@sha256:99790c13…` est bâtie hors de la plateforme (« Option 1 ») ; elle figure dans la provenance comme image du pas de `construire-rpm`.
+- L'époque est fixée par la pipeline signée (option (i)). Le BUILDTIME `1794787200` relevé dans les journaux de `construire` n'est pas cette époque et reste non expliqué. L'hôte n'a pas `rpm` : NEVRA et BUILDTIME du rpm tiré ne sont pas lus ici ; le rpm est égal à celui de M3 par sha256 et `cmp`.
+- La porte ne nomme aucune tâche rpm (« succès à vide », carte de M4) : ni déclencheur ni rattrapage pour le rpm avant son extension, hors M4, à décider par le propriétaire.
+- Vérification par clé, sans journal de transparence, comme en M4b et dans la 06.
+- `privileged` du pas de `construire-rpm` est lu dans la tâche signée, non relevé sur le pod ; l'uid 0 est mesuré dans l'invité (journaux de `construire`).
+- Les réserves de [M4b](m4b-predictions.md) et les trois de M2 ([s1-predictions.md](s1-predictions.md)) demeurent.
+
+**Suite** : M5 du tableau des jalons (tests négatifs : rpm de fermeture altéré, sortie réseau pendant le build, pod privilégié hors Kata ; un rejeu de zéro, pas avant le 28/11). L'extension de la porte reste hors M4.
