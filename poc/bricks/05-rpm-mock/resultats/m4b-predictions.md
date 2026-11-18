@@ -568,3 +568,36 @@ Ce tour s'arrête donc avant `SIGNER=1`, comme annoncé. La suite est annoncée 
 - Le journal et le WAL ont pris plus que `df`. Un autre arbre a donc diminué pendant la fenêtre (déduction, non attribuée).
 - **Conclusion (lecture) :** la croissance n'est attribuable ni à la brique ni aux arbres lisibles, hormis le journal de systemd. Pour l'attribuer, il faut `du` en root sur les arbres illisibles, deux fois à au moins une heure d'écart. Cette commande revient au propriétaire.
 - Rien ne bloque `taches`, qui pousse deux bundles de quelques dizaines de kilo-octets (calcul : tâche signée de 6 398 octets au banc, liste de 39 938 octets dans la pipeline). Avant `rpm`, qui écrit environ 318 Mo, l'espace libre sera relevé de nouveau : 4,47 Go libres à 09:48:54 UTC.
+
+## Note datée du 18/11/2026, écrite à 09:52:38 UTC : corrections à la note de préparation de `taches`, avant tout passage
+
+**Disque de sc-stockage : deux affirmations dépassaient la mesure.**
+- « Un autre arbre a donc diminué pendant la fenêtre » est retiré. Les trois grandeurs ne se soustraient pas :
+  - `du -sxb` donne des tailles apparentes ;
+  - `df` compte des blocs alloués ;
+  - les tailles de Prometheus viennent de ses métriques.
+- Les rythmes « par jour » de ces notes, 1,19 Go et 147 Mo, ne sont pas des rythmes : ce sont des pentes sur de courtes fenêtres, qui varient d'un segment à l'autre. Voici la pente par segment, d'après les relevés archivés de `df` sur `/` (calcul) :
+
+| Segment (UTC) | Durée (s) | Octets utilisés en plus | Équivalent en Mo par jour |
+|---|---|---|---|
+| 09:07:08 → 09:10:08 | 180 | +8 712 192 | 4 182 |
+| 09:10:08 → 09:23:32 | 804 | +5 963 776 | 641 |
+| 09:23:32 → 09:24:51 | 79 | +1 998 848 | 2 186 |
+| 09:24:51 → 09:29:51 | 300 | +2 150 400 | 619 |
+| 09:29:51 → 09:34:34 | 283 | +2 756 608 | 842 |
+| 09:34:34 → 09:48:54 | 860 | +1 466 368 | 147 |
+
+  Sources : `m4b-prealables_taches.log`, `m4b-zot-fs.log`, `m4a-publier-zot-avant.log`, `m4a-publier-zot-apres.log`, `m4b-zot-fs-suivi.log`, `m4b-disque-sc-stockage.log`.
+- Un `df` lu à l'écran à 09:33:42 UTC, non archivé, était plus bas qu'à 09:29:51 UTC (lecture).
+- **Lien avec la brique (lecture) :**
+  - le segment qui contient `essai_tache` (09:16:37 à 09:17:47 UTC, dans 09:10:08 → 09:23:32) n'est pas le plus raide ;
+  - le plus raide, 09:07:08 → 09:10:08, ne contient aucune étape de la brique, seulement des lectures ;
+  - aucun lien net avec l'activité de la brique ne ressort.
+- « Sans écriture de la brique » était trop fort. Les lectures de la brique dans Zot peuvent produire des journaux sur sc-stockage (`/var/log/zot`, Loki, journald). Or `/var/log/journal` est le seul arbre lisible qui grossit.
+- L'attribution reste au propriétaire : `du` en root, en blocs alloués (`-B1`, comparable à `df`), deux fois à au moins une heure d'écart.
+
+**Note de `taches`**
+- « Refusé par l'API, pas par un webhook » : c'est une déduction tirée de la forme du message (« cannot be handled as a Task: strict decoding error »), donc « (lecture) ».
+- « Aucune tâche en service lue jusqu'ici ne déclare des `resources` non vides » est faux. Trois tâches signées en déclarent dans au moins un pas : `construire-image` (08), `construire-builder` et `construire-deb` (06). C'est vérifié dans le dépôt, avec `yq` sur les fichiers `*.signee.yaml`. Ce sont des précédents pour le champ `resources` en v1beta1. Leur effet dans le pod n'a pas été relu ici ; la prédiction pour `rpm` reste à écrire.
+- Les dossiers de banc `banc-taches-signer-1` à `-4` restent sous `~/.cache/supply-chain-poc/05/`. Chacun contient une clé P-256 jetable nommée `taches.key`, distincte de la clé des tâches de la plateforme et jamais utilisée hors du banc.
+- **Journal de `SIGNER=1`** : la seconde passe le réécrirait, car `lancer` écrit les deux passes dans `m4b-taches.log` (cas de S4b, « journal écrasé, puis restauré »). Juste après `SIGNER=1`, le journal est donc copié en `m4b-taches-signer.log` et commité, avant la seconde passe.
