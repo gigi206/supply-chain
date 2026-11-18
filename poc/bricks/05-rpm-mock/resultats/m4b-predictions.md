@@ -433,3 +433,14 @@ Point « à lire avant `taches` » de la note de 22:59:14 UTC le 17/11.
 - Marge : environ ×2,19. Un script substitué jusqu'à 98 168 octets environ resterait sous la borne (calcul, non mesuré).
 
 **Limites.** La mesure est faite par ssh sur l'hôte sc-build, pas dans un pod. Les pods en runc partagent le noyau de l'hôte (lecture), mais `place-scripts` dans un vrai TaskRun n'est pas mesuré : ce sera fait au premier PipelineRun de `rpm`. Le reste de `Args[1]` (préfixe de `place-scripts`, script de débogage) n'est pas lu en entier dans `convertScripts`. Ce point est clos pour la taille, sans bloquer `taches`.
+
+## Note datée du 18/11/2026, écrite à 09:30:06 UTC : heure de la mesure de `script.go`, suivi du disque de sc-stockage
+
+- **Heure corrigée.** La note précédente date la mesure « 09:26:30 à 09:26:37 UTC ». Le journal archivé commence à 09:26:36 UTC, donc le passage archivé va de 09:26:36 à 09:26:37 UTC. Trois passages antérieurs ont eu lieu entre 09:26:20 et 09:26:29 UTC ; ils ne sont pas archivés :
+  - le premier s'est arrêté au chargement de `commun.sh` sous `set -u` ;
+  - le deuxième a construit un argument vide, à cause d'un mauvais échappement ;
+  - le troisième n'avait pas encore la mesure de la borne.
+- **Suivi de `/` sur sc-stockage** ([point de 09:29:51 UTC](m4b-zot-fs-suivi.log)) : 15 548 702 720 octets utilisés, 4 472 213 504 libres.
+  - Depuis le relevé de `prealables_taches` à 09:07:08 UTC : 18 825 216 octets de plus en 1 363 s. Seul `publier` a écrit dans Zot pendant cette fenêtre, deux petits fichiers.
+  - Rythme moyen sur la fenêtre : environ 1.19 Go par jour (calcul). À ce rythme, l'espace libre durerait un peu moins de quatre jours (calcul, non une prédiction).
+  - L'origine n'est pas relevée. Elle est à attribuer avant `rpm`, en commençant par des `du -sx` espacés sur les arbres lisibles sans sudo ; sinon le relevé revient au propriétaire.
