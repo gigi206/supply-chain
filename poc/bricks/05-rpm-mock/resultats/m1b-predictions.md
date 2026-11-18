@@ -26,3 +26,26 @@ Le verdict reste à vérifier avant toute tâche de M1b.
 - Si seuls des fichiers sous `var/` diffèrent, le point 1 A est jugé « neutralisable à mesurer ». Il restera à mesurer un second banc qui retire ou fige ces fichiers, et à vérifier que mock fonctionne encore sans eux.
 - Si des fichiers hors de `var/` diffèrent, je les liste et je ne conclus pas sans relecture. Un écart de la seule mtime d'un répertoire compte comme un écart, puisqu'il entre dans le digest d'une couche.
 - Je ne conclus pas sur les archives sans le témoin RB3t.
+
+## Résultat du passage du 18/11/2026, de 19:44:49 à 19:45:19 UTC, code 0 (note écrite à 2026-11-18T19:46:49Z)
+
+Journaux : [banc](m1b-repro.log), et [analyse en lecture seule des deux arbres](m1b-repro-analyse.log) par [`m1b-repro-analyse.py`](m1b-repro-analyse.py), de 19:45:53 à 19:45:55 UTC. Le dossier `~/.cache/supply-chain-poc/05/m1b-repro-20261118T194449Z` est laissé en place.
+
+- **RB1 tenue** : deux installations hors ligne, chacune en code 0 et en 10 s environ (de 19:44:51 à 19:45:01, puis de 19:45:06 à 19:45:16 UTC). Chacune compte 222 paquets, avec la même liste triée de NEVRA (`42d1b11d…`) et 26 540 entrées des deux côtés. Les scriptlets ont tourné (25 lignes « Running scriptlet » ou assimilées par passage). `dev/null` est devenu un fichier ordinaire dans les deux racines installées, puisque `/dev` est absent.
+- **RB2 tenue** : `INSTALLTIME` de `bash` à 1795031094 puis à 1795031109.
+- **RB3t tenue** : l'arbre 1 archivé deux fois avec les options brutes de `s1.sh` donne `f2dfdcb3…` puis `023bbfd7…`, et avec les options normalisées `287eebe8…` les deux fois. **Les options de la ligne 377 de `s1.sh` ne donnent pas une archive stable, même d'un arbre inchangé.** La couche de la racine de M1b ne pourra pas les reprendre telles quelles.
+- **RB3 tenue** : les archives normalisées des deux arbres diffèrent (`287eebe8…`, `eef303c3…`).
+- **RB4 tenue** : contenu différent pour `var/lib/rpm/rpmdb.sqlite`, `var/lib/dnf/history.sqlite` (et ses fichiers `-shm` et `-wal`), et pour `var/log/dnf.log`, `dnf.librepo.log`, `dnf.rpm.log` et `hawkey.log`. S'y ajoute `var/cache/ldconfig/aux-cache`, qui n'était pas prédit.
+- **RB5 tenue pour le contenu** : aucun fichier sous `usr/` ne diffère par son contenu. **Mais 3332 entrées ont une mtime différente**, sous `usr/` pour la plupart (1182 sous `usr/lib`, 1409 sous `usr/share`). Il y a 2824 répertoires, 326 liens et 172 fichiers ordinaires, dont la mtime tombe chaque fois pendant leur propre transaction.
+- **RB6 tenue** : un fichier hors de `var/` diffère par son contenu, `etc/pki/ca-trust/extracted/java/cacerts`, écrit pendant la transaction (scriptlet ou trigger de `ca-certificates`, déduit du chemin, non lu).
+
+**Lecture, selon la règle écrite d'avance** : des fichiers hors de `var/` diffèrent, par leur contenu (`cacerts`) et par leur mtime (répertoires, liens et fichiers sous `usr/` et `etc/`). Je les liste et **je ne conclus pas sans relecture**. Le point 1 A n'est donc pas établi.
+
+Ce que le banc montre, et rien de plus : sur ces versions, une racine installée par `dnf --installroot` n'est pas reproductible au bit près sans traitement. Les écarts se rangent en trois familles :
+- des mtimes posées pendant la transaction ;
+- des fichiers d'état et des journaux de dnf et de rpm ;
+- deux fichiers générés, `cacerts` et `aux-cache`.
+
+Je n'ai mesuré aucun moyen de les neutraliser, par exemple borner les mtimes à l'archivage, retirer les journaux, ou traiter la base rpm et `cacerts`.
+
+**Portée** : ce sont 222 rpm de vault 9.7, avec rpm 4.16.1.3 et dnf 4.14.0 de l'image d'essai, hors de Kata. Ce n'est pas l'ensemble de l'outillage de M1b, ni dnf de l'amorce 9.8.

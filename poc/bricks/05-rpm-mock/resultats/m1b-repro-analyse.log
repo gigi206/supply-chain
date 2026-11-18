@@ -1,0 +1,16 @@
+# m1b-repro-analyse.py, début 2026-11-18T19:45:53Z, passage m1b-repro-20261118T194449Z
+écarts par type et par nature : fichier contenu 10, fichier mtime 172, lien mtime 326, répertoire mtime 2824
+écarts par préfixe (deux composants) : dev 1, dev/null 1, etc 1, etc/.pwd.lock 1, etc/X11 2, etc/alternatives 5, etc/crypto-policies 20, etc/debuginfod 1, etc/default 1, etc/dnf 4, etc/gdbinit.d 1, etc/groff 2, etc/group 1, etc/group- 1, etc/gshadow 1, etc/gshadow- 1, etc/gss 1, etc/krb5.conf.d 1, etc/ld.so.cache 1, etc/libssh 1, etc/mtab 1, etc/nsswitch.conf 1, etc/openldap 1, etc/pam.d 1, etc/pkcs11 1, etc/pkgconfig 1, etc/pki 460, etc/pm 1, etc/prelink.conf.d 1, etc/profile.d 1, etc/security 1, etc/selinux 1, etc/skel 1, etc/ssl 1, etc/xdg 1, etc/yum.repos.d 1, proc 1, run 1, run/blkid 1, sys 1, usr 1, usr/bin 3, usr/include 70, usr/lib 1182, usr/lib64 93, usr/libexec 9, usr/local 4, usr/sbin 1, usr/share 1409, usr/src 2, var 1, var/cache 6, var/kerberos 2, var/lib 14, var/lock 1, var/log 4, var/run 1, var/spool 1, var/tmp 1
+fichiers ordinaires à seule mtime différente : pendant la transaction 172
+écarts de contenu : 10
+     contenu : etc/pki/ca-trust/extracted/java/cacerts
+     contenu : var/cache/ldconfig/aux-cache
+     contenu : var/lib/dnf/history.sqlite
+     contenu : var/lib/dnf/history.sqlite-shm
+     contenu : var/lib/dnf/history.sqlite-wal
+     contenu : var/lib/rpm/rpmdb.sqlite
+     contenu : var/log/dnf.librepo.log
+     contenu : var/log/dnf.log
+     contenu : var/log/dnf.rpm.log
+     contenu : var/log/hawkey.log
+# fin 2026-11-18T19:45:55Z
