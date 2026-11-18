@@ -601,3 +601,26 @@ Ce tour s'arrête donc avant `SIGNER=1`, comme annoncé. La suite est annoncée 
 - « Aucune tâche en service lue jusqu'ici ne déclare des `resources` non vides » est faux. Trois tâches signées en déclarent dans au moins un pas : `construire-image` (08), `construire-builder` et `construire-deb` (06). C'est vérifié dans le dépôt, avec `yq` sur les fichiers `*.signee.yaml`. Ce sont des précédents pour le champ `resources` en v1beta1. Leur effet dans le pod n'a pas été relu ici ; la prédiction pour `rpm` reste à écrire.
 - Les dossiers de banc `banc-taches-signer-1` à `-4` restent sous `~/.cache/supply-chain-poc/05/`. Chacun contient une clé P-256 jetable nommée `taches.key`, distincte de la clé des tâches de la plateforme et jamais utilisée hors du banc.
 - **Journal de `SIGNER=1`** : la seconde passe le réécrirait, car `lancer` écrit les deux passes dans `m4b-taches.log` (cas de S4b, « journal écrasé, puis restauré »). Juste après `SIGNER=1`, le journal est donc copié en `m4b-taches-signer.log` et commité, avant la seconde passe.
+
+
+## Note datée du 18/11/2026, 2026-11-18T09:59:16Z UTC : `taches` passée en `SIGNER=1`, arrêt pour la revue de `taches.yml`
+
+Passe lancée sous l'accord permanent du 18/11, `m4b.sh` à `8402b2b7…`, de 09:57:50 à 09:57:52 UTC (`chrono.tsv`), code 0. Journal : `m4b-taches-signer.log` (copie de `m4b-taches.log`, que la seconde passe réécrira).
+
+| Prédiction | Mesure | Verdict |
+| --- | --- | --- |
+| TS0 | Relevé avant à 09:57:30 UTC (`m4b-taches-zot-avant.log`, commit `4679c1a`) : les deux dépôts en `NAME_UNKNOWN`, catalogue de 145 | Tenue |
+| TS1 | Liste `95541ee8…` ; `publier-fermeture` lue dans la liste revue, `7fa92ad3…` complet | Tenue |
+| TS2 | Tâche et pipeline admises (code 0) ; témoin refusé, message compté 1 fois | Tenue |
+| TS3 | Sept contrôles de la tâche signée tenus, dont le script substitué `572fb78c…` complet | Tenue |
+| TS4 | « SIGNER : nouvelle signature » ; `fermeture/prefetch-rpm.signee.yaml` conforme au gabarit rendu, signature exceptée ; sha256 du fichier `41235395…` | Tenue |
+| TS5 | Bundle poussé : `tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a` ; « à ajouter » et « pipeline non signée » affichés ; code 0 ; 13 lignes OK | Tenue |
+| TS6 | `$T/auth` absent après la passe (`test -e`, sans lister) | Tenue |
+| TS7 | `kubectl get tasks.tekton.dev,pipelines.tekton.dev -n builds -o name` : code 0, sortie vide | Tenue |
+| TS8 | Relevé après à 09:58:14 UTC (`m4b-taches-zot-apres.log`) : tag `m4b` seul, digest égal à celui de l'étape ; pipeline en `NAME_UNKNOWN` ; catalogue de 146 | Tenue |
+| TS9 | 2 s selon `chrono.tsv` | Tenue |
+
+- **Disque de sc-stockage** : utilisés 15525396480 o avant et 15527145472 o après, soit +1748992 o entre deux df pris à 43 à 46 s d'écart (horodatages des relevés : 09:57:30 à 09:57:31, 09:58:14 à 09:58:16 UTC). L'écart n'est pas attribué : il mêle le bundle et la croissance de fond, jamais attribuée (lecture). Le relevé avant montre 21 155 840 o de moins qu'au relevé après `publier` de 09:24:52 UTC : la place utilisée a aussi baissé entre les deux, cause inconnue.
+- **Bundle poussé avant la revue** : il est dans Zot, absent de la liste revue. La porte et `politique.sh declencheurs` le refusent tant que la liste n'est pas modifiée (lecture, comme en S4a).
+- **Sortie réseau** lue dans le cluster à 2026-11-18T09:59:16Z : `prefetch-rpm-sortie` présente dans `builds`, et `prefetch-rpm` dans le `NotIn` de `builds-sans-internet` (avec `prefetch-gomod` et `prefetch-deb`).
+- **Suite** : l'ajout de `prefetch-rpm@sha256:9afe09db…` à `politique/porte/taches.yml` (08) est proposé au propriétaire. ARRÊT jusqu'à sa revue ; la seconde passe (TP1 à TP3) n'est pas lancée.
