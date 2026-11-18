@@ -28,3 +28,6 @@ premier commit : 2026-11-05T22:24:04Z 196ee34 ; dernier : 2026-11-17T20:24:06Z 8
 # nouveau relevé, même méthode, 2026-11-17T22:38:38Z à HEAD 312efce ; les relevés ci-dessus ne sont pas réécrits
 premier commit : 196ee34 ; dernier : 312efce
 140 commits, 18.83 h
+# nouveau relevé, même méthode (date d auteur, écarts <= 1 h), 2026-11-18T13:47:13Z à HEAD bdbe204, avant la carte de M4c ; contrôle de la méthode : 140 commits, 18.83 h à 312efce, égal au relevé ci-dessus ; les relevés ci-dessus ne sont pas réécrits
+premier commit : 196ee34 ; dernier : bdbe204
+167 commits, 21.93 h
