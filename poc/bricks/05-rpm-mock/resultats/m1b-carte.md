@@ -157,3 +157,10 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 ## Correction à la note du banc de l'outillage (écrite à 2026-11-18T21:03:44Z UTC)
 
 « Les outils de l'amorce comptent donc » dépasse la mesure. Le banc mesure des écarts de langues et de mode avec S1, mais il n'a lu ni l'amorce, ni le umask. La cause reste une hypothèse ([corrections](m1b-predictions.md)).
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T21:09:22Z UTC : outillage sans machine-id
+
+- **Qui l'écrit** : le `%post` de systemd lance `systemd-machine-id-setup`. Le fichier est déclaré `%ghost` (taille 0) : rpm ne livre pas son contenu.
+- **Mesure** : sans ce membre, deux installations de l'outillage faites le même jour donnent la même archive, `05d35d64…`. C'est la référence du 18/11 pour la relance d'un autre jour.
+- **À trancher dans la carte** : faut-il un fichier vide ou un fichier absent ? Ce banc n'a mesuré que l'exclusion.
+- **Détail** : [prédictions et résultat](m1b-predictions.md), [lecture](m1b-machine-id.log), [journal](m1b-sans-machine-id.log).

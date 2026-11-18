@@ -1,0 +1,19 @@
+# m1b-sans-machine-id.sh, début 2026-11-18T21:08:52Z
+## 1. témoin : i5 avec les exclusions du passage (a5.tar du passage : sha256 babac006…)
+t5.tar : 396861440 octets, 15866 membres, sha256 babac0060652f499bda0e8134b7b51dcbfcf6c0f7567248c49df1764e9bf1827
+OK   t5.tar égal à a5.tar du passage
+## 2. sans etc/machine-id
+b5.tar : 396861440 octets, 15865 membres, sha256 05d35d64f09692b13bd08af86b405607bca75c72d359550864fcf89a0321a59a
+b6.tar : 396861440 octets, 15865 membres, sha256 05d35d64f09692b13bd08af86b405607bca75c72d359550864fcf89a0321a59a
+b7.tar : 396861440 octets, 15865 membres, sha256 9f87c36f0a13f13ba9fb83e0daa3ab44b04d74b719d2217623828002d1699ff5
+b5.tar : membres etc/machine-id : 0
+b6.tar : membres etc/machine-id : 0
+b7.tar : membres etc/machine-id : 0
+OK   b5.tar et b6.tar identiques octet à octet
+## 3. b5 contre b7 (installation par fichiers, sans gpg-pubkey)
+membres : 15865 et 15865
+seulement d'un côté : 0 ; présents des deux côtés et différents : 1
+     écart : ./var/lib/rpm/rpmdb.sqlite (sha256)
+champs en cause : sha256 1
+archives laissées dans /home/gigi/.cache/supply-chain-poc/05/m1b-sans-machine-id-20261118T210852Z
+# fin 2026-11-18T21:08:57Z

@@ -644,3 +644,23 @@ Trois formules dépassent la mesure. Elles sont corrigées ici, le texte d'origi
 - le bootstrap.
 
 Le point 1 A reste non établi.
+
+### Résultat du ré-archivage sans `etc/machine-id`, 18/11/2026, de 21:08:52 à 21:08:57 UTC, code 0 (note écrite à 2026-11-18T21:09:22Z UTC)
+
+Journal : [`m1b-sans-machine-id.log`](m1b-sans-machine-id.log). Archives laissées dans `~/.cache/supply-chain-poc/05/m1b-sans-machine-id-20261118T210852Z`.
+
+**MS1 à MS4 tenues.**
+- **MS1** : `t5.tar` a le sha256 de `a5.tar` du passage (`babac006…`, 15 866 membres).
+- **MS2** : `b5`, `b6` et `b7` n'ont aucun membre `./etc/machine-id`. Elles ont 15 865 membres chacune, soit un de moins que `t5`.
+- **MS3** : `b5.tar` et `b6.tar` sont identiques octet à octet, avec le sha256 `05d35d64f09692b13bd08af86b405607bca75c72d359550864fcf89a0321a59a`. **C'est la référence du 18/11 pour l'outillage sans machine-id.**
+- **MS4** : `b7` (`9f87c36f…`) n'a aucun membre d'un seul côté, et un seul membre diffère de `b5` : `var/lib/rpm/rpmdb.sqlite`.
+
+**Lecture** : avec la racine d'outils de `99790c13`, le même jour, deux installations de l'outillage par nom donnent la même archive, dès que `etc/machine-id` en est exclu. L'installation par fichiers, sans gpg-pubkey, ne diffère que par la base rpm.
+
+Restent non mesurés :
+- le choix entre un fichier vide et un fichier absent ;
+- un autre jour (à partir du 19/11) ;
+- les outils de l'amorce (langues, umask) ;
+- le bootstrap.
+
+Le point 1 A reste non établi.
