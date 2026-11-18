@@ -756,3 +756,27 @@ Journal : [`m1b-a10-b5.log`](m1b-a10-b5.log).
 **AB1 tenue.** Les deux archives ont le sha256 de leur journal et diffèrent octet à octet. Elles ont les mêmes 15 865 membres, dont 2 567 sous `usr/share/locale`. Un seul membre commun diffère : `var/lib/dnf`, par son mode.
 
 **Lecture** : sur le banc, une fois la macro de langue masquée et à umask près, les outils de l'amorce et ceux de `99790c13` donnent le même contenu d'archive. Les deux écarts du banc de 20:57:14 UTC avec `racine.tar` (langues et mode de `var/lib/dnf`) viennent donc, sur le banc, de la macro `macros.image-language-conf` et du umask, pas du reste des outils. `container=oci` n'a rien changé au contenu. Le pod Kata n'est pas mesuré, et le point 1 A reste non établi.
+
+### Banc du bootstrap : lecture et prédictions (note écrite à 2026-11-18T21:41:32Z UTC, après relecture du plan par le conseiller, avant le lancement)
+
+**Objet** : le bootstrap de M1b est la base `rockylinux:9.7` (`ee90dc0e`) plus les dix lignes de `verrou_brut` (décision « Dix lignes »). Deux installations faites le même jour, hors réseau, donnent-elles la même archive bornée à S ? Script : [`m1b-boot.sh`](m1b-boot.sh).
+
+**Lecture préalable** :
+- `boot_racine` de S1 a tourné sur l'image d'essai `99790c13`, avec `dnf-3` (pas de `/usr/bin/dnf`). Elle a copié la base par `podman image mount` et `cp -a`, sans `SOURCE_DATE_EPOCH`. Elle a archivé sans borne, en ne retirant que `/w` ([`s1-boot_racine.log`](s1-boot_racine.log)).
+- Les dix rpm ne sont pas en local. Le banc les télécharge depuis vault 9.7 (lecture publique), avec les métadonnées de BaseOS seules ; S1 avait quatre dépôts actifs, et sa transaction n'a tiré que de `baseos97`.
+- La racine d'outils du banc est l'arbre de `a8.tar` (`06c289ad…`, outils de l'amorce, banc de 21:25:17 UTC), plus proche de l'image que la plateforme construira que `99790c13`. Ce choix est noté ici ; il n'est pas mesuré contre `99790c13`.
+- La base n'est pas une racine neuve : ses journaux et son historique de dnf restent dans l'archive. Le premier passage n'exclut donc que `./m`, où dnf place son cache sous `--installroot` (archives `c1`, `c2`). Les archives `x1` et `x2` ajoutent les exclusions du banc de l'outillage. Choisir la liste d'exclusions revient à la carte.
+
+**Prédictions :**
+- **BT1** (réseau) : `repomd.xml` de BaseOS a le sha256 `fa6d5054…` de `hote97` et une signature valide de `21CB256A…`. Les métadonnées sont conformes à `repomd.xml`, et les dix rpm ont le sha256 de `hote97`. Confiance haute : vault 9.7 est figé.
+- **BT2** (outils) : `a8.tar` a le sha256 `06c289ad…`. `/usr/bin/dnf` et `macros.image-language-conf` sont absents de la racine d'outils, umask 022, `%_install_langs` vaut `all`, rpm 4.16.1.3 et dnf-3 4.14.0. `rpm -K` donne 10 sur 10. Confiance moyenne pour `all` : rien n'a lu la macro dans `a8`.
+- **BT3** (base) : la couche `812c4412…` a son sha256. Aucun de ses membres n'a un mtime au-delà de S, et elle n'a aucun `.wh.`. Les deux extractions rendent 0 sans erreur. `rpm -qa` donne 147 lignes, dont une `gpg-pubkey`, comme « racine avant » de S1. S vaut 1766985142. Confiance moyenne : l'extraction des xattrs dans un espace de noms d'utilisateur n'a jamais été mesurée ici.
+- **BT4** (témoin) : `n1` et `n2`, extractions nues archivées, sont identiques octet à octet. Confiance haute.
+- **BT5** (installations) : `dnf-3` rend 0 deux fois. Chaque transaction compte 6 installations et 4 montées. La liste `rpm -qa` (153 lignes) est égale à celle de S1, au format de S1. Confiance moyenne : le miroir n'a qu'un dépôt.
+- **BT6** (témoin) : `c1` et `c1b` sont identiques octet à octet. Confiance haute.
+- **BT7** : `c1` et `c2` diffèrent. Aucun membre n'est d'un seul côté. Tous les membres différents sont dans la liste d'exclusions du banc de l'outillage (journaux de dnf, `history.sqlite*`, `aux-cache`). Confiance moyenne.
+- **BT8** : `x1` et `x2` sont identiques octet à octet. Confiance moyenne : c'est la première mesure d'une transaction sur une base existante.
+- **BT9** (lecture, sans pari sur l'égalité) : `c1` contre `boot-racine.tar` de S1, contenu seul, xattrs compris. Écarts attendus : `rpmdb.sqlite` (S1 sans `SOURCE_DATE_EPOCH`), les journaux de dnf, `history.sqlite*` et `aux-cache`. Le banc relève aussi le nombre de membres sous `usr/share/locale` des deux côtés. Confiance faible.
+- **BT10** (lecture) : `n1` contre `c1` dit ce que la transaction ajoute et change.
+
+**Portée** : la référence ne vaut que pour le 18/11, avec ces outils et ce miroir. Le pod Kata n'est pas mesuré, et le point 1 A reste non établi. Les valeurs à retenir (`en_US`, 022, machine-id, exclusions) reviennent à la carte.

@@ -190,3 +190,9 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **a10 contre b5** (AB1 tenue) : macro de langue masquée et umask mis à part, les outils de l'amorce et ceux de `99790c13` donnent, sur le banc, le même contenu ; seul le mode de `var/lib/dnf` diffère.
 - **Valeurs à retenir** : `en_US` et umask 022 sont les valeurs de S1 ; les garder pour la tâche est un choix de la carte, non mesuré dans le pod Kata.
 - **Autre jour** : relancer `m1b-outil-amorce.sh` (référence `06c289ad…`) et les scripts de `05d35d64…`, inchangés.
+
+## Note datée du 18/11/2026, écrite à 2026-11-18T21:41:32Z UTC : banc du bootstrap, prédictions
+
+- **Banc** : [`m1b-boot.sh`](m1b-boot.sh). La base `ee90dc0e` et les dix lignes sont installées deux fois, hors réseau, avec les outils de `a8` (`dnf-3`, comme S1). Les dix rpm et les métadonnées de BaseOS sont d'abord téléchargés depuis vault 9.7, puis vérifiés.
+- **Prédictions** : BT1 à BT10 ([détail](m1b-predictions.md)), écrites avant le lancement.
+- **Ce n'est pas un accord** pour une écriture dans le cluster ni dans Zot.
