@@ -65,3 +65,27 @@ R4, R6 et R7 ont chacune trois issues : refus, acceptation, non mesuré. Leurs b
 Prédictions PR1 à PR10 inchangées. Relance de `prealables` sous `m5`.
 
 **Erreur de procédure** : la correction a été commitée (`b17168f`) sans cette note, car la commande ne s'arrêtait pas sur l'échec de son script d'écriture (compte de OK faux : 30, et non 33). La note est ajoutée par le commit suivant, avant la relance.
+
+## Note datée du 18/11/2026, écrite à 18:43:41 UTC : `prealables` passée (18:42:14 à 18:43:18 UTC, code 0), PR1 à PR10 tenues
+
+[Journal](m5-prealables.log) : **45 OK, aucun KO**, en 64 s. Rien n'a été créé dans le cluster ni écrit dans Zot.
+
+| # | Résultat |
+|---|---|
+| PR1 | Tenue : 7 copies conformes, source inchangée (`d3a610bb…`) ; `intacte`, `r4`, `r6` passent la confrontation, `r1`, `r2`, `r3`, `r5` refusées avec leur message, comme au banc |
+| PR2 | Tenue : `rpm -i --test` sur R4, code 1, « does not verify: Payload SHA256 ALT digest: BAD » ; cible intacte, code 0 |
+| PR3 | Tenue : `lo` seule, connexion refusée, code 0 |
+| PR4 | Tenue : pipeline exportée de Zot, trois tâches, bundles égaux aux références, les deux dans la liste revue |
+| PR5 | Tenue : paramètres de `preparer` figés, égaux aux références épinglées ; `construire` : `epoque` `1793229566` seule |
+| PR6 | Tenue : `construction-rpm-sans-sortie` comme en M4c ; aucune politique n'autorise de trafic à `construire-rpm` |
+| PR7 | Tenue : aucun objet `m5-*` |
+| PR8 | Tenue : les 13 objets admis à blanc, dont `m5-sans-kata` et les deux pods Kata privilégiés de R7 avec le PVC |
+| PR9 | Tenue : 4 enveloppes valides sur `07b7bd6f…` |
+| PR10 | Tenue : code 0, 64 s |
+
+**Relevés**
+- Classe de stockage par défaut : `local-path` (`rancher.io/local-path`). Nœud de la zone build : `sc-build`, 29 916 549 507 octets de stockage éphémère allouable.
+- Un pod sans label de tâche n'est sélectionné, dans `builds`, que par `builds-sans-internet` (Cilium). Le bras a de R7 doit donc joindre Zot, comme le témoin de N6 de la 06.
+- Les PipelineRuns `m4c-rpm-1` et `m4c-rpm-2` sont gardés.
+
+Suite : écrire les étapes `temoin`, `alterer`, `fermeture`, `reseau`, `sans_kata`, `invariance` et `retirer`, avec leur banc et leurs prédictions, avant tout lancement.

@@ -1,4 +1,4 @@
-# m5.sh prealables, 2026-11-18T18:40:08Z
+# m5.sh prealables, 2026-11-18T18:42:14Z
 ## hôte, hors ligne
 OK   rpm du rootfs de l'image d'outillage (m5-sigmd5.sh) : RPM version 4.16.1.3
 m5-alterer.py 8bc019dc46a7f28f7f9df2915471e17c9ff31e0cd5260a76e9bb555efd6b26bd ; m5-reseau.spec 1dd1ad3ba811137806d99e93949b6afea343cc3dd7db16295e24311d52652750
@@ -59,7 +59,7 @@ OK   paramètres de construire : [{"name":"epoque","value":"1793229566"}]
 politiques de builds : NetworkPolicy builder-sans-sortie, NetworkPolicy construction-deb-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
 OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
 OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
-relevé : politiques de builds qui sélectionnent un pod sans label de tâche : CiliumNetworkPolicy CiliumNetworkPolicy builds-sans-internet
+relevé : politiques de builds qui sélectionnent un pod sans label de tâche : CiliumNetworkPolicy builds-sans-internet
 relevé : classe de stockage par défaut : local-path (rancher.io/local-path)
 relevé : nœuds de la zone build, stockage éphémère allouable : sc-build 29916549507
 OK   objets du jalon déjà présents (TaskRuns, pods, PVC au label poc.test/jalon=m5) : 0
@@ -67,4 +67,19 @@ OK   aucun objet de builds ne porte un nom du jalon
 OK   objets rendus : variables de pipeline restantes : 0
 OK   TaskRuns de construire : runtimeClassName (7 sous Kata, sans-kata sans) : kata kata kata kata kata kata kata -
 OK   pods d'essai de R7 : labels de tâche (a, b) : - construire-rpm
-KO   pods d'essai de R7 : contexte du conteneur, celui du pas signé : {"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0} (attendu : {"privileged":true,"allowPrivilegeEscalation":true,"runAsUser":0,"runAsGroup":0,"runAsNonRoot":false})
+OK   pods d'essai de R7 : contexte du conteneur, celui du pas signé (JSON trié) : {"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0}
+OK   admis à blanc : pvc-m5-entrees.json
+OK   admis à blanc : tr-m5-preparer.json
+OK   admis à blanc : tr-m5-intacte.json
+OK   admis à blanc : tr-m5-r1.json
+OK   admis à blanc : tr-m5-r2.json
+OK   admis à blanc : tr-m5-r3.json
+OK   admis à blanc : tr-m5-r4.json
+OK   admis à blanc : tr-m5-r5.json
+OK   admis à blanc : tr-m5-r6.json
+OK   admis à blanc : tr-m5-sans-kata.json
+OK   admis à blanc : pod-m5-alterer.json
+OK   admis à blanc : pod-m5-reseau-a.json
+OK   admis à blanc : pod-m5-reseau-b.json
+relevé : PipelineRuns de M4c gardés : pipelinerun.tekton.dev/m4c-rpm-1 pipelinerun.tekton.dev/m4c-rpm-2
+OK   enveloppes valides sur l'artefact de M4c (état de départ) : 4
