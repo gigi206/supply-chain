@@ -1,0 +1,7 @@
+# m1b-coherence-refus.sh, début 2026-11-19T14:25:00Z ; m1b-builders.sh 82004de28016ee27… ; dossier /home/gigi/.cache/supply-chain-poc/05/m1b-coherence-refus.kXUZ3l
+contrôle extrait : 12 lignes, sha256 b15fadc4c014de61…
+tel-quel : base amont/rockylinux/rockylinux@sha256:ee90dc0e23c2, couche 812c44127102 : cohérentes
+digest-autre : incohérent : 'amont/rockylinux/rockylinux ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 812c44127102f
+nom-autre : incohérent : 'amont/rockylinux/rockylinux ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 812c44127102f
+couche-autre : incohérent : 'amont/rockylinux/rockylinux ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 812c44127102f
+# fin 2026-11-19T14:25:00Z

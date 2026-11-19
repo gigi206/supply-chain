@@ -1579,3 +1579,20 @@ Journaux sous `m1bt3`, tous à code 0 :
 - Il rend 0.
 - Il affiche « sans base » pour l'outillage, et « base amont/rockylinux/rockylinux@sha256:ee90dc0e23c2, couche 812c44127102 : cohérentes » pour le bootstrap.
 - Les quatre scripts substitués gardent les sha256 de `m1bt3`, puisque les tâches et les valeurs ne changent pas. Les essais de `m1bt3` restent donc valables.
+
+### AN1 : résultat (note écrite à 14:25:24 UTC)
+
+Journal : [`m1b-builders-m1bt4-prealables.log`](m1b-builders-m1bt4-prealables.log), fin à 14:24:43 UTC, code 0.
+
+**AN1 tenue.**
+- Le contrôle donne « sans base » pour l'outillage, et « base amont/rockylinux/rockylinux@sha256:ee90dc0e23c2, couche 812c44127102 : cohérentes » pour le bootstrap.
+- Les quatre scripts substitués gardent les sha256 de `m1bt3` (`a93deebb…`, `912520ea…`, `956e39c2…`, `cad7f550…`). Les essais de `m1bt3` restent donc valables.
+
+**Refus montrés** : [`m1b-coherence-refus.sh`](m1b-coherence-refus.sh), journal [`m1b-coherence-refus.log`](m1b-coherence-refus.log) (14:25:00 UTC). Le contrôle, extrait tel quel de `m1b-builders.sh`, a été joué sur des copies de la pipeline rendue du bootstrap.
+- Sur la copie intacte, il répond « cohérentes ».
+- Il répond « incohérent » sur chacune des trois altérations :
+  - `base.digest` remplacé par `ed654c69…` ;
+  - `base.name` changé ;
+  - `couche` de construire changée.
+
+**Portée** : dans les pipelines que `m1b-builders.sh` rend, l'annotation de base est maintenant égale au manifeste que le prefetch contrôle. La pipeline signée, elle, n'aura ce contrôle qu'à son rendu par ce script. Aucune tâche ne le refait à l'exécution.
