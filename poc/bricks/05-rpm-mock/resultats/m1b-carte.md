@@ -220,3 +220,9 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 ## Note datée du 18/11/2026, écrite à 2026-11-18T21:55:08Z UTC : banc du script de comparaison
 
 - **AJ0 tenue** : sur les dossiers du 18/11, `m1b-autre-jour.sh` retrouve les quatre références (8 OK). La branche « écart » n'est pas exercée. Les relances restent à faire à partir du 19/11 ([détail](m1b-predictions.md), [journal](m1b-autre-jour-banc.log)).
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T00:07:51Z UTC : relances d'un autre jour
+
+- **AJ1 à AJ7 tenues** : les quatre bancs relancés le 19/11 UTC (00:00:38 à 00:06:05) redonnent les quatre références du 18/11 (`05d35d64…`, `06c289ad…`, `0c00666a…`, `28634a12…`), 8 OK sur 8 ([détail](m1b-predictions.md), [journal](m1b-autre-jour.log)).
+- **Intervalle réel** : 140 à 229 min, un autre jour UTC et non 24 h.
+- **Le point 1 A reste non établi** (ni pod Kata, ni autre hôte). Suite : les valeurs de la carte, à décider avec le propriétaire.

@@ -1,0 +1,143 @@
+# m1b-outil-amorce.sh, début 2026-11-19T00:00:38Z
+liste épinglée : 199 rpm, sha256 c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f
+umask de l'hôte (pour mémoire) : 0002
+## 1. clés et miroir partiel
+OK   RPM-GPG-KEY-Rocky-9 : empreinte 21CB256AE16FC54C6E652949702D426D350D275D
+OK   RPM-GPG-KEY-EPEL-9 : empreinte FF8AD1344597106ECE813B918A3872BF3228467C
+miroir copié depuis le banc de 20:57:14 UTC : 222 fichier(s)
+OK   baseos98 : repomd.xml égal à la copie du 18/11 (vault98-baseos98), sha256 abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+OK   baseos98 : signature de repomd.xml valide (21CB256AE16FC54C6E652949702D426D350D275D)
+OK   baseos98 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+OK   appstream98 : repomd.xml égal à la copie du 18/11 (vault98-appstream98), sha256 a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+OK   appstream98 : signature de repomd.xml valide (21CB256AE16FC54C6E652949702D426D350D275D)
+OK   appstream98 : 7 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+OK   epel9 : repomd.xml égal à la copie du 18/11 (archive-9.8), sha256 e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61
+epel9 : repomd.xml non signé (instantané d'EPEL) ; ancre : sha256 de la copie du 18/11 et de la liste épinglée
+OK   epel9 : 5 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+OK   rpm du miroir au sha256 de la liste épinglée : 199, 113665783 octets
+## 2. racine d'outils de l'amorce, témoins, signatures et borne S
+OK   manifeste ed654c69 : sha256 égal
+OK   couche 99c753a880cc : sha256 égal, 87572693 octets
+témoin umask (dans la racine d'outils) : 0022
+témoin umask de i11 : 0002
+témoin %_install_langs (dans la racine d'outils) : [en_US]
+témoin %_install_langs de i10 (macros.image-language-conf masqué) : [all]
+outils : RPM version 4.16.1.3 ; dnf 4.14.0
+     rpm-4.16.1.3-40.el9.x86_64
+     dnf-4.14.0-34.el9_8.rocky.0.1.noarch
+     python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch
+     libsolv-0.7.24-4.el9.x86_64
+     libdnf-0.69.0-18.el9.rocky.0.1.x86_64
+rpm -K : 199 « digests signatures OK » sur 199
+S = 1793914619 (2026-11-05T21:36:59Z)
+## 3. installations
+dnf.conf : sha256 d554fb1ce168663fbfbfaffa175056f049506a2fa33675acb63dedf2969d03cc
+## installation 8 (umask 022, macro de langue masquée : 0), début 2026-11-19T00:00:42Z
+dnf code 0 ; 883 lignes de journal
+lignes « scriptlet », « warning » ou « error » (casse ignorée) : 29
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+## installation 8, fin 2026-11-19T00:01:05Z
+## installation 9 (umask 022, macro de langue masquée : 0), début 2026-11-19T00:01:10Z
+dnf code 0 ; 883 lignes de journal
+lignes « scriptlet », « warning » ou « error » (casse ignorée) : 29
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+## installation 9, fin 2026-11-19T00:01:34Z
+## installation 10 (umask 022, macro de langue masquée : 1), début 2026-11-19T00:01:39Z
+dnf code 0 ; 883 lignes de journal
+lignes « scriptlet », « warning » ou « error » (casse ignorée) : 29
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+## installation 10, fin 2026-11-19T00:02:02Z
+## installation 11 (umask 0002, macro de langue masquée : 0), début 2026-11-19T00:02:07Z
+dnf code 0 ; 883 lignes de journal
+lignes « scriptlet », « warning » ou « error » (casse ignorée) : 29
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+     Importing GPG key 0x350D275D:
+      Userid     : "Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée>"
+      From       : /m/cles/RPM-GPG-KEY-Rocky-9
+## installation 11, fin 2026-11-19T00:02:31Z
+référence : 199 NEVRA hors gpg-pubkey (base de racine.tar)
+i8 : 201 entrée(s), dont 2 gpg-pubkey ; NEVRA égaux à la référence : oui (en plus : 0, en moins : 0)
+i9 : 201 entrée(s), dont 2 gpg-pubkey ; NEVRA égaux à la référence : oui (en plus : 0, en moins : 0)
+i10 : 201 entrée(s), dont 2 gpg-pubkey ; NEVRA égaux à la référence : oui (en plus : 0, en moins : 0)
+i11 : 201 entrée(s), dont 2 gpg-pubkey ; NEVRA égaux à la référence : oui (en plus : 0, en moins : 0)
+## 4. archives bornées à S
+a8.tar : 343930880 octets, 13332 membres, sha256 06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5
+a9.tar : 343930880 octets, 13332 membres, sha256 06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5
+a8b.tar : 343930880 octets, 13332 membres, sha256 06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5
+a10.tar : 396861440 octets, 15865 membres, sha256 d04abddacc75e34ffab1c2bfb7110a5107b73f31879c8a8f9f4f99f743236c8b
+a11.tar : 343930880 octets, 13332 membres, sha256 226e906a9f543b74476d5058ce361b8ad248c21c1892517b17a457f3b508a3e3
+## 4a. i8 et i9
+OK   a8.tar et a9.tar identiques octet à octet
+OK   témoin : a8.tar et a8b.tar identiques octet à octet
+## 4b. contenu seul : a8 contre racine.tar de S1
+membres : a8 13332 ; racine.tar 13341
+a8 : 34 membres sous usr/share/locale, dont 7 fichiers .mo
+racine.tar : 34 membres sous usr/share/locale, dont 7 fichiers .mo
+seulement dans a8 : 0 ; seulement dans racine.tar : 9 ; présents des deux côtés et différents : 4
+     seul dans racine.tar : ./etc/machine-id
+     seul dans racine.tar : ./var/cache/ldconfig/aux-cache
+     seul dans racine.tar : ./var/lib/dnf/history.sqlite
+     seul dans racine.tar : ./var/lib/dnf/history.sqlite-shm
+     seul dans racine.tar : ./var/lib/dnf/history.sqlite-wal
+     seul dans racine.tar : ./var/log/dnf.librepo.log
+     seul dans racine.tar : ./var/log/dnf.log
+     seul dans racine.tar : ./var/log/dnf.rpm.log
+     seul dans racine.tar : ./var/log/hawkey.log
+     écart : ./etc/pki/ca-trust/extracted/java/cacerts (sha256)
+     écart : ./etc/shadow (sha256)
+     écart : ./etc/shadow- (sha256)
+     écart : ./var/lib/rpm/rpmdb.sqlite (sha256)
+champs en cause : sha256 4
+## 4c. témoin de langue : a10 (macro masquée) contre a8
+membres : a10 15865 ; a8 13332
+a10 : 2567 membres sous usr/share/locale, dont 1157 fichiers .mo
+a8 : 34 membres sous usr/share/locale, dont 7 fichiers .mo
+seulement dans a10 : 2533 ; seulement dans a8 : 0 ; présents des deux côtés et différents : 1
+     seul dans a10 : ./usr/share/locale/aa
+     seul dans a10 : ./usr/share/locale/aa/LC_MESSAGES
+     seul dans a10 : ./usr/share/locale/ab
+     seul dans a10 : ./usr/share/locale/ab/LC_MESSAGES
+     seul dans a10 : ./usr/share/locale/ace
+     seul dans a10 : ./usr/share/locale/ace/LC_MESSAGES
+     seul dans a10 : ./usr/share/locale/ach
+     seul dans a10 : ./usr/share/locale/ach/LC_MESSAGES
+     seul dans a10 : ./usr/share/locale/ada
+     seul dans a10 : ./usr/share/locale/ada/LC_MESSAGES
+     seul dans a10 : ./usr/share/locale/ady
+     seul dans a10 : ./usr/share/locale/ady/LC_MESSAGES
+     seul dans a10 : ./usr/share/locale/ae
+     seul dans a10 : ./usr/share/locale/ae/LC_MESSAGES
+     seul dans a10 : ./usr/share/locale/af
+     seul dans a10 : ./usr/share/locale/af/LC_MESSAGES
+     seul dans a10 : ./usr/share/locale/af/LC_MESSAGES/Linux-PAM.mo
+     seul dans a10 : ./usr/share/locale/af/LC_MESSAGES/bash.mo
+     seul dans a10 : ./usr/share/locale/af/LC_MESSAGES/coreutils.mo
+     seul dans a10 : ./usr/share/locale/af/LC_MESSAGES/glib20.mo
+     écart : ./var/lib/rpm/rpmdb.sqlite (sha256)
+champs en cause : sha256 1
+## 4d. témoin de umask : a11 (umask 0002) contre a8
+membres : a11 13332 ; a8 13332
+a11 : 34 membres sous usr/share/locale, dont 7 fichiers .mo
+a8 : 34 membres sous usr/share/locale, dont 7 fichiers .mo
+seulement dans a11 : 0 ; seulement dans a8 : 0 ; présents des deux côtés et différents : 1
+     écart : ./var/lib/dnf (mode)
+champs en cause : mode 1
+arbres et archives laissés dans /home/gigi/.cache/supply-chain-poc/05/m1b-outil-amorce-20261119T000038Z
+# fin 2026-11-19T00:02:38Z

@@ -885,3 +885,21 @@ Journal : [`m1b-autre-jour-banc.log`](m1b-autre-jour-banc.log). Lancé sur les q
 - `b1` et `b2` sont en 775 des deux côtés. Le umask du shell de lancement est 0002.
 
 **Portée.** Le script retrouve les références sur les arbres du 18/11. **La branche « écart »**, qui appelle `m1b-repro2-comparer.py`, **n'a pas été exercée**. Le comparateur lui-même a déjà servi dans les bancs précédents. Aucun autre jour n'est mesuré. Les ré-archives de ce banc restent dans `~/.cache/supply-chain-poc/05/m1b-autre-jour-20261118T215436Z` (environ 800 Mo d'après les tailles du journal).
+
+### Résultat des relances d'un autre jour (AJ1 à AJ7), 19/11/2026, de 00:00:38 à 00:06:27 UTC (note écrite à 2026-11-19T00:07:51Z UTC)
+
+Journaux : [`m1b-outil-amorce-j2.log`](m1b-outil-amorce-j2.log), [`m1b-boot-j2.log`](m1b-boot-j2.log), [`m1b-outil-j2.log`](m1b-outil-j2.log), [`m1b-repro3-j2.log`](m1b-repro3-j2.log), [`m1b-autre-jour.log`](m1b-autre-jour.log). Les quatre bancs sont relancés sans modification, dans l'ordre prévu, chacun dans un dossier neuf daté du 19/11 UTC.
+
+**AJ1 à AJ7 tenues.**
+- **AJ1** : les quatre journaux sont datés du 19/11 UTC et finissent par leur ligne « # fin » (00:02:38, 00:03:02, 00:05:04, 00:06:05 UTC) : code 0.
+- **AJ2** : les trois `repomd.xml` (baseos98, appstream98, epel9) sont égaux aux copies du 18/11. La signature de vault est valide (`21CB256A…`). Les métadonnées sont conformes à `repomd.xml`.
+- **AJ3** : `repomd.xml` de vault 9.7 vaut `fa6d5054…`, et les dix rpm ont les sha256 de `s1-hote97.log`. Comme le 18/11, ce banc relit vault 9.7 par le réseau.
+- **AJ4** : `S = 1793914619`. `b5` et `b6` ré-archivés valent `05d35d64…` (396 861 440 octets, 15 865 membres).
+- **AJ5** : `a8` et `a9` valent `06c289ad…`.
+- **AJ6** : `a3` et `a4` valent `0c00666a…`. Le banc voit bien un autre jour : « jour du passage » 20776, contre 20775 le 18/11 ; S est inchangée.
+- **AJ7** : umask 0002 au lancement, `b1` et `b2` en 775 comme le 18/11 ; `x1` et `x2` valent `28634a12…`.
+- 8 « OK » sur 8, aucun « ÉCART ». Les lignes OK et ÉCART des quatre journaux `-j2` sont celles du 18/11, y compris les écarts attendus (`a5`/`a6` avant exclusion de machine-id, `c1`/`c2`).
+
+**Intervalles mesurés** (imprimés par le script, entre horodatages des dossiers) : 140 min (bootstrap), 155 min (amorce), 185 min (outils de 99790c13), 229 min (troisième banc). **C'est un autre jour UTC, pas 24 h d'écart.**
+
+**Portée.** Sur ce banc, cet hôte, ces outils et ces sources figées, deux jours UTC à 140 à 229 min d'écart donnent les mêmes quatre archives. Rien n'est mesuré dans le pod Kata ni sur un autre hôte, ni à un écart de plusieurs jours. La branche « écart » de `m1b-autre-jour.sh` n'est toujours pas exercée. **Le point 1 A reste non établi.** Viennent ensuite les valeurs de la carte : `en_US` ou toutes les langues, umask 022, machine-id vide ou absent, liste d'exclusions, mode de la racine. Les dossiers neufs restent dans `~/.cache/supply-chain-poc/05/` ; rien n'est supprimé.
