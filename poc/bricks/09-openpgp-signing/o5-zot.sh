@@ -23,6 +23,12 @@ CLE_CHAINS=$TOP/poc/bricks/08-trust-plane/resultats/chains-cle-publique.pem
 W=$HOME/.cache/supply-chain-poc/09/o5-zot
 ORAS=$(cd "$TOP" && mise which oras)
 COSIGN=$(cd "$TOP" && mise which cosign)
+# compte_zot (décision « Oui, signes/** » du 19/11/2026) : mot de passe et ligne htpasswd de poc-lien, sur l'hôte, sans réseau,
+# comme replay.sh compte_zot (brique 10) ; la brique 08 ne lira que la ligne htpasswd (A-REPORTER §4 quinquies).
+S9=$HOME/.cache/supply-chain-poc/09/secrets
+if [ -n "${BANC:-}" ]; then R=$BANC/resultats; S9=$BANC/secrets9; mkdir -p "$R"; fi
+MDP=$S9/zot-poc-lien.password
+HTP=$S9/zot-poc-lien.htpasswd
 
 masquer() { sed -E 's/<[^>]*@[^>]*>/<adresse retirée>/g; s/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+/<adresse retirée>/g; /jeton|token/I c\[ligne masquée : motif jeton|token]'; }
 ko() { echo "KO   $*"; }
@@ -71,8 +77,49 @@ etape_lecture() {
   echo "à effacer après archivage (chemin littéral) : $W"
 }
 
+etape_compte_zot() {
+  set +e
+  local h s
+  [ -d "$S9" ] || { ko "dossier 09/secrets absent"; return 1; }
+  [ ! -e "$MDP" ] && [ ! -e "$HTP" ] && echo "OK   mot de passe et ligne htpasswd de poc-lien absents de 09/secrets" \
+    || { ko "mot de passe ou ligne htpasswd de poc-lien déjà présent : rien n'est écrasé"; return 1; }
+  echo "     mkpasswd : $(command -v mkpasswd) ; $(dpkg-query -W -f '${Package} ${Version}' whois 2>/dev/null || echo 'paquet whois non relevé')"
+  (umask 077 && openssl rand -hex 24 | tr -d '\n' > "$MDP")
+  grep -qxE '[0-9a-f]{48}' "$MDP" && echo "OK   mot de passe : 48 caractères hexadécimaux (openssl rand -hex 24), jamais affiché" \
+    || { ko "mot de passe de forme inattendue"; return 1; }
+  h=$(mkpasswd -m bcrypt -R 12 -s < "$MDP")
+  case $h in '$2b$12$'*) ;; *) ko "hash bcrypt inattendu"; return 1 ;; esac
+  (umask 077 && printf 'poc-lien:%s\n' "$h" > "$HTP")
+  h=
+  grep -qxE 'poc-lien:\$2b\$12\$[./A-Za-z0-9]{53}' "$HTP" \
+    && echo "OK   ligne htpasswd conforme au motif proposé pour stockage.sh (poc-lien, bcrypt, coût 12)" || ko "ligne htpasswd non conforme"
+  s=$(cut -c17-38 "$HTP")   # sel bcrypt (22 caractères après « poc-lien:$2b$12$ »)
+  [ "poc-lien:$(mkpasswd -m bcrypt -R 12 -S "$s" -s < "$MDP")" = "$(cat "$HTP")" ] \
+    && echo "OK   hash recalculé depuis le mot de passe avec le même sel : égal à la ligne htpasswd" || ko "hash recalculé différent"
+  s=
+  [ "$(stat -c %a "$MDP")" = 600 ] && [ "$(stat -c %a "$HTP")" = 600 ] \
+    && echo "OK   modes : zot-poc-lien.password 600, zot-poc-lien.htpasswd 600" || ko "modes inattendus"
+  echo "     suite : la session principale ajoute le bloc du §4 quinquies d'A-REPORTER à stockage.sh et l'entrée signes/** à zot.json, puis redémarre Zot"
+}
+
 e=${1:-}
 case "$e" in
+  compte_zot)
+    L=$R/o5-zot-$e.log
+    set +e
+    (umask 077 && : > "$L")
+    { echo "étape $e commencée : $(date -u '+%Y-%m-%dT%H:%M:%SZ') ; o5-zot.sh $(sha256sum < "$here/o5-zot.sh" | cut -c1-16)…${BANC:+ ; BANC}"
+      "etape_$e"; echo "étape $e finie : $(date -u '+%Y-%m-%dT%H:%M:%SZ')"; } 2>&1 | masquer >> "$L"; rc=${PIPESTATUS[0]}
+    # contrôles avant tout affichage : ni le mot de passe ni le hash dans le journal
+    n=0
+    [ -s "$MDP" ] && n=$(grep -c -F -f "$MDP" "$L" || true)
+    [ -s "$HTP" ] && [ "$n" = 0 ] && n=$(cut -d: -f2 "$HTP" | grep -c -F -f - "$L" || true)
+    if [ "$n" != 0 ]; then : > "$L"; echo "KO   K6 : mot de passe ou hash de poc-lien dans le journal : journal vidé" > "$L"; chmod 644 "$L"; cat "$L"; exit 1; fi
+    echo "OK   K6 : ni le mot de passe ni le hash de poc-lien dans le journal" >> "$L"
+    k=$(grep -c '^KO' "$L" || true)
+    [ "$k" = 0 ] || { echo "bilan : $k ligne(s) KO" >> "$L"; rc=1; }
+    chmod 644 "$L"; cat "$L"
+    exit "$rc" ;;
   lecture)
     L=$R/o5-zot-$e.log
     set +e
@@ -85,5 +132,5 @@ case "$e" in
     [ "$k" = 0 ] || { echo "bilan : $k ligne(s) KO" >> "$L"; rc=1; }
     cat "$L"
     exit "$rc" ;;
-  *) echo "usage : $0 lecture" >&2; exit 64 ;;
+  *) echo "usage : $0 lecture | compte_zot" >&2; exit 64 ;;
 esac

@@ -88,3 +88,25 @@ Aucun autre compte n'écrit dans `signes/**`, et `poc-lien` n'écrit nulle part 
 7. **Premier contact avec OpenBao par cosign.** Ce sera une lecture seule : `cosign public-key --key hashivault://lien`, comparée à `lien-cle-publique.pem`. On ne sait pas si le client hashivault fonctionne sans la politique `default`, par exemple s'il consulte son propre jeton, ce qu'E8 refuse.
 8. **Témoins.** `poc-lien` ne peut rien supprimer : tout objet d'essai (`signes/essai-09`, témoins faux) **reste dans Zot**. Les témoins faux sont signés par une clé cosign jetable. Ils sont vérifiés avec cette clé jetable, pour que ce soit le contrôle indépendant, et non cosign, qui les refuse.
 9. **Redirection de port vers OpenBao.** Elle ouvre un nouveau chemin de l'hôte vers le plan de confiance. **Elle relève d'un accord à part**, demandé après celui-ci ; rien n'est lancé vers OpenBao d'ici là.
+
+## Décision datée du 19/11/2026, 20:08:20 UTC : espace `signes/**`
+
+Question posée : « Publier les objets d'O5 dans un espace signes/** à part, plutôt que dans builds/** ? ». Réponse du propriétaire, reçue avant l'heure ci-dessus : « Oui, signes/** ».
+
+Le §2 est retenu tel quel. La suite, dans cet ordre :
+1. **`compte_zot`**, préparé et passé par la brique 09 : sur l'hôte, sans réseau, il écrit le mot de passe et la ligne htpasswd dans `09/secrets`.
+2. **Application par la session principale** : §4 quinquies d'`A-REPORTER.md`, puis redémarrage de Zot.
+3. **`droits_zot`**, par la brique 09.
+4. **Accord à part** pour la redirection de port vers OpenBao.
+
+## Prédictions de `compte_zot`, écrites le 19/11/2026 à 20:09:35 UTC, avant tout lancement
+
+Étape `compte_zot` d'[`o5-zot.sh`](../o5-zot.sh), sur l'hôte, sans réseau, sur le modèle de `replay.sh compte_zot` (brique 10). Rien ne touche Zot.
+
+**Banc** ([o5-zot-compte-banc.sh](../o5-zot-compte-banc.sh), dossier jetable) : 9 OK, 0 KO à 20:09:21 UTC ([journal](o5-zot-compte-banc.log)). Un passage précédent, à 20:09:12 UTC, donnait aussi 9 OK, mais affichait le journal de la relance au lieu du journal nominal. Seul l'affichage a été corrigé, et ce journal a été remplacé.
+
+| N° | Prédiction | Confiance |
+|---|---|---|
+| CZ1 | `09/secrets` existe, sans `zot-poc-lien.password` ni `zot-poc-lien.htpasswd` | haute |
+| CZ2 | Mot de passe de 48 caractères hexadécimaux, ligne `poc-lien:$2b$12$…` conforme au motif proposé pour `stockage.sh`, hash recalculé égal avec le même sel, modes 600 | haute : même outil (`mkpasswd` de whois 5.6.6) que la 08 et la 10 |
+| K6 | Ni le mot de passe ni le hash dans le journal ; aucune ligne KO ; code 0 | haute |
