@@ -1,0 +1,23 @@
+# ligne-vide.sh, début 2026-11-19T00:10:32Z ; dossier /home/gigi/.cache/supply-chain-poc/dep-helmfile-20261119T000950Z
+## cilium : en-têtes de diff (ref masquée contre helmfile masqué)
+1640a1641
+ligne ajoutée n° 1641 sur 1641 ; contexte dans la sortie de helmfile (clés seules, valeurs masquées) :
+ 1639 |         configMap:
+ 1640 |           name: <valeur masquée>
+ 1641 | 
+octets : ref 47769, helmfile 47770 ; helmfile sans sa ligne 1641 égal à ref : oui
+## rke2-coredns : en-têtes de diff (ref masquée contre helmfile masqué)
+424a425
+ligne ajoutée n° 425 sur 425 ; contexte dans la sortie de helmfile (clés seules, valeurs masquées) :
+  423 |             - key: <valeur masquée>
+  424 |               path: <valeur masquée>
+  425 | 
+octets : ref 12180, helmfile 12181 ; helmfile sans sa ligne 425 égal à ref : oui
+## rke2-metrics-server : en-têtes de diff (ref masquée contre helmfile masqué)
+269a270
+ligne ajoutée n° 270 sur 270 ; contexte dans la sortie de helmfile (clés seules, valeurs masquées) :
+  268 |   version: <valeur masquée>
+  269 |   versionPriority: <valeur masquée>
+  270 | 
+octets : ref 7630, helmfile 7631 ; helmfile sans sa ligne 270 égal à ref : oui
+# fin 2026-11-19T00:10:32Z

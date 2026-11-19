@@ -34,7 +34,7 @@ for k in 1 2; do
   ns "$HELM" template rke2-metrics-server "$CHART_METRICS" --namespace kube-system > "$W/ref/rke2-metrics-server.$k"
 done
 for n in cilium rke2-coredns rke2-metrics-server; do
-  if cmp -s "$W/ref/$n.1" "$W/ref/$n.2"; then echo "OK   témoin $n : deux rendus identiques"; else echo "INSTABLE $n : $(diff "$W/ref/$n.1" "$W/ref/$n.2" | grep -c '^[<>]') lignes diffèrent entre deux helm template ; 6 premières (valeurs masquées) :"; diff "$W/ref/$n.1" "$W/ref/$n.2" | grep '^[<>]' | head -6 | sed -E 's/(: ).*/\1<valeur masquée>/' | cut -c1-120; fi
+  if cmp -s "$W/ref/$n.1" "$W/ref/$n.2"; then echo "OK   témoin $n : deux rendus identiques"; else echo "INSTABLE $n : $(diff "$W/ref/$n.1" "$W/ref/$n.2" | grep -c '^[<>]') lignes diffèrent entre deux helm template ; 6 premières (valeurs masquées) :"; diff "$W/ref/$n.1" "$W/ref/$n.2" | grep '^[<>]' | head -6 | sed -E 's/(: ).*/\1<valeur masquée>/' | cut -c1-120 || true; fi
   cp "$W/ref/$n.1" "$W/ref/$n.yaml"
 done
 for n in cilium rke2-coredns rke2-metrics-server; do echo "ref $n : $(wc -l < "$W/ref/$n.yaml") lignes, sha256 $(sha256sum < "$W/ref/$n.yaml" | cut -c1-16)"; done
@@ -44,8 +44,19 @@ for n in cilium rke2-coredns rke2-metrics-server; do
   echo "helmfile $n : code $rc ; $(wc -l < "$W/hf/$n.yaml") lignes, sha256 $(sha256sum < "$W/hf/$n.yaml" | cut -c1-16) ; stderr : $(wc -l < "$W/hf/$n.err") lignes"
   sed -E 's/[0-9a-f]{40,}/<hex>/g' "$W/hf/$n.err" | head -5 | sed 's/^/   stderr : /'
   if cmp -s "$W/ref/$n.yaml" "$W/hf/$n.yaml"; then echo "OK   $n : sortie identique octet pour octet à helm template"
-  else echo "ÉCART $n : $(diff "$W/ref/$n.yaml" "$W/hf/$n.yaml" | grep -c '^[<>]') lignes différentes ; 10 premières (valeurs masquées) :"; diff "$W/ref/$n.yaml" "$W/hf/$n.yaml" | grep '^[<>]' | head -10 | sed -E 's/(: ).*/\1<valeur masquée>/' | cut -c1-120
+  else echo "ÉCART $n : $(diff "$W/ref/$n.yaml" "$W/hf/$n.yaml" | grep -c '^[<>]') lignes différentes ; 10 premières (valeurs masquées) :"; diff "$W/ref/$n.yaml" "$W/hf/$n.yaml" | grep '^[<>]' | head -10 | sed -E 's/(: ).*/\1<valeur masquée>/' | cut -c1-120 || true
     cmp -s "$W/ref/$n.1" "$W/ref/$n.2" || echo "     ($n est instable entre deux helm template : écart à juger hors des objets instables)"; fi
+done
+# ajout du 19/11/2026, après le premier passage (essai-helmfile-1.log) : Cilium génère des certificats à chaque rendu. Comparaison
+# des rendus avec les valeurs des seules clés ca.crt, ca.key, tls.crt et tls.key remplacées par un repère, témoin compris.
+echo "## comparaison hors certificats générés (valeurs de ca.crt, ca.key, tls.crt, tls.key remplacées)"
+mq() { sed -E 's/^( *)(ca\.crt|ca\.key|tls\.crt|tls\.key): .*/\1\2: <certificat>/' "$1"; }
+for n in cilium rke2-coredns rke2-metrics-server; do
+  mq "$W/ref/$n.1" > "$W/ref/$n.m1"; mq "$W/ref/$n.2" > "$W/ref/$n.m2"; mq "$W/hf/$n.yaml" > "$W/hf/$n.m"
+  echo "$n : lignes remplacées $(diff "$W/ref/$n.1" "$W/ref/$n.m1" | grep -c '^>' || true)"
+  if cmp -s "$W/ref/$n.m1" "$W/ref/$n.m2"; then echo "OK   témoin $n hors certificats : deux rendus identiques"; else echo "INSTABLE $n hors certificats : $(diff "$W/ref/$n.m1" "$W/ref/$n.m2" | grep -c '^[<>]' || true) lignes"; fi
+  if cmp -s "$W/ref/$n.m1" "$W/hf/$n.m"; then echo "OK   $n hors certificats : helmfile identique à helm template"
+  else echo "ÉCART $n hors certificats : $(diff "$W/ref/$n.m1" "$W/hf/$n.m" | grep -c '^[<>]' || true) lignes ; 10 premières (valeurs masquées) :"; diff "$W/ref/$n.m1" "$W/hf/$n.m" | grep '^[<>]' | head -10 | sed -E 's/(: ).*/\1<valeur masquée>/' | cut -c1-120 || true; fi
 done
 echo "## taille : helmfile.yaml contre les appels qu'il remplacerait"
 echo "helmfile.yaml.gotmpl : $(grep -vc '^#' "$here/helmfile.yaml.gotmpl") lignes hors commentaires ; appels helm upgrade --install des scripts : rke2.sh l. 166 à 169, cilium.sh $(grep -cE '\bhelm (upgrade|install)' "$r/poc/bricks/08-trust-plane/cilium.sh")"

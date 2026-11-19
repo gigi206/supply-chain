@@ -194,3 +194,24 @@ Journal : [`essai-helmfile-lecture.log`](resultats/essai-helmfile-lecture.log), 
 ### Accord d'installation de helmfile (2026-11-18T23:31:27Z)
 
 « Oui, après relances », en réponse à « J'ajoute helmfile 1.8.4 à mise.toml après les relances ? ». helmfile 1.8.4 sera ajouté à `mise.toml` et `mise.lock`, et son attestation revérifiée, **une fois finis** les quatre relances du 19/11 et `m1b-autre-jour.sh`. L'essai `essai.sh` passera ensuite, dans un journal neuf.
+
+### Résultat de l'essai helmfile (19/11/2026, de 00:08:47 à 00:10:32 UTC ; note écrite à 2026-11-19T00:11:19Z UTC)
+
+Journaux : [`essai-helmfile-installation.log`](resultats/essai-helmfile-installation.log), [`essai-helmfile-1.log`](resultats/essai-helmfile-1.log) (premier passage, arrêté), [`essai-helmfile.log`](resultats/essai-helmfile.log), [`essai-helmfile-ligne-vide.log`](resultats/essai-helmfile-ligne-vide.log).
+
+**Installation.** helmfile 1.8.4 a été ajouté à `mise.toml` et verrouillé dans `mise.lock` (`provenance = "github-attestations"`), puis installé par mise. [`installation.sh`](essai-helmfile/installation.sh) a retéléchargé la release à part :
+- somme `1f19ced8…` du tarball égale à `checksums.txt` et à `mise.lock` ;
+- `gh attestation verify` valide pour `releaser.yaml@refs/tags/v1.8.4`, commit `119a9eff…`, celui du tag dans `sante.log` ;
+- binaire installé par mise identique à celui du tarball vérifié.
+
+**Premier passage arrêté (défaut du script).** Avec `pipefail`, le `diff` de la branche « INSTABLE » rendait le code 1 et arrêtait `essai.sh` juste après le témoin de Cilium. Correctif : `|| true` sur les deux `diff` affichés. Ce passage a quand même montré que Cilium est instable entre deux `helm template`. **Ajout fait après l'avoir vu** : une comparaison où seules les valeurs de `ca.crt`, `ca.key`, `tls.crt` et `tls.key` sont remplacées par un repère, témoin compris. `ligne-vide.sh` localise ensuite l'écart ; son premier lancement visait le mauvais dossier, le second avait le même défaut de `pipefail`. Ces deux journaux sont écartés, non commités.
+
+**Prédictions.**
+- **HE0 tenue** : CoreDNS et metrics-server donnent deux rendus identiques. Cilium non : 10 lignes diffèrent, soit 5 certificats et clés régénérés à chaque rendu (`ca.crt`, `ca.key`, `tls.crt`, `tls.key`). Hors de ces 5 valeurs, les deux rendus de Cilium sont identiques.
+- **HE1 tenue** : somme dans `checksums.txt` et attestation valide pour `releaser.yaml`.
+- **HE2 tenue** : `helmfile template` rend le code 0 pour les trois releases. Aucun greffon n'est vu, ni avant ni après (`HELM_PLUGINS` vide).
+- **HE3 tenue** : les trois rendus passent sans réseau (`unshare -n`, `--skip-deps`).
+- **HE4 non tenue au sens strict.** Chaque sortie de helmfile a **une ligne de plus, une ligne vide finale** (1 octet). Sans elle, la sortie est identique à `helm template` pour CoreDNS et metrics-server, et pour Cilium hors des 5 valeurs régénérées. Aucune étiquette ni aucun argument ajoutés n'est vu. La cause de la ligne vide n'est pas lue dans le code.
+- **HE5** : `helmfile.yaml.gotmpl` fait 17 lignes hors commentaires, pour les trois releases d'`etape_rendu`. La portée corrigée le 18/11 tient : les arguments des installations réelles (`--server-side`, `--wait`, la couche de la 08c, `--reset-values`) n'y sont pas.
+
+**Portée.** Seul le rendu est mesuré, sur cet hôte et sans cluster. `apply` et `diff` exigent `helm-diff`, non audité, et ne sont pas essayés. La décision « Garder les scripts » du 18/11 ne change pas : l'essai répond seulement à la question du rendu. helmfile reste installé par mise (dans `~/.local/share/mise/installs`). Les dossiers de travail restent dans `~/.cache/supply-chain-poc/`.

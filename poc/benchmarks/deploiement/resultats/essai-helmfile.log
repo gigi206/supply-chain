@@ -1,0 +1,67 @@
+greffons Helm de l'hôte avant isolement (helm plugin list) :
+  NAME    	VERSION	TYPE     	APIVERSION	PROVENANCE	SOURCE 
+  diff    	3.11.0 	cli/v1   	legacy    	unknown   	unknown
+  helm-git	1.3.0  	getter/v1	legacy    	unsigned  	unknown
+  secrets 	4.6.3  	getter/v1	legacy    	unknown   	unknown
+# essai.sh (helmfile), début 2026-11-19T00:09:50Z ; dossier /home/gigi/.cache/supply-chain-poc/dep-helmfile-20261119T000950Z
+helm : /home/gigi/.local/share/mise/installs/aqua-helm-helm/4.3.1/linux-amd64/helm v4.3.1+gc0d08d0 ; helmfile : /home/gigi/.local/share/mise/installs/aqua-helmfile-helmfile/1.8.4/helmfile 1.8.4
+greffons Helm vus avec HELM_PLUGINS vide : []
+entrée cilium-1.20.4.tgz : sha256 505abff8385811df
+entrée rke2-coredns-1.47.102.tgz : sha256 2ce253185dab4580
+entrée rke2-metrics-server-3.14.001.tgz : sha256 8dbc13c9d3d25ba7
+entrée valeurs-cilium.yaml : sha256 0958141c92d790df
+entrée valeurs-coredns.yaml : sha256 a89bff38ec812e2d
+entrée helmfile.yaml.gotmpl : sha256 d67b1276cc37bff4
+## références : helm template, comme rke2.sh (sans réseau), rendues deux fois (témoin de stabilité)
+INSTABLE cilium : 10 lignes diffèrent entre deux helm template ; 6 premières (valeurs masquées) :
+<   ca.crt: <valeur masquée>
+<   ca.key: <valeur masquée>
+>   ca.crt: <valeur masquée>
+>   ca.key: <valeur masquée>
+<   ca.crt: <valeur masquée>
+<   tls.crt: <valeur masquée>
+OK   témoin rke2-coredns : deux rendus identiques
+OK   témoin rke2-metrics-server : deux rendus identiques
+ref cilium : 1640 lignes, sha256 9df649c668cdc0a7
+ref rke2-coredns : 424 lignes, sha256 651ed4ad706d53d3
+ref rke2-metrics-server : 269 lignes, sha256 35d9d3c0f822b8a7
+## helmfile template, une release à la fois (sans réseau, sans greffon)
+helmfile cilium : code 0 ; 1641 lignes, sha256 2b080a9238471909 ; stderr : 1 lignes
+   stderr : Templating release=cilium, chart=/home/gigi/.cache/supply-chain-poc/08/telechargements/cilium/cilium-1.20.4.tgz
+ÉCART cilium : 11 lignes différentes ; 10 premières (valeurs masquées) :
+<   ca.crt: <valeur masquée>
+<   ca.key: <valeur masquée>
+>   ca.crt: <valeur masquée>
+>   ca.key: <valeur masquée>
+<   ca.crt: <valeur masquée>
+<   tls.crt: <valeur masquée>
+<   tls.key: <valeur masquée>
+>   ca.crt: <valeur masquée>
+>   tls.crt: <valeur masquée>
+>   tls.key: <valeur masquée>
+     (cilium est instable entre deux helm template : écart à juger hors des objets instables)
+helmfile rke2-coredns : code 0 ; 425 lignes, sha256 0512cfc685721c00 ; stderr : 1 lignes
+   stderr : Templating release=rke2-coredns, chart=/home/gigi/.cache/supply-chain-poc/08b/telechargements/rke2-coredns-1.47.102.tgz
+ÉCART rke2-coredns : 1 lignes différentes ; 10 premières (valeurs masquées) :
+> 
+helmfile rke2-metrics-server : code 0 ; 270 lignes, sha256 bb5ab8258ff43ece ; stderr : 1 lignes
+   stderr : Templating release=rke2-metrics-server, chart=/home/gigi/.cache/supply-chain-poc/08b/telechargements/rke2-metrics-server-3.14.001.tgz
+ÉCART rke2-metrics-server : 1 lignes différentes ; 10 premières (valeurs masquées) :
+> 
+## comparaison hors certificats générés (valeurs de ca.crt, ca.key, tls.crt, tls.key remplacées)
+cilium : lignes remplacées 5
+OK   témoin cilium hors certificats : deux rendus identiques
+ÉCART cilium hors certificats : 1 lignes ; 10 premières (valeurs masquées) :
+> 
+rke2-coredns : lignes remplacées 0
+OK   témoin rke2-coredns hors certificats : deux rendus identiques
+ÉCART rke2-coredns hors certificats : 1 lignes ; 10 premières (valeurs masquées) :
+> 
+rke2-metrics-server : lignes remplacées 0
+OK   témoin rke2-metrics-server hors certificats : deux rendus identiques
+ÉCART rke2-metrics-server hors certificats : 1 lignes ; 10 premières (valeurs masquées) :
+> 
+## taille : helmfile.yaml contre les appels qu'il remplacerait
+helmfile.yaml.gotmpl : 17 lignes hors commentaires ; appels helm upgrade --install des scripts : rke2.sh l. 166 à 169, cilium.sh 2
+greffons après l'essai : []
+# fin 2026-11-19T00:09:52Z
