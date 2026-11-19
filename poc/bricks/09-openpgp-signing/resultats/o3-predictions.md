@@ -27,3 +27,10 @@
 | K3 | Aucune ligne de bloc OpenPGP armuré dans le journal ; aucune ligne KO ; code final 0 | haute |
 
 Le rpm signé n'est pas reproductible d'une signature à l'autre, car la signature porte sa date : la `repetition` et `signer` donneront deux sha256 différents. B1 compare toujours au même `864d55f4…`.
+
+## Correction datée du 19/11/2026, 17:57:06 UTC, avant tout lancement, après relecture du conseiller
+
+- **Refus jugés sur le motif, pas sur le code seul** : `o3-interne.sh` est corrigé. Un refus attendu (V4, V6) n'est compté OK que si la sortie porte un motif de signature. Le motif cherché, sans tenir compte de la casse, est `gpg|signature|signed|nokey|digest`, et la dernière ligne qui le porte est citée. Un code non nul sans motif donne KO (« refus sans motif de signature »). Sans cette correction, un `dnf-3` absent ou une erreur de cache auraient passé pour des refus.
+- **V1 révisée** : seule la mention NOKEY est jugée, et le code est relevé. La prédiction sur le code est abandonnée : elle était de confiance moyenne, et un code 0 aurait compté KO sans défaut de la chaîne.
+- **Amorce réutilisée** : le vérificateur est l'amorce Rocky 9.8 `ed654c69…`, que `rocky_telecharger` a déjà utilisée en O2. Le texte proposé pour l'ADR (§4 ter d'`A-REPORTER.md`) dit que chaque amorce ne sert qu'une fois. Ici, elle sert à vérifier, sans aucune clé privée. Son rpm et son dnf viennent de l'image amont, contrôlée seulement par le sha256 de sa couche, pas par le `primary` vérifié. Un vérificateur contrôlé avec dnf demanderait le réseau, que K1 refuse tant que la clé existe sur l'hôte. Cet écart ira dans le rapport final.
+- **Installation** : rien n'est installé sur l'hôte. V7 installe `sample-app` par dnf **dans l'amorce de vérification**, qui est jetée ensuite.
