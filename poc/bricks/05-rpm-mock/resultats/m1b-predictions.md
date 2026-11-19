@@ -1764,3 +1764,24 @@ Journal : [`m1b-refus-prefetch.log`](m1b-refus-prefetch.log), de 15:51:32 à 15:
 - **PX5** : les quatre pods sont retirés, et il ne reste aucun pod au préfixe `m1brp2-`.
 
 **Portée.** Dans un pod runc du cluster, le prefetch refuse un `repomd.xml` autre que celui fixé, un autre manifeste de base, et une couche autre que celle du manifeste. Chaque refus vient de sa garde, sans sortie écrite. Avec RZ1 à RZ8 et AN1, les cas refusés demandés avant signature sont joués. Rien n'est mesuré dans un TaskRun.
+
+### Correction datée du 19/11/2026, écrite à 15:59:32 UTC : date de l'amorce
+
+- **Erreur.** La note de résultat de CA1 à CA5 dit : « Ce retard vient de l'image `rockylinux:9.8` du 27/01/2026 ». Le 27/01/2026 est la date de build du paquet `curl-minimal`, pas celle de l'image. La config de l'amorce (`686e4558…`, lue à la main à 15:56 UTC dans le cache OCI local) porte `created` 2026-05-25T20:19:03Z. Une autre trace la contredisait déjà : la même amorce porte `python3-dnf-4.14.0-34.el9_8.rocky.0.1`, que la ligne de dnf de docs/04 dit construit le 19/05/2026.
+- **Lecture corrigée** : l'image du 25/05/2026 porte un `curl-minimal` construit le 27/01/2026. La date de l'image est relevée par le script ci-dessous (FR1). Le passage de docs/04 est reformulé dans le même commit.
+- **Portée du constat** : seul curl a été relu. Toute l'amorce est figée par digest (D4 a), y compris les bibliothèques que curl charge face au réseau (TLS, glibc) et ce que `construire` exécute en root dans Kata (rpm, dnf, python). Le point ouvert s'appelle donc « fraîcheur de l'amorce (D4 a) », pas « curl ».
+
+## Fraîcheur de l'amorce : prédictions écrites le 19/11/2026 à 15:59:32 UTC, avant le lancement
+
+**Relevé** : [`m1b-amorce-fraicheur.sh`](m1b-amorce-fraicheur.sh) (sha256 `8edd98347dfa2be8…`), journal à venir `m1b-amorce-fraicheur.log`. Hors ligne.
+- Il relit les paquets installés de l'amorce dans une racine extraite à neuf.
+- Il les compare au plus récent de chaque nom dans les `primary` de BaseOS et AppStream 9.8 des bancs du 18/11. Ce sont les `repomd.xml` `abac8b17…` et `a3ca4230…`, que fixe la pipeline de l'outillage, avec `primary` et `updateinfo` contrôlés contre `repomd.xml`. La comparaison se fait par `rpm.labelCompare` de l'amorce.
+- Il compte, par gravité, les errata de sécurité dont une version est plus récente qu'un paquet installé.
+- Il détaille une liste fixée de paquets exposés au réseau ou exécutés en root.
+
+- **FR1** (haute) : la config de l'amorce porte `created` 2026-05-25T20:19:03Z, avec une seule couche, `99c753a8…`.
+- **FR2** (haute) : `primary` et `updateinfo` des deux dépôts sont conformes à leur `repomd.xml`.
+- **FR3** (haute pour curl, sans pari pour le reste) : `curl-minimal` et `libcurl-minimal` sont en retard, et leur plus récent est `7.76.1-40.el9_8.9`, comme dans CA4. Le nombre total de paquets en retard est relevé sans pari.
+- **FR4** (sans pari) : le nombre d'errata de sécurité plus récents que les paquets installés, leurs gravités, et le détail des paquets exposés.
+
+**Lecture prévue.** Comme pour curl, un erratum plus récent ne prouve pas que le code exécuté est touché. Le relevé chiffre le retard de l'amorce ; il ne juge pas son exposition. Le choix entre amorce figée et amorce rafraîchie te revient avant `SIGNER=1`. Rafraîchir l'amorce changerait la racine de l'outillage et du bootstrap, donc les cibles `7c07083c…` et `b063feb3…`, et referait la mesure d'un autre jour.
