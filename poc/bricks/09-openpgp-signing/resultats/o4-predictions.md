@@ -94,3 +94,51 @@ Passée de 18:30:34 à 18:30:38 UTC, code 1 ([journal](o4-repetition-premier-pas
 - **Trois lignes KO viennent d'un défaut du script, pas de la chaîne** : la garde de construction (`sig_ok`) lit `InRelease` par `gpg --list-packets`. Sur un message signé en clair, gpg s'arrête au paquet de données littérales et n'affiche pas le paquet de signature. D'où « InRelease n'est pas une signature v4 RSA… » pour le dépôt (A3), `autre-cle` et `sha1`. Pour la même raison, la garde n'a pas jugé l'`InRelease` des témoins ; seul leur `Release.gpg` l'a été : `digest algo 10` avec la clé `23A69D77…` pour `autre-cle`, `digest algo 2` avec la clé du dépôt pour `sha1`. **Vérifié sur l'hôte avant cette note** (heure non relevée), avec un trousseau jetable dans `$XDG_RUNTIME_DIR`, effacé ensuite : `gpg --list-packets` sur le bloc de signature **extrait** de l'`InRelease` du dépôt donne `algo 1, keyid 766B346B65025E3C`, `version 4`, `digest algo 10` (sortie non archivée en journal).
 
 Les dossiers `o4/repetition*` restent en place jusqu'à la correction ; ils seront effacés avant la relance.
+
+## Correction datée du 19/11/2026, 18:35:46 UTC, avant la relance de `repetition`, après relecture du conseiller
+
+**Deux phrases de la note de 18:31:26 UTC dépassent la mesure :**
+- « apt 3.0.4 par sqv ne l'accepte pas » : le refus du `Release.gpg` binaire ne cite pas « Sub-process /usr/bin/sqv », contrairement aux quatre autres refus. **Ce qui est mesuré est qu'apt 3.0.4 le refuse** ; qui refuse, d'apt ou de sqv, n'est pas établi. De même, « un `Release.gpg` doit être armuré pour apt de Debian 13 » ne vaudra qu'une fois V2 passée avec un `Release.gpg` armuré.
+- « l'image `7378260c…` est plus récente que l'instantané de la racine » est faux. Sa configuration (`596c6d80…`, lue localement après contrôle par sha256) porte `created` 2026-11-04T21:23:39Z, avant l'instantané `20261105T000000Z`. La racine a apt 3.0.3 parce qu'O2 épingle `apt-utils=3.0.3` (`DEB_PAQUETS` d'`o2.sh`, l. 43), qui tire `apt_3.0.3`. L'origine du 3.0.4 de l'image n'est pas établie.
+
+**Scripts corrigés** (`o4.sh` `6a16c5a1…`, `o4-interne.sh` `f4f9e76b…`) :
+- **Release.gpg armuré** (`--armor`) pour le dépôt et pour les témoins. Nouveau témoin `release-gpg-binaire` : Release.gpg binaire seul, sans InRelease, signé par la clé du dépôt.
+- **Garde de construction** : pour InRelease, le bloc de signature est extrait par `sed` dans GNUPGHOME, puis lu par `gpg --list-packets`. La lecture est vérifiée sur l'hôte (note précédente). La garde juge désormais l'InRelease des témoins `autre-cle` et `sha1`, puisque c'est le fichier qu'apt lit en premier. A3 vérifie aussi que Release.gpg commence par l'en-tête armuré.
+- **Motifs resserrés par témoin**, d'après les libellés mesurés au premier passage :
+
+  | Témoin | Motif |
+  |---|---|
+  | `autre-cle` et `sans-signed-by` | `Missing key` |
+  | `release-modifie` | `manipulated` |
+  | `packages-modifie` et `deb-modifie` | `Hash Sum mismatch` |
+  | `sha1` | `SHA1` |
+  | `release-gpg-binaire` | `binary format` |
+
+  Toutes les lignes qui portent le motif sont citées, séparées par « | » ; au premier passage, le séparateur non ASCII était coupé sous `LC_ALL=C`.
+- **P5 lue dans le message de refus du témoin `autre-cle`**. La ligne est OK si « Sub-process /usr/bin/sqv » paraît, ÉCART sinon, avec les sous-processus cités. L'autre branche n'exige pas la chaîne `/usr/bin/gpgv`, car le libellé d'apt sous gpgv n'est pas connu. `Debug::Acquire::gpgv` et le jugement sur « Preparing to exec » sont retirés.
+- **Tous les cas tournent deux fois** :
+  - dans la **racine Debian** : apt 3.0.3, vérifié paquet par paquet en O2, avec sqv et gpgv présents. Listes, cache et téléchargements vont dans `o4/<mode>-racine-apt`, lié en écriture ; les secrets ne sont pas liés ;
+  - dans l'**amorce** : apt 3.0.4, gpgv absent, dossiers sous `/var/tmp/o4`.
+  Le passage dans la racine réduit l'écart « amorce contrôlée par le sha256 de sa couche seulement ». Le dossier de téléchargement de chaque cas est donné à `_apt` (`chown`), pour un téléchargement dans le bac à sable ; si le `chown` est refusé, la ligne le dit.
+
+**Prédictions de la relance** (valent pour `repetition` et pour `signer`, dans la racine et dans l'amorce, sauf mention) :
+
+| N° | Prédiction | Confiance |
+|---|---|---|
+| A1, A2, L1, R1 | Comme au premier passage : A1, A2 et L1 tenues ; `SOURCE_DATE_EPOCH` ignoré | haute |
+| A3 | Code 0 ; Release.gpg armuré et InRelease, v4, RSA, clé du dépôt, `digest algo 10` | haute |
+| G | Gardes de construction : `autre-cle` (`digest algo 10`, clé jetable) et `sha1` (`digest algo 2`) jugées sur Release.gpg et InRelease ; `release-gpg-binaire` a un Release.gpg binaire, sans InRelease | haute |
+| V1, V3 | Code 0 | haute (tenues dans l'amorce au premier passage) |
+| V2 | `sans-inrelease`, avec un Release.gpg **armuré** : code 0 | moyenne-haute : l'armure est la seule différence avec le refus mesuré |
+| V4 | Refus, code 100 ; motifs `Missing key`, `manipulated`, `Hash Sum mismatch` ; `sample-app` inconnu ensuite | haute |
+| V5 | `sha1` refusé, motif `SHA1` | haute dans l'amorce (mesuré) ; moyenne-haute dans la racine (sqv attendu, voir P5) |
+| V6 | `depot` et `sans-inrelease` : code 0 ; deb égal à `f66bbeb2…`, relu dans la racine ou l'amorce puis sur l'hôte | haute pour `depot`, moyenne-haute pour `sans-inrelease` |
+| V7 | `deb-modifie` refusé au téléchargement, motif `Hash Sum mismatch` ; aucun deb écrit | haute |
+| V8 | `release-gpg-binaire` refusé, code 100, motif `binary format` | haute dans l'amorce (mesuré) ; moyenne dans la racine, où gpgv est présent |
+| P5a | Amorce : le refus d'`autre-cle` nomme `/usr/bin/sqv` | haute (mesuré au premier passage) |
+| P5b | Racine, avec sqv et gpgv : le refus d'`autre-cle` nomme `/usr/bin/sqv` (prédiction 5 du README) | moyenne |
+| K3 | Comme avant ; code final 0 | haute |
+
+Si la `repetition` n'échoue que sur une prédiction de confiance moyenne (P5b ou V8 dans la racine), `signer` est lancée quand même ; l'écart est consigné. Tout autre KO arrête la suite.
+
+Avant la relance, les dossiers `o4/repetition`, `o4/repetition-vierge`, `o4/repetition-racine-apt` et `o4/repetition-secrets` du premier passage sont effacés, dans l'espace de noms, avec des chemins littéraux.

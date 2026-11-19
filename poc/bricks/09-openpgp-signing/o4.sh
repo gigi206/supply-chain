@@ -7,8 +7,8 @@
 #   signer      chaîne complète avec la clé du PoC (09/secrets, liée en lecture seule, jamais listée ni lue par la session) ;
 #               le dépôt signé et la clé publique restent dans o4/signer/ pour O5.
 # Chaîne : signer (racine Debian, gpg 2.4.7, apt-ftparchive 3.0.3) ; contrôle du lien sur l'hôte (Release → Packages → deb) ;
-# méthode (racine Debian, sqv et gpgv présents : vérificateur choisi par apt) ; vérifier (amorce Debian 13 neuve : apt-get
-# update avec Signed-By, méthode relevée, apt-get download) ; contrôle du deb
+# vérifier, deux fois : dans la racine Debian (apt 3.0.3, sqv et gpgv présents) et dans l'amorce Debian 13 neuve (apt 3.0.4,
+# gpgv absent) : apt-get update avec Signed-By, vérificateur lu dans les refus, apt-get download ; contrôle du deb
 # téléchargé sur l'hôte ; aucun en-tête de clé privée dans le dossier produit.
 # Usage (racine du dépôt) : poc/bricks/09-openpgp-signing/o4.sh <étape>   (journal : resultats/o4-<étape>.log)
 set -euo pipefail
@@ -27,7 +27,7 @@ DEB=sample-app_1.0.0-2_amd64.deb
 POOL=pool/main/s/sample-app
 DEB_SRC=$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/$DEB
 DEB_SHA=f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
-CAS="depot sans-inrelease autre-cle release-modifie packages-modifie deb-modifie sha1 sans-signed-by"
+CAS="depot sans-inrelease autre-cle release-modifie packages-modifie deb-modifie sha1 sans-signed-by release-gpg-binaire"
 cd "$BASE"
 
 masquer() { sed -E 's/<[^>]*@[^>]*>/<adresse retirée>/g; s/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+/<adresse retirée>/g; /jeton|token/I c\[ligne masquée : motif jeton|token]'; }
@@ -128,18 +128,20 @@ chaine() { # MODE SECRETS : signer, lien, vérifier, contrôles sur l'hôte
   echo "### lien sur l'hôte"
   lien "$T"
   sources "$T"
-  echo "### méthode d'apt dans la racine Debian (sqv et gpgv présents ; listes et cache jetables, secrets non liés)"
+  echo "### vérifier dans la racine Debian (apt 3.0.3, sqv et gpgv présents ; dossiers d'apt jetables liés, secrets non liés)"
   absent "$O4/$m-racine-apt"; mkdir -p "$O4/$m-racine-apt"
-  LIENS="$T:/o2/t:ro $I4:/o2/o4-interne.sh:ro $O4/$m-racine-apt:/o2/apt:rw" dans_hors "$RD" /bin/bash /o2/o4-interne.sh methode /o2/t /o2/apt
+  LIENS="$T:/o2/t:ro $I4:/o2/o4-interne.sh:ro $O4/$m-racine-apt:/o2/apt:rw" dans_hors "$RD" /bin/bash /o2/o4-interne.sh verifier /o2/t /o2/apt racine
   echo "  code $?"
   echo "### vérifier (amorce Debian 13 neuve, sans réseau)"
   extraire "$OCI/library/debian" "$DEB_M" "$V"
-  LIENS="$T:/o2/t:ro $I4:/o2/o4-interne.sh:ro" dans_hors "$V" /bin/bash /o2/o4-interne.sh verifier /o2/t
+  LIENS="$T:/o2/t:ro $I4:/o2/o4-interne.sh:ro" dans_hors "$V" /bin/bash /o2/o4-interne.sh verifier /o2/t /var/tmp/o4 amorce
   echo "  code $?"
   echo "### contrôles sur l'hôte"
-  for c in depot sans-inrelease; do
-    s=$(sha256sum < "$V/root/o4/$c/$DEB" 2>/dev/null | cut -c1-64)
-    [ "$s" = "$DEB_SHA" ] && echo "OK   deb téléchargé par apt ($c) égal à ${DEB_SHA:0:16}… (relu sur l'hôte)" || echo "KO   deb téléchargé par apt ($c) : ${s:-absent}"
+  for d in "racine:$O4/$m-racine-apt" "amorce:$V/var/tmp/o4"; do
+    for c in depot sans-inrelease; do
+      s=$(sha256sum < "${d#*:}/$c/telechargement/$DEB" 2>/dev/null | cut -c1-64)
+      [ "$s" = "$DEB_SHA" ] && echo "OK   deb téléchargé par apt (${d%%:*}, $c) égal à ${DEB_SHA:0:16}… (relu sur l'hôte)" || echo "KO   deb téléchargé par apt (${d%%:*}, $c) : ${s:-absent}"
+    done
   done
   s=$(sha256sum < "$T/depot/$POOL/$DEB" | cut -c1-64)
   [ "$s" = "$DEB_SHA" ] && echo "OK   deb du dépôt signé inchangé (D1 a)" || echo "KO   deb du dépôt signé modifié : $s"
