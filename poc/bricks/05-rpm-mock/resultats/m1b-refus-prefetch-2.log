@@ -1,0 +1,8 @@
+# m1b-refus-prefetch.sh, début 2026-11-19T15:50:47Z ; HEAD 9990c3d7e25f
+OK   script-pb.sh rendu sous m1bt3 : sha256 912520eae2810d58…
+OK   prefetch-rpm-sortie : sélecteur {"matchLabels":{"tekton.dev/task":"prefetch-rpm"}}
+## cas temoin : début 2026-11-19T15:50:47Z
+Error: bad file '/home/gigi/Documents/git/github/gigi206/supply-chain/poc/bricks/05-rpm-mock/builders/prefetch-racine-rpm.yaml': go-yaml load error in scanner (while scanning for the next token) at L67.C12: found character that cannot start any token
+jq: invalid JSON text passed to --argjson
+Use jq --help for help with command-line options,
+or see the jq manpage, or online docs  at https://jqlang.org

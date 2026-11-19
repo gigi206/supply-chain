@@ -17,7 +17,7 @@ umask 022
 G=$(git rev-parse --show-toplevel)
 here=$G/poc/bricks/08-trust-plane   # commun.sh attend le répertoire de l appelant
 . "$here/commun.sh"   # W, REG
-N=m1brp
+N=${PREFIXE:-m1brp}   # une relance se fait sous un autre préfixe
 S3=$W/m1bt3-05/script-pb.sh   # rendu de prealables sous m1bt3 : lecture seule
 T=$W/$N-05
 [ ! -e "$T" ] || { echo "KO   $T existe (relancer sous un autre préfixe)" >&2; exit 1; }
@@ -46,7 +46,7 @@ script_cas() { # cas ancienne nouvelle : une seule ligne changée, ou tel quel s
 }
 pod_json() { # nom
   jq -n --arg n "$1" --arg i "$AMORCE" --arg j "$N" \
-    --argjson res "$(yq -o=json -I=0 '.spec.steps[0].resources' "$G/poc/bricks/05-rpm-mock/builders/prefetch-racine-rpm.yaml")" '{
+    --argjson res "$(yq -o=json -I=0 '.spec.steps[0].resources' "$W/m1bt3-05/prefetch-racine-rpm.yaml")" '{
     apiVersion: "v1", kind: "Pod", metadata: {name: $n, namespace: "builds", labels: {"poc.test/jalon": $j, "tekton.dev/task": "prefetch-rpm"}},
     spec: {automountServiceAccountToken: false, enableServiceLinks: false, restartPolicy: "Never",
       nodeSelector: {zone: "build"}, tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
