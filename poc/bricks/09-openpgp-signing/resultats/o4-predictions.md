@@ -191,3 +191,11 @@ Aucun fichier de ce dossier ne porte d'en-tête de clé privée. Compte fait sur
   - un `Release.gpg` binaire est refusé (« unsupported binary format ») ; le dépôt publié a donc un `Release.gpg` armuré, et un dépôt sans `InRelease` est accepté sous cette forme. Ce dernier point compte pour la recommandation du README sur CVE-2025-68972 ;
   - `apt-ftparchive` 3.0.3 ignore `SOURCE_DATE_EPOCH`, comme le 3.2.1 de l'hôte.
 - **Écart consigné** : l'image de l'amorce `7378260c…` a déjà servi en O2, et son apt 3.0.4 n'est contrôlé que par le sha256 de sa couche. Il est atténué par le passage complet dans la racine Debian, dont l'apt 3.0.3 a été vérifié paquet par paquet en O2.
+
+## Note datée du 19/11/2026, 18:41:38 UTC : deux valeurs archivées, date de Release non fixée
+
+- **Valeurs archivées par un relevé local** ([`o4-releve.sh`](../o4-releve.sh), [journal](o4-releve.log), 18:41:19 UTC, code 0). Jusqu'ici, la correction de 18:35:46 UTC et la note de `signer` citaient sans journal :
+  - le `created` de l'image `7378260c…`, désormais archivé : 2026-11-04T21:23:39Z, configuration `596c6d80…` contrôlée par sha256 ;
+  - le sha256 de la clé publique exportée, désormais archivé : `20bcaf43…`. **Les clés publiques exportées en O3 (gpg 2.3.3, `o3/signer`) et en O4 (gpg 2.4.7, `o4/signer`) sont égales octet pour octet** à celle de l'étape `cle` d'O2 (`o2-cle.log`). Le dossier `09/secrets` n'est pas lu.
+- **La date de `Release` n'est pas fixée.** Le README (banc O0) disait qu'elle serait « à fixer autrement avant O4 » ; ce n'est pas fait. `apt-ftparchive` 3.0.3 ignore `SOURCE_DATE_EPOCH` (R1), et la signature porte sa propre date. Chaque passage de `signer` donne donc un `Release`, un `InRelease` et un `Release.gpg` différents. O5 devra viser les empreintes du dépôt gardé dans `o4/signer` (note précédente). Refaire `signer` changerait ces empreintes.
+- **Motif `SHA1` trop lâche** (relecture du conseiller) : il trouve aussi le nom du témoin dans les chemins. Le refus pour SHA-1 repose sur le message de politique, compté à part : 6 lignes dans chaque journal. `signer` n'est pas relancée pour ce motif, car le dépôt gardé pour O5 changerait d'empreintes.
