@@ -1,0 +1,20 @@
+étape prealables commencée : 2026-11-19T18:53:07Z ; o5.sh 25878d8ba621fed8… ; o5-lien.py a8196118424ed54c…
+cosign : .local/share/mise/installs/aqua-sigstore-cosign/3.1.4/cosign
+OK   cosign : sha256 424e2c97d0b45fd7a6b608a87f090f35633f4c23ece5f092d48bba11aaf4bbfa égal à mise.lock
+     GitVersion: v3.1.4;GitCommit: 0e48502cf5ef34e2e60bbd3617aa19945712f705;BuildDate: 2026-10-20T17:33:02Z
+OK   cosign generate-key-pair accepte : --output-key-prefix=x
+OK   cosign attest-blob accepte : --new-bundle-format --use-signing-config=false --tlog-upload=false --yes
+     note : Flag --new-bundle-format has been deprecated, this will be the only supported format in future versions
+     note : Flag --use-signing-config has been deprecated, an offline signing flag will be added in the future; TUF will continue to provide a signing config by default if one is not provided manually
+     note : Flag --tlog-upload has been deprecated, prefer using a --signing-config file with no transparency log services
+OK   cosign verify-blob-attestation accepte : --new-bundle-format --insecure-ignore-tlog
+     note : Flag --new-bundle-format has been deprecated, this will be the only supported format in future versions
+python3 : 3.13.12
+### valeurs archivées et fichiers gardés
+KO   09-openpgp-signing/resultats/o3-signer.log : motif '^outils : (.+)$' : 2 valeur(s) distincte(s), une attendue
+KO   valeurs archivées ou fichiers gardés
+OK   en-têtes de clé privée dans o3/signer et o4/signer : 0 fichier(s) (0 attendu)
+OK   /home/gigi/.cache/supply-chain-poc/09/o5/banc absent
+étape prealables finie : 2026-11-19T18:53:08Z
+OK   K3 : aucune ligne de bloc armuré (OpenPGP ou clé privée) dans le journal
+bilan : 2 ligne(s) KO
