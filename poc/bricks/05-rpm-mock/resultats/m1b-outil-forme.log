@@ -1,0 +1,30 @@
+# m1b-outil-forme.sh, début 2026-11-19T13:23:44Z ; dossier /home/gigi/.cache/supply-chain-poc/05/m1b-outil-forme-20261119T132344Z
+place libre sous $HOME avant : 114370524 kB
+OK   a8-amorce.tar du 19/11 : 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+OK   dnf.conf du banc (16 car.) : d554fb1ce168663f
+avant : /m de la racine d'outils 14 entrée(s), /mnt 0
+## OF0 : outils et témoins dans la racine d'outils
+     rpm-4.16.1.3-40.el9.x86_64
+     python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch
+     libsolv-0.7.24-4.el9.x86_64
+     libdnf-0.69.0-18.el9.rocky.0.1.x86_64
+     tar-2:1.34-11.el9.x86_64
+     dnf-4.14.0-34.el9_8.rocky.0.1.noarch
+     /m/miroir en lecture seule : oui
+     rpm dans /m/miroir : 199
+     %_install_langs lu par rpm de python, env -i HOME=/root : [en_US]
+     %_install_langs lu par rpm de python, env -i HOME=/m/h : [en_US]
+## OF1 à OF3 : installation sous la forme décidée, début 2026-11-19T13:23:46Z
+limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 524288 / 524288
+dnf-3 code 0 en 23 s ; 883 lignes de journal
+résumé de la transaction : Install  199 Packages
+paquets installés : 201, dont gpg-pubkey 2
+racine de l arbre avant chmod : 555
+racine passée en 555 ; etc/machine-id : 33 octet(s)
+tar de l amorce : code 0 ; stderr 0 lignes
+f.tar : 343930880 octets, 13332 membres, sha256 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+## OF4 : f.tar contre la cible 7c07083c
+OK   f.tar = 7c07083c octet pour octet
+après : /m de la racine d'outils 14 entrée(s) (avant : 14), /mnt 0
+place libre sous $HOME après : 113482132 kB ; dossier laissé : /home/gigi/.cache/supply-chain-poc/05/m1b-outil-forme-20261119T132344Z
+# fin 2026-11-19T13:24:10Z

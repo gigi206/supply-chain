@@ -1339,3 +1339,16 @@ Journal : [`m1b-amorce-outils.log`](m1b-amorce-outils.log) (13:21:40 à 13:21:42
   Si `f.tar` diffère, le comparateur membre à membre contre `a8-amorce.tar` nomme chaque écart.
 
 **Portée prévue.** Si OF4 est tenue, la forme de la tâche redonne l'outillage sur l'hôte. Ce n'est mesuré ni dans Kata, ni par la tâche.
+
+### Banc de l'outillage sous la forme de la tâche : résultat (note écrite à 2026-11-19T13:24:28Z UTC)
+
+Journal : [`m1b-outil-forme.log`](m1b-outil-forme.log) (13:23:44 à 13:24:10 UTC, code 0).
+
+**OF0 à OF4 tenues.**
+- **OF0** : les versions sont celles de LG0. Le miroir est en lecture seule, avec 199 rpm. rpm de python lit `[en_US]` avec `HOME=/root` comme avec `HOME=/m/h`.
+- **OF1** : la limite vaut `1024 / 1024` dans le sous-shell. Celle du shell reste `524288 / 524288` après (valeur de l'hôte).
+- **OF2** : dnf-3 rend 0 en 23 s, avec 199 installations ; 201 paquets installés, dont 2 `gpg-pubkey`.
+- **OF3** : la racine vaut 555 avant le `chmod`. `etc/machine-id` existe (33 octets) et l'archive l'exclut. `tar` rend 0, sans rien sur stderr.
+- **OF4** : `f.tar` vaut `7c07083c…` octet pour octet (343 930 880 octets, 13 332 membres).
+
+**Portée.** Sur l'hôte, hors réseau, la forme que la tâche poserait (dnf-3, limite autour de dnf seul, langue `en_US` posée par `.rpmmacros`, racine 0555) redonne l'outillage. Les deux images ont donc maintenant une même forme d'installation, mesurée. Rien n'est mesuré dans Kata sous cette forme pour l'outillage, ni par une tâche.
