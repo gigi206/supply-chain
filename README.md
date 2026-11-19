@@ -11,7 +11,29 @@ Plateforme de **supply-chain logicielle** auto-hébergée. Elle vise à :
 - produire des **rpm et deb** multi-distro (Debian, Ubuntu, Rocky, Alma, CentOS Stream) ;
 - atteindre **SLSA Build L3**.
 
-> **Statut au 05/11/2026 : phase 2b-1, PoC en service sur un laptop (trois VM).** Les bancs de l'ADR 0000 sont terminés. La chaîne de confiance (brique 08) tourne sous k3s, du webhook à la porte ; ses 8 tests négatifs ont été mesurés et l'ensemble a été rejoué de zéro le 03/11/2026. La conversion à RKE2 (08b) est préparée mais n'a jamais été lancée ; rien de la 08c (durcissement) ni de la 08d (cert-manager) n'est appliqué. Les briques rpm et deb (05, 06, 09) ne sont pas commencées. L'avancement détaillé est suivi dans [`docs/03-validation-briques.md`](docs/03-validation-briques.md).
+> **Statut au 19/11/2026 : PoC en service sur un laptop (trois VM), sous RKE2 ; phase 2b-2 (packaging) en cours, 2b-1 pas entièrement close.** L'avancement détaillé, daté et sourcé, est suivi dans [`docs/03-validation-briques.md`](docs/03-validation-briques.md).
+>
+> - **Bancs de l'ADR 0000** : terminés (voir plus bas).
+> - **Plateforme** :
+>   - chaîne de confiance (08) : J1 à J8 faits le 02/11 ;
+>   - cluster converti à RKE2, en profil CIS (08b) : seuil atteint le 06/11 avec un écart accepté, aucun passage d'un seul tenant ;
+>   - durcissement (08c) : brique close le 09/11 ;
+>   - rejeu de zéro sous RKE2 (S5b) : terminé le 13/11, en plusieurs passages, sans écart de la plateforme ;
+>   - cert-manager (08d) : non installé.
+> - **Seuils atteints sur le laptop** : 01 (02/11), 19 et 19b (02/11), 10 (03/11, avec les écarts D1 (b) et D2 (a)). Les briques 02, 03, 04, 07a et 13a sont validées en local et restent à compléter ; le scan de la 07a est en service.
+> - **deb (06)** :
+>   - jalons S1 à S5a tenus les 10 et 11/11, dont un deb bit-identique sur deux builds (S3) ;
+>   - S6a fait le 14/11 ;
+>   - le seuil de la brique n'est pas encore déclaré atteint.
+> - **rpm (05)** :
+>   - M2 à M4 et M5a tenus les 17 et 18/11 ;
+>   - M1 non réévalué : les images d'outillage ont été construites hors de la plateforme ;
+>   - M1b en cours, pour que la plateforme les construise sans réseau ;
+>   - rejeu M5b pas avant le 28/11.
+> - **Licences (13a)** : volet deb fait le 14/11, volet rpm pas lancé. **Signature OpenPGP (09)** : non commencée.
+> - **Décisions du 18/11** :
+>   - Tekton Triggers est gardé : Pipelines as Code n'est pas retenu ([`poc/benchmarks/pac`](poc/benchmarks/pac/README.md)) ;
+>   - la plateforme reste déployée par ses scripts : Argo CD, Flux et helmfile ne sont pas retenus ([`poc/benchmarks/deploiement`](poc/benchmarks/deploiement/README.md)).
 
 ## Existe-t-il un projet open source qui fait tout ça ?
 
