@@ -1,0 +1,29 @@
+# m1b-boot-0555.sh, début 2026-11-19T08:40:18Z ; dossier /home/gigi/.cache/supply-chain-poc/05/m1b-boot-0555-20261119T084018Z
+## 0. arbres du 18/11 avant : mode de la racine
+b1 : 775
+b2 : 775
+## 1. témoin : ré-archivage de b1 tel quel (BR0)
+t1.tar : 241981440 octets, 11472 membres, sha256 28634a12c5e99aae558a0cd6719d8f87fad6bac329724f0afafee252e6b78ab3
+OK   t1 = référence du 18/11 : 28634a12c5e99aae558a0cd6719d8f87fad6bac329724f0afafee252e6b78ab3
+## 2. copies par cp -a, racine des copies en 0555 (BR1)
+copie b1 : code 0 ; stderr 0 lignes ; racine 555 ; 257612 kB
+copie b2 : code 0 ; stderr 0 lignes ; racine 555 ; 257612 kB
+## 3. archives y1, y2 (BR2 à BR5)
+y1.tar : 241981440 octets, 11472 membres, sha256 f265216965e3e4723dfeb8931469cb9e57335e231ecfa4b7dc9151ba40545ee7
+y2.tar : 241981440 octets, 11472 membres, sha256 f265216965e3e4723dfeb8931469cb9e57335e231ecfa4b7dc9151ba40545ee7
+OK   y1.tar et y2.tar identiques octet à octet
+tar t1 : stderr vide
+tar y1 : stderr vide
+tar y2 : stderr vide
+y1 : 11472 membres ; x1 : 11472 membres ; noms identiques : oui
+y1 : racine 0o555 ; x1 : racine 0o775 ; etc/machine-id dans y1 : absent
+membres communs différant par un champ d'en-tête : 1
+     . : mode 509 -> 365
+   comparer : membres : 11472 et 11472
+   comparer : seulement d'un côté : 0 ; présents des deux côtés et différents : 1
+   comparer :      écart : . (mode)
+   comparer : champs en cause : mode 1
+## 4. arbres du 18/11 après : mode de la racine (BR6)
+b1 : 775
+b2 : 775
+# fin 2026-11-19T08:40:23Z

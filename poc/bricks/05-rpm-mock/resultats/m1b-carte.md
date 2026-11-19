@@ -250,3 +250,9 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Valeurs annoncées comme fixées dans la tâche, sans question** : `%_install_langs` à `en_US`, umask 022, racine de l'archive en 0555.
 - **Conséquence** : la référence du bootstrap `28634a12…` a sa racine en 0775. Elle est à refaire avec la racine en 0555, par ré-archivage des arbres existants, sans nouvelle installation. Les trois autres références ont déjà 0555 et machine-id absent.
 - **Portée** : rien n'est mesuré dans le pod Kata ; le point 1 A reste non établi. Ce n'est un accord pour aucune écriture dans le cluster ni dans Zot.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T08:41:01Z UTC : référence du bootstrap en 0555
+
+- **BR0 à BR6 tenues** (08:40:18 à 08:40:23 UTC) : la copie des arbres du 18/11, racine passée en 0555, donne deux fois la même archive, `f2652169…`. Elle ne diffère de `28634a12…` que par le mode de `.` ([résultat](m1b-predictions.md), [journal](m1b-boot-0555.log)).
+- **Références pour les valeurs fixées le 19/11** : `05d35d64…` (outils de `99790c13`), `06c289ad…` (outils de l'amorce), `0c00666a…` (racine), `f2652169…` (bootstrap). Toutes ont la racine en 0555 et machine-id absent.
+- **Le point 1 A reste non établi** (ni pod Kata, ni autre hôte).

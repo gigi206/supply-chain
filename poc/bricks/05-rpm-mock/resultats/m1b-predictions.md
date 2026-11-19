@@ -918,3 +918,19 @@ Suite de la décision « Absent » du 19/11 ([carte](m1b-carte.md)). Le banc [`m
 - **BR7** (lecture, sans valeur pariée) : le sha256 de `y1` devient la référence du bootstrap pour les valeurs fixées le 19/11.
 
 Ce n'est un accord pour aucune écriture dans le cluster ni dans Zot.
+
+### Référence du bootstrap avec la racine en 0555 : résultat, 19/11/2026, de 08:40:18 à 08:40:23 UTC, code 0 (note écrite à 2026-11-19T08:41:01Z UTC)
+
+Journal : [`m1b-boot-0555.log`](m1b-boot-0555.log).
+
+**BR0 à BR6 tenues.**
+- **BR0** : `t1` (ré-archivage de `b1` tel quel) vaut `28634a12…`.
+- **BR1** : les deux `cp -a` rendent le code 0, sans ligne d'erreur ; la racine des copies vaut 555.
+- **BR2** : `y1` et `y2` sont identiques octet à octet (241 981 440 octets, 11 472 membres).
+- **BR3** : la racine de `y1` vaut 0555, et `etc/machine-id` en est absent.
+- **BR4** : `y1` et `x1` ont les mêmes 11 472 noms. Un seul membre diffère, `.`, et seulement par son mode (0775 → 0555). Le comparateur membre à membre (contenu compris) donne le même résultat.
+- **BR5** : `tar` n'a rien écrit sur stderr pour `t1`, `y1` et `y2`.
+- **BR6** : `b1` et `b2` sont en 775 avant et après le banc.
+- **BR7** : `f265216965e3e4723dfeb8931469cb9e57335e231ecfa4b7dc9151ba40545ee7` est la référence du bootstrap pour les valeurs fixées le 19/11 (`en_US`, umask 022, racine 0555, machine-id absent).
+
+**Portée.** La racine en 0555 est obtenue par un `chmod` sur une copie. Dans S1, elle venait du `cp -a` de la racine de la base, mais cette origine est lue dans `s1.sh`, non mesurée. Les quatre références ont désormais la racine en 0555 et machine-id absent : `05d35d64…`, `06c289ad…`, `0c00666a…`, `f2652169…`. Rien n'est mesuré dans le pod Kata ; le point 1 A reste non établi.
