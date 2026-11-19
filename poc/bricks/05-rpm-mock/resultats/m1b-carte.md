@@ -268,3 +268,11 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
   - `05d35d64…` : outils de `99790c13`, langues `all`, umask 0002 ;
   - `0c00666a…` : troisième banc, 26 533 membres contre 13 332 pour `a8` ; ses langues et son umask ne sont pas établis dans cette carte.
 - **Archives écrites par le `tar` de l'hôte** : les quatre références viennent de la fonction `archive()` des bancs (`ns tar`). La tâche archivera avec le `tar` de l'amorce : ce point est à mesurer avant le pod.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T08:49:18Z UTC : tar de l'amorce
+
+- **Mesure** (08:47:46 UTC) : réarchivé par le `tar` 1.34 de l'amorce, l'arbre `i8` donne `7c07083c…`, contre `06c289ad…` avec le `tar` 1.35 de l'hôte. Les membres, les en-têtes pax et les contenus sont égaux. Seuls `devmajor` et `devminor` diffèrent, vides contre `0000000`, ainsi que la somme de chaque en-tête ([résultat](m1b-predictions.md), [journal](m1b-tar-amorce.log), [écarts](m1b-tar-amorce-ecart.log)).
+- **Cibles mises à jour** :
+  - outillage : `7c07083c…`, avec le `tar` de l'amorce, pour le pod et la tâche ;
+  - bootstrap : `f2652169…` reste une archive du `tar` de l'hôte ; elle est à refaire avec le `tar` de l'image qui l'archivera.
+- **Ce n'est un accord** pour aucune écriture dans le cluster ni dans Zot.

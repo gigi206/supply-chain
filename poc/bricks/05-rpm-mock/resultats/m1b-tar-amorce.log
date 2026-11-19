@@ -1,0 +1,17 @@
+# m1b-tar-amorce.sh, début 2026-11-19T08:47:46Z ; dossier /home/gigi/.cache/supply-chain-poc/05/m1b-tar-amorce-20261119T084746Z
+OK   S = 1793914619 dans m1b-outil-amorce.log
+OK   a8.tar du 18/11 : 06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5
+tar de l'hôte : tar (GNU tar) 1.35
+tar de l'amorce : tar (GNU tar) 1.34 ; paquet tar-1.34-11.el9.x86_64
+## ré-archivage de i8 par le tar de l'amorce (TA1, TA2)
+tar de l'amorce : code 0 ; stderr 0 lignes
+a8-amorce.tar : 343930880 octets, 13332 membres, sha256 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+ÉCART a8-amorce.tar différent de a8.tar
+## comparaison membre à membre (TA3)
+   comparer : membres : 13332 et 13332
+   comparer : seulement d'un côté : 0 ; présents des deux côtés et différents : 0
+   comparer : champs en cause : aucun
+## en-têtes pax de a8 (TA4)
+membres avec un en-tête SCHILY.xattr : 2
+     SCHILY.xattr.security.capability : 2
+# fin 2026-11-19T08:47:49Z

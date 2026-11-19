@@ -1,0 +1,34 @@
+# m1b-tar-amorce-ecart.sh, début 2026-11-19T08:48:08Z
+a8.tar : 343930880 octets, sha256 06c289ad8da33198 ; a8-amorce.tar : 343930880 octets, sha256 7c07083cd7bee149
+octets différents (sur la longueur commune) : 227947 ; blocs de 512 touchés : 13332
+blocs touchés par type d'en-tête (x = en-tête pax, 0 = fichier, 5 = dossier, 2 = lien, données = hors en-tête) :
+     0 : 8390
+     1 : 1900
+     2 : 1651
+     5 : 1391
+champs différents dans les en-têtes touchés :
+     type 0, devmajor : 8390
+     type 0, devminor : 8390
+     type 0, somme : 8390
+     type 1, devmajor : 1900
+     type 1, devminor : 1900
+     type 1, somme : 1900
+     type 2, devmajor : 1651
+     type 2, devminor : 1651
+     type 2, somme : 1651
+     type 5, devmajor : 1391
+     type 5, devminor : 1391
+     type 5, somme : 1391
+bloc 0 : type 5, nom './'
+     somme : 1.35 b'006152\x00 ' ; 1.34 b'007412\x00 '
+     devmajor : 1.35 b'' ; 1.34 b'0000000'
+     devminor : 1.35 b'' ; 1.34 b'0000000'
+bloc 1 : type 5, nom './afs/'
+     somme : 1.35 b'006707\x00 ' ; 1.34 b'010147\x00 '
+     devmajor : 1.35 b'' ; 1.34 b'0000000'
+     devminor : 1.35 b'' ; 1.34 b'0000000'
+bloc 2 : type 2, nom './bin'
+     somme : 1.35 b'010134\x00 ' ; 1.34 b'011374\x00 '
+     devmajor : 1.35 b'' ; 1.34 b'0000000'
+     devminor : 1.35 b'' ; 1.34 b'0000000'
+# fin 2026-11-19T08:48:36Z

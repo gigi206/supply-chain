@@ -945,3 +945,18 @@ Les références ont été archivées par le `tar` de l'hôte (GNU tar 1.35). La
 - **TA4** (lecture) : nombre de membres de `a8` qui ont un en-tête `SCHILY.xattr.*`, et quelles clés. Ce sont les membres les plus exposés entre l'espace de noms de l'hôte et le root réel de Kata.
 
 **Suite selon TA2.** Égale : la cible du pod est `06c289ad…` au bit près. Différente : la référence utile devient l'archive du `tar` de l'amorce.
+
+### tar de l'amorce contre tar de l'hôte : résultat, 19/11/2026, de 08:47:46 à 08:47:49 UTC, code 0 (note écrite à 2026-11-19T08:49:18Z UTC)
+
+Journaux : [`m1b-tar-amorce.log`](m1b-tar-amorce.log) et, pour la localisation des écarts (lecture seule, 08:48:08 à 08:48:36 UTC), [`m1b-tar-amorce-ecart.sh`](m1b-tar-amorce-ecart.sh) et [`m1b-tar-amorce-ecart.log`](m1b-tar-amorce-ecart.log). Le second script a été écrit après avoir vu l'écart.
+
+- **TA1 tenue** : le `tar` de l'amorce (GNU tar 1.34, `tar-1.34-11.el9`) rend le code 0, sans rien sur stderr.
+- **TA2 (sans pari) : différente.** L'archive du `tar` de l'amorce vaut `7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7`, contre `06c289ad…`. Elle a la même taille (343 930 880 octets).
+- **TA3 tenue** : 13 332 membres des deux côtés. Le comparateur ne trouve aucun membre différent : noms, types, modes, propriétaires, mtimes, tailles, cibles, en-têtes pax et contenus sont égaux.
+- **Écart localisé** :
+  - 227 947 octets diffèrent, dans 13 332 blocs, un par membre : 8 390 fichiers, 1 900 liens durs, 1 651 liens symboliques et 1 391 dossiers ;
+  - dans chacun, seuls trois champs de l'en-tête ustar diffèrent : `devmajor` et `devminor`, vides avec 1.35 et à `0000000` avec 1.34, ainsi que la somme d'en-tête qui en découle ;
+  - les données des fichiers ne sont pas touchées.
+- **TA4 (lecture)** : deux membres de `a8` ont un en-tête `SCHILY.xattr.security.capability`, aucun autre xattr.
+
+**Conséquence.** Les octets de l'archive, et donc la couche de l'image, dépendent de la version de `tar`. La cible du pod et de la tâche, qui archivent avec le `tar` de l'amorce, est `7c07083c…`, pas `06c289ad…`. Le contenu est le même. La référence du bootstrap `f2652169…` a aussi été écrite par le `tar` de l'hôte : elle est à refaire avec le `tar` de l'image qui l'archivera. La cause côté code de `tar` n'est pas lue.
