@@ -8,6 +8,8 @@
 # Chaque étape écrit un journal neuf dans resultats/ ; un journal déjà présent arrête tout (aucun écrasement). La première étape en
 # échec arrête la suite. Le bilan confronte les valeurs des journaux neufs à celles du 19/11 (m1b-pod_c.log, m1b-pod_e.log,
 # m1b-builders-m1bt3-*.log). Aucune politique, aucune signature, aucune écriture dans Zot.
+# Ajout du 19/11/2026 (note datée) : PREFIXE_ANCIENNE et PREFIXE_TACHE (défauts m1b-20 et m1bt-20) ; REPETITION=1 ne joue que les
+# deux prealables (hôte, admission à blanc, aucun pod), sans le garde-date, pour éprouver le chemin du lanceur.
 # Usage (racine du dépôt) : bash poc/bricks/05-rpm-mock/resultats/m1b-jour-kata.sh < /dev/null > poc/bricks/05-rpm-mock/resultats/m1b-jour-kata.log 2>&1
 set -euo pipefail
 export LC_ALL=C
@@ -16,7 +18,10 @@ B=$G/poc/bricks/05-rpm-mock
 R=$B/resultats
 cd "$G"
 echo "# m1b-jour-kata.sh, début $(date -u +%FT%TZ) ; HEAD $(git rev-parse --short=12 HEAD)"
-[ "$(date -u +%Y%m%d)" -ge 20261120 ] || { echo "KO   pas avant le 20/11/2026 à 00:00 UTC" >&2; exit 2; }
+PA=${PREFIXE_ANCIENNE:-m1b-20} PT=${PREFIXE_TACHE:-m1bt-20} REP=${REPETITION:-}   # réglables (note datée du 19/11), défauts de JK et JT
+case "$PA$PT" in *[!a-z0-9-]*) echo "KO   préfixe invalide" >&2; exit 2 ;; esac
+echo "préfixes : ancienne forme $PA, forme de la tâche $PT$([ -n "$REP" ] && echo " ; RÉPÉTITION : les deux prealables seulement")"
+[ -n "$REP" ] || [ "$(date -u +%Y%m%d)" -ge 20261120 ] || { echo "KO   pas avant le 20/11/2026 à 00:00 UTC" >&2; exit 2; }
 export DISTRO=rke2 KUBECONFIG=${KUBECONFIG:-$HOME/.kube/supply-chain-poc.yaml}
 echo "scripts : m1b.sh $(sha256sum < "$B/m1b.sh" | cut -c1-16) ; m1b-builders.sh $(sha256sum < "$B/m1b-builders.sh" | cut -c1-16)"
 nko=0
@@ -32,12 +37,17 @@ lancer() { # script préfixe étape journal
   [ "$c" -eq 0 ] || { echo "KO   arrêt sur $1 $3" >&2; exit "$c"; }
 }
 
-lancer m1b.sh m1b-20 prealables m1b-20-prealables.log
-lancer m1b.sh m1b-20 pod_c m1b-20-pod_c.log
-lancer m1b.sh m1b-20 prealables_boot m1b-20-prealables_boot.log
-lancer m1b.sh m1b-20 pod_e m1b-20-pod_e.log
+if [ -n "$REP" ]; then   # répétition : hôte et admission à blanc seulement, aucun pod créé
+  lancer m1b.sh "$PA" prealables "$PA-prealables.log"
+  lancer m1b-builders.sh "$PT" prealables "m1b-builders-$PT-prealables.log"
+  echo "# fin de la répétition $(date -u +%FT%TZ)"; exit 0
+fi
+lancer m1b.sh "$PA" prealables "$PA-prealables.log"
+lancer m1b.sh "$PA" pod_c "$PA-pod_c.log"
+lancer m1b.sh "$PA" prealables_boot "$PA-prealables_boot.log"
+lancer m1b.sh "$PA" pod_e "$PA-pod_e.log"
 for e in prealables banc essai_prefetch essai_construire; do
-  lancer m1b-builders.sh m1bt-20 "$e" "m1b-builders-m1bt-20-$e.log"
+  lancer m1b-builders.sh "$PT" "$e" "m1b-builders-$PT-$e.log"
 done
 
 echo "## bilan : valeurs du 20/11 contre celles du 19/11"
@@ -50,10 +60,10 @@ compare() { # libellé journal-neuf journal-19 motif
   if [ -n "$a" ] && [ "$a" = "$b" ]; then ok "$1 : $a"; else ko "$1 : 20/11 « $a », 19/11 « $b »"; fi
 }
 ARCH='s/.*archive du pod : .* sha256 \([0-9a-f]\{64\}\)$/\1/p'
-compare "pod_c, archive de l'outillage" m1b-20-pod_c.log m1b-pod_c.log "$ARCH"
-compare "pod_e, archive du bootstrap" m1b-20-pod_e.log m1b-pod_e.log "$ARCH"
-compare "pod_e, liste rpm -qa après" m1b-20-pod_e.log m1b-pod_e.log 's/.*liste rpm -qa après : .* sha256 \([0-9a-f]\{64\}\)$/\1/p'
-N=m1b-builders-m1bt-20 V=m1b-builders-m1bt3
+compare "pod_c, archive de l'outillage" "$PA-pod_c.log" m1b-pod_c.log "$ARCH"
+compare "pod_e, archive du bootstrap" "$PA-pod_e.log" m1b-pod_e.log "$ARCH"
+compare "pod_e, liste rpm -qa après" "$PA-pod_e.log" m1b-pod_e.log 's/.*liste rpm -qa après : .* sha256 \([0-9a-f]\{64\}\)$/\1/p'
+N=m1b-builders-$PT V=m1b-builders-m1bt3
 for x in po pb co cb; do
   compare "script-$x rendu" "$N-prealables.log" "$V-prealables.log" "s/^OK   script-$x : .* sha256 \([0-9a-f]\{64\}\)$/\1/p"
 done

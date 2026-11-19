@@ -1815,3 +1815,11 @@ Journal : [`m1b-amorce-fraicheur.log`](m1b-amorce-fraicheur.log), de 15:59:33 à
   - **(b)** rafraîchir l'outillage des tâches, par une image dérivée construite sans réseau, ou par une amorce plus récente. Cela change les outils qui installent, donc peut-être les racines `7c07083c…` et `b063feb3…`, et referait la mesure d'un autre jour.
 
   Rien ne change avant la mesure du 20/11.
+
+### Correction datée du 19/11/2026, écrite à 16:01:11 UTC : lanceur de la mesure d'un autre jour, préfixes réglables et répétition
+
+- **Pourquoi.** Seuls le garde-date et le bilan du lanceur avaient été essayés ; le chemin `lancer` n'avait jamais tourné. Trois des scripts du jour ont échoué à leur premier passage. Et les préfixes à tiret (`m1b-20`, `m1bt-20`) sont neufs pour `m1b.sh` et `m1b-builders.sh`. Enfin, une relance après échec aurait demandé d'éditer le lanceur, dont le sha256 est cité dans JK et JT.
+- **Changement** : les préfixes sont réglables par `PREFIXE_ANCIENNE` et `PREFIXE_TACHE`, avec pour défauts `m1b-20` et `m1bt-20`, ceux de JK et JT. Les journaux suivent le préfixe. `REPETITION=1` ne joue que les deux `prealables` (hôte et admission à blanc, aucun pod), sans le garde-date. Sans ces variables, le lanceur fait exactement ce que décrivaient JK et JT ; il refuse toujours de partir avant le 20/11 (essayé à 16:00:48 UTC : code 2). Le nouveau sha256 est `a4217d92d23680fa…` ; JK et JT ne changent pas.
+- **Répétition** : sous `m1b-r1` et `m1bt-r1`, journal du lanceur `m1b-jour-kata-repetition.log`.
+  - **LR1** (haute) : les deux `prealables` rendent 0 sous ces préfixes à tiret, et le lanceur s'arrête après eux, sur sa ligne de fin de répétition.
+  - **LR2** (haute) : `m1b-builders.sh prealables` rend les mêmes quatre scripts que `m1bt3` (sha256 de JT1).
