@@ -57,3 +57,8 @@ Commandes réellement exécutées par erreur, d'après la sortie de la commande 
 - les autres mots (empreintes, noms de fichiers) ont échoué en « command not found ».
 
 Désormais, aucun texte ne passe par `bash -c` avec des accents graves : les notes sont écrites avec l'outil d'écriture.
+
+## Corrections datées du 19/11/2026 (heure : celle des corrections du README, 15:04:40 UTC)
+
+- **BD11** : la prédiction disait qu'apt de trixie refuse une signature SHA-1 depuis le 01/02/2026. La ligne lue de `default-sequoia.config` porte sur `sha1.second_preimage_resistance`, propriété qui, d'après Sequoia, vise surtout les autosignatures ; le seuil appliqué aux signatures de données comme `Release` n'est pas lu ([quatrième complément](releve-complements-4.log)). Le refus par apt n'est donc **pas établi**. Ce qui a été mesuré reste : gpgv 2.4.8 accepte une signature SHA-1 de `Release`.
+- **Incident** : « Aucune clé ni aucun fichier n'a été lu, écrit ou affiché » est plus fort que la mesure. Établi : rien n'a été affiché. La lecture de la configuration du trousseau par défaut par `gpg-agent` et `gpgconf` n'est pas exclue.
