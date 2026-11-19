@@ -934,3 +934,14 @@ Journal : [`m1b-boot-0555.log`](m1b-boot-0555.log).
 - **BR7** : `f265216965e3e4723dfeb8931469cb9e57335e231ecfa4b7dc9151ba40545ee7` est la référence du bootstrap pour les valeurs fixées le 19/11 (`en_US`, umask 022, racine 0555, machine-id absent).
 
 **Portée.** La racine en 0555 est obtenue par un `chmod` sur une copie. Dans S1, elle venait du `cp -a` de la racine de la base, mais cette origine est lue dans `s1.sh`, non mesurée. Les quatre références ont désormais la racine en 0555 et machine-id absent : `05d35d64…`, `06c289ad…`, `0c00666a…`, `f2652169…`. Rien n'est mesuré dans le pod Kata ; le point 1 A reste non établi.
+
+### tar de l'amorce contre tar de l'hôte : prédictions (note écrite à 2026-11-19T08:47:44Z UTC, avant le lancement)
+
+Les références ont été archivées par le `tar` de l'hôte (GNU tar 1.35). La tâche archivera avec celui de l'amorce `ed654c69`. Le banc [`m1b-tar-amorce.sh`](m1b-tar-amorce.sh) ré-archive l'arbre `i8` du 18/11 avec le `tar` de l'amorce, dans sa racine d'outils, avec les mêmes options, la même borne S et les mêmes exclusions. Il tourne hors ligne et n'installe rien.
+
+- **TA1** : le `tar` de l'amorce rend le code 0 et n'écrit rien sur stderr.
+- **TA2** (sans pari) : l'archive est-elle égale à `06c289ad…` octet pour octet ? Je ne parie pas : les deux versions de `tar` peuvent écrire les en-têtes pax autrement.
+- **TA3** : même nombre de membres que `a8` (13 332). Contenu des fichiers identique, membre par membre. S'il y a des écarts, ils ne portent que sur les en-têtes.
+- **TA4** (lecture) : nombre de membres de `a8` qui ont un en-tête `SCHILY.xattr.*`, et quelles clés. Ce sont les membres les plus exposés entre l'espace de noms de l'hôte et le root réel de Kata.
+
+**Suite selon TA2.** Égale : la cible du pod est `06c289ad…` au bit près. Différente : la référence utile devient l'archive du `tar` de l'amorce.
