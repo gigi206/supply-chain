@@ -575,3 +575,11 @@ PX1 à PX5 tenues ([`m1b-refus-prefetch.log`](m1b-refus-prefetch.log)). Le point
 - le choix sur le curl de l'amorce ;
 - la ligne GnuPG de docs/04 (session de la brique 09) ;
 - les deux politiques de réseau, un accord pour chacune.
+
+## Note datée du 19/11/2026, écrite à 16:00:25 UTC : fraîcheur de l'amorce (D4 a)
+
+Le point « choix sur le curl de l'amorce » devient « fraîcheur de l'amorce (D4 a) ». L'amorce `ed654c69…`, image du 25/05/2026, a 44 paquets sur 146 en retard sur Rocky 9.8, dont `ca-certificates` (un erratum « Critical »), `openssl-libs`, `glibc`, `python3` et curl. Au total, 54 errata de sécurité de Rocky sont plus récents qu'elle ([`m1b-amorce-fraicheur.log`](m1b-amorce-fraicheur.log)). `rpm`, `dnf` et `gnupg2` sont à jour. Les images construites ne sont pas touchées : elles sont installées depuis le miroir 9.8 fixé.
+
+**Choix à poser au propriétaire avant `SIGNER=1`** :
+- **(a)** amorce figée, en réserve mesurée ;
+- **(b)** outillage des tâches rafraîchi, ce qui referait les références et la mesure d'un autre jour.

@@ -1785,3 +1785,33 @@ Journal : [`m1b-refus-prefetch.log`](m1b-refus-prefetch.log), de 15:51:32 à 15:
 - **FR4** (sans pari) : le nombre d'errata de sécurité plus récents que les paquets installés, leurs gravités, et le détail des paquets exposés.
 
 **Lecture prévue.** Comme pour curl, un erratum plus récent ne prouve pas que le code exécuté est touché. Le relevé chiffre le retard de l'amorce ; il ne juge pas son exposition. Le choix entre amorce figée et amorce rafraîchie te revient avant `SIGNER=1`. Rafraîchir l'amorce changerait la racine de l'outillage et du bootstrap, donc les cibles `7c07083c…` et `b063feb3…`, et referait la mesure d'un autre jour.
+
+### Fraîcheur de l'amorce : résultat (note écrite le 19/11/2026 à 16:00:25 UTC)
+
+Journal : [`m1b-amorce-fraicheur.log`](m1b-amorce-fraicheur.log), de 15:59:33 à 15:59:43 UTC, à HEAD `f41d4a9`, code 0.
+
+**FR1 à FR3 tenues ; FR4 lue.**
+- **FR1** : la config `686e4558…` porte `created` 2026-05-25T20:19:03Z, avec une seule couche, `99c753a8…`.
+- **FR2** : `primary` et `updateinfo` de BaseOS et AppStream 9.8 sont conformes à leur `repomd.xml`.
+- **FR3** : `curl-minimal` et `libcurl-minimal` sont en retard sur `7.76.1-40.el9_8.9`. Sur 146 paquets installés (hors `gpg-pubkey`), tous présents dans 9.8, **44 sont en retard**.
+- **FR4** (lecture) : 54 errata de sécurité de Rocky portent une version plus récente qu'un paquet installé, dont **1 « Critical », 22 « Important »**, 28 « Moderate » et 3 « Low ». Ils touchent 36 paquets.
+  - **Paquets en retard, exposés au réseau** :
+    - `ca-certificates`, avec l'erratum « Critical » `RLSA-2026:88459` ;
+    - `openssl-libs` 3.5.5 contre 3.5.8, 4 errata dont 3 « Important » ;
+    - `gnutls`, 1 « Important » ;
+    - `glibc`, 5 « Moderate » ;
+    - `libnghttp2`, 1 « Moderate » ;
+    - curl, 4 errata dont 2 « Important » ;
+    - `python3` et `python3-libs`, 3 « Important ».
+  - **Paquets en retard, exécutés en root dans Kata** : `tar` et `libsolv`, 1 « Moderate » chacun.
+  - **À jour** : `rpm`, `dnf`, `python3-dnf`, `libdnf`, `librepo`, `gnupg2`, `gpgme`, `zlib`.
+
+**Lecture.**
+- L'amorce, image du 25/05/2026 figée par digest (D4 a), n'a pas les correctifs que Rocky 9.8 a publiés depuis. Ce retard touche le pod de prefetch, qui parle au réseau en TLS, et le pod de construction, qui exécute python, tar et libsolv en root dans Kata, sans réseau.
+- **Ce retard n'atteint pas le contenu des images construites.** L'outillage et le bootstrap sont installés depuis le miroir 9.8 fixé par la pipeline, avec ses révisions à jour, `curl-7.76.1-40.el9_8.9` par exemple. L'amorce ne fournit que les outils qui installent et archivent.
+- Les contre-contrôles sont ceux de CA5 : sha256 fixés, signatures, pods sans secret, prefetch en runc et `restricted`, construction sans réseau. Un erratum plus récent ne prouve pas que le code exécuté est touché.
+- **Choix avant `SIGNER=1`, qui te revient** :
+  - **(a)** garder l'amorce figée, en réserve mesurée ;
+  - **(b)** rafraîchir l'outillage des tâches, par une image dérivée construite sans réseau, ou par une amorce plus récente. Cela change les outils qui installent, donc peut-être les racines `7c07083c…` et `b063feb3…`, et referait la mesure d'un autre jour.
+
+  Rien ne change avant la mesure du 20/11.

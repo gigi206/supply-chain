@@ -1,0 +1,33 @@
+# m1b-amorce-fraicheur.sh, début 2026-11-19T15:59:33Z ; HEAD f41d4a9dbba3
+OK   amorce ed654c694190… : config 686e4558d0a5…, created 2026-05-25T20:19:03.81230907Z, une couche 99c753a880cc…
+OK   baseos98 : repomd.xml abac8b17ece7… ; primary et updateinfo conformes
+OK   appstream98 : repomd.xml a3ca4230ce7e… ; primary et updateinfo conformes
+     paquets installés (hors gpg-pubkey) : 146 ; présents dans BaseOS ou AppStream 9.8 : 146 ; en retard : 44 ; absents des deux : 0
+     errata de sécurité qui portent une version plus récente qu'un paquet installé : 54 ; gravités : Critical 1, Important 22, Low 3, Moderate 28
+     paquets installés touchés par au moins un de ces errata : 36
+       curl-minimal : 7.76.1-40.el9 ; plus récent : 7.76.1-40.el9_8.9 (baseos98) ; errata de sécurité : 4 (RLSA-2026:55439 Important, RLSA-2026:69126 Important, RLSA-2026:80511 Moderate, RLSA-2026:92907 Moderate)
+       libcurl-minimal : 7.76.1-40.el9 ; plus récent : 7.76.1-40.el9_8.9 (baseos98) ; errata de sécurité : 4 (RLSA-2026:55439 Important, RLSA-2026:69126 Important, RLSA-2026:80511 Moderate, RLSA-2026:92907 Moderate)
+       openssl-libs : 3.5.5-2.el9_8 ; plus récent : 3.5.8-2.el9_8 (baseos98) ; errata de sécurité : 4 (RLSA-2026:22312 Moderate, RLSA-2026:25239 Important, RLSA-2026:67165 Important, RLSA-2026:77396 Important)
+       gnutls : 3.8.10-3.el9 ; plus récent : 3.8.10-9.el9_8 (baseos98) ; errata de sécurité : 1 (RLSA-2026:20612 Important)
+       nss : non installé
+       krb5-libs : 1.21.1-10.el9_8 ; plus récent : 1.21.1-10.el9_8.1 (baseos98) ; errata de sécurité : 0
+       libnghttp2 : 1.43.0-6.el9_7.1 ; plus récent : 1.43.0-6.el9_8.2 (baseos98) ; errata de sécurité : 1 (RLSA-2026:54662 Moderate)
+       libssh : non installé
+       libpsl : non installé
+       ca-certificates : 2025.2.80_v9.0.305-91.el9 ; plus récent : 2026.2.92_v9.0.319-90.3.el9_8 (baseos98) ; errata de sécurité : 1 (RLSA-2026:88459 Critical)
+       glibc : 2.34-266.el9_8 ; plus récent : 2.34-284.el9_8.4 (baseos98) ; errata de sécurité : 5 (RLSA-2026:20597 Moderate, RLSA-2026:33226 Moderate, RLSA-2026:42952 Moderate, RLSA-2026:79281 Moderate, RLSA-2026:95618 Moderate)
+       zlib : 1.2.11-40.el9 ; à jour dans 9.8
+       gnupg2 : 2.3.3-5.el9_7 ; à jour dans 9.8
+       gpgme : 1.15.1-6.el9 ; à jour dans 9.8
+       python3 : 3.9.25-7.el9_8 ; plus récent : 3.9.25-7.el9_8.6 (baseos98) ; errata de sécurité : 3 (RLSA-2026:39798 Important, RLSA-2026:54268 Important, RLSA-2026:89742 Important)
+       python3-libs : 3.9.25-7.el9_8 ; plus récent : 3.9.25-7.el9_8.6 (baseos98) ; errata de sécurité : 3 (RLSA-2026:39798 Important, RLSA-2026:54268 Important, RLSA-2026:89742 Important)
+       rpm : 4.16.1.3-40.el9 ; à jour dans 9.8
+       rpm-libs : 4.16.1.3-40.el9 ; à jour dans 9.8
+       dnf : 4.14.0-34.el9_8.rocky.0.1 ; à jour dans 9.8
+       python3-dnf : 4.14.0-34.el9_8.rocky.0.1 ; à jour dans 9.8
+       libdnf : 0.69.0-18.el9.rocky.0.1 ; à jour dans 9.8
+       librepo : 1.19.0-1.el9 ; à jour dans 9.8
+       libsolv : 0.7.24-4.el9 ; plus récent : 0.7.24-6.el9_8 (baseos98) ; errata de sécurité : 1 (RLSA-2026:39315 Moderate)
+       tar : 1.34-11.el9 ; plus récent : 1.34-13.el9_8 (baseos98) ; errata de sécurité : 1 (RLSA-2026:61581 Moderate)
+place libre de /home : 106973512 kB ; dossier laissé : /home/gigi/.cache/supply-chain-poc/05/m1b-amorce-fraicheur-20261119T155933Z
+# fin 2026-11-19T15:59:43Z ; KO 0
