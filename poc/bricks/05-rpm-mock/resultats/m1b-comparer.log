@@ -1,0 +1,14 @@
+# m1b.sh comparer (PREFIXE m1b), début 2026-11-19T12:18:38Z
+p-a.tar : sha256 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7 ; p-b.tar : sha256 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+OK   les deux pods donnent la même archive
+OK   p-a.tar = cible 7c07083c…
+## p-a.tar contre a8.tar (membre à membre)
+   comparer : membres : 13332 et 13332
+   comparer : seulement d'un côté : 0 ; présents des deux côtés et différents : 0
+   comparer : champs en cause : aucun
+OK   p-b.tar = cible 7c07083c…
+## p-b.tar contre a8.tar (membre à membre)
+   comparer : membres : 13332 et 13332
+   comparer : seulement d'un côté : 0 ; présents des deux côtés et différents : 0
+   comparer : champs en cause : aucun
+# fin comparer 2026-11-19T12:18:42Z

@@ -1116,3 +1116,19 @@ Décision du propriétaire : « Mesurer aussi /proc ».
 - **PD5** (sans pari) : l'archive vaut-elle `7c07083c…` ? Les scriptlets voient un `/proc` réel, ce qui peut changer des fichiers. Si elle diffère, le comparateur membre à membre contre `a8` nomme chaque écart. Elle est toujours rapatriée (344 Mo ; il reste environ 3,8 G sur /home).
 
 **Ce qui départagera.** Si PD2, PD3 et PD5 sont tenues (code 0, rapide, même archive), les deux remèdes se valent pour cette installation, et le choix redevient une question de simplicité. Si l'archive diffère, garder `/proc` demanderait de refaire les références.
+
+### pod_b et comparer : résultat, 19/11/2026 (note écrite à 2026-11-19T12:19:05Z UTC)
+
+Journaux : [`m1b-pod_b.log`](m1b-pod_b.log) (de 10:41:12 à 12:17:56 UTC, code 0) et [`m1b-comparer.log`](m1b-comparer.log) (de 12:18:38 à 12:18:42 UTC, code 0). `pod_b` a tourné avec le même script que `pod_a` ; le changement pour `pod_d` n'a été appliqué qu'après sa fin.
+
+**PK1 à PK6 tenues pour `pod_b`, PC1 tenue, PC2 sans objet.**
+- **PK1** : pod prêt sous `kata`, au label `construire-rpm`, sur le nœud `sc-build`. Les entrées sont copiées en 4 morceaux et revérifiées dans le pod (code 0, 225 fichiers).
+- **PK2** : `%_install_langs` vaut `en_US`, les versions sont celles du banc, et la S recalculée vaut `1793914619`.
+- **PK3** : les deux témoins réseau échouent (code 124 en TCP vers Zot comme en DNS public).
+- **PK4** (lecture) : umask du conteneur `0022`, comme dans `pod_a`.
+- **PK5** : dnf rend 0 ; 201 paquets sont installés, dont 2 `gpg-pubkey` ; la racine est en 555 ; `tar` rend 0, sans rien sur stderr ; 13 332 membres.
+- **PK6** : l'archive vaut `7c07083c…` octet pour octet.
+- **PC1** : `p-a.tar` et `p-b.tar` sont identiques, et chacune égale la cible. Le comparateur membre à membre contre `a8` ne trouve aucun écart.
+- **Durée** (lecture) : dnf met 5 724 s, contre 5 811 s dans `pod_a`, à la même limite par défaut.
+
+**Portée.** Trois pods Kata (`pod_a`, `pod_b`, `pod_c`), du même nœud et du même jour, donnent l'archive `7c07083c…` de l'outillage. C'est la portée annoncée dans les prédictions : rien n'est établi pour le bootstrap, ni pour un autre jour, ni pour la tâche elle-même.
