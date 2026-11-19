@@ -6,4 +6,142 @@ Règles reprises : celles de la [brique 05](../05-rpm-mock/README.md) (projets j
 
 ## État
 
-**Squelette posé le 19/11/2026 à 14:39:09 UTC (`date -u`), préparation à sec en cours, dans un worktree à part (branche `claude/brique-09-sec-fdb4c6`), rien installé, rien lu ni écrit dans le cluster ou Zot.** Les sections suivantes sont écrites au fil de la préparation.
+**Préparé à sec le 19/11/2026 (squelette à 14:39:09 UTC, relevés de 14:44:38 à 14:53:01 UTC, protocole écrit à partir de 14:53:44 UTC), dans un worktree à part (branche `claude/brique-09-sec-fdb4c6`, jamais poussée). Rien installé, aucun `sudo`, rien lu ni écrit dans le cluster ou dans Zot.** Seuls ont tourné des relevés en lecture publique ([`releve-amont.sh`](releve-amont.sh) et trois compléments, journaux sous [`resultats/`](resultats/)) et, après les prédictions de ce README, un banc sur l'hôte avec les outils déjà présents (voir « Banc hors cluster »). Les jalons O2 et suivants attendent les décisions D1 à D4 et un accord pour chacun.
+
+Les ajouts proposés aux fichiers partagés (doc 03, doc 04, README racine, ADR, et une correction datée du doc 00) sont dans [`A-REPORTER.md`](A-REPORTER.md). Cette session ne modifie pas ces fichiers.
+
+## Ce qui existe déjà
+
+- **Doc 00, l. 106** : signature OpenPGP « **Retenu** (brique 09) », service isolé et HSM (sigul, signd d'OBS, worker debusine cités) ; OpenBao Transit « ne fait pas d'OpenPGP » ; « `rpmsign`/`debsign` modifient l'artefact, d'où une attestation de lien ». **La moitié deb de cette phrase est inexacte** d'après la page de manuel de trixie : `debsign` signe le `.dsc`, le `.buildinfo` et le `.changes`, pas le `.deb` ([journal](resultats/releve-complements.log), §A). Correction datée proposée dans `A-REPORTER.md`.
+- **Doc 02, l. 30** : nœud `PGP[Service OpenPGP + HSM]` dans la zone Confiance. **l. 217** : clé « OpenPGP dépôts et paquets », stockage « HSM du service de signature isolé », usages `rpmsign`, `debsign`, `Release`/`repomd`, rotation « expiration planifiée, révocation ».
+- **Doc 01** : **B8** (« Signés en OpenPGP avec attestation de lien ») ; **B1** définit le bit-identique « contenu hors signature OpenPGP », ce qui fixe la propriété que l'attestation de lien doit porter ; ligne des clés (l. 105) : séparation par usage, rotation, révocation, ADR 0003 ; l. 41 : « clés OpenPGP (HSM) » ; menace G (l. 64) : « OpenPGP sur les dépôts ».
+- **ADR 0003** : « À rédiger » ; entrées mesurées en brique 08 (J3 clé de provenance Transit, J5 clé `tsa`, J6 clé des tâches en fichier 0600 sur l'hôte d'administration).
+- **Artefacts à signer, lus dans les journaux** (pas tirés de Zot) :
+  - rpm : `sample-app-1.0.0-2.el9.x86_64.rpm`, 2 173 376 octets, sha256 `864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f`, seul membre de la couche du manifeste `sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119` (`builds/sample-app-rpm`, M4c, [comparaison](../05-rpm-mock/resultats/m4c-comparaison.log), l. 6, 33, 34) ;
+  - deb « D » : `sample-app_1.0.0-2_amd64.deb`, 1 953 492 octets, sha256 `f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b`, dans le manifeste `sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e` (`builds/sample-app-deb`, [S4d](../06-deb-sbuild/resultats/s4d-pipeline.log), l. 11 et 57 ; [S3](../06-deb-sbuild/resultats/s3-comparaison.log), l. 4).
+
+## Relevé amont (19/11/2026, 14:44:38 à 14:53:01 UTC)
+
+Journaux : [relevé](resultats/releve-amont.log), compléments [1](resultats/releve-complements.log), [2](resultats/releve-complements-2.log) et [3](resultats/releve-complements-3.log). **78 fichiers téléchargés, 50 462 785 octets** au total, dont `primary.xml.gz` de Rocky 9.8 BaseOS pour 45 549 029 octets ; nom, origine, taille et sha256 de chacun dans la [liste](resultats/releve-amont-telechargements.tsv). Dossiers neufs, sous `~/.cache/supply-chain-poc/09/` (`releve-20261119T144438Z`, `complements-20261119T144707Z`, et le `--homedir` de gpg `gnupg-releve-20261119T144438Z`), relus par `python3 -I` ou par `gpgv` ; à garder : deux scripts les relisent par chemin fixe.
+
+| Point | Mesuré | Conséquence |
+|---|---|---|
+| GnuPG amont | `swdb.lst` **vérifié par gpgv** (clé `6DAA6E64…3ADA`, une des 6 empreintes de `signature_key.asc`, recoupées avec `signature_key.html` du même site) : `gnupg26_ver 2.5.24` du 23/09/2026, `gnupg24_ver 2.4.9` du 30/12/2025. Tableau de fin de vie : **2.4 au 30/06/2026**, 2.5 et 2.6 « tba », **aucune ligne 2.3** ; libgcrypt 1.10 au 30/06/2026 | La branche 2.4 est hors maintenance amont depuis 4 mois et demi |
+| GnuPG de Debian 13 | `gnupg` et `gpgv` **2.4.7-21+deb13u1** ; tracker de sécurité : 4 failles « Open issues » pour trixie, toutes « vulnerable (no DSA) » (CVE-2026-105712 gpgtar, CVE-2026-57062 gpgsm, CVE-2026-24882 tpm2d, **CVE-2025-68972** messages signés en clair « through 2.4.8 »), et CVE-2022-3219 sous « Open unimportant issues » | CVE-2025-68972 touche la vérification de messages signés en clair, donc la forme `InRelease` vérifiée par gpgv : vérifier `Release` + `Release.gpg`, ou l'octet sorti de la vérification, jamais le fichier brut |
+| GnuPG de Rocky 9.8 | `gnupg2` **2.3.3-5.el9_7** (construit le 19/01/2026), BaseOS vérifié par son `repomd.xml.asc` (clé `21CB256A…275D`, celle du doc 04) ; `rpm-sign-libs` 4.16.1.3-40.el9 **exige `/usr/bin/gpg2`** | La signature rpm passe par le gpg de Rocky, version d'une branche amont absente du tableau de fin de vie : maintenance de la distribution seulement |
+| GnuPG de l'hôte | 2.4.8 (Ubuntu 26.04) | Le banc ne mesure ni 2.3.3 ni 2.4.7 |
+| rpm de Rocky 9.8 | `rpm` et `rpm-sign` 4.16.1.3-40.el9 (28/12/2025) ; `rpm-libs` lié à `libcrypto.so.3` ; `rpm-sequoia` présent dans BaseOS, non requis par `rpm-libs` | Au tag amont `rpm-4.16.1.3` : `--addsign`, `--resign`, `--delsign` ; `%__gpg_sign_cmd` appelle gpg ; EdDSA cité 23 fois dans `digest_openssl.c` (compte d'occurrences, pas une mesure de Rocky) |
+| apt de Debian 13 | **3.0.3** (3.0.4 en proposed-updates) ; `debian/control` : `sqv (>= 1.3.0) … | gpgv` ; `debian/default-sequoia.config` : DSA refusé depuis le 01/02/2024, RSA 2048 jusqu'au 01/02/2030, **SHA-1 et SHA-224 jusqu'au 01/02/2026**, signatures v3 jusqu'au 01/02/2026 ; `sqv` 1.3.0-3+b2 dans trixie | Clé RSA ≥ 3072 ou Ed25519, empreinte SHA-256 ou SHA-512, signatures v4. **Quelle méthode apt emploie réellement (sqv ou gpgv) n'est pas lu** : à mesurer en O4 |
+| Outils deb | `apt-utils` (`apt-ftparchive`) 3.0.3 ; `devscripts` (`debsign`) 2.25.15+deb13u1 ; `reprepro` 5.4.6+really5.3.2-1+deb13u1 ; `debsigs` 0.2.2-1 et `debsig-verify` 0.33 ; **`dpkg-sig` et `obs-signd` absents de trixie** (madison) | Un dépôt signé se fait avec `apt-ftparchive` et gpg, sans outil de plus |
+| Outils rpm | `createrepo_c` 0.20.1-4.el9 (AppStream 9.8, déjà audité au doc 04) ; `repomd.xml.asc` de Rocky : signature détachée armurée | Même forme pour notre dépôt |
+| HSM logiciel | SoftHSMv2 **2.7.0** du 20/01/2026 (trixie 2.6.1-3, Rocky `softhsm` 2.6.1-11.el9) ; pont gpg vers PKCS#11 : **gnupg-pkcs11-scd 0.11.0 du 27/10/2024**, rien depuis ; obs-sign : moteurs `signd_pkcs11` et `signd_tpm` **sur master seulement**, absents du tag 2.8.5 | **Aucun chemin publié et maintenu de gpg vers PKCS#11** : la garde de la clé se réduit à un fichier dans un service isolé, ou à un jeton matériel (carte OpenPGP par `scdaemon`) |
+| Services de signature | **sigul** 1.4 (EPEL 9 : 1.4-1 ; paquet « Update to v1.4 » le 22/04/2025 ; aucun tag plus récent) ; **siguldry** 0.9.1 du 13/11/2026, 0.x, « not currently deployed within the Fedora infrastructure » ; **obs-sign** 2.8.5 du 05/02/2026 ; **debusine** : clés OpenPGP sur HSM non faites (ticket 1099 « opened ») ; **vault-gpg-plugin** v0.6.3 du 02/01/2025 | Aucun service tout fait n'est retenable aujourd'hui (verdicts ci-dessous) |
+
+## Trois niveaux d'identité et attestation de lien
+
+Chains et la VSA ne connaissent que les **manifestes OCI** (`07b7bd6f…`, `60f25f5c…`). La couche porte le **fichier** (`864d55f4…`, `f66bbeb2…`). Signer un rpm crée un **troisième objet**, le fichier signé, publié sous un nouveau manifeste, sans provenance de Chains. L'attestation de lien doit relier ce nouvel objet au manifeste non signé, et la propriété de B1 (« contenu hors signature OpenPGP ») dit ce qu'elle affirme : même en-tête principal et même charge utile, seule l'en-tête de signature change.
+
+- **rpm** : la signature s'écrit dans l'en-tête de signature. Vérification indépendante proposée : les octets à partir de l'en-tête principal sont identiques dans le rpm signé et dans `864d55f4…`, et `SHA256HEADER` et le digest de la charge utile sont égaux (`rpm -qp --qf`). `rpm --delsign` puis comparaison à `864d55f4…` est un second contrôle, d'issue incertaine.
+- **deb** : avec D1 (a), le `.deb` n'est pas modifié. Le lien est une identité : l'entrée `Packages` du dépôt signé porte `f66bbeb2…`, et `Release` (signé) porte l'empreinte de `Packages`.
+- **dépôts** : `Release`/`InRelease` et `repomd.xml.asc` signent des métadonnées neuves ; l'attestation énumère les fichiers couverts et leurs empreintes.
+
+## Options étudiées (verdicts proposés, détail dans `A-REPORTER.md`)
+
+| Option | Mesure qui décide | Verdict proposé | Retenue |
+|---|---|---|---|
+| GnuPG (gpg, gpg-agent, gpgv), paquets de la distribution | Releases et swdb signés ; 90 commits en 90 jours sur le miroir, 4 auteurs, 60 commits d'un même domaine ; branche 2.4 en fin de vie amont ; 4 failles ouvertes sans DSA dans trixie | **À surveiller, chemin critique** | Oui |
+| rpm-sign (projet rpm) | Déjà au doc 04 (rpm « À surveiller ») ; exige gpg2 | Renvoi à la ligne rpm | Oui |
+| createrepo_c | Déjà au doc 04 | Renvoi | Oui |
+| apt (`apt-ftparchive`) | 3.3.8 du 16/11/2026 ; au moins 100 commits en 90 jours, 9 auteurs, **79 sur 100 d'un même auteur** | **À surveiller, chemin critique** | Oui |
+| sqv (Sequoia), vérificateur de apt | sequoia-sqv v1.5.0 du 03/07/2026, 0 commit en 90 jours sur ce dépôt ; bibliothèque `openpgp/v2.4.2` du 14/10/2026, 27 commits, 5 auteurs | **À surveiller**, hors chemin de signature (côté consommateur, sert au contrôle O4) | Oui, pour vérifier |
+| devscripts (`debsign`) | v2.26.15 du 07/11/2026 ; 39 commits, 16 auteurs | **À surveiller** (employeurs non établis, Scorecard n/a) | Selon D1 |
+| sigul | Aucun tag après v1.4, publiée au plus tard le 22/04/2025 | **Remplit à la lettre « Risqué »** (borne : date du tag non lue) | Non |
+| gnupg-pkcs11-scd | 0.11.0 du 27/10/2024, 0 commit en 90 jours | **Remplit à la lettre « Risqué »** | Non |
+| vault-gpg-plugin | v0.6.3 du 02/01/2025, un seul auteur ; extension de Vault, OpenBao non vérifié | **Remplit à la lettre « Risqué »** | Non |
+| debsigs | Tag amont `release/0.2.2` du 22/11/2024 ; trixie livre 0.2.2-1 ; tag d'empaquetage `debian/0.2.2-2` du 07/01/2026, sans nouvelle version amont | **Remplit à la lettre « Risqué »** (le tag Debian est un empaquetage, pas une release ; même lecture que pour GnuPG, où seule la release amont compte pour le critère) | Non |
+| dpkg-sig | Absent de trixie (madison) | Non audité | Non |
+| obs-sign | Tag 2.8.5 du 05/02/2026 ; 10 commits en 90 jours, tous du même domaine ; absent de trixie, EPEL 9 en 2.5.10 de 2021 ; PKCS#11 et TPM non publiés | **À surveiller** | Non (usage : à construire depuis les sources, sans HSM publié) |
+| siguldry | 0.9.1, 0.x ; 60 commits, 4 auteurs, 38 d'un même domaine ; licence non détectée par l'API ; non déployé par Fedora | **À surveiller (0.x)** | Non, veille |
+| SoftHSMv2 | 2.7.0 du 20/01/2026 (plus de 6 mois) ; 11 commits, 8 auteurs | **À surveiller** | Non (aucun pont gpg publié) |
+| debusine (worker de signature) | Déjà au doc 04 « À surveiller (option) » ; OpenPGP sur HSM non fait | Inchangé | Non |
+
+## Décisions à prendre
+
+Recommandations soumises au conseiller avant d'être écrites ; les vrais choix reviennent au propriétaire, une question à la fois, dans l'ordre D1, D2, D3, D4.
+
+**D1. Lecture de « deb signé ».** Recommandé : **(a)**.
+- (a) Le `.deb` reste tel quel (bit-identique, `f66bbeb2…`). La signature porte sur le dépôt (`Release.gpg` et `InRelease`, vérifiés par apt), et, en option, sur le `.changes` et le `.buildinfo` par `debsign`. C'est la pratique de Debian. Le lien deb est une identité d'empreinte.
+- (b) Signature intégrée au `.deb` (`debsigs`, membre `_gpg…`) : modifie l'artefact, n'est pas vérifiée par apt par défaut, et `debsigs` remplit à la lettre « Risqué ». Écartée sauf décision contraire.
+
+**D2. Garde de la clé (sens de « HSM » dans le PoC).** Recommandé : **(a)**.
+- (a) Fichier de clé (`private-keys-v1.d`, 0600, sans phrase de passe ou avec une phrase hors argument) dans un **service de signature isolé hors du cluster, sur l'hôte d'administration**, comme la clé des tâches de J6 ; aucun HSM, écart écrit dans l'ADR 0003. Le cluster ne voit jamais la clé privée.
+- (b) Même fichier, dans un pod dédié de la zone Confiance (Secret monté) : plus proche du doc 02, mais la clé est lisible par quiconque lit les Secrets de cet espace, et il faut des tâches, des droits et une NetworkPolicy de plus.
+- (c) Jeton matériel OpenPGP (`scdaemon`) : seule voie HSM mesurable sans logiciel « Risqué », mais achat, accès USB et règles udev sur l'hôte (installation système, à demander).
+
+**D3. Émetteur et clé de l'attestation de lien.** Recommandé : **(a)**.
+- (a) Le service de signature émet un énoncé in-toto (sujet : l'artefact signé ; prédicat : manifeste et fichier non signés, empreinte de la clé OpenPGP, versions des outils, contrôle de B1), signé par cosign avec une **clé Transit dédiée `lien`** dans OpenBao, distincte des clés de provenance, `tsa` et des tâches (séparation par usage, doc 01 l. 105). Avant de signer, le service vérifie la provenance de Chains sur le manifeste non signé, comme le job TSA de J6.
+- (b) Même énoncé signé par la clé OpenPGP elle-même : une clé de moins, mais Kyverno et Conforma ne savent pas vérifier une signature OpenPGP.
+
+**D4. Version de GnuPG.** Recommandé : **(a)**.
+- (a) Paquets des distributions : `gnupg2` 2.3.3-5.el9_7 de Rocky 9.8 pour rpm (imposé par `rpm-sign-libs`), `gnupg` 2.4.7-21+deb13u1 de Debian 13 pour deb. Maintenance par les distributions, branches amont hors maintenance ; failles ouvertes à suivre.
+- (b) GnuPG 2.5.24 construit depuis l'archive amont signée : version maintenue en amont, mais une construction de plus, et rien ne garantit que `rpm-sign` 4.16 l'accepte.
+
+## Jalons proposés
+
+Chaque jalon demande un accord ; « pod d'essai avant signature » de toute tâche neuve, comme en 05 et 06.
+
+| Jalon | Contenu | Preuve attendue |
+|---|---|---|
+| O0 | **Banc hors cluster** (fait à sec, voir plus bas) : dépôt apt signé sur l'hôte autour d'une copie de D | Chaîne `Release.gpg` → `Release` → `Packages` → `f66bbeb2…` ; témoins refusés |
+| O1 | Lignes du doc 04 intégrées par la session principale ; D1 à D4 décidées | Doc 04 à jour, décisions consignées |
+| O2 | Clé OpenPGP du PoC (RSA 4096, v4, identité fictive, expiration, certificat de révocation à part) selon D2 ; images de signature construites par la plateforme : Rocky 9.8 (`rpm-sign`, `gnupg2`, `createrepo_c`) et Debian 13 (`gnupg`, `apt-utils`), paquets épinglés et vérifiés | Empreinte de la clé ; images par digest ; signatures des paquets d'origine vérifiées |
+| O3 | rpm : `rpmsign --addsign` sur une copie de `864d55f4…` ; `rpmkeys --checksig` dans un Rocky 9.8 vierge ; contrôle de B1 ; dépôt par `createrepo_c` et `repomd.xml.asc` ; `dnf` avec `gpgcheck=1` et `repo_gpgcheck=1` | rpm signé vérifié ; en-tête principal et charge utile inchangés ; dépôt accepté, témoins refusés |
+| O4 | deb : le dépôt du banc refait dans l'image Debian 13 ; `apt update` et `apt-get download` dans un Debian 13 vierge avec `signed-by` ; méthode réellement employée par apt relevée (sqv ou gpgv) | deb téléchargé égal à `f66bbeb2…` ; témoins refusés par apt |
+| O5 | Attestation de lien (D3) pour le rpm, le deb et les deux dépôts, en referrer dans Zot ; vérification par cosign et par un contrôle indépendant de B1 | Attestations vérifiées ; refus : lien vers un autre digest, rpm à charge altérée, clé étrangère |
+| O6 | Optionnel, à chiffrer après O5 : tâche signée dans la pipeline, ou contrôle par la porte (Conforma) | Hors de l'estimation de 1,5 pw |
+
+## Prédictions de la brique (19/11/2026, avant tout lancement)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| 1 | Le `rpmsign --addsign` de Rocky 9.8 laisse l'en-tête principal et la charge utile inchangés : octets égaux à `864d55f4…` à partir de l'en-tête principal | Moyenne-haute : la signature va dans l'en-tête de signature ; jamais mesuré dans ce PoC |
+| 2 | `rpm --delsign` sur le rpm signé redonne exactement `864d55f4…` | Faible : remplissage de l'en-tête de signature non lu |
+| 3 | Une clé RSA 4096 v4 est acceptée par `rpmkeys` de Rocky 9.8 et par apt de Debian 13 | Haute : la clé de Rocky est RSA ; RSA 4096 n'est pas borné par `default-sequoia.config` |
+| 4 | Une clé Ed25519 v4 serait aussi acceptée par Rocky 9.8 | Faible : comptes d'occurrences au tag amont seulement ; non retenue pour le PoC |
+| 5 | apt de Debian 13 vérifie par sqv, pas par gpgv | Moyenne : dépendance et méthode présentes, choix effectif non lu |
+| 6 | Le deb servi par le dépôt signé est égal à `f66bbeb2…` | Haute : `apt-ftparchive` ne modifie pas les paquets |
+| 7 | L'effort reste sous 1,5 pw si D2 (a) et D3 (a) sont retenues | Faible : la 05 et la 06 ont dépassé leur estimation ; O3 et O5 sont neufs |
+
+Prédictions du banc : [`resultats/banc-depot-deb-predictions.md`](resultats/banc-depot-deb-predictions.md).
+
+## Banc hors cluster
+
+**Possible sans rien installer, pour le dépôt deb seulement**, avec les outils déjà sur l'hôte : `gpg` et `gpgv` 2.4.8, `apt-ftparchive`, `dpkg-deb`, `python3`. Script : [`banc-depot-deb.sh`](banc-depot-deb.sh), étapes `prealables` puis `banc`.
+
+- Entrée : une copie locale de D (`~/.cache/supply-chain-poc/08/travail/s3-06/build-1/`), admise parce qu'elle n'est pas tirée de Zot (interprétation), et **refusée si son sha256 diffère** de celui de [`s3-comparaison.log`](../06-deb-sbuild/resultats/s3-comparaison.log). Rien n'est écrit dans les dossiers 05, 06 ou 08.
+- Clé jetable RSA 4096, identité fictive sans adresse, `%no-protection` dans un fichier de paramètres (aucun secret en argument), `--homedir` neuf ; seules des empreintes sont journalisées.
+- **Non faisable sur l'hôte sans installation** : `rpmsign` (rpm absent), `createrepo_c` (absent), `debsign` (devscripts absent), `sqv` (absent), tout HSM. Le banc ne mesure donc ni le gpg de Rocky (2.3.3) ni celui de Debian 13 (2.4.7), ni le vérificateur réel d'apt.
+
+## Risques
+
+- **GnuPG hors maintenance amont** dans les deux distributions (D4) ; failles ouvertes sans DSA. Plan de sortie relevé, non mesuré : Sequoia côté deb (`sq` 1.3.1 dans trixie) ; côté rpm, aucun, `rpm-sign` 4.16 appelant gpg.
+- **Pas de HSM** (D2) : la clé du PoC est un fichier. Écart à écrire dans l'ADR 0003.
+- **Un seul fusionneur ou presque** pour apt (79 commits sur 100) et pour les candidats écartés.
+- **Nouveau manifeste sans provenance** pour le rpm signé : sans attestation de lien vérifiée à l'admission, Kyverno refuserait ou laisserait passer selon la règle ; à régler en O5.
+- **Dépassement** : la 05 et la 06 ont dépassé leur estimation ; seuil de décision à 3 pw.
+
+## Accords à demander avant tout passage dans le cluster
+
+1. D1 à D4 (une question à la fois).
+2. Création de la clé OpenPGP du PoC et son emplacement (D2), puis de la clé Transit `lien` dans OpenBao (D3).
+3. Construction des deux images de signature par la plateforme et leur publication dans Zot.
+4. Pods d'essai dans le cluster (O3, O4) et écritures dans Zot : rpm signé, dépôts signés, attestations de lien.
+5. Toute modification de Kyverno, de la porte ou des NetworkPolicy (O5, O6).
+6. Aucune installation sur l'hôte n'est prévue ; D2 (c) en demanderait une.
+
+## Limites connues
+
+- Les employeurs ne sont mesurés que par les domaines des adresses d'auteur.
+- Le Scorecard de `gpg/gnupg` (3,5) est celui d'un miroir que les mainteneurs ne suivent pas, pas celui du projet : GnuPG est jugé au §4 du doc 04 (hors GitHub).
+- Le délai de correction des CVE de GnuPG n'est pas mesuré.
+- Les cibles 2c de B8 (alma-9, centos-stream-10, debian-12, ubuntu-24.04) ont leurs propres vérificateurs (rpm-sequoia, gpgv, apt 2.x), non relevés.
