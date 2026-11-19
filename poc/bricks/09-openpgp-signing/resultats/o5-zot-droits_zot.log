@@ -1,0 +1,23 @@
+étape droits_zot commencée : 2026-11-19T20:27:57Z ; o5-zot.sh 1b1f46ef4cfa69bc…
+OK   configuration de registre de poc-lien déjà présente (mode 600)
+sha256:c5fa3f603bf92deedc68bf09a9b742007690bc842b7bdaf958c2044e79bf4484
+image jetable : sha256:c5fa3f603bf92deedc68bf09a9b742007690bc842b7bdaf958c2044e79bf4484
+### poc-lien
+OK   poc-lien, par digest dans signes/essai-09 : accepte
+OK   poc-lien, par tag dans signes/essai-09 : refus (Error from destination registry for "192.168.161.13:5000/signes/essai-09:tag-interdit": denied: requested access to the resource is denied: )
+OK   poc-lien, par digest dans builds/essai-09 (hors de signes/**) : refus (Error from destination registry for "192.168.161.13:5000/builds/essai-09@sha256:c5fa3f603bf92deedc68bf09a9b742007690bc842b7bdaf958c2044e79bf)
+OK   poc-lien, referrer (oras attach) sur signes/essai-09@image : accepte
+OK   poc-lien, referrer dans signes/essai-09-sans-sujet, sujet absent de ce dépôt : refus (Error response from registry: failed to resolve sha256:c5fa3f603bf92deedc68bf09a9b742007690bc842b7bdaf958c2044e79bf4484: 192.168.161.13:5000)
+OK   poc-lien, suppression du manifeste : refus (Error response from registry: denied: requested access to the resource is denied: map[description:The access controller denied access for th)
+### autres
+OK   anonyme, par digest dans signes/essai-09-anonyme : refus (Error from destination registry for "192.168.161.13:5000/signes/essai-09-anonyme@sha256:c5fa3f603bf92deedc68bf09a9b742007690bc842b7bdaf958c2)
+OK   poc-ecriture, par digest dans signes/essai-09-ecriture (motif le plus long) : refus (Error from destination registry for "192.168.161.13:5000/signes/essai-09-ecriture@sha256:c5fa3f603bf92deedc68bf09a9b742007690bc842b7bdaf958c)
+     configuration temporaire du témoin poc-ecriture vidée (0 octet)
+### lecture anonyme
+OK   manifeste relu en anonyme : sha256:c5fa3f603bf92deedc68bf09a9b742007690bc842b7bdaf958c2044e79bf4484
+OK   referrers relus en anonyme : application/vnd.dev.sigstore.bundle.v0.3+json
+     tags de signes/essai-09 : aucun
+     objets laissés dans Zot (poc-lien ne peut rien supprimer) : signes/essai-09@sha256:c5fa3f603bf92deedc68bf09a9b742007690bc842b7bdaf958c2044e79bf4484 et son referrer
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-zot
+étape droits_zot finie : 2026-11-19T20:28:10Z
+OK   K6 : ni le mot de passe ni le hash de poc-lien dans le journal

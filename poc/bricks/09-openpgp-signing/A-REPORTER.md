@@ -197,6 +197,8 @@ Règles de lecture des sessions : ajouter `~/.cache/supply-chain-poc/09/secrets/
 
 *Note datée du 19/11/2026, 20:09:56 UTC (brique 09, `compte_zot`)* : un troisième secret de la brique 09 est sur l'hôte, `~/.cache/supply-chain-poc/09/secrets/zot-poc-lien.password` (0600, 48 caractères hexadécimaux). À ajouter aussi à la boucle de la ligne 8 de `tools/secrets-depot.sh`. La ligne htpasswd `zot-poc-lien.htpasswd` ne porte que le hash ; `stockage.sh` la lira (§4 quinquies).
 
+*Note datée du 19/11/2026, 20:28:37 UTC (brique 09, `droits_zot`)* : un quatrième fichier secret de la brique 09, `~/.cache/supply-chain-poc/09/secrets/zot-poc-lien-docker/config.json` (0600), porte l'authentification de `poc-lien` en base64. Pour `secrets-depot.sh`, ce motif dérive de `zot-poc-lien.password`. Il est à ajouter aussi, ou à couvrir par un motif tiré du mot de passe, comme la 07a le fait pour `poc-scan`.
+
 ---
 
 ## 4 quinquies. Brique 08 : compte Zot `poc-lien` (O5 de la brique 09, quatrième accord du propriétaire)

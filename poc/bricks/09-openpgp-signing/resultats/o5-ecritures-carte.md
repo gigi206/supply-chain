@@ -164,3 +164,31 @@ Le journal est gardé : [o5-zot-droits_zot-premier-passage.log](o5-zot-droits_zo
 **Effet de bord.** La configuration de registre de `poc-lien` est écrite (`09/secrets/zot-poc-lien-docker`) ; la relance la réutilise. La configuration du témoin a été vidée.
 
 **Correction.** Le script écrit `oci-layout` (`imageLayoutVersion 1.0.0`). Les prédictions ne changent pas. Le dossier de travail est effacé avant la relance.
+
+## Note datée du 19/11/2026, 20:28:37 UTC : `droits_zot` relancée (20:27:57 à 20:28:10 UTC, code 0), D1 à D9 et K6 tenues
+
+Journal : [o5-zot-droits_zot.log](o5-zot-droits_zot.log). L'image jetable est `signes/essai-09@sha256:c5fa3f60…`.
+
+**Écritures de `poc-lien` :**
+- **D1** : par digest dans `signes/essai-09`, acceptée.
+- **D2** : par tag, refusée (« denied: requested access to the resource is denied »).
+- **D3** : hors de `signes/**`, refusée.
+- **D4** : referrer sur l'image, accepté.
+- **D5** : referrer dans un dépôt où le sujet est absent, refusé par `oras attach` (« failed to resolve »). **Le tableau du §3 est donc figé avec la copie `signes/sample-app-deb@60f25f5c…`** : le manifeste non signé du deb, recopié octet pour octet, porte le referrer `identity`.
+- **D6** : suppression refusée (« The access controller denied access »).
+
+**Autres comptes :**
+- **D7** : l'anonyme est refusé.
+- **D8** : `poc-ecriture` est refusé dans `signes/` ; le motif le plus long remplace bien `**`.
+
+**D9** : manifeste et referrer relus en anonyme ; aucun tag.
+
+**Réserve.** Pour D3, D7 et D8, le motif du refus est coupé à 140 caractères dans le journal. Il s'arrête sur l'adresse refusée, avant la raison. Ces trois refus ne sont pas jugés sur leur motif.
+
+**Objets laissés dans Zot** : `signes/essai-09@sha256:c5fa3f60…` et son referrer d'essai, puisque `poc-lien` ne peut rien supprimer.
+
+**Secrets sur l'hôte** :
+- `09/secrets/zot-poc-lien-docker/config.json` (0600), gardé pour la publication ;
+- `09/secrets/temoin-poc-ecriture-docker/config.json`, vidé (0 octet).
+
+**Suite** : préparer à sec la publication dans `signes/**` et les quatre attestations de lien réelles. Ce sera la prochaine étape, avec banc et prédictions.
