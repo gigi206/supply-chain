@@ -159,3 +159,17 @@ Les quatre énoncés sont archivés : `o5-signes-enonce-{rpm,deb,depot-rpm,depot
 - la porte et Kyverno ne lisent pas encore `signes/**` : c'est O6 ;
 - l'attestation est vérifiée sur l'hôte, pas dans le cluster ;
 - les dossiers de travail sont effacés, y compris `09/o5-signes/construire`, que l'on peut refaire à l'identique (CO1).
+
+## Note datée du 19/11/2026, 20:53:54 UTC : relecture du conseiller, deux compléments
+
+**1. Refus du contrôle jamais déclenchés jusqu'ici.** Ni `o5-signes-banc.sh` ni `essai_attest` ne les avaient déclenchés. Un banc hors réseau les éprouve désormais ([o5-signes-refus-banc.sh](../o5-signes-refus-banc.sh), **14 OK, 0 KO** à 20:53:39 UTC, [journal](o5-signes-refus-banc.log)). Sur les arbres gardés d'O3 et d'O4, et sur les layouts construits par le script, sont refusés :
+- un membre hors de la chaîne ;
+- une adresse hors de `.invalid` et `.example` ;
+- un membre de la chaîne manquant ;
+- deux enveloppes de lien ;
+- zéro enveloppe de lien ;
+- un sujet différent du digest attendu.
+
+**Deux contrôles ne peuvent être déclenchés par aucun témoin** : B1 et l'égalité entre le texte signé d'InRelease et Release. Le contrôle exige d'abord que le rpm signé, le rpm non signé, InRelease et Release égalent leurs sha256 archivés ; toute altération est donc refusée avant d'arriver à eux. Dans `verifier`, B1 est **recalculé** sur les octets tirés de Zot, mais pas éprouvé ici. Son épreuve par témoin reste celle du banc d'`o5.sh` (rpm à charge altérée), où le rpm n'était pas jugé par son sha256.
+
+**2. Réserve sur la copie du deb.** `signes/sample-app-deb@60f25f5c…` ne porte qu'un referrer, l'attestation de lien. La provenance de Chains de ce digest ne se lit que dans `builds/sample-app-deb`, où elle a été vérifiée avant la signature (`chainsProvenance` du prédicat). O6 devra donc lire deux dépôts pour un même digest.

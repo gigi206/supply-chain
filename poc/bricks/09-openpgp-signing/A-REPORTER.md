@@ -84,6 +84,8 @@ Avant la ligne « **Risqué → interdit** » :
 
 *Note datée du 19/11/2026, 20:50:29 UTC* : en plus des notes précédentes, lire dans la ligne de remplacement de `docs/03` « **écritures dans Zot** (rpm signé, dépôts signés, attestations de lien) **en attente d'accord** » ainsi : « **O5 réel tenu le 19/11/2026** ([prédictions et résultats](../poc/bricks/09-openpgp-signing/resultats/o5-signes-predictions.md)) : rpm signé, copie du manifeste deb, dépôts rpm et apt signés publiés par `poc-lien` dans `signes/**`, par digest, sans tag ; une attestation de lien par objet, signée par `cosign attest --key hashivault://lien` (redirection locale vers OpenBao) ; vérifiée en anonyme par cosign avec la clé publique archivée, puis par un contrôle indépendant sur les octets tirés de Zot (B1 recalculé, identité du deb, chaînes des dépôts) ; clé jetable refusée. Jetons d'horodatage non vérifiés ; porte et Kyverno (O6) non faits ».
 
+*Note datée du 19/11/2026, 20:53:54 UTC* : à la note précédente, ajouter « ; la copie `signes/sample-app-deb@60f25f5c…` ne porte pas la provenance de Chains, lue dans `builds/sample-app-deb` : O6 lira deux dépôts pour ce digest ».
+
 ## 3. `README.md` racine, ligne 33
 
 Remplacer « **Signature OpenPGP (09)** : non commencée. » par :

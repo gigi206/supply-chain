@@ -1,0 +1,21 @@
+banc commencé : 2026-11-19T20:53:39Z ; o5-signes.py 329c60eaeab808a4… ; o5-signes-refus-banc.sh 72b4936779a6eedc…
+BANC : valeurs archivées remplacées : deb_manifeste, rpm_manifeste
+### arbres de dépôt (membres_controles, comme construire)
+OK   depot-rpm tel quel : ACCEPTÉ
+OK   depot-rpm + un membre hors de la chaîne : REFUS dépôt rpm : 1 membre(s) hors de la chaîne : ['en-trop.txt']
+OK   depot-rpm + une adresse hors de .invalid et .example : REFUS membre note.txt : adresse électronique hors des domaines réservés (non affichée)
+OK   depot-rpm + une adresse en .invalid : admise par le balayage, refusée par la chaîne : REFUS dépôt rpm : 1 membre(s) hors de la chaîne : ['note.txt']
+OK   depot-rpm − un membre de la chaîne : REFUS dépôt rpm : repodata/repomd.xml.asc absent
+OK   depot-apt tel quel : ACCEPTÉ
+OK   depot-apt + un membre hors de la chaîne : REFUS dépôt apt : 1 membre(s) hors de la chaîne : ['en-trop.txt']
+OK   depot-apt + une adresse hors de .invalid et .example : REFUS membre note.txt : adresse électronique hors des domaines réservés (non affichée)
+OK   depot-apt + une adresse en .invalid : admise par le balayage, refusée par la chaîne : REFUS dépôt apt : 1 membre(s) hors de la chaîne : ['note.txt']
+OK   depot-apt − un membre de la chaîne : REFUS dépôt apt : main/binary-amd64/Packages.gz absent ou sha256 ≠ Release
+### enveloppes (controle, sur le rpm signé construit et l'image non signée locale)
+OK   une enveloppe de lien : ACCEPTÉ
+OK   deux enveloppes de lien : REFUS enveloppes : 2 énoncé(s) de type lien, un seul attendu
+OK   zéro enveloppe de lien (une enveloppe d'un autre type) : REFUS enveloppes : 0 énoncé(s) de type lien, un seul attendu
+OK   sujet différent du digest attendu : REFUS sujet : [{'sha256': 'fa5b175786dcaf0cbd989b7e7098c6306e3d66427d4cf6ae2f3ecb1fd857a283'}] (attendu : sha256:ed666ab80dd15b87…)
+bilan : 14 OK, 0 KO
+banc fini : 2026-11-19T20:53:39Z
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-signes-refus-banc
