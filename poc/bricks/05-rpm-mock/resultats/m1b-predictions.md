@@ -903,3 +903,18 @@ Journaux : [`m1b-outil-amorce-j2.log`](m1b-outil-amorce-j2.log), [`m1b-boot-j2.l
 **Intervalles mesurés** (imprimés par le script, entre horodatages des dossiers) : 140 min (bootstrap), 155 min (amorce), 185 min (outils de 99790c13), 229 min (troisième banc). **C'est un autre jour UTC, pas 24 h d'écart.**
 
 **Portée.** Sur ce banc, cet hôte, ces outils et ces sources figées, deux jours UTC à 140 à 229 min d'écart donnent les mêmes quatre archives. Rien n'est mesuré dans le pod Kata ni sur un autre hôte, ni à un écart de plusieurs jours. La branche « écart » de `m1b-autre-jour.sh` n'est toujours pas exercée. **Le point 1 A reste non établi.** Viennent ensuite les valeurs de la carte : `en_US` ou toutes les langues, umask 022, machine-id vide ou absent, liste d'exclusions, mode de la racine. Les dossiers neufs restent dans `~/.cache/supply-chain-poc/05/` ; rien n'est supprimé.
+
+### Référence du bootstrap avec la racine en 0555 : prédictions (note écrite à 2026-11-19T08:40:17Z UTC, avant le lancement)
+
+Suite de la décision « Absent » du 19/11 ([carte](m1b-carte.md)). Le banc [`m1b-boot-0555.sh`](m1b-boot-0555.sh) tourne hors ligne et n'installe rien. Il copie par `cp -a` les arbres `b1` et `b2` du 18/11 dans un dossier neuf, puis passe la racine de chaque copie en 0555. Il archive ensuite avec la fonction, la borne `S = 1766985142` et les exclusions de `m1b-boot.sh`. Les arbres du 18/11 ne sont pas modifiés.
+
+- **BR0** : le ré-archivage de `b1` tel quel redonne `28634a12…`.
+- **BR1** : les deux `cp -a` rendent le code 0, sans ligne d'erreur ; la racine des copies vaut 555.
+- **BR2** : `y1.tar` et `y2.tar` sont identiques octet à octet.
+- **BR3** : la racine de `y1` vaut 0555, et `etc/machine-id` en est absent.
+- **BR4** (confiance moyenne) : `y1` et `x1` ont les mêmes 11 472 noms. Le seul champ d'en-tête qui diffère est le mode de `.`. Le risque : `cp -a` dans l'espace de noms pourrait changer des xattrs ou des liens.
+- **BR5** : `tar` n'écrit rien sur stderr pour `t1`, `y1` et `y2`.
+- **BR6** : `b1` et `b2` restent en 775 après le banc.
+- **BR7** (lecture, sans valeur pariée) : le sha256 de `y1` devient la référence du bootstrap pour les valeurs fixées le 19/11.
+
+Ce n'est un accord pour aucune écriture dans le cluster ni dans Zot.
