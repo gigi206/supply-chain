@@ -79,3 +79,14 @@ La part des autres briques dans ces blocs n'est pas séparée : le bloc du 16/11
 
 - Passage de 14:59:06 UTC, gardé dans [`cloture-denominateur-1.log`](cloture-denominateur-1.log) : 3 KO en F, sur les blocs YAML `drop:` / `- ALL` des trois tâches signées (`prefetch-deb`, `preparer-deb`, `prefetch-gomod`). Le script resserrait les espaces avant de changer le retour à la ligne en espace : il comparait « drop:  - ALL », avec deux espaces, à « drop: - ALL ». Les blocs sont bien des `drop ALL`. Défaut du script, pas de la plateforme.
 - Correctif : le retour à la ligne est changé avant le resserrage. Le script passe à `49157d226c8fa848…`. CL7 à CL9 ne changent pas ; seul le passage suivant compte.
+
+## CL7 à CL9 : résultat (note écrite le 19/11/2026 à 15:00:01 UTC)
+
+Journal : [`cloture-denominateur.log`](cloture-denominateur.log), 14:59:24 UTC, à HEAD `26bf5a3`, code 0, 0 KO (30 OK).
+
+**CL7 à CL9 tenues.**
+- **CL7** : 54 fichiers suivis lus. 16 lignes « privileged » dans 13 fichiers, toutes classées : 4 définitions de `PRIVILEGIE`, 2 lignes de contexte de correctifs, 4 tâches privilégiées (Kata posé par le PipelineRun), 2 pods d'essai sous Kata, 3 lectures ou mesures (1 lecture de contexte, 2 lignes de la mesure de N7), 1 réglage du noyau de `sc-replay`.
+- **CL8** : 14 lignes de capacités, toutes des `drop ALL` (7 en ligne, 7 en bloc YAML) ; aucune ligne `SYS_ADMIN`, `hostPID`, `hostNetwork` ni `hostPath`.
+- **CL9** : lus avec `grep -a`, 33 en-têtes de pod, 19 sous Kata et 14 sans RuntimeClass ; les 7 contextes privilégiés affichés sont sous Kata. `diag-exec-releve.log` a un en-tête, sous Kata.
+
+**Portée.** Dans les fichiers de la 06, tout usage privilégié est sous Kata, ou n'est qu'une lecture. Les journaux archivés le confirment pour les pods dont le contexte est affiché, et l'admission refuse un pod privilégié hors Kata (N7 le 16/11, état de 14:54:14 UTC). Cela ne dit rien des pods d'autres briques, ni de `kube-system` et `kyverno`, hors de la politique.

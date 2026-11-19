@@ -1,0 +1,40 @@
+# cloture-denominateur.sh, début 2026-11-19T14:59:24Z ; HEAD 26bf5a3ff701
+fichiers suivis lus (hors resultats/ et .md) : 54
+## E : lignes « privileged »
+OK   builder/construire-builder.signee.yaml:155 : tâche privilégiée, Kata posé par le PipelineRun (A)
+OK   builder/construire-builder.yaml:56 : tâche privilégiée, Kata posé par le PipelineRun (A)
+OK   deb/construire-deb.signee.yaml:108 : tâche privilégiée, Kata posé par le PipelineRun (A)
+OK   deb/construire-deb.yaml:42 : tâche privilégiée, Kata posé par le PipelineRun (A)
+OK   diag-exec-kata.sh:41 : définition de PRIVILEGIE (usages : cloture-releve.sh, A)
+OK   revision-1.0.0-2-v2.patch:12 : ligne de contexte d'un correctif (définition de s3.sh)
+OK   revision-1.0.0-2.patch:12 : ligne de contexte d'un correctif (définition de s3.sh)
+OK   s1.sh:48 : définition de PRIVILEGIE (usages : cloture-releve.sh, A)
+OK   s2.sh:45 : définition de PRIVILEGIE (usages : cloture-releve.sh, A)
+OK   s3.sh:50 : définition de PRIVILEGIE (usages : cloture-releve.sh, A)
+OK   s4d.sh:145 : lecture du contexte d'une tâche (contrôle)
+OK   s4d.sh:345 : pod d'essai privilégié sous Kata (A)
+OK   s5.sh:118 : pod d'essai privilégié seulement sous Kata (A)
+OK   s5.sh:453 : mesure du refus N7 (contrôle)
+OK   s5.sh:454 : mesure du refus N7 (contrôle)
+OK   s6b.sh:197 : lecture d'un réglage du noyau de sc-replay (pas un pod)
+lignes « privileged » : 16, dans 13 fichiers
+## F : capacités et accès à l'hôte
+OK   builder/prefetch-deb.signee.yaml:27 : drop ALL (bloc YAML)
+OK   builder/prefetch-deb.yaml:42 : drop ALL (bloc YAML)
+OK   deb/declencheur.yaml:236 : drop ALL (bloc YAML)
+OK   deb/preparer-deb.signee.yaml:49 : drop ALL (bloc YAML)
+OK   deb/preparer-deb.yaml:79 : drop ALL (bloc YAML)
+OK   diag-exec-kata.sh:185 : drop ALL
+OK   diag-exec-kata.sh:490 : drop ALL
+OK   fermetures/prefetch-gomod.signee.yaml:24 : drop ALL (bloc YAML)
+OK   fermetures/prefetch-gomod.yaml:46 : drop ALL (bloc YAML)
+OK   s1.sh:50 : drop ALL
+OK   s3.sh:289 : drop ALL
+OK   s4d.sh:407 : drop ALL
+OK   s5.sh:119 : drop ALL
+OK   s6a.sh:205 : drop ALL
+lignes de capacités ou d'accès à l'hôte : 14
+## G : journaux archivés, grep -a
+en-têtes de pod : 33, dont 19 sous kata et 14 sans RuntimeClass ; contexte privilégié affiché : 7
+diag-exec-releve.log, lu avec -a : 1 en-tête(s) :  1 ### diag-exec-kata (kata, uid 1000, sans label);
+# fin 2026-11-19T14:59:24Z ; KO 0
