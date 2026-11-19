@@ -513,3 +513,18 @@ Cette note prépare le choix 2 de la note « avant signature ». Elle ne change 
 **Avec la déclaration** : `BASE_ARTIFACT_INPUTS`, sur la forme de `BOOTSTRAP_ARTIFACT_INPUTS`. Il serait écrit pour le bootstrap seulement. Le cas de l'outillage, déclaré mais non écrit, est lu dans le code et non mesuré. Il ne le serait qu'au premier PipelineRun de l'outillage, après signature. Si la lecture est fausse, il faut une signature et une revue de plus.
 
 **Calendrier** : la mesure d'un autre jour porte sur la section dnf et tar du constructeur, que ce changement ne touche pas. Elle reste valable sur la forme actuelle, quelle que soit la réponse.
+
+## Note datée du 19/11/2026, écrite à 14:12:23 UTC : décisions du propriétaire sur les deux choix d'avant signature
+
+Réponses lues avant 14:12:23 UTC, aux deux questions posées après les notes précédentes :
+- **Choix 1, « Garder l'arrêt »** : `construire-racine-rpm` garde le paramètre `racine`. La tâche s'arrête si la racine construite diffère du sha256 fixé par la pipeline (`7c07083c…` pour l'outillage, `b063feb3…` pour le bootstrap).
+- **Choix 2, « Vérifier et déclarer »** : le prefetch lit dans Zot le manifeste de base du bootstrap (`amont/rockylinux/rockylinux@sha256:ee90dc0e…`) et en contrôle le sha256. Il contrôle aussi que sa couche unique est la couche fixée (`812c4412…`), puis écrit `BASE_ARTIFACT_INPUTS` sur la forme de `BOOTSTRAP_ARTIFACT_INPUTS` de `prefetch-rpm`.
+  - L'outillage déclare ce résultat sans l'écrire. D'après le code lu, cela ne fait rien échouer, mais ce n'est pas mesuré avant la signature : c'est le reliquat accepté.
+  - Aucune règle de la porte ne juge ce résultat.
+
+**Suite** :
+1. Changer `prefetch-racine-rpm` et le rendu des pipelines dans `m1b-builders.sh`. `construire-racine-rpm` ne change pas.
+2. Écrire les prédictions et les commiter.
+3. Rejouer `prealables`, `banc`, `essai_prefetch` et `essai_construire` sous un préfixe neuf.
+
+La mesure d'un autre jour, à partir de 00:00 UTC le 20/11, reste prévue telle quelle.
