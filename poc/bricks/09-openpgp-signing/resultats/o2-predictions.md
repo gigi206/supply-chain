@@ -16,3 +16,64 @@ O2 (README, « Jalons proposés ») : clé OpenPGP du PoC selon D2, environnemen
 | RL6 | Hôte : `unshare --map-auto --map-root-user -n` fonctionne (code 0) ; `secrets-depot.sh` ne lit que les dossiers `08/secrets` et `10/secrets` et n'a pas de motif « BEGIN PGP » ; podman non nécessaire au mécanisme retenu | haute : lu dans le script et employé en 05 |
 
 Téléchargements attendus : 3 clés de ftp-master, `InRelease`, `Packages.xz` (environ 10 Mo, ordre de grandeur non mesuré), 4 fichiers `repomd` de vault ; aucun `primary` si RL5 tient.
+
+Résultat : [carte d'O2](o2-carte.md), section « Résultat du relevé préalable ».
+
+## `o2.sh`, `o2-interne.sh` et `o2-banc.sh` (racines (a), décision du 19/11/2026)
+
+Écrites le 19/11/2026 à partir de 16:02:15 UTC (`date -u`), **avant tout lancement** de ces trois scripts. `prealables` et le banc sont lancés à sec, juste après le commit qui porte ces prédictions. **`construire`, `cle` et `essai` ne sont PAS lancés** : ils attendent un accord nommé du propriétaire.
+
+### `prealables` (lecture locale)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| PA1 | Les deux amorces : manifeste, configuration et couche égaux à leur sha256 | haute (RL1, RL3) |
+| PA2 | `RPM-GPG-KEY-Rocky-9` de l'amorce égale, en sha256, au fichier du relevé dont l'empreinte a été vérifiée | moyenne-haute : même fichier publié par Rocky, jamais comparé |
+| PA3 | Place libre sous `~/.cache` supérieure à 3 000 Mo | haute (104 813 Mo à 15:58 UTC) |
+| PA4 | Espace de noms : tmpfs monté (`tmpfs`), interfaces `[lo]` seulement | haute (RL6) |
+| PA5 | `~/.cache/supply-chain-poc/09/o2` et `…/09/secrets` absents | haute |
+| PA6 | `secrets-depot.sh` lit `08/secrets` et `10/secrets` seulement ; K3 tenue pour le journal | haute |
+
+### Banc `o2-banc.sh` (gpg 2.4.8 de l'hôte, clé jetable, sans réseau)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| BC5a | Garde réseau lancée sur l'hôte, avec réseau : refus (`KO … (K1)`, code 1) | haute |
+| BC5b | Même garde dans l'espace de noms sans réseau : `OK`, code 0 | haute |
+| BC1 | Création : code 0 ; RSA (algo 1), 4096 bits, expiration au 19/11/2027, usages `scSC` comme au banc O0 ; trois fichiers en 600, dossier en 700 ; clé privée armurée | haute |
+| BC2 | Seconde création dans le même dossier : refus (K4), code 1 ; fichiers inchangés | haute |
+| BC3 | Homedir sur disque : refus (K2), code 1 ; aucun fichier écrit | haute |
+| BC4 | Import, signature SHA-512, vérification par gpgv : `OK` avec l'empreinte ; « sqv absent » | haute |
+| BC6 | Clé jetable créée, importée dans un homedir neuf et utilisée pour signer | haute |
+| BC8 | Signature du PoC vérifiée avec la clé jetable : ligne `KO   gpgv`, code 0 (la fonction rapporte sans échouer) | haute |
+| BC7 | K3 : aucun « BEGIN PGP » et aucune ligne de la clé privée jetable dans le journal | haute |
+
+Durée : moins d'une minute. Ne mesure ni gpg 2.4.7 ni 2.3.3.
+
+### `construire` (NON LANCÉE : réseau et installation de paquets dans des racines neuves)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| CR1 | Gardes : dossier des secrets absent (K1), dossier de travail absent | haute |
+| CR2 | Rocky : `dnf-3 --installroot` depuis vault 9.8, code 0 ; `gnupg2-2.3.3-5.el9_7`, `rpm-sign-4.16.1.3-40.el9`, `createrepo_c-0.20.1-4.el9` installés ; tous les paquets signés par la clé `702d426d350d275d` (fin de l'empreinte Rocky 9) | moyenne : mécanisme mesuré en 05 hors ligne, jamais avec le réseau ni `repo_gpgcheck` |
+| CR3 | Nombre et taille des rpm téléchargés | **relevé, non prédit** ; chacun journalisé et ajouté à la liste |
+| CR4 | Debian : `apt-get update` dans l'amorce, code 0 ; `InRelease` lu par apt égal à `0584fba3…` ; mmdebstrap 1.5.7-1+deb13u1 installé | moyenne-haute : chemin de la 06, mais sur l'hôte, avec le DNS de l'hôte |
+| CR5 | `mmdebstrap --mode=root` dans l'espace de noms utilisateur : code 0 | **faible** : jamais mesuré sur l'hôte ; montages de `/proc` et `/sys` dans la cible, et `sysfs` exige d'ordinaire son propre espace de noms réseau, que `construire` n'a pas |
+| CR6 | Si CR5 tient : les sept versions épinglées installées (gnupg, gpg, gpgv, gpg-agent, gpgconf, apt-utils, sqv) | moyenne |
+| CR7 | `gpg2 --version` donne 2.3.3 dans la racine Rocky, `gpg --version` 2.4.7 dans la racine Debian | haute si CR2 et CR5 tiennent |
+
+### `cle` (NON LANCÉE : création de la clé du PoC)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| CL1 | Clé créée par gpg 2.4.7 sous K1 et K2 : RSA 4096, v4, expiration au jour du lancement plus un an ; trois fichiers 600 dans `~/.cache/supply-chain-poc/09/secrets` (700) ; K3 tenue | moyenne-haute : mêmes commandes qu'au banc, autre version de gpg |
+
+### `essai` (NON LANCÉE : sans réseau, avec la clé du PoC)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| ES1 | E1 et E2 : signature dans la racine Debian, vérifiée par gpgv et par sqv | moyenne-haute : sqv accepte RSA 4096 et SHA-512 d'après `default-sequoia.config` (lu, non mesuré) |
+| ES2 | E3 (K5) : la clé créée par 2.4.7 s'importe dans 2.3.3 et y signe | moyenne : jamais mesuré |
+| ES3 | E4 et E5 : vérifications croisées acceptées (Rocky lit la signature Debian, Debian lit la signature Rocky) | moyenne : suit ES2 |
+| ES4 | E6 à E8 (K5b) : clé jetable de 2.3.3 importée par 2.4.7, signature vérifiée par Rocky | moyenne-haute |
+| ES5 | K3 tenue pour le journal | haute |

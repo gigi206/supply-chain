@@ -58,3 +58,11 @@ Message de la session principale, reçu vers 15:48 UTC. Mesure vérifiée ici da
 Recoupement avec ce relevé : le `primary` vérifié de BaseOS 9.8 (vault égal à pub) ne liste **qu'une entrée `gnupg2`, 2.3.3-5.el9_7** ([relevé](releve-amont.log), l. 367 ; le script en imprimait jusqu'à deux par nom). Le gpg de l'amorce est donc la seule révision de Rocky 9.8 : **aucun retard de révision**, à la différence de curl (4 révisions de retard d'après la session principale, non vérifié ici). Les errata de Rocky pour `gnupg2` et les avis de GnuPG touchant 2.3.3 ne sont pas lus.
 
 Conséquence pour l'option (a) : côté Rocky, `gnupg2` n'est pas à installer ; seuls `rpm-sign`, `rpm-sign-libs`, `createrepo_c`, `createrepo_c-libs` et leurs dépendances le sont.
+
+## Décision du propriétaire du 19/11/2026 : racines de signature (a), pour le PoC (consignée à 15:58:16 UTC)
+
+Question posée dans le cadre de fin de tour : « Racines de signature d'O2 : refaites sur l'hôte depuis les dépôts signés, pour le PoC ? ». Réponse du propriétaire, reçue avant l'heure ci-dessus : « Oui, option (a) ».
+
+- **(a) retenue pour le PoC** : chaque amorce ne sert qu'une fois, pour produire une racine neuve depuis les dépôts signés (`vault/rocky/9.8`, instantané Debian `20261105T000000Z`). **(b)**, racines produites par la plateforme, devient la **cible de production**, à écrire dans l'ADR 0003 (proposé dans `A-REPORTER.md`). **(c)** est écartée.
+- **Correction de la phrase précédente** (« `gnupg2` n'est pas à installer ») : elle valait pour un ajout de paquets dans l'amorce, c'est-à-dire l'option (c). Avec (a), la racine Rocky est neuve (`dnf --installroot`). `gnupg2` y est donc installé depuis vault, dans la même révision 2.3.3-5.el9_7 que celle de l'amorce.
+- Suite : `o2.sh` et ses prédictions ; `construire` et `cle` attendent un accord nommé.
