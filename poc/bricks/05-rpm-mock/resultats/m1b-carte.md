@@ -591,3 +591,23 @@ TD1 à TD5 tenues ([`m1b-taches-admission.log`](m1b-taches-admission.log)) : les
 - le choix sur la fraîcheur de l'amorce ;
 - la ligne GnuPG de docs/04 (session de la brique 09) ;
 - les deux politiques de réseau, un accord pour chacune.
+
+## Note datée du 19/11/2026, écrite à 16:15:18 UTC : décision « (a) Figée » sur la fraîcheur de l'amorce
+
+**Décision du propriétaire** (réponse « (a) Figée », lue le 19/11/2026 avant 16:15:18 UTC) : pour la première signature, les deux tâches gardent l'amorce `ed654c69…` figée par digest (D4 a). Son retard est une **réserve mesurée et acceptée** : 44 paquets sur 146 en retard sur Rocky 9.8, et 54 errata de sécurité plus récents ([`m1b-amorce-fraicheur.log`](m1b-amorce-fraicheur.log)). La mesure du 20/11, les références `7c07083c…` et `b063feb3…` et les prédictions JK et JT ne changent pas.
+
+**Ce que couvre la réserve** :
+- les altérations essayées sont refusées par leur garde : racine, rpm, couche, `repomd.xml` (RZ1 à RZ8) ; `repomd.xml`, manifeste et couche dans un pod de prefetch (PX1 à PX5) ;
+- la construction tourne sans réseau, et toutes ses entrées sont fixées par sha256 ;
+- le contenu construit vient du miroir 9.8 fixé, pas de l'amorce.
+
+**Ce qu'elle ne couvre pas** :
+- une exécution de code dans le pod de prefetch, par une réponse réseau hostile à curl ou openssl, n'est pas mesurée ;
+- les pods signés portent le label `prefetch-racine-rpm`. Leur borne réseau dépend donc de la politique de sortie en attente d'accord (DNS, adresses publiques en 443, Zot), pas de `prefetch-rpm-sortie`, sous laquelle les pods d'essai ont tourné.
+
+**Suite possible, non décidée et à mesurer** : une fois que M1b aura publié l'image d'outillage construite par la plateforme, une nouvelle version signée du prefetch pourrait tourner dessus. La construction resterait sur l'amorce. Rien ne montre encore que cette image fait tourner le prefetch en UID 65532 sous `restricted`, ni qu'elle donne une sortie égale à `attendu-*.sha256`.
+
+**Restent avant signature** :
+- la mesure d'un autre jour (à partir du 20/11 à 00:00 UTC), avec les sha256 des quatre rendus de `m1bt-20` à confronter à ceux de TD1 ;
+- la ligne GnuPG de docs/04 (session de la brique 09) ;
+- les deux politiques de réseau, un accord pour chacune.
