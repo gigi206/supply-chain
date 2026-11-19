@@ -1,0 +1,26 @@
+# m1b-pod_d-amont.sh, début 2026-11-19T12:37:13Z
+securityContext du pas construire (construire-rpm.signee.yaml) : {"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0}
+couche 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09 : sha256 recalculé 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+couche amont : 11170 membres ; usr/lib/tmpfiles.d/systemd.conf : absent ; paquet systemd (usr/lib/systemd/systemd) : absent
+   root/.ssh : absent
+   run/lock : absent
+   run/lock/subsys : absent
+   run/log : absent
+   run/systemd : absent
+   run/systemd/ask-password : absent
+   run/systemd/machines : absent
+   run/systemd/seats : absent
+   run/systemd/sessions : absent
+   run/systemd/shutdown : absent
+   run/systemd/users : absent
+   run/user : absent
+   var/cache/private : absent
+   var/lib/private : absent
+   var/lib/systemd/coredump : absent
+   var/log/README : absent
+   var/log/btmp : absent
+   var/log/lastlog : absent
+   var/log/private : absent
+   var/log/wtmp : absent
+bilan couche amont : 0 des 20 chemins en plus de pod_d présents
+# fin 2026-11-19T12:37:15Z

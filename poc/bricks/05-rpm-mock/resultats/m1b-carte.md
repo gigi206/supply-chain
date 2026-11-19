@@ -324,3 +324,26 @@ Cette note complète, sans la réécrire, la note « pods d'essai Kata, et lente
   - l'exclusion éventuelle de `var/lib/rpm/rpmdb.sqlite-shm` ;
   - la référence du bootstrap, à refaire avec le tar de l'image qui archivera.
 - **Révisable** à la revue de `taches.yml`, qui reste soumise au propriétaire. Ce n'est un accord pour aucune écriture dans Zot ni pour aucun changement du cluster.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T12:37:39Z UTC : validation du conseiller sur « Limite seule », et corrections
+
+À la demande du propriétaire (« fait valider par l'advisor »), le conseiller a relu la décision. **Il la confirme** : aucune mesure ne plaide pour `/proc`. Il demande trois corrections des deux notes précédentes, faites ici sans les réécrire.
+
+**Corrections.**
+- **« Le contenu sans `/proc` est celui des racines de S1 »**, et « les images de M2 à M4c avaient le contenu sans `/proc` » : c'est trop fort. La mesure dit seulement que les 20 chemins sont absents des racines de S1. Le reste n'est pas comparé : `racine.tar` de S1 a 13 341 membres et 361 758 720 octets, la cible `7c07083c…` 13 332 membres et 343 930 880 octets. Il faut lire « sur ces 20 chemins seulement ».
+- **« Refaire les références »** : c'est trop large. La référence du bootstrap est à refaire de toute façon (tar de l'image qui archivera). Le coût propre à `/proc` est :
+  - la cible de l'outillage ;
+  - les relances « autre jour » déjà préparées ;
+  - un second `pod_d` pour la reproductibilité.
+- **« La création des chemins de `tmpfiles.d` échoue en silence »** : il faut lire « n'a pas lieu ; le mécanisme n'est pas lu ».
+
+**Arguments ajoutés.**
+- **Privilège** ([`m1b-pod_d-amont.log`](m1b-pod_d-amont.log), [script](m1b-pod_d-amont.sh)) : le montage de `/proc` a été permis par le `securityContext` du pas `construire` de la tâche signée, que reprend le pod d'essai (`privileged: true`). Baisser une limite ne demande aucun droit ; `mount -t proc` en demande un.
+  - Dans le gabarit actuel, le pas est déjà privilégié pour mock, donc l'argument ne vaut que pour une tâche d'installation moins privilégiée.
+  - Que dnf passe sans ce droit n'est pas mesuré.
+- **Entrée implicite** : un `/proc` réel expose aux scriptlets le noyau, les CPU et la mémoire du nœud. C'est une source d'écart possible entre nœuds, au sens de l'ADR 0007. C'est structurel, non mesuré.
+- **Le revers est borné** : la comparaison membre à membre est exhaustive. L'écart entre `pod_d` et `a8` se limite à 20 chemins et 3 champs. Les racines de S1, sans ces 20 chemins, ont servi aux constructions de M2 à M4c. C'est une mesure d'usage, limitée à ces constructions. Elle remplace « je n'attends pas d'effet ».
+
+**Lecture de l'image amont, non probante** : la couche `812c4412…` (11 170 membres) n'a aucun des 20 chemins. Mais elle ne contient ni `usr/lib/tmpfiles.d/systemd.conf` ni systemd. Elle ne dit donc pas ce que Rocky publie quand systemd est installé.
+
+**La décision « Limite seule » ne change pas.**
