@@ -1738,3 +1738,9 @@ Journal : [`m1b-curl-amorce.log`](m1b-curl-amorce.log), de 15:46:06 à 15:46:10 
 **Cas non joué, et pourquoi.** La paire cohérente (`ed654c69…`, `99c753a8…`) passerait le prefetch, puisque ce manifeste a bien cette couche. Aucun refus n'y est donc prédit. Ce qui l'arrête est le contrôle de cohérence de `prealables` (AN1) : il exige que l'annotation `base.digest` et la couche de `construire` égalent la base contrôlée par le prefetch. C'est déjà mesuré par trois altérations refusées ([`m1b-coherence-refus.log`](m1b-coherence-refus.log)).
 
 **Portée prévue.** Si tout tient, le prefetch refuse dans un pod un `repomd.xml` autre que celui fixé, un autre manifeste de base et une couche autre que celle du manifeste, chacun par sa garde et sans sortie écrite. Ce n'est pas mesuré dans un TaskRun.
+
+### Correction datée du 19/11/2026, écrite à 15:50:41 UTC : premier passage des cas du prefetch arrêté au chargement
+
+- **Ce qui s'est passé.** Le premier passage, lancé après le commit `3626d98`, s'est arrêté à la première ligne : `commun.sh` attend la variable `here`, qui donne le répertoire de l'appelant, et le script ne la posait pas. Il est gardé dans [`m1b-refus-prefetch-1.log`](m1b-refus-prefetch-1.log), une seule ligne, sans en-tête daté. Rien n'a été créé : 0 pod `m1brp-` dans `builds` et aucun dossier de travail `m1brp`, relevés juste après.
+- **Correction** : `here` est posé avant le chargement, sur le répertoire de la brique 08, comme le font les scripts de la 05. Rien d'autre ne change. Le script corrigé a le sha256 `cb8a758bfb905f7e…`.
+- **Relance** : le passage complet est rejoué dans un journal neuf, `m1b-refus-prefetch.log`. Les prédictions PX1 à PX5 ne changent pas.

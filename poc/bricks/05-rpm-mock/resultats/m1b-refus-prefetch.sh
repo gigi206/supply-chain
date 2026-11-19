@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2015  # ok et ko n'échouent jamais
+# shellcheck disable=SC2015,SC1091  # ok et ko n échouent jamais ; commun.sh chargé par un chemin calculé
 # SPDX-FileCopyrightText: 2026 Ghislain LE MEUR
 # SPDX-License-Identifier: Apache-2.0
 # Brique 05, jalon M1b : cas refusés de prefetch-racine-rpm, dans des pods d'essai du cluster, préparés à sec le 19/11/2026.
@@ -15,7 +15,8 @@ set -euo pipefail
 export LC_ALL=C
 umask 022
 G=$(git rev-parse --show-toplevel)
-. "$G/poc/bricks/08-trust-plane/commun.sh"   # W, REG
+here=$G/poc/bricks/08-trust-plane   # commun.sh attend le répertoire de l appelant
+. "$here/commun.sh"   # W, REG
 N=m1brp
 S3=$W/m1bt3-05/script-pb.sh   # rendu de prealables sous m1bt3 : lecture seule
 T=$W/$N-05
