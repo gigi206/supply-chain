@@ -1450,3 +1450,13 @@ Journal : [`m1b-builders-banc.log`](m1b-builders-banc.log) (13:45:03 à 13:45:45
 **Autres relevés** : pic de `/w`, 868 Mo pour l'outillage et 512 Mo pour le bootstrap (sur l'hôte, `/w` est un dossier ext4, pas un tmpfs). `memory.peak` est absent hors cgroup.
 
 **Portée.** Sur l'hôte, les scripts qui seraient signés retrouvent les deux racines au bit près, puis écrivent un layout valide. Les digests `70f8c412…` et `6de899ac…` servent de référence aux pods d'essai. Rien n'est encore mesuré dans Kata ni par le prefetch.
+
+### Correction datée du 19/11/2026, écrite à 2026-11-19T13:48:21Z UTC : premier essai du prefetch, et relance sous `m1bt2`
+
+Journal : [`m1b-builders-essai_prefetch-1.log`](m1b-builders-essai_prefetch-1.log) (début 13:46:33 UTC, code 1).
+- **Relevés avant l'échec** : les politiques sont relues, et le PVC et les deux pods sont admis à blanc. Le pod sous le label neuf `prefetch-racine-rpm` est lui aussi admis à blanc.
+- **Échec** : le pod `m1bt-po` était prêt sur `sc-build`. Le script de l'outillage s'est arrêté au contrôle des paramètres, avant tout téléchargement : `KO   nom de rpm invalide : passt-0^20251210.gd04c480-7.el9_8.x86_64.rpm`.
+- **Cause** : la liste des caractères permis dans un nom de rpm n'avait pas `^`. C'est le seul nom de la liste qui en a un ; le banc de l'hôte l'avait téléchargé tel quel.
+- **Correctif** : `^` est admis dans `builders/prefetch-racine-rpm.yaml`, dont le sha256 passe à `60f4577f0da05a20…`. Le nom passe toujours non encodé à curl, comme au banc ; seul `+` est encodé, comme dans `prefetch-rpm`.
+- **Ménage** : le pod raté et son PVC, vide, sont retirés.
+- **Relance** sous le préfixe neuf `m1bt2`, puisque le script de prefetch change. `prealables` et `banc` sont rejoués sous ce préfixe, dans des journaux neufs (`m1b-builders-m1bt2-<étape>.log`). Les prédictions TQ à EC valent telles quelles pour cette relance, avec `m1bt2-w` et le préfixe `m1bt2-` à la place de `m1bt-w` et `m1bt-`. Les scripts de construction ne changent pas : TC doit redonner les mêmes digests, `70f8c412…` et `6de899ac…`.

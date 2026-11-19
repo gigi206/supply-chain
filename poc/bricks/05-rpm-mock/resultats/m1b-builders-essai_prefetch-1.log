@@ -1,0 +1,16 @@
+# m1b-builders.sh essai_prefetch (PREFIXE m1bt), début 2026-11-19T13:46:33Z
+OK   prefetch-rpm-sortie : sélecteur : {"matchLabels":{"tekton.dev/task":"prefetch-rpm"}}
+OK   construction-rpm-sans-sortie : sélecteur, types, règles : [{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]
+OK   admis à blanc : m1bt-w.json
+OK   admis à blanc : m1bt-po.json
+OK   admis à blanc : m1bt-pb.json
+relevé : m1bt-po.json sous le label prefetch-racine-rpm : admis à blanc
+PVC m1bt-w créé (2Gi, local-path, liaison au premier pod)
+pod m1bt-po prêt : nœud sc-build, runtimeClassName «  », label prefetch-rpm
+OK   script copié dans m1bt-po (sha256) : dd51d357f551a011e90e793699085f6c79066c11c7c59f5c6e19195a837a2be9
+## essai-po : début 2026-11-19T13:46:39Z
+     KO   nom de rpm invalide : passt-0^20251210.gd04c480-7.el9_8.x86_64.rpm
+     command terminated with exit code 1
+## essai-po : code 1, fin 2026-11-19T13:46:40Z
+pod m1bt-po laissé pour lecture
+KO   prefetch o

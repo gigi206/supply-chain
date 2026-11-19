@@ -129,7 +129,7 @@ spec:
         [ -z "$reste" ] || ko "ligne de liste à plus de trois champs : $f"
         awk -v d="$dep" '$1 == d {t = 1} END {exit !t}' /tmp/depots || ko "dépôt inconnu dans la liste : $dep"
         case $f in *.rpm) ;; *) ko "nom de rpm invalide : $f" ;; esac
-        case $f in *[!A-Za-z0-9._+~-]*) ko "nom de rpm invalide : $f" ;; esac
+        case $f in *[!A-Za-z0-9._+~^-]*) ko "nom de rpm invalide : $f" ;; esac
         hex "$sha" 64 || ko "sha256 invalide : $f"
         nl=$((nl + 1))
       done < /tmp/liste
