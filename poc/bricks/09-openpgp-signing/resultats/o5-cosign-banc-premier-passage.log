@@ -1,0 +1,43 @@
+banc commencé : 2026-11-19T20:13:46Z ; o5-cosign.sh 579bfd2f04a1cd7f… ; o5-cosign-banc.sh bec3405c6265796e…
+### 1. cle nominal
+KO   code 0, aucune ligne KO (condition : [ "$RC" = 0 ] && ! grep -q "^KO" "$J")
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-cle/resultats/o5-cosign-cle.log: No such file or directory
+KO   clé égale à l'archivée (condition : grep -q "^OK   clé lue par cosign dans OpenBao = clé publique archivée" "$J")
+KO   environnement du client conforme, secret jamais en argument (condition : [ ! -s "$C/etat/erreurs" ] && [ "$(cat "$C/etat/appels")" = public-key ])
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-cle/resultats/o5-cosign-cle.log: No such file or directory
+KO   redirection fermée, plus aucune écoute (condition : grep -q "^OK   redirection fermée" "$J" && [ "$(ecoutes)" = 0 ])
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-cle/travail: No such file or directory
+OK   secret absent du journal, de la sortie et du dossier de travail
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-cle/resultats/o5-cosign-cle.log: No such file or directory
+KO   K5 tenu, aucune ligne masquée (condition : grep -q "^OK   K5" "$J" && ! grep -q "ligne masquée" "$J")
+cp: cannot stat '/home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-cle/resultats/o5-cosign-cle.log': No such file or directory
+### 2. cle : OpenBao rend une autre clé
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-autre/resultats/o5-cosign-cle.log: No such file or directory
+KO   autre clé : KO, redirection fermée (condition : grep -q "^KO   clé lue par cosign .* différente de la clé archivée" "$J" && grep -q "^OK   redirection fermée" "$J" && [ "$(ecoutes)" = 0 ])
+### 3. redirection en échec
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-pf/resultats/o5-cosign-cle.log: No such file or directory
+KO   redirection en échec : KO, cosign jamais appelé (condition : grep -q "^KO   redirection non ouverte" "$J" && [ ! -s "$C/etat/appels" ] && [ "$(ecoutes)" = 0 ])
+### 4. essai nominal
+KO   code 0, aucune ligne KO (condition : [ "$RC" = 0 ] && ! grep -q "^KO" "$J")
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-essai/resultats/o5-cosign-essai.log: No such file or directory
+KO   signature vérifiée hors réseau, témoin refusé (condition : grep -q "^OK   vérification hors réseau avec la clé publique archivée : Verified OK" "$J" && grep -q "^OK   témoin : même bundle" "$J")
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-essai/resultats/o5-cosign-essai.log: No such file or directory
+KO   environnement conforme, redirection fermée avant la vérification (condition : [ ! -s "$C/etat/erreurs" ] && [ "$(grep -n "redirection fermée\|vérification hors réseau" "$J" | head -1 | grep -c fermée)" = 1 ] && [ "$(ecoutes)" = 0 ])
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-essai/travail: No such file or directory
+OK   secret absent du journal, de la sortie et du dossier de travail
+cp: cannot stat '/home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-essai/resultats/o5-cosign-essai.log': No such file or directory
+### 5. signature refusée par OpenBao
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-refus/resultats/o5-cosign-essai.log: No such file or directory
+KO   refus : KO attest-blob, redirection fermée (condition : grep -q "^KO   attest-blob : code 1" "$J" && grep -q "^OK   redirection fermée" "$J" && [ "$(ecoutes)" = 0 ])
+### 6. fuite du secret dans une erreur du client
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-fuite/resultats/o5-cosign-cle.log: No such file or directory
+KO   fuite : journal vidé par K5, secret absent du journal et de la sortie (condition : grep -q "^KO   K5" "$J" && [ "$(grep -c . "$J")" = 1 ] && ! grep -q -F "$SECRET" "$J" "$C/cle.sortie" && [ "$(ecoutes)" = 0 ])
+### 7. dossier de travail déjà présent
+grep: /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-present/resultats/o5-cosign-cle.log: No such file or directory
+KO   dossier présent : refus avant la redirection (condition : grep -q "^KO   .*travail existe déjà" "$J" && [ ! -s "$C/etat/appels" ] && [ ! -e "$C/travail/redirection.log" ])
+### journaux nominaux
+sed: can't read /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-cle/cle-nominal.log: No such file or directory
+sed: can't read /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc/cas-essai/essai-nominal.log: No such file or directory
+bilan : 2 OK, 13 KO
+banc fini : 2026-11-19T20:13:46Z
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-cosign-banc
