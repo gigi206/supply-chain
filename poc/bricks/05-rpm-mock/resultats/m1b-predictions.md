@@ -1186,3 +1186,20 @@ La référence du bootstrap `f2652169…` a été écrite par le `tar` 1.35 de l
 - **BA5** : `/mnt` de la racine d'outils reste vide, et les racines des copies restent en 555.
 
 **Conséquence prévue.** Si BA1 à BA4 sont tenues, le sha256 de `z-b1.tar` devient la cible du bootstrap pour le pod et la tâche, à la place de `f2652169…`, comme `7c07083c…` pour l'outillage. Rien n'est mesuré dans Kata ; c'est le pod d'essai du bootstrap qui suit.
+
+### Référence du bootstrap avec le tar de l'amorce : résultat, 19/11/2026, de 12:45:18 à 12:45:23 UTC, code 0 (note écrite à 2026-11-19T12:46:03Z UTC)
+
+Journal : [`m1b-boot-amorce.log`](m1b-boot-amorce.log).
+
+**BA1 à BA5 tenues.**
+- **BA1** : le `tar` de l'amorce est `tar-1.34-11.el9`. Les deux ré-archivages rendent le code 0, sans rien sur stderr, avec 11 472 membres. La copie est vue en 555 sous `/mnt`, et l'écriture y est refusée.
+- **BA2** : l'archive diffère de `f2652169…`, par les champs `devmajor` et `devminor` :
+  - `y1.tar` (tar 1.35) les a vides dans ses 11 486 en-têtes ;
+  - `z-b1.tar` (tar 1.34) les a à `0000000` dans 11 472 en-têtes, et vides dans 14 autres.
+
+  Les 14 sont sans doute des en-têtes pax étendus (11 486 − 11 472), ce qui n'est pas lu en détail.
+- **BA3** : le comparateur membre à membre contre `y1.tar` ne trouve aucun écart.
+- **BA4** : `z-b1.tar` et `z-b2.tar` sont identiques octet à octet, avec le sha256 `b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348`.
+- **BA5** : `/mnt` de la racine d'outils reste vide, et les racines des copies restent en 555.
+
+**Conséquence.** La cible du bootstrap pour le pod et la tâche, qui archiveront avec le `tar` de l'amorce, est `b063feb3…`, à la place de `f2652169…`. Le contenu est le même. Comme pour l'outillage (`7c07083c…`), rien n'est encore mesuré dans Kata.

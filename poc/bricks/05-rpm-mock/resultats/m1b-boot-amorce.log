@@ -1,0 +1,23 @@
+# m1b-boot-amorce.sh, début 2026-11-19T12:45:18Z ; dossier /home/gigi/.cache/supply-chain-poc/05/m1b-boot-amorce-20261119T124518Z
+OK   y1.tar du 19/11 (référence du bootstrap, tar de l'hôte) : f265216965e3e4723dfeb8931469cb9e57335e231ecfa4b7dc9151ba40545ee7
+avant : /mnt de la racine d'outils 755, 0 entrée(s) ; racines des copies : b1 555, b2 555
+tar de l'hôte : tar (GNU tar) 1.35
+tar de l'amorce : tar (GNU tar) 1.34 ; paquet tar-1.34-11.el9.x86_64
+témoin : racine vue sous /mnt dans le chroot : 555 ; écriture refusée : oui
+## ré-archivage de la copie b1 par le tar de l'amorce (BA1, BA2)
+tar de l'amorce (b1) : code 0 ; stderr 0 lignes
+z-b1.tar : 241981440 octets, 11472 membres, sha256 b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+## ré-archivage de la copie b2 par le tar de l'amorce (BA1, BA2)
+tar de l'amorce (b2) : code 0 ; stderr 0 lignes
+z-b2.tar : 241981440 octets, 11472 membres, sha256 b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+ÉCART z-b1.tar différent de f2652169
+OK   z-b1.tar et z-b2.tar identiques octet à octet (BA4)
+## comparaison membre à membre contre y1.tar (BA3)
+   comparer : membres : 11472 et 11472
+   comparer : seulement d'un côté : 0 ; présents des deux côtés et différents : 0
+   comparer : champs en cause : aucun
+## en-têtes d'en-tête ustar : devmajor et devminor (BA2)
+y1.tar : devmajor b'\x00\x00\x00\x00\x00\x00\x00\x00' devminor b'\x00\x00\x00\x00\x00\x00\x00\x00' : 11486 en-têtes
+z-b1.tar : devmajor b'\x00\x00\x00\x00\x00\x00\x00\x00' devminor b'\x00\x00\x00\x00\x00\x00\x00\x00' : 14 en-têtes ; devmajor b'0000000\x00' devminor b'0000000\x00' : 11472 en-têtes
+après : /mnt de la racine d'outils 755, 0 entrée(s) ; racines des copies : b1 555, b2 555
+# fin 2026-11-19T12:45:23Z

@@ -357,3 +357,9 @@ La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de 
 - **`s1.sh` n'est pas touché** : son empreinte, `362af7ef…`, est citée par les bancs archivés.
 - **Non remesuré** : les 5 694 s de `racine` et les 761 s de `boot_racine` de S1. La même cause y reste probable, sans mesure.
 - **Suite** : la référence du bootstrap avec le tar de l'amorce, puis un pod d'essai du bootstrap dans Kata, sous la limite posée autour de dnf seul.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T12:46:03Z UTC : cible du bootstrap avec le tar de l'amorce
+
+- **Nouvelle cible du bootstrap** : `b063feb3…`. Elle remplace `f2652169…`, écrite par le `tar` de l'hôte. Le contenu est le même (0 écart membre à membre) ; seuls les champs `devmajor` et `devminor` changent ([résultat](m1b-predictions.md), [journal](m1b-boot-amorce.log)).
+- **Cibles pour le pod et la tâche** : `7c07083c…` pour l'outillage, `b063feb3…` pour le bootstrap.
+- **Suite** : le pod d'essai du bootstrap dans Kata, sous la limite de fichiers ouverts posée autour de dnf seul.
