@@ -1719,3 +1719,22 @@ Journal : [`m1b-curl-amorce.log`](m1b-curl-amorce.log), de 15:46:06 à 15:46:10 
 - **Contre-contrôles en place** : curl n'est qu'un transport. Ce qu'il écrit n'est gardé que si le sha256 est fixé par la pipeline, ou si la signature passe gpgv et `rpm -K`. Le pod tourne en runc, sous l'UID 65532, en Pod Security `restricted` ; il n'a pas de secret, et sa sortie réseau ne sera ouverte qu'à DNS, au 443 public et à Zot. Une faille de curl ne peut donc pas changer le contenu d'une entrée sans être vue. Elle peut viser le pod lui-même, par un serveur ou un intermédiaire TLS hostile ; ce n'est pas mesuré.
 - **Choix avant `SIGNER=1`, qui te revient** : garder l'amorce figée, avec ces contre-contrôles, ou rafraîchir le curl du prefetch. Rafraîchir demande une image dérivée ou une autre amorce, et refait les références. Rien ne change avant la mesure du 20/11.
 - `gnupg2` est en `el9_7` dans les deux images. Le fait est transmis à la session de la brique 09 ; sa ligne n'est pas écrite ici.
+
+## Prédictions du 19/11/2026, écrites à 15:49:55 UTC : cas refusés du prefetch, dans des pods d'essai
+
+**Script** : [`m1b-refus-prefetch.sh`](m1b-refus-prefetch.sh) (sha256 `09784e3dd24ad753…`), journal à venir `m1b-refus-prefetch.log`.
+- Il joue le script de prefetch du bootstrap rendu sous `m1bt3` (`script-pb.sh` `912520ea…`, celui de JT1), relu au sha256. Chaque cas ne change qu'une ligne, contrôlée par `diff`.
+- Chaque cas a son pod runc, comme `essai_prefetch` : image de l'amorce, UID 65532, label `prefetch-rpm`, sortie posée le 16/11, sélecteur relu avant. La sortie va sur un `emptyDir` au lieu du PVC.
+- Un refus ne compte que si le code est non nul, s'il n'y a qu'une ligne `KO`, égale au message de la garde visée, et si ni `BASE_ARTIFACT_INPUTS` ni `couche.tar.gz` ne sont écrits. Pour les deux cas du manifeste, qui partagent le même message, la ligne `AssertionError` doit aussi montrer la couche lue dans le manifeste, ce qui sépare la garde de la couche de celle du `mediaType`. Les deux manifestes, lus dans le cache OCI local, sont des manifestes OCI (`application/vnd.oci.image.manifest.v1+json`) : `ed654c69…` a la couche `99c753a8…`, `ee90dc0e…` la couche `812c4412…`.
+- **Écritures** : quatre pods d'essai dans `builds`, sous un label existant, retirés par le script (accord permanent du 18/11). Ni politique, ni signature, ni écriture dans Zot.
+- **Lectures** : vault 9.7 BaseOS (métadonnées et 10 rpm, environ 2 Mo par cas) et Zot (manifestes, et la couche de 87 Mo dans le témoin seulement).
+
+- **PX1** (haute) : témoin, script tel quel : code 0, `BASE_ARTIFACT_INPUTS` à `ee90dc0e…`, `couche.tar.gz` écrite.
+- **PX2** (haute) : `repomd.xml` de `baseos97` fixé à `abac8b17…` (celui de BaseOS 9.8) : refus « baseos97 : repomd.xml différent du sha256 fixé », avant tout rpm.
+- **PX3** (haute) : autre manifeste, `ed654c69…` (l'amorce), avec la couche fixée `812c4412…` : le manifeste est lu à son sha256, puis le prefetch refuse sur « manifeste de base : image OCI à une seule couche, la couche fixée, attendue », avec `AssertionError: ['sha256:99c753a8…']`.
+- **PX4** (haute) : bon manifeste, `ee90dc0e…`, avec une couche fausse, `99c753a8…` : même refus, avec `AssertionError: ['sha256:812c4412…']`.
+- **PX5** (haute) : aucun pod restant au préfixe `m1brp-`.
+
+**Cas non joué, et pourquoi.** La paire cohérente (`ed654c69…`, `99c753a8…`) passerait le prefetch, puisque ce manifeste a bien cette couche. Aucun refus n'y est donc prédit. Ce qui l'arrête est le contrôle de cohérence de `prealables` (AN1) : il exige que l'annotation `base.digest` et la couche de `construire` égalent la base contrôlée par le prefetch. C'est déjà mesuré par trois altérations refusées ([`m1b-coherence-refus.log`](m1b-coherence-refus.log)).
+
+**Portée prévue.** Si tout tient, le prefetch refuse dans un pod un `repomd.xml` autre que celui fixé, un autre manifeste de base et une couche autre que celle du manifeste, chacun par sa garde et sans sortie écrite. Ce n'est pas mesuré dans un TaskRun.
