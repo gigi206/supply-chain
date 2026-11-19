@@ -1825,3 +1825,17 @@ Journal : [`m1b-amorce-fraicheur.log`](m1b-amorce-fraicheur.log), de 15:59:33 à
   - **LR2** (haute) : `m1b-builders.sh prealables` rend les mêmes quatre scripts que `m1bt3` (sha256 de JT1).
 
 **LR1 et LR2 tenues** (note écrite le 19/11/2026 à 16:01:37 UTC) : [`m1b-jour-kata-repetition.log`](m1b-jour-kata-repetition.log), de 16:01:12 à 16:01:18 UTC, à HEAD `85f4365`, code 0. Sous `m1b-r1`, `prealables` rend 0 ([`m1b-r1-prealables.log`](m1b-r1-prealables.log)). Sous `m1bt-r1`, il rend 0 et donne les quatre scripts de JT1 ([`m1b-builders-m1bt-r1-prealables.log`](m1b-builders-m1bt-r1-prealables.log)). Le lanceur s'arrête sur sa ligne de fin de répétition. Aucun pod n'est créé. **Commande pour le 20/11, à partir de 00:00 UTC** (racine du dépôt) : `bash poc/bricks/05-rpm-mock/resultats/m1b-jour-kata.sh < /dev/null > poc/bricks/05-rpm-mock/resultats/m1b-jour-kata.log 2>&1`.
+
+## Validation des tâches et pipelines par Tekton : prédictions écrites le 19/11/2026 à 16:10:43 UTC, avant le lancement
+
+**Script** : [`m1b-taches-admission.sh`](m1b-taches-admission.sh) (sha256 `f6d7617692e936fb…`), journal à venir `m1b-taches-admission.log`. C'est le point « `--dry-run=server` par Tekton » de la carte : l'admission à blanc de `prealables` ne porte que sur les pods d'essai, jamais sur les objets Tekton. Le script passe les deux tâches et les deux pipelines rendues sous `m1bt3` en `kubectl create --dry-run=server` dans `builds`, comme `m4b-taches-admission`. Rien n'est créé et aucun fichier n'est écrit ; seul le nombre de lignes du motif de refus est relevé, jamais son texte.
+
+- **TD1** (haute) : les quatre rendus sont ceux de `m1bt3`, écrits à 15:14 UTC (sha256 `b0fdff38…`, `de77ba0a…`, `13836c38…`, `b2443188…`).
+- **TD2** (haute) : `prefetch-racine-rpm` et `construire-racine-rpm`, en `tekton.dev/v1beta1`, sont admises (code 0, aucun motif). Leurs noms de paramètres à tiret bas (`cle_sup`, `dnf_conf`, `dnf_conf_sha256`) et le champ `resources` du pas n'ont jamais été vus par le webhook. Tekton autorise le tiret bas dans un nom de paramètre, et M4b a mesuré que `resources` est le nom admis en v1beta1.
+- **TD3** (haute) : `builder-mock-rocky9` et `builder-rocky9-bootstrap` sont admises (code 0). Leurs références de bundle portent un digest factice (zéros) : le webhook valide la forme, pas la résolution, comme pour la pipeline factice de M4b.
+- **TD4** : deux témoins, pour vérifier que le passage contrôle bien quelque chose.
+  - **Témoin de tâche** (haute) : `construire-racine-rpm` avec `computeResources` à la place de `resources` dans le pas est refusée, avec une ligne du motif « strict decoding error: unknown field », comme le témoin mesuré le 18/11.
+  - **Témoin de pipeline** (moyenne) : `pipeline-b` avec un champ inconnu dans sa première tâche est refusée par le même motif. Le décodage strict n'a été mesuré que sur une tâche.
+- **TD5** (haute) : les noms des tâches et pipelines de `builds` sont les mêmes avant et après.
+
+**Lecture prévue.** Si TD1 à TD5 tiennent, le point « `--dry-run=server` » est fait pour les rendus de `m1bt3`. La mesure du 20/11 rendra de nouveau ces quatre objets sous `m1bt-20`. JT1 veut les mêmes scripts ; les objets entiers ne sont pas comparés, et la validation ne vaudra donc pour eux que si leurs sha256 sont égaux à ceux de TD1. Un refus de TD2 ou TD3 changerait le gabarit, donc les scripts rendus, et la mesure du 20/11 serait à repréparer.
