@@ -260,3 +260,10 @@ Préparation demandée par le propriétaire (« Oui, prépare O2 »). Décision 
 - **`construire`** : réseau vers `vault/rocky/9.8` et `snapshot.debian.org`, téléchargement et installation de paquets épinglés dans deux racines neuves sous `~/.cache/supply-chain-poc/09/o2` ;
 - **`cle`** : clé du PoC (RSA 4096, v4, 1 an, **sans phrase de passe**, compromis à écrire dans l'ADR 0003), dans `~/.cache/supply-chain-poc/09/secrets` (0700 ; clé privée, clé publique et certificat de révocation en 0600) ; **clé publique dans le dépôt ou non**, à décider ;
 - **`essai`** : sans réseau, avec la clé du PoC.
+
+## Correction datée du 19/11/2026, écrite à 16:15:45 UTC : O2 restructuré, banc dans la racine Rocky passé
+
+- **Écart corrigé** (relu par le conseiller) : la version d'`o2.sh` décrite dans l'additif précédent ne suivait pas l'option (a) approuvée. Elle installait Rocky en ligne en une seule passe, sans contrôle des rpm contre le `primary` vérifié, et son étape `construire` était tout ou rien. Rien n'en avait été lancé, hormis `prealables`. Détail : [prédictions](resultats/o2-predictions.md), correction de 16:13:44 UTC.
+- **Nouvelles étapes**, chacune avec son accord : `rocky_telecharger`, `rocky_installer` (hors ligne), `debian_amorce`, `debian_racine`, `cle`, `essai`. Les replis de mmdebstrap, les échecs et l'effacement sont dans la [carte](resultats/o2-carte.md).
+- **`banc_chroot` passé à sec** (16:14:50 à 16:14:55 UTC, BK0 à BK5 tenues, [journal](resultats/o2-banc_chroot.log)). Il a tourné dans l'amorce Rocky du cache local, sans réseau ni installation, avec des clés jetables. Il mesure la mécanique de `cle` et `essai` sous gpg 2.3.3, et l'import dans 2.3.3 d'une clé créée par 2.4.8. gpg 2.4.7 n'est pas mesuré.
+- **Accord à demander maintenant** : celui de la première étape seulement, `rocky_telecharger`. Il ouvre le réseau vers `vault/rocky/9.8` et télécharge les rpm de la racine Rocky dans `~/.cache/supply-chain-poc/09/o2/rocky`, avant tout contrôle contre le `primary` vérifié. Rien n'est installé à cette étape.

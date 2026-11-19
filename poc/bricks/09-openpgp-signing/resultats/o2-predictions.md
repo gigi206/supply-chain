@@ -137,3 +137,20 @@ Interprétation de « sans rien installer » : l'amorce Rocky du cache local est
 | DA1 | `debian_amorce` : `apt-get update` puis mmdebstrap 1.5.7-1+deb13u1 installé, code 0 ; `InRelease` égal à `0584fba3…` ; **tous les `.deb` égaux au `Packages.xz` vérifié** | moyenne-haute : chemin de la 06, mais sur l'hôte |
 | DR1 | `debian_racine` : `mmdebstrap --mode=root` dans l'espace de noms utilisateur : code 0 | **faible** (voir les replis de la carte) |
 | DR2 | Si DR1 tient : `.deb` égaux au `Packages.xz` vérifié ; sept versions épinglées installées ; gpg 2.4.7 dans la racine | moyenne |
+
+## Note datée du 19/11/2026, écrite à 16:15:24 UTC : `banc_chroot` passé, BK0 à BK5 tenues
+
+Lancé après le commit des prédictions (`5f9076d2`). [Journal](o2-banc_chroot.log) : 16:14:50 à 16:14:55 UTC, code 0.
+
+- **BK0 tenue** : amorce extraite ; gpg 2.3.3 ; `gnupg2-2.3.3-5.el9_7.x86_64`.
+- **BK1 tenue** : gpg 2.3.3 crée la clé jetable dans la mécanique de `cle` (liens, tmpfs sous chroot, K1, K2) : RSA 4096, usages `scSC`, trois fichiers 600, export armuré.
+- **BK2 tenue** : refus (K4), seule ligne `KO` du journal.
+- **BK3 tenue** : le programme d'essai signe (E1, E3, E6, E7) et vérifie par gpgv (E2, E4, E5, E8) ; sqv absent de l'amorce Rocky.
+- **BK4 tenue** : une clé jetable créée par le gpg **2.4.8** de l'hôte est importée par gpg **2.3.3**, qui signe ; gpgv 2.3.3 vérifie. Ce n'est qu'un indice pour K5, qui porte sur 2.4.7.
+- **BK5 tenue** : K3 tenue ; code 0.
+
+**Défaut du journal, corrigé après le passage** : l'en-tête n'a pas écrit le sha256 d'`o2.sh` (« No such file », ligne 346), parce que `$0` était relatif après le `cd`. Le calcul passe désormais par `$here/o2.sh`. Seule cette ligne d'en-tête change par rapport au script de `5f9076d2` qui a tourné. Le sha256 d'`o2-interne.sh` est au journal (`7c91e50f…`).
+
+Dossier du banc effacé dans l'espace de noms, par un chemin littéral, à 16:15:03 UTC. **Restent non mesurés** : gpg 2.4.7 (K5 et K5b au sens strict), le téléchargement et l'installation des racines, mmdebstrap sur l'hôte (DR1).
+
+**Signalé** : deux journaux commités plus tôt, `o2-banc.log` et `o2-banc-premier-passage.log`, nomment les interfaces réseau de l'hôte (BC5a). La garde ne fait désormais que les compter.

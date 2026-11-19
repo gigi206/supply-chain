@@ -343,7 +343,7 @@ case "$e" in
   prealables|banc_chroot|rocky_telecharger|rocky_installer|debian_amorce|debian_racine|cle|essai)
     L=$R/o2-$e.log
     set +e
-    { echo "étape $e commencée : $(date -u '+%Y-%m-%dT%H:%M:%SZ') ; o2.sh $(sha256sum < "$0" | cut -c1-16)… ; o2-interne.sh $(sha256sum < "$I" | cut -c1-16)…"
+    { echo "étape $e commencée : $(date -u '+%Y-%m-%dT%H:%M:%SZ') ; o2.sh $(sha256sum < "$here/o2.sh" | cut -c1-16)… ; o2-interne.sh $(sha256sum < "$I" | cut -c1-16)…"
       "etape_$e"; echo "étape $e finie : $(date -u '+%Y-%m-%dT%H:%M:%SZ')"; } 2>&1 | masquer | tee "$L"; rc=${PIPESTATUS[0]}
     n=$(grep -c -e '-----BEGIN PGP' "$L" || true)
     if [ "$n" != 0 ]; then : > "$L"; echo "KO   K3 : $n ligne(s) de bloc OpenPGP dans le journal : journal vidé" | tee "$L"; exit 1; fi

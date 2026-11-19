@@ -1,0 +1,108 @@
+poc/bricks/09-openpgp-signing/o2.sh: line 346: poc/bricks/09-openpgp-signing/o2.sh: No such file or directory
+étape banc_chroot commencée : 2026-11-19T16:14:50Z ; o2.sh … ; o2-interne.sh 7c91e50fd7921f89…
+OK   couche 99c753a880cc de ed654c694190 extraite dans /home/gigi/.cache/supply-chain-poc/09/o2-banc-chroot/rocky
+  gpg de l amorce Rocky : gpg (GnuPG) 2.3.3
+  paquet : gnupg2-2.3.3-5.el9_7.x86_64
+### BK1 : création d'une clé jetable par gpg 2.3.3, même mécanique que cle (CHROOT, liens, tmpfs)
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.3.3
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : 9DE9843FCD47952B1514959435FEB9DD26A9B2BB
+  cle-openpgp.asc : 600 3466 (mode, octets), sha256 331d3b6c63604d20cfa58680ed15231b607135af8b60735c3d5511deb243abc5
+  cle-publique.asc : 600 1713 (mode, octets), sha256 cea3bd87a35d439e529306668fe16b5d6779cb1a2a6fd049855f33f6cf17754f
+  revocation.asc : 600 1848 (mode, octets), sha256 64b1ee7a0f3a2db077a83edd0d3709d44c0a374d1156bec2bb3673ffe21f8b48
+OK   clé privée exportée armurée (K3)
+empreinte créée : 9DE9843FCD47952B1514959435FEB9DD26A9B2BB
+  code 0
+  cle-openpgp.asc : 600 3466 (mode, octets)
+  cle-publique.asc : 600 1713 (mode, octets)
+  revocation.asc : 600 1848 (mode, octets)
+### BK2 (K4) : seconde création, refus attendu
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+KO   /o2/secrets/cle-openpgp.asc existe déjà : rien n'est écrasé (K4)
+  code 1 (refus attendu)
+### BK3 : programme d'essai, racine Rocky pour D et pour R, plus import d'une clé de l'hôte (2.4.8 vers 2.3.3)
+### E1 racine D : import de la clé et signature
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.3.3
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : 9DE9843FCD47952B1514959435FEB9DD26A9B2BB
+OK   essai.txt signé par 9DE9843FCD47952B1514959435FEB9DD26A9B2BB (SHA-512), signature de 566 octets
+  code 0
+### E2 racine D : vérification par gpgv et sqv
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+OK   gpgv : signature valide, 9DE9843FCD47952B1514959435FEB9DD26A9B2BB
+sqv absent de cette racine
+  code 0
+### E3 racine R : import de la clé et signature (K5)
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.3.3
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : 9DE9843FCD47952B1514959435FEB9DD26A9B2BB
+OK   essai.txt signé par 9DE9843FCD47952B1514959435FEB9DD26A9B2BB (SHA-512), signature de 566 octets
+  code 0
+### E4 racine R : vérification de la signature de D par gpgv
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+OK   gpgv : signature valide, 9DE9843FCD47952B1514959435FEB9DD26A9B2BB
+sqv absent de cette racine
+  code 0
+### E5 racine D : vérification de la signature de R par gpgv et sqv
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+OK   gpgv : signature valide, 9DE9843FCD47952B1514959435FEB9DD26A9B2BB
+sqv absent de cette racine
+  code 0
+### E6 racine R : clé jetable créée (K5b)
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.3.3
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : FFB4536AAAF5661DEAD05CC27EE9E7F16BBDA085
+OK   clé jetable FFB4536AAAF5661DEAD05CC27EE9E7F16BBDA085 exportée dans /o2/x/k5b (tmpfs)
+  code 0
+### E7 racine D : import de la clé jetable de R et signature (K5b)
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.3.3
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : FFB4536AAAF5661DEAD05CC27EE9E7F16BBDA085
+OK   essai.txt signé par FFB4536AAAF5661DEAD05CC27EE9E7F16BBDA085 (SHA-512), signature de 566 octets
+  code 0
+### E8 racine R : vérification de la signature K5b par gpgv
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+OK   gpgv : signature valide, FFB4536AAAF5661DEAD05CC27EE9E7F16BBDA085
+sqv absent de cette racine
+  code 0
+### E9 hôte (gpg 2.4.8) : clé jetable créée hors racine
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/home/gigi/.cache/supply-chain-poc/09/o2-banc-chroot/x/gh)
+gpg : gpg (GnuPG) 2.4.8
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : 7D656E3DF27B6C7FD1A3F76D1006B87645E28279
+OK   clé jetable 7D656E3DF27B6C7FD1A3F76D1006B87645E28279 exportée dans /home/gigi/.cache/supply-chain-poc/09/o2-banc-chroot/x/hote (tmpfs)
+  code 0
+### E10 racine R : import de la clé de l hôte et signature
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.3.3
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : 7D656E3DF27B6C7FD1A3F76D1006B87645E28279
+OK   essai.txt signé par 7D656E3DF27B6C7FD1A3F76D1006B87645E28279 (SHA-512), signature de 566 octets
+  code 0
+### E11 racine R : vérification par gpgv
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+OK   gpgv : signature valide, 7D656E3DF27B6C7FD1A3F76D1006B87645E28279
+sqv absent de cette racine
+  code 0
+à effacer après archivage (chemin littéral, dans l'espace de noms, car les fichiers appartiennent à des sous-UID) :
+  unshare --map-auto --map-root-user rm -r --one-file-system /home/gigi/.cache/supply-chain-poc/09/o2-banc-chroot
+étape banc_chroot finie : 2026-11-19T16:14:55Z
+OK   K3 : aucune ligne de bloc OpenPGP armuré dans le journal
