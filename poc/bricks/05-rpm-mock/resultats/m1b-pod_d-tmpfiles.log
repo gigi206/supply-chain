@@ -1,0 +1,24 @@
+# m1b-pod_d-tmpfiles.sh, début 2026-11-19T12:21:32Z
+fichiers tmpfiles.d lus dans a8 : 19 ; lignes de déclaration : 115
+   /root/.ssh : usr/lib/tmpfiles.d/provision.conf:21: d- /root/.ssh :0700 root :root -
+   /run/lock : usr/lib/tmpfiles.d/legacy.conf:13: d /run/lock 0755 root root -
+   /run/lock/subsys : usr/lib/tmpfiles.d/legacy.conf:20: d /run/lock/subsys 0755 root root -
+   /run/log : usr/lib/tmpfiles.d/systemd.conf:20: d /run/log 0755 root root -
+   /run/systemd : AUCUNE déclaration
+   /run/systemd/ask-password : usr/lib/tmpfiles.d/systemd.conf:13: d /run/systemd/ask-password 0755 root root -
+   /run/systemd/machines : usr/lib/tmpfiles.d/systemd.conf:17: d /run/systemd/machines 0755 root root -
+   /run/systemd/seats : usr/lib/tmpfiles.d/systemd.conf:14: d /run/systemd/seats 0755 root root -
+   /run/systemd/sessions : usr/lib/tmpfiles.d/systemd.conf:15: d /run/systemd/sessions 0755 root root -
+   /run/systemd/shutdown : usr/lib/tmpfiles.d/systemd.conf:18: d /run/systemd/shutdown 0755 root root -
+   /run/systemd/users : usr/lib/tmpfiles.d/systemd.conf:16: d /run/systemd/users 0755 root root -
+   /run/user : usr/lib/tmpfiles.d/systemd.conf:10: d /run/user 0755 root root -
+   /var/cache/private : usr/lib/tmpfiles.d/systemd.conf:40: d /var/cache/private 0700 root root -
+   /var/lib/private : usr/lib/tmpfiles.d/systemd.conf:38: d /var/lib/private 0700 root root -
+   /var/lib/systemd/coredump : usr/lib/tmpfiles.d/systemd.conf:36: d /var/lib/systemd/coredump 0755 root root 2w
+   /var/log/README : usr/lib/tmpfiles.d/legacy.conf:15: L /var/log/README - - - - ../../usr/share/doc/systemd/README.logs
+   /var/log/btmp : usr/lib/tmpfiles.d/var.conf:16: f /var/log/btmp 0660 root utmp -
+   /var/log/lastlog : usr/lib/tmpfiles.d/var.conf:17: f /var/log/lastlog 0664 root utmp -
+   /var/log/private : usr/lib/tmpfiles.d/systemd.conf:39: d /var/log/private 0700 root root -
+   /var/log/wtmp : usr/lib/tmpfiles.d/var.conf:15: f /var/log/wtmp 0664 root utmp -
+chemins en plus : 20 ; déclarés : 19 ; non déclarés : 1
+# fin 2026-11-19T12:21:32Z

@@ -1132,3 +1132,33 @@ Journaux : [`m1b-pod_b.log`](m1b-pod_b.log) (de 10:41:12 à 12:17:56 UTC, code 0
 - **Durée** (lecture) : dnf met 5 724 s, contre 5 811 s dans `pod_a`, à la même limite par défaut.
 
 **Portée.** Trois pods Kata (`pod_a`, `pod_b`, `pod_c`), du même nœud et du même jour, donnent l'archive `7c07083c…` de l'outillage. C'est la portée annoncée dans les prédictions : rien n'est établi pour le bootstrap, ni pour un autre jour, ni pour la tâche elle-même.
+
+### pod_d : résultat, 19/11/2026, de 12:18:28 à 12:20:29 UTC, code 0 (note écrite à 2026-11-19T12:22:27Z UTC)
+
+Journaux :
+- [`m1b-pod_d.log`](m1b-pod_d.log) : le passage ;
+- [`m1b-pod_d-ecarts.log`](m1b-pod_d-ecarts.log) : les écarts membre à membre contre `a8` ([script](m1b-pod_d-ecarts.sh)) ;
+- [`m1b-pod_d-journaux.log`](m1b-pod_d-journaux.log) : les journaux de dnf de `pod_a` et de `pod_d`, comparés sans horodatage ([script](m1b-pod_d-journaux.sh)) ;
+- [`m1b-pod_d-tmpfiles.log`](m1b-pod_d-tmpfiles.log) : les chemins en plus, rapprochés des fichiers `tmpfiles.d` de `a8` ([script](m1b-pod_d-tmpfiles.sh)).
+
+**PD1, PD3 et PD4 tenues ; PD2 lue : code 0 ; PD5 : l'archive diffère.**
+- **PD1** : `/proc` est monté dans la racine avant dnf, avec 1 montage. Le mode du point de montage vaut 555, celui de la racine 755 (dossier créé par `mkdir -p` sous `umask 022`).
+- **PD2** (lecture) : dnf rend le code 0, avec 201 paquets dont 2 `gpg-pubkey`. Le paquet `filesystem` s'installe donc sur un `/proc` déjà monté.
+- **PD3** : dnf dure 40 s, comme `pod_c` sous la limite 1 024, à la limite par défaut cette fois.
+- **PD4** : `/proc` est démonté après dnf, sans montage restant. La racine est en 555.
+- **PD5** : l'archive vaut `fb33228f…`, avec 13 352 membres au lieu de 13 332. Contre `a8` :
+  - 20 membres n'existent que dans `pod_d`, et aucun que dans `a8` ;
+  - 3 membres diffèrent : `./proc` est en 755 au lieu de 555, et la mtime de `./root` et de `./var/log` vaut S (`1793914619`) au lieu de `1730597381`.
+- **Les 20 membres en plus** : 19 sont déclarés, ligne pour ligne, dans les fichiers `tmpfiles.d` de l'outillage (`systemd.conf`, `legacy.conf`, `var.conf`, `provision.conf`). Le vingtième, `/run/systemd`, est le parent de dossiers déclarés. Ce sont des dossiers vides, le lien `/var/log/README`, et les fichiers `btmp`, `wtmp` et `lastlog`.
+- **Journaux de dnf** : ceux de `pod_a` et de `pod_d` ne diffèrent que par les débits et les heures. Aucun ne signale d'erreur de scriptlet.
+
+**Lecture.**
+- Avec `/proc` monté, un scriptlet crée les chemins de `tmpfiles.d` ; sans `/proc`, il ne les crée pas, sans rien signaler dans le journal de dnf. Que ce soit l'appel à `systemd-tmpfiles` du paquet `systemd` est probable, mais non lu : rpm est absent de l'hôte, et les scriptlets n'ont pas été extraits.
+- La mtime de `./root` et de `./var/log` suit : un membre nouveau y a été créé, et `tar` borne la mtime à S.
+- `./proc` en 755 : le mode de `filesystem` s'est appliqué au `/proc` monté. Au démontage, reste le dossier de `mkdir -p`. C'est une conséquence du montage lui-même, que la sonde pourrait corriger. Non essayé.
+- Les 17 520 octets de `lastlog` ne sont pas expliqués. `tmpfiles.d` déclare ce fichier vide ; un `useradd` d'un scriptlet postérieur l'aurait rempli. C'est une hypothèse, non mesurée.
+
+**Ce qui départage.** Les deux remèdes ne se valent pas :
+- **limite de fichiers ouverts à 1 024** : même vitesse (40 s), même archive `7c07083c…` que les références ;
+- **`/proc` monté dans la racine** : même vitesse, mais un autre contenu. Le garder demanderait de refaire les références.
+- **S1** ([`m1b-pod_d-s1.log`](m1b-pod_d-s1.log), [script](m1b-pod_d-s1.sh)) : aucun des 20 chemins n'existe dans `racine.tar` (13 341 membres, `./proc` en 555) ni dans `boot-racine.tar` (11 482 membres, `./proc` en 755, venu de l'image amont). Sur ce point, les racines de S1 ressemblent à celles faites sans `/proc`, pas à `pod_d`.

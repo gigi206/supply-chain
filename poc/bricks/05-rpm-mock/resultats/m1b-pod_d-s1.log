@@ -1,0 +1,48 @@
+# m1b-pod_d-s1.sh, début 2026-11-19T12:22:15Z
+racine.tar : 361758720 octets
+boot-racine.tar : 258129920 octets
+## racine.tar : 13341 membres ; proc : mode 0o555 ; membres sous proc/ : 0
+   root/.ssh : absent
+   run/lock : absent
+   run/lock/subsys : absent
+   run/log : absent
+   run/systemd : absent
+   run/systemd/ask-password : absent
+   run/systemd/machines : absent
+   run/systemd/seats : absent
+   run/systemd/sessions : absent
+   run/systemd/shutdown : absent
+   run/systemd/users : absent
+   run/user : absent
+   var/cache/private : absent
+   var/lib/private : absent
+   var/lib/systemd/coredump : absent
+   var/log/README : absent
+   var/log/btmp : absent
+   var/log/lastlog : absent
+   var/log/private : absent
+   var/log/wtmp : absent
+   bilan racine.tar : 0 des 20 chemins en plus de pod_d présents
+## boot-racine.tar : 11482 membres ; proc : mode 0o755 ; membres sous proc/ : 0
+   root/.ssh : absent
+   run/lock : absent
+   run/lock/subsys : absent
+   run/log : absent
+   run/systemd : absent
+   run/systemd/ask-password : absent
+   run/systemd/machines : absent
+   run/systemd/seats : absent
+   run/systemd/sessions : absent
+   run/systemd/shutdown : absent
+   run/systemd/users : absent
+   run/user : absent
+   var/cache/private : absent
+   var/lib/private : absent
+   var/lib/systemd/coredump : absent
+   var/log/README : absent
+   var/log/btmp : absent
+   var/log/lastlog : absent
+   var/log/private : absent
+   var/log/wtmp : absent
+   bilan boot-racine.tar : 0 des 20 chemins en plus de pod_d présents
+# fin 2026-11-19T12:22:17Z

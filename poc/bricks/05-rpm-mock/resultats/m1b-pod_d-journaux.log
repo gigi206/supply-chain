@@ -1,0 +1,92 @@
+# m1b-pod_d-journaux.sh, début 2026-11-19T12:21:11Z
+pod-a-dnf.log : 883 lignes
+pod-d-dnf.log : 883 lignes
+## lignes « scriptlet », « warning », « error », « tmpfiles » (casse ignorée), pod_a puis pod_d
+--- pod_a
+    libgpg-error                   x86_64  1.42-5.el9                    baseos98     211 k
+     Running scriptlet: filesystem-3.16-5.el9.x86_64                           1/1 
+     Running scriptlet: setup-2.13.7-10.el9.noarch                           6/199 
+     Running scriptlet: bash-5.1.8-9.el9.x86_64                             14/199 
+     Running scriptlet: libgcc-11.5.0-14.el9.x86_64                         15/199 
+     Running scriptlet: glibc-2.34-284.el9_8.4.x86_64                       18/199 
+     Running scriptlet: glibc-2.34-284.el9_8.4.x86_64                       18/199 
+     Installing       : libgpg-error-1.42-5.el9.x86_64                      27/199 
+     Running scriptlet: crypto-policies-20260224-1.gitea0f072.el9.noarch    38/199 
+     Running scriptlet: p11-kit-trust-0.26.4-1.el9_8.x86_64                 56/199 
+     Running scriptlet: mock-filesystem-6.9-1.el9.noarch                    68/199 
+     Running scriptlet: libutempter-1.2.1-6.el9.x86_64                      71/199 
+     Running scriptlet: nftables-1:1.0.9-9.el9_8.x86_64                     92/199 
+     Running scriptlet: iptables-legacy-1.8.10-11.1.el9.x86_64             104/199 
+     Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no   116/199 
+     Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no   116/199 
+     Running scriptlet: systemd-libs-252-67.el9_8.6.rocky.0.1.x86_64       117/199 
+     Running scriptlet: libblkid-2.37.4-25.el9.x86_64                      118/199 
+     Running scriptlet: util-linux-core-2.37.4-25.el9.x86_64               129/199 
+     Running scriptlet: fuse-overlayfs-1.16-1.el9_7.x86_64                 158/199 
+     Running scriptlet: systemd-252-67.el9_8.6.rocky.0.1.x86_64            163/199 
+     Running scriptlet: systemd-252-67.el9_8.6.rocky.0.1.x86_64            163/199 
+     Running scriptlet: dbus-common-1:1.12.20-8.el9.noarch                 164/199 
+     Running scriptlet: dbus-broker-28-9.el9_8.x86_64                      165/199 
+     Running scriptlet: elfutils-default-yama-scope-0.194-1.el9.rocky.0.   166/199 
+     Running scriptlet: tpm2-tss-3.2.3-1.el9.x86_64                        193/199 
+     Running scriptlet: mock-core-configs-45.2-1.el9.noarch                198/199 
+     Running scriptlet: filesystem-3.16-5.el9.x86_64                       199/199 
+     Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no   199/199 
+     Running scriptlet: rpm-4.16.1.3-40.el9.x86_64                         199/199 
+     Running scriptlet: mock-6.9-1.el9.noarch                              199/199 
+     Verifying        : libgpg-error-1.42-5.el9.x86_64                      69/199 
+     libgpg-error-1.42-5.el9.x86_64                                                
+--- pod_d
+    libgpg-error                   x86_64  1.42-5.el9                    baseos98     211 k
+     Running scriptlet: filesystem-3.16-5.el9.x86_64                           1/1 
+     Running scriptlet: setup-2.13.7-10.el9.noarch                           6/199 
+     Running scriptlet: bash-5.1.8-9.el9.x86_64                             14/199 
+     Running scriptlet: libgcc-11.5.0-14.el9.x86_64                         15/199 
+     Running scriptlet: glibc-2.34-284.el9_8.4.x86_64                       18/199 
+     Running scriptlet: glibc-2.34-284.el9_8.4.x86_64                       18/199 
+     Installing       : libgpg-error-1.42-5.el9.x86_64                      27/199 
+     Running scriptlet: crypto-policies-20260224-1.gitea0f072.el9.noarch    38/199 
+     Running scriptlet: p11-kit-trust-0.26.4-1.el9_8.x86_64                 56/199 
+     Running scriptlet: mock-filesystem-6.9-1.el9.noarch                    68/199 
+     Running scriptlet: libutempter-1.2.1-6.el9.x86_64                      71/199 
+     Running scriptlet: nftables-1:1.0.9-9.el9_8.x86_64                     92/199 
+     Running scriptlet: iptables-legacy-1.8.10-11.1.el9.x86_64             104/199 
+     Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no   116/199 
+     Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no   116/199 
+     Running scriptlet: systemd-libs-252-67.el9_8.6.rocky.0.1.x86_64       117/199 
+     Running scriptlet: libblkid-2.37.4-25.el9.x86_64                      118/199 
+     Running scriptlet: util-linux-core-2.37.4-25.el9.x86_64               129/199 
+     Running scriptlet: fuse-overlayfs-1.16-1.el9_7.x86_64                 158/199 
+     Running scriptlet: systemd-252-67.el9_8.6.rocky.0.1.x86_64            163/199 
+     Running scriptlet: systemd-252-67.el9_8.6.rocky.0.1.x86_64            163/199 
+     Running scriptlet: dbus-common-1:1.12.20-8.el9.noarch                 164/199 
+     Running scriptlet: dbus-broker-28-9.el9_8.x86_64                      165/199 
+     Running scriptlet: elfutils-default-yama-scope-0.194-1.el9.rocky.0.   166/199 
+     Running scriptlet: tpm2-tss-3.2.3-1.el9.x86_64                        193/199 
+     Running scriptlet: mock-core-configs-45.2-1.el9.noarch                198/199 
+     Running scriptlet: filesystem-3.16-5.el9.x86_64                       199/199 
+     Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no   199/199 
+     Running scriptlet: rpm-4.16.1.3-40.el9.x86_64                         199/199 
+     Running scriptlet: mock-6.9-1.el9.noarch                              199/199 
+     Verifying        : libgpg-error-1.42-5.el9.x86_64                      69/199 
+     libgpg-error-1.42-5.el9.x86_64                                                
+## diff des journaux sans horodatage (pod_a -> pod_d)
+   1c1
+   < Rocky 9.8 BaseOS                                8.6 kB/s | 833  B     00:00    
+   ---
+   > Rocky 9.8 BaseOS                                 10 kB/s | 833  B     00:00    
+   7,8c7,8
+   < Rocky 9.8 BaseOS                                208 MB/s |  47 MB     00:00    
+   < Rocky 9.8 AppStream                              21 kB/s | 833  B     00:00    
+   ---
+   > Rocky 9.8 BaseOS                                244 MB/s |  47 MB     00:00    
+   > Rocky 9.8 AppStream                              25 kB/s | 833  B     00:00    
+   14,16c14,16
+   < Rocky 9.8 AppStream                             234 MB/s |  31 MB     00:00    
+   < EPEL 9                                          338 MB/s |  20 MB     00:00    
+   < Last metadata expiration check: 0:00:03 ago on Thu Nov 19 09:00:54 2026.
+   ---
+   > Rocky 9.8 AppStream                             208 MB/s |  31 MB     00:00    
+   > EPEL 9                                          336 MB/s |  20 MB     00:00    
+   > Last metadata expiration check: 0:00:04 ago on Thu Nov 19 12:19:26 2026.
+# fin 2026-11-19T12:21:11Z

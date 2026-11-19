@@ -1,0 +1,55 @@
+# m1b-pod_d-ecarts.sh, début 2026-11-19T12:20:53Z
+a8.tar : 343930880 octets, sha256 06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5
+p-d.tar : 343951360 octets, sha256 fb33228f67ccbd72d1a82bdc04d965a3ff64f47a1fbcf630774ed1b990fbcdfc
+## comparateur du second banc (m1b-repro2-comparer.py)
+   membres : 13332 et 13352
+   seulement d'un côté : 20 ; présents des deux côtés et différents : 3
+        seul : ./root/.ssh
+        seul : ./run/lock
+        seul : ./run/lock/subsys
+        seul : ./run/log
+        seul : ./run/systemd
+        seul : ./run/systemd/ask-password
+        seul : ./run/systemd/machines
+        seul : ./run/systemd/seats
+        seul : ./run/systemd/sessions
+        seul : ./run/systemd/shutdown
+        seul : ./run/systemd/users
+        seul : ./run/user
+        seul : ./var/cache/private
+        seul : ./var/lib/private
+        seul : ./var/lib/systemd/coredump
+        seul : ./var/log/README
+        seul : ./var/log/btmp
+        seul : ./var/log/lastlog
+        seul : ./var/log/private
+        seul : ./var/log/wtmp
+        écart : ./proc (mode)
+        écart : ./root (mtime)
+        écart : ./var/log (mtime)
+   champs en cause : mode 1, mtime 2
+## détail par côté
+   seulement dans p-d : ./root/.ssh (type 5, mode 0o700, taille 0)
+   seulement dans p-d : ./run/lock (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./run/lock/subsys (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./run/log (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./run/systemd (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./run/systemd/ask-password (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./run/systemd/machines (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./run/systemd/seats (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./run/systemd/sessions (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./run/systemd/shutdown (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./run/systemd/users (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./run/user (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./var/cache/private (type 5, mode 0o700, taille 0)
+   seulement dans p-d : ./var/lib/private (type 5, mode 0o700, taille 0)
+   seulement dans p-d : ./var/lib/systemd/coredump (type 5, mode 0o755, taille 0)
+   seulement dans p-d : ./var/log/README (type 2, mode 0o777, taille 0)
+   seulement dans p-d : ./var/log/btmp (type 0, mode 0o660, taille 0)
+   seulement dans p-d : ./var/log/lastlog (type 0, mode 0o664, taille 17520)
+   seulement dans p-d : ./var/log/private (type 5, mode 0o700, taille 0)
+   seulement dans p-d : ./var/log/wtmp (type 0, mode 0o664, taille 0)
+   écart : ./proc : mode '0o555' -> '0o755'
+   écart : ./root : mtime 1730597381 -> 1793914619
+   écart : ./var/log : mtime 1730597381 -> 1793914619
+# fin 2026-11-19T12:20:56Z
