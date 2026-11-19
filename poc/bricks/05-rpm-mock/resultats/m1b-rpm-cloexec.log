@@ -1,0 +1,57 @@
+# m1b-rpm-cloexec.sh, début 2026-11-19T09:30:04Z
+tag : refs/tags/rpm-4.16.1.3 tag dae764ac297369f8b1dbc7950614acddbc68e3c3
+rpmio/rpmio.c : 1821 lignes, sha256 9f1e532c011a103e0268ef875e68cd5892bff435a889f4c0bd58f67825f2e86a
+lib/rpmscript.c : 663 lignes, sha256 fdec349a501c59d420a278589640bfb59b61f43548dc708d948f70508879f70f
+## rpmio/rpmio.c, rpmSetCloseOnExec
+ 1774 | 
+ 1775 | static void set_cloexec(int fd)
+ 1776 | {
+ 1777 |     int flags = fcntl(fd, F_GETFD);
+ 1778 | 
+ 1779 |     if (flags == -1 || (flags & FD_CLOEXEC))
+ 1780 | 	return;
+ 1781 | 
+ 1782 |     fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
+ 1783 | }
+ 1784 | 
+ 1785 | void rpmSetCloseOnExec(void)
+ 1786 | {
+ 1787 |     const int min_fd = STDERR_FILENO; /* don't touch stdin/out/err */
+ 1788 |     int fd;
+ 1789 | 
+ 1790 |     DIR *dir = opendir("/proc/self/fd");
+ 1791 |     if (dir == NULL) { /* /proc not available */
+ 1792 | 	/* iterate over all possible fds, might be slow */
+ 1793 | 	struct rlimit rl;
+ 1794 | 	int open_max;
+ 1795 | 
+ 1796 | 	if (getrlimit(RLIMIT_NOFILE, &rl) == 0 && rl.rlim_max != RLIM_INFINITY)
+ 1797 | 	    open_max = rl.rlim_max;
+ 1798 | 	else
+ 1799 | 	    open_max = sysconf(_SC_OPEN_MAX);
+ 1800 | 
+ 1801 | 	if (open_max == -1)
+ 1802 | 	    open_max = 1024;
+ 1803 | 
+ 1804 | 	for (fd = min_fd + 1; fd < open_max; fd++)
+ 1805 | 	    set_cloexec(fd);
+ 1806 | 
+ 1807 | 	return;
+ 1808 |     }
+ 1809 | 
+ 1810 |     /* iterate over fds obtained from /proc */
+ 1811 |     struct dirent *entry;
+ 1812 |     while ((entry = readdir(dir)) != NULL) {
+ 1813 | 	fd = atoi(entry->d_name);
+ 1814 | 	if (fd > min_fd)
+ 1815 | 	    set_cloexec(fd);
+ 1816 |     }
+ 1817 | 
+ 1818 |     closedir(dir);
+ 1819 | 
+ 1820 |     return;
+ 1821 | }
+## lib/rpmscript.c, appel dans doScriptExec
+171:static void doScriptExec(ARGV_const_t argv, ARGV_const_t prefixes,
+179:    rpmSetCloseOnExec();
+# fin 2026-11-19T09:30:11Z

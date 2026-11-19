@@ -1,0 +1,14 @@
+# m1b-pod-observation.sh, début 2026-11-19T09:24:54Z ; pod m1b-a
+hôte : limite de fichiers ouverts 524288 (souple) / 524288 (dure)
+pod : processus dnf principal 1045 ; limite de fichiers ouverts : 1073741824 1073741824
+pod : CLK_TCK 100 ; vCPU 3 ; noyau 6.18.56
+échantillon 1, 09:24:54 : paquets « Installing » 117 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+échantillon 2, 09:25:15 : paquets « Installing » 117 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+échantillon 3, 09:25:36 : paquets « Installing » 117 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+échantillon 4, 09:25:57 : paquets « Installing » 117 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+échantillon 5, 09:26:18 : paquets « Installing » 117 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+échantillon 6, 09:26:38 : paquets « Installing » 117 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+cut: /proc/1045/stat: No such file or directory
+cut: /proc/1045/stat: No such file or directory
+dnf principal : utime  stime  (tops)
+# fin 2026-11-19T09:26:59Z

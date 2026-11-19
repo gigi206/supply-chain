@@ -1002,3 +1002,20 @@ Le script est [`m1b.sh`](../m1b.sh), préparé à sec. Créer les deux pods est 
 - **PC2** : si PK6 n'est pas tenue, le comparateur membre à membre contre `a8` nomme chaque écart. Aucun pari sur leur nature.
 
 **Portée prévue.** Si PK6 et PC1 sont tenues, la mesure couvre deux pods Kata du cluster, le même jour. Les entrées y sont livrées par copie, et seule l'archive de la racine est faite : pas de couche de configuration, pas de layout. Rien ne sera établi pour le bootstrap, ni pour un autre jour, ni pour la tâche elle-même.
+
+### Constat pendant pod_a : lenteur de dnf dans le pod (note écrite à 2026-11-19T09:30:37Z UTC, pendant le passage, demande du propriétaire)
+
+Journaux :
+- [`m1b-pod-observation.log`](m1b-pod-observation.log), relevé en lecture seule à partir de 09:27:08 UTC ([script](m1b-pod-observation.sh)). Le premier passage, [`-1`](m1b-pod-observation-1.log), avait pris un fils de dnf pour le processus principal : défaut du script, corrigé.
+- [`m1b-rpm-cloexec.log`](m1b-rpm-cloexec.log), lecture publique du source amont de rpm 4.16.1.3 ([script](m1b-rpm-cloexec.sh)).
+
+- **Mesure** :
+  - dnf avance dans le pod (118 « Installing » à 09:27, contre 23 s pour toute l'installation sur l'hôte), mais lentement ;
+  - pendant le scriptlet de `ca-certificates`, un fils du processus dnf reste plus de 133 s à environ un vCPU (utime 6 058 et stime 7 246 tops à 133 s), avec l'exécutable `python3.9` : il n'a pas encore fait son `exec` ;
+  - la limite de fichiers ouverts vaut 1 073 741 824 dans le pod, contre 524 288 sur l'hôte.
+- **Lecture du source amont** : avant l'`exec` d'un scriptlet, `doScriptExec` appelle `rpmSetCloseOnExec()`. Quand `/proc/self/fd` ne s'ouvre pas, cette fonction appelle `fcntl` sur chaque descripteur, jusqu'à la limite dure `RLIMIT_NOFILE`.
+- **Hypothèse, non mesurée** :
+  - dans le fils du scriptlet, la racine visible serait celle de l'installation, sans `/proc` monté ; ce serait alors environ 10⁹ appels par scriptlet dans le pod, contre 5·10⁵ sur l'hôte ;
+  - trois points ne sont pas lus : le passage dans la racine avant le scriptlet (chroot), les correctifs de Rocky sur `rpm-4.16.1.3-40.el9`, et le lien avec les 5 694 s de l'étape `racine` de S1.
+- **Ce qui la trancherait** : un essai à part, avec une limite dure basse (`ulimit -Hn`) ou `/proc` monté dans la racine. Les fichiers installés ne devraient pas en dépendre ; c'est à mesurer.
+- **Rien n'est changé** dans `pod_a`, qui continue. `pod_b` gardera le même script, pour que PC1 compare deux passages identiques.

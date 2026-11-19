@@ -1,0 +1,18 @@
+# m1b-pod-observation.sh, début 2026-11-19T09:27:08Z ; pod m1b-a
+hôte : limite de fichiers ouverts 524288 (souple) / 524288 (dure)
+pod : processus dnf principal 59 ; limite de fichiers ouverts : 1073741824 1073741824
+pod : CLK_TCK 100 ; vCPU 3 ; noyau 6.18.56
+échantillon 1, 09:27:09 : paquets « Installing » 118 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+     fils 6946 : état R ; âge 28 s ; utime 1301 stime 1590 (tops) ; exe /usr/bin/python3.9 ; cmdline /usr/bin/python3.9 /usr/bin/dnf -y -c /m
+échantillon 2, 09:27:29 : paquets « Installing » 118 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+     fils 6946 : état R ; âge 49 s ; utime 2256 stime 2724 (tops) ; exe /usr/bin/python3.9 ; cmdline /usr/bin/python3.9 /usr/bin/dnf -y -c /m
+échantillon 3, 09:27:50 : paquets « Installing » 118 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+     fils 6946 : état R ; âge 70 s ; utime 3186 stime 3880 (tops) ; exe /usr/bin/python3.9 ; cmdline /usr/bin/python3.9 /usr/bin/dnf -y -c /m
+échantillon 4, 09:28:11 : paquets « Installing » 118 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+     fils 6946 : état R ; âge 91 s ; utime 4144 stime 5007 (tops) ; exe /usr/bin/python3.9 ; cmdline /usr/bin/python3.9 /usr/bin/dnf -y -c /m
+échantillon 5, 09:28:32 : paquets « Installing » 118 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+     fils 6946 : état R ; âge 112 s ; utime 5107 stime 6120 (tops) ; exe /usr/bin/python3.9 ; cmdline /usr/bin/python3.9 /usr/bin/dnf -y -c /m
+échantillon 6, 09:28:53 : paquets « Installing » 118 ; dernière ligne :  Running scriptlet: ca-certificates-2026.2.92_v9.0.319-90.3.el9_8.no 116/199
+     fils 6946 : état R ; âge 133 s ; utime 6058 stime 7246 (tops) ; exe /usr/bin/python3.9 ; cmdline /usr/bin/python3.9 /usr/bin/dnf -y -c /m
+dnf principal : utime 1880 stime 696 (tops)
+# fin 2026-11-19T09:29:14Z
