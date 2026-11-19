@@ -1823,3 +1823,5 @@ Journal : [`m1b-amorce-fraicheur.log`](m1b-amorce-fraicheur.log), de 15:59:33 à
 - **Répétition** : sous `m1b-r1` et `m1bt-r1`, journal du lanceur `m1b-jour-kata-repetition.log`.
   - **LR1** (haute) : les deux `prealables` rendent 0 sous ces préfixes à tiret, et le lanceur s'arrête après eux, sur sa ligne de fin de répétition.
   - **LR2** (haute) : `m1b-builders.sh prealables` rend les mêmes quatre scripts que `m1bt3` (sha256 de JT1).
+
+**LR1 et LR2 tenues** (note écrite le 19/11/2026 à 16:01:37 UTC) : [`m1b-jour-kata-repetition.log`](m1b-jour-kata-repetition.log), de 16:01:12 à 16:01:18 UTC, à HEAD `85f4365`, code 0. Sous `m1b-r1`, `prealables` rend 0 ([`m1b-r1-prealables.log`](m1b-r1-prealables.log)). Sous `m1bt-r1`, il rend 0 et donne les quatre scripts de JT1 ([`m1b-builders-m1bt-r1-prealables.log`](m1b-builders-m1bt-r1-prealables.log)). Le lanceur s'arrête sur sa ligne de fin de répétition. Aucun pod n'est créé. **Commande pour le 20/11, à partir de 00:00 UTC** (racine du dépôt) : `bash poc/bricks/05-rpm-mock/resultats/m1b-jour-kata.sh < /dev/null > poc/bricks/05-rpm-mock/resultats/m1b-jour-kata.log 2>&1`.

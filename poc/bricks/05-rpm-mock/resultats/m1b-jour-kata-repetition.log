@@ -1,0 +1,8 @@
+# m1b-jour-kata.sh, début 2026-11-19T16:01:12Z ; HEAD 85f4365ab89a
+préfixes : ancienne forme m1b-r1, forme de la tâche m1bt-r1 ; RÉPÉTITION : les deux prealables seulement
+scripts : m1b.sh 373ae33436d298e3 ; m1b-builders.sh 82004de28016ee27
+2026-11-19T16:01:12Z m1b.sh prealables (PREFIXE m1b-r1) : journal m1b-r1-prealables.log
+2026-11-19T16:01:15Z    code 0
+2026-11-19T16:01:15Z m1b-builders.sh prealables (PREFIXE m1bt-r1) : journal m1b-builders-m1bt-r1-prealables.log
+2026-11-19T16:01:18Z    code 0
+# fin de la répétition 2026-11-19T16:01:18Z
