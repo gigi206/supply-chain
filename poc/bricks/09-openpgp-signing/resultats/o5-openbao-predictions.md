@@ -34,3 +34,24 @@ L'accord couvre **la clé seule**. Il ne couvre ni politique, ni jeton, ni rôle
 | K | K3 et K4 tenus ; aucune ligne KO | haute |
 
 **Après.** Aucun compte ni pod n'a encore le droit de signer avec `lien` : la politique et le jeton relèvent du deuxième accord. La clé n'est pas supprimable (`deletion_allowed=false`) ; la retirer demanderait de changer sa configuration avec le jeton root.
+
+## Note datée du 19/11/2026, 19:39:00 UTC : `releve` et `cle_lien` passées, toutes les prédictions tenues
+
+**`releve`**, de 19:38:33 à 19:38:34 UTC, code 0 ([journal](o5-openbao-releve.log)).
+- **R1 tenue** : OpenBao 2.7.2, initialisé et descellé.
+- **R2 tenue** : exactement `chains`, `scanner` et `tsa`, toutes `ecdsa-p256`, version 1, non exportables.
+- **R3 tenue**.
+- **K tenue** : K3 et K4.
+
+**`cle_lien`**, de 19:38:38 à 19:38:42 UTC, code 0 ([journal](o5-openbao-cle_lien.log)).
+- **C1 tenue** : code 0. OpenBao 2.7.2 renvoie l'état de la clé dès l'écriture, clé publique comprise ; elle figure dans le journal, et c'est une clé publique. La clé a été créée à 2026-11-19T19:38:40Z, selon `creation_time`.
+- **C2 tenue** : `ecdsa-p256,false,false,false,1,true`.
+- **C3 tenue** : clé publique P-256 dans [`lien-cle-publique.pem`](lien-cle-publique.pem). Fichier sha256 `e661718dc8f97d9981ecc398277021ac43281a900ff67e3ad74794633bd0cce9` ; SPKI sha256 `42529342ceb102ad76f45285b2655d38265eebbe0c956f53706dcedf08e8d861`.
+- **C4 tenue** : seule `lien` est ajoutée ; `chains`, `scanner` et `tsa` sont inchangées.
+- **K tenue**.
+
+**État.** La clé `lien` existe dans OpenBao, mais aucun compte n'a le droit de signer avec : il n'y a ni politique, ni jeton, ni rôle. Rien n'est écrit dans Zot.
+
+**Suite d'O5 réel**, à accorder dans cet ordre :
+1. un jeton OpenBao borné à `transit/sign/lien` (et à la lecture de `transit/keys/lien`), avec sa politique ;
+2. un accès en lecture à Zot.

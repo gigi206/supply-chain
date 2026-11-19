@@ -305,3 +305,9 @@ La clé OpenPGP du PoC est créée **sans phrase de passe**, pour le PoC seuleme
 - **Relu, pas recalculé** : le lien manifeste ↔ fichier vient des journaux archivés des briques 05 et 06 ; aucune couche OCI n'est lue.
 
 Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.
+
+*Note datée du 19/11/2026, 19:39:00 UTC* : **O5 réel, premier accord (« Oui ») : clé Transit `lien` créée dans OpenBao** ([prédictions et résultats](resultats/o5-openbao-predictions.md)).
+- **Création** : script [`o5-openbao.sh`](o5-openbao.sh), éprouvé d'abord sur un banc hors cluster (15 OK). La clé est `ecdsa-p256`, non exportable, sans sauvegarde en clair, non supprimable, version 1.
+- **Clé publique** : [`resultats/lien-cle-publique.pem`](resultats/lien-cle-publique.pem), SPKI sha256 `42529342…`.
+- **Rien d'autre n'a changé** : les clés `chains`, `scanner` et `tsa` sont inchangées.
+- **Ce qui manque encore** : aucune politique ni aucun jeton ne permet de signer avec `lien`. Ce sont les deuxième et troisième accords : jeton OpenBao borné, puis lecture de Zot.

@@ -76,6 +76,8 @@ Avant la ligne « **Risqué → interdit** » :
 
 *Note datée du 19/11/2026, 18:56:05 UTC* : dans la ligne de remplacement ci-dessus, lire « O5 (attestation de lien) en attente d'accords » ainsi : « **O5 : banc hôte à sec tenu** (clés cosign jetables, sans réseau ; cosign et contrôle indépendant de B1 tous deux nécessaires) ; **O5 réel** (clé Transit `lien`, referrer dans Zot) **en attente d'accords** ».
 
+*Note datée du 19/11/2026, 19:39:00 UTC* : en plus de la note de 18:56:05 UTC, la ligne de remplacement de `docs/03` lit « O5 réel (clé Transit `lien`, referrer dans Zot) en attente d'accords » ainsi : « **clé Transit `lien` créée dans OpenBao** (`ecdsa-p256`, non exportable, 19/11/2026, accord du propriétaire) ; **jeton borné et lecture de Zot en attente d'accords** ».
+
 ## 3. `README.md` racine, ligne 33
 
 Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
