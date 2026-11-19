@@ -33,3 +33,28 @@ Portée de la lecture « privilégié dans Kata n'est pas privilégié sur l'hô
 - Passage de 14:53:45 UTC, gardé dans [`cloture-releve-1.log`](cloture-releve-1.log) : arrêt en A, au contrôle de `deb/declencheur.yaml`. Ce fichier est un gabarit à variables `@NOM@` ; yq refuse de le lire. Défaut du script, pas de la plateforme.
 - Avant l'arrêt, A avait relevé les 11 usages de `$PRIVILEGIE`, tous sur une ligne qui nomme `kata`, et les gabarits de `s4a.sh`, `s4d.sh` et `s5.sh`. Ces lignes ne comptent pas comme mesure : seul le passage suivant compte.
 - Correctif : les variables `@NOM@` sont remplacées par un littéral avant la lecture par yq. Le script passe à `49afd5020dccbf97…`. Les prédictions CL1 à CL6 ne changent pas.
+
+## Résultat (note écrite le 19/11/2026 à 14:54:48 UTC)
+
+Journal : [`cloture-releve.log`](cloture-releve.log), de 14:54:13 à 14:54:14 UTC, à HEAD `ac133de`, code 0, 0 KO.
+
+**CL1 à CL5 tenues.**
+- **CL1** : les 11 usages de `$PRIVILEGIE` sont sur une ligne qui nomme `kata`.
+- **CL2** : le pod d'essai de `s4d.sh` (ligne 345) porte Kata dans le même objet ; celui de `s5.sh` n'est privilégié que sous Kata. Les quatre fichiers de tâches privilégiées ne posent pas de RuntimeClass ; les gabarits de `s4a.sh`, `s4d.sh`, `s5.sh` et `deb/declencheur.yaml` la posent pour `construire`.
+- **CL3** : 31 en-têtes de pod relus, 17 sous Kata et 14 sans RuntimeClass (`diag-exec-kata` 11 fois, `s1-runc-restreint` une fois, `s3-sonde-runc` deux fois). Les 7 contextes privilégiés affichés sont tous sous Kata. Le seul pod sans Kata dont le contexte est affiché est restreint ; pour les autres, le contexte vient des scripts (CL1).
+- **CL4** : `pods-isolation` en `["Deny"]`, 4 validations, règle « privilégié hors Kata » égale à `admission.yaml` ; espace `builds` en `restricted`.
+- **CL5** : à 14:54:14 UTC, 3 pods privilégiés hors Kata, tous dans `kube-system`, et 0 ailleurs.
+
+**Limite de CL3** : grep a traité `diag-exec-releve.log` comme un fichier binaire et n'en a pas rendu les en-têtes. Ce journal vient du même script de diagnostic, couvert par CL1 ; ses en-têtes ne sont pas comptés.
+
+**CL6, heures de commit** (UTC, blocs séparés par plus de 45 min, borne basse) : 72 commits qui touchent la 06 depuis le 14/11 à 21:40:25Z, en 5 blocs, **6:34:16**.
+
+| Bloc | Commits | Durée | Autres chemins touchés |
+|---|---|---|---|
+| 14/11, 21:40:34 à 23:15:33 | 24 | 1:34:59 | 07a, 13a, docs |
+| 15/11, 20:40:06 à 20:45:28 | 3 | 0:05:22 | — |
+| 16/11, 15:08:13 à 19:33:52 | 36 | 4:25:39 | 05, docs, tools |
+| 16/11, 20:47:33 à 21:15:19 | 7 | 0:27:46 | docs |
+| 19/11, 14:53:40 à 14:54:10 | 2 | 0:00:30 | — |
+
+La part des autres briques dans ces blocs n'est pas séparée : le bloc du 16/11 après-midi contient du travail de la 05. Aucune conversion en pw n'est faite ici.

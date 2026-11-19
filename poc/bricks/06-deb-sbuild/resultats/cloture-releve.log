@@ -1,0 +1,45 @@
+# cloture-releve.sh, début 2026-11-19T14:54:13Z ; HEAD ac133defb497
+## A : scripts
+OK   usage privilégié avec kata : s1.sh:98
+OK   usage privilégié avec kata : s1.sh:99
+OK   usage privilégié avec kata : s1.sh:198
+OK   usage privilégié avec kata : s1.sh:262
+OK   usage privilégié avec kata : s1.sh:282
+OK   usage privilégié avec kata : s2.sh:199
+OK   usage privilégié avec kata : s3.sh:214
+OK   usage privilégié avec kata : s3.sh:318
+OK   usage privilégié avec kata : diag-exec-kata.sh:87
+OK   usage privilégié avec kata : diag-exec-kata.sh:140
+OK   usage privilégié avec kata : diag-exec-kata.sh:209
+usages de $PRIVILEGIE : 11
+OK   s4d.sh:345 : pod d'essai privilégié, runtimeClassName kata dans le même objet
+OK   s5.sh : pod d'essai privilégié seulement si $k == kata, et alors runtimeClassName kata
+tâche privilégiée : builder/construire-builder.yaml (1 ligne) ; runtimeClassName dans la tâche : 0
+tâche privilégiée : builder/construire-builder.signee.yaml (1 ligne) ; runtimeClassName dans la tâche : 0
+tâche privilégiée : deb/construire-deb.yaml (1 ligne) ; runtimeClassName dans la tâche : 0
+tâche privilégiée : deb/construire-deb.signee.yaml (1 ligne) ; runtimeClassName dans la tâche : 0
+OK   s4a.sh : gabarit de PipelineRun ou TaskRun, Kata posé : pipelineTaskName: "construire", podTemplate: ($g.zone + {runtimeClassName: "kata"})
+OK   s4d.sh : gabarit de PipelineRun ou TaskRun, Kata posé : pipelineTaskName: "construire", podTemplate: ($z + {runtimeClassName: "kata"})
+OK   s5.sh : gabarit de PipelineRun ou TaskRun, Kata posé : podTemplate: (if $k == "kata" then $z + {runtimeClassName: "kata"} else $z end)
+OK   deb/declencheur.yaml : taskRunSpecs construire, runtimeClassName kata (une fois)
+## B : journaux archivés
+grep: diag-exec-releve.log : fichiers binaires correspondent
+en-têtes de pod : 17 sous kata, 14 sans RuntimeClass ; contexte privilégié affiché : 7, tous sous kata si aucun KO ci-dessus
+grep: diag-exec-releve.log : fichiers binaires correspondent
+     11 ### diag-exec-kata (runtimeClassName -, uid 1000, sans label)
+      1 ### s1-runc-restreint (runtimeClassName -, uid 1000, contexte {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}})
+      2 ### s3-sonde-runc (runtimeClassName -, uid 1000, label -)
+## C : cluster, à 14:54:14 UTC
+pods-isolation : actions ["Deny"], 4 validations
+OK   pods-isolation : règle « privilégié hors Kata » déployée telle que dans admission.yaml
+espace builds : pod-security enforce « restricted »
+pods privilégiés hors Kata, par espace :  3 kube-system;
+hors kube-system et kyverno : 0
+## D : effort (heures de commit, UTC)
+bloc 2026-11-14T21:40:34Z à 2026-11-14T23:15:33Z : 24 commits, 1:34:59 ; autres chemins : 07a-sbom-grype, 13a-licences, docs
+bloc 2026-11-15T20:40:06Z à 2026-11-15T20:45:28Z : 3 commits, 0:05:22 ; autres chemins : -
+bloc 2026-11-16T15:08:13Z à 2026-11-16T19:33:52Z : 36 commits, 4:25:39 ; autres chemins : 05-rpm-mock, docs, tools
+bloc 2026-11-16T20:47:33Z à 2026-11-16T21:15:19Z : 7 commits, 0:27:46 ; autres chemins : docs
+bloc 2026-11-19T14:53:40Z à 2026-11-19T14:54:10Z : 2 commits, 0:00:30 ; autres chemins : -
+commits : 72 ; blocs : 5 ; somme des blocs : 6:34:16 (borne basse : avant le premier commit de chaque bloc, non compté)
+# fin 2026-11-19T14:54:14Z ; KO 0
