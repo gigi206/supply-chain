@@ -77,3 +77,12 @@ complements-20261119T144707Z/obs-sign-signd.8	https://raw.githubusercontent.com/
 complements-20261119T144707Z/obs-sign-sign.conf.5	https://raw.githubusercontent.com/openSUSE/obs-sign/2.8.5/sign.conf.5	4596	76bc31cba4438a63404855e9fcbdcd072a0e9b1589ca13a791d9e0883ed5a621
 complements-20261119T144707Z/fedora-signatures.html	https://docs.fedoraproject.org/en-US/fedora/security-team/cryptography/signatures/	42096	e408292ebc51d410b8d822fe1f7bbb59a26b5d4525f6816772683d87b111589c
 complements-20261119T144707Z/tracker-gnupg2.html	https://security-tracker.debian.org/tracker/source-package/gnupg2	9724	c45cf0780037b46aa727b1e594fece20273a97082f5553ee262f553d235a2014
+o2-releve-20261119T154234Z/archive-key-12.asc	https://ftp-master.debian.org/keys/archive-key-12.asc	11861	c2a9a16fde95e037bafd0fa6b7e31f41b4ff1e85851de5558f19a2a2f0e955e2
+o2-releve-20261119T154234Z/archive-key-13.asc	https://ftp-master.debian.org/keys/archive-key-13.asc	11861	6f1d277429dd7ffedcc6f8688a7ad9a458859b1139ffa026d1eeaadcbffb0da7
+o2-releve-20261119T154234Z/release-13.asc	https://ftp-master.debian.org/keys/release-13.asc	1384	4d097bb93f83d731f475c5b92a0c2fcf108cfce1d4932792fca72d00b48d198b
+o2-releve-20261119T154234Z/InRelease	https://snapshot.debian.org/archive/debian/20261105T000000Z/dists/trixie/InRelease	140421	0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+o2-releve-20261119T154234Z/Packages.xz	https://snapshot.debian.org/archive/debian/20261105T000000Z/dists/trixie/main/binary-amd64/Packages.xz	9678380	7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498
+o2-releve-20261119T154234Z/vault-BaseOS-repomd.xml	https://dl.rockylinux.org/vault/rocky/9.8/BaseOS/x86_64/os/repodata/repomd.xml	4449	abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+o2-releve-20261119T154234Z/vault-BaseOS-repomd.xml.asc	https://dl.rockylinux.org/vault/rocky/9.8/BaseOS/x86_64/os/repodata/repomd.xml.asc	833	fd9d161f8d35f144ebf0e5135ea33f7a8502922539687842e858af02b392b7a3
+o2-releve-20261119T154234Z/vault-AppStream-repomd.xml	https://dl.rockylinux.org/vault/rocky/9.8/AppStream/x86_64/os/repodata/repomd.xml	4918	a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+o2-releve-20261119T154234Z/vault-AppStream-repomd.xml.asc	https://dl.rockylinux.org/vault/rocky/9.8/AppStream/x86_64/os/repodata/repomd.xml.asc	833	f1a898396cf281e4431d1b62d7ebf9d4285d054276f1ef2ed7acfe82c63be741
