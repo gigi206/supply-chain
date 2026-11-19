@@ -1,0 +1,19 @@
+     enveloppes lues : 1 de type lien, 0 d'un autre type
+OK   énoncé : _type https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+OK   sujet : 192.168.161.13:5000/signes/sample-app-deb @ sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+OK   lien : nature du lien égal à la valeur archivée (identity…)
+OK   lien : dépôt d'origine égal à la valeur archivée (builds/sample-app-deb…)
+OK   lien : manifeste non signé égal à la valeur archivée (sha256:60f25f5c3fb58b7c…)
+OK   lien : fichier non signé égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+OK   lien : dépôt signé égal à la valeur archivée (signes/sample-app-deb…)
+OK   lien : empreinte OpenPGP égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+OK   lien : sha256 de la clé publique égal à la valeur archivée (20bcaf436ddf28d4a6c0f69…)
+OK   lien : empreinte recalculée de cle-publique.asc égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+OK   layout sha256:60f25f5c3fb5… : manifeste, configuration et couche recalculés ; 1 membre(s)
+OK   lien : fichier de l'image non signée (lu) égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+OK   layout sha256:60f25f5c3fb5… : manifeste, configuration et couche recalculés ; 1 membre(s)
+OK   membres écrits par la brique : aucun bloc privé, aucune adresse hors de .invalid et .example (0 adresse(s) fictive(s))
+OK   lien : deb (identité) égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+OK   lien : identité : manifeste publié égal à la valeur archivée (sha256:60f25f5c3fb58b7c…)
+OK   lien : fichier signé du prédicat égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+ACCEPTÉ

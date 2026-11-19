@@ -1,0 +1,21 @@
+     enveloppes lues : 1 de type lien, 0 d'un autre type
+OK   énoncé : _type https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+OK   sujet : 192.168.161.13:5000/signes/sample-app-rpm @ sha256:fa5b175786dcaf0cbd989b7e7098c6306e3d66427d4cf6ae2f3ecb1fd857a283
+OK   lien : nature du lien égal à la valeur archivée (rpm-b1…)
+OK   lien : dépôt d'origine égal à la valeur archivée (builds/sample-app-rpm…)
+OK   lien : manifeste non signé égal à la valeur archivée (sha256:07b7bd6feb489bff…)
+OK   lien : fichier non signé égal à la valeur archivée (864d55f486f423cec854cde…)
+OK   lien : dépôt signé égal à la valeur archivée (signes/sample-app-rpm…)
+OK   lien : empreinte OpenPGP égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+OK   lien : sha256 de la clé publique égal à la valeur archivée (20bcaf436ddf28d4a6c0f69…)
+OK   lien : empreinte recalculée de cle-publique.asc égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+OK   layout sha256:07b7bd6feb48… : manifeste, configuration et couche recalculés ; 1 membre(s)
+OK   lien : fichier de l'image non signée (lu) égal à la valeur archivée (864d55f486f423cec854cde…)
+OK   layout sha256:fa5b175786dc… : manifeste, configuration et couche recalculés ; 1 membre(s)
+OK   membres écrits par la brique : aucun bloc privé, aucune adresse hors de .invalid et .example (0 adresse(s) fictive(s))
+OK   lien : rpm signé égal à la valeur archivée (9f71d578d3b13bc5c4a996a…)
+OK   lien : fichier signé du prédicat égal à la valeur archivée (9f71d578d3b13bc5c4a996a…)
+     B1 recalculé : signé 8 entrées de signature, en-tête principal à l'octet 4504 ; non signé 7, à l'octet 4504
+OK   lien : en-tête principal du prédicat égal à la valeur archivée (4504…)
+OK   B1 recalculé sur les octets lus : lead égal, 2168872 octets égaux à partir de l'en-tête principal
+ACCEPTÉ

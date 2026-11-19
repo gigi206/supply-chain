@@ -1,0 +1,46 @@
+étape verifier commencée : 2026-11-19T20:49:45Z ; o5-signes.sh 747853a9e8f2e94f… ; o5-signes.py 329c60eaeab808a4…
+OK   valeurs archivées relues (o5-signes.py attendus)
+OK   digests de construire (journal archivé = dossier) : rpm fa5b175786dc…, depot-rpm ed666ab80dd1…, depot-apt 90909a869321… ; deb = manifeste non signé 60f25f5c3fb5…
+OK   clé publique archivée : SPKI sha256 42529342ceb102ad76f45285b2655d38265eebbe0c956f53706dcedf08e8d861
+     anonyme : aucun secret lu, aucune redirection ouverte
+OK   tiré en anonyme : builds/sample-app-rpm@sha256:07b7bd6feb48…
+OK   builds/sample-app-rpm : layout contrôlé (o5-zot-controle.py), un seul fichier de sha256 archivé
+OK   tiré en anonyme : builds/sample-app-deb@sha256:60f25f5c3fb5…
+OK   builds/sample-app-deb : layout contrôlé (o5-zot-controle.py), un seul fichier de sha256 archivé
+### rpm : signes/sample-app-rpm@sha256:fa5b175786dcaf0cbd989b7e7098c6306e3d66427d4cf6ae2f3ecb1fd857a283
+OK   une attestation de lien parmi les referrers (1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+OK   aucun tag
+OK   cosign verify-attestation (clé lien archivée) : 1 enveloppe(s)
+OK   tiré en anonyme : signes/sample-app-rpm@sha256:fa5b175786dc…
+OK   rpm : contrôle indépendant ACCEPTÉ (18 contrôles OK)
+     énoncé archivé : resultats/o5-signes-enonce-rpm.json
+OK   témoin : clé jetable refusée (Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1)
+### deb : signes/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+OK   une attestation de lien parmi les referrers (1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+OK   aucun tag
+OK   cosign verify-attestation (clé lien archivée) : 1 enveloppe(s)
+OK   tiré en anonyme : signes/sample-app-deb@sha256:60f25f5c3fb5…
+OK   deb : contrôle indépendant ACCEPTÉ (17 contrôles OK)
+     énoncé archivé : resultats/o5-signes-enonce-deb.json
+OK   témoin : clé jetable refusée (Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1)
+### depot-rpm : signes/depot-rpm@sha256:ed666ab80dd15b871b45c4bbba2295146fa395a8e4bd6d1bafe066b2cb97b915
+OK   une attestation de lien parmi les referrers (1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+OK   aucun tag
+OK   cosign verify-attestation (clé lien archivée) : 1 enveloppe(s)
+OK   tiré en anonyme : signes/depot-rpm@sha256:ed666ab80dd1…
+OK   depot-rpm : contrôle indépendant ACCEPTÉ (21 contrôles OK)
+     énoncé archivé : resultats/o5-signes-enonce-depot-rpm.json
+OK   témoin : clé jetable refusée (Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1)
+### depot-apt : signes/depot-apt@sha256:90909a869321b2455693408a394114725e5d9f2d75e723c9ecda811e2cc2630a
+OK   une attestation de lien parmi les referrers (1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+OK   aucun tag
+OK   cosign verify-attestation (clé lien archivée) : 1 enveloppe(s)
+OK   tiré en anonyme : signes/depot-apt@sha256:90909a869321…
+OK   depot-apt : contrôle indépendant ACCEPTÉ (23 contrôles OK)
+     énoncé archivé : resultats/o5-signes-enonce-depot-apt.json
+OK   témoin : clé jetable refusée (Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1)
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-signes/verifier
+étape verifier finie : 2026-11-19T20:49:46Z
+OK   K3 : aucune ligne de bloc privé dans le journal
+OK   K5 : valeur du secret lien absente du journal et du dossier de l'étape
+OK   K6 : ni mot de passe, ni hash, ni chaîne d'authentification de poc-lien dans le journal et le dossier de l'étape

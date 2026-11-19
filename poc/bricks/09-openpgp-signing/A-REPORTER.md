@@ -82,6 +82,8 @@ Avant la ligne « **Risqué → interdit** » :
 
 *Note datée du 19/11/2026, 19:58:28 UTC* : en plus des notes précédentes, lire dans la ligne de remplacement de `docs/03` « lecture de Zot en attente d'accord » ainsi : « **Zot lu en anonyme** (manifestes non signés et leur fichier recalculés, provenance de Chains vérifiée) ; **écritures dans Zot** (rpm signé, dépôts signés, attestations de lien) **en attente d'accord** ».
 
+*Note datée du 19/11/2026, 20:50:29 UTC* : en plus des notes précédentes, lire dans la ligne de remplacement de `docs/03` « **écritures dans Zot** (rpm signé, dépôts signés, attestations de lien) **en attente d'accord** » ainsi : « **O5 réel tenu le 19/11/2026** ([prédictions et résultats](../poc/bricks/09-openpgp-signing/resultats/o5-signes-predictions.md)) : rpm signé, copie du manifeste deb, dépôts rpm et apt signés publiés par `poc-lien` dans `signes/**`, par digest, sans tag ; une attestation de lien par objet, signée par `cosign attest --key hashivault://lien` (redirection locale vers OpenBao) ; vérifiée en anonyme par cosign avec la clé publique archivée, puis par un contrôle indépendant sur les octets tirés de Zot (B1 recalculé, identité du deb, chaînes des dépôts) ; clé jetable refusée. Jetons d'horodatage non vérifiés ; porte et Kyverno (O6) non faits ».
+
 ## 3. `README.md` racine, ligne 33
 
 Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
@@ -99,6 +101,8 @@ Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 *Note datée du 19/11/2026, 18:58:46 UTC* : dans le texte de remplacement ci-dessus, lire « reste l'attestation de lien (O5) » ainsi : « attestation de lien éprouvée sur un banc hôte à clés cosign jetables ; reste O5 réel (clé Transit `lien`, referrer et lecture de Zot) ».
 
 *Note datée du 19/11/2026, 19:50:00 UTC* : en plus de la note de 18:58:46 UTC, lire « reste O5 réel (clé Transit `lien`, referrer et lecture de Zot) » ainsi : « clé Transit `lien` et accès borné créés dans OpenBao ; reste O5 réel dans Zot (lecture, referrers) ».
+
+*Note datée du 19/11/2026, 20:50:29 UTC* : en plus des notes de 18:58:46 et 19:50:00 UTC, lire « reste O5 réel dans Zot (lecture, referrers) » ainsi : « rpm, deb et dépôts signés publiés dans Zot (`signes/**`), chacun avec une attestation de lien signée par la clé Transit `lien` et vérifiée sur l'hôte (cosign et contrôle indépendant) ; non vérifiée par la porte ni par Kyverno ». Ce texte atteint, sur l'hôte, le seuil de la ligne 33 (« rpm, deb et dépôt signés ; attestation de lien vérifiée »). La clôture de la brique reste au propriétaire.
 
 ---
 
@@ -249,3 +253,12 @@ Après le tableau du §4 (sous la ligne « Sources : … »), ajouter :
 - Les verdicts « Risqué » proposés au §1.2 n'interdisent que des outils **non retenus** ; aucune voie de la brique n'en dépend.
 - La ligne curl du doc 04 reste à la session principale ; la brique 09 a employé le curl de l'hôte pour ses lectures publiques.
 - Environ 32 appels anonymes à l'API GitHub ont été consommés de 14:44 à 14:48 UTC ; le quota était revenu à 60 sur 60 lors du relevé de 14:52:27 UTC (note du dossier partagé des sessions).
+
+*Note datée du 19/11/2026, 20:50:29 UTC (O5 réel)* :
+- **Objets écrits dans Zot par `poc-lien`, de 20:48:26 à 20:49:30 UTC**, qui y restent, puisque `poc-lien` ne peut rien supprimer :
+  - `signes/sample-app-rpm@sha256:fa5b1757…`, `signes/sample-app-deb@sha256:60f25f5c…`, `signes/depot-rpm@sha256:ed666ab8…` et `signes/depot-apt@sha256:90909a86…`, chacun avec une attestation de lien ;
+  - `signes/essai-09-attest`, `signes/essai-09-autre` et `signes/essai-09-altere`, avec un referrer signé par une clé jetable ;
+  - l'essai de 20:27:57 UTC, `signes/essai-09`.
+- **Taille.** Chaque couche fait environ 2 Mo : 2 181 120 octets pour le rpm (et autant pour le rpm altéré), 2 191 360 pour le dépôt rpm, 1 966 080 pour le dépôt apt, plus la couche du deb, recopiée. Je n'ai pas mesuré l'espace pris sur le disque de Zot.
+- **Garde horaire.** Toute écriture de la brique dans Zot est refusée par `o5-signes.sh` entre 23:30 et 08:00 UTC (mesure de M1b).
+- **Secret `lien`.** Il expire au plus tard le 22/11/2026 à 19:49:36 UTC. Aucune signature `lien` n'est prévue d'ici là.

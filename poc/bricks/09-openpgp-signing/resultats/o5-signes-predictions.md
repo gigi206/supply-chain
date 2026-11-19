@@ -136,3 +136,26 @@ Journal : [o5-signes-attester.log](o5-signes-attester.log). Aucune ligne KO ; K3
 - **AT2** : quatre `cosign attest --key hashivault://lien`, à code 0, par la redirection `127.0.0.1:34445`. La redirection a été fermée ensuite, et le port n'écoute plus. Chaque objet porte désormais **une** attestation de lien, et aucun autre referrer.
 
 Prédicats signés, archivés : `o5-signes-predicat-{rpm,deb,depot-rpm,depot-apt}.json`, sans aucune adresse. Le dossier de l'étape est effacé.
+
+## Note datée du 19/11/2026, 20:50:43 UTC : `verifier` passée (20:49:45 à 20:49:46 UTC, code 0), VE1, VE2 et K tenues
+
+Journal : [o5-signes-verifier.log](o5-signes-verifier.log). L'étape tourne en anonyme : aucun secret lu, aucune redirection ouverte. Aucune ligne KO ; K3, K5 et K6 tenus.
+
+**VE1.** Pour chaque objet, `cosign verify-attestation` avec la clé `lien` archivée rend une seule enveloppe. Le contrôle indépendant accepte ensuite les quatre ([rpm](o5-signes-verifier-controle-rpm.log), [deb](o5-signes-verifier-controle-deb.log), [dépôt rpm](o5-signes-verifier-controle-depot-rpm.log), [dépôt apt](o5-signes-verifier-controle-depot-apt.log)) :
+- **rpm** : B1 est recalculé sur les octets tirés de `signes/sample-app-rpm` et de `builds/sample-app-rpm`. Le signé a 8 entrées de signature, le non signé 7 ; l'en-tête principal est à l'octet 4504 dans les deux. Le lead est égal, et les 2 168 872 octets qui suivent l'en-tête principal aussi.
+- **deb** : le manifeste publié est le manifeste non signé (identité).
+- **dépôt rpm** : chaîne repomd.xml → 6 fichiers de repodata → primary → rpm signé ; 9 membres, aucun de trop.
+- **dépôt apt** : le texte signé d'InRelease est égal à Release ; chaîne Release → 2 index → Packages → deb ; 6 membres, aucun de trop.
+
+Les quatre énoncés sont archivés : `o5-signes-enonce-{rpm,deb,depot-rpm,depot-apt}.json`.
+
+**VE2.** Une clé jetable est refusée quatre fois (« accepted signatures do not match threshold, Found: 0, Expected 1 »). Il n'y a aucun tag, et une seule attestation de lien par objet.
+
+**Bilan des prédictions** : CO1, CO2, EA1 à EA4, PU1, AT1, AT2, VE1, VE2 et K sont tenues. Aucun premier passage en échec.
+
+**Réserves** :
+- les jetons d'horodatage ne sont ni posés ni vérifiés sur les attestations de lien ;
+- sans journal de transparence (PoC hors ligne), cosign tourne avec des drapeaux dépréciés mais acceptés ;
+- la porte et Kyverno ne lisent pas encore `signes/**` : c'est O6 ;
+- l'attestation est vérifiée sur l'hôte, pas dans le cluster ;
+- les dossiers de travail sont effacés, y compris `09/o5-signes/construire`, que l'on peut refaire à l'identique (CO1).

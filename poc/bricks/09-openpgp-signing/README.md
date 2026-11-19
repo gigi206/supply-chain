@@ -339,3 +339,10 @@ Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.
 - **Script** [`o5-signes.sh`](o5-signes.sh), contrôle [`o5-signes.py`](o5-signes.py). Étapes : `construire` (hors réseau), `essai_attest` (clé jetable, `signes/essai-09-*`), `publier`, `attester` (clé `lien`), `verifier` (anonyme).
 - **Banc** hors cluster ([o5-signes-banc.sh](o5-signes-banc.sh)) : 28 OK, 0 KO. Il simule Zot et OpenBao et ne prouve pas la vraie poussée de `cosign attest` sous `poc-lien` : `essai_attest` la mesure avant toute signature par `lien`.
 - **Garde horaire** : aucune écriture dans Zot entre 23:30 et 08:00 UTC (mesure de M1b).
+
+*Note datée du 19/11/2026, 20:50:43 UTC* : **O5 réel tenu** ([prédictions et résultats](resultats/o5-signes-predictions.md)).
+- **Publié par `poc-lien`** dans `signes/**`, par digest, sans tag : le rpm signé, la copie du manifeste deb, les dépôts rpm et apt signés.
+- **Attestations.** Chaque objet porte une attestation de lien, signée par `cosign attest --key hashivault://lien`.
+- **Vérification.** En anonyme, cosign vérifie avec la clé archivée, puis le contrôle indépendant recalcule sur les octets tirés de Zot : B1 pour le rpm, l'identité du deb, la chaîne de chaque dépôt.
+- **Témoins.** La clé jetable est refusée. Les témoins faux, dans `signes/essai-09-*`, sont refusés par le contrôle.
+- **Réserves** : jetons d'horodatage non vérifiés ; porte et Kyverno (O6) non faits.

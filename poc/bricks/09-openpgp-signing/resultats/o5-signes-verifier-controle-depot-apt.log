@@ -1,0 +1,25 @@
+     enveloppes lues : 1 de type lien, 0 d'un autre type
+OK   énoncé : _type https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+OK   sujet : 192.168.161.13:5000/signes/depot-apt @ sha256:90909a869321b2455693408a394114725e5d9f2d75e723c9ecda811e2cc2630a
+OK   lien : nature du lien égal à la valeur archivée (repository…)
+OK   lien : dépôt d'origine égal à la valeur archivée (builds/sample-app-deb…)
+OK   lien : manifeste non signé égal à la valeur archivée (sha256:60f25f5c3fb58b7c…)
+OK   lien : fichier non signé égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+OK   lien : dépôt signé égal à la valeur archivée (signes/depot-apt…)
+OK   lien : empreinte OpenPGP égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+OK   lien : sha256 de la clé publique égal à la valeur archivée (20bcaf436ddf28d4a6c0f69…)
+OK   lien : empreinte recalculée de cle-publique.asc égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+OK   layout sha256:60f25f5c3fb5… : manifeste, configuration et couche recalculés ; 1 membre(s)
+OK   lien : fichier de l'image non signée (lu) égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+OK   layout sha256:90909a869321… : manifeste, configuration et couche recalculés ; 6 membre(s)
+OK   membres écrits par la brique : aucun bloc privé, aucune adresse hors de .invalid et .example (2 adresse(s) fictive(s))
+OK   lien : InRelease égal à la valeur archivée (9113af02f3d78bf6250f1c5…)
+OK   lien : Release égal à la valeur archivée (b6f2617f73a79c5af2e73b6…)
+OK   lien : Release.gpg égal à la valeur archivée (72b930effcbed24ad5d5250…)
+OK   dépôt apt : texte signé d'InRelease = Release
+OK   lien : deb dans Packages égal à la valeur archivée (['f66bbeb2aba31e5220b33…)
+OK   lien : deb du dépôt égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+OK   dépôt apt : chaîne InRelease/Release → 2 index → Packages → deb ; 6 membres, aucun de trop
+OK   lien : racine du dépôt égal à la valeur archivée (dists/poc/InRelease…)
+OK   dépôt : 6 fichiers couverts = membres lus
+ACCEPTÉ
