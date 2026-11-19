@@ -80,6 +80,8 @@ Avant la ligne « **Risqué → interdit** » :
 
 *Note datée du 19/11/2026, 19:50:00 UTC* : en plus des notes de 18:56:05 et 19:39:00 UTC, lire dans la ligne de remplacement de `docs/03` « jeton borné et lecture de Zot en attente d'accords » ainsi : « **politique `lien-signature` et jeton borné créés** (72 h, non renouvelable, essais de droits sur OpenBao) ; **lecture de Zot en attente d'accord** ».
 
+*Note datée du 19/11/2026, 19:58:28 UTC* : en plus des notes précédentes, lire dans la ligne de remplacement de `docs/03` « lecture de Zot en attente d'accord » ainsi : « **Zot lu en anonyme** (manifestes non signés et leur fichier recalculés, provenance de Chains vérifiée) ; **écritures dans Zot** (rpm signé, dépôts signés, attestations de lien) **en attente d'accord** ».
+
 ## 3. `README.md` racine, ligne 33
 
 Remplacer « **Signature OpenPGP (09)** : non commencée. » par :

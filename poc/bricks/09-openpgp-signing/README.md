@@ -318,3 +318,11 @@ Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.
 - **Essais sur le vrai OpenBao** : avec ce jeton, lecture et signature `lien` acceptées, et la signature est vérifiée par OpenSSL avec la clé publique archivée. Les neuf autres essais sont refusés en 403 : autres clés, export, kv, politiques, jeton enfant, consultation de soi.
 - **Mes choix**, à contester si besoin : durée, révocation de soi (non essayée), fichier en clair.
 - **Reste pour O5 réel** : lecture de Zot (troisième accord) ; route de l'hôte vers OpenBao pour cosign `hashivault://` ; attestations réelles et referrers.
+
+*Note datée du 19/11/2026, 19:58:28 UTC* : **O5 réel, troisième accord (« Oui, prépare-le ») : Zot lu en anonyme, sans aucune écriture** ([prédictions et résultats](resultats/o5-zot-predictions.md)). Script : [`o5-zot.sh`](o5-zot.sh) ; contrôle hors réseau : [`o5-zot-controle.py`](o5-zot-controle.py), banc 14 OK.
+- **Lien manifeste → fichier recalculé.** Les manifestes non signés `07b7bd6f…` (rpm) et `60f25f5c…` (deb), tirés par digest, contiennent chacun une seule couche et un seul fichier : `864d55f4…` et `f66bbeb2…`.
+- **Provenance de Chains vérifiée** par cosign avec la clé publique archivée : 4 enveloppes SLSA v1 côté rpm, 8 côté deb, chacune avec ce manifeste pour seul sujet. Avec une clé jetable, la vérification est refusée.
+- **Reste pour O5 réel :**
+  - les écritures dans Zot (rpm signé, dépôts signés, attestations de lien en referrers), point 4 de la liste « Accords » ;
+  - la route de l'hôte vers OpenBao, pour que cosign signe par `hashivault://lien` ;
+  - les jetons d'horodatage, non vérifiés ici.

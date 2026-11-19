@@ -29,3 +29,31 @@ cosign tourne avec le réseau, puisqu'il doit joindre Zot. Qu'il contacte ou non
 | P2 | deb : code 0, **8** enveloppes, toutes SLSA v1, sujet = `60f25f5c…` | haute pour la validité ; moyenne pour le nombre (`s4d3-chemins.log` : « 4 → 8 ») |
 | T | Même vérification avec une clé jetable : refusée, motif « no matching attestations » | haute : mesuré par la 05 |
 | K | Aucune ligne de bloc armuré dans le journal, aucune ligne KO, code 0 | haute |
+
+## Note datée du 19/11/2026, 19:58:28 UTC : `lecture` passée (19:58:02 à 19:58:03 UTC, code 0), toutes les prédictions tenues
+
+Journal : [o5-zot-lecture.log](o5-zot-lecture.log).
+
+**G tenue.**
+
+**Z1 et Z2 tenues** : les deux tirages anonymes donnent le code 0, avec un seul membre par couche.
+
+| | rpm | deb |
+|---|---|---|
+| Couche | `ac3e3ef1…`, 2 181 120 octets | `d8f9685c…`, 1 955 840 octets |
+| Membre | `sample-app-1.0.0-2.el9.x86_64.rpm`, 2 173 376 octets | `sample-app_1.0.0-2_amd64.deb`, 1 953 492 octets |
+| sha256 | `864d55f4…` | `f66bbeb2…` |
+
+**Le lien manifeste → fichier est recalculé** depuis les octets tirés de Zot. Cela lève la réserve 3 de la correction de 18:58:46 UTC.
+
+**P1 et P2 tenues, nombres compris** :
+- rpm : **4** enveloppes valides ;
+- deb : **8** enveloppes valides.
+
+Toutes sont en SLSA v1, avec un seul sujet, égal au manifeste. Chaque enveloppe a un `invocationId` distinct : 4 côté rpm, 8 côté deb. Il y a une seule valeur de `buildType` (`https://tekton.dev/chains/v2/slsa-tekton`) et une seule de `builder.id` (`https://supply-chain.example/builders/tekton-chains@v1`).
+
+**T tenue** : avec une clé jetable, la vérification est refusée sur les deux artefacts (« no matching attestations: accepted signatures do not match threshold, Found: 0, Expected 1 »).
+
+**K tenue.**
+
+Rien n'est écrit dans Zot. Le dossier `~/.cache/supply-chain-poc/09/o5-zot` est effacé après le commit de cette note.
