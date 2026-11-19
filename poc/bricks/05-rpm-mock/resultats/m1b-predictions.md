@@ -1649,3 +1649,9 @@ Journal : [`m1b-builders-m1bt4-prealables.log`](m1b-builders-m1bt4-prealables.lo
 - **RZ8** (haute) : les entrées des bancs du 18/11 et la couche amont du cache OCI sont inchangées après le banc (sha256 de la liste, avant et après).
 
 **Portée prévue.** Si tout tient, la tâche de construction refuse au banc une racine fixée fausse, et un rpm, une couche ou un `repomd.xml` altérés après le prefetch, chacun par sa garde. Ce n'est pas mesuré dans Kata ni dans un TaskRun. La signature d'une clé ou d'un `repomd.xml` n'est pas rejouée ici : la tâche de construction ne contrôle que leur sha256, et c'est le prefetch qui vérifie les signatures.
+
+### Correction datée du 19/11/2026, écrite à 15:37:06 UTC : premier passage du banc des cas refusés arrêté sur un défaut du script
+
+- **Ce qui s'est passé.** Le premier passage, du 19/11 à 15:36:15 UTC, à HEAD `f39a39d`, est gardé dans [`m1b-refus-banc-1.log`](m1b-refus-banc-1.log). RZ1 à RZ3 y ont tenu. Le cas `b-couche` s'est ensuite arrêté avant d'être joué : python n'a pas pu ouvrir en écriture la copie de `couche.tar.gz`. La copie garde le mode du cache OCI (`0444`), alors que les autres entrées copiées sont inscriptibles. Rien n'a été altéré ; RZ8 n'a pas été relevée.
+- **Correction** : `chmod u+w` sur la copie, juste après le contrôle qui refuse d'altérer un lien dur. Rien d'autre ne change. Le script corrigé a le sha256 `6db7ea19eb7c55d1…`.
+- **Relance** : le banc complet est rejoué, RZ1 à RZ8, dans un journal neuf, `m1b-refus-banc.log`. Les prédictions ne changent pas.

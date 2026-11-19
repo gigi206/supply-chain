@@ -1,0 +1,75 @@
+# m1b-refus-banc.sh, début 2026-11-19T15:36:15Z ; HEAD f39a39d27b87
+dossier : /home/gigi/.cache/supply-chain-poc/05/m1b-refus-banc-20261119T153615Z ; place libre de /home : 107346784 kB
+OK   script-co.sh rendu sous m1bt3 : sha256 956e39c260a74aac…
+OK   script-cb.sh rendu sous m1bt3 : sha256 cad7f5501dfe61a3…
+## cas b-temoin (b) : début 2026-11-19T15:36:15Z
+     entrées du cas b-temoin = entrées attendues du prefetch (liens)
+        invité : 7.0.0-31-generic, 16 vCPU, 64247872 kB ; uid 0 ; /w : ext4 ; entrees : ext4 ro,relatime, écriture refusée
+        versions : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 
+        témoin DNS dl.rockylinux.org : échec, code 2 (attendu)
+        témoin TCP 192.168.161.13/5000 : échec, code 1 (attendu)
+        témoin TCP 192.168.161.13/3000 : échec, code 1 (attendu)
+        entrées revérifiées : 1 clé(s), 1 dépôt(s), 10 rpm, couche 812c44127102…
+        %_install_langs lu par rpm de python, env -i HOME=/m/h : [all] ; umask 0022
+        couche extraite par le tar de l'amorce : racine 755 ; rpm -qa avant : 147 lignes
+        tmpfs /w : 248 Mo (avant dnf)
+        limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 524288 / 524288
+        dnf-3 code 0 en 3 s ; 85 lignes de journal
+        résumé de la transaction : Install  6 Packages
+        résumé de la transaction : Upgrade  4 Packages
+        paquets installés : 153, dont gpg-pubkey 1
+        tmpfs /w : 282 Mo (après dnf)
+        racine passée en 555 ; etc/machine-id : 0 octet(s), exclu de l'archive
+        racine : 241981440 octets, 11472 membres, sha256 b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+        racine conforme à la valeur fixée par la pipeline
+        tmpfs /w : 231 Mo (racine archivée, arbre retiré)
+        couches : 1 ; configuration sha256:ff96017c3f06a35a11d06a454930ec797002708cd0187ac46d7febe0891444a2 (163 octets) ; manifeste sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 (624 octets)
+        image.tar : 241991680 octets, sha256 e574aaa17ed8c4a68b58f2580f762e2e5718f43a7e7734fabfffab95fc3b321b, en 1 s
+        pic du tmpfs /w : 512 Mo sur 7 relevés ; memory.peak du cgroup : absent
+## cas b-temoin : code 0, fin 2026-11-19T15:36:23Z
+OK   RZ1 bootstrap, témoin : code 0, résultat sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+## cas b-racine (b) : début 2026-11-19T15:36:23Z
+     entrées du cas b-racine = entrées attendues du prefetch (liens)
+     script : « RACINE='b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348' » devient « RACINE='7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7' »
+        invité : 7.0.0-31-generic, 16 vCPU, 64247872 kB ; uid 0 ; /w : ext4 ; entrees : ext4 ro,relatime, écriture refusée
+        versions : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 
+        témoin DNS dl.rockylinux.org : échec, code 2 (attendu)
+        témoin TCP 192.168.161.13/5000 : échec, code 1 (attendu)
+        témoin TCP 192.168.161.13/3000 : échec, code 1 (attendu)
+        entrées revérifiées : 1 clé(s), 1 dépôt(s), 10 rpm, couche 812c44127102…
+        %_install_langs lu par rpm de python, env -i HOME=/m/h : [all] ; umask 0022
+        couche extraite par le tar de l'amorce : racine 755 ; rpm -qa avant : 147 lignes
+        tmpfs /w : 248 Mo (avant dnf)
+        limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 524288 / 524288
+        dnf-3 code 0 en 2 s ; 85 lignes de journal
+        résumé de la transaction : Install  6 Packages
+        résumé de la transaction : Upgrade  4 Packages
+        paquets installés : 153, dont gpg-pubkey 1
+        tmpfs /w : 282 Mo (après dnf)
+        racine passée en 555 ; etc/machine-id : 0 octet(s), exclu de l'archive
+        racine : 241981440 octets, 11472 membres, sha256 b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+        KO   racine différente de la valeur fixée par la pipeline (7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7)
+## cas b-racine : code 1, fin 2026-11-19T15:36:30Z
+OK   RZ2 bootstrap, racine fixée fausse : code 1, refus « racine différente de la valeur fixée par la pipeline (7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7) »
+OK   RZ2 bootstrap, racine fixée fausse : ni image.tar ni résultat DIGEST_CONSTRUIT
+OK   RZ2 bootstrap, racine fixée fausse : la garde est atteinte après « racine : 241981440 octets, 11472 membres, sha256 b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348 »
+## cas b-rpm (b) : début 2026-11-19T15:36:30Z
+     entrées du cas b-rpm = entrées attendues du prefetch (copie)
+     altéré : miroir/baseos97/Packages/d/dbus-libs-1.12.20-8.el9.x86_64.rpm, un octet au milieu ; sha256 ab81c1e16482f333… devient 942f1b81350fb799…
+        invité : 7.0.0-31-generic, 16 vCPU, 64247872 kB ; uid 0 ; /w : ext4 ; entrees : ext4 ro,relatime, écriture refusée
+        versions : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 
+        témoin DNS dl.rockylinux.org : échec, code 2 (attendu)
+        témoin TCP 192.168.161.13/5000 : échec, code 1 (attendu)
+        témoin TCP 192.168.161.13/3000 : échec, code 1 (attendu)
+        KO   rpm altéré : baseos97 dbus-libs-1.12.20-8.el9.x86_64.rpm
+## cas b-rpm : code 1, fin 2026-11-19T15:36:31Z
+OK   RZ3 bootstrap, rpm altéré : code 1, refus « rpm altéré : baseos97 dbus-libs-1.12.20-8.el9.x86_64.rpm »
+OK   RZ3 bootstrap, rpm altéré : ni image.tar ni résultat DIGEST_CONSTRUIT
+OK   RZ3 bootstrap, rpm altéré : refus avant dnf
+## cas b-couche (b) : début 2026-11-19T15:36:31Z
+     entrées du cas b-couche = entrées attendues du prefetch (copie)
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import sys; f = open(sys.argv[1], "r+b"); f.seek(0, 2); n = f.tell() // 2; f.seek(n); b = f.read(1); f.seek(n); f.write(bytes([b[0] ^ 0xFF]))
+                    ~~~~^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/home/gigi/.cache/supply-chain-poc/05/m1b-refus-banc-20261119T153615Z/b-couche/entrees/couche.tar.gz'

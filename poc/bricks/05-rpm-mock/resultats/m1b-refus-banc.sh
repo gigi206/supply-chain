@@ -50,6 +50,7 @@ alterer() { # cas chemin : un octet inversé au milieu d'une copie réelle (jama
   local f=$D/$1/entrees/$2 a
   [ "$(stat -c %h "$f")" = 1 ] || { echo "KO   $2 : lien dur, altération refusée" >&2; exit 1; }
   a=$(sha256sum < "$f" | cut -c1-64)
+  chmod u+w "$f"   # la copie garde le mode du cache OCI (0444) ; jamais un lien dur, contrôlé ci-dessus
   python3 -I -c 'import sys; f = open(sys.argv[1], "r+b"); f.seek(0, 2); n = f.tell() // 2; f.seek(n); b = f.read(1); f.seek(n); f.write(bytes([b[0] ^ 0xFF]))' "$f"
   echo "     altéré : $2, un octet au milieu ; sha256 ${a:0:16}… devient $(sha256sum < "$f" | cut -c1-16)…"
 }
