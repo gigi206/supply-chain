@@ -444,3 +444,45 @@ La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de 
   - refus : aucun cas refusé n'est mesuré. À jouer au moins une `racine` fausse et un rpm altéré au banc, et un `repomd` faux dans un pod de prefetch, comme le cas refusé d'`essai_tache` de M4b ;
   - annotation de base du bootstrap : `base.digest ee90dc0e…` est écrite dans le manifeste, alors que seule la couche `812c4412…` est contrôlée. Un remède possible, non retenu : le prefetch lirait le manifeste `ee90dc0e…` dans Zot, contrôlerait son sha256 et en tirerait la couche. C'est lié au choix 2, à poser après lecture, dans la source de Tekton v1.15.5, du sort d'un résultat objet déclaré mais non écrit ;
   - docs/04 n'a de ligne ni pour curl ni pour GnuPG, que le prefetch utilise depuis l'amorce. `prefetch-rpm` les utilise déjà, depuis l'image de M3. À vérifier comme dnf l'a été.
+
+## Note datée du 19/11/2026, écrite à 14:06:10 UTC : résultat objet déclaré mais non écrit, lecture de Tekton v1.15.5 et de Chains v0.29.9
+
+Cette note prépare le choix 2 de la note « avant signature ». Elle ne change aucune tâche.
+
+**Lecture** : [`m1b-tekton-resultat-absent.sh`](m1b-tekton-resultat-absent.sh), journal [`m1b-tekton-resultat-absent.log`](m1b-tekton-resultat-absent.log) (14:05:15 UTC, code 0).
+- Trois fichiers ont été téléchargés au tag v1.15.5 depuis `raw.githubusercontent.com/tektoncd/pipeline`, à côté de `script.go`. Rien n'en est exécuté.
+
+  | Fichier | Octets | sha256 |
+  |---|---|---|
+  | `pkg/reconciler/taskrun/validate_taskrun.go` | 13 462 | `ce6bbea0…` |
+  | `pkg/entrypoint/entrypointer.go` | 29 618 | `9c4ad23f…` |
+  | `pkg/pod/status.go` | 39 464 | `ecd337d0…` |
+
+- Chains est lu dans la copie locale v0.29.9 (`signable.go`, `ec115244…`).
+- Le premier passage, [`m1b-tekton-resultat-absent-1.log`](m1b-tekton-resultat-absent-1.log) (14:04:57 UTC), n'extrayait pas `findMissingKeys`. Le second l'ajoute, sans autre changement.
+
+**Ce qui est lu** :
+- **Entrypoint** (`readResultsFromDisk`, lignes 450 à 452) : un fichier de résultat absent est sauté (`os.IsNotExist`, puis `continue`).
+- **Reconciler** (`validateTaskRunResults`) : il fait deux contrôles, et tous deux ne parcourent que `tr.Status.Results`, c'est-à-dire les résultats émis (lignes 305 et 332).
+  - le contrôle du type ;
+  - le contrôle des clés d'objet. `findMissingKeys` parcourt les clés fournies (ligne 150) : un résultat objet déclaré mais absent n'y est jamais signalé.
+- **`status.go`** : aucune ligne ne parle de résultat manquant. C'est un grep, pas une lecture complète.
+- **Chains** : il ne parcourt que les résultats émis, par suffixe `ARTIFACT_INPUTS`. Il ignore un résultat sans objet (`isStructuredResult`, ligne 346).
+
+**Conclusion de lecture, non mesurée** : une tâche qui déclare `*_ARTIFACT_INPUTS` sans l'écrire (l'outillage, qui n'a pas de couche de base) ne devrait pas échouer pour cela. Chains n'inscrirait rien.
+
+**Ce qui n'est pas lu ni mesuré** :
+- la résolution des références de résultats côté PipelineRun. Aucune tâche de `builder-rpm` ne lirait ce résultat ;
+- aucun TaskRun réel n'a déclaré un résultat sans l'écrire.
+
+**Forme de `prefetch-rpm`, signée** : `BOOTSTRAP_ARTIFACT_INPUTS`, objet `uri` et `digest`, avec l'uri `oci://<référence sans digest>` et le digest du manifeste. Il est écrit après le contrôle « manifeste de l'image de bootstrap égal au digest de la source ».
+
+**Portée de ce qui serait déclaré** : `porte.rego` ne juge que les résultats de `_attendues` (`preparer-entrees` et `preparer-deb`). Une entrée du prefetch rpm serait inscrite dans `resolvedDependencies`, mais aucune règle ne la jugerait.
+
+**Le choix 2 a trois options** :
+- **(a) Rien déclarer**, l'état actuel. Les ancres restent des paramètres de la pipeline signée. L'annotation `base.digest ee90dc0e…` reste non vérifiée.
+- **(b) Déclarer ce qui est contrôlé aujourd'hui**, la couche `812c4412…`. Mais c'est un blob, pas une image : une uri `oci://` portant ce digest serait trompeuse.
+- **(c) Faire comme `prefetch-rpm`** : le prefetch lit dans Zot le manifeste `ee90dc0e…`, contrôle son sha256, en tire la couche et déclare l'image.
+  - Cela règle le point ouvert de l'annotation.
+  - Forme lue dans le cache OCI de l'hôte ([`m1b-base-manifeste.log`](m1b-base-manifeste.log), 14:06:30 UTC) : `ee90dc0e…` est un manifeste d'image (`application/vnd.oci.image.manifest.v1+json`, 573 octets) à une couche, `812c4412…`. Pas d'index à résoudre. Le dépôt est celui de l'annotation, `amont/rockylinux/rockylinux`.
+  - En revanche, la tâche change : `prealables`, `banc` et `essai_prefetch` sont à rejouer avant la mesure d'un autre jour.

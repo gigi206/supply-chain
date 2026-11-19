@@ -1,0 +1,172 @@
+# m1b-tekton-resultat-absent.sh, début 2026-11-19T14:05:15Z
+pkg/reconciler/taskrun/validate_taskrun.go : 13462 octets, sha256 ce6bbea0eb858db8170ef01a312460415b5edfbec5e1c8af629d9929b9ab6707
+pkg/entrypoint/entrypointer.go : 29618 octets, sha256 9c4ad23ff6e2ae588e45602552bffa7d83d0aa7009d0965827666d150af0abfb
+pkg/pod/status.go : 39464 octets, sha256 ecd337d025273a3848d1dcb0e8c04a75d855c0cfa80795f25cdddefa4b087fce
+Chains : v0.29.9, signable.go sha256 ec11524451cc0940fb3d1bf6bfce2efaf217ebe53f721bee8118c237fa69c33b
+
+## validate_taskrun.go : fonctions qui touchent aux résultats
+267:func validateTaskRunResults(tr *v1.TaskRun, resolvedTaskSpec *v1.TaskSpec) error {
+295:func mismatchedTypesResults(tr *v1.TaskRun, specResults []v1.TaskResult) map[string]string {
+300:	for _, r := range specResults {
+305:	for _, trr := range tr.Status.Results {
+319:func missingKeysofObjectResults(tr *v1.TaskRun, specResults []v1.TaskResult) map[string][]string {
+323:	for _, r := range specResults {
+332:	for _, trr := range tr.Status.Results {
+
+### validateTaskRunResults (ligne 267)
+267: func validateTaskRunResults(tr *v1.TaskRun, resolvedTaskSpec *v1.TaskSpec) error {
+268: 	specResults := []v1.TaskResult{}
+269: 	if tr.Spec.TaskSpec != nil {
+270: 		specResults = append(specResults, tr.Spec.TaskSpec.Results...)
+271: 	}
+272: 
+273: 	if resolvedTaskSpec != nil {
+274: 		specResults = append(specResults, resolvedTaskSpec.Results...)
+275: 	}
+276: 
+277: 	// When get the results, check if the type of result is the expected one
+278: 	if missmatchedTypes := mismatchedTypesResults(tr, specResults); len(missmatchedTypes) != 0 {
+279: 		var s []string
+280: 		for k, v := range missmatchedTypes {
+281: 			s = append(s, fmt.Sprintf(" \"%v\": %v", k, v))
+282: 		}
+283: 		sort.Strings(s)
+284: 		return pipelineErrors.WrapUserError(fmt.Errorf("Provided results don't match declared results; may be invalid JSON or missing result declaration: %v", strings.Join(s, ",")))
+285: 	}
+286: 
+287: 	// When get the results, for object value need to check if they have missing keys.
+288: 	if missingKeysObjectNames := missingKeysofObjectResults(tr, specResults); len(missingKeysObjectNames) != 0 {
+289: 		return pipelineErrors.WrapUserError(fmt.Errorf("missing keys for these results which are required in TaskResult's properties %v", missingKeysObjectNames))
+290: 	}
+291: 	return nil
+292: }
+
+### mismatchedTypesResults (ligne 295)
+295: func mismatchedTypesResults(tr *v1.TaskRun, specResults []v1.TaskResult) map[string]string {
+296: 	neededTypes := make(map[string]string)
+297: 	mismatchedTypes := make(map[string]string)
+298: 	var filteredResults []v1.TaskRunResult
+299: 	// collect needed types for results
+300: 	for _, r := range specResults {
+301: 		neededTypes[r.Name] = string(r.Type)
+302: 	}
+303: 
+304: 	// collect mismatched types for results, and correct results in filteredResults
+305: 	for _, trr := range tr.Status.Results {
+306: 		needed, ok := neededTypes[trr.Name]
+307: 		if ok && needed != string(trr.Type) {
+308: 			mismatchedTypes[trr.Name] = fmt.Sprintf("task result is expected to be \"%v\" type but was initialized to a different type \"%v\"", needed, trr.Type)
+309: 		} else {
+310: 			filteredResults = append(filteredResults, trr)
+311: 		}
+312: 	}
+313: 	// remove the mismatched results
+314: 	tr.Status.Results = filteredResults
+315: 	return mismatchedTypes
+316: }
+
+### missingKeysofObjectResults (ligne 319)
+319: func missingKeysofObjectResults(tr *v1.TaskRun, specResults []v1.TaskResult) map[string][]string {
+320: 	neededKeys := make(map[string][]string)
+321: 	providedKeys := make(map[string][]string)
+322: 	// collect needed keys for object results
+323: 	for _, r := range specResults {
+324: 		if string(r.Type) == string(v1.ParamTypeObject) {
+325: 			for key := range r.Properties {
+326: 				neededKeys[r.Name] = append(neededKeys[r.Name], key)
+327: 			}
+328: 		}
+329: 	}
+330: 
+331: 	// collect provided keys for object results
+332: 	for _, trr := range tr.Status.Results {
+333: 		if trr.Value.Type == v1.ParamTypeObject {
+334: 			for key := range trr.Value.ObjectVal {
+335: 				providedKeys[trr.Name] = append(providedKeys[trr.Name], key)
+336: 			}
+337: 		}
+338: 	}
+339: 	return findMissingKeys(neededKeys, providedKeys)
+340: }
+
+### findMissingKeys (ligne 148)
+148: func findMissingKeys(neededKeys, providedKeys map[string][]string) map[string][]string {
+149: 	missings := map[string][]string{}
+150: 	for p, keys := range providedKeys {
+151: 		if _, ok := neededKeys[p]; !ok {
+152: 			// Ignore any missing objects - this happens when object param is provided with default
+153: 			continue
+154: 		}
+155: 		missedKeys := list.DiffLeft(neededKeys[p], keys)
+156: 		if len(missedKeys) != 0 {
+157: 			missings[p] = missedKeys
+158: 		}
+159: 	}
+160: 
+161: 	return missings
+162: }
+
+## entrypointer.go : lecture des fichiers de résultats
+352:	file, err := os.ReadFile(fp)
+353:	if os.IsNotExist(err) {
+440:func (e Entrypointer) readResultsFromDisk(ctx context.Context, resultDir string, resultType result.ResultType) error {
+450:		fileContents, err := os.ReadFile(filepath.Join(resultDir, resultFile))
+451:		if os.IsNotExist(err) {
+490:	exitCode, err := os.ReadFile(breakpointExitPostFile)
+491:	if os.IsNotExist(err) {
+556:	fileContents, err := os.ReadFile(fp)
+743:	fileContents, err := os.ReadFile(fp)
+834:		dataBytes, err := os.ReadFile(e.Command[0])
+440: func (e Entrypointer) readResultsFromDisk(ctx context.Context, resultDir string, resultType result.ResultType) error {
+441: 	output := []result.RunResult{}
+442: 	results := e.Results
+443: 	if resultType == result.StepResultType {
+444: 		results = e.StepResults
+445: 	}
+446: 	for _, resultFile := range results {
+447: 		if resultFile == "" {
+448: 			continue
+449: 		}
+450: 		fileContents, err := os.ReadFile(filepath.Join(resultDir, resultFile))
+451: 		if os.IsNotExist(err) {
+452: 			continue
+453: 		} else if err != nil {
+454: 			return err
+455: 		}
+456: 		// if the file doesn't exist, ignore it
+457: 		output = append(output, result.RunResult{
+458: 			Key:        resultFile,
+459: 			Value:      string(fileContents),
+460: 			ResultType: resultType,
+461: 		})
+462: 	}
+463: 
+464: 	signed, err := signResults(ctx, e.SpireWorkloadAPI, output)
+465: 	if err != nil {
+466: 		return err
+467: 	}
+468: 	output = append(output, signed...)
+469: 
+470: 	// push output to termination path
+471: 	if e.ResultExtractionMethod == ResultExtractionMethodTerminationMessage && len(output) != 0 {
+472: 		if err := e.writeTerminationMessage(e.TerminationPath, output); err != nil {
+473: 			return err
+474: 		}
+475: 	}
+476: 	return nil
+477: }
+
+## status.go : résultats manquants
+aucune ligne « missing / not found » liée aux résultats
+
+## Chains v0.29.9 : isStructuredResult
+342: func isStructuredResult(res objects.Result, categoryMarker string) (bool, error) {
+343: 	if !strings.HasSuffix(res.Name, categoryMarker) {
+344: 		return false, nil
+345: 	}
+346: 	if res.Value.ObjectVal == nil {
+347: 		return false, fmt.Errorf("%s should be an object: %v", res.Name, res.Value.ObjectVal)
+348: 	}
+349: 	return isValidArtifactOutput(res)
+350: }
+# fin 2026-11-19T14:05:15Z

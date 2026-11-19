@@ -1,0 +1,6 @@
+# m1b-base-manifeste.sh, début 2026-11-19T14:06:30Z
+manifeste ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 : 573 octets, sha256 ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+mediaType : application/vnd.oci.image.manifest.v1+json
+couches : sha256:812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+manifests (index) : 0
+# fin 2026-11-19T14:06:30Z
