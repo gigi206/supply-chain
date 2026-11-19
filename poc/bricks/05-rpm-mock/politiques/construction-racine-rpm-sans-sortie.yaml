@@ -1,0 +1,19 @@
+# Brique 05, jalon M1b : aucune entrée ni sortie réseau pour les pods de la tâche neuve construire-racine-rpm (Kata privilégié,
+# root, entrées toutes fixées par sha256) : ni adresses publiques, ni Zot, ni DNS, ni API du cluster. Copie de
+# construction-rpm-sans-sortie (M3, « Tout couper ») au label près ; aucune règle, donc rien d'autorisé. builds-sans-internet (08c)
+# et son NotIn sont inchangés pour ce label : son refus des adresses publiques s'ajoute à ce refus total.
+# Les pods d'essai de M1b ont tourné sous le label construire-rpm, donc sous construction-rpm-sans-sortie. À poser avant le premier
+# TaskRun de construire-racine-rpm.
+# PROPOSITION, NON POSÉE (19/11/2026) : posée par ../../08c-durcissement/sortie-builds.sh m1b_sans_sortie, sur accord du propriétaire.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: construction-racine-rpm-sans-sortie
+  namespace: builds
+spec:
+  podSelector:
+    matchLabels:
+      tekton.dev/task: construire-racine-rpm
+  policyTypes:
+  - Ingress
+  - Egress

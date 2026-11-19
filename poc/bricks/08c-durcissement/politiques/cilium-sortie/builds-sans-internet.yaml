@@ -14,18 +14,21 @@
 # NotIn, pour la sortie dédiée des pods rpm de la brique 05 (../05-rpm-mock/politiques/prefetch-rpm-sortie.yaml ; rpm_appliquer).
 # Additif du 16/11/2026, 22:24:20 UTC : correctif appliqué au dépôt (« Oui, applique-le ») ; NotIn à trois labels NON POSÉ dans le cluster.
 # Additif du 16/11/2026, 22:32:52 UTC : NotIn à trois labels POSÉ dans le cluster par rpm_appliquer, 22:31:59 à 22:32:02 UTC (« Oui, lance rpm_appliquer »).
+# Additif du 19/11/2026 (brique 05, M1b, préparé à sec) : prefetch-racine-rpm ajouté au NotIn, pour la sortie dédiée de la tâche
+# neuve (../05-rpm-mock/politiques/prefetch-racine-rpm-sortie.yaml ; sortie-builds.sh m1b_sortie, sur accord). NotIn à quatre
+# labels NON POSÉ dans le cluster, qui garde les trois labels ci-dessus.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: builds-sans-internet
   namespace: builds
 spec:
-  description: "builds : aucune sortie vers les adresses publiques, sauf prefetch-gomod, prefetch-deb et prefetch-rpm"
+  description: "builds : aucune sortie vers les adresses publiques, sauf prefetch-gomod, prefetch-deb, prefetch-rpm et prefetch-racine-rpm"
   endpointSelector:
     matchExpressions:
     - key: tekton.dev/task
       operator: NotIn
-      values: [prefetch-gomod, prefetch-deb, prefetch-rpm]
+      values: [prefetch-gomod, prefetch-deb, prefetch-rpm, prefetch-racine-rpm]
   enableDefaultDeny:
     ingress: false
     egress: false

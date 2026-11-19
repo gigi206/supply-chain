@@ -1,0 +1,53 @@
+# Brique 05, jalon M1b : sortie dédiée des pods de la tâche neuve prefetch-racine-rpm (label tekton.dev/task=prefetch-racine-rpm,
+# que le contrôleur de Tekton pose avec le nom de la tâche résolue). Copie de prefetch-rpm-sortie au label près : DNS, adresses
+# publiques en 443 (vault de Rocky et archive d'EPEL ; intégrité par repomd.xml au sha256 fixé, signature gpgv et sha256 de chaque
+# rpm, TLS en plus), et Zot seul parmi les adresses privées (manifeste et couche de base du bootstrap, tirés par curl par digest).
+# Ne vaut qu'avec prefetch-racine-rpm ajouté au NotIn de builds-sans-internet (08c) : sans cela, son egressDeny l'emporte sur toute
+# autorisation publique. Ordre d'application : cette politique d'abord, le NotIn ensuite ; retrait dans l'ordre inverse
+# (sortie-builds.sh m1b_sortie et m1b_retirer).
+# Les pods d'essai de M1b ont tourné sous le label prefetch-rpm, donc sous prefetch-rpm-sortie : celle-ci n'a jamais été mesurée.
+# Limite de la réserve « (a) Figée » (19/11/2026) : la borne réseau de l'amorce dans le prefetch signé est cette politique.
+# PROPOSITION, NON POSÉE (19/11/2026) : posée par ../../08c-durcissement/sortie-builds.sh m1b_sortie, sur accord du propriétaire.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: prefetch-racine-rpm-sortie
+  namespace: builds
+spec:
+  description: "builds : prefetch-racine-rpm, DNS, adresses publiques en 443 et Zot seulement"
+  endpointSelector:
+    matchLabels:
+      tekton.dev/task: prefetch-racine-rpm
+  enableDefaultDeny:
+    ingress: true
+    egress: true
+  ingress: []
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+  - toCIDRSet:
+    - cidr: 0.0.0.0/0
+      except:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 169.254.0.0/16
+      - 127.0.0.0/8
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+  - toCIDR:
+    - 192.168.161.13/32
+    toPorts:
+    - ports:
+      - port: "5000"
+        protocol: TCP

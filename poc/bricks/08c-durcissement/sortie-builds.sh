@@ -41,6 +41,20 @@
 #   rejeu         pose aussi prefetch-rpm-sortie, avant builds-sans-internet, et attend les trois labels dans le NotIn
 # deb_appliquer et deb_retirer sont historiques : ils supposent un NotIn sans prefetch-rpm et ne sont plus à lancer après rpm_appliquer.
 # Correctif appliqué au dépôt le 16/11/2026 à 22:24:20 UTC (« Oui, applique-le ») : rien posé dans le cluster, aucune étape rpm_* lancée.
+# Politiques des tâches neuves du jalon M1b de la brique 05 (ajoutées à sec le 19/11/2026, NON POSÉES ; prédictions :
+# ../05-rpm-mock/resultats/m1b-predictions.md) ; ../05-rpm-mock/politiques/prefetch-racine-rpm-sortie.yaml et
+# construction-racine-rpm-sans-sortie.yaml ; builds-sans-internet du dépôt porte désormais prefetch-racine-rpm dans son NotIn :
+#   m1b_sec         hôte seul : politiques du dépôt (les huit), invariants rpm et M1b ; contre-épreuves : NotIn sans
+#                   prefetch-racine-rpm, sans prefetch-racine-rpm-sortie, sans construction-racine-rpm-sans-sortie, et celle-ci
+#                   avec une règle de sortie
+#   m1b_sortie      (accord) état de départ contrôlé (NotIn à trois labels, prefetch-racine-rpm-sortie absente) ; dry-run serveur ;
+#                   prefetch-racine-rpm-sortie puis builds-sans-internet posées ; invariants dans le cluster
+#   m1b_sans_sortie (accord, à part) construction-racine-rpm-sans-sortie absente, dry-run serveur, posée ; invariants M1b complets
+#   m1b_temoins     les témoins de rpm_temoins, plus deux pods runc aux labels prefetch-racine-rpm (DNS, public en 443 et Zot
+#                   seulement) et construire-racine-rpm (rien)
+#   m1b_retirer     (accord) NotIn à trois labels d'abord, puis les deux politiques de M1b supprimées ; invariants rpm
+#   rejeu           pose aussi les deux politiques de M1b, prefetch-racine-rpm-sortie avant builds-sans-internet, et attend quatre labels
+# rpm_appliquer est désormais historique : il attend un NotIn à trois labels, alors que builds-sans-internet du dépôt en porte quatre.
 #
 # Usage (racine du dépôt) : DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/sortie-builds.sh <étape>…   (journal : resultats/sortie-<étape>.log)
 set -euo pipefail
@@ -52,6 +66,9 @@ b08=$here/../08-trust-plane
 REGLE=$here/politiques/cilium-sortie/builds-sans-internet.yaml
 REGLE_DEB=$here/politiques/cilium-sortie/prefetch-deb-sortie.yaml
 REGLE_RPM=$here/../05-rpm-mock/politiques/prefetch-rpm-sortie.yaml
+POL_M3=$here/../05-rpm-mock/politiques/construction-rpm-sans-sortie.yaml   # posée par s1.sh m3_reseau (17/11/2026)
+REGLE_M1B_P=$here/../05-rpm-mock/politiques/prefetch-racine-rpm-sortie.yaml
+POL_M1B_C=$here/../05-rpm-mock/politiques/construction-racine-rpm-sans-sortie.yaml
 IMAGE=$REG/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc   # prefetch.sh (03)
 LIMITES='{"cpu": "500m", "memory": "256Mi"}'
 T=$W/sortie-builds
@@ -61,7 +78,8 @@ attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (atte
 politiques() { { kubectl get networkpolicy -n builds -o json </dev/null; kubectl get ciliumnetworkpolicy -n builds -o json </dev/null; } \
   | jq -s '{items: ([.[].items[]])}' > "$T/politiques.json"; }
 sel() { jq -r -L "$b08" "include \"selecteurs\"; $1" "$T/politiques.json"; }   # filtre jq sur les politiques de builds
-DEPOT_POL=("$b08/politique/construction-sans-sortie.yaml" "$b08/politique/prefetch-sortie.yaml" "$REGLE" "$REGLE_DEB" "$REGLE_RPM")
+DEPOT_POL=("$b08/politique/construction-sans-sortie.yaml" "$b08/politique/prefetch-sortie.yaml" "$REGLE" "$REGLE_DEB" "$REGLE_RPM"
+  "$POL_M3" "$REGLE_M1B_P" "$POL_M1B_C")   # les trois dernières ajoutées le 19/11/2026 (M1b de la 05)
 politiques_depot() { # mêmes politiques, lues dans le dépôt : YAML vers JSON par le moteur de gabarits de Helm (helm template, hors ligne,
   # comme audit_json de durcissement.sh), sans lecture du cluster. Inventaire du cluster relevé à 13:55 UTC (sortie-appliquer.log) :
   # construction-sans-sortie, prefetch-sortie, builds-sans-internet
@@ -107,6 +125,19 @@ invariants_rpm() { # source : politiques | politiques_depot
   invariants_deb "$1"
   attendu "politiques qui sélectionnent un pod de prefetch-rpm" \
     "$(sel '[.items[] | select(selectionne({"tekton.dev/task": "prefetch-rpm"})) | nom] | sort | join(", ")')" "CiliumNetworkPolicy prefetch-rpm-sortie"
+}
+invariants_m1b_p() { # sur les politiques déjà relues : le prefetch de M1b n'a que sa sortie dédiée
+  attendu "politiques qui sélectionnent un pod de prefetch-racine-rpm" \
+    "$(sel '[.items[] | select(selectionne({"tekton.dev/task": "prefetch-racine-rpm"})) | nom] | sort | join(", ")')" "CiliumNetworkPolicy prefetch-racine-rpm-sortie"
+}
+invariants_m1b_c() { # sur les politiques déjà relues : la construction de M1b n'a ni entrée ni sortie
+  attendu "politiques qui sélectionnent un pod de construire-racine-rpm" \
+    "$(sel '[.items[] | select(selectionne({"tekton.dev/task": "construire-racine-rpm"})) | nom] | sort | join(", ")')" \
+    "CiliumNetworkPolicy builds-sans-internet, NetworkPolicy construction-racine-rpm-sans-sortie"
+  attendu "politiques qui autorisent du trafic à un pod de construire-racine-rpm" \
+    "$(sel '[.items[] | select(selectionne({"tekton.dev/task": "construire-racine-rpm"}) and autorise) | nom] | join(", ")')" ""
+  attendu "types des NetworkPolicy qui sélectionnent un pod de construire-racine-rpm" \
+    "$(sel '[.items[] | select(.kind == "NetworkPolicy" and selectionne({"tekton.dev/task": "construire-racine-rpm"})) | (.spec.policyTypes | sort | join("+"))] | join(", ")')" "Egress+Ingress"
 }
 valide() { # nom de CiliumNetworkPolicy de builds : condition Valid à True, attendue jusqu'à 60 s
   for _ in $(seq 30); do [ "$(kubectl get cnp -n builds "$1" -o jsonpath='{.status.conditions[?(@.type=="Valid")].status}' </dev/null 2>/dev/null)" = True ] && break; sleep 2; done
@@ -260,14 +291,75 @@ etape_rpm_retirer() {
   invariants_deb politiques
 }
 
+etape_m1b_sec() {
+  echo "## invariants sur les politiques du dépôt (aucune lecture du cluster)"
+  invariants_rpm politiques_depot
+  invariants_m1b_p
+  invariants_m1b_c
+  echo "## contre-épreuve : NotIn sans prefetch-racine-rpm, l'invariant de sortie CIDR doit signaler prefetch-racine-rpm-sortie"
+  jq '(.items[] | select(.metadata.name == "builds-sans-internet") | .spec.endpointSelector.matchExpressions[0].values) -= ["prefetch-racine-rpm"]' \
+    "$T/politiques.json" > "$T/politiques.tmp" && mv "$T/politiques.tmp" "$T/politiques.json"
+  attendu "politiques à sortie CIDR sous un refus, NotIn sans prefetch-racine-rpm" "$(sel "$SOUS_REFUS")" "CiliumNetworkPolicy prefetch-racine-rpm-sortie"
+  echo "## contre-épreuve : sans prefetch-racine-rpm-sortie, l'invariant des labels exclus doit signaler prefetch-racine-rpm"
+  politiques_depot
+  jq '.items |= map(select(.metadata.name != "prefetch-racine-rpm-sortie"))' "$T/politiques.json" > "$T/politiques.tmp" && mv "$T/politiques.tmp" "$T/politiques.json"
+  attendu "labels exclus d'un refus sans politique de sortie dédiée, sans prefetch-racine-rpm-sortie" "$(sel "$EXCLUS_SANS_SORTIE")" "tekton.dev/task=prefetch-racine-rpm"
+  echo "## contre-épreuve : sans construction-racine-rpm-sans-sortie, seul le refus des adresses publiques sélectionne la construction"
+  politiques_depot
+  jq '.items |= map(select(.metadata.name != "construction-racine-rpm-sans-sortie"))' "$T/politiques.json" > "$T/politiques.tmp" && mv "$T/politiques.tmp" "$T/politiques.json"
+  attendu "politiques qui sélectionnent un pod de construire-racine-rpm, sans sa politique" \
+    "$(sel '[.items[] | select(selectionne({"tekton.dev/task": "construire-racine-rpm"})) | nom] | sort | join(", ")')" "CiliumNetworkPolicy builds-sans-internet"
+  echo "## contre-épreuve : construction-racine-rpm-sans-sortie avec une règle de sortie, l'invariant d'autorisation doit la signaler"
+  politiques_depot
+  jq '(.items[] | select(.metadata.name == "construction-racine-rpm-sans-sortie") | .spec.egress) = [{}]' \
+    "$T/politiques.json" > "$T/politiques.tmp" && mv "$T/politiques.tmp" "$T/politiques.json"
+  attendu "politiques qui autorisent du trafic à un pod de construire-racine-rpm, règle ajoutée" \
+    "$(sel '[.items[] | select(selectionne({"tekton.dev/task": "construire-racine-rpm"}) and autorise) | nom] | join(", ")')" "NetworkPolicy construction-racine-rpm-sans-sortie"
+}
+etape_m1b_sortie() {
+  attendu "NotIn de builds-sans-internet avant" "$(notin)" '["prefetch-gomod","prefetch-deb","prefetch-rpm"]'
+  kubectl get cnp -n builds prefetch-racine-rpm-sortie </dev/null >/dev/null 2>&1 && { echo "KO   prefetch-racine-rpm-sortie déjà posée" >&2; exit 1; } || echo "OK   prefetch-racine-rpm-sortie absente"
+  kubectl apply --dry-run=server -f "$REGLE_M1B_P" </dev/null >/dev/null || { echo "KO   prefetch-racine-rpm-sortie refusée en dry-run serveur" >&2; exit 1; }
+  kubectl apply --dry-run=server -f "$REGLE" </dev/null >/dev/null || { echo "KO   builds-sans-internet refusée en dry-run serveur" >&2; exit 1; }
+  echo "OK   les deux politiques admises en dry-run serveur"
+  kubectl apply -f "$REGLE_M1B_P" </dev/null | sed 's/^/kubectl : /'
+  valide prefetch-racine-rpm-sortie
+  kubectl apply -f "$REGLE" </dev/null | sed 's/^/kubectl : /'
+  valide builds-sans-internet
+  attendu "NotIn de builds-sans-internet après" "$(notin)" '["prefetch-gomod","prefetch-deb","prefetch-rpm","prefetch-racine-rpm"]'
+  invariants_rpm politiques
+  invariants_m1b_p
+}
+etape_m1b_sans_sortie() {
+  kubectl get netpol -n builds construction-racine-rpm-sans-sortie </dev/null >/dev/null 2>&1 && { echo "KO   construction-racine-rpm-sans-sortie déjà posée" >&2; exit 1; } || echo "OK   construction-racine-rpm-sans-sortie absente"
+  kubectl apply --dry-run=server -f "$POL_M1B_C" </dev/null >/dev/null || { echo "KO   construction-racine-rpm-sans-sortie refusée en dry-run serveur" >&2; exit 1; }
+  echo "OK   construction-racine-rpm-sans-sortie admise en dry-run serveur"
+  kubectl apply -f "$POL_M1B_C" </dev/null | sed 's/^/kubectl : /'
+  invariants_rpm politiques
+  invariants_m1b_c
+}
+etape_m1b_temoins() { TEMOINS+=("deb prefetch-deb" "rpm prefetch-rpm" "racine-p prefetch-racine-rpm" "racine-c construire-racine-rpm"); temoins m1b; }
+etape_m1b_retirer() {
+  kubectl patch cnp -n builds builds-sans-internet --type=json </dev/null -p '[{"op": "test", "path": "/spec/endpointSelector/matchExpressions/0/values", "value": ["prefetch-gomod", "prefetch-deb", "prefetch-rpm", "prefetch-racine-rpm"]}, {"op": "replace", "path": "/spec/endpointSelector/matchExpressions/0/values", "value": ["prefetch-gomod", "prefetch-deb", "prefetch-rpm"]}]' | sed 's/^/kubectl : /'
+  attendu "NotIn de builds-sans-internet" "$(notin)" '["prefetch-gomod","prefetch-deb","prefetch-rpm"]'
+  kubectl delete -f "$REGLE_M1B_P" </dev/null | sed 's/^/kubectl : /'
+  kubectl delete --ignore-not-found -f "$POL_M1B_C" </dev/null | sed 's/^/kubectl : /'
+  invariants_rpm politiques
+}
+
 etape_rejeu() {
   kubectl apply -f "$REGLE_DEB" </dev/null | sed 's/^/kubectl : /'
   valide prefetch-deb-sortie
   kubectl apply -f "$REGLE_RPM" </dev/null | sed 's/^/kubectl : /'
   valide prefetch-rpm-sortie
+  kubectl apply -f "$REGLE_M1B_P" </dev/null | sed 's/^/kubectl : /'   # ajouté le 19/11/2026 (M1b de la 05)
+  valide prefetch-racine-rpm-sortie
   kubectl apply -f "$REGLE" </dev/null | sed 's/^/kubectl : /'
   valide builds-sans-internet
-  attendu "NotIn de builds-sans-internet" "$(notin)" '["prefetch-gomod","prefetch-deb","prefetch-rpm"]'
+  kubectl apply -f "$POL_M1B_C" </dev/null | sed 's/^/kubectl : /'   # ajouté le 19/11/2026 (M1b de la 05)
+  attendu "NotIn de builds-sans-internet" "$(notin)" '["prefetch-gomod","prefetch-deb","prefetch-rpm","prefetch-racine-rpm"]'
   invariants_rpm politiques
+  invariants_m1b_p
+  invariants_m1b_c
 }
 lancer sortie "08c sortie de builds" "$@"

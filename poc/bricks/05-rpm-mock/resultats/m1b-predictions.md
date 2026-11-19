@@ -1849,3 +1849,49 @@ Journal : [`m1b-taches-admission.log`](m1b-taches-admission.log), de 16:10:52 à
 - **TD5** : `builds` n'avait aucune tâche ni pipeline avant le passage, et n'en a toujours aucune.
 
 **Portée.** La validation vaut pour les rendus de `m1bt3`. Elle vaudra pour ceux de `m1bt-20` si leurs sha256 sont égaux à ceux de TD1. Elle ne dit rien de la résolution des bundles, ni de la vérification des signatures, ni de l'exécution par le contrôleur : ces trois points viennent avec `SIGNER=1` et les PipelineRuns.
+
+## Politiques réseau des tâches neuves : prédictions écrites le 19/11/2026 à 16:25:48 UTC, avant tout lancement
+
+**Préparé à sec.** Rien n'est posé dans le cluster.
+- [`prefetch-racine-rpm-sortie.yaml`](../politiques/prefetch-racine-rpm-sortie.yaml) (sha256 `1be25fed0ccb4d01…`) est une copie de `prefetch-rpm-sortie` au label près : DNS, adresses publiques en 443, Zot en 5000.
+- [`construction-racine-rpm-sans-sortie.yaml`](../politiques/construction-racine-rpm-sans-sortie.yaml) (sha256 `bddeeedf33cbdd64…`) est une copie de `construction-rpm-sans-sortie` au label près : ni entrée ni sortie.
+- `builds-sans-internet` du dépôt (sha256 `30e087e0d35ec414…`) porte `prefetch-racine-rpm` dans son `NotIn`, qui passe à quatre labels. Le cluster garde les trois labels actuels.
+- [`sortie-builds.sh`](../../08c-durcissement/sortie-builds.sh) (sha256 `85f7dfdc212761c8…`) reçoit les étapes `m1b_sec`, `m1b_sortie`, `m1b_sans_sortie`, `m1b_temoins` et `m1b_retirer`. `rejeu` pose aussi les deux politiques. Les journaux iront sous `08c-durcissement/resultats/sortie-m1b_<étape>.log`.
+
+**Ordre prévu** :
+1. `m1b_sec`, hôte seul, ce soir ;
+2. `m1b_sortie`, sur ton accord ;
+3. `m1b_sans_sortie`, sur un accord à part ;
+4. `m1b_temoins`.
+
+Les étapes 2 à 4 ne viennent qu'**après la mesure du 20/11**, pour qu'elle tourne dans le même cluster que le 19/11. Les pods d'essai de cette mesure portent les labels `prefetch-rpm` et `construire-rpm`, que rien ici ne touche.
+
+**m1b_sec** (hôte seul, aucune lecture du cluster) :
+- **NS1** (haute) : les huit politiques du dépôt se lisent. Les invariants rpm tiennent, à quatre labels dans le `NotIn`. Le prefetch de M1b n'est sélectionné que par sa sortie dédiée. La construction de M1b est sélectionnée par `builds-sans-internet` et par sa politique sans sortie, qui n'autorise rien et porte les types `Egress+Ingress`.
+- **NS2** (haute) : les quatre contre-épreuves signalent chacune ce qu'elles visent :
+  - sans `prefetch-racine-rpm` dans le `NotIn` : la sortie dédiée tombe sous le refus ;
+  - sans la sortie dédiée : le label exclu n'a pas de politique ;
+  - sans la politique sans sortie : seul le refus des adresses publiques sélectionne la construction ;
+  - avec une règle de sortie ajoutée : l'invariant d'autorisation la signale.
+
+**m1b_sortie** (sur accord) :
+- **NA1** (haute) : départ contrôlé (`NotIn` à trois labels, sortie dédiée absente). Les deux politiques sont admises en dry-run serveur, puis posées. Les deux sont valides pour Cilium, et le `NotIn` passe à quatre labels.
+- **NA2** (haute) : les invariants rpm et celui du prefetch de M1b tiennent dans le cluster.
+- **Conséquence connue** : `s1.sh prealables` attend un `NotIn` à trois labels (l. 271 à 273). Il échouera ensuite tant qu'il n'est pas adapté, ce qui touche le rejeu M5b. `rpm_appliquer` est déjà historique.
+
+**m1b_sans_sortie** (sur accord, à part) :
+- **NC1** (haute) : la politique est absente au départ, admise en dry-run serveur, puis posée. Les invariants rpm et ceux de la construction de M1b tiennent dans le cluster.
+
+**m1b_temoins** (pods runc d'essai, accord permanent du 18/11) :
+- **NT1** (haute) : les cinq témoins de `rpm_temoins` rendent les mêmes lignes que le 16/11 (`sortie-rpm_temoins.log`), aux adresses résolues près.
+- **NT2** (haute) : le témoin au label `prefetch-racine-rpm` rend les lignes du témoin `prefetch-rpm` :
+  - DNS résolu ;
+  - 443 public joint (proxy.golang.org et dl.rockylinux.org) ;
+  - 80 refusé ;
+  - API refusée ;
+  - Zot joint ;
+  - Forgejo refusé.
+- **NT3** (haute) : le témoin au label `construire-racine-rpm` rend les lignes du témoin `construire-image` : DNS en échec et toutes les destinations refusées.
+- **NT4** (moyenne) : un pod runc à ce label est admis. Seuls les pods d'essai Kata ont été relevés « admis à blanc » sous ce label. Le témoin est runc, et ne dit donc rien du chemin réseau propre à Kata. M3 l'a mesuré sous `construction-rpm-sans-sortie`.
+
+**Lecture prévue.** NT2 borne le prefetch signé sur l'amorce figée : il joint toute adresse publique en 443, pas seulement vault et EPEL. C'est la borne réseau de la réserve « (a) Figée », déjà écrite comme telle.
