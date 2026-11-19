@@ -1,0 +1,6 @@
+relevé commencé : 2026-11-19T18:41:19Z ; o4-releve.sh 83fd596e45d16aeb…
+OK   image de l'amorce : manifeste 7378260c0a098d27…, configuration 596c6d80c879dc94… contrôlés ; created 2026-11-04T21:23:39Z
+clé publique dans o2-cle.log : 20bcaf436ddf28d4a6c0f69384832bb558f5ce6ddc5948da8a801bcd05b749e7
+OK   o4/signer/cle-publique.asc : 20bcaf436ddf28d4a6c0f69384832bb558f5ce6ddc5948da8a801bcd05b749e7, égal à o2-cle.log
+OK   o3/signer/cle-publique.asc : 20bcaf436ddf28d4a6c0f69384832bb558f5ce6ddc5948da8a801bcd05b749e7, égal à o2-cle.log
+relevé fini : 2026-11-19T18:41:19Z

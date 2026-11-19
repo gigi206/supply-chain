@@ -1,0 +1,66 @@
+{
+  "chainsProvenance": {
+    "chainsPublicKeySha256": "1e7b2a03f9d5d289898e63b57410aeafa4e3680e86474d4f35aaa4e01f0c5e65",
+    "envelopes": 4,
+    "timestampTokens": "non vérifiés par cette étape",
+    "transparencyLog": "non (PoC hors ligne)",
+    "verifiedAt": "2026-11-19T20:49:20Z",
+    "verifiedWith": "cosign verify-attestation --type slsaprovenance1, clé publique de Chains (brique 08)"
+  },
+  "covers": [
+    {
+      "path": "repodata/0f7e35df97a48742fec4bc2f39972f13b8c96712b4d00faec0130e2fb3e66e62-filelists.xml.gz",
+      "sha256": "0f7e35df97a48742fec4bc2f39972f13b8c96712b4d00faec0130e2fb3e66e62"
+    },
+    {
+      "path": "repodata/4c6e3c4fba410820bcb13b34202b088da6502aee42624b50b105d5b389d87acf-other.sqlite.bz2",
+      "sha256": "4c6e3c4fba410820bcb13b34202b088da6502aee42624b50b105d5b389d87acf"
+    },
+    {
+      "path": "repodata/8e0550ad787c42ba7788e93bfc9ca5c41da15ea6a5536a873c3f4fd77276247d-primary.sqlite.bz2",
+      "sha256": "8e0550ad787c42ba7788e93bfc9ca5c41da15ea6a5536a873c3f4fd77276247d"
+    },
+    {
+      "path": "repodata/97d45bf653ab160eb50dd3f3acccbb1aa7da00b939332280c23305beb8728f7c-other.xml.gz",
+      "sha256": "97d45bf653ab160eb50dd3f3acccbb1aa7da00b939332280c23305beb8728f7c"
+    },
+    {
+      "path": "repodata/d7422f670d700fa0c9cb323df8e07d3208b71ef07936592448402d30bbea2a54-filelists.sqlite.bz2",
+      "sha256": "d7422f670d700fa0c9cb323df8e07d3208b71ef07936592448402d30bbea2a54"
+    },
+    {
+      "path": "repodata/fc194d4476c58d88a40a89730989c228bf83b6c2a4fe8fa1e8a8199ea75c4f5d-primary.xml.gz",
+      "sha256": "fc194d4476c58d88a40a89730989c228bf83b6c2a4fe8fa1e8a8199ea75c4f5d"
+    },
+    {
+      "path": "repodata/repomd.xml",
+      "sha256": "f1d1bc09f6802041d6087d5079007664cc292b7518ece49effc46c324deca69e"
+    },
+    {
+      "path": "repodata/repomd.xml.asc",
+      "sha256": "ce0f600e4537ab80e31c949f517b39cf319673dfa3883bcc631fa4e3967a9d8b"
+    },
+    {
+      "path": "sample-app-1.0.0-2.el9.x86_64.rpm",
+      "sha256": "9f71d578d3b13bc5c4a996a9cbacf60d1d5083d744ef2313054764fd9925567b"
+    }
+  ],
+  "link": "repository",
+  "openpgp": {
+    "fingerprint": "29BA1C48A39C099B7070DCD8C0658591BCF03A86",
+    "publicKeySha256": "20bcaf436ddf28d4a6c0f69384832bb558f5ce6ddc5948da8a801bcd05b749e7"
+  },
+  "signed": {
+    "repository": "signes/depot-rpm",
+    "root": "repodata/repomd.xml"
+  },
+  "tools": "rpm-4.16.1.3-40.el9.x86_64 rpm-sign-4.16.1.3-40.el9.x86_64 createrepo_c-0.20.1-4.el9.x86_64 gnupg2-2.3.3-5.el9_7.x86_64",
+  "unsigned": {
+    "file": {
+      "name": "sample-app-1.0.0-2.el9.x86_64.rpm",
+      "sha256": "864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f"
+    },
+    "manifest": "sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119",
+    "repository": "builds/sample-app-rpm"
+  }
+}

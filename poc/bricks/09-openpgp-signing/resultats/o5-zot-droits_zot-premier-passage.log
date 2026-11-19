@@ -1,0 +1,24 @@
+étape droits_zot commencée : 2026-11-19T20:27:33Z ; o5-zot.sh 8a10f28ebe05e9ff…
+OK   configuration de registre de poc-lien écrite dans 09/secrets/zot-poc-lien-docker (mode 600)
+sha256:68f39f65997d681fdb576fb618ff26859c7fee9c56b1914f33bc2533cc63b448
+image jetable : sha256:68f39f65997d681fdb576fb618ff26859c7fee9c56b1914f33bc2533cc63b448
+### poc-lien
+KO   poc-lien, par digest dans signes/essai-09 : refus (attendu accepte) : Error: invalid OCI Image Layout: failed to open OCI layout file: open oci-layout: no such file or directory
+OK   poc-lien, par tag dans signes/essai-09 : refus (Error: invalid OCI Image Layout: failed to open OCI layout file: open oci-layout: no such file or directory)
+OK   poc-lien, par digest dans builds/essai-09 (hors de signes/**) : refus (Error: invalid OCI Image Layout: failed to open OCI layout file: open oci-layout: no such file or directory)
+KO   poc-lien, referrer (oras attach) sur signes/essai-09@image : refus (attendu accepte) : Error response from registry: failed to resolve sha256:68f39f65997d681fdb576fb618ff26859c7fee9c56b1914f33bc2533cc63b448: 192.168.161.13:5000
+OK   poc-lien, referrer dans signes/essai-09-sans-sujet, sujet absent de ce dépôt : refus (Error response from registry: failed to resolve sha256:68f39f65997d681fdb576fb618ff26859c7fee9c56b1914f33bc2533cc63b448: 192.168.161.13:5000)
+KO   poc-lien, suppression du manifeste : accepte (attendu refus) : 
+### autres
+OK   anonyme, par digest dans signes/essai-09-anonyme : refus (Error: invalid OCI Image Layout: failed to open OCI layout file: open oci-layout: no such file or directory)
+OK   poc-ecriture, par digest dans signes/essai-09-ecriture (motif le plus long) : refus (Error: invalid OCI Image Layout: failed to open OCI layout file: open oci-layout: no such file or directory)
+     configuration temporaire du témoin poc-ecriture vidée (0 octet)
+### lecture anonyme
+KO   lecture anonyme du manifeste : rien
+KO   referrers : rien
+     tags de signes/essai-09 : aucun
+     objets laissés dans Zot (poc-lien ne peut rien supprimer) : signes/essai-09@sha256:68f39f65997d681fdb576fb618ff26859c7fee9c56b1914f33bc2533cc63b448 et son referrer
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-zot
+étape droits_zot finie : 2026-11-19T20:27:33Z
+OK   K6 : ni le mot de passe ni le hash de poc-lien dans le journal
+bilan : 5 ligne(s) KO

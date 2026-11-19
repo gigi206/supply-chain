@@ -1,0 +1,121 @@
+compléments commencés : 2026-11-19T14:47:07Z ; premier passage relu : /home/gigi/.cache/supply-chain-poc/09/releve-20261119T144438Z ; dossier neuf : /home/gigi/.cache/supply-chain-poc/09/complements-20261119T144707Z
+
+## A. debsign.1 et debsigs.1p de trixie (relus : servis en texte roff, pas en gzip)
+### debsign.1.gz ( . T : début du fichier)
+  .TH DEBSIGN 1 "Debian Utilities" "DEBIAN" \" -*- nroff -*-
+  debsign - sign a Debian .changes and .dsc file pair using GPG
+  debsign [options] [changes-file|dsc-file|commands-file ...]
+  debsign mimics the signing aspects (and bugs) of
+  dpkg-buildpackage(1).  It takes a .dsc, .buildinfo, or
+  .changes file and signs it, and any child .dsc,
+  .buildinfo, or .changes files directly or indirectly
+  the name of the .changes file to look for in the parent
+  If a .commands file is specified it is first validated (see the
+  machine where it is unsafe to sign it; they need then only transfer
+  the small .dsc, .buildinfo and .changes files to a
+  safe machine and then use the debsign program to sign them before
+  trusted signing machine use debsign to connect to the untrusted
+  non-signing machine, rather than using debrsign to make the
+  a .dsc, .buildinfo or .changes file must be explicitly
+  When debsign needs to execute GPG to sign it will run progname
+  debsign makes no use of these distinctions except with respect
+  Look for a source-only .changes file instead of a binary-build
+  .changes file.
+  They affect the search for the .changes file.  They are provided
+  name of the .changes file.
+  Multiarch .changes mode: This signifies that debsign should
+  package_version_*+*.changes as the .changes file, allowing for the
+  .changes files produced by dpkg-cross.
+  Recreate signature, respectively use the existing signature, if the
+  current signature.
+  Always re-sign files even if they are already signed, without prompting.
+  .BR debrsign (1),
+### debsigs.1p.gz ( . \ : début du fichier)
+  debsigs - process signatures in .deb packages
+  debsigs is used to manipulate the cryptographic signatures stored inside
+  a .deb file.  It is not used to verify those signatures; for that purpose,
+  Lists the signatures found in the specified file.
+  Creates a new signature of the type specified in the given file.
+  The signature will be created using the default key for your GPG keyring.
+  See "SIGNATURE TYPES" below for possible values of the \f(CW\*(C`type\*(C' field.
+  Invokes debsig-verify to check the validity of the signature on this
+  Deletes the signature of the specified type from the package.
+  .SH "SIGNATURE TYPES"
+  .IX Header "SIGNATURE TYPES"
+  A Debian package may carry different types of signatures.  The most
+  The official signature of the organization which distributes
+  derived from it.  This signature may be added automatically.
+  The signature of the maintainer of the Debian package.  This signature
+  An automatically-added signature renewed periodically to ensure
+  more information and rationale for the different signature types.
+
+## B. obs-sign : fichiers à la racine, pages de manuel, date du tag 2.8.5
+  racine : ['.gitignore', 'COPYING', 'Makefile', 'appimage.c', 'appx.c', 'base64.c', 'bele.h', 'clearsign.c', 'cpio.c', 'dist', 'examples', 'hash.c', 'inc.h', 'ko.c', 'pe.c', 'pgp.c', 'rpm.c', 'sign.8', 'sign.c', 'sign.conf', 'sign.conf.5', 'signd', 'signd.8', 'signd_gcrypt', 'signd_openssl', 'signd_pkcs11', 'signd_privileged', 'signd_ssl', 'signd_tpm', 'sock.c', 't', 'util.c', 'x509.c', 'zip.c']
+téléchargé : obs-sign-sign.8 (5613 octets, sha256 41f553b9ae6145c0cc06aa586c13ab54b38697654c0ec96e91d7013d5106b425) depuis https://raw.githubusercontent.com/openSUSE/obs-sign/2.8.5/sign.8
+  sign.8, lignes citant pkcs11, hsm, card, token, rpm, deb, privsign, agent :
+    4:sign \- sign files or rpms
+    16:.BR -k | -p
+    44:to a rpm package (-r option). If no mode is specified, sign does a rpm sign
+    45:if the file name ends in ".rpm", otherwise it does a clearsign. If no
+    55:The -k option makes sign print the keyid instead of signing a file, the
+    76:Sign RPM package
+    88:Sign AppImage container
+    100:Create a detached pkcs7/CMS signature
+    108:the checksum of the signed rpms. This can be used to speed up repository
+    123:Explicit sign time. If RPM mode (\-r) is used also accepts the string "buildtime".
+    143:Do not include certificates in the pkcs7/cms signature
+    156:is currently only supported for rpm packages.
+téléchargé : obs-sign-signd.8 (719 octets, sha256 bf75231bcf2c50db6a19e9aec682ce3ebe990d087f05b0426f89895ec94bd292) depuis https://raw.githubusercontent.com/openSUSE/obs-sign/2.8.5/signd.8
+  signd.8, lignes citant pkcs11, hsm, card, token, rpm, deb, privsign, agent :
+téléchargé : obs-sign-sign.conf.5 (4596 octets, sha256 76bc31cba4438a63404855e9fcbdcd072a0e9b1589ca13a791d9e0883ed5a621) depuis https://raw.githubusercontent.com/openSUSE/obs-sign/2.8.5/sign.conf.5
+  sign.conf.5, lignes citant pkcs11, hsm, card, token, rpm, deb, privsign, agent :
+    82:.BR use-agent: " true|false"
+    83:Make signd directly talk to the gpg-agent for signing instead of
+    89:is only done if the gpg-agent is used for signing. The cache
+    93:.BR agentsocket: " socketpath [socketpath...]"
+    94:Specify the location of the gpg agent socket. It is possible to
+    98:the current location of the agent socket.
+curl: (22) The requested URL returned error: 404
+ÉCHEC du téléchargement : obs-sign-README.md depuis https://raw.githubusercontent.com/openSUSE/obs-sign/2.8.5/README.md
+  tag 2.8.5 : commit 53f1d8b14492fa46a231dc7e05b38f2fe4b03797 ; date 2026-02-05T14:47:32Z
+
+## C. Fedora : documentation de la signature (adresse de redirection lue au premier passage)
+téléchargé : fedora-signatures.html (42096 octets, sha256 e408292ebc51d410b8d822fe1f7bbb59a26b5d4525f6816772683d87b111589c) depuis https://docs.fedoraproject.org/en-US/fedora/security-team/cryptography/signatures/
+  « When it detects a new artifact to sign (for example, from the Koji buildsystem), it downloads it, signs it using Sigul, and uploads it back to the original source. »
+  « Sigul Cryptographic operations within the Fedora infrastructure are performed by Sigul. »
+  « Sigul allows authorised signers (Robosignatory and a small pool of trusted operators) to issue signing jobs to the Bridge server, which forwards it over a Mutual TLS connection to a pool of signing servers. »
+  « The Sigul bridge is deployed on sign-bridge01. »
+  « Additional documentation for Sigul can be found on Pagure . »
+  « Siguldry Written in Rust, Siguldry is the next generation of Fedora’s signing infrastructure. »
+  « Its architecture is heavily based on Sigul, taking advantage of modern features like systemd-credentials for the mTLS connections between components. »
+  « Siguldry is not currently deployed within the Fedora infrastructure, but is intended to eventually replace Sigul as the primary signing tool. »
+  « Parts of the code base are already used for signing PE Executables for Secure Boot (using sigul-pesign-bridge ), however this is still currently pointing at the existing Sigul infrastructure. »
+  « Additional documentation for Siguldry can be found on GitHub and its documentation site . »
+  « Key Management Each Fedora and EPEL release has a standalone GPG keypair which is generated by Sigul at the start of the release cycle. »
+  « Encrypted versions of the keys are stored in Sigul’s database, protected by a password and PKCS#11 devices (currently YubiKeys). »
+
+## D. sigul : date du commit du tag v1.4 (git ls-remote puis page du commit sur pagure)
+  v1.4 → 8e2ee64595b3ec9f1d050f0a32c16ba932eaa4fe
+curl: (22) The requested URL returned error: 404
+ÉCHEC du téléchargement : sigul-v1.4-commit.html depuis https://pagure.io/sigul/c/8e2ee64595b3ec9f1d050f0a32c16ba932eaa4fe
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+FileNotFoundError: [Errno 2] No such file or directory: '/home/gigi/.cache/supply-chain-poc/09/complements-20261119T144707Z/sigul-v1.4-commit.html'
+
+## E. Rocky 9.8 BaseOS (primary relu, vérifié au premier passage) : dépendances de rpm-libs et de rpm-sign
+  rpm-libs 4.16.1.3-40.el9 : requires 23, dont ['libcrypto.so.3()(64bit)', 'libcrypto.so.3(OPENSSL_3.0.0)(64bit)', 'libcrypto.so.3(OPENSSL_3.4.0)(64bit)']
+  rpm-sign 4.16.1.3-40.el9 : requires 8, dont []
+  rpm-sign-libs 4.16.1.3-40.el9 : requires 20, dont ['/usr/bin/gpg2', 'libcrypto.so.3()(64bit)']
+
+## F. Debian 13 : rpm et createrepo-c (madison) ; GnuPG au security tracker
+   createrepo-c stable 1.2.0-2 1.2.0-2+b1
+   libgcrypt20 stable 1.11.0-7+deb13u1
+   rpm stable 4.20.1+dfsg-3
+téléchargé : tracker-gnupg2.html (9724 octets, sha256 c45cf0780037b46aa727b1e594fece20273a97082f5553ee262f553d235a2014) depuis https://security-tracker.debian.org/tracker/source-package/gnupg2
+  identifiants CVE cités sur la page : 35 distincts ; plus récents : ['CVE-2026-24882', 'CVE-2026-24883', 'CVE-2026-57062', 'CVE-2026-105712', 'CVE-2026-118131']
+  section : Available versions
+  section : Open issues
+  section : Open unimportant issues
+  section : Resolved issues
+  section : Security announcements
+compléments finis : 2026-11-19T14:47:24Z

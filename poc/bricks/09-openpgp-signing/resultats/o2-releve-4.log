@@ -1,0 +1,16 @@
+quatrième relevé O2 commencé : 2026-11-19T16:32:16Z ; mmdebstrap de l'amorce sha256 c8a55d9731e81c00…
+page de manuel : absente de l amorce slim (premier passage, FileNotFoundError) ; lecture du script seulement
+## script usr/bin/mmdebstrap : occurrences de essential/unlink et du retrait des .deb
+  3990:    if (any { $_ eq 'essential/unlink' } @{ $options->{skip} }) {
+  3991:        info "skipping essential/unlink as requested";
+  4002:            unlink "$options->{root}/$deb"
+  4003:              or error "cannot unlink $deb: $!";
+  4188:        unlink "$options->{root}/etc/apt/apt.conf.d/00mmdebstrap"
+  4189:          or warning "failed to unlink /etc/apt/apt.conf.d/00mmdebstrap: $!";
+  4190:        unlink "$options->{root}/etc/apt/apt.conf.d/99debconf"
+  4191:          or warning "failed to unlink /etc/apt/apt.conf.d/99debconf: $!";
+  5743:        'essential-hook=s' => sub {
+  5746:        'chrooted-essential-hook=s' => sub {
+  7940:=item B<--essential-hook>=I<command>
+  7949:    --essential-hook='echo unattended-upgrades
+quatrième relevé O2 fini : 2026-11-19T16:32:16Z

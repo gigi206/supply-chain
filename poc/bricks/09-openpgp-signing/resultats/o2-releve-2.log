@@ -1,0 +1,28 @@
+second relevé O2 commencé : 2026-11-19T15:46:17Z
+## page https://manpages.debian.org/trixie/mmdebstrap/mmdebstrap.1.en.gz (servie en texte roff) : lignes sur les modes
+  .IP --mode=name 8
+  .IX Item "--mode=name"
+  .IP auto 8
+  unshare mode is picked if /etc/subuid and /etc/subgid are set up
+  .IP "sudo, root" 8
+  needs to be able to mount and thus requires \f(CW\*(C`CAP_SYS_ADMIN\*(C'.
+  .IP unshare 8
+  When used as a normal (not root) user, this mode uses Linux user namespaces to
+  newuidmap\|(1) and newgidmap\|(1) via their setuid bit. Running those
+  successfully requires /etc/subuid and /etc/subgid to have an entry for
+  Besides the user namespace, the mount, pid (process ids), uts (hostname) and
+  information (seen from outside the unshared user namespace). For correct
+  ownership information, the directory must be accessed from a user namespace
+  with the right subuid/subgid offset, like so:
+  map the current effective user/group ID into the subuid/subgid range using
+  available and you know your subuid/subgid offset (100000 in this example):
+  If this mode is used as the root user, the user namespace is not unshared (but
+  .IP "fakeroot, fakechroot" 8
+  .IP chrootless 8
+  --customize-hook=\*(Aqchroot "$1" mmdebstrap --mode=chrootless
+  .IP auto 8
+  by --mode, \f(CW\*(C`MMDEBSTRAP_FORMAT\*(C' stores the format chosen by --format,
+  not function like in unshared user namespaces.
+  user namespaces instead. This fixes Debian bug #829134.
+  $ mmdebstrap --variant=custom --mode=unshare \e
+second relevé O2 fini : 2026-11-19T15:46:17Z

@@ -1,0 +1,32 @@
+étape construire commencée : 2026-11-19T20:48:09Z ; o5-signes.sh 747853a9e8f2e94f… ; o5-signes.py 329c60eaeab808a4…
+### rpm : 1 membre(s) lus
+OK   membres écrits par la brique : aucun bloc privé, aucune adresse hors de .invalid et .example (0 adresse(s) fictive(s))
+OK   lien : rpm signé égal à la valeur archivée (9f71d578d3b13bc5c4a996a…)
+OK   layout sha256:fa5b175786dc… : manifeste, configuration et couche recalculés ; 1 membre(s)
+OK   rpm : layout sha256:fa5b175786dcaf0cbd989b7e7098c6306e3d66427d4cf6ae2f3ecb1fd857a283 (couche 2181120 octets, 1 membre(s))
+### depot-rpm : 9 membre(s) lus
+OK   membres écrits par la brique : aucun bloc privé, aucune adresse hors de .invalid et .example (4 adresse(s) fictive(s))
+OK   lien : repomd.xml égal à la valeur archivée (f1d1bc09f6802041d6087d5…)
+OK   lien : repomd.xml.asc égal à la valeur archivée (ce0f600e4537ab80e31c949…)
+OK   lien : rpm dans primary.xml.gz égal à la valeur archivée (['9f71d578d3b13bc5c4a99…)
+OK   lien : rpm signé du dépôt égal à la valeur archivée (9f71d578d3b13bc5c4a996a…)
+OK   dépôt rpm : chaîne repomd.xml → 6 fichiers de repodata → primary → rpm signé ; 9 membres, aucun de trop
+OK   layout sha256:ed666ab80dd1… : manifeste, configuration et couche recalculés ; 9 membre(s)
+OK   depot-rpm : layout sha256:ed666ab80dd15b871b45c4bbba2295146fa395a8e4bd6d1bafe066b2cb97b915 (couche 2191360 octets, 9 membre(s))
+### depot-apt : 6 membre(s) lus
+OK   membres écrits par la brique : aucun bloc privé, aucune adresse hors de .invalid et .example (2 adresse(s) fictive(s))
+OK   lien : InRelease égal à la valeur archivée (9113af02f3d78bf6250f1c5…)
+OK   lien : Release égal à la valeur archivée (b6f2617f73a79c5af2e73b6…)
+OK   lien : Release.gpg égal à la valeur archivée (72b930effcbed24ad5d5250…)
+OK   dépôt apt : texte signé d'InRelease = Release
+OK   lien : deb dans Packages égal à la valeur archivée (['f66bbeb2aba31e5220b33…)
+OK   lien : deb du dépôt égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+OK   dépôt apt : chaîne InRelease/Release → 2 index → Packages → deb ; 6 membres, aucun de trop
+OK   layout sha256:90909a869321… : manifeste, configuration et couche recalculés ; 6 membre(s)
+OK   depot-apt : layout sha256:90909a869321b2455693408a394114725e5d9f2d75e723c9ecda811e2cc2630a (couche 1966080 octets, 6 membre(s))
+OK   seconde construction indépendante : mêmes digests (layouts déterministes)
+     dossier gardé pour publier et attester (à effacer après verifier) : /home/gigi/.cache/supply-chain-poc/09/o5-signes/construire ; à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-signes/construire-bis
+étape construire finie : 2026-11-19T20:48:09Z
+OK   K3 : aucune ligne de bloc privé dans le journal
+OK   K5 : valeur du secret lien absente du journal et du dossier de l'étape
+OK   K6 : ni mot de passe, ni hash, ni chaîne d'authentification de poc-lien dans le journal et le dossier de l'étape

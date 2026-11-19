@@ -1,0 +1,12 @@
+étape releve commencée : 2026-11-19T19:38:33Z ; o5-openbao.sh 6537f746edf1d7f3…
+OpenBao : version 2.7.2, initialisé true, scellé false
+OK   OpenBao initialisé et descellé
+clés Transit (nom type dernière_version exportable) :
+     chains ecdsa-p256 1 false
+     scanner ecdsa-p256 1 false
+     tsa ecdsa-p256 1 false
+OK   transit/keys/lien absente
+OK   resultats/lien-cle-publique.pem absent
+étape releve finie : 2026-11-19T19:38:34Z
+OK   K3 : aucune ligne de bloc privé dans le journal
+OK   K4 : valeur du jeton root absente du journal

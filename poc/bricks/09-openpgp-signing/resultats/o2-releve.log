@@ -1,0 +1,127 @@
+relevé O2 commencé : 2026-11-19T15:42:34Z ; dossier neuf /home/gigi/.cache/supply-chain-poc/09/o2-releve-20261119T154234Z ; homedir gpg dédié /home/gigi/.cache/supply-chain-poc/09/o2-gnupg-20261119T154234Z
+
+## 1. Amorces du cache OCI local (lecture seule, sans extraction)
+### rockylinux : manifeste ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+  manifeste : sha256 égal
+  configuration 686e4558d0a5 : sha256 égal ; créée 2026-05-25T20:19:03.81230907Z ; architecture amd64
+  couche 99c753a880cc : sha256 égale, 87572693 octets, application/vnd.oci.image.layer.v1.tar+gzip
+    entrées : 11170
+    usr/bin/gpg : présent
+    usr/bin/gpg2 : présent
+    usr/bin/gpgv : présent
+    usr/bin/gpgv2 : présent
+    usr/bin/gpg-agent : présent
+    usr/bin/gpgconf : présent
+    usr/bin/rpm : présent
+    usr/bin/rpmsign : absent
+    usr/bin/rpmkeys : présent
+    usr/bin/createrepo_c : absent
+    usr/bin/dnf : présent
+    usr/bin/dnf-3 : présent
+    usr/bin/apt-get : absent
+    usr/bin/apt-ftparchive : absent
+    usr/bin/dpkg : absent
+    usr/bin/sqv : absent
+    usr/share/keyrings/debian-archive-keyring.gpg : absent
+    etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9 : présent
+    usr/bin/xz : absent
+    usr/bin/tar : présent
+    greffons dnf : aucun
+### debian : manifeste 7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392
+  manifeste : sha256 égal
+  configuration 596c6d80c879 : sha256 égal ; créée 2026-11-04T21:23:39Z ; architecture amd64
+  couche 37fb86c2a767 : sha256 égale, 29856132 octets, application/vnd.oci.image.layer.v1.tar+gzip
+    entrées : 3271
+    usr/bin/gpg : absent
+    usr/bin/gpg2 : absent
+    usr/bin/gpgv : absent
+    usr/bin/gpgv2 : absent
+    usr/bin/gpg-agent : absent
+    usr/bin/gpgconf : absent
+    usr/bin/rpm : absent
+    usr/bin/rpmsign : absent
+    usr/bin/rpmkeys : absent
+    usr/bin/createrepo_c : absent
+    usr/bin/dnf : absent
+    usr/bin/dnf-3 : absent
+    usr/bin/apt-get : présent
+    usr/bin/apt-ftparchive : absent
+    usr/bin/dpkg : présent
+    usr/bin/sqv : présent
+    usr/share/keyrings/debian-archive-keyring.gpg : présent
+    etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9 : absent
+    usr/bin/xz : absent
+    usr/bin/tar : présent
+    greffons dnf : aucun
+
+## 2. Instantané Debian 20261105T000000Z
+téléchargé : archive-key-12.asc (11861 octets, sha256 c2a9a16fde95e037bafd0fa6b7e31f41b4ff1e85851de5558f19a2a2f0e955e2) depuis https://ftp-master.debian.org/keys/archive-key-12.asc
+téléchargé : archive-key-13.asc (11861 octets, sha256 6f1d277429dd7ffedcc6f8688a7ad9a458859b1139ffa026d1eeaadcbffb0da7) depuis https://ftp-master.debian.org/keys/archive-key-13.asc
+téléchargé : release-13.asc (1384 octets, sha256 4d097bb93f83d731f475c5b92a0c2fcf108cfce1d4932792fca72d00b48d198b) depuis https://ftp-master.debian.org/keys/release-13.asc
+téléchargé : InRelease (140421 octets, sha256 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675) depuis https://snapshot.debian.org/archive/debian/20261105T000000Z/dists/trixie/InRelease
+OK   signataires d'InRelease (clés primaires) : 04B54C3CDCA79751B16BC6B5225629DF75B188BD 41587F7DB8C774BCCF131416762F67A0B2C39DE4 B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8
+  Suite: stable
+  Version: 13.7
+  Codename: trixie
+  Date: Sat, 12 Sep 2026 07:55:41 UTC
+téléchargé : Packages.xz (9678380 octets, sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498) depuis https://snapshot.debian.org/archive/debian/20261105T000000Z/dists/trixie/main/binary-amd64/Packages.xz
+OK   Packages.xz égal au sha256 du texte vérifié d'InRelease
+  gnupg 2.4.7-21+deb13u1 all sha256 e68f0fd24a7a62f1… 417112 octets
+    Depends : dirmngr (<< 2.4.7-21+deb13u1.1~), dirmngr (>= 2.4.7-21+deb13u1), gnupg-l10n (= 2.4.7-21+deb13u1), gpg (<< 2.4.7-21+deb13u1.1~), gpg (>= 2.4.7-21+deb13u1), gpg-agent (<< 2.4.7-21+deb13u1.1~), gpg-agent (>= 2.4.7-21+deb13u1), gpgsm (<< 2.4.7-21+deb13u1.1~), gpgsm (>= 2.4.7-21+deb13u1)
+  gpg 2.4.7-21+deb13u1+b5 amd64 sha256 3aeedf3d223e5e6a… 636212 octets
+    Depends : gpgconf (= 2.4.7-21+deb13u1+b5), init-system-helpers (>= 1.52), libassuan9 (>= 2.5.1), libbz2-1.0, libc6 (>= 2.38), libgcrypt20 (>= 1.11.0), libgpg-error0 (>= 1.49), libksba8 (>= 1.6.3), libnpth0t64 (>= 1.2), libreadline8t64 (>= 6.0), libsqlite3-0 (>= 3.14.0), zlib1g (>= 1:1.1.4)
+  gpgv 2.4.7-21+deb13u1+b5 amd64 sha256 104e4c57b98f0b88… 241100 octets
+    Depends : libbz2-1.0, libc6 (>= 2.38), libgcrypt20 (>= 1.11.0), libgpg-error0 (>= 1.49), zlib1g (>= 1:1.1.4)
+  gpg-agent 2.4.7-21+deb13u1+b5 amd64 sha256 ebc440c05dd5c5ba… 271000 octets
+  gpgconf 2.4.7-21+deb13u1+b5 amd64 sha256 14668f3f4847d254… 128880 octets
+  gpgsm 2.4.7-21+deb13u1+b5 amd64 sha256 092f4675a1810ca7… 275832 octets
+  dirmngr 2.4.7-21+deb13u1+b5 amd64 sha256 385b4689f43678db… 383892 octets
+  keyboxd : absent de l'instantané
+  gnupg-utils 2.4.7-21+deb13u1+b5 amd64 sha256 787d8ec1f2184544… 193852 octets
+  gpg-wks-client 2.4.7-21+deb13u1+b5 amd64 sha256 a21a9f15360e2763… 108624 octets
+  apt 3.0.3 amd64 sha256 55e341fbe92d7502… 1452192 octets
+  apt-utils 3.0.3 amd64 sha256 679daae89a4f3a51… 336256 octets
+    Depends : apt (= 3.0.3), libapt-pkg7.0 (>= 2.9.27+exp1), libc6 (>= 2.34), libdb5.3t64, libgcc-s1 (>= 3.0), libstdc++6 (>= 13.1)
+  libgcrypt20 1.11.0-7+deb13u1 amd64 sha256 f0eb41f8cb40896e… 843104 octets
+  libassuan9 3.0.2-2 amd64 sha256 9d78ef8f016e7f24… 61520 octets
+  libksba8 1.6.7-2+b1 amd64 sha256 45bc1bfaf41a5e11… 136048 octets
+  libnpth0t64 1.8-3 amd64 sha256 37d489976ef91ca0… 23248 octets
+  pinentry-curses 1.3.1-2 amd64 sha256 aed82cd9cc92b8a3… 86388 octets
+  sqv 1.3.0-3+b2 amd64 sha256 97760aa17acceee0… 661428 octets
+
+## 3. Rocky https://dl.rockylinux.org/vault/rocky/9.8
+  clé relue dans /home/gigi/.cache/supply-chain-poc/09/releve-20261119T144438Z : 21CB256AE16FC54C6E652949702D426D350D275D
+téléchargé : vault-BaseOS-repomd.xml (4449 octets, sha256 abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163) depuis https://dl.rockylinux.org/vault/rocky/9.8/BaseOS/x86_64/os/repodata/repomd.xml
+téléchargé : vault-BaseOS-repomd.xml.asc (833 octets, sha256 fd9d161f8d35f144ebf0e5135ea33f7a8502922539687842e858af02b392b7a3) depuis https://dl.rockylinux.org/vault/rocky/9.8/BaseOS/x86_64/os/repodata/repomd.xml.asc
+OK   BaseOS : repomd.xml de vault vérifié par la clé Rocky 9
+OK   BaseOS : repomd.xml de vault égal à celui de pub/9.8 du relevé du 19/11 (abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163) : primary relu
+  dnf-plugins-core-4.3.0-26.el9.noarch sha256 2af0175e6746ff40… Packages/d/dnf-plugins-core-4.3.0-26.el9.noarch.rpm
+  gnupg2-2.3.3-5.el9_7.x86_64 sha256 47ecef51db73418e… Packages/g/gnupg2-2.3.3-5.el9_7.x86_64.rpm ; requires []
+  gpgme-1.15.1-6.el9.x86_64 sha256 b1f03906b959728f… Packages/g/gpgme-1.15.1-6.el9.x86_64.rpm
+  libgcrypt-1.10.0-11.el9.x86_64 sha256 350f4bc7f8c9f5a9… Packages/l/libgcrypt-1.10.0-11.el9.x86_64.rpm
+  libgcrypt-1.10.0-13.el9_8.x86_64 sha256 7f1640e5c53049df… Packages/l/libgcrypt-1.10.0-13.el9_8.x86_64.rpm
+  libmodulemd-2.13.0-2.el9.x86_64 sha256 c26a812e5a875748… Packages/l/libmodulemd-2.13.0-2.el9.x86_64.rpm
+  python3-dnf-plugins-core-4.3.0-26.el9.noarch sha256 3ceeed90f5f3bd5d… Packages/p/python3-dnf-plugins-core-4.3.0-26.el9.noarch.rpm
+  rpm-4.16.1.3-40.el9.x86_64 sha256 5a6be9d462199f8f… Packages/r/rpm-4.16.1.3-40.el9.x86_64.rpm
+  rpm-libs-4.16.1.3-40.el9.x86_64 sha256 20b6df9f44648b69… Packages/r/rpm-libs-4.16.1.3-40.el9.x86_64.rpm
+  rpm-sign-4.16.1.3-40.el9.x86_64 sha256 f2aa2cc9af024610… Packages/r/rpm-sign-4.16.1.3-40.el9.x86_64.rpm ; requires ['rpm-sign-libs(x86-64)']
+  rpm-sign-libs-4.16.1.3-40.el9.x86_64 sha256 fcbeb250428a8690… Packages/r/rpm-sign-libs-4.16.1.3-40.el9.x86_64.rpm ; requires ['rpm-libs(x86-64)']
+téléchargé : vault-AppStream-repomd.xml (4918 octets, sha256 a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b) depuis https://dl.rockylinux.org/vault/rocky/9.8/AppStream/x86_64/os/repodata/repomd.xml
+téléchargé : vault-AppStream-repomd.xml.asc (833 octets, sha256 f1a898396cf281e4431d1b62d7ebf9d4285d054276f1ef2ed7acfe82c63be741) depuis https://dl.rockylinux.org/vault/rocky/9.8/AppStream/x86_64/os/repodata/repomd.xml.asc
+OK   AppStream : repomd.xml de vault vérifié par la clé Rocky 9
+OK   AppStream : repomd.xml de vault égal à celui de pub/9.8 du relevé du 19/11 (a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b) : primary relu
+  createrepo_c-0.20.1-4.el9.x86_64 sha256 6a12a9566e616076… Packages/c/createrepo_c-0.20.1-4.el9.x86_64.rpm ; requires ['createrepo_c-libs', 'rpm']
+  createrepo_c-libs-0.20.1-4.el9.x86_64 sha256 b43ab57f35a9cb00… Packages/c/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm
+  pinentry-1.1.1-8.el9.x86_64 sha256 bcb0d7145aca311a… Packages/p/pinentry-1.1.1-8.el9.x86_64.rpm
+  m1b-sources.log (brique 05), lignes citant repomd de vault 9.8 :
+
+## 4. Hôte
+  unshare from util-linux 2.42.4
+OK   unshare --map-auto --map-root-user -n disponible (code 0)
+  podman : podman version 5.7.0 ; paquet 5.7.0+ds2-3build1
+  changelog.Debian de podman, lignes citant GHSA-2cvf ou 5.8.8 : 0
+    podman (5.7.0+ds2-3build1) resolute; urgency=medium
+    
+      * No-change rebuild for gpgme1.0 2.0
+  secrets-depot.sh : dossiers de motifs lus : supply-chain-poc/08/secrets supply-chain-poc/10/secrets ; motif « BEGIN PGP » : 0
+relevé O2 fini : 2026-11-19T15:42:52Z

@@ -1,0 +1,124 @@
+étape banc commencée : 2026-11-19T18:55:07Z ; o5.sh 25878d8ba621fed8… ; o5-lien.py 3230ff72eeaf043f…
+### valeurs archivées
+OK   valeurs archivées et fichiers gardés relus (10 contrôles)
+### clés cosign jetables (sans mot de passe, hors du dépôt, jamais affichées)
+OK   clé lien : publique 867f9149b19e81cd… ; en-tête de la clé privée : 1 ligne(s) « ENCRYPTED SIGSTORE PRIVATE KEY », 0 ligne(s) du motif de garde-cle-privee.sh
+OK   clé autre : publique 9fbb4cc1f761d443… ; en-tête de la clé privée : 1 ligne(s) « ENCRYPTED SIGSTORE PRIVATE KEY », 0 ligne(s) du motif de garde-cle-privee.sh
+### prédicats (valeurs relues dans les journaux archivés)
+     prédicat rpm : lien rpm-b1, origine sha256:07b7bd6feb48… / 864d55f486f423ce…
+     prédicat deb : lien identity, origine sha256:60f25f5c3fb5… / f66bbeb2aba31e52…
+     prédicat depot-rpm : lien repository, origine sha256:07b7bd6feb48… / 864d55f486f423ce…, 8 fichiers couverts
+     prédicat depot-apt : lien repository, origine sha256:60f25f5c3fb5… / f66bbeb2aba31e52…, 5 fichiers couverts
+     prédicat rpm-autre-manifeste : unsigned.manifest remplacé par une valeur archivée du deb
+     prédicat rpm-autre-fichier : unsigned.file remplacé par une valeur archivée du deb
+     rpm à charge altérée : dernier octet (2173375) inversé au bit 0 ; sha256 1325d4bdb44ea10ac89be85b21d991fd2075345c84e9fe5210a3688ce5ea1e69
+### L1 à L4 : attest-blob (clé lien) puis vérification par cosign et par le contrôle indépendant
+OK   attest-blob rpm : code 0
+OK   rpm : cosign verify-blob-attestation : Verified OK
+     | OK   forme : bundle application/vnd.dev.sigstore.bundle.v0.3+json, énoncé https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+     | OK   sujet : sample-app-1.0.0-2.el9.x86_64.rpm = fichier en main (9f71d578d3b13bc5…)
+     | OK   lien : manifeste non signé égal à la valeur archivée (sha256:07b7bd6feb489bff…)
+     | OK   lien : fichier non signé égal à la valeur archivée (864d55f486f423cec854cde…)
+     | OK   lien : empreinte OpenPGP égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+     | OK   lien : empreinte recalculée de cle-publique.asc égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+     | OK   lien : sha256 de cle-publique.asc égal à la valeur archivée (20bcaf436ddf28d4a6c0f69…)
+     | OK   lien : nature du lien égal à la valeur archivée (rpm-b1…)
+     | OK   lien : rpm d'entrée en main égal à la valeur archivée (864d55f486f423cec854cde…)
+     |      B1 recalculé : signé 8 entrées de signature, en-tête principal à l'octet 4504 ; entrée 7 entrées, en-tête principal à l'octet 4504
+     | OK   B1 recalculé : lead égal, 2168872 octets égaux à partir de l'en-tête principal
+     | ACCEPTÉ
+OK   rpm : contrôle indépendant : accepté
+     énoncé archivé : o5-enonce-rpm.json ; mediaType du bundle application/vnd.dev.sigstore.bundle.v0.3+json ; verificationMaterial : publicKey
+OK   attest-blob deb : code 0
+OK   deb : cosign verify-blob-attestation : Verified OK
+     | OK   forme : bundle application/vnd.dev.sigstore.bundle.v0.3+json, énoncé https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+     | OK   sujet : sample-app_1.0.0-2_amd64.deb = fichier en main (f66bbeb2aba31e52…)
+     | OK   lien : manifeste non signé égal à la valeur archivée (sha256:60f25f5c3fb58b7c…)
+     | OK   lien : fichier non signé égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+     | OK   lien : empreinte OpenPGP égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+     | OK   lien : empreinte recalculée de cle-publique.asc égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+     | OK   lien : sha256 de cle-publique.asc égal à la valeur archivée (20bcaf436ddf28d4a6c0f69…)
+     | OK   lien : nature du lien égal à la valeur archivée (identity…)
+     | OK   lien : deb en main (identité) égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+     | ACCEPTÉ
+OK   deb : contrôle indépendant : accepté
+     énoncé archivé : o5-enonce-deb.json ; mediaType du bundle application/vnd.dev.sigstore.bundle.v0.3+json ; verificationMaterial : publicKey
+OK   attest-blob depot-rpm : code 0
+OK   depot-rpm : cosign verify-blob-attestation : Verified OK
+     | OK   forme : bundle application/vnd.dev.sigstore.bundle.v0.3+json, énoncé https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+     | OK   sujet : repomd.xml = fichier en main (f1d1bc09f6802041…)
+     | OK   lien : manifeste non signé égal à la valeur archivée (sha256:07b7bd6feb489bff…)
+     | OK   lien : fichier non signé égal à la valeur archivée (864d55f486f423cec854cde…)
+     | OK   lien : empreinte OpenPGP égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+     | OK   lien : empreinte recalculée de cle-publique.asc égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+     | OK   lien : sha256 de cle-publique.asc égal à la valeur archivée (20bcaf436ddf28d4a6c0f69…)
+     | OK   lien : nature du lien égal à la valeur archivée (repository…)
+     | OK   dépôt : 8 fichiers couverts, tous égaux aux fichiers en main
+     | OK   lien : repomd.xml (sujet) égal à la valeur archivée (f1d1bc09f6802041d6087d5…)
+     | OK   lien : repomd.xml.asc égal à la valeur archivée (ce0f600e4537ab80e31c949…)
+     | OK   lien : rpm signé du dépôt égal à la valeur archivée (9f71d578d3b13bc5c4a996a…)
+     | OK   lien : rpm dans primary.xml.gz égal à la valeur archivée (['9f71d578d3b13bc5c4a99…)
+     | OK   dépôt : chaîne repomd.xml → 6 fichiers de repodata → primary → rpm signé
+     | ACCEPTÉ
+OK   depot-rpm : contrôle indépendant : accepté
+     énoncé archivé : o5-enonce-depot-rpm.json ; mediaType du bundle application/vnd.dev.sigstore.bundle.v0.3+json ; verificationMaterial : publicKey
+OK   attest-blob depot-apt : code 0
+OK   depot-apt : cosign verify-blob-attestation : Verified OK
+     | OK   forme : bundle application/vnd.dev.sigstore.bundle.v0.3+json, énoncé https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+     | OK   sujet : InRelease = fichier en main (9113af02f3d78bf6…)
+     | OK   lien : manifeste non signé égal à la valeur archivée (sha256:60f25f5c3fb58b7c…)
+     | OK   lien : fichier non signé égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+     | OK   lien : empreinte OpenPGP égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+     | OK   lien : empreinte recalculée de cle-publique.asc égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+     | OK   lien : sha256 de cle-publique.asc égal à la valeur archivée (20bcaf436ddf28d4a6c0f69…)
+     | OK   lien : nature du lien égal à la valeur archivée (repository…)
+     | OK   dépôt : 5 fichiers couverts, tous égaux aux fichiers en main
+     | OK   lien : InRelease (sujet) égal à la valeur archivée (9113af02f3d78bf6250f1c5…)
+     | OK   lien : Release égal à la valeur archivée (b6f2617f73a79c5af2e73b6…)
+     | OK   lien : Release.gpg égal à la valeur archivée (72b930effcbed24ad5d5250…)
+     | OK   lien : deb dans Packages égal à la valeur archivée (['f66bbeb2aba31e5220b33…)
+     | OK   lien : deb du dépôt égal à la valeur archivée (f66bbeb2aba31e5220b332f…)
+     | OK   dépôt : chaîne Release → 2 index → Packages → deb
+     | ACCEPTÉ
+OK   depot-apt : contrôle indépendant : accepté
+     énoncé archivé : o5-enonce-depot-apt.json ; mediaType du bundle application/vnd.dev.sigstore.bundle.v0.3+json ; verificationMaterial : publicKey
+### T1 : clé étrangère (énoncé du rpm signé par la clé autre)
+OK   T1 clé étrangère : cosign refuse, code 1, motif « signature|verif » : Error: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+### T2 : lien vers un autre digest (énoncé signé par la clé lien, prédicat faux)
+OK   T2 autre-manifeste (cosign ne lit pas le prédicat) : cosign verify-blob-attestation : Verified OK
+     | OK   forme : bundle application/vnd.dev.sigstore.bundle.v0.3+json, énoncé https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+     | OK   sujet : sample-app-1.0.0-2.el9.x86_64.rpm = fichier en main (9f71d578d3b13bc5…)
+     | REFUS lien : manifeste non signé sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e (attendu : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119)
+OK   T2 autre-manifeste : contrôle indépendant refuse, motif « lien : manifeste non signé »
+OK   T2 autre-fichier (cosign ne lit pas le prédicat) : cosign verify-blob-attestation : Verified OK
+     | OK   forme : bundle application/vnd.dev.sigstore.bundle.v0.3+json, énoncé https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+     | OK   sujet : sample-app-1.0.0-2.el9.x86_64.rpm = fichier en main (9f71d578d3b13bc5…)
+     | OK   lien : manifeste non signé égal à la valeur archivée (sha256:07b7bd6feb489bff…)
+     | REFUS lien : fichier non signé f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (attendu : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f)
+OK   T2 autre-fichier : contrôle indépendant refuse, motif « lien : fichier non signé »
+### T3 : rpm à charge altérée (énoncé valide, signé par la clé lien, sujet = rpm altéré)
+OK   T3 (sujet = rpm altéré) : cosign verify-blob-attestation : Verified OK
+     | OK   forme : bundle application/vnd.dev.sigstore.bundle.v0.3+json, énoncé https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+     | OK   sujet : rpm-altere.rpm = fichier en main (1325d4bdb44ea10a…)
+     | OK   lien : manifeste non signé égal à la valeur archivée (sha256:07b7bd6feb489bff…)
+     | OK   lien : fichier non signé égal à la valeur archivée (864d55f486f423cec854cde…)
+     | OK   lien : empreinte OpenPGP égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+     | OK   lien : empreinte recalculée de cle-publique.asc égal à la valeur archivée (29BA1C48A39C099B7070DCD…)
+     | OK   lien : sha256 de cle-publique.asc égal à la valeur archivée (20bcaf436ddf28d4a6c0f69…)
+     | OK   lien : nature du lien égal à la valeur archivée (rpm-b1…)
+     | OK   lien : rpm d'entrée en main égal à la valeur archivée (864d55f486f423cec854cde…)
+     |      B1 recalculé : signé 8 entrées de signature, en-tête principal à l'octet 4504 ; entrée 7 entrées, en-tête principal à l'octet 4504
+     | REFUS B1 : octets différents à partir de l'en-tête principal (premier écart à 2168871 octets de son début ; longueurs 2168872 et 2168872)
+OK   T3 charge altérée : contrôle indépendant refuse, motif « B1 : octets différents »
+### T4 : énoncé du rpm signé présenté avec le rpm altéré
+OK   T4 sujet : cosign refuse, code 1, motif « digest|subject|match » : Error: failed to verify signature: provided artifact digests do not match digests in statement
+     | OK   forme : bundle application/vnd.dev.sigstore.bundle.v0.3+json, énoncé https://in-toto.io/Statement/v0.1, prédicat https://supply-chain.example/lien-openpgp/v1
+     | REFUS sujet : sha256 9f71d578d3b13bc5… ≠ fichier en main 1325d4bdb44ea10a…
+OK   T4 sujet : contrôle indépendant refuse, motif « sujet »
+### contrôles de fin
+     forme d'un bundle : application/vnd.dev.sigstore.bundle.v0.3+json ; clés : dsseEnvelope, mediaType, verificationMaterial
+OK   aucun en-tête de clé privée dans les bundles, les prédicats ni resultats/
+     archivés : resultats/o5-predicat-rpm.json et resultats/o5-enonce-{rpm,deb,depot-rpm,depot-apt}.json
+à effacer après archivage (chemin littéral ; clés jetables comprises) : /home/gigi/.cache/supply-chain-poc/09/o5/banc
+étape banc finie : 2026-11-19T18:55:10Z
+OK   K3 : aucune ligne de bloc armuré (OpenPGP ou clé privée) dans le journal

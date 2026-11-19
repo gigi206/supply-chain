@@ -1,0 +1,46 @@
+étape cle_lien commencée : 2026-11-19T19:38:38Z ; o5-openbao.sh 6537f746edf1d7f3…
+OpenBao : version 2.7.2, initialisé true, scellé false
+OK   OpenBao initialisé et descellé
+avant :
+     chains ecdsa-p256 1 false
+     scanner ecdsa-p256 1 false
+     tsa ecdsa-p256 1 false
+### création (seule écriture de l'étape)
+     | Key                       Value
+     | ---                       -----
+     | allow_plaintext_backup    false
+     | auto_rotate_period        0s
+     | deletion_allowed          false
+     | derived                   false
+     | exportable                false
+     | imported_key              false
+     | keys                      map[1:map[certificate_chain: creation_time:2026-11-19T19:38:40.011932127Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+     | MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE31MMAxW/uTyb380n8DCskmAVpJHr
+     | SEKGPVF5InFpKW22PBPfl1+vqkUqsvz8xSPePRE+nOVry+17qAeVjBVR7g==
+     | -----END PUBLIC KEY-----
+     | ]]
+     | latest_version            1
+     | min_available_version     0
+     | min_decryption_version    1
+     | min_encryption_version    0
+     | name                      lien
+     | soft_deleted              false
+     | supports_decryption       false
+     | supports_derivation       false
+     | supports_encryption       false
+     | supports_signing          true
+     | type                      ecdsa-p256
+OK   bao write -f transit/keys/lien : code 0
+### relecture
+OK   clé lien (type, exportable, sauvegarde en clair, suppression, version, signature) : ecdsa-p256,false,false,false,1,true
+     Public-Key: (256 bit field, 128 bit security level);NIST CURVE: P-256
+OK   clé publique exportée : resultats/lien-cle-publique.pem (fichier sha256 e661718dc8f97d9981ecc398277021ac43281a900ff67e3ad74794633bd0cce9 ; SPKI sha256 42529342ceb102ad76f45285b2655d38265eebbe0c956f53706dcedf08e8d861)
+après :
+     chains ecdsa-p256 1 false
+     lien ecdsa-p256 1 false
+     scanner ecdsa-p256 1 false
+     tsa ecdsa-p256 1 false
+OK   seule différence : transit/keys/lien ajoutée ; les autres clés Transit sont inchangées (type, version, exportable)
+étape cle_lien finie : 2026-11-19T19:38:42Z
+OK   K3 : aucune ligne de bloc privé dans le journal
+OK   K4 : valeur du jeton root absente du journal

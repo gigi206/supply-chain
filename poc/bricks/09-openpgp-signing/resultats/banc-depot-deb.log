@@ -1,0 +1,110 @@
+banc commencé : 2026-11-19T14:58:04Z ; dossier neuf /home/gigi/.cache/supply-chain-poc/09/banc-depot-deb-20261119T145804Z ; --homedir /home/gigi/.cache/supply-chain-poc/09/banc-depot-deb-20261119T145804Z/gnupg
+OK     BD1 garde : copie égale au journal (f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b)
+
+## Clés jetables (identité fictive, sans adresse, sans phrase de passe, aucun secret en argument)
+gpg: vérification de la base de confiance
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: profondeur : 0  valables :   2  signées :   0
+     confiance : 0 i., 0 n.d., 0 j., 0 m., 0 t., 2 u.
+gpg: la prochaine vérification de la base de confiance aura lieu le 2026-11-21
+  pub algo 1 bits 4096 expire 2026-11-21 usage scSC
+  pub algo 1 bits 4096 expire 2026-11-21 usage scSC
+OK     BD2 deux clés RSA créées : F8BD3922CA287FA21D8288C737BC678DCF30B167 (signataire), DB423EAF0C529D9082354F8627206EEB2ADCCE5A (témoin)
+  clés publiques exportées en binaire (non affichées) : cle1.pub.gpg 1152 octets, cle2.pub.gpg 1150 octets
+
+## Dépôt : Packages, Packages.gz, Release
+  | Package: sample-app
+  | Architecture: amd64
+  | Version: 1.0.0-2
+  | Static-Built-Using: golang-1.24 (= 1.24.4-1)
+  | Priority: optional
+  | Section: web
+  | Maintainer: Contributeurs de gigi206/supply-chain <adresse retirée>
+  | Installed-Size: 5785
+  | Filename: pool/main/s/sample-app/sample-app_1.0.0-2_amd64.deb
+  | Size: 1953492
+  | MD5sum: e4d372cb662f69441b79e6c3dfd66d2b
+  | SHA1: 437de9dbc6fec357e0a543bc896da018261a1c60
+  | SHA256: f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+  | SHA512: 48402cfa115f1fa0b6ff96ce03b81d6bab43d998ab55b3e60923f3724ac9088996f507ae9fd64c64d1c14440cc4e97c00682b5adaba01af9d5dfceb8a1ef96cd
+  | Homepage: https://github.com/gigi206/supply-chain
+  | Description: application de démonstration de la plateforme supply-chain
+  |  Binaire Go qui sert une interface web construite avec npm et embarquée à la
+  |  compilation.
+  | 
+  | Architectures: amd64
+  | Codename: poc
+  | Components: main
+  | Date: Thu, 19 Nov 2026 14:58:06 +0000
+  | Label: poc
+  | Origin: poc
+  | Suite: poc
+  | MD5Sum:
+  |  0cdf3b0299d763ee13a73eb71fe9bd71              823 main/binary-amd64/Packages
+  |  c0bfd24b5b6e644d73cf69d87d21bfb8              571 main/binary-amd64/Packages.gz
+  | SHA1:
+  |  1e1df7bf2be2258ae541c25970b129b519e6eae9              823 main/binary-amd64/Packages
+  |  d6f6570e2ab41e346728aad275cb266674c324cf              571 main/binary-amd64/Packages.gz
+  | SHA256:
+  |  86e66db7cc092e28cf9a0a3a256652422e9686de7cc2f8a89d3211883c968294              823 main/binary-amd64/Packages
+  |  b6703e70abd6d19dc05c03cc523dd55a7b2f3c33e5b31d35e766009c271d6efd              571 main/binary-amd64/Packages.gz
+  | SHA512:
+  |  a630eb1398401cad804329726e9127fc300b99da7e7ec1017585abafd4c06314f8bb0e0ed2d1ad1005d1e507c3d412f045fc6c101376e58a2c3bf2f65ff3519e              823 main/binary-amd64/Packages
+  |  ece12c44beca6125c574149efa3acdf47fcd8cf8ab219d56ebacd52791d07d54daee9e986909c02ae4963df980cbe5c8a69c29a972a7e708bae39c330fd89e24              571 main/binary-amd64/Packages.gz
+  BD5 (relevé, non prédit) : Date de Release « Thu, 19 Nov 2026 14:58:06 +0000 » ; SOURCE_DATE_EPOCH=1763337600 vaut « Mon, 17 Nov 2025 00:00:00 UTC » ; deux sorties identiques : oui
+  main/binary-amd64/Packages : sha256 et taille égaux à Release (86e66db7cc092e28…, 823 octets)
+  main/binary-amd64/Packages.gz : sha256 et taille égaux à Release (b6703e70abd6d19d…, 571 octets)
+  Packages : 1 strophe(s)
+  strophe : sample-app 1.0.0-2 amd64 Size 1953492 Filename pool/main/s/sample-app/sample-app_1.0.0-2_amd64.deb SHA256 f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+  fichier sample-app_1.0.0-2_amd64.deb : sha256 et taille égaux à la strophe
+OK     BD3 et BD4 : strophe et empreintes de Release conformes
+
+## Signature (clé F8BD3922CA287FA21D8288C737BC678DCF30B167, SHA-512)
+  Release.gpg 566 octets ; InRelease 1944 octets
+
+## Vérification par gpgv (homedir dédié, trousseau de la seule clé signataire)
+  gpgv: Signature faite le jeu. 19 nov. 2026 15:58:06 CET
+  gpgv:                avec la clef RSA F8BD3922CA287FA21D8288C737BC678DCF30B167
+  gpgv: Bonne signature de « Banc 09 PoC cle jetable »
+OK     BD6 Release.gpg vérifié (code 0, empreinte F8BD3922CA287FA21D8288C737BC678DCF30B167)
+  gpgv: Signature faite le jeu. 19 nov. 2026 15:58:06 CET
+  gpgv:                avec la clef RSA F8BD3922CA287FA21D8288C737BC678DCF30B167
+  gpgv: Bonne signature de « Banc 09 PoC cle jetable »
+OK     BD7 InRelease vérifié, texte sorti égal à Release octet pour octet
+  :signature packet: algo 1, keyid 37BC678DCF30B167
+  	version 4, created 1795100286, md5len 0, sigclass 0x00
+  	digest algo 10, begin of digest 5b c2
+OK     BD8 signature v4, RSA (algo 1), SHA-512 (digest algo 10)
+  main/binary-amd64/Packages : sha256 et taille égaux à Release (86e66db7cc092e28…, 823 octets)
+  main/binary-amd64/Packages.gz : sha256 et taille égaux à Release (b6703e70abd6d19d…, 571 octets)
+  Packages : 1 strophe(s)
+  strophe : sample-app 1.0.0-2 amd64 Size 1953492 Filename pool/main/s/sample-app/sample-app_1.0.0-2_amd64.deb SHA256 f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+  fichier sample-app_1.0.0-2_amd64.deb : sha256 et taille égaux à la strophe
+OK     BD9 chaîne tenue depuis le texte sorti de la vérification d'InRelease
+
+## Témoins (copies sous temoins/)
+OK     BD10 N1 Release altéré refusé par gpgv (code 1)
+OK     BD10 N2 InRelease altéré refusé par gpgv (code 1)
+OK     BD10 N3 clé étrangère : refusé par gpgv (code 2)
+    main/binary-amd64/Packages : DIFFÉRENT de Release (lu 67ef7a14758e5dac…, Release 86e66db7cc092e28…)
+    main/binary-amd64/Packages.gz : sha256 et taille égaux à Release (b6703e70abd6d19d…, 571 octets)
+    Packages : 1 strophe(s)
+    strophe : sample-app 1.0.0-2 amd64 Size 1953492 Filename pool/main/s/sample-app/sample-app_1.0.0-2_amd64.deb SHA256 f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+    fichier sample-app_1.0.0-2_amd64.deb : sha256 et taille égaux à la strophe
+OK     BD10 N4 Packages altéré : écart détecté par la chaîne
+    main/binary-amd64/Packages : sha256 et taille égaux à Release (86e66db7cc092e28…, 823 octets)
+    main/binary-amd64/Packages.gz : sha256 et taille égaux à Release (b6703e70abd6d19d…, 571 octets)
+    Packages : 1 strophe(s)
+    strophe : sample-app 1.0.0-2 amd64 Size 1953492 Filename pool/main/s/sample-app/sample-app_1.0.0-2_amd64.deb SHA256 f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+    fichier sample-app_1.0.0-2_amd64.deb : DIFFÉRENT de la strophe (86b0ae2ba982e7df…, 1953493 octets)
+OK     BD10 N5 deb altéré : écart détecté par la chaîne
+
+## Limite L1 : signature SHA-1 jugée par gpgv 2.4.8 (apt de trixie suit default-sequoia.config, non mesuré ici)
+  gpgv: Signature faite le jeu. 19 nov. 2026 15:58:06 CET
+  gpgv:                avec la clef RSA F8BD3922CA287FA21D8288C737BC678DCF30B167
+  gpgv: Bonne signature de « Banc 09 PoC cle jetable »
+OK     BD11 gpgv 2.4.8 accepte une signature SHA-1 (code 0) : gpgv ne reflète pas la politique d'apt
+
+## Fin
+OK     BD12 deb du dépôt inchangé : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+bilan banc : 14 OK, 0 ÉCART ; fini : 2026-11-19T14:58:06Z

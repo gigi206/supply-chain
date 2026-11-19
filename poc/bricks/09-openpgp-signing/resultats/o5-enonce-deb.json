@@ -1,0 +1,28 @@
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "predicate": {
+    "chainsProvenance": "non vérifiée : banc hors cluster, sans Zot (le service la vérifierait avant de signer, D3 a)",
+    "link": "identity",
+    "openpgp": {
+      "fingerprint": "29BA1C48A39C099B7070DCD8C0658591BCF03A86",
+      "publicKeySha256": "20bcaf436ddf28d4a6c0f69384832bb558f5ce6ddc5948da8a801bcd05b749e7"
+    },
+    "tools": "apt-utils 3.0.3;gnupg 2.4.7-21+deb13u1;gpg 2.4.7-21+deb13u1+b5;gpgv 2.4.7-21+deb13u1+b5;gzip 1.13-1+deb13u1",
+    "unsigned": {
+      "file": {
+        "name": "sample-app_1.0.0-2_amd64.deb",
+        "sha256": "f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b"
+      },
+      "manifest": "sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e"
+    }
+  },
+  "predicateType": "https://supply-chain.example/lien-openpgp/v1",
+  "subject": [
+    {
+      "digest": {
+        "sha256": "f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b"
+      },
+      "name": "sample-app_1.0.0-2_amd64.deb"
+    }
+  ]
+}

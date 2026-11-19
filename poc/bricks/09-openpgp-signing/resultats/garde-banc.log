@@ -1,0 +1,72 @@
+banc de la garde commencé : 2026-11-19T17:09:24Z ; garde sha256 3a83f89d35c4ea48… ; banc sha256 55efc5fb234f8e2d… ; git version 2.53.0 ; gpg (GnuPG) 2.4.8
+OK   GB0 : /run/user/1000 est un tmpfs
+## GB1 : arbre réel de la branche
+     | garde clé privée : 2469 fichier(s) suivi(s), 1 non suivi(s) non ignoré(s)
+     | OK   aucun en-tête de clé privée (--cached)
+     | OK   aucun en-tête de clé privée (--untracked)
+OK   GB1 : code 0 (attendu 0)
+## copie superficielle et clé jetable
+copie : 36dbe85, 2469 fichiers suivis
+     gpg : gpg: le trousseau local « /run/user/1000/o9-garde-gnupg/pubring.kbx » a été créé
+     gpg : gpg: /run/user/1000/o9-garde-gnupg/trustdb.gpg : base de confiance créée
+     gpg : gpg: répertoire « /run/user/1000/o9-garde-gnupg/openpgp-revocs.d » créé
+     gpg : gpg: Certificat de révocation stocké comme « /run/user/1000/o9-garde-gnupg/openpgp-revocs.d/95C2B90596536162F5DBDA5F98CAA3C221ADD794.rev »
+export privé : 11 lignes, mode 600 ; export public : 10 lignes
+## GB2 : copie propre
+     | garde clé privée : 2469 fichier(s) suivi(s), 0 non suivi(s) non ignoré(s)
+     | OK   aucun en-tête de clé privée (--cached)
+     | OK   aucun en-tête de clé privée (--untracked)
+OK   GB2 : code 0 (attendu 0)
+## GB3 : clé privée en fichier non suivi
+     | garde clé privée : 2469 fichier(s) suivi(s), 1 non suivi(s) non ignoré(s)
+     | OK   aucun en-tête de clé privée (--cached)
+     | KO   en-tête de clé privée seul sur sa ligne (--untracked) :
+     |      poc/bricks/09-openpgp-signing/fuite.asc
+OK   GB3 : code 1 (attendu 1)
+## GB4 : même fichier ajouté à l'index
+     | garde clé privée : 2470 fichier(s) suivi(s), 0 non suivi(s) non ignoré(s)
+     | KO   en-tête de clé privée seul sur sa ligne (--cached) :
+     |      poc/bricks/09-openpgp-signing/fuite.asc
+     | KO   en-tête de clé privée seul sur sa ligne (--untracked) :
+     |      poc/bricks/09-openpgp-signing/fuite.asc
+OK   GB4 : code 1 (attendu 1)
+## GB5 : dans l'index seulement (fichier retiré de l'arbre de travail)
+     | garde clé privée : 2470 fichier(s) suivi(s), 0 non suivi(s) non ignoré(s)
+     | KO   en-tête de clé privée seul sur sa ligne (--cached) :
+     |      poc/bricks/09-openpgp-signing/fuite.asc
+     | OK   aucun en-tête de clé privée (--untracked)
+OK   GB5 : code 1 (attendu 1)
+## GB6 : clé indentée de quatre espaces à la fin d'un fichier suivi
+     | garde clé privée : 2469 fichier(s) suivi(s), 0 non suivi(s) non ignoré(s)
+     | OK   aucun en-tête de clé privée (--cached)
+     | KO   en-tête de clé privée seul sur sa ligne (--untracked) :
+     |      poc/bricks/09-openpgp-signing/README.md
+OK   GB6 : code 1 (attendu 1)
+## GB7 : clé avec fins de ligne CRLF
+     | garde clé privée : 2469 fichier(s) suivi(s), 1 non suivi(s) non ignoré(s)
+     | OK   aucun en-tête de clé privée (--cached)
+     | KO   en-tête de clé privée seul sur sa ligne (--untracked) :
+     |      poc/bricks/09-openpgp-signing/fuite-crlf.asc
+OK   GB7 : code 1 (attendu 1)
+## GB8 : clé publique seule
+     | garde clé privée : 2469 fichier(s) suivi(s), 1 non suivi(s) non ignoré(s)
+     | OK   aucun en-tête de clé privée (--cached)
+     | OK   aucun en-tête de clé privée (--untracked)
+OK   GB8 : code 0 (attendu 0)
+## GB9 : clé privée dans un dossier ignoré (limite attendue : non lue)
+     check-ignore : poc/bricks/09-openpgp-signing/__pycache__/fuite.asc
+     | garde clé privée : 2469 fichier(s) suivi(s), 0 non suivi(s) non ignoré(s)
+     | OK   aucun en-tête de clé privée (--cached)
+     | OK   aucun en-tête de clé privée (--untracked)
+OK   GB9 : code 0 (attendu 0)
+## GB10 : arbre qui n'est pas un dépôt git
+fatal: ni ceci ni aucun de ses répertoires parents (jusqu'au point de montage /run/user) n'est un dépôt git
+Arrêt à la limite du système de fichiers (GIT_DISCOVERY_ACROSS_FILESYSTEM n'est pas défini).
+     | KO   pas un arbre git : contrôle impossible
+OK   GB10 : code 1 (attendu 1)
+## GB11b : aucune ligne de la clé privée jetable dans le journal (lignes de 16 caractères ou plus, en-têtes exclus)
+OK   GB11b : 6 motifs, 0 ligne du journal
+## GB12 : effacement
+OK   GB12 : GNUPGHOME et copie effacés
+banc de la garde fini : 2026-11-19T17:09:27Z
+OK   GB11 (K3) : aucun « BEGIN PGP » dans le journal

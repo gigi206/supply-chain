@@ -1,0 +1,59 @@
+étape essai commencée : 2026-11-19T17:19:11Z ; o2.sh 1a6f9cd01ad73adb… ; o2-interne.sh 7c91e50fd7921f89…
+### E1 racine D : import de la clé et signature
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.4.7
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2027-11-19, usages scSC
+  empreinte : 29BA1C48A39C099B7070DCD8C0658591BCF03A86
+OK   essai.txt signé par 29BA1C48A39C099B7070DCD8C0658591BCF03A86 (SHA-512), signature de 566 octets
+  code 0
+### E2 racine D : vérification par gpgv et sqv
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+OK   gpgv : signature valide, 29BA1C48A39C099B7070DCD8C0658591BCF03A86
+OK   sqv : signature valide, 29BA1C48A39C099B7070DCD8C0658591BCF03A86 
+  code 0
+### E3 racine R : import de la clé et signature (K5)
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.3.3
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2027-11-19, usages scSC
+  empreinte : 29BA1C48A39C099B7070DCD8C0658591BCF03A86
+OK   essai.txt signé par 29BA1C48A39C099B7070DCD8C0658591BCF03A86 (SHA-512), signature de 566 octets
+  code 0
+### E4 racine R : vérification de la signature de D par gpgv
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+OK   gpgv : signature valide, 29BA1C48A39C099B7070DCD8C0658591BCF03A86
+sqv absent de cette racine
+  code 0
+### E5 racine D : vérification de la signature de R par gpgv et sqv
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+OK   gpgv : signature valide, 29BA1C48A39C099B7070DCD8C0658591BCF03A86
+OK   sqv : signature valide, 29BA1C48A39C099B7070DCD8C0658591BCF03A86 
+  code 0
+### E6 racine R : clé jetable créée (K5b)
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.3.3
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : 8A66305CEAB32B6B4E4D1FE0128599962BA96D52
+OK   clé jetable 8A66305CEAB32B6B4E4D1FE0128599962BA96D52 exportée dans /o2/x/k5b (tmpfs)
+  code 0
+### E7 racine D : import de la clé jetable de R et signature (K5b)
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.4.7
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : 8A66305CEAB32B6B4E4D1FE0128599962BA96D52
+OK   essai.txt signé par 8A66305CEAB32B6B4E4D1FE0128599962BA96D52 (SHA-512), signature de 566 octets
+  code 0
+### E8 racine R : vérification de la signature K5b par gpgv
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+OK   gpgv : signature valide, 8A66305CEAB32B6B4E4D1FE0128599962BA96D52
+sqv absent de cette racine
+  code 0
+étape essai finie : 2026-11-19T17:19:12Z
+OK   K3 : aucune ligne de bloc OpenPGP armuré dans le journal

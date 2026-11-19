@@ -1,0 +1,31 @@
+prealables commencée : 2026-11-19T14:58:01Z
+gpg : gpg (GnuPG) 2.4.8 ; gpgv : gpgv (GnuPG) 2.4.8
+apt-ftparchive : apt 3.2.1 (amd64)
+dpkg-deb : Outil dpkg-deb de gestion en arrière-plan des archives Debian, version 1.23.7 (amd64).
+python3 (répertoire courant /home/gigi/.cache/supply-chain-poc/09) : /home/gigi/.local/share/mise/shims/python3 3.15.2
+paquets de l'hôte (dpkg-query, lecture seule) :
+  apt 3.2.1ubuntu0.1
+  apt-utils 3.2.1ubuntu0.1
+  dpkg 1.23.7ubuntu1
+  gnupg 2.4.8-4ubuntu3.1
+  gpg 2.4.8-4ubuntu3.1
+  gpg-agent 2.4.8-4ubuntu3.1
+  gpgv 2.4.8-4ubuntu3.1
+  gzip 1.14-1~exp2ubuntu1.1
+outils absents attendus :
+  rpm : absent
+  rpmsign : absent
+  rpmkeys : absent
+  createrepo_c : absent
+  debsign : absent
+  sqv : absent
+  sq : absent
+  softhsm2-util : absent
+  gnupg-pkcs11-scd : absent
+attendu deb (s3-comparaison.log) : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+attendu rpm (m4c-comparaison.log) : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+OK     copie locale du deb égale au journal : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)
+OK     copie rpm banc-m4c-comparaison-copie/m3 égale au journal : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+OK     copie rpm banc-m3-2-1 différente du journal (garde nécessaire) : 1407b7ef9da8f42f2fd8d3d29fa0200905c9a5ecaebaa92fb3a4ceef3e39802f
+OK     .changes de S3 présent : 1323 octets, sha256 327969346b081623dfe0dae54b526f290b0c07c279dfcd52600dafaf71e46de6, lignes portant le sha256 du deb : 1
+bilan prealables : 4 OK, 0 ÉCART ; finie : 2026-11-19T14:58:01Z

@@ -1,0 +1,66 @@
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "predicate": {
+    "chainsProvenance": {
+      "chainsPublicKeySha256": "1e7b2a03f9d5d289898e63b57410aeafa4e3680e86474d4f35aaa4e01f0c5e65",
+      "envelopes": 8,
+      "timestampTokens": "non vérifiés par cette étape",
+      "transparencyLog": "non (PoC hors ligne)",
+      "verifiedAt": "2026-11-19T20:49:20Z",
+      "verifiedWith": "cosign verify-attestation --type slsaprovenance1, clé publique de Chains (brique 08)"
+    },
+    "covers": [
+      {
+        "path": "dists/poc/InRelease",
+        "sha256": "9113af02f3d78bf6250f1c5b3dd5360e3b9e06b22fa55499137ee09df2337a8e"
+      },
+      {
+        "path": "dists/poc/Release",
+        "sha256": "b6f2617f73a79c5af2e73b6d2c69a23b46ae0698a0af7909a650164f4d7ab043"
+      },
+      {
+        "path": "dists/poc/Release.gpg",
+        "sha256": "72b930effcbed24ad5d5250b7c6df8ddd86b3f9a19f23e5469332818ce08a417"
+      },
+      {
+        "path": "dists/poc/main/binary-amd64/Packages",
+        "sha256": "86e66db7cc092e28cf9a0a3a256652422e9686de7cc2f8a89d3211883c968294"
+      },
+      {
+        "path": "dists/poc/main/binary-amd64/Packages.gz",
+        "sha256": "b6703e70abd6d19dc05c03cc523dd55a7b2f3c33e5b31d35e766009c271d6efd"
+      },
+      {
+        "path": "pool/main/s/sample-app/sample-app_1.0.0-2_amd64.deb",
+        "sha256": "f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b"
+      }
+    ],
+    "link": "repository",
+    "openpgp": {
+      "fingerprint": "29BA1C48A39C099B7070DCD8C0658591BCF03A86",
+      "publicKeySha256": "20bcaf436ddf28d4a6c0f69384832bb558f5ce6ddc5948da8a801bcd05b749e7"
+    },
+    "signed": {
+      "repository": "signes/depot-apt",
+      "root": "dists/poc/InRelease"
+    },
+    "tools": "apt-utils 3.0.3;gnupg 2.4.7-21+deb13u1;gpg 2.4.7-21+deb13u1+b5;gpgv 2.4.7-21+deb13u1+b5;gzip 1.13-1+deb13u1",
+    "unsigned": {
+      "file": {
+        "name": "sample-app_1.0.0-2_amd64.deb",
+        "sha256": "f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b"
+      },
+      "manifest": "sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+      "repository": "builds/sample-app-deb"
+    }
+  },
+  "predicateType": "https://supply-chain.example/lien-openpgp/v1",
+  "subject": [
+    {
+      "digest": {
+        "sha256": "90909a869321b2455693408a394114725e5d9f2d75e723c9ecda811e2cc2630a"
+      },
+      "name": "192.168.161.13:5000/signes/depot-apt"
+    }
+  ]
+}

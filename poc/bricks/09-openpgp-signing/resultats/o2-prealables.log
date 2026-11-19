@@ -1,0 +1,13 @@
+prealables commencée : 2026-11-19T16:03:01Z
+unshare from util-linux 2.42.4 ; python3 3.15.2 ; tar (GNU tar) 1.35
+OK   amorce rockylinux : manifeste, configuration et couche égaux à leur sha256
+OK   amorce debian : manifeste, configuration et couche égaux à leur sha256
+  amorce 3a66e521e7a4abac…, relevé 3a66e521e7a4abac…
+OK   clé Rocky 9 de l'amorce égale à celle du relevé (empreinte 21CB256A…275D vérifiée le 19/11)
+place libre sous ~/.cache : 104811 Mo
+OK   espace de noms : tmpfs monté (tmpfs), interfaces [lo]
+absent : /home/gigi/.cache/supply-chain-poc/09/o2
+absent : /home/gigi/.cache/supply-chain-poc/09/secrets
+secrets-depot.sh lit : supply-chain-poc/08/secrets supply-chain-poc/10/secrets (09/secrets à ajouter, A-REPORTER.md)
+prealables finie : 2026-11-19T16:03:01Z
+OK   K3 : aucun « BEGIN PGP » dans resultats/o2-prealables.log

@@ -1,0 +1,53 @@
+quatrième complément commencé : 2026-11-19T15:04:01Z
+
+## 1. sequoia-policy-config (main) : README, lignes citant second_preimage, collision, sha1
+  48:    p.from_bytes(b"[hash_algorithms]
+  49:        sha1.collision_resistance = \"never\"")?;
+## sequoia-openpgp, tag openpgp/v2.4.2, openpgp/src/policy.rs : commentaires sur les deux propriétés
+  163:/// collision resistance.  This enum indicates this.
+  165:/// In short, many self signatures only require second pre-image
+  167:/// algorithms whose collision resistance has been partially
+  190:/// is impractical for an attacker to find a message `m` such that `h
+  193:/// pre-image resistance if it is impractical for an attacker to find
+  195:/// `m1`, it is hard for an attacker to find an `m2` such that
+  197:/// resistance if it is impractical for an attacker to find two
+  198:/// messages with the same hash.  That is, it is hard for an attacker
+  204:/// always need a hash algorithm with second pre-image resistance,
+  205:/// because an attacker must not be able to repurpose an arbitrary
+  207:/// hash.  And, we need collision resistance when a signature is over
+  208:/// data that could have been influenced by an attacker: if an
+  209:/// attacker creates a pair of colliding messages and convinces the
+  210:/// user to sign one of them, then the attacker can copy the signature
+  213:/// Collision resistance implies second pre-image resistance, but not
+  214:/// vice versa.  If an attacker can find a second message with the
+  218:/// collision resistance also requires second pre-image resistance.
+  220:/// Because collision resistance is with respect to two arbitrary
+  221:/// messages, collision resistance is always susceptible to a
+  223:/// algorithm's collision resistance is half of the security margin of
+  224:/// its second pre-image resistance.  And, in practice, the collision
+  232:/// only gives the attacker limited control over the content of the
+  236:/// attack gives the attacker complete control over the prefixes of
+  244:/// A chosen-prefix collision attack works as follows: an attacker
+  272:/// Where `m1`, `m2`, and `suffix` are controlled by the attacker, and
+  275:/// If an attacker can convince an OpenPGP user to sign a message of
+  277:/// the attacker also has a valid signature from the victim for a
+  281:/// attacker.  Although the attacker may control the message, the
+  299:/// implementation, the attacker may be able to predict it, but they
+  304:/// This restriction on the signature packet means that an attacker
+## même fichier : seuils par défaut de SHA1 (lignes citant SHA1 et une date ou un cutoff)
+  1084:    /// Sequoia uses a variant of SHA-1 called [SHA1CD], which is able
+  1089:    ///   [SHA1CD]: https://github.com/cr-marcstevens/sha1collisiondetection
+
+## 2. Brique 06, journal S4d (/home/gigi/Documents/git/github/gigi206/supply-chain/.claude/worktrees/brique-09-sec-fdb4c6/poc/bricks/09-openpgp-signing/../06-deb-sbuild/resultats/s4d-pipeline.log) : couche publiée et fichiers cités
+  11:     deb produit : sample-app_1.0.0-2_amd64.deb f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)
+  12:     ----- sample-app_1.0.0-2_amd64.buildinfo -----
+  31:     ----- fin du .buildinfo -----
+  32:     couche sha256:d8f9685c8962286e3fdeba09788df7396dd62dc05ed166868778694a1e065637 (1955840 octets) ; configuration sha256:344f9108f2ded783de0d471bfbb8f61ca2b255972ae8e7963677ccb0819fbe45 ; manifeste sha256:60f25f5c3fb58b7c4
+  45:     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+  68:     deb produit : sample-app_1.0.0-2_amd64.deb f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)
+  69:     ----- sample-app_1.0.0-2_amd64.buildinfo -----
+  88:     ----- fin du .buildinfo -----
+  89:     couche sha256:d8f9685c8962286e3fdeba09788df7396dd62dc05ed166868778694a1e065637 (1955840 octets) ; configuration sha256:344f9108f2ded783de0d471bfbb8f61ca2b255972ae8e7963677ccb0819fbe45 ; manifeste sha256:60f25f5c3fb58b7c4
+  103:     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+  lignes citant .changes : 0
+quatrième complément fini : 2026-11-19T15:04:04Z

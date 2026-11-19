@@ -1,0 +1,17 @@
+étape cle commencée : 2026-11-19T17:18:37Z ; o2.sh 1a6f9cd01ad73adb… ; o2-interne.sh 7c91e50fd7921f89…
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.4.7
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2027-11-19, usages scSC
+  empreinte : 29BA1C48A39C099B7070DCD8C0658591BCF03A86
+  cle-openpgp.asc : 600 3498 (mode, octets), sha256 17ef8da69e81d4d5f9165c749e3e67a83db277c98770cc932375f3becd990ee5
+  cle-publique.asc : 600 1749 (mode, octets), sha256 20bcaf436ddf28d4a6c0f69384832bb558f5ce6ddc5948da8a801bcd05b749e7
+  revocation.asc : 600 1877 (mode, octets), sha256 8a9092cc30c5bf36f11afa2fe096a4da28afb6417fc8beb30afc048e603f353f
+OK   clé privée exportée armurée (K3)
+empreinte créée : 29BA1C48A39C099B7070DCD8C0658591BCF03A86
+  cle-openpgp.asc : 600 3498 (mode, octets)
+  cle-publique.asc : 600 1749 (mode, octets)
+  revocation.asc : 600 1877 (mode, octets)
+dossier des secrets : 700
+étape cle finie : 2026-11-19T17:18:38Z
+OK   K3 : aucune ligne de bloc OpenPGP armuré dans le journal

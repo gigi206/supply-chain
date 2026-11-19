@@ -1,0 +1,51 @@
+étape acces_lien commencée : 2026-11-19T19:49:30Z ; o5-openbao.sh 208c3e7da49c0bdc…
+OpenBao : version 2.7.2, initialisé true, scellé false
+OK   OpenBao initialisé et descellé
+OK   secret lien et accesseur absents de 09/secrets
+OK   clé lien toujours conforme : ecdsa-p256,false,false,false,1,true
+OK   clé publique de lien égale à resultats/lien-cle-publique.pem
+politiques avant : chains-signature chains-zot default horodatage-zot root scan-zot scanner-signature tsa-signature
+### écriture 1 : politique lien-signature
+     | Success! Uploaded policy: lien-signature
+OK   politique lien-signature relue = politique/lien-signature.hcl (hors commentaires et lignes vides : ca399363e749d211)
+### écriture 2 : secret lien (service, lien-signature seule, orphelin, 72 h, non renouvelable)
+     réponse : politiques ["lien-signature"], durée 259200 s, renouvelable false, orphelin true
+OK   secret lien écrit dans 09/secrets/openbao-lien.secret : mode 600, 26 octets, préfixe « s. » : oui ; accesseur à côté (mode 600)
+### relecture par root (accesseur)
+OK   secret lien (politiques, type, orphelin, renouvelable, durée maximale, durée restante, nom, usages) : lien-signature,service,true,false,259200,true,true,0
+### essais avec le secret lien
+     | ACCEPTE|lecture de transit/keys/lien
+     | ACCEPTE|signature avec la clé lien
+     | REFUSE|signature avec la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|signature avec la clé tsa|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|signature avec la clé scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|lecture de transit/keys/chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|export de la clé lien|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|lecture de kv/horodatage/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|liste des politiques|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|création d'un secret enfant|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|consultation de soi|Code: 403. Errors: * 1 error occurred: * permission denied 
+OK   essai lecture de transit/keys/lien : ACCEPTE
+OK   essai signature avec la clé lien : ACCEPTE
+OK   essai signature avec la clé chains : REFUSE
+OK   essai signature avec la clé tsa : REFUSE
+OK   essai signature avec la clé scanner : REFUSE
+OK   essai lecture de transit/keys/chains : REFUSE
+OK   essai export de la clé lien : REFUSE
+OK   essai lecture de kv/horodatage/zot : REFUSE
+OK   essai liste des politiques : REFUSE
+OK   essai création d'un secret enfant : REFUSE
+OK   essai consultation de soi : REFUSE
+### signature vérifiée sur l'hôte avec la clé publique archivée
+     signature Transit : préfixe vault:v1, 72 octets DER
+     OpenSSL 4.1.0 23 Oct 2026 (Library: OpenSSL 4.1.0 23 Oct 2026)
+OK   openssl : signature de la clé lien vérifiée par resultats/lien-cle-publique.pem (Verified OK)
+OK   témoin : même signature sur une autre entrée refusée (Verification failure)
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-essai-signature
+OK   seule politique ajoutée : lien-signature
+clés Transit après : chains ecdsa-p256 1 false;lien ecdsa-p256 1 false;scanner ecdsa-p256 1 false;tsa ecdsa-p256 1 false
+OK   clés Transit inchangées depuis cle_lien
+étape acces_lien finie : 2026-11-19T19:49:36Z
+OK   K3 : aucune ligne de bloc privé dans le journal
+OK   K4 : valeur du jeton root absente du journal
+OK   K5 : valeur du secret lien absente du journal
