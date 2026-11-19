@@ -1,0 +1,24 @@
+# cloture-releve.sh, début 2026-11-19T14:53:45Z ; HEAD b98728bb606a
+## A : scripts
+OK   usage privilégié avec kata : s1.sh:98
+OK   usage privilégié avec kata : s1.sh:99
+OK   usage privilégié avec kata : s1.sh:198
+OK   usage privilégié avec kata : s1.sh:262
+OK   usage privilégié avec kata : s1.sh:282
+OK   usage privilégié avec kata : s2.sh:199
+OK   usage privilégié avec kata : s3.sh:214
+OK   usage privilégié avec kata : s3.sh:318
+OK   usage privilégié avec kata : diag-exec-kata.sh:87
+OK   usage privilégié avec kata : diag-exec-kata.sh:140
+OK   usage privilégié avec kata : diag-exec-kata.sh:209
+usages de $PRIVILEGIE : 11
+OK   s4d.sh:345 : pod d'essai privilégié, runtimeClassName kata dans le même objet
+OK   s5.sh : pod d'essai privilégié seulement si $k == kata, et alors runtimeClassName kata
+tâche privilégiée : builder/construire-builder.yaml (1 ligne) ; runtimeClassName dans la tâche : 0
+tâche privilégiée : builder/construire-builder.signee.yaml (1 ligne) ; runtimeClassName dans la tâche : 0
+tâche privilégiée : deb/construire-deb.yaml (1 ligne) ; runtimeClassName dans la tâche : 0
+tâche privilégiée : deb/construire-deb.signee.yaml (1 ligne) ; runtimeClassName dans la tâche : 0
+OK   s4a.sh : gabarit de PipelineRun ou TaskRun, Kata posé : pipelineTaskName: "construire", podTemplate: ($g.zone + {runtimeClassName: "kata"})
+OK   s4d.sh : gabarit de PipelineRun ou TaskRun, Kata posé : pipelineTaskName: "construire", podTemplate: ($z + {runtimeClassName: "kata"})
+OK   s5.sh : gabarit de PipelineRun ou TaskRun, Kata posé : podTemplate: (if $k == "kata" then $z + {runtimeClassName: "kata"} else $z end)
+Error: bad file '/home/gigi/Documents/git/github/gigi206/supply-chain/poc/bricks/06-deb-sbuild/deb/declencheur.yaml': go-yaml load error in scanner (while scanning for the next token) at L33.C18: found character that cannot start any token

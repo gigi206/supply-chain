@@ -43,8 +43,9 @@ for x in 's4a.sh:pipelineTaskName: "construire", podTemplate: ($g.zone + {runtim
   f=${x%%:*}; m=${x#*:}
   [ "$(grep -cF "$m" "$B/$f")" = 1 ] && ok "$f : gabarit de PipelineRun ou TaskRun, Kata posé : $m" || ko "$f : motif absent"
 done
-v=$(yq '.. | select(tag == "!!map") | select(has("pipelineTaskName")) | select(.pipelineTaskName == "construire") | .podTemplate.runtimeClassName' \
-  "$B/deb/declencheur.yaml" | sort | uniq -c | tr -s ' ')
+v=$(sed -E 's/@[A-Z0-9_]+@/x/g' "$B/deb/declencheur.yaml" \
+  | yq '.. | select(tag == "!!map") | select(has("pipelineTaskName")) | select(.pipelineTaskName == "construire") | .podTemplate.runtimeClassName' \
+  | sort | uniq -c | tr -s ' ')   # gabarit : les variables @NOM@ sont remplacées avant la lecture par yq
 [ "$v" = " 1 kata" ] && ok "deb/declencheur.yaml : taskRunSpecs construire, runtimeClassName kata (une fois)" || ko "declencheur.yaml : $v"
 
 echo "## B : journaux archivés"

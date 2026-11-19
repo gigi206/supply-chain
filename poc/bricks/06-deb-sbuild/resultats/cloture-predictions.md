@@ -27,3 +27,9 @@ Portée de la lecture « privilégié dans Kata n'est pas privilégié sur l'hô
 
 - Qu'aucun pod privilégié hors Kata n'a existé entre deux mesures : l'admission est la seule barrière, et l'état de C ne vaut qu'à l'heure du relevé.
 - La clause « bit-identique », déjà mesurée : 1.0.0-2 (`f66bbeb2`, `60f25f5c`) en S3 deux fois, en S4d deux fois sous Kata, et reconstruit hors ligne dans `sc-replay` (M5 de la ligne 11). Le rejeu de zéro (S5b) porte sur 1.0.0-1 ; aucun rejeu de zéro n'a eu lieu depuis la cascade.
+
+## Note datée du 19/11/2026, écrite à 14:54:09 UTC : premier passage arrêté sur un défaut du script
+
+- Passage de 14:53:45 UTC, gardé dans [`cloture-releve-1.log`](cloture-releve-1.log) : arrêt en A, au contrôle de `deb/declencheur.yaml`. Ce fichier est un gabarit à variables `@NOM@` ; yq refuse de le lire. Défaut du script, pas de la plateforme.
+- Avant l'arrêt, A avait relevé les 11 usages de `$PRIVILEGIE`, tous sur une ligne qui nomme `kata`, et les gabarits de `s4a.sh`, `s4d.sh` et `s5.sh`. Ces lignes ne comptent pas comme mesure : seul le passage suivant compte.
+- Correctif : les variables `@NOM@` sont remplacées par un littéral avant la lecture par yq. Le script passe à `49afd5020dccbf97…`. Les prédictions CL1 à CL6 ne changent pas.
