@@ -329,3 +329,13 @@ Si RP3c est tenue, une note datée ajoutera `revocation.asc` aux limites de la g
 - La garde a une limite de plus : `revocation.asc` n'est pas vu.
 - Le §4 quater d'`A-REPORTER.md` reçoit une seconde correction datée sur la longueur des motifs.
 - Le dossier `~/.cache/supply-chain-poc/09/o2/repetition` sera effacé après le commit de cette note.
+
+## Prédictions de `cle` (écrites à 17:18:33 UTC, avant tout lancement, après la décision « Sans phrase de passe »)
+
+CL1 reste valable. Elle porte sur une clé créée par gpg 2.4.7 sous K1 et K2 : RSA 4096, v4, expiration au jour du lancement plus un an, trois fichiers 600 dans `09/secrets` (700), K3 tenue. Sa confiance monte à haute : la répétition (RP1) a fait passer les mêmes commandes sous la même version. Trois prédictions s'ajoutent :
+
+| N° | Prédiction | Confiance |
+|---|---|---|
+| CL2 | Usages de la clé primaire : `scSC`, comme en RP1. Identité : nom et commentaire par défaut d'`o2-interne.sh`, sans adresse | haute |
+| CL3 | Chaque fichier est plus grand que son équivalent de la répétition, de moins de 200 octets : clé privée au-dessus de 3457, clé publique au-dessus de 1709, révocation au-dessus de 1848 octets. Cause attendue : l'identité par défaut est plus longue que celle de la clé jetable | moyenne |
+| CL4 | Code 0, aucune ligne KO. Après `cle`, `garde-cle-privee.sh` passe sur l'arbre réel, car la clé est hors du dépôt | haute |

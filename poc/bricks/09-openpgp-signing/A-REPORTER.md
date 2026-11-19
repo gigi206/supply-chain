@@ -139,6 +139,8 @@ hors de l'hôte couvrirait ce cas, mais chaque signature la demanderait, et root
 pendant une signature la lirait quand même.
 ```
 
+*Note datée du 19/11/2026, 17:18:33 UTC* : la phrase de passe est confirmée par le propriétaire : « Sans phrase de passe ». Le texte ci-dessus est à reprendre tel quel, sans « (proposée, à confirmer dans l'accord de l'étape « cle ») ».
+
 ---
 
 ## 4 quater. `tools/secrets-depot.sh` et règles de lecture des sessions

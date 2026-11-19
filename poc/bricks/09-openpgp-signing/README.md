@@ -279,3 +279,7 @@ Préparation demandée par le propriétaire (« Oui, prépare O2 »). Décision 
 - **Prochaine question au propriétaire** : l'accord de `cle`, qui porte sur la phrase de passe et sur la clé publique dans le dépôt ou non.
 
 *Note datée du 19/11/2026, 17:13:47 UTC* : la [répétition de `cle` et `essai`](resultats/o2-predictions.md) avec une clé jetable est passée sous gpg 2.4.7 et 2.3.3 (K5 et K5b mesurées sur une clé de même forme). La garde locale a une limite de plus : `revocation.asc` porte un en-tête public précédé de deux-points, qu'elle ne voit pas.
+
+## Décision du propriétaire du 19/11/2026 : « Sans phrase de passe » (consignée à 17:18:33 UTC)
+
+La clé OpenPGP du PoC est créée **sans phrase de passe**, pour le PoC seulement. Le compromis est déjà rédigé pour l'ADR 0003, au §4 ter d'`A-REPORTER.md` : une sauvegarde de l'hôte emporte une clé utilisable. Une phrase gardée hors de l'hôte couvrirait ce cas, mais chaque signature la demanderait, et root sur l'hôte la lirait quand même pendant une signature. Paramètres de l'étape `cle`, tels que préparés et répétés : RSA 4096, v4, 1 an, dans `~/.cache/supply-chain-poc/09/secrets` (0700, fichiers en 0600), créée sous gpg 2.4.7 dans la racine Debian, sans réseau. La présence de la clé publique dans le dépôt reste une question à part, posée plus tard. Après `cle`, aucune session ne lit ni ne liste `09/secrets` ; seuls les scripts d'O2 y accèdent. `tools/secrets-depot.sh` ne connaît pas encore ce dossier. La garde locale couvre la clé privée, mais pas `revocation.asc` (répétition, RP3c).
