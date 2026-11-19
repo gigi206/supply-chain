@@ -170,3 +170,12 @@ Les passages ci-dessus restent tels qu'écrits ; voici ce qui les corrige ou les
 4. **debsigs** : le verdict proposé repose sur les seuls tags du dépôt salsa `debian/debsigs`.
 5. **Incident** : « aucune clé lue ni affichée » est plus fort que la mesure. Établi : rien n'a été affiché. La lecture de la configuration du trousseau par défaut par `gpg-agent` et `gpgconf` n'est pas exclue. Une note d'avertissement a été déposée dans le dossier partagé des sessions.
 6. **Transparence** : pendant l'orientation, un `find` sur `~/.cache/supply-chain-poc` (profondeur 6 et 7, à la recherche des copies du rpm et du deb) a exclu les dossiers `auth`, `secrets` et `docker`, mais **pas `pac/banc/forgejo`**. Il n'a affiché que des chemins de fichiers `sample-app*.rpm` et `sample-app_1.0.0-2_amd64.deb`, aucun de ce dossier.
+
+## Décision du propriétaire du 19/11/2026 : D1 (a) (consignée à 15:22:10 UTC)
+
+Question posée dans le cadre de fin de tour : « Pour « deb signé » (D1), garder le .deb intact et signer le dépôt ? ». Réponse du propriétaire, reçue avant l'heure ci-dessus : « Oui, option (a) ».
+
+- **D1 (a) retenue** : le `.deb` reste tel quel (bit-identique, `f66bbeb2…`). « deb signé » se lit comme **dépôt apt signé** (`Release.gpg` et `InRelease`), vérifié par apt. Le lien deb est une identité d'empreinte : la strophe `Packages` porte le sha256 du fichier de la couche de `60f25f5c…`.
+- **`debsign` n'est pas employé pour l'instant** : la pipeline S4d ne publie ni `.changes` ni `.buildinfo` (corrections datées ci-dessus, point 2). La ligne devscripts proposée au doc 04 reste donc sans usage.
+- **D1 (b)**, signature intégrée au `.deb` par `debsigs`, est écartée.
+- **Rien n'est lancé.** Question suivante : D2 (garde de la clé), puis D3 et D4.
