@@ -687,3 +687,17 @@ J'ai préparé à sec, pendant l'attente de la mesure, le point « deux Pipeline
 - ton accord pour les écritures dans Zot.
 
 La provenance reste à préparer, sur le modèle de M4c. Sa forme dépend des résultats réels de PN2.
+
+## Note datée du 19/11/2026, écrite à 18:47:43 UTC : gardes d'entrée et portée du masquage
+
+- **Gardes d'entrée** : ce sont celles de la correction datée de [`m1b-predictions.md`](m1b-predictions.md).
+  - Avant toute création, les deux dépôts d'images doivent être absents, et Zot doit avoir la place des deux images.
+  - Une relance après une première publication n'est plus annoncée comme possible sous un autre préfixe. Accepter un dépôt déjà présent sera une décision du propriétaire.
+  - Script `f1982fdd442427fc…`, banc v2 à 109 OK, 0 KO.
+- **Portée du masquage inopérant, établie sur tout le dépôt** :
+  - un `git grep` de `sed -E` suivi de `MASQUE` ne trouve que `m1b.sh` et `m1b-builders.sh` ;
+  - les cinq scripts qui définissent `MASQUE` l'écrivent en BRE ; les trois autres (`m4c.sh`, `m5.sh`, `m1b-pipeline.sh`) le passent à un `sed` sans `-E` ;
+  - les journaux de `m1b.sh` et de `m1b-builders.sh` sont tous des `m1b*.log`, déjà comptés : une seule ligne, de yq.
+  - La note précédente vaut donc pour tout le dépôt.
+- **Cette nuit** : les journaux de la mesure sortiront de ce `filtre`, donc non masqués. Avant toute lecture, je compterai leurs lignes jeton/token sans les afficher, et `secrets-depot.sh` tranchera avant le commit.
+- **Correction des deux scripts** : dans un tour de jour, après `jk-verif.py` et le commit du résultat, avec leurs bancs. Elle n'est pas prévue cette nuit.

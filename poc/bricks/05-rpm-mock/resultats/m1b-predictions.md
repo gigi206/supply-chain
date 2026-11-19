@@ -1968,3 +1968,17 @@ Dans tous les cas, `$T/auth` est absent à la fin. Il ne couvre ni Zot, ni le vr
 - **PN6** (haute) : pour chaque image, deux exécutions donnent le même digest, égal à celui de `m1bt3` et de la mesure d'un autre jour.
 - **PN7** (moyenne) : Chains signe les quatre PipelineRuns (annotation). Les signatures et attestations de l'image relèvent de l'étape provenance, à préparer.
 - **Relevé, sans pari** : la place prise dans Zot. Les couches attendues pèsent environ 586 Mo, pour les deux premiers PipelineRuns seulement. Mais `/` de sc-stockage dérive d'environ 0,5 Go par jour sans écriture de la brique.
+
+### Correction datée du 19/11/2026, écrite à 18:47:43 UTC, avant tout lancement : gardes d'entrée des PipelineRuns
+
+**Défaut** : le script disait « relancer sous un autre `PREFIXE` ». C'est faux après une première publication. Le dépôt de l'image n'était contrôlé qu'avant le premier PipelineRun de chaque image, et le compte de `publier-image` ne peut rien supprimer. Un échec après la publication de l'outillage, sur `signe` ou sur `m1b-b-1` par exemple, aurait donc rendu toute relance impossible sans décision.
+
+**Correction** : [`m1b-pipeline.sh`](../m1b-pipeline.sh) a maintenant le sha256 `f1982fdd442427fc…`.
+- Les deux dépôts d'images doivent être absents avant toute création.
+- La place libre doit couvrir 1 Gio plus les deux `image.tar`.
+- La garde de chaque PipelineRun reste en place.
+- Toute relance demande une décision du propriétaire ; un autre `PREFIXE` ne suffit plus.
+
+**Banc v2** : [`m1b-pipeline-banc-v2.log`](m1b-pipeline-banc-v2.log), 109 OK, 0 KO, joué à 18:46:12 UTC sur ce sha256 (banc `d76ade3109e8a225…`). Il a 24 cas : relance sous un autre préfixe après publication de l'outillage, garde d'entrée des deux images, et place tombée après le premier PipelineRun. Le banc précédent ([`m1b-pipeline-banc.log`](m1b-pipeline-banc.log)) reste valable pour l'ancien sha256.
+
+**Prédictions** : PN1 à PN7 sont inchangées. Les gardes de PN1 comprennent désormais les deux dépôts absents et la place pour les deux images.

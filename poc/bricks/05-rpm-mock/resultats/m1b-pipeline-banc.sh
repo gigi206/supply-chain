@@ -12,7 +12,8 @@
 # marqués d'une sentinelle partout : ils ne doivent jamais sortir.
 # Cas : succès ; mesure divergente ; pipeline autre au tag m1b ; tâche hors de la liste revue ; NotIn à trois labels ; NetworkPolicy
 # de construction absente ; politique qui autorise du trafic à la construction ; PipelineRun déjà présent ; dépôt déjà présent ;
-# espace sous la garde (taille de l'image comprise) ; refus à l'admission ; prefetch de l'outillage en échec (résultat déclaré non
+# relance sous un autre préfixe après publication de l'outillage (ajout du 19/11, correction des gardes d'entrée) ; espace sous la
+# garde d'entrée (deux images) ou sous celle d'une image ; place tombée après le premier PipelineRun ; refus à l'admission ; prefetch de l'outillage en échec (résultat déclaré non
 # écrit) ; digest autre ; digests divergents ; construction sans Kata ; témoin réseau absent ; couches ; non signé par Chains ;
 # base du bootstrap autre ; base écrite pour l'outillage ; PipelineRun jamais terminé. Dans chaque cas : aucun kubectl delete,
 # aucune sentinelle dans la sortie, nombre de créations attendu.
@@ -184,6 +185,7 @@ if a[:2] == ['manifest', 'fetch'] and '--descriptor' in a:
     print(json.dumps({'mediaType': 'application/vnd.oci.image.manifest.v1+json', 'digest': d, 'size': 553})); sys.exit(0)
 if a[:2] == ['repo', 'tags']:
     if cas == 'depot_present' and cible.endswith('rocky9-bootstrap'): print('sha256-6de899ac.att'); sys.exit(0)
+    if cas == 'relance' and cible.endswith('mock-rocky9'): print('sha256-70f8c412.att'); sys.exit(0)
     print('Error response from registry: name unknown: repository name not known to registry', file=sys.stderr); sys.exit(1)
 if a[:2] == ['manifest', 'fetch']:
     c = 2 if 'mock-rocky9' in cible else 1
@@ -202,7 +204,7 @@ jouer() { # cas mesure liste [VAR=valeur…] : etape_pipeline dans la forme de l
     set -euo pipefail
     . "$1"
     R=$BANC_W/R
-    sur() { case $1 in sc-stockage) echo " ${BANC_LIBRE-3978911744}" ;; *) echo " 50000000000" ;; esac; }
+    sur() { case $1 in sc-stockage) if [ -n "$(ls -A "$BANC_ETAT")" ]; then echo " ${BANC_LIBRE2-${BANC_LIBRE-3978911744}}"; else echo " ${BANC_LIBRE-3978911744}"; fi ;; *) echo " 50000000000" ;; esac; }
     { echo "# etape_pipeline (banc), $(date -u +%FT%TZ)"; etape_pipeline; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$BANC_W/sortie.txt" > /dev/null' _ "$SCRIPT"
 }
 cas() { # libellé code motif créations cas mesure liste [VAR=valeur…]
@@ -239,8 +241,12 @@ cas "NotIn à trois labels" 1 "^KO   NotIn de builds-sans-internet : prefetch-de
 cas "NetworkPolicy de construction absente" 1 "^KO   politiques qui sélectionnent un pod de construire-racine-rpm : CiliumNetworkPolicy builds-sans-internet " 0 politique_absente "$ME" "$L"
 cas "politique qui autorise la construction" 1 "^KO   politiques qui autorisent du trafic à un pod de construire-racine-rpm : NetworkPolicy construction-racine-rpm-sans-sortie " 0 autorise "$ME" "$L"
 cas "PipelineRun déjà présent" 1 "^KO   m1b-b-2 existe déjà" 0 existe "$ME" "$L"
-cas "dépôt déjà présent" 1 "^KO   dépôt .*/builds/builders/rocky9-bootstrap absent avant le premier PipelineRun : 0" 2 depot_present "$ME" "$L"
-cas "espace sous la garde, taille comprise" 1 "^KO   espace libre illisible ou sous la garde" 0 plein "$ME" "$L" BANC_LIBRE=1417693183
+cas "dépôt déjà présent" 1 "^KO   dépôt .*/builds/builders/rocky9-bootstrap absent \(aucune publication antérieure ; sinon décision avant toute relance\) : 0" 0 depot_present "$ME" "$L"
+cas "relance sous un autre préfixe après publication de l'outillage" 1 "^KO   dépôt .*/builds/builders/mock-rocky9 absent \(aucune publication" 0 relance "$ME" "$L" PREFIXE=m1c
+cas "espace sous la garde d'entrée (deux images)" 1 "^KO   espace libre illisible ou sous la garde d'entrée" 0 plein "$ME" "$L" BANC_LIBRE=1659684863
+cas "espace sous la garde d'une image" 1 "^KO   espace libre illisible ou sous la garde d'entrée" 0 plein1 "$ME" "$L" BANC_LIBRE=1417693183
+cas "place tombée après le premier PipelineRun" 1 "^KO   espace libre illisible ou sous la garde sur sc-stockage$" 1 tombee "$ME" "$L" BANC_LIBRE2=1417693183
+egal "place tombée : m1b-o-1 contrôlé jusqu'au bout avant le refus" "$(grep -c '^OK   PipelineRun m1b-o-1 signé par Chains : true$' "$B/tombee/sortie.txt")" 1
 cas "refus à l'admission" 1 "^KO   m1b-o-1 admis en dry-run serveur .* : 1" 0 refus_admission "$ME" "$L"
 echo "## contrôles après création"
 cas "prefetch de l'outillage en échec" 1 "^KO   PipelineRun m1b-o-1 : False\|Failed" 1 prefetch_echoue "$ME" "$L"

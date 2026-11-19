@@ -14,9 +14,12 @@
 #             - politiques de builds relues dans le cluster : NotIn de builds-sans-internet à quatre labels ; prefetch-racine-rpm
 #               sélectionné par sa seule sortie ; construire-racine-rpm sélectionné par builds-sans-internet et sa NetworkPolicy,
 #               aucune n'autorise de trafic ;
-#             puis, avant chaque PipelineRun : nom absent, dépôt de l'image absent avant le premier, place libre sur / de
-#             sc-stockage au moins LIBRE_MIN plus la taille de l'image.tar, dry-run serveur. Rien n'est purgé : une relance se
-#             fait sous un autre PREFIXE. Preuve imprimée avant toute assertion ; jamais le message d'une condition ni une
+#             - les quatre noms absents, les deux dépôts d'images absents, place libre sur / de sc-stockage d'au moins
+#               LIBRE_MIN plus la taille des deux image.tar (correction du 19/11/2026, avant tout lancement : une relance après
+#               une première publication bute sur un dépôt déjà présent, que le compte de publier-image ne peut pas supprimer) ;
+#             puis, avant chaque PipelineRun : place libre d'au moins LIBRE_MIN plus la taille de son image.tar, dry-run serveur.
+#             Rien n'est purgé : toute relance demande une décision du propriétaire (noms pris, dépôt déjà publié), un autre
+#             PREFIXE ne suffit pas. Preuve imprimée avant toute assertion ; jamais le message d'une condition ni une
 #             variable d'environnement. Contrôles : tâches, Kata et nœud par pod ; journaux de prefetch et de construire
 #             (témoins réseau, racine conforme, manifeste) ; BASE_ARTIFACT_INPUTS (outillage : déclaré, non écrit, relevé ;
 #             bootstrap : la base vérifiée) ; DIGEST_CONSTRUIT, IMAGE_URL, IMAGE_DIGEST, ligne de publication, manifeste relu
@@ -224,7 +227,7 @@ controler_pr() { # PipelineRun image : preuve imprimée, puis assertions (stop) 
 }
 
 etape_pipeline() { # quatre PipelineRuns, deux par image ; gardes avant la première création ; rien n'est purgé
-  local x i pr l s
+  local x i pr l s to tb
   gardes_mesure
   gardes_pipelines
   echo "## politiques de builds (lecture seule)"
@@ -233,17 +236,21 @@ etape_pipeline() { # quatre PipelineRuns, deux par image ; gardes avant la premi
   for x in o b; do for i in 1 2; do
     pr=$N-$x-$i
     [ -z "$(kubectl get pipelinerun -n builds --field-selector "metadata.name=$pr" -o name < /dev/null 2> /dev/null)" ] \
-      && echo "OK   $pr absent" || echec "$pr existe déjà : rien n'est purgé, relancer sous un autre PREFIXE"
+      && echo "OK   $pr absent" || echec "$pr existe déjà : rien n'est purgé, décision avant toute relance"
   done; done
+  echo "## dépôts des images et place dans Zot, avant toute création"
+  for x in o b; do
+    s=$(oras repo tags --ca-file "$P/ca-poc.crt" "$(v IMAGE "$x" | sed "s#^$REG#$REG_HOTE#")" < /dev/null 2>&1 || true)
+    attendu "dépôt $(v IMAGE "$x") absent (aucune publication antérieure ; sinon décision avant toute relance)" "$(grep -c 'name unknown' <<< "$s")" 1
+  done
+  l=$(libre_zot); to=$(v TAILLE o); tb=$(v TAILLE b)
+  echo "/ de sc-stockage : $l octets libres à $(date -u +%H:%M:%S) (garde d'entrée : $LIBRE_MIN + $to + $tb)"
+  if ! [[ $l =~ ^[0-9]+$ ]] || [ "$l" -lt $((LIBRE_MIN + to + tb)) ]; then echec "espace libre illisible ou sous la garde d'entrée sur sc-stockage"; fi
   echo "relevé : / de sc-build : $(sur sc-build 'df -B1 --output=avail / | tail -n 1' < /dev/null 2> /dev/null | tr -d ' ' || echo illisible) octets libres (PVC local-path)"
   for x in o b; do
     for i in 1 2; do
       pr=$N-$x-$i
       echo "## $pr ($(v NOM "$x"))"
-      if [ "$i" = 1 ]; then
-        s=$(oras repo tags --ca-file "$P/ca-poc.crt" "$(v IMAGE $x | sed "s#^$REG#$REG_HOTE#")" < /dev/null 2>&1 || true)
-        attendu "dépôt $(v IMAGE "$x") absent avant le premier PipelineRun" "$(grep -c 'name unknown' <<< "$s")" 1
-      fi
       l=$(libre_zot)
       echo "/ de sc-stockage : $l octets libres à $(date -u +%H:%M:%S) (garde : $LIBRE_MIN + $(v TAILLE "$x"))"
       if ! [[ $l =~ ^[0-9]+$ ]] || [ "$l" -lt $((LIBRE_MIN + $(v TAILLE "$x"))) ]; then echec "espace libre illisible ou sous la garde sur sc-stockage"; fi
