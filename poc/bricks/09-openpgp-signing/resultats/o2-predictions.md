@@ -218,3 +218,18 @@ Relance sur l'accord du propriétaire (« Oui, relance-la », en réponse à « 
 - **DA2 tenue** : « docker-clean mis de côté dans o2/ » ; **20 `.deb` sur 20 égaux au `Packages.xz` vérifié** ; code 0. Aucune ligne « Permission denied ».
 - **DA1 tenue** : apt code 0 ; `InRelease` égal à `0584fba3…` ; mmdebstrap 1.5.7 installé.
 - **Téléchargements** : 20 `.deb`, **14 298 692 octets**, listés avec leur sha256 dans le journal et dans [la liste des téléchargements](releve-amont-telechargements.tsv). Le premier passage avait reçu les mêmes 20 paquets (« 14.3 MB ») sans les garder ; ils ne sont pas listés.
+
+## Note datée du 19/11/2026, écrite à 16:28:51 UTC : `debian_racine` passée, DR1 et DR2 tenues, contrôle des `.deb` partiel
+
+Lancée sur l'accord du propriétaire (« Oui, lance-la », en réponse à « Je lance debian_racine (mmdebstrap sur l'hôte, réseau ; prédiction faible) ? »), sur le commit `e2036b92`. [Journal](o2-debian_racine.log) : 16:26:50 à 16:27:39 UTC, code 0 ; `o2.sh` `9c817f68…`.
+
+- **DR1 tenue, contre une confiance faible** : `mmdebstrap --mode=root` réussit dans l'espace de noms utilisateur de l'hôte (« success in 47.1577 seconds »). Les replis de la carte sont sans objet.
+- **DR2 tenue** :
+  - archive `debian13.tar` de 205 667 840 octets, sha256 `45f376e6…` ;
+  - les sept versions épinglées sont installées (gnupg 2.4.7-21+deb13u1 ; gpg, gpgv, gpg-agent, gpgconf 2.4.7-21+deb13u1+b5 ; apt-utils 3.0.3 ; sqv 1.3.0-3+b2) ;
+  - gpg 2.4.7 dans la racine ;
+  - **47 `.deb` sur 47 égaux au `Packages.xz` vérifié**.
+- **Écart de couverture, non prédit** : la racine compte **106 paquets**, mais seuls 47 `.deb` étaient encore dans le cache au moment du crochet. Les `.deb` des **59 paquets essentiels** (`libc6`, `bash`, `dpkg`, `coreutils`, etc.) avaient déjà été retirés par mmdebstrap après leur installation. Ces 59 paquets n'ont été vérifiés que par apt (sommes de `Packages`, sous l'`InRelease` signé).
+- **Contrôle complémentaire** ([`o2-controle-versions.sh`](../o2-controle-versions.sh), [journal](o2-controle-versions.log), 16:28:16 UTC, local, sans relance) : **106 versions installées sur 106 figurent dans le `Packages.xz` vérifié**. Il ne prouve pas le contenu des fichiers des 59 paquets essentiels.
+- **Pour un contrôle complet** : garder les `.deb` essentiels, par une option de mmdebstrap (une option `--skip=essential/unlink` existerait, **non lue**), ou par un crochet `--essential-hook`. Cela demande une relance de `debian_racine`, avec son accord. La racine actuelle reste en place.
+- **Téléchargements** : 47 `.deb` listés avec leur sha256 (taille non relevée par le crochet). Les 59 paquets essentiels téléchargés par mmdebstrap n'ont laissé aucune trace de fichier, et ne sont pas listés.
