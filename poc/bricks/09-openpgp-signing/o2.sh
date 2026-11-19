@@ -89,7 +89,7 @@ PY
   echo "OK   couche ${l:0:12} de ${m:0:12} extraite dans $d"
 }
 signaler() { # DOSSIER ORIGINE : chaque paquet téléchargé journalisé et ajouté à la liste des téléchargements
-  find "$1" -type f \( -name '*.rpm' -o -name '*.deb' \) -printf '%f\t%s\t%p\n' | sort | while IFS=$'\t' read -r n t p; do
+  find "$1" -maxdepth 1 -type f \( -name '*.rpm' -o -name '*.deb' \) -printf '%f\t%s\t%p\n' | sort | while IFS=$'\t' read -r n t p; do
     s=$(sha256sum < "$p" | cut -c1-64)
     printf '%s\t%s\t%s\t%s\n' "o2/$n" "$2" "$t" "$s" >> "$LISTE"
     echo "  téléchargé : $n ($t octets, sha256 $s)"
@@ -282,14 +282,16 @@ etape_debian_amorce() {
   extraire "$OCI/library/debian" "$DEB_M" "$WDA"
   mkdir -p "$WDA/o2"
   [ -f "$WDA/etc/apt/sources.list.d/debian.sources" ] && mv "$WDA/etc/apt/sources.list.d/debian.sources" "$WDA/o2/debian.sources.origine"
+  # docker-clean (image Debian officielle) efface les .deb après chaque dpkg : mis de côté, sinon aucun .deb à contrôler (premier passage)
+  [ -f "$WDA/etc/apt/apt.conf.d/docker-clean" ] && mv "$WDA/etc/apt/apt.conf.d/docker-clean" "$WDA/o2/docker-clean.origine" && echo "docker-clean mis de côté dans o2/"
   echo "deb [check-valid-until=no] $MIROIR trixie main" > "$WDA/etc/apt/sources.list.d/instantane.list"
   dans_avec "$WDA" /bin/sh -c "apt-get -q update && apt-get -q -y --no-install-recommends -o APT::Keep-Downloaded-Packages=true install mmdebstrap=$V_MMDEBSTRAP" > "$W/debian-amorce-apt.log" 2>&1
   rc=$?; echo "apt dans l'amorce : code $rc ; dernières lignes :"; tail -3 "$W/debian-amorce-apt.log" | sed 's/^/  | /'
   [ "$rc" = 0 ] || ko "installation de mmdebstrap dans l'amorce"
-  i=$(find "$WDA/var/lib/apt/lists" -name '*_InRelease' | head -1)
+  i=$(find "$WDA/var/lib/apt/lists" -maxdepth 1 -name '*_InRelease' | head -1)
   [ -n "$i" ] && [ "$(sha256sum < "$i" | cut -c1-64)" = "$INRELEASE" ] && echo "OK   InRelease lu par apt égal à celui vérifié par le relevé" || echo "KO   InRelease différent du relevé"
   signaler "$WDA/var/cache/apt/archives" "$MIROIR (apt de l'amorce)"
-  find "$WDA/var/cache/apt/archives" -name '*.deb' | while read -r f; do echo "deb amorce ${f##*/} $(sha256sum < "$f" | cut -c1-64)"; done > "$W/debian-amorce-debs.txt"
+  find "$WDA/var/cache/apt/archives" -maxdepth 1 -name '*.deb' | while read -r f; do echo "deb amorce ${f##*/} $(sha256sum < "$f" | cut -c1-64)"; done > "$W/debian-amorce-debs.txt"
   controle_debs "$W/debian-amorce-debs.txt"
   dans_hors "$WDA" mmdebstrap --version | sed 's/^/  /'
 }

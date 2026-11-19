@@ -183,3 +183,30 @@ Lancée sur l'accord du propriétaire (« Oui, lance-la », en réponse à « Je
 - **Ajout à RI1 en partie tenu** : le message « clé Rocky 350d275d déjà dans la base rpm de la racine » est bien écrit, mais à la ligne 1 du journal de dnf (`~/.cache/supply-chain-poc/09/o2/rocky-installer-dnf.log`, hors du dépôt). Il n'est pas dans le journal de l'étape, contrairement à ce qu'annonçait la prédiction.
 - **Limite** : le journal ne montre pas explicitement le contrôle des signatures à l'installation (`localpkg_gpgcheck=True`). Les 101 lignes « Verifying » de dnf sont la vérification d'après installation. Ce qui est établi : les 101 rpm sont égaux au `primary` vérifié (RT1), et chacun porte la signature de la clé Rocky (`RSAHEADER`, ci-dessus).
 - **Rien n'est fait côté Debian. Aucune clé du PoC n'existe.**
+
+## Note datée du 19/11/2026, écrite à 16:25:27 UTC : `debian_amorce` passée en partie, DA1 en partie non tenue ; correctif, relance préparée
+
+Lancée sur l'accord du propriétaire (« Oui, lance-la », en réponse à « Je lance debian_amorce (réseau vers l'instantané, mmdebstrap dans l'amorce) ? »), sur le commit `02bbf040`. [Journal archivé](o2-debian_amorce-premier-passage.log) : 16:24:03 à 16:24:12 UTC, **code 1** (une ligne KO).
+
+**Tenu** :
+- apt dans l'amorce, code 0 ; mmdebstrap 1.5.7-1+deb13u1 installé ;
+- `InRelease` lu par apt égal à `0584fba3…`, celui vérifié par le relevé.
+
+**Non tenu** : « tous les `.deb` égaux au `Packages.xz` vérifié ». **Aucun `.deb` n'a été retrouvé** (« 0 sur 0 »). Le journal d'apt, hors du dépôt (gardé sous `~/.cache/supply-chain-poc/09/o2/debian-amorce-apt-premier-passage.log`), montre 20 paquets reçus (« Need to get 14.3 MB of archives »). Ils ont été installés, vérifiés par apt seulement.
+
+**Cause mesurée** : l'amorce `debian:trixie-20261104-slim` contient `/etc/apt/apt.conf.d/docker-clean`. Ce fichier efface `/var/cache/apt/archives/*.deb` après chaque appel à dpkg (`DPkg::Post-Invoke`), et `APT::Keep-Downloaded-Packages=true` ne l'en empêche pas. Les lignes « Permission denied » viennent du sous-dossier `partial`, qui appartient au sous-UID de `_apt` ; elles sont sans effet sur le résultat. Les 20 téléchargements ne sont pas dans la liste des téléchargements : `signaler` n'a rien trouvé à lister.
+
+**Correctif** (`o2.sh`) :
+- `docker-clean` est mis de côté dans `o2/` avant apt ;
+- `find` limité à une profondeur 1 pour les `.deb`, l'`InRelease` et `signaler`.
+
+Le dossier de l'amorce a été effacé à 16:24:57 UTC, dans l'espace de noms et par un chemin littéral, pour que la relance reparte à neuf (garde « dossier absent »).
+
+**Prédiction de la relance (DA2)**, en plus de DA1 :
+- le journal dira « docker-clean mis de côté » ;
+- environ 20 `.deb` seront retrouvés, signalés et égaux au `Packages.xz` vérifié ;
+- code 0.
+
+Confiance moyenne-haute : la cause est lue dans le fichier ; le nombre de `.deb` est celui du premier passage.
+
+**Effet possible sur `debian_racine`** : la racine minbase de mmdebstrap ne vient pas de l'image Docker. Ce que mmdebstrap lit de la configuration d'apt de l'amorce n'est pas lu. Si des `.deb` y manquaient aussi, le contrôle le dirait (« 0 sur 0 », KO).

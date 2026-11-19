@@ -1,0 +1,15 @@
+étape debian_amorce commencée : 2026-11-19T16:24:03Z ; o2.sh fdae5389cd01c61a… ; o2-interne.sh 7c91e50fd7921f89…
+OK   couche 37fb86c2a767 de 7378260c0a09 extraite dans /home/gigi/.cache/supply-chain-poc/09/o2/debian-amorce
+apt dans l'amorce : code 0 ; dernières lignes :
+  | running python post-rtupdate hooks for python3.13...
+  | Setting up mmdebstrap (1.5.7-1+deb13u1) ...
+  | Processing triggers for libc-bin (2.41-12+deb13u4) ...
+find: '/home/gigi/.cache/supply-chain-poc/09/o2/debian-amorce/var/lib/apt/lists/partial': Permission denied
+OK   InRelease lu par apt égal à celui vérifié par le relevé
+find: '/home/gigi/.cache/supply-chain-poc/09/o2/debian-amorce/var/cache/apt/archives/partial': Permission denied
+find: '/home/gigi/.cache/supply-chain-poc/09/o2/debian-amorce/var/cache/apt/archives/partial': Permission denied
+KO   sha256 des .deb conformes au Packages vérifié : 0 sur 0
+  mmdebstrap 1.5.7
+étape debian_amorce finie : 2026-11-19T16:24:12Z
+OK   K3 : aucune ligne de bloc OpenPGP armuré dans le journal
+bilan : 1 ligne(s) KO
