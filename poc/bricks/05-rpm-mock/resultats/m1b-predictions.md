@@ -1684,3 +1684,20 @@ Journal : [`m1b-refus-banc.log`](m1b-refus-banc.log), de 15:37:11 à 15:38:31 UT
 - **Erreur.** La note de 15:33:13 UTC dit : « depuis Zot sur le laptop, 10 rpm (environ 2 Mo), les métadonnées de BaseOS 9.7 et la couche amont ». C'est faux pour les rpm et les métadonnées. La ligne `depots` de la pipeline du bootstrap (`pipeline-b.yaml`, rendu sous `m1bt3`) est `baseos97 https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os fa6d5054… RPM-GPG-KEY-Rocky-9`, et le prefetch n'admet que vault et l'archive d'EPEL. Les 10 rpm et les métadonnées de BaseOS 9.7 viennent donc de vault. Seuls le manifeste de base `ee90dc0e…` et la couche `812c4412…` viennent de Zot.
 - **Conséquence pour JT3** : la confiance moyenne, due aux sources hors du laptop, vaut aussi pour `fa6d5054…` (BaseOS 9.7). Rien d'autre ne change dans les prédictions.
 - **Lanceur, relu** : dans `m1b.sh`, `pod_c` n'exige que `entrees.tar`, écrit par `prealables`. `pod_e` exige `entrees-boot.tar` et le pod rendu, écrits par `prealables_boot`. L'étape `banc` de `m1b.sh`, jouée le 19/11 avant les pods, n'est requise par aucun des deux. Le lanceur n'a pas d'étape manquante.
+
+## curl exécuté par les prefetch : prédictions écrites le 19/11/2026 à 15:46:05 UTC, avant le lancement
+
+**Pourquoi.** Le relevé de santé ([`sante-curl.log`](sante-curl.log), 15:39:13 UTC) porte sur le projet amont, alors que les prefetch exécutent le paquet de Rocky. Une lecture à la main, faite à 15:41 UTC dans une racine du banc où une tâche avait tourné (`b-temoin/r`), donne `curl-minimal-7.76.1-40.el9` dans l'amorce, alors que vault 9.8 liste `40.el9_8.8` et `40.el9_8.9`. Cette lecture n'est pas citable telle quelle ; elle est refaite ici par un script archivé, sur des racines extraites à neuf.
+
+**Relevé** : [`m1b-curl-amorce.sh`](m1b-curl-amorce.sh) (sha256 `84da085cd5255fd9…`), journal à venir `m1b-curl-amorce.log`. Lectures publiques de `curl.se/docs/vuln.json` et de vault 9.8 BaseOS (`repomd.xml` et sa signature, `other`), quelques Mo. Ni cluster, ni Zot.
+
+- **CA1** (haute) : l'amorce (couche `99c753a8…`) porte `curl-minimal` et `libcurl-minimal` en `7.76.1-40.el9`, construits le 27/01/2026, ainsi que `gnupg2-2.3.3-5.el9_7`, et ni `curl` ni `libcurl` complets.
+- **CA2** (moyenne) : la racine de `99790c13`, image de `prefetch-rpm` déjà signée, porte `curl` et `libcurl` en `7.76.1-40.el9_8.9`, la révision que liste `s1-racine.log`.
+- **CA3** (sans pari) : le nombre d'avis du projet curl publiés depuis un an dont les versions touchées comptent 7.76.1, et leurs gravités.
+- **CA4** (haute) : le `repomd.xml` de vault 9.8 BaseOS a une signature valide par la clé de Rocky de l'amorce, `other` est conforme à `repomd.xml`, et `curl-minimal` y a au moins deux révisions, dont `40.el9_8.9`.
+- **CA5** (sans pari) : pour chaque avis de CA3, si le changelog du paquet de l'amorce et celui de la dernière révision de vault le mentionnent.
+
+**Lecture prévue.**
+- Un avis mentionné dans le changelog est corrigé selon Rocky. Un avis absent n'est pas pour autant une faille : la version 7.76.1 peut ne pas avoir le code touché, ou Red Hat peut ne pas corriger un avis de faible gravité. On écrira donc « en retard de révisions », jamais « vulnérable », sans lecture plus poussée.
+- La décision qui en découle, garder le curl figé de l'amorce avec ses contre-contrôles ou rafraîchir l'amorce, ce qui referait les références, te revient avant `SIGNER=1`. Rien ne change dans l'amorce ni dans les tâches avant la mesure du 20/11.
+- `gnupg2` est relevé pour information. Sa ligne dans docs/04 revient à la session de la brique 09.
