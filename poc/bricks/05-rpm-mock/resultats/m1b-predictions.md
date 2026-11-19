@@ -1096,3 +1096,23 @@ Journal : [`m1b-pod_c.log`](m1b-pod_c.log).
 - **Contenu** : il ne dépend pas de cette limite. Deux pods Kata, l'un à la limite par défaut (2³⁰), l'autre à 1 024, donnent la même archive.
 - **Ce qui n'est pas mesuré** : la même cause pour les 5 694 s de l'étape `racine` de S1 et les 761 s de `boot_racine`. C'est probable, mais ces durées n'ont pas été remesurées.
 - **Pour la tâche à venir** : abaisser la limite de fichiers ouverts (souple, puis dure) avant dnf. C'est une proposition, pas une décision.
+
+### pod_d, /proc monté dans la racine installée : prédictions (note écrite à 2026-11-19T10:51:48Z UTC, avant le lancement)
+
+Décision du propriétaire : « Mesurer aussi /proc ».
+
+- **Changement de `m1b.sh`** :
+  - nouvelle étape `pod_d`, soit `pod_essai d - proc` ;
+  - pour ce seul pod, la limite de fichiers ouverts reste celle par défaut ;
+  - avant dnf, la sonde crée `/w/m/i/proc` et y monte `proc` ;
+  - juste après dnf, avant `tar`, elle démonte `/proc` et relève les montages restants ;
+  - `pod_a`, `pod_b` et `pod_c` ne changent pas.
+- **Application différée** : comme pour `pod_c`, le changement n'est appliqué qu'après la fin de `pod_b`, que bash relit en cours d'exécution. La version prête a le sha256 `349dca4939052a65…` ; son rendu de la sonde a été essayé hors du cluster.
+
+- **PD1** : `/proc` est monté dans la racine avant dnf, avec 1 montage.
+- **PD2** (sans pari) : le code de dnf. Le paquet `filesystem` livre `/proc`, avec son mode, alors que le dossier est déjà un point de montage. Que rpm l'accepte n'est pas lu.
+- **PD3** : si dnf rend 0, il dure moins de 300 s : rpm ouvre alors `/proc/self/fd` et ne boucle plus jusqu'à la limite.
+- **PD4** : `/proc` est démonté après dnf (0 montage restant). La racine est en 555.
+- **PD5** (sans pari) : l'archive vaut-elle `7c07083c…` ? Les scriptlets voient un `/proc` réel, ce qui peut changer des fichiers. Si elle diffère, le comparateur membre à membre contre `a8` nomme chaque écart. Elle est toujours rapatriée (344 Mo ; il reste environ 3,8 G sur /home).
+
+**Ce qui départagera.** Si PD2, PD3 et PD5 sont tenues (code 0, rapide, même archive), les deux remèdes se valent pour cette installation, et le choix redevient une question de simplicité. Si l'archive diffère, garder `/proc` demanderait de refaire les références.

@@ -286,3 +286,9 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **mock n'est pas concerné en pratique** : `mock --hermetic-build` dure de 46 à 54 s dans Kata dans les journaux archivés ([`m4c-essai.log`](m4c-essai.log) par exemple). Pourquoi la boucle ne le ralentit pas n'est pas mesuré.
 - **Non remesuré** : les 5 694 s de l'étape `racine` et les 761 s de `boot_racine` de S1. La même cause y est probable.
 - **Point ouvert, distinct de la vitesse** : `var/lib/rpm/rpmdb.sqlite-shm` a varié entre deux installations de l'hôte avec `keepcache=0` ([comparaison](m1b-cloexec-comparaison.log)). Il n'a pas varié entre le banc des sondes, `pod_a` et `pod_c`. C'est un risque pour la reproductibilité ; l'exclure n'est pas décidé.
+
+## Décision du 19/11/2026, consignée à 2026-11-19T10:51:48Z UTC : « Mesurer aussi /proc »
+
+**Décision du propriétaire** (réponse reçue avant 2026-11-19T10:51:48Z UTC, heure exacte non relevée) : « Mesurer aussi /proc ». La question était : « Pour la tâche : limite seule, ou mesurer aussi /proc ? ». Ma recommandation, passée par le conseiller, était la limite seule.
+- **Conséquence** : la voie « `/proc` monté dans la racine installée », notée « non retenue » dans la note précédente, est mesurée par un pod à part, `pod_d`, après `pod_b`. Le remède de la tâche sera choisi ensuite, sur les deux mesures.
+- **Ce n'est un accord** pour aucune écriture dans Zot ni pour aucun changement du cluster. Le pod d'essai est lancé sous l'accord permanent du 18/11.
