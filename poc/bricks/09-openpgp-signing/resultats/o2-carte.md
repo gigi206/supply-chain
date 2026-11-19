@@ -48,3 +48,13 @@ Les deux amorces ne sont pas signées, et l'image Debian dépend de debuerreotyp
 **Recommandation (relue par le conseiller) : (a), pour le PoC seulement.** Ce qui décide est une dépendance, pas un effort : (b) attend M1b. (b) est proposée comme **cible de production**, à écrire dans l'ADR 0003 à côté de l'écart de D2.
 
 Après la réponse : script `o2.sh` (étapes `telecharger`, `construire`, `cle`, `essai`), prédictions K1 à K5b et des racines, banc à sec. `construire` et `cle` restent NON LANCÉES sans accord nommé (installation de paquets dans une racine, création de la clé).
+
+## Note datée du 19/11/2026, écrite à 15:48:31 UTC : version de gpg dans l'amorce Rocky (RL2 complété par une mesure de la session principale)
+
+Message de la session principale, reçu vers 15:48 UTC. Mesure vérifiée ici dans son commit `9b0f5e9f` (branche `claude/focused-fermi-ul5y20`, non fusionnée dans cette branche), journal `poc/bricks/05-rpm-mock/resultats/m1b-curl-amorce.log`, lu par `git show` :
+- l. 5 : l'amorce `rockylinux:9.8` (couche `99c753a880cc…`) porte `gnupg2-2.3.3-5.el9_7.x86_64`, construit le 19/01/2026 ;
+- l. 13 : la racine de `99790c13` (image de `prefetch-rpm`) porte le même paquet.
+
+Recoupement avec ce relevé : le `primary` vérifié de BaseOS 9.8 (vault égal à pub) ne liste **qu'une entrée `gnupg2`, 2.3.3-5.el9_7** ([relevé](releve-amont.log), l. 367 ; le script en imprimait jusqu'à deux par nom). Le gpg de l'amorce est donc la seule révision de Rocky 9.8 : **aucun retard de révision**, à la différence de curl (4 révisions de retard d'après la session principale, non vérifié ici). Les errata de Rocky pour `gnupg2` et les avis de GnuPG touchant 2.3.3 ne sont pas lus.
+
+Conséquence pour l'option (a) : côté Rocky, `gnupg2` n'est pas à installer ; seuls `rpm-sign`, `rpm-sign-libs`, `createrepo_c`, `createrepo_c-libs` et leurs dépendances le sont.
