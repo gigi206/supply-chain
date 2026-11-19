@@ -142,3 +142,22 @@ Les dossiers `o4/repetition*` restent en place jusqu'à la correction ; ils sero
 Si la `repetition` n'échoue que sur une prédiction de confiance moyenne (P5b ou V8 dans la racine), `signer` est lancée quand même ; l'écart est consigné. Tout autre KO arrête la suite.
 
 Avant la relance, les dossiers `o4/repetition`, `o4/repetition-vierge`, `o4/repetition-racine-apt` et `o4/repetition-secrets` du premier passage sont effacés, dans l'espace de noms, avec des chemins littéraux.
+
+## Note datée du 19/11/2026, 18:36:34 UTC : relance de `repetition` passée, toutes les prédictions tenues
+
+Passée de 18:36:18 à 18:36:22 UTC, code 0, aucune ligne KO ni ÉCART ([journal](o4-repetition.log)). Scripts `o4.sh` `6a16c5a1…` et `o4-interne.sh` `f4f9e76b…`, ceux de la correction. Clé jetable du dépôt : `3683E06D…D737850E` ; clé du témoin `autre-cle` : `599661F2…7CF44FC7`.
+
+- **A1, A2, L1 et K3 tenues.** R1 de nouveau : `SOURCE_DATE_EPOCH` est ignoré.
+- **A3 tenue** : Release.gpg est armuré, et InRelease aussi est signé. Les deux sont des signatures v4 RSA de la clé du dépôt, avec `digest algo 10`.
+- **G tenue** : `autre-cle` est signé par la clé jetable avec `digest algo 10`, `sha1` avec `digest algo 2`, et cela sur Release.gpg comme sur InRelease. `release-gpg-binaire` n'a qu'un Release.gpg binaire.
+- Dans la **racine** (apt 3.0.3, sqv et gpgv présents) **et** dans l'**amorce** (apt 3.0.4, gpgv absent), mêmes résultats :
+  - **V1, V2 et V3** : code 0. **V2 passe avec un Release.gpg armuré**, quand le binaire avait été refusé au premier passage. Ce qui est établi : apt de Debian 13, en 3.0.3 et en 3.0.4, accepte un dépôt sans InRelease si son Release.gpg est armuré, et le refuse s'il est binaire (V8).
+  - **V4** : code 100 pour les quatre témoins, avec le motif attendu, et `sample-app` reste inconnu ensuite.
+  - **V5** : refus de `sha1`, code 100. **Le motif `SHA1` est faible**, puisqu'il trouve aussi le nom du témoin dans les chemins. Le message « SHA1 is not considered secure since 2013-02-01 » est donc compté à part : 6 lignes dans le journal.
+  - **V6** : `depot` et `sans-inrelease` téléchargés, chacun égal à `f66bbeb2…` (1 953 492 octets). Quatre fichiers sont relus sur l'hôte.
+  - **V7** : `Hash Sum mismatch`, et aucun deb n'est écrit.
+  - **V8** : `release-gpg-binaire` est refusé, code 100, avec « Detached signature file … is in unsupported binary format ». Ce refus ne nomme aucun sous-processus ; qui refuse, d'apt ou de sqv, n'est pas établi.
+- **P5a et P5b tenues : prédiction 5 du README tenue.** Le refus d'`autre-cle` nomme « Sub-process /usr/bin/sqv » dans la racine aussi, où gpgv est installé. Dans tout le journal, 34 lignes nomment `/usr/bin/sqv`, aucune `gpgv`.
+- **Bac à sable** : le `chown _apt` du dossier de téléchargement a passé (aucune ligne de refus), et l'avertissement « unsandboxed » du premier passage n'apparaît plus (0 ligne).
+
+Les dossiers `o4/repetition*` sont effacés après le commit de cette note. Suite : `signer` avec la clé du PoC, mêmes prédictions.
