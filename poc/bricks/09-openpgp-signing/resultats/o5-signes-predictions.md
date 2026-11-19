@@ -173,3 +173,9 @@ Les quatre énoncés sont archivés : `o5-signes-enonce-{rpm,deb,depot-rpm,depot
 **Deux contrôles ne peuvent être déclenchés par aucun témoin** : B1 et l'égalité entre le texte signé d'InRelease et Release. Le contrôle exige d'abord que le rpm signé, le rpm non signé, InRelease et Release égalent leurs sha256 archivés ; toute altération est donc refusée avant d'arriver à eux. Dans `verifier`, B1 est **recalculé** sur les octets tirés de Zot, mais pas éprouvé ici. Son épreuve par témoin reste celle du banc d'`o5.sh` (rpm à charge altérée), où le rpm n'était pas jugé par son sha256.
 
 **2. Réserve sur la copie du deb.** `signes/sample-app-deb@60f25f5c…` ne porte qu'un referrer, l'attestation de lien. La provenance de Chains de ce digest ne se lit que dans `builds/sample-app-deb`, où elle a été vérifiée avant la signature (`chainsProvenance` du prédicat). O6 devra donc lire deux dépôts pour un même digest.
+
+## Décision datée du 19/11/2026, 20:55:35 UTC : secret `lien` gardé
+
+Question posée : « Que faire du secret lien : le révoquer maintenant, ou le garder pour O6 ? ». Réponse du propriétaire, reçue avant l'heure ci-dessus : « Garde ».
+
+Le secret reste dans `09/secrets/openbao-lien.secret` (0600). Il expire au plus tard le 22/11/2026 à 19:49:36 UTC ; `attester` refuse de signer après 19:40:00 UTC ce jour-là. Au-delà, il faudra l'étape de renouvellement, pas encore écrite (note du 20:03:31 UTC de la carte, point 5).
