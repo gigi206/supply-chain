@@ -69,7 +69,7 @@ Avant la ligne « **Risqué → interdit** » :
 Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 
 ```
-**Signature OpenPGP (09)** : préparée à sec le 19/11/2026 (branche à part, non fusionnée) ; banc O0 sur l'hôte tenu ; D1 et D2 décidées le 19/11/2026 (« deb signé » = dépôt apt signé, `.deb` intact ; clé OpenPGP en fichier sur l'hôte d'administration, pour le PoC seulement) ; D3 et D4 attendues avant tout passage dans le cluster.
+**Signature OpenPGP (09)** : préparée à sec le 19/11/2026 (branche à part, non fusionnée) ; banc O0 sur l'hôte tenu ; D1 à D3 décidées le 19/11/2026 (« deb signé » = dépôt apt signé, `.deb` intact ; clé OpenPGP en fichier sur l'hôte d'administration, pour le PoC seulement ; attestation de lien signée par la clé Transit `lien` après vérification de la provenance de Chains) ; D4 attendue avant tout passage dans le cluster.
 ```
 
 ---
@@ -79,7 +79,7 @@ Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 À la fin de la cellule « Décision attendue », ajouter :
 
 ```
- ; **brique 09 (préparée à sec le 19/11/2026)** : décision du propriétaire D1 (a) du 19/11/2026, « deb signé » = dépôt apt signé (`Release.gpg`, `InRelease`), `.deb` bit-identique et lien par identité d'empreinte ; aucun chemin publié et maintenu de gpg vers un HSM PKCS#11 (gnupg-pkcs11-scd « Risqué » à la lettre ; moteurs PKCS#11 et TPM d'obs-sign non publiés) ; **décision du propriétaire D2 (a) du 19/11/2026, pour le PoC seulement** : clé OpenPGP en fichier 0600 sur l'hôte d'administration, hors du cluster, comme la clé des tâches de J6 ; **écart de production à écrire dans l'ADR** (texte au §4 bis de `poc/bricks/09-openpgp-signing/A-REPORTER.md`) ; clé distincte pour l'attestation de lien, proposée en Transit (`lien`, décision D3) ; clé RSA 4096 v4 et SHA-512, non bornées par `default-sequoia.config` d'apt de Debian 13 (lecture du fichier ; sqv non mesuré ; banc O0 sous gpgv 2.4.8 seulement) ; expiration et certificat de révocation à part
+ ; **brique 09 (préparée à sec le 19/11/2026)** : décision du propriétaire D1 (a) du 19/11/2026, « deb signé » = dépôt apt signé (`Release.gpg`, `InRelease`), `.deb` bit-identique et lien par identité d'empreinte ; aucun chemin publié et maintenu de gpg vers un HSM PKCS#11 (gnupg-pkcs11-scd « Risqué » à la lettre ; moteurs PKCS#11 et TPM d'obs-sign non publiés) ; **décision du propriétaire D2 (a) du 19/11/2026, pour le PoC seulement** : clé OpenPGP en fichier 0600 sur l'hôte d'administration, hors du cluster, comme la clé des tâches de J6 ; **écart de production à écrire dans l'ADR** (texte au §4 bis de `poc/bricks/09-openpgp-signing/A-REPORTER.md`) ; **décision du propriétaire D3 (a) du 19/11/2026** : attestation de lien (énoncé in-toto) émise par le service de signature après vérification de la provenance de Chains sur le manifeste non signé, signée par cosign avec une clé Transit `lien` distincte (provenance, `tsa`, tâches) ; l'hôte d'administration détient un jeton OpenBao borné à `lien` et un accès en lecture à Zot ; clé RSA 4096 v4 et SHA-512, non bornées par `default-sequoia.config` d'apt de Debian 13 (lecture du fichier ; sqv non mesuré ; banc O0 sous gpgv 2.4.8 seulement) ; expiration et certificat de révocation à part
 ```
 
 ---

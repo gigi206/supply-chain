@@ -215,3 +215,16 @@ Conséquences pour le protocole :
 - **Écart de production** à écrire dans l'ADR 0003 (texte proposé dans [`A-REPORTER.md`](A-REPORTER.md), §4). Il est à reprendre avant toute mise en production.
 - Le jeton matériel OpenPGP reste **non mesuré** ; aucune mesure n'est prévue dans cette brique.
 - **Rien n'est lancé.** Question suivante : D3, puis D4.
+
+## Décision du propriétaire du 19/11/2026 : D3 (a) (consignée à 15:31:50 UTC)
+
+Question posée dans le cadre de fin de tour : « Pour D3, le service de signature vérifie la provenance de Chains, puis signe le lien avec Transit « lien » ? ». Réponse du propriétaire, reçue avant l'heure ci-dessus : « Oui, option (a) ».
+
+- **D3 (a) retenue.** Le service de signature tourne sur l'hôte d'administration (D2). Il travaille en trois temps :
+  1. il vérifie la provenance de Chains sur le manifeste non signé (`07b7bd6f…` pour le rpm, `60f25f5c…` pour le deb), avant toute signature, comme le job TSA de J6 ;
+  2. il émet un énoncé in-toto. Sujet : l'artefact signé. Prédicat : manifeste et fichier non signés, empreinte de la clé OpenPGP, versions des outils, résultat du contrôle de B1 ;
+  3. il signe cet énoncé par cosign avec une clé Transit **`lien`** d'OpenBao, distincte des clés de provenance, `tsa` et des tâches.
+- **D3 (b)**, énoncé signé par la clé OpenPGP, est écartée.
+- **Coûts déjà écrits, désormais engagés** : l'hôte d'administration détiendra un jeton OpenBao borné à la clé `lien` et un accès en lecture à Zot. Création de la clé `lien`, du jeton et de sa politique : **accord à demander** avant O5 (liste « Accords », point 2).
+- La forme exacte du prédicat (type, champs) sera écrite avec les prédictions d'O5.
+- **Rien n'est lancé.** Question suivante : D4 (version de GnuPG).
