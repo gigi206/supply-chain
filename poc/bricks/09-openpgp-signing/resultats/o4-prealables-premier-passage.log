@@ -1,0 +1,26 @@
+étape prealables commencée : 2026-11-19T18:24:01Z ; o4.sh cb533e7d04e5dd7f… ; o4-interne.sh 1ef823a6503b7623… ; o2-interne.sh 7c91e50fd7921f89…
+OK   copie locale du deb égale à f66bbeb2aba31e52… (1953492 octets)
+OK   o2/racine-debian13/usr/bin/gpg présent
+OK   o2/racine-debian13/usr/bin/apt-ftparchive présent
+OK   o2/racine-debian13/usr/bin/gzip présent
+OK   o2/racine-debian13/usr/bin/gpgconf présent
+paquets de la racine Debian (dpkg-query dans la racine, sans réseau) :
+  apt 3.0.3
+  apt-utils 3.0.3
+  gnupg 2.4.7-21+deb13u1
+  gpg 2.4.7-21+deb13u1+b5
+  gpgv 2.4.7-21+deb13u1+b5
+  gzip 1.13-1+deb13u1
+  sqv 1.3.0-3+b2
+OK   manifeste 7378260c0a09 et couche 37fb86c2a767 de l'amorce Debian 13 contrôlés par sha256
+amorce Debian 13, entrées de la couche (tar -t, sans extraction) :
+  usr/bin/sqv : absent
+  usr/bin/gpgv : absent
+  usr/bin/gpg : absent
+  usr/share/apt/default-sequoia.config : absent
+  etc/apt/apt.conf.d/docker-clean : absent
+OK   clé publique du PoC présente (test -f, dossier non listé)
+place libre sous /home/gigi/.cache/supply-chain-poc/09 : 103472 Mo
+OK   /home/gigi/.cache/supply-chain-poc/09/o4 absent
+étape prealables finie : 2026-11-19T18:24:02Z
+OK   K3 : aucune ligne de bloc OpenPGP armuré dans le journal
