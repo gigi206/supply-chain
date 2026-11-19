@@ -8,6 +8,8 @@ Sources : [relevé](resultats/releve-amont.log), compléments [1](resultats/rele
 
 ## 1. `docs/04-sante-projets.md`
 
+*Note datée du 19/11/2026, 18:00:59 UTC* : les trois lignes GnuPG de docs/04 (§3, §4, §6) sont déjà écrites par la session principale, au commit `5d0e7868` de `claude/focused-fermi-ul5y20` (non poussé). Ce commit est vu dans le dépôt local : trois lignes ajoutées qui contiennent « GnuPG ». Elles reprennent le verdict « À surveiller, chemin critique » d'après les relevés `74e7b94c` et `96b7e6f7`, et la brique 05 y ajoute une mesure à elle : aucun erratum de Rocky 9.8 ne porte un gnupg2 plus récent. Pour l'intégration de ce fichier : **sauter** la ligne GnuPG du §1.3 et celle du §1.4. Au §1.2, **retirer GnuPG** de la ligne « À surveiller, chemin critique » et garder apt, rpm-sign et createrepo_c. Le reste ne change pas (§1.1, apt, devscripts, Sequoia, lignes « non retenus »).
+
 ### 1.1 §2, tableau du relevé Scorecard : lignes à ajouter (les cinq premières avant les lignes « hors GitHub » existantes, à partir de Forgejo ; les quatre dernières parmi ces lignes « hors GitHub »)
 
 ```
