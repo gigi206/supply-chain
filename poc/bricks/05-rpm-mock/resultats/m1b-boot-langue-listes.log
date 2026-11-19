@@ -1,0 +1,12 @@
+# m1b-boot-langue-listes.sh, début 2026-11-19T12:52:12Z
+avant-en : 147 lignes ; après-en : 153 lignes
+OK   liste rpm -qa après (en) = celle de S1 (153 lignes)
+avant-all : 147 lignes ; après-all : 153 lignes
+OK   liste rpm -qa après (all) = celle de S1 (153 lignes)
+OK   listes avant (en, all) identiques
+seulement dans z-all : 87, dont 87 sous usr/share/locale et 87 fichiers .mo
+seulement dans z-en : 0
+domaines .mo seulement dans z-all : dnf-plugins-core.mo 32, dnf.mo 55
+base nue n1 : 1207 fichiers .mo sous usr/share/locale ; absents de z-en : 55 ; absents de z-all : 0
+domaines .mo de la base absents de z-en : dnf.mo 55
+# fin 2026-11-19T12:52:13Z

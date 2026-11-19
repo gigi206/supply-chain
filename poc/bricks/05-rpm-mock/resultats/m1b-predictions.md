@@ -1231,3 +1231,27 @@ Journal : [`m1b-boot-amorce.log`](m1b-boot-amorce.log).
 - **LG6** : le `/m` de la racine d'outils garde le même nombre d'entrées, et `/mnt` reste vide.
 
 **Ce qui départagera.** Si LG4 est tenue, seule la langue distingue l'amorce des outils de `a8` pour le bootstrap. La question au propriétaire porte alors sur la langue du bootstrap : `all` comme S1, ou `en_US` comme annoncé le 19/11.
+
+### Langue du bootstrap, séparée des outils : résultat, 19/11/2026, de 12:51:40 à 12:51:51 UTC, code 0 (note écrite à 2026-11-19T12:52:51Z UTC)
+
+Journaux : [`m1b-boot-langue.log`](m1b-boot-langue.log) ; complément sur l'hôte : [`m1b-boot-langue-listes.log`](m1b-boot-langue-listes.log) ([script](m1b-boot-langue-listes.sh)).
+
+**LG0, LG1, LG3, LG4 et LG6 tenues ; LG2 tenue, mesurée en partie après coup ; LG5 lue.**
+- **LG0** : les outils sont ceux de l'amorce (`libsolv-0.7.24-4.el9`, `python3-dnf-4.14.0-34.el9_8.rocky.0.1`, `tar-1.34-11.el9`), et le miroir est en lecture seule. Sous `env -i`, rpm de python lit `[en_US]` avec `HOME=/root` et `[all]` avec `HOME=/m/h`. Poser la langue par `.rpmmacros` fonctionne donc sous `env -i`.
+- **LG1** : l'extraction par le `tar` de l'amorce rend 0, sans rien sur stderr ; `rpm -qa` donne 147 lignes avant l'installation.
+- **LG2** : dnf-3 rend 0 deux fois (2 s et 3 s), avec 6 installations et 4 montées.
+  - La limite vaut `1024 / 1024` dans le sous-shell ; celle du shell reste `524288 / 524288` après : la forme « sous-shell autour de dnf seul » est mesurée.
+  - **Défaut du banc** : la comparaison des listes `rpm -qa` avec S1 a échoué deux fois sur « `cmp: command not found` » (l'amorce n'a pas `cmp`). Les « ÉCART » imprimés viennent de ce défaut, pas d'un écart.
+  - Faite ensuite sur l'hôte, à partir des listes laissées par le banc, la comparaison donne les deux listes égales à celle de S1 (153 lignes).
+  - **Pour la sonde du pod** : ne pas compter sur `cmp` dans l'amorce.
+- **LG3** : `tar` rend 0, sans rien sur stderr, et la racine passe en 555.
+- **LG4** : `z-all.tar` vaut `b063feb3…` octet pour octet. libsolv `-4`, l'extraction par le `tar` 1.34, `env -i` et la limite ne changent rien. **Seule la langue distingue l'amorce des outils de `a8` pour le bootstrap.**
+- **LG5** : `z-en.tar` (`4171b0d3…`, 11 385 membres) n'a que 87 membres de moins que `z-all.tar`, tous des fichiers `.mo` sous `usr/share/locale`. `var/lib/rpm/rpmdb.sqlite` diffère aussi. Le détail :
+  - **32 `dnf-plugins-core.mo`** : les traductions d'un paquet nouveau, que `en_US` n'installe pas ;
+  - **55 `dnf.mo`** : des fichiers que la base nue avait, et que `z-en` n'a plus. Sous `en_US`, la montée de version qui les livre ne les réinstalle pas. `z-all` les garde tous.
+- **LG6** : le `/m` de la racine d'outils garde 14 entrées, et `/mnt` reste vide.
+
+**Lecture.**
+- Avec `all` posée explicitement, l'amorce redonne le bootstrap de référence, celui que mock a utilisé de M2 à M4c, déjà retrouvé un autre jour UTC (`28634a12…`, de même contenu à la racine et au `tar` près).
+- Avec `en_US`, le bootstrap perd 55 traductions que la base `rockylinux:9.7` publiée contient. Ce n'est plus « la base, plus les dix lignes ».
+- **Place** : il reste 1 353 808 kB sous `$HOME` après le banc.

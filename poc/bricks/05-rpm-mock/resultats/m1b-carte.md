@@ -370,3 +370,11 @@ La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de 
 - **Correction** : `b063feb3…` est la cible du bootstrap seulement si sa langue est `all`. Ce choix revient au propriétaire. L'outillage reste en `en_US` (`7c07083c…`).
 - **Deux variables** : la langue (`all` contre `en_US`) et les outils (libsolv `0.7.24-6` dans `a8`, `0.7.24-4` dans l'amorce). La tâche peut poser la langue elle-même, quelle que soit l'image (ADR 0007). Un banc de l'hôte les sépare avant la question.
 - **Le pod du bootstrap attend** ce banc et ce choix.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T12:52:51Z UTC : langue du bootstrap, mesure
+
+- **Avec `all` posée explicitement**, la racine d'outils de l'amorce (libsolv `-4`, `tar` 1.34, sonde du pod, limite autour de dnf seul) redonne la référence `b063feb3…` octet pour octet. Seule la langue distingue les deux outils pour le bootstrap ([résultat](m1b-predictions.md), [journal](m1b-boot-langue.log)).
+- **Avec `en_US`** : `4171b0d3…`, avec 87 fichiers `.mo` de moins, dont 55 `dnf.mo` que la base nue avait, et un autre `rpmdb.sqlite` ([listes](m1b-boot-langue-listes.log)).
+- **Les deux listes `rpm -qa`** sont celles de S1 (153 lignes).
+- **Défaut du banc** : `cmp` est absent de l'amorce. La comparaison des listes a été faite ensuite sur l'hôte, et la sonde du pod ne doit pas compter sur `cmp`.
+- **Question au propriétaire** : la langue du bootstrap, `all` comme S1, ou `en_US` comme annoncé le 19/11.

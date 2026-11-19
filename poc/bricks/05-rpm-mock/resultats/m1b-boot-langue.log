@@ -1,0 +1,106 @@
+# m1b-boot-langue.sh, début 2026-11-19T12:51:40Z ; dossier /home/gigi/.cache/supply-chain-poc/05/m1b-boot-langue-20261119T125140Z
+place libre sous $HOME avant : 2481376 kB
+OK   z-b1.tar du 19/11 : b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+OK   dnf97.conf du 18/11 : 7f49d5d39d0f1b1b232482a2b9e416c235ece7885a6858256bae0a2692e9f5ef
+OK   couche 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09 : 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+avant : /m de la racine d'outils 14 entrée(s), /mnt 0
+paquets demandés : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+liste rpm -qa de S1 après : 153 lignes
+## LG0 : outils et témoins dans la racine d'outils
+     rpm-4.16.1.3-40.el9.x86_64
+     python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch
+     libsolv-0.7.24-4.el9.x86_64
+     libdnf-0.69.0-18.el9.rocky.0.1.x86_64
+     tar-2:1.34-11.el9.x86_64
+     dnf-4.14.0-34.el9_8.rocky.0.1.noarch
+     /m/miroir en lecture seule : oui
+     %_install_langs lu par rpm de python, env -i HOME=/root : [en_US]
+     %_install_langs lu par rpm de python, env -i HOME=/m/h : [all]
+## installation en (HOME=/root), début 2026-11-19T12:51:40Z
+extraction par le tar de l amorce : code 0 ; stderr 0 lignes ; racine 755
+avant : rpm -qa 147 lignes
+limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 524288 / 524288
+dnf-3 code 0 en 2 s ; 85 lignes de journal
+résumé de la transaction : Install  6 Packages
+résumé de la transaction : Upgrade  4 Packages
+_: line 13: cmp: command not found
+ÉCART liste rpm -qa après différente de celle de S1
+racine passée en 555 ; etc/machine-id : 0 octet(s)
+tar de l amorce : code 0 ; stderr 0 lignes
+z-en.tar : 238888960 octets, 11385 membres, sha256 4171b0d3d89c9c1fddc099df21fa2b99eab858263f285356a1219e958ade2c60
+## installation en, fin 2026-11-19T12:51:45Z
+## installation all (HOME=/m/h), début 2026-11-19T12:51:45Z
+extraction par le tar de l amorce : code 0 ; stderr 0 lignes ; racine 755
+avant : rpm -qa 147 lignes
+limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 524288 / 524288
+dnf-3 code 0 en 3 s ; 85 lignes de journal
+résumé de la transaction : Install  6 Packages
+résumé de la transaction : Upgrade  4 Packages
+_: line 13: cmp: command not found
+ÉCART liste rpm -qa après différente de celle de S1
+racine passée en 555 ; etc/machine-id : 0 octet(s)
+tar de l amorce : code 0 ; stderr 0 lignes
+z-all.tar : 241981440 octets, 11472 membres, sha256 b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+## installation all, fin 2026-11-19T12:51:49Z
+## LG4 : z-all contre la référence b063feb3
+OK   z-all.tar = b063feb3 octet pour octet
+## LG5 : z-en contre z-all (membre à membre)
+   comparer : membres : 11472 et 11385
+   comparer : seulement d'un côté : 87 ; présents des deux côtés et différents : 1
+   comparer :      seul : ./usr/share/locale/ar/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/bg/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/bg/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/bn/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/bn_IN/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/ca/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/ca/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/cs/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/cs/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/da/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/da/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/de/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/de/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/el/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/eo/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/es/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/es/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/eu/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/eu/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/fa/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/fi/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/fi/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/fil/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/fr/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/fr/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/fur/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/fur/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/gd/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/gu/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/he/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/hi/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/hr/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/hu/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/hu/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/id/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/id/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/it/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/it/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/ja/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/ja/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/ka/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/ka/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/kk/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/ko/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/ko/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/lt/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/ml/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/mr/LC_MESSAGES/dnf-plugins-core.mo
+   comparer :      seul : ./usr/share/locale/mr/LC_MESSAGES/dnf.mo
+   comparer :      seul : ./usr/share/locale/ms/LC_MESSAGES/dnf.mo
+   comparer :      écart : ./var/lib/rpm/rpmdb.sqlite (sha256)
+   comparer : champs en cause : sha256 1
+z-all : 11472 membres ; 2608 sous usr/share/locale, dont 1239 fichiers .mo
+z-en : 11385 membres ; 2521 sous usr/share/locale, dont 1152 fichiers .mo
+après : /m de la racine d'outils 14 entrée(s) (avant : 14), /mnt 0
+place libre sous $HOME après : 1353808 kB ; dossier laissé : /home/gigi/.cache/supply-chain-poc/05/m1b-boot-langue-20261119T125140Z
+# fin 2026-11-19T12:51:51Z
