@@ -2663,3 +2663,35 @@ Lecture du code de v1.20.0 (publiée le 12/11/2026), **rien mesuré, aucune note
 - **Les 6 cas de sélection de J8 ([journal](resultats/preuves-reserve_c.log))** : les deux dépôts à un seul bundle (`partiel-*`) n'ont qu'un candidat, retenu tel quel : rien ne change (lecture). Pour les deux copies aux mêmes deux enveloppes (TaskRun `00b86d8c`, PipelineRun `1fb94652`), si la date retenue est celle de l'énoncé, le choix ne dépendrait plus de l'ordre de l'index, mais de leurs `finishedOn`, non archivés pour le TaskRun. Pour `horodatage/bundles` (41 bundles, dont des provenances d'autres images du même digest) et `webhook-seul`, la provenance retenue n'est pas déterminable sans rejeu.
 - **La PR 18010** (même idée, présente dans v1.20.0) ne touche que `pkg/engine`, le moteur des `ClusterPolicy` ; nos quatre politiques sont des `ImageValidatingPolicy`.
 - **Ce qui trancherait** : rejouer les 6 cas avec le CLI 1.20.0. Cela demande d'épingler cette version dans `mise.toml` (installation, accord du propriétaire) et un nouveau protocole, car `reserve_c` n'est pas rejouable tel quel (dépôts d'essai nommés en dur, vides au rejeu). Kyverno reste épinglé en 1.19.2.
+
+## Note datée du 19/11/2026, écrite à 20:25:33 UTC : compte Zot `poc-lien` (brique 09, O5)
+
+Accord du propriétaire, « Maintenant », donné à la demande de la brique 09 (`A-REPORTER.md`, §4 quinquies, sur sa branche `claude/brique-09-sec-fdb4c6`).
+
+**Compte Zot `poc-lien`** : il range les attestations de lien, le rpm signé et les dépôts signés de la brique 09.
+- **`stockage.sh`, étape `zot`** : la ligne `htpasswd` (bcrypt, coût 12) est lue dans le dossier de la brique, `~/.cache/supply-chain-poc/09/secrets/zot-poc-lien.htpasswd`, comme pour `poc-replay`. Le mot de passe n'est jamais lu ici. Le bloc est celui de la brique 09, mot pour mot.
+- **`stockage/zot.json`** : nouvelle entrée `signes/**`, en lecture anonyme.
+  - `poc-lien` peut lire, et créer par digest seulement, avec la même condition CEL que `poc-scan`. Il ne peut ni mettre à jour ni supprimer.
+  - Aucun autre compte n'y est cité, comme la brique 09 le demandait. **`poc-ecriture` n'a donc aucun droit d'écriture sur `signes/**`**, à la différence des autres entrées : le motif le plus long remplace `**`.
+  - `poc-lien` n'apparaît dans aucune autre entrée.
+- **Validation** : avant le rejeu, `zot verify` 2.1.22 a jugé valides la configuration neuve et l'ancienne. Le contrôle portait sur des copies dont les chemins TLS et htpasswd étaient factices.
+
+**Rejeu ciblé** de `mise run confiance:stockage -- zot`, de 20:24:09 à 20:24:16 UTC, code 0. Le journal d'avant est gardé dans [`stockage-zot-avant-poc-lien.log`](resultats/stockage-zot-avant-poc-lien.log).
+- Zot a répondu 200 ; son exposition systemd vaut 3,0.
+- Le `config.json` installé a le même sha256 que celui du dépôt (`094282b4…`).
+- `htpasswd` compte 10 comptes : les neuf d'avant et `poc-lien`.
+- L'amorce `ed654c69…` se lit toujours en anonyme ; la mesure de M1b, à 00:01 UTC, en dépend.
+- `signes/` est vide.
+
+**Incident, de mon fait** : un second passage, non voulu, a tourné de 20:24:42 à 20:24:48 UTC.
+- **Cause** : en écrivant cette note, j'ai mis des accents graves dans une commande `bash -c "…"`. Le zsh de l'hôte les a exécutés avant bash. L'un d'eux contenait `mise run confiance:stockage -- zot`.
+- **Ce qui s'est passé** : Zot a redémarré une seconde fois, avec la même configuration, et a de nouveau répondu 200. `chrono.tsv` porte les deux passages.
+- **Après coup, à 20:25:13 UTC** : même sha256 installé, mêmes 10 comptes, amorce lisible, service actif.
+- **Journaux** : le second passage a écrasé `stockage-zot.log`. La sortie du premier, écrite aussi dans un fichier de travail, est archivée dans [`stockage-zot-1.log`](resultats/stockage-zot-1.log).
+- **Autres substitutions** : les autres mots entre accents graves ont échoué, faute de commande de ce nom. Une seule a fait autre chose : `zot`, appelé sans configuration, a imprimé son aide. Le fichier `htpasswd` de la brique 09, en 0600 et non exécutable, a été refusé à l'exécution ; son contenu n'a pas été affiché.
+
+**Non mesuré ici** : les droits de `poc-lien` (création par digest acceptée ; tag, suppression et écriture hors de `signes/**` refusés). C'est l'étape `droits_zot` de la brique 09.
+
+**Retrait** : retirer l'entrée `signes/**` de `stockage/zot.json` et le bloc de `stockage.sh`, effacer la ligne `htpasswd` de la brique, puis rejouer `stockage.sh zot`.
+
+**À reporter**, non fait ici (`A-REPORTER.md` de la brique 09) : ajouter `zot-poc-lien.password` et `openbao-lien.secret` de `09/secrets` à la boucle de `tools/secrets-depot.sh`.

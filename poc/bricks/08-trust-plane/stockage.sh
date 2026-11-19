@@ -9,6 +9,7 @@
 #              ; poc-replay (brique 10, D5 : VSA, builds/** par digest seulement ; hash lu dans le dossier du domaine)
 #              ; poc-vulndb (brique 07a, D2 : base Grype du jour, vulndb/**, création seulement, tags datés) et poc-scan
 #              (brique 07a, D2 : attestations du scanner, builds/scan/** par digest seulement)
+#              ; poc-lien (brique 09, O5 : attestations de lien, rpm et dépôts signés, signes/** par digest seulement ; hash lu dans le dossier de la brique)
 #   registre   push par digest de l'image sample-app de la brique 04 depuis l'hôte, relecture anonyme ;
 #              refus attendus : push anonyme, mauvais mot de passe, suppression
 #   containerd pull refusé sans la CA, puis CA et registries.yaml sur les trois nœuds (redémarrés un par un) ;
@@ -92,6 +93,16 @@ etape_zot() {
     (umask 077 && cat "$h10" >> "$d/htpasswd") && echo "htpasswd : poc-replay, bcrypt, coût 12 (hash fourni par la brique 10)"
   else
     echo "htpasswd : poc-replay absent (brique 10, D5 non appliqué)"
+  fi
+  # poc-lien (brique 09, O5, quatrième accord du propriétaire du 19/11/2026) : attestations de lien, rpm signé et dépôts signés,
+  # signes/** seulement, création par digest seulement. Seule sa ligne htpasswd (hash bcrypt) est lue, dans le dossier de la
+  # brique 09 ; le mot de passe n'est jamais lu ici. Absente : compte non créé.
+  local h09=$HOME/.cache/supply-chain-poc/09/secrets/zot-poc-lien.htpasswd
+  if [ -s "$h09" ]; then
+    grep -qxE 'poc-lien:\$2b\$12\$[./A-Za-z0-9]{53}' "$h09" || { echo "KO   ligne htpasswd de poc-lien inattendue" >&2; exit 1; }
+    (umask 077 && cat "$h09" >> "$d/htpasswd") && echo "htpasswd : poc-lien, bcrypt, coût 12 (hash fourni par la brique 09)"
+  else
+    echo "htpasswd : poc-lien absent (brique 09, O5 non appliqué)"
   fi
   cp "$z" "$here/stockage/zot.json" "$here/stockage/zot.service" "$P/zot.crt" "$S/zot.key" "$d/"
   copier sc-stockage /tmp/zot-installation "$d"/*

@@ -262,6 +262,35 @@
               ]
             }
           ]
+        },
+        "signes/**": {
+          "anonymousPolicy": [
+            "read"
+          ],
+          "policies": [
+            {
+              "users": [
+                "poc-lien"
+              ],
+              "actions": [
+                "read"
+              ]
+            },
+            {
+              "users": [
+                "poc-lien"
+              ],
+              "actions": [
+                "create"
+              ],
+              "conditions": [
+                {
+                  "expression": "req.referenceType != \"tag\"",
+                  "message": "poc-lien : attestations de lien, rpm et dépôts signés (brique 09, O5), écriture par digest seulement, aucun tag"
+                }
+              ]
+            }
+          ]
         }
       },
       "metrics": {
