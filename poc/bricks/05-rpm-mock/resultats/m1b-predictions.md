@@ -1031,3 +1031,15 @@ Le propriétaire a demandé, le 19/11 : « il faut vérifier ton explication ».
 - **CX5** : dnf rend le code 0 dans les quatre installations.
 
 **Portée prévue.** Le mécanisme serait montré sur l'hôte, avec une limite de 524 288. Dans le pod, la limite de 2³⁰ est mesurée, mais le nombre d'appels n'y est pas compté : ce banc ne le mesure pas. Un pod d'essai à limite basse le mesurerait.
+
+### Vérification de l'explication sur l'hôte : résultat, 19/11/2026, de 09:54:30 à 09:59:18 UTC, code 0 (note écrite à 2026-11-19T10:00:21Z UTC)
+
+Journaux : [`m1b-cloexec-banc.log`](m1b-cloexec-banc.log), [`m1b-cloexec-comparaison.log`](m1b-cloexec-comparaison.log) (archives comparées après coup, membre à membre) et, pour le premier passage, [`m1b-cloexec-banc-1.log`](m1b-cloexec-banc-1.log). Ce premier passage a été arrêté : `strace -f` attendait les `gpg-agent` lancés par dnf.
+
+- **CX5 tenue** : dnf rend le code 0 dans les quatre installations, avec 29 lignes « Running scriptlet » chacune.
+- **CX1 tenue** : sur 249 ouvertures de `/proc/self/fd`, 30 échouent avec `ENOENT` et 219 réussissent.
+- **CX2 tenue** : B compte 15 798 388 appels `fcntl`, dont 15 728 033 en erreur. Or 30 boucles complètes jusqu'à 524 288 feraient 30 × 524 285 = 15 728 550 appels : l'écart de 517 vient des descripteurs réellement ouverts, qui ne sont pas en erreur. Il y a donc **une boucle complète jusqu'à la limite dure par ouverture ratée**, avec le rpm de l'amorce lui-même (correctifs de Rocky compris).
+- **CX3 non mesurée** : `ulimit -Hn 1024` a été refusé (`Invalid argument`), car la limite souple, encore à 524 288, dépassait la nouvelle limite dure. D a donc tourné avec la même limite que C : défaut du script.
+- **CX4 non tenue** : C et D ne valent pas `7c07083c…`. Le seul membre qui diffère est `var/lib/rpm/rpmdb.sqlite-shm`, entre le banc des sondes et C (taille et contenu) comme entre C et D (contenu). Ce banc ajoutait `--setopt=keepcache=0`, absent de `SONDE_INSTALL`. Le lien entre cette option et l'écart n'est pas mesuré. Le fichier `-shm` est la mémoire partagée de SQLite.
+
+**Lecture.** Le mécanisme est montré sur l'hôte : avant chaque scriptlet, l'ouverture de `/proc/self/fd` échoue, et rpm parcourt alors tous les descripteurs jusqu'à la limite dure. La limite du pod vaut 2³⁰ (mesurée), soit environ 2 048 fois plus d'appels par scriptlet. **Ce qui n'est pas mesuré** : le nombre d'appels et la durée dans le pod. Les mesurer demande un passage dans Kata avec une limite basse, en abaissant d'abord la limite souple. Le fichier `rpmdb.sqlite-shm` devient aussi un candidat à l'exclusion. Ce n'est pas décidé.

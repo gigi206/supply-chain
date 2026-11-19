@@ -1,0 +1,24 @@
+# m1b-cloexec-banc.sh, début 2026-11-19T09:54:30Z ; dossier /home/gigi/.cache/supply-chain-poc/05/m1b-cloexec-20261119T095430Z
+strace : strace -- version 6.19 ; place libre de /home : 8007012 kB
+OK   entrees.tar (m1b-prealables.log) : ba6f1f8852dfe4ec42bf67a1a65196520c57a64de6bb4fc84622739e9fd2e383
+OK   couche de l'amorce : 99c753a880cc03bbe9da8bf6e354c8ba2d99f19058e87b8a55b6487ffcf52f8a
+OK   entrées revérifiées (225 fichiers)
+## A : openat de /proc/self/fd, limite de l'hôte
+A : limite dure 524288, trace a : dnf code 0 en 27.3 s ; strace: Requested path "/proc/self/fd" resolved into "/proc/1774747/fd" ; scriptlets « Running scriptlet » 29
+ouvertures de /proc/self/fd tracées : 249 ; par résultat : {'ENOENT': 30, 'réussie': 219} ; processus distincts : 243
+     7     --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=8, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+     7     --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=9, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+     10    --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=11, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+## B : nombre d'appels fcntl, limite de l'hôte
+B : limite dure 524288, trace b : dnf code 0 en 205.0 s ; limite vue dans la racine d outils : 524288 / 524288 ; scriptlets « Running scriptlet » 29
+     % time     seconds  usecs/call     calls    errors syscall
+     100.00   27.892394           1  15798388  15728033 fcntl
+     100.00   27.892394           1  15798388  15728033 total
+## C : sans trace, limite de l'hôte
+C : limite dure 524288, trace - : dnf code 0 en 26.7 s ; limite vue dans la racine d outils : 524288 / 524288 ; scriptlets « Running scriptlet » 29
+ÉCART archive C : b99ba82c8b4a261c3f854173d243700881cf0c7d0babdb2e38173706782b7a30
+## D : sans trace, limite dure 1024
+D : limite dure 1024, trace - : dnf code 0 en 25.8 s ; _: line 2: ulimit: open files: cannot modify limit: Invalid argument ; scriptlets « Running scriptlet » 29
+ÉCART archive D : 74bf69f00c45ab652f44dd7aa254daeb32556d9e72dcf6f6dc9f136d213a7158
+place libre de /home après : 4646284 kB
+# fin 2026-11-19T09:59:18Z

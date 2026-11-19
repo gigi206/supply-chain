@@ -1,0 +1,15 @@
+# comparaison des archives du banc cloexec, début 2026-11-19T10:00:18Z
+/home/gigi/.cache/supply-chain-poc/05/m1b-banc-sondes-20261119T085915Z/r/w/p.tar : 343930880 octets, sha256 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+/home/gigi/.cache/supply-chain-poc/05/m1b-cloexec-20261119T095430Z/r/w/C.tar : 344023040 octets, sha256 b99ba82c8b4a261c3f854173d243700881cf0c7d0babdb2e38173706782b7a30
+/home/gigi/.cache/supply-chain-poc/05/m1b-cloexec-20261119T095430Z/r/w/D.tar : 344023040 octets, sha256 74bf69f00c45ab652f44dd7aa254daeb32556d9e72dcf6f6dc9f136d213a7158
+## banc des sondes (p.tar) contre C
+membres : 13332 et 13332
+seulement d'un côté : 0 ; présents des deux côtés et différents : 1
+     écart : ./var/lib/rpm/rpmdb.sqlite-shm (taille, sha256)
+champs en cause : sha256 1, taille 1
+## C contre D
+membres : 13332 et 13332
+seulement d'un côté : 0 ; présents des deux côtés et différents : 1
+     écart : ./var/lib/rpm/rpmdb.sqlite-shm (sha256)
+champs en cause : sha256 1
+# fin 2026-11-19T10:00:21Z
