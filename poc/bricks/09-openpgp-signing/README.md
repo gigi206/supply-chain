@@ -241,3 +241,22 @@ Question posée dans le cadre de fin de tour : « Pour D4, signer avec le GnuPG 
 - **À suivre** : branches amont hors maintenance (2.4 depuis le 30/06/2026, 2.3 absente du tableau de fin de vie) ; les 4 failles ouvertes sans DSA de Debian 13 sont à relever à chaque ré-audit. Les vérifications se font sur `Release` + `Release.gpg`, ou sur le texte sorti de la vérification, jamais sur un `InRelease` brut (CVE-2025-68972).
 - **D1 à D4 sont décidées.** Selon D2, l'outillage de signature tourne sur l'hôte d'administration. Les « images de signature » du jalon O2 sont donc à relire : il faut un **environnement de signature** Rocky 9.8 et un Debian 13 qui tournent sur l'hôte, par exemple des conteneurs podman (podman est présent sur l'hôte). Leur forme n'est pas tranchée ici ; elle sera proposée, avec ses prédictions, avant O2.
 - **Rien n'est lancé.** Prochaine étape : préparer O2 à sec. Elle demande les accords de la liste « Accords » : clé OpenPGP du PoC, puis clé `lien`, jeton OpenBao et accès à Zot avant O5.
+
+## Additif du 19/11/2026, écrit à 16:04:07 UTC : O2 préparé à sec ; `construire`, `cle` et `essai` NON LANCÉES
+
+Préparation demandée par le propriétaire (« Oui, prépare O2 »). Décision prise en route : « racines (a) », pour le PoC (« Oui, option (a) »). Détail : [carte d'O2](resultats/o2-carte.md), [prédictions et résultats](resultats/o2-predictions.md).
+
+- **Relevé préalable** ([journal](resultats/o2-releve.log), [manuel de mmdebstrap](resultats/o2-releve-2.log)) : les versions de D4 sont confirmées dans les deux sources figées, l'instantané Debian `20261105T000000Z` et `vault/rocky/9.8` (dont les `repomd` sont égaux à ceux de pub). Les deux amorces sont dans le cache local de la 05.
+- **Version de gpg de l'amorce Rocky** : `gnupg2-2.3.3-5.el9_7`, mesurée par la session principale (`9b0f5e9f`), vérifiée ici. C'est la seule révision de Rocky 9.8.
+- **Décision « racines (a) »** : chaque amorce ne sert qu'une fois, pour produire une racine neuve depuis les dépôts signés. Les racines produites par la plateforme deviennent la cible de production (ADR 0003).
+- **Scripts** : [`o2.sh`](o2.sh) (`prealables`, `construire`, `cle`, `essai`), [`o2-interne.sh`](o2-interne.sh) (gestes sur la clé, gardes K1 à K4), [`o2-banc.sh`](o2-banc.sh). Mécanisme de la 05 : `unshare --map-auto --map-root-user` puis `chroot`, sans podman.
+- **Mesuré à sec** : `prealables` (PA1 à PA6) et le banc des gardes, avec le gpg 2.4.8 de l'hôte et une clé jetable (BC1 à BC8), tous tenus. Un premier passage du banc, raté sur un défaut du script, est archivé.
+- **Non mesuré** :
+  - l'import entre gpg 2.4.7 et 2.3.3 (K5, K5b) ;
+  - `mmdebstrap --mode=root` dans un espace de noms utilisateur de l'hôte (CR5, confiance faible) ;
+  - toute installation de paquets.
+
+**Accord nommé à demander avant de lancer** :
+- **`construire`** : réseau vers `vault/rocky/9.8` et `snapshot.debian.org`, téléchargement et installation de paquets épinglés dans deux racines neuves sous `~/.cache/supply-chain-poc/09/o2` ;
+- **`cle`** : clé du PoC (RSA 4096, v4, 1 an, **sans phrase de passe**, compromis à écrire dans l'ADR 0003), dans `~/.cache/supply-chain-poc/09/secrets` (0700 ; clé privée, clé publique et certificat de révocation en 0600) ; **clé publique dans le dépôt ou non**, à décider ;
+- **`essai`** : sans réseau, avec la clé du PoC.

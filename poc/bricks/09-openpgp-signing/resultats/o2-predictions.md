@@ -77,3 +77,28 @@ Durée : moins d'une minute. Ne mesure ni gpg 2.4.7 ni 2.3.3.
 | ES3 | E4 et E5 : vérifications croisées acceptées (Rocky lit la signature Debian, Debian lit la signature Rocky) | moyenne : suit ES2 |
 | ES4 | E6 à E8 (K5b) : clé jetable de 2.3.3 importée par 2.4.7, signature vérifiée par Rocky | moyenne-haute |
 | ES5 | K3 tenue pour le journal | haute |
+
+## Note datée du 19/11/2026, écrite à 16:03:45 UTC : `prealables` et banc passés, prédictions tenues
+
+Lancés après le commit des prédictions (`9a086ae5`).
+
+**`prealables`** ([journal](o2-prealables.log), 16:03:01 UTC, code 0) : **PA1 à PA6 tenues**.
+- Amorces égales à leur sha256.
+- Clé Rocky 9 de l'amorce égale à celle du relevé (`3a66e521…`).
+- 104 811 Mo libres.
+- Espace de noms avec tmpfs et `[lo]` seulement.
+- `o2` et `secrets` absents ; K3 tenue.
+
+**Banc** ([journal](o2-banc.log), 16:03:16 à 16:03:19 UTC, code 0) : **BC1 à BC8 tenues**.
+- BC5a refuse sur l'hôte, car les interfaces de l'hôte sont visibles (leurs noms sont au journal) ; BC5b passe sans réseau.
+- BC1 : RSA 4096, expiration au 19/11/2027, usages `scSC`, trois fichiers 600 dans un dossier 700, export armuré.
+- BC2 : refus (K4), fichiers inchangés.
+- BC3 : refus (K2) sur `ext2/ext3`, aucun fichier écrit.
+- BC4 : signature SHA-512 vérifiée par gpgv, sqv absent.
+- BC6 : clé jetable créée, importée et utilisée.
+- BC8 : refus de gpgv avec une clé étrangère.
+- BC7 : ni « BEGIN PGP » ni aucune ligne de la clé privée jetable dans le journal.
+
+**Passage raté archivé** : [premier passage](o2-banc-premier-passage.log), arrêté après BC5a. `set -e` coupait la fonction au premier refus attendu. C'était un défaut du script, corrigé par `set +e` dans la fonction du banc. Le dossier du banc ne contenait encore aucun fichier ; il a été effacé avant la relance.
+
+Le dossier du banc (clé jetable comprise) a été effacé à 16:03:25 UTC. Rien de ce banc ne mesure gpg 2.4.7 ni 2.3.3 : **K5 et K5b restent des prédictions** (ES2, ES4). `construire`, `cle` et `essai` ne sont pas lancées.

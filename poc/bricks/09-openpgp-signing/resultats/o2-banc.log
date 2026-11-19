@@ -1,0 +1,70 @@
+banc O2 commencé : 2026-11-19T16:03:16Z ; gpg de l'hôte : gpg (GnuPG) 2.4.8
+### BC5a (K1, témoin) : garde réseau lancée sur l'hôte, avec réseau : refus attendu
+KO   interfaces réseau visibles : [lo wlp0s20f3 lxcbr0 virbr-okd virbr1 br-ff0a930b4cad br-740ec01f010f docker0 br-9f0760f3ece9 br-a577252fce5a br-a9b35f368f28 br-e0b059f9f6c2 lxdbr0 br-5fcf02ef3469 virbr-screplay vnet124 virbr-scpoc vnet146 vnet147 vnet148 veth56f21b5 veth223df9e] (K1)
+  code 1
+### BC5b (K1) : garde réseau sans réseau
+OK   réseau absent : seule l'interface lo est visible (K1)
+  code 0
+### BC1 : création, exports armurés 0600
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/home/gigi/.cache/supply-chain-poc/09/o2-banc/g)
+gpg : gpg (GnuPG) 2.4.8
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2027-11-19, usages scSC
+  empreinte : 59DBF4BCC74C794E0F5A5A6DC6D598519CE9FC40
+  cle-openpgp.asc : 600 3498 (mode, octets), sha256 2009efd427a8e8f7a4533b97b19d249108194d94d6e21daafb310c7e93d34780
+  cle-publique.asc : 600 1749 (mode, octets), sha256 bc1bca078c112db2b30860cf5b4e2a7f22468e8b61fa630d1b6c52fb3bd55b98
+  revocation.asc : 600 1877 (mode, octets), sha256 23008960b29d851749e6896a137f9e59eebda30e2b9e4d11010d804d559631a7
+OK   clé privée exportée armurée (K3)
+empreinte créée : 59DBF4BCC74C794E0F5A5A6DC6D598519CE9FC40
+  code 0
+### BC2 (K4) : seconde création dans le même dossier, refus attendu
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/home/gigi/.cache/supply-chain-poc/09/o2-banc/g)
+KO   /home/gigi/.cache/supply-chain-poc/09/o2-banc/secrets-banc/cle-openpgp.asc existe déjà : rien n'est écrasé (K4)
+  code 1
+OK   BC2 : fichiers inchangés après le refus
+### BC3 (K2) : homedir sur disque, refus attendu
+OK   réseau absent : seule l'interface lo est visible (K1)
+KO   GNUPGHOME /home/gigi/.cache/supply-chain-poc/09/o2-banc/disque sur ext2/ext3, pas sur tmpfs (K2)
+  code 1
+  fichiers écrits dans secrets-2 : 0
+### BC4 : import de la clé et signature
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/home/gigi/.cache/supply-chain-poc/09/o2-banc/g)
+gpg : gpg (GnuPG) 2.4.8
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2027-11-19, usages scSC
+  empreinte : 59DBF4BCC74C794E0F5A5A6DC6D598519CE9FC40
+OK   essai.txt signé par 59DBF4BCC74C794E0F5A5A6DC6D598519CE9FC40 (SHA-512), signature de 566 octets
+  code 0
+### BC4 : vérification par gpgv (et sqv s'il existe)
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/home/gigi/.cache/supply-chain-poc/09/o2-banc/g)
+OK   gpgv : signature valide, 59DBF4BCC74C794E0F5A5A6DC6D598519CE9FC40
+sqv absent de cette racine
+  code 0
+### BC6 : clé jetable
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/home/gigi/.cache/supply-chain-poc/09/o2-banc/g)
+gpg : gpg (GnuPG) 2.4.8
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : BD391F5508A21421D21E67E17FD24540229730F0
+OK   clé jetable BD391F5508A21421D21E67E17FD24540229730F0 exportée dans /home/gigi/.cache/supply-chain-poc/09/o2-banc/x/jet (tmpfs)
+  code 0
+### BC6 : import de la clé jetable et signature
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/home/gigi/.cache/supply-chain-poc/09/o2-banc/g)
+gpg : gpg (GnuPG) 2.4.8
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : BD391F5508A21421D21E67E17FD24540229730F0
+OK   essai.txt signé par BD391F5508A21421D21E67E17FD24540229730F0 (SHA-512), signature de 566 octets
+  code 0
+### BC8 : signature du PoC vérifiée avec la clé jetable, refus attendu
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/home/gigi/.cache/supply-chain-poc/09/o2-banc/g)
+KO   gpgv : signature non vérifiée
+sqv absent de cette racine
+  code 0
+  modes : secrets-banc 700 ; cle-openpgp.asc 600 ; cle-publique.asc 600 ; revocation.asc 600 ; 
+banc O2 fini : 2026-11-19T16:03:19Z
+OK   BC7 (K3) : aucun « BEGIN PGP » dans le journal
+OK   BC7 (K3) : aucune ligne de la clé privée jetable dans le journal

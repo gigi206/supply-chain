@@ -15,6 +15,7 @@ mkdir -m 700 "$B/g" "$B/x" "$B/disque" "$B/secrets-banc" "$B/secrets-2"
 cd "$B"
 
 banc() {
+  set +e   # les refus attendus (BC5a, BC2, BC3) rendent un code non nul : ils sont journalisés, pas fatals
   echo "banc O2 commencé : $(date -u '+%Y-%m-%dT%H:%M:%SZ') ; gpg de l'hôte : $(gpg --version | head -1)"
   echo "### BC5a (K1, témoin) : garde réseau lancée sur l'hôte, avec réseau : refus attendu"
   bash "$I" reseau; echo "  code $?"

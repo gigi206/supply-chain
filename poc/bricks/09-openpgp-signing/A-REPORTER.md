@@ -59,7 +59,7 @@ Avant la ligne « **Risqué → interdit** » :
 ## 2. `docs/03-validation-briques.md`, tableau « Briques » : une ligne à ajouter
 
 ```
-| 09 | openpgp-signing | **Préparé à sec** (19/11/2026, branche `claude/brique-09-sec-fdb4c6`) ; banc O0 sur l'hôte tenu, rien installé, cluster et Zot intacts | Dépôt apt signé autour d'une copie de D (`f66bbeb2…`) : `Release.gpg` et `InRelease` vérifiés par gpgv 2.4.8, chaîne `Release` → `Packages` → deb tenue, 5 témoins refusés ou détectés ; gpgv 2.4.8 accepte une signature SHA-1 de `Release` (refus par apt de Debian 13 non établi) ; `apt-ftparchive` 3.2.1 ignore `SOURCE_DATE_EPOCH` pour `Date`. Ni rpm, ni `createrepo_c`, ni sqv, ni le gpg des distributions cibles mesurés | [README](../poc/bricks/09-openpgp-signing/README.md), [banc](../poc/bricks/09-openpgp-signing/resultats/banc-depot-deb-predictions.md) ; décisions D1 à D4 prises le 19/11/2026, toutes en (a) ; O2 à préparer |
+| 09 | openpgp-signing | **Préparé à sec** (19/11/2026, branche `claude/brique-09-sec-fdb4c6`) ; banc O0 sur l'hôte tenu, rien installé, cluster et Zot intacts | Dépôt apt signé autour d'une copie de D (`f66bbeb2…`) : `Release.gpg` et `InRelease` vérifiés par gpgv 2.4.8, chaîne `Release` → `Packages` → deb tenue, 5 témoins refusés ou détectés ; gpgv 2.4.8 accepte une signature SHA-1 de `Release` (refus par apt de Debian 13 non établi) ; `apt-ftparchive` 3.2.1 ignore `SOURCE_DATE_EPOCH` pour `Date`. Ni rpm, ni `createrepo_c`, ni sqv, ni le gpg des distributions cibles mesurés | [README](../poc/bricks/09-openpgp-signing/README.md), [banc](../poc/bricks/09-openpgp-signing/resultats/banc-depot-deb-predictions.md) ; décisions D1 à D4 prises le 19/11/2026, toutes en (a) ; O2 préparé à sec ([carte](../poc/bricks/09-openpgp-signing/resultats/o2-carte.md)) : relevé et banc des gardes de la clé tenus (gpg de l'hôte, clé jetable), construction des racines et clé du PoC non lancées |
 ```
 
 ---
@@ -69,7 +69,7 @@ Avant la ligne « **Risqué → interdit** » :
 Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 
 ```
-**Signature OpenPGP (09)** : préparée à sec le 19/11/2026 (branche à part, non fusionnée) ; banc O0 sur l'hôte tenu ; D1 à D4 décidées le 19/11/2026 (« deb signé » = dépôt apt signé, `.deb` intact ; clé OpenPGP en fichier sur l'hôte d'administration, pour le PoC seulement ; attestation de lien signée par la clé Transit `lien` après vérification de la provenance de Chains ; GnuPG des distributions) ; O2 à préparer, rien lancé.
+**Signature OpenPGP (09)** : préparée à sec le 19/11/2026 (branche à part, non fusionnée) ; banc O0 sur l'hôte tenu ; D1 à D4 décidées le 19/11/2026 (« deb signé » = dépôt apt signé, `.deb` intact ; clé OpenPGP en fichier sur l'hôte d'administration, pour le PoC seulement ; attestation de lien signée par la clé Transit `lien` après vérification de la provenance de Chains ; GnuPG des distributions) ; O2 préparé à sec (racines sur l'hôte depuis les dépôts signés, décision du 19/11/2026), construction et clé non lancées.
 ```
 
 ---
@@ -120,6 +120,34 @@ Mesures d'appui (brique 09, relevé du 19/11/2026) : gnupg-pkcs11-scd 0.11.0 du 
 seulement, absents du tag 2.8.5 ; sigul sans tag après v1.4 (au plus tard le 22/04/2025) ;
 debusine : clés OpenPGP sur HSM non faites (ticket 1099 ouvert) ; jeton matériel non mesuré.
 ```
+
+## 4 ter. ADR 0003 (à rédiger) : racines de signature et phrase de passe (O2 de la brique 09)
+
+À ajouter sous la section du 4 bis :
+
+```
+Racines de signature (décision du propriétaire du 19/11/2026, « racines (a) », pour le PoC) :
+l'outillage OpenPGP (gpg, rpm-sign, createrepo_c, apt-ftparchive, sqv) tourne sur l'hôte
+d'administration, dans deux racines neuves construites depuis les dépôts signés figés
+(vault/rocky/9.8 ; instantané Debian 20261105T000000Z), chaque image d'amorce ne servant
+qu'une fois. Cible de production : racines produites par la plateforme, sans réseau, avec
+leur provenance (même voie que la décision « C » de la brique 05, M1b).
+
+Phrase de passe de la clé du PoC (proposée, à confirmer dans l'accord de l'étape « cle ») :
+aucune. Compromis : une sauvegarde de l'hôte emporte une clé utilisable ; une phrase gardée
+hors de l'hôte couvrirait ce cas, mais chaque signature la demanderait, et root sur l'hôte
+pendant une signature la lirait quand même.
+```
+
+---
+
+## 4 quater. `tools/secrets-depot.sh` et règles de lecture des sessions
+
+`tools/secrets-depot.sh` ne lit aujourd'hui que `08/secrets` et `10/secrets` ([relevé d'O2](resultats/o2-releve.log), §4), et n'a aucun motif « BEGIN PGP ». Deux ajouts proposés, à faire **avant** l'étape `cle` d'O2 :
+- ajouter `"$HOME"/.cache/supply-chain-poc/09/secrets/*` à la boucle de la ligne 8. La clé privée est exportée armurée : chacune de ses lignes devient un motif ;
+- refuser tout fichier modifié ou nouveau qui contient la ligne `-----BEGIN PGP PRIVATE KEY BLOCK-----`. Ce contrôle vaut aussi pour une clé d'une autre origine.
+
+Règles de lecture des sessions : ajouter `~/.cache/supply-chain-poc/09/secrets/` aux chemins à ne jamais lire ni lister.
 
 ---
 
