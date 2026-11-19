@@ -1080,3 +1080,19 @@ Journal : [`m1b-pod_a.log`](m1b-pod_a.log). Le premier lancement de `pod_c`, ref
 - **Durée** : dnf a pris 5 811 s, de 09:00:44 à 10:37:35 UTC, contre 23 s sur l'hôte. La cause est étudiée à part : [constat](#constat-pendant-pod_a--lenteur-de-dnf-dans-le-pod-note-écrite-à-2026-11-19t093037z-utc-pendant-le-passage-demande-du-propriétaire) et vérification sur l'hôte.
 
 **Portée.** Dans un pod Kata du cluster, hors réseau, l'installation de l'outillage par le dnf de l'amorce redonne l'archive de l'hôte au bit près. C'est un seul pod, un seul jour. Les entrées sont livrées par copie, et seule la racine est archivée : pas de couche de configuration, pas de layout. PC1, la comparaison avec `pod_b`, reste à faire.
+
+### pod_c : résultat, 19/11/2026, de 10:38:43 à 10:40:47 UTC, code 0 (note écrite à 2026-11-19T10:41:11Z UTC)
+
+Journal : [`m1b-pod_c.log`](m1b-pod_c.log).
+
+**PL1 à PL4 tenues.**
+- **PL1** : la limite relevée avant dnf vaut `1024 / 1024`.
+- **PL2** : dnf rend le code 0 en 40 s, contre 5 811 s pour `pod_a`, sur le même nœud, avec la même image, les mêmes entrées et la même sonde, à la limite près.
+- **PL3** : l'archive vaut `7c07083c…` octet pour octet, comme celle de `pod_a`. Le fichier `rpmdb.sqlite-shm` n'a pas varié ici.
+- **PL4** : 201 paquets sont installés, dont 2 `gpg-pubkey`, et la racine est en 555.
+
+**Lecture.**
+- **Cause de la lenteur** : avec la seule limite de fichiers ouverts abaissée, dnf passe de 5 811 s à 40 s dans Kata. Avec le banc de l'hôte (une boucle de `fcntl` jusqu'à la limite dure par scriptlet, faute de `/proc/self/fd`), c'est la cause de la lenteur de dnf dans le pod.
+- **Contenu** : il ne dépend pas de cette limite. Deux pods Kata, l'un à la limite par défaut (2³⁰), l'autre à 1 024, donnent la même archive.
+- **Ce qui n'est pas mesuré** : la même cause pour les 5 694 s de l'étape `racine` de S1 et les 761 s de `boot_racine`. C'est probable, mais ces durées n'ont pas été remesurées.
+- **Pour la tâche à venir** : abaisser la limite de fichiers ouverts (souple, puis dure) avant dnf. C'est une proposition, pas une décision.
