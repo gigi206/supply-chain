@@ -44,6 +44,17 @@ specifiers = ["4.3.1"]
 checksum = "sha256:0403a88ae20913d11b10a2467b50087721fea7581736da6b9d3992f5357fe54b"
 url = "https://get.helm.sh/helm-v4.3.1-linux-amd64.tar.gz"
 
+[[tools."aqua:helmfile/helmfile"]]
+version = "1.8.4"
+backend = "aqua:helmfile/helmfile"
+specifiers = ["1.8.4"]
+
+[tools."aqua:helmfile/helmfile"."platforms.linux-x64"]
+checksum = "sha256:1f19ced8adb0cdf2350e94ca598cf64e390d8c21d0d9b4bdc1c9f246d4591c9d"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.8.4/helmfile_1.8.4_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/helmfile/helmfile/releases/assets/741828694"
+provenance = "github-attestations"
+
 [[tools."aqua:kubernetes-sigs/kind"]]
 version = "0.33.0"
 backend = "aqua:kubernetes-sigs/kind"

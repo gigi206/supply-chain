@@ -1,0 +1,27 @@
+# installation.sh (helmfile 1.8.4), début 2026-11-19T00:08:47Z ; dossier /home/gigi/.cache/supply-chain-poc/dep-hf-installation-20261119T000847Z
+## 1. mise.toml et mise.lock
+31:"aqua:helmfile/helmfile" = "1.8.4"               # essai à sec de helmfile (poc/benchmarks/deploiement), accord du propriétaire du 18/11/2026 ; sha256 et attestation GitHub (releaser.yaml)
+  [[tools."aqua:helmfile/helmfile"]]
+  version = "1.8.4"
+  backend = "aqua:helmfile/helmfile"
+  specifiers = ["1.8.4"]
+  
+  [tools."aqua:helmfile/helmfile"."platforms.linux-x64"]
+  checksum = "sha256:1f19ced8adb0cdf2350e94ca598cf64e390d8c21d0d9b4bdc1c9f246d4591c9d"
+  url = "https://github.com/helmfile/helmfile/releases/download/v1.8.4/helmfile_1.8.4_linux_amd64.tar.gz"
+  url_api = "https://api.github.com/repos/helmfile/helmfile/releases/assets/741828694"
+  provenance = "github-attestations"
+## 2. release téléchargée à part
+tarball : 41937916 octets, sha256 1f19ced8adb0cdf2350e94ca598cf64e390d8c21d0d9b4bdc1c9f246d4591c9d ; checksums.txt : 1f19ced8adb0cdf2350e94ca598cf64e390d8c21d0d9b4bdc1c9f246d4591c9d ; mise.lock : 1f19ced8adb0cdf2350e94ca598cf64e390d8c21d0d9b4bdc1c9f246d4591c9d
+OK   somme égale à checksums.txt
+OK   somme égale à mise.lock
+OK   url de mise.lock = https://github.com/helmfile/helmfile/releases/download/v1.8.4/helmfile_1.8.4_linux_amd64.tar.gz
+## 3. attestation d'artefact (GitHub)
+OK   gh attestation verify : code 0
+émetteur : https://token.actions.githubusercontent.com ; workflow : https://github.com/helmfile/helmfile/.github/workflows/releaser.yaml@refs/tags/v1.8.4 ; dépôt : https://github.com/helmfile/helmfile ; ref : refs/tags/v1.8.4 ; commit : 119a9effecb99764a4aa196cb90c1176753516a8
+## 4. binaire installé par mise
+mise which helmfile : /home/gigi/.local/share/mise/installs/aqua-helmfile-helmfile/1.8.4/helmfile
+installé : sha256 7bf165e7948dd7dc4480e6a39d9841e4d588345cdbbbd18c7fb518c2fb03a2a8 ; extrait du tarball vérifié : sha256 7bf165e7948dd7dc4480e6a39d9841e4d588345cdbbbd18c7fb518c2fb03a2a8
+OK   binaire installé identique au binaire du tarball vérifié
+version : helmfile version 1.8.4
+# fin 2026-11-19T00:08:54Z
