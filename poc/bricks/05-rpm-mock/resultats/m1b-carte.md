@@ -241,3 +241,12 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Correction** : la note de 08:33:55 UTC dit « Les références du banc ont 0775 ; aucune n'a le mode de S1 ». C'est faux pour trois des quatre. `.` vaut 0555 dans `a8` (`06c289ad…`), `b5` (`05d35d64…`) et `a3` (`0c00666a…`), comme dans S1. Seule `x1` (`28634a12…`, bootstrap) a 0775.
 - **Précision** : « qui vient de la base » est désormais mesuré. La couche amont `812c4412` a un `etc/machine-id` vide (0 octet, mode 0644). « Écrit à l'installation », pour `racine.tar`, reste seulement cohérent avec le `%post` de systemd lu sur le banc.
 - **machine-id** : il est absent des quatre références (`a8`, `b5`, `a3`, `x1`).
+
+## Décision du 19/11/2026, consignée à 2026-11-19T08:39:00Z UTC : machine-id absent
+
+**Décision du propriétaire** (réponse reçue avant 2026-11-19T08:39:00Z UTC, heure exacte non relevée) : « Absent ». La question était : « Pour etc/machine-id dans les images de M1b : absent ou vide ? ».
+
+- **Recommandation présentée** (passée par le conseiller) : « absent », seule valeur appuyée par une mesure archivée, sur les quatre références et deux jours UTC.
+- **Valeurs annoncées comme fixées dans la tâche, sans question** : `%_install_langs` à `en_US`, umask 022, racine de l'archive en 0555.
+- **Conséquence** : la référence du bootstrap `28634a12…` a sa racine en 0775. Elle est à refaire avec la racine en 0555, par ré-archivage des arbres existants, sans nouvelle installation. Les trois autres références ont déjà 0555 et machine-id absent.
+- **Portée** : rien n'est mesuré dans le pod Kata ; le point 1 A reste non établi. Ce n'est un accord pour aucune écriture dans le cluster ni dans Zot.
