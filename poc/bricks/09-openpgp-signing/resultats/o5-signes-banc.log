@@ -1,0 +1,219 @@
+banc commencé : 2026-11-19T20:46:20Z ; o5-signes.sh 747853a9e8f2e94f… ; o5-signes.py 329c60eaeab808a4… ; o5-signes-banc.sh 8c0f06df551e83d4…
+### 1. construire
+OK   code 0, aucune ligne KO
+OK   trois layouts, seconde construction égale
+OK   chaînes complètes, aucun membre de trop, balayage des membres
+### 2. essai_attest (clé jetable)
+OK   code 0, aucune ligne KO
+OK   prédicat réel accepté, deux témoins refusés par le contrôle
+OK   clé lien refuse l'attestation jetable ; trois attestations jetables, aucune par la clé lien
+OK   relevé de la forme de la sortie de verify-attestation
+### 3. publier
+OK   code 0 ; quatre objets poussés par poc-lien, relus en anonyme, sans tag
+OK   copie du deb : même digest que le manifeste non signé
+OK   relance : quatre objets déjà présents, rien repoussé
+### 4. fenêtre de la mesure de M1b
+OK   23:45 UTC : publier refusée avant tout appel à oras
+OK   07:59 UTC : attester refusée avant tout appel
+### 5. attester nominal
+OK   code 0, aucune ligne KO
+OK   quatre prédicats acceptés avant signature, quatre signatures par la clé lien
+OK   environnement hashivault conforme, secret jamais en argument, compte poc-lien
+OK   une attestation de lien par objet ; prédicats archivés
+OK   redirection fermée, plus aucune écoute
+OK   K5 et K6 tenus ; secret et mot de passe absents des journaux, sorties et dossiers
+OK   relance : refus avant signature (attestation déjà présente), aucune redirection
+### 6. attester : layout corrompu après construire
+OK   corrompu : refus avant signature, aucune redirection
+### 7. attester : provenance de Chains refusée
+OK   Chains refusée : aucune signature, aucune redirection
+### 8. attester : redirection en échec
+OK   redirection en échec : KO, aucune signature
+### 9. attester : secret dans une erreur du client
+OK   fuite : journal vidé par K5, secret absent du journal et de la sortie, redirection fermée
+### 10. verifier
+OK   code 0, aucune ligne KO
+OK   quatre contrôles indépendants ACCEPTÉ, quatre énoncés archivés
+OK   B1 recalculé, identité du deb, chaînes des dépôts recalculées
+OK   quatre témoins clé jetable refusés ; aucun secret lu (étape anonyme)
+### 11. variable de banc hors banc
+OK   O5_SIGNES_ATTENDUS refusée hors banc (code 64), avant tout
+### journaux nominaux
+     | étape essai_attest commencée : 2026-11-19T20:46:20Z ; o5-signes.sh 747853a9e8f2e94f… ; o5-signes.py 329c60eaeab808a4… ; BANC
+     | OK   valeurs archivées relues (o5-signes.py attendus) ; BANC : valeurs remplacées
+     | OK   heure 12:00 UTC : hors de la fenêtre 23:30-08:00 UTC
+     | OK   digests de construire (journal archivé = dossier) : rpm fa5b175786dc…, depot-rpm ed666ab80dd1…, depot-apt 90909a869321… ; deb = manifeste non signé a134d50c3c4a…
+     | OK   configuration de registre de poc-lien présente (mode 600, non lue par la session)
+     | OK   clé cosign jetable (hors réseau, sans phrase de passe)
+     | OK   tiré en anonyme : builds/sample-app-rpm@sha256:7d0a0be26c97…
+     | OK   builds/sample-app-rpm : layout contrôlé (o5-zot-controle.py), un seul fichier de sha256 archivé
+     | OK   tiré en anonyme : builds/sample-app-deb@sha256:a134d50c3c4a…
+     | OK   builds/sample-app-deb : layout contrôlé (o5-zot-controle.py), un seul fichier de sha256 archivé
+     | OK   clé publique de Chains : sha256 1e7b2a03f9d5d289…, égal à m4c-provenance.log (05)
+     | OK   provenance de Chains de builds/sample-app-rpm : 2 enveloppe(s), SLSA v1, sujet = manifeste non signé
+     | OK   provenance de Chains de builds/sample-app-deb : 2 enveloppe(s), SLSA v1, sujet = manifeste non signé
+     | BANC : valeurs archivées remplacées : deb_manifeste, rpm_manifeste
+     | OK   lien : sha256 de cle-publique.asc égal à la valeur archivée (20bcaf436ddf28d4a6c0f69…)
+     | OK   layout sha256:ed666ab80dd1… : manifeste, configuration et couche recalculés ; 9 membre(s)
+     | OK   layout sha256:90909a869321… : manifeste, configuration et couche recalculés ; 6 membre(s)
+     |      prédicat rpm : lien rpm-b1, origine sha256:7d0a0be26c97…, dépôt signes/sample-app-rpm
+     |      prédicat deb : lien identity, origine sha256:a134d50c3c4a…, dépôt signes/sample-app-deb
+     |      prédicat depot-rpm : lien repository, origine sha256:7d0a0be26c97…, dépôt signes/depot-rpm, 9 fichiers couverts
+     |      prédicat depot-apt : lien repository, origine sha256:a134d50c3c4a…, dépôt signes/depot-apt, 6 fichiers couverts
+     | BANC : valeurs archivées remplacées : deb_manifeste, rpm_manifeste
+     |      prédicat rpm-autre-manifeste : unsigned.manifest remplacé par le manifeste non signé du deb
+     | OK   layout sha256:fa5b175786dc… : manifeste, configuration et couche recalculés ; 1 membre(s)
+     |      layout rpm-altere : dernier octet du rpm signé inversé au bit 0 ; image sha256:fdde6876e4a9a8c64e8cb72a1d73892fd43eec7b6078d7e7358db6b2754fb4b8
+     | OK   prédicat rpm : contrôle indépendant ACCEPTÉ avant signature
+     | ### poussées (poc-lien) et attestations par la clé jetable
+     | OK   poussé par poc-lien : signes/essai-09-attest@sha256:fa5b175786dc…
+     | OK   poussé par poc-lien : signes/essai-09-autre@sha256:fa5b175786dc…
+     | OK   poussé par poc-lien : signes/essai-09-altere@sha256:fdde6876e4a9…
+     | OK   cosign attest (clé jetable) signes/essai-09-attest@sha256:fa5b175786dc… : code 0
+     |      referrers (lien, total, types) : 1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1) ; tags : aucun
+     | OK   cosign attest (clé jetable) signes/essai-09-autre@sha256:fa5b175786dc… : code 0
+     |      referrers (lien, total, types) : 1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1) ; tags : aucun
+     | OK   cosign attest (clé jetable) signes/essai-09-altere@sha256:fdde6876e4a9… : code 0
+     |      referrers (lien, total, types) : 1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1) ; tags : aucun
+     | ### relevés sur signes/essai-09-attest
+     |      cosign verify-attestation --new-bundle-format (clé jetable) : code 0, 1 ligne(s)
+     |      ligne 1 : clés ['payload', 'payloadType', 'signatures'] ; _type https://in-toto.io/Statement/v0.1 ; predicateType https://supply-chain.example/lien-openpgp/v1 ; sujet [('192.168.161.13:5000/signes/essai-09-attest', ['sha256'])]
+     | ### contrôle indépendant sur les octets tirés de Zot
+     | OK   tiré en anonyme : signes/essai-09-attest@sha256:fa5b175786dc…
+     | OK   essai-09-attest (prédicat réel) : contrôle indépendant ACCEPTÉ (18 contrôles OK)
+     | OK   tiré en anonyme : signes/essai-09-autre@sha256:fa5b175786dc…
+     | OK   témoin autre manifeste non signé : contrôle indépendant refuse (lien : manifeste non signé sha256:a134d50c3c4a538ed5fac735df88de955f18f45ed8fef3cacfde48163040747a (attendu : sha256:7d0a0be26c973ab1f8176ab28ed24b8893dad611317286ed1e47e9e0)
+     | OK   tiré en anonyme : signes/essai-09-altere@sha256:fdde6876e4a9…
+     | OK   témoin rpm à charge altérée : contrôle indépendant refuse (lien : rpm signé 1325d4bdb44ea10ac89be85b21d991fd2075345c84e9fe5210a3688ce5ea1e69 (attendu : 9f71d578d3b13bc5c4a996a9cbacf60d1d5083d744ef2313054764fd9925567b))
+     | OK   clé lien : l'attestation de la clé jetable est refusée (Error: no matching attestations: (banc))
+     |      objets laissés dans Zot (poc-lien ne peut rien supprimer) : signes/essai-09-{attest,autre}@sha256:fa5b175786dc…, signes/essai-09-altere@sha256:fdde6876e4a9…, et leurs referrers
+     | à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-signes-banc/nominal/travail/essai_attest
+     | étape essai_attest finie : 2026-11-19T20:46:22Z
+     | OK   K3 : aucune ligne de bloc privé dans le journal
+     | OK   K5 : valeur du secret lien absente du journal et du dossier de l'étape
+     | OK   K6 : ni mot de passe, ni hash, ni chaîne d'authentification de poc-lien dans le journal et le dossier de l'étape
+     | étape publier commencée : 2026-11-19T20:46:22Z ; o5-signes.sh 747853a9e8f2e94f… ; o5-signes.py 329c60eaeab808a4… ; BANC
+     | OK   valeurs archivées relues (o5-signes.py attendus) ; BANC : valeurs remplacées
+     | OK   heure 12:00 UTC : hors de la fenêtre 23:30-08:00 UTC
+     | OK   digests de construire (journal archivé = dossier) : rpm fa5b175786dc…, depot-rpm ed666ab80dd1…, depot-apt 90909a869321… ; deb = manifeste non signé a134d50c3c4a…
+     | OK   configuration de registre de poc-lien présente (mode 600, non lue par la session)
+     | OK   tiré en anonyme : builds/sample-app-rpm@sha256:7d0a0be26c97…
+     | OK   builds/sample-app-rpm : layout contrôlé (o5-zot-controle.py), un seul fichier de sha256 archivé
+     | OK   tiré en anonyme : builds/sample-app-deb@sha256:a134d50c3c4a…
+     | OK   builds/sample-app-deb : layout contrôlé (o5-zot-controle.py), un seul fichier de sha256 archivé
+     | OK   poussé par poc-lien : signes/sample-app-rpm@sha256:fa5b175786dc…
+     | OK   relu en anonyme : signes/sample-app-rpm@sha256:fa5b175786dcaf0cbd989b7e7098c6306e3d66427d4cf6ae2f3ecb1fd857a283
+     | OK   signes/sample-app-rpm : aucun tag
+     | OK   poussé par poc-lien : signes/sample-app-deb@sha256:a134d50c3c4a…
+     | OK   relu en anonyme : signes/sample-app-deb@sha256:a134d50c3c4a538ed5fac735df88de955f18f45ed8fef3cacfde48163040747a
+     | OK   signes/sample-app-deb : aucun tag
+     | OK   poussé par poc-lien : signes/depot-rpm@sha256:ed666ab80dd1…
+     | OK   relu en anonyme : signes/depot-rpm@sha256:ed666ab80dd15b871b45c4bbba2295146fa395a8e4bd6d1bafe066b2cb97b915
+     | OK   signes/depot-rpm : aucun tag
+     | OK   poussé par poc-lien : signes/depot-apt@sha256:90909a869321…
+     | OK   relu en anonyme : signes/depot-apt@sha256:90909a869321b2455693408a394114725e5d9f2d75e723c9ecda811e2cc2630a
+     | OK   signes/depot-apt : aucun tag
+     | à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-signes-banc/nominal/travail/publier
+     | étape publier finie : 2026-11-19T20:46:23Z
+     | OK   K3 : aucune ligne de bloc privé dans le journal
+     | OK   K5 : valeur du secret lien absente du journal et du dossier de l'étape
+     | OK   K6 : ni mot de passe, ni hash, ni chaîne d'authentification de poc-lien dans le journal et le dossier de l'étape
+     | étape attester commencée : 2026-11-19T20:46:24Z ; o5-signes.sh 747853a9e8f2e94f… ; o5-signes.py 329c60eaeab808a4… ; BANC
+     | OK   valeurs archivées relues (o5-signes.py attendus) ; BANC : valeurs remplacées
+     | OK   heure 12:00 UTC : hors de la fenêtre 23:30-08:00 UTC
+     | OK   digests de construire (journal archivé = dossier) : rpm fa5b175786dc…, depot-rpm ed666ab80dd1…, depot-apt 90909a869321… ; deb = manifeste non signé a134d50c3c4a…
+     | OK   configuration de registre de poc-lien présente (mode 600, non lue par la session)
+     | OK   avant 2026-11-22T19:40:00Z (fin du secret lien, 22/11 19:49:36 UTC, moins une marge)
+     | OK   secret lien présent dans 09/secrets (non lu par la session)
+     | OK   clé publique archivée : SPKI sha256 5e836dc8ecc90549484b6c9059e23485cc81d397c204b438134d881fd975a80f
+     | ### objets publiés, sans attestation de lien
+     | OK   signes/sample-app-rpm@sha256:fa5b175786dc… publié, aucune attestation de lien (referrers : 0 0 )
+     | OK   signes/sample-app-deb@sha256:a134d50c3c4a… publié, aucune attestation de lien (referrers : 0 0 )
+     | OK   signes/depot-rpm@sha256:ed666ab80dd1… publié, aucune attestation de lien (referrers : 0 0 )
+     | OK   signes/depot-apt@sha256:90909a869321… publié, aucune attestation de lien (referrers : 0 0 )
+     | ### provenance de Chains et prédicats, avant toute signature
+     | OK   tiré en anonyme : builds/sample-app-rpm@sha256:7d0a0be26c97…
+     | OK   builds/sample-app-rpm : layout contrôlé (o5-zot-controle.py), un seul fichier de sha256 archivé
+     | OK   tiré en anonyme : builds/sample-app-deb@sha256:a134d50c3c4a…
+     | OK   builds/sample-app-deb : layout contrôlé (o5-zot-controle.py), un seul fichier de sha256 archivé
+     | OK   clé publique de Chains : sha256 1e7b2a03f9d5d289…, égal à m4c-provenance.log (05)
+     | OK   provenance de Chains de builds/sample-app-rpm : 2 enveloppe(s), SLSA v1, sujet = manifeste non signé
+     | OK   provenance de Chains de builds/sample-app-deb : 2 enveloppe(s), SLSA v1, sujet = manifeste non signé
+     | BANC : valeurs archivées remplacées : deb_manifeste, rpm_manifeste
+     | OK   lien : sha256 de cle-publique.asc égal à la valeur archivée (20bcaf436ddf28d4a6c0f69…)
+     | OK   layout sha256:ed666ab80dd1… : manifeste, configuration et couche recalculés ; 9 membre(s)
+     | OK   layout sha256:90909a869321… : manifeste, configuration et couche recalculés ; 6 membre(s)
+     |      prédicat rpm : lien rpm-b1, origine sha256:7d0a0be26c97…, dépôt signes/sample-app-rpm
+     |      prédicat deb : lien identity, origine sha256:a134d50c3c4a…, dépôt signes/sample-app-deb
+     |      prédicat depot-rpm : lien repository, origine sha256:7d0a0be26c97…, dépôt signes/depot-rpm, 9 fichiers couverts
+     |      prédicat depot-apt : lien repository, origine sha256:a134d50c3c4a…, dépôt signes/depot-apt, 6 fichiers couverts
+     | OK   prédicat rpm : contrôle indépendant ACCEPTÉ avant signature
+     | OK   prédicat deb : contrôle indépendant ACCEPTÉ avant signature
+     | OK   prédicat depot-rpm : contrôle indépendant ACCEPTÉ avant signature
+     | OK   prédicat depot-apt : contrôle indépendant ACCEPTÉ avant signature
+     | ### signature par hashivault://lien
+     | OK   redirection ouverte : 127.0.0.1:35485 → openbao-0:8200 (processus 2354821)
+     | OK   cosign attest --key hashivault://lien signes/sample-app-rpm@sha256:fa5b175786dc… : code 0
+     | OK   cosign attest --key hashivault://lien signes/sample-app-deb@sha256:a134d50c3c4a… : code 0
+     | OK   cosign attest --key hashivault://lien signes/depot-rpm@sha256:ed666ab80dd1… : code 0
+     | OK   cosign attest --key hashivault://lien signes/depot-apt@sha256:90909a869321… : code 0
+     | OK   redirection fermée : processus 2354821 arrêté, 127.0.0.1:35485 n'écoute plus
+     | OK   signes/sample-app-rpm : une attestation de lien (referrers : 1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+     | OK   signes/sample-app-deb : une attestation de lien (referrers : 1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+     | OK   signes/depot-rpm : une attestation de lien (referrers : 1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+     | OK   signes/depot-apt : une attestation de lien (referrers : 1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+     |      prédicats signés archivés : resultats/o5-signes-predicat-{rpm,deb,depot-rpm,depot-apt}.json
+     | à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-signes-banc/nominal/travail/attester
+     | étape attester finie : 2026-11-19T20:46:25Z
+     | OK   K3 : aucune ligne de bloc privé dans le journal
+     | OK   K5 : valeur du secret lien absente du journal et du dossier de l'étape
+     | OK   K6 : ni mot de passe, ni hash, ni chaîne d'authentification de poc-lien dans le journal et le dossier de l'étape
+     | étape verifier commencée : 2026-11-19T20:46:31Z ; o5-signes.sh 747853a9e8f2e94f… ; o5-signes.py 329c60eaeab808a4… ; BANC
+     | OK   valeurs archivées relues (o5-signes.py attendus) ; BANC : valeurs remplacées
+     | OK   digests de construire (journal archivé = dossier) : rpm fa5b175786dc…, depot-rpm ed666ab80dd1…, depot-apt 90909a869321… ; deb = manifeste non signé a134d50c3c4a…
+     | OK   clé publique archivée : SPKI sha256 5e836dc8ecc90549484b6c9059e23485cc81d397c204b438134d881fd975a80f
+     |      anonyme : aucun secret lu, aucune redirection ouverte
+     | OK   tiré en anonyme : builds/sample-app-rpm@sha256:7d0a0be26c97…
+     | OK   builds/sample-app-rpm : layout contrôlé (o5-zot-controle.py), un seul fichier de sha256 archivé
+     | OK   tiré en anonyme : builds/sample-app-deb@sha256:a134d50c3c4a…
+     | OK   builds/sample-app-deb : layout contrôlé (o5-zot-controle.py), un seul fichier de sha256 archivé
+     | ### rpm : signes/sample-app-rpm@sha256:fa5b175786dcaf0cbd989b7e7098c6306e3d66427d4cf6ae2f3ecb1fd857a283
+     | OK   une attestation de lien parmi les referrers (1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+     | OK   aucun tag
+     | OK   cosign verify-attestation (clé lien archivée) : 1 enveloppe(s)
+     | OK   tiré en anonyme : signes/sample-app-rpm@sha256:fa5b175786dc…
+     | OK   rpm : contrôle indépendant ACCEPTÉ (18 contrôles OK)
+     |      énoncé archivé : resultats/o5-signes-enonce-rpm.json
+     | OK   témoin : clé jetable refusée (Error: no matching attestations: (banc))
+     | ### deb : signes/sample-app-deb@sha256:a134d50c3c4a538ed5fac735df88de955f18f45ed8fef3cacfde48163040747a
+     | OK   une attestation de lien parmi les referrers (1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+     | OK   aucun tag
+     | OK   cosign verify-attestation (clé lien archivée) : 1 enveloppe(s)
+     | OK   tiré en anonyme : signes/sample-app-deb@sha256:a134d50c3c4a…
+     | OK   deb : contrôle indépendant ACCEPTÉ (17 contrôles OK)
+     |      énoncé archivé : resultats/o5-signes-enonce-deb.json
+     | OK   témoin : clé jetable refusée (Error: no matching attestations: (banc))
+     | ### depot-rpm : signes/depot-rpm@sha256:ed666ab80dd15b871b45c4bbba2295146fa395a8e4bd6d1bafe066b2cb97b915
+     | OK   une attestation de lien parmi les referrers (1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+     | OK   aucun tag
+     | OK   cosign verify-attestation (clé lien archivée) : 1 enveloppe(s)
+     | OK   tiré en anonyme : signes/depot-rpm@sha256:ed666ab80dd1…
+     | OK   depot-rpm : contrôle indépendant ACCEPTÉ (21 contrôles OK)
+     |      énoncé archivé : resultats/o5-signes-enonce-depot-rpm.json
+     | OK   témoin : clé jetable refusée (Error: no matching attestations: (banc))
+     | ### depot-apt : signes/depot-apt@sha256:90909a869321b2455693408a394114725e5d9f2d75e723c9ecda811e2cc2630a
+     | OK   une attestation de lien parmi les referrers (1 1 application/vnd.dev.sigstore.bundle.v0.3+json(https://supply-chain.example/lien-openpgp/v1))
+     | OK   aucun tag
+     | OK   cosign verify-attestation (clé lien archivée) : 1 enveloppe(s)
+     | OK   tiré en anonyme : signes/depot-apt@sha256:90909a869321…
+     | OK   depot-apt : contrôle indépendant ACCEPTÉ (23 contrôles OK)
+     |      énoncé archivé : resultats/o5-signes-enonce-depot-apt.json
+     | OK   témoin : clé jetable refusée (Error: no matching attestations: (banc))
+     | à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-signes-banc/nominal/travail/verifier
+     | étape verifier finie : 2026-11-19T20:46:32Z
+     | OK   K3 : aucune ligne de bloc privé dans le journal
+     | OK   K5 : valeur du secret lien absente du journal et du dossier de l'étape
+     | OK   K6 : ni mot de passe, ni hash, ni chaîne d'authentification de poc-lien dans le journal et le dossier de l'étape
+bilan : 28 OK, 0 KO
+banc fini : 2026-11-19T20:46:32Z
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-signes-banc

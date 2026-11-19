@@ -192,3 +192,9 @@ Journal : [o5-zot-droits_zot.log](o5-zot-droits_zot.log). L'image jetable est `s
 - `09/secrets/temoin-poc-ecriture-docker/config.json`, vidé (0 octet).
 
 **Suite** : préparer à sec la publication dans `signes/**` et les quatre attestations de lien réelles. Ce sera la prochaine étape, avec banc et prédictions.
+
+## Note datée du 19/11/2026, 20:47:51 UTC : publication et attestations préparées à sec
+
+Prédictions, banc et ordre des étapes : [o5-signes-predictions.md](o5-signes-predictions.md). Deux écarts au §3 :
+- **Prédicat** : il garde `unsigned` (dépôt, manifeste, fichier) et porte `signed` (dépôt, fichier ou racine du dépôt). `chainsProvenance` dit ce qui a été vérifié juste avant la signature : la clé, le nombre d'enveloppes, l'heure, et que les jetons d'horodatage ne sont pas vérifiés.
+- **Témoins** : chacun dans son propre dépôt (`signes/essai-09-attest`, `-autre`, `-altere`), puisqu'un referrer est rangé avec son sujet.

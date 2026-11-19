@@ -334,3 +334,8 @@ Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.
 - **Mode banc** : le banc a révélé un défaut du script, une clé publique mal choisie en mode banc. Il est corrigé avant le vrai passage.
 - **Décision « Oui, signes/** »** ; `compte_zot` est passée.
 - **Reste pour O5** : application par la session principale (§4 quinquies d'`A-REPORTER.md`, redémarrage de Zot), `droits_zot`, publication et attestations réelles.
+
+*Note datée du 19/11/2026, 20:47:51 UTC* : **O5 réel : publication dans `signes/**` et attestations de lien préparées à sec** ([prédictions](resultats/o5-signes-predictions.md)).
+- **Script** [`o5-signes.sh`](o5-signes.sh), contrôle [`o5-signes.py`](o5-signes.py). Étapes : `construire` (hors réseau), `essai_attest` (clé jetable, `signes/essai-09-*`), `publier`, `attester` (clé `lien`), `verifier` (anonyme).
+- **Banc** hors cluster ([o5-signes-banc.sh](o5-signes-banc.sh)) : 28 OK, 0 KO. Il simule Zot et OpenBao et ne prouve pas la vraie poussée de `cosign attest` sous `poc-lien` : `essai_attest` la mesure avant toute signature par `lien`.
+- **Garde horaire** : aucune écriture dans Zot entre 23:30 et 08:00 UTC (mesure de M1b).
