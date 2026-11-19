@@ -1501,3 +1501,35 @@ Journaux, tous en code 0 :
 - tout est mesuré le même jour : le point 1 A demande encore un autre jour.
 
 Les deux pods seraient admis à blanc sous les labels neufs. Leurs politiques réseau restent à poser, sur accord.
+
+## Prédictions du 19/11/2026, écrites à 14:14:38 UTC : base du bootstrap vérifiée et déclarée (« Vérifier et déclarer »)
+
+**Changement**, fait après la décision du propriétaire (carte, note de 14:12:23 UTC) et avant tout lancement :
+- `builders/prefetch-racine-rpm.yaml` passe de `60f4577f…` à `11a9a032eb4bc7b3…` :
+  - le paramètre `couche` devient « dépôt sha256-manifeste sha256-couche » ;
+  - le manifeste de base est lu par curl dans `/tmp` (`/v2/<dépôt>/manifests/sha256:<h>`, en-tête `Accept` de manifeste OCI). Le prefetch contrôle son sha256, son type et sa couche unique, égale à la couche fixée ;
+  - le résultat objet `BASE_ARTIFACT_INPUTS` est déclaré. Il est écrit pour le bootstrap seulement.
+- `m1b-builders.sh` passe de `ab2969fd…` à `906ce9911ac2971f…`. Changent :
+  - le rendu de la pipeline du bootstrap (`couche` du prefetch avec `ee90dc0e…`) ;
+  - la substitution du résultat (`/tmp/resultat-base`) ;
+  - deux contrôles d'`essai_prefetch` : le JSON du bootstrap, et l'absence du fichier pour l'outillage.
+- `builders/construire-racine-rpm.yaml` est inchangé (`3a2c00b2565324dd…`).
+
+**Lancement prévu** : `prealables`, `banc`, `essai_prefetch` puis `essai_construire`, sous `PREFIXE=m1bt3`, chacune dans un journal neuf `m1b-builders-m1bt3-<étape>.log`.
+
+- **BV1, `prealables`** : code 0.
+  - `bash -n` passe, et shellcheck ne signale rien sur les quatre scripts.
+  - Les scripts de construction sont inchangés par rapport à `m1bt2` : 50 280 et 18 836 caractères en base64.
+  - Les scripts de prefetch grandissent, et restent sous la borne de 131 071.
+  - Les entrées attendues restent 224 et 20 : le manifeste n'est pas écrit dans le workspace.
+- **BV2, `banc`** : code 0, avec les mêmes digests qu'avant, `sha256:70f8c412…` pour l'outillage et `sha256:6de899ac…` pour le bootstrap. Les `image.tar` sont aussi les mêmes, `26ce192f…` et `e574aaa1…`.
+- **BV3, `essai_prefetch`** : code 0.
+  - Le pod du bootstrap lit le manifeste `ee90dc0e…` dans Zot sans compte, et l'affiche à 573 octets, image OCI à une couche, `812c4412…`.
+  - Son `BASE_ARTIFACT_INPUTS` vaut `{"uri":"oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux","digest":"sha256:ee90dc0e…"}`.
+  - Le pod de l'outillage affiche « aucune base », et `/tmp/resultat-base` y est absent.
+  - Les deux arbres sont égaux aux entrées du banc, fichier par fichier.
+- **BV4, `essai_construire`** : code 0, mêmes digests et mêmes `image.tar` qu'au banc. Il ne reste aucun objet `m1bt3-` après coup.
+
+**Pari le moins sûr** : BV3, sur la lecture anonyme d'un **manifeste** dans Zot. Celle d'un blob du même dépôt est mesurée (EP2), celle d'un manifeste ne l'est pas. Si Zot la refuse, le prefetch s'arrête sur « HTTP 401 » ; il faudrait alors revoir la lecture, sans changer la politique de Zot sans accord.
+
+**Hors de portée** : le cas « déclaré mais non écrit » dans un vrai TaskRun. Les pods d'essai ne passent pas par Tekton, donc il reste lu dans le code et non mesuré jusqu'au premier PipelineRun de l'outillage.

@@ -122,7 +122,7 @@ etape_prealables() {
   sed "s|@AMORCE@|$AMORCE|" "$GAB/construire-racine-rpm.yaml" > "$T/construire-racine-rpm.yaml"
   rendre_pipeline o builder-mock-rocky9 "$DEPOTS_O" "$LISTE_O" "$CLES_O" "$CLE_EPEL_F" - - "$DNF_O" "$NOMS_O" en_US "$S_O" \
     "$CIBLE_O" "$FICHIERS_O" "$CONFIG_O" '{}' "$IMAGE_O"
-  rendre_pipeline b builder-rocky9-bootstrap "$DEPOTS_B" "$LISTE_B" "$CLES_B" - "amont/rockylinux/rockylinux $COUCHE_BOOT" "$COUCHE_BOOT" \
+  rendre_pipeline b builder-rocky9-bootstrap "$DEPOTS_B" "$LISTE_B" "$CLES_B" - "amont/rockylinux/rockylinux ${BOOT_DIGEST#sha256:} $COUCHE_BOOT" "$COUCHE_BOOT" \
     "$DNF_B" "$(noms_b)" all "$S_B" "$CIBLE_B" - '{}' "$ANNOT_B" "$IMAGE_B"
   for f in prefetch-racine-rpm construire-racine-rpm; do
     attendu "$f : image du pas" "$(yq '.spec.steps[0].image' "$T/$f.yaml")" "$AMORCE"
@@ -161,8 +161,8 @@ etape_prealables() {
   attendu "fichiers produits = fichiers de la couche de S1, octet pour octet" \
     "$(diff -r "$x" "$(cat "$T/config-s1.chemin")" > /dev/null && echo identiques || echo différents)" identiques
   echo "## scripts substitués comme par Tekton"
-  substituer "$T/prefetch-racine-rpm.yaml" "$T/pipeline-o.yaml" 0 "$T/script-po.sh" sortie=/workspace/sortie
-  substituer "$T/prefetch-racine-rpm.yaml" "$T/pipeline-b.yaml" 0 "$T/script-pb.sh" sortie=/workspace/sortie
+  substituer "$T/prefetch-racine-rpm.yaml" "$T/pipeline-o.yaml" 0 "$T/script-po.sh" sortie=/workspace/sortie BASE_ARTIFACT_INPUTS=/tmp/resultat-base
+  substituer "$T/prefetch-racine-rpm.yaml" "$T/pipeline-b.yaml" 0 "$T/script-pb.sh" sortie=/workspace/sortie BASE_ARTIFACT_INPUTS=/tmp/resultat-base
   substituer "$T/construire-racine-rpm.yaml" "$T/pipeline-o.yaml" 1 "$T/script-co.sh" entrees=/workspace/entrees sortie=/workspace/sortie DIGEST_CONSTRUIT=/tmp/resultat
   substituer "$T/construire-racine-rpm.yaml" "$T/pipeline-b.yaml" 1 "$T/script-cb.sh" entrees=/workspace/entrees sortie=/workspace/sortie DIGEST_CONSTRUIT=/tmp/resultat
   for x in po pb co cb; do
@@ -418,6 +418,13 @@ etape_essai_prefetch() {
     echo "arbre écrit par le pod $p : $(wc -l < "$T/essai-p$x.sha256") fichiers, liste $(sha256sum < "$T/essai-p$x.sha256" | cut -c1-64)"
     if cmp -s "$T/essai-p$x.sha256" "$T/attendu-$x.sha256"; then echo "OK   arbre du pod $p = entrées du banc, fichier par fichier"
     else echo "ÉCART arbre du pod $p différent des entrées du banc :"; diff "$T/attendu-$x.sha256" "$T/essai-p$x.sha256" | head -n 20 | sed 's/^/     /'; fi
+    if [ "$x" = b ]; then
+      attendu "BASE_ARTIFACT_INPUTS du pod $p" "$(kubectl exec -n builds "$p" -- cat /tmp/resultat-base < /dev/null)" \
+        "{\"uri\":\"oci://$REG/amont/rockylinux/rockylinux\",\"digest\":\"$BOOT_DIGEST\"}"
+    else
+      attendu "BASE_ARTIFACT_INPUTS du pod $p (outillage, sans base)" \
+        "$(kubectl exec -n builds "$p" -- sh -c 'test -e /tmp/resultat-base && echo présent || echo absent' < /dev/null)" absent
+    fi
     retirer "$p"
   done
   echo "PVC $N-w gardé pour essai_construire : $(kubectl get pvc -n builds "$N-w" -o jsonpath='{.status.phase} {.spec.volumeName}' < /dev/null)"

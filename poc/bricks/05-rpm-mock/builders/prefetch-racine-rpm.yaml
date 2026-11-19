@@ -10,10 +10,14 @@
 #   - chaque fichier de métadonnées cité par repomd.xml à son sha256 (bases sqlite *_db écartées : dnf 4 ne les lit pas) ;
 #   - chaque rpm de la liste cherché dans primary par dépôt et nom de fichier, même sha256 que la liste, téléchargé à son chemin
 #     (location) puis contrôlé ; rpm -K de tous les rpm contre les clés ;
-#   - couche de base (bootstrap seulement) : blob de Zot (lecture anonyme, CA du PoC) au sha256 fixé.
+#   - base (bootstrap seulement) : manifeste de l'image de base lu dans Zot au sha256 fixé (lecture anonyme, CA du PoC), image OCI
+#     à une seule couche égale à la couche fixée, puis blob de cette couche au sha256 fixé (décision « Vérifier et déclarer » du
+#     19/11/2026, carte de M1b).
 # Entrées par substitution de Tekton dans le script, jamais par variable d'environnement : l'env du podTemplate d'un PipelineRun
 # l'emporterait sur celui du pas (docs/podtemplates.md de Tekton v1.15.5, carte de taches de M4b).
-# Aucun résultat *_ARTIFACT_INPUTS : les ancres sont des paramètres de la pipeline signée (point ouvert, carte de M1b).
+# BASE_ARTIFACT_INPUTS pour Chains (forme de BOOTSTRAP_ARTIFACT_INPUTS de prefetch-rpm), écrit pour le bootstrap seulement :
+# l'outillage, sans base, le déclare sans l'écrire (lu dans Tekton v1.15.5 et Chains v0.29.9 : ni échec ni matériau,
+# m1b-tekton-resultat-absent.log ; non mesuré dans un TaskRun). Les autres ancres restent des paramètres de la pipeline signée.
 # @AMORCE@ : m1b-builders.sh. Signée une fois, versionnée (prefetch-racine-rpm.signee.yaml), digest dans la liste revue.
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -33,6 +37,14 @@ spec:
     type: string
   workspaces:
   - name: sortie
+  results:
+  - name: BASE_ARTIFACT_INPUTS
+    type: object
+    properties:
+      uri:
+        type: string
+      digest:
+        type: string
   volumes:
   - name: tmp
     emptyDir: {}
@@ -135,9 +147,11 @@ spec:
       done < /tmp/liste
       [ "$nl" -ge 1 ] || ko "liste vide"
       if [ "$COUCHE" != - ]; then
-        cd_=${COUCHE% *}; cs=${COUCHE#* }
+        read -r cd_ cm cs reste <<< "$COUCHE"
+        [ -n "$cs" ] && [ -z "$reste" ] || ko "couche : « dépôt sha256-manifeste sha256-couche » attendu"
         case $cd_ in amont/*) ;; *) ko "dépôt de la couche hors de amont/ : $cd_" ;; esac
         case $cd_ in *..*|*[!a-z0-9/._-]*) ko "dépôt de la couche invalide : $cd_" ;; esac
+        hex "$cm" 64 || ko "sha256 du manifeste de base invalide"
         hex "$cs" 64 || ko "sha256 de la couche invalide"
       fi
       M=$S/miroir; C=$S/cles
@@ -244,11 +258,25 @@ spec:
       k=$(grep -c ': digests signatures OK$' /tmp/k.log || true)
       echo "rpm -K : rc $r, $k OK sur $n"
       [ "$r" = 0 ] && [ "$k" = "$n" ] || ko "signatures des rpm"
-      # Couche de base
+      # Base : manifeste, puis couche
       if [ "$COUCHE" != - ]; then
+        get /tmp/base-manifeste "https://sc-stockage.poc.test:5000/v2/$cd_/manifests/sha256:$cm" --cacert /etc/ca-poc/ca.crt \
+          -H 'Accept: application/vnd.oci.image.manifest.v1+json'
+        [ "$(sha256sum < /tmp/base-manifeste | cut -c1-64)" = "$cm" ] || ko "sha256 du manifeste de base"
+        python3 -I - /tmp/base-manifeste "sha256:$cs" <<'PY' || ko "manifeste de base : image OCI à une seule couche, la couche fixée, attendue"
+      import json, sys
+      m = json.load(open(sys.argv[1], encoding="utf-8"))
+      assert m.get("mediaType") == "application/vnd.oci.image.manifest.v1+json", m.get("mediaType")
+      assert [c["digest"] for c in m["layers"]] == [sys.argv[2]], [c["digest"] for c in m["layers"]]
+      PY
+        echo "manifeste de base $cd_@sha256:$cm : $(stat -c %s /tmp/base-manifeste) octets, image OCI à une couche, sha256:$cs"
         get "$S/couche.tar.gz" "https://sc-stockage.poc.test:5000/v2/$cd_/blobs/sha256:$cs" --cacert /etc/ca-poc/ca.crt
         [ "$(sha256sum < "$S/couche.tar.gz" | cut -c1-64)" = "$cs" ] || ko "sha256 de la couche"
         echo "couche $cd_ sha256:$cs : $(stat -c %s "$S/couche.tar.gz") octets, conforme"
+        printf '{"uri":"oci://sc-stockage.poc.test:5000/%s","digest":"sha256:%s"}' "$cd_" "$cm" > '$(results.BASE_ARTIFACT_INPUTS.path)'
+        echo "résultat BASE_ARTIFACT_INPUTS : oci://sc-stockage.poc.test:5000/$cd_ sha256:$cm"
+      else
+        echo "aucune base : BASE_ARTIFACT_INPUTS non écrit"
       fi
       ( cd "$S" && find . -type f | sed 's|^\./||' | sort | xargs sha256sum ) > /tmp/entrees.sha256
       echo "entrées : $(wc -l < /tmp/entrees.sha256) fichiers, $(du -sb "$S" | cut -f1) octets ; liste des sha256 : $(sha256sum < /tmp/entrees.sha256 | cut -c1-64) ; en $(($(date +%s) - t0)) s"
