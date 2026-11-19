@@ -115,3 +115,15 @@ Journal : [o5-signes-essai_attest.log](o5-signes-essai_attest.log). Aucune ligne
 - un referrer jetable sur chacun.
 
 Le dossier de l'étape, qui contenait la clé jetable, est effacé. La suite, `publier`, peut partir.
+
+## Note datée du 19/11/2026, 20:49:15 UTC : `publier` passée (20:48:58 à 20:49:06 UTC, code 0), PU1 tenue
+
+Journal : [o5-signes-publier.log](o5-signes-publier.log). Aucune ligne KO ; K3, K5 et K6 tenus.
+
+Quatre objets ont été poussés par `poc-lien` et relus en anonyme, sans aucun tag :
+- `signes/sample-app-rpm@sha256:fa5b1757…` ;
+- `signes/sample-app-deb@sha256:60f25f5c…` : la copie du manifeste non signé, au même digest ;
+- `signes/depot-rpm@sha256:ed666ab8…` ;
+- `signes/depot-apt@sha256:90909a86…`.
+
+Le dossier de l'étape est effacé.
