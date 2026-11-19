@@ -369,3 +369,40 @@ Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.
 - **Réserve qui reste.** La porte ne juge pas l'attestation de lien.
 - **Secret `lien`.** Il ne sert plus à rien et expire seul le 22/11/2026.
 - **Clôture de la brique.** Elle revient au propriétaire ([carte](resultats/o6-carte.md), dernière note).
+
+## Clôture (19/11/2026, écrite à 22:04:19 UTC ; décision du propriétaire : « Clore la brique 09 »)
+
+Le propriétaire a écrit « Clore la brique 09 » directement dans cette session. Aucune question n'était en cours. La brique est close **sans O6** : le choix entre N et la voie deb (P1-deb + P2-apt) est sans objet dans la 09. Cette section remplace la section « État » en tête de ce README, qui décrit l'état du début de journée (« rien lu ni écrit dans le cluster ou dans Zot »).
+
+**Le seuil est atteint sur le laptop, avec des réserves.** Seuil : « rpm, deb et dépôt signés ; attestation de lien vérifiée ». Les signatures OpenPGP ont été faites sur l'hôte, hors cluster et sans réseau. Les objets signés et leurs attestations sont dans Zot. Aucune mesure n'a été refaite à la clôture : chaque ligne vaut à l'heure de sa mesure.
+
+| Élément du seuil | Résultat (19/11/2026) | Preuve |
+|---|---|---|
+| rpm signé | O3, 17:57:42 UTC : `rpmsign --addsign` (gpg2 2.3.3 de la racine Rocky 9.8, SHA-512) sur le rpm de M4c (`864d55f4…`) ; rpm signé `9f71d578…`, en-tête principal et charge utile inchangés (B1, comparaison d'octets) ; `rpmkeys --checksig` code 0 après import de la clé ; rpm altéré d'un octet refusé | [`o3-signer.log`](resultats/o3-signer.log), [prédictions d'O3](resultats/o3-predictions.md) |
+| Dépôt rpm signé | O3 : `createrepo_c` et `repomd.xml.asc` armuré (SHA-512) ; dnf d'une amorce Rocky 9.8 l'accepte avec `gpgcheck=1` et `repo_gpgcheck=1` ; témoins autre clé, `repomd.xml` modifié et rpm non signé refusés | [`o3-signer.log`](resultats/o3-signer.log) |
+| deb signé (par le dépôt apt, décision D1 a) | O4, 18:36:57 UTC : `InRelease` et `Release.gpg` armuré (gpg 2.4.7 de la racine Debian 13, SHA-512), deb inchangé (`f66bbeb2…`) ; apt 3.0.3 (racine) et 3.0.4 (amorce) l'acceptent avec `Signed-By`, par sqv ; sept témoins refusés, dont SHA-1 et `Release.gpg` binaire | [`o4-signer.log`](resultats/o4-signer.log), [prédictions d'O4](resultats/o4-predictions.md) |
+| Publication dans Zot | O5, étape `publier` de 20:48:58 à 20:49:06 UTC, puis `attester` de 20:49:19 à 20:49:30 UTC : par `poc-lien`, dans `signes/**`, par digest, sans tag. Les objets construits sont égaux aux sorties archivées d'O3 et d'O4 (rpm signé `9f71d578…`, `repomd.xml`, `InRelease`, deb `f66bbeb2…`) | [`o5-signes-construire.log`](resultats/o5-signes-construire.log), [`o5-signes-publier.log`](resultats/o5-signes-publier.log) |
+| Attestation de lien vérifiée | O5, 20:49:45 à 20:49:46 UTC, en anonyme : pour chacun des quatre objets, une attestation de lien en referrer, signée par la clé Transit `lien` ; `cosign verify-attestation` l'accepte avec la clé publique archivée ; le contrôle indépendant l'accepte sur les octets tirés de Zot (rpm 18 contrôles, deb 17, dépôt rpm 21, dépôt apt 23) ; clé jetable refusée | [`o5-signes-verifier.log`](resultats/o5-signes-verifier.log), [prédictions et résultats d'O5](resultats/o5-signes-predictions.md) |
+
+**Réserves** :
+- **Porte** : elle ne juge pas l'attestation de lien. O6 n'est pas fait (« Oui » relayé, lu comme N, puis clôture). La politique de la porte du dépôt refuse les quatre objets de `signes/**`, avec ou sans la clé `lien` (O6-M0, hors cluster).
+- **Rpm sans verdict de la porte** : aucun verdict archivé de la porte sur le rpm non signé `builds/sample-app-rpm@07b7bd6f…` (réserve « Porte sans tâche rpm » de la 05).
+- **Lien du deb** : il se réduit à une identité. La copie `signes/sample-app-deb` a le digest du manifeste non signé, et la provenance de Chains se lit dans `builds/sample-app-deb`, pas sur la copie.
+- **Vérifications complémentaires** : le contrôle indépendant (`o5-signes.py`) lit l'énoncé de l'enveloppe, pas sa signature ; seule cosign vérifie la signature. Avec une clé jetable, cosign refuse.
+- **Horodatage** : les jetons d'horodatage des attestations de lien ne sont pas vérifiés.
+- **Clé OpenPGP** (D2 a, « Sans phrase de passe ») : fichier 0600 sur l'hôte d'administration, sans phrase de passe, pour le PoC seulement ; aucun HSM ; expire le 19/11/2027 ([`o2-cle.log`](resultats/o2-cle.log)). L'écart de production est rédigé pour l'ADR 0003 (§4 bis et §4 ter d'`A-REPORTER.md`).
+- **Clé publique OpenPGP dans le dépôt** : question jamais tranchée. La clé publique n'est pas versionnée ; seule son empreinte est archivée.
+- **Certificat de révocation** : créé (CL3 d'O2), mais la garde locale ne le couvre pas (RP3c).
+- **Contrôle des secrets du dépôt** : `tools/secrets-depot.sh` de la branche principale ne connaît pas les secrets de la 09 (§4 quater d'`A-REPORTER.md`, non intégré au commit `867bd680`). Seule la garde locale `garde-cle-privee.sh` les couvre.
+- **GnuPG** (D4 a) : versions des distributions, de branches amont hors maintenance (2.3.3 et 2.4.7).
+- **Amorces de vérification** : réutilisées depuis O2, contrôlées par le sha256 de leur couche seulement.
+- **Limites mesurées** : `apt-ftparchive` 3.0.3 ignore `SOURCE_DATE_EPOCH` ; `rpmsign --delsign` ne rend pas le rpm d'origine.
+- **Zot** : les objets d'essai `signes/essai-09*` y restent, car `poc-lien` ne peut rien supprimer. L'espace pris sur le disque de Zot n'est pas mesuré.
+- **Intégration** : branche jamais poussée ni fusionnée. Les fichiers partagés ne sont pas modifiés par cette session ; l'état de leur intégration est dans `A-REPORTER.md` (§6, note de clôture).
+
+**État laissé, rien supprimé** :
+- **OpenBao** : clé Transit `lien` (non supprimable), politique `lien-signature`, jeton borné qui expire seul au plus tard le 22/11/2026 à 19:49:36 UTC (décision « Garde »), sans usage prévu.
+- **Zot** : compte `poc-lien`, quatre objets signés avec leur attestation, objets d'essai.
+- **Hôte** : racines et amorces sous `~/.cache/supply-chain-poc/09`, lues par `o3.sh` et `o4.sh`, et la clé du PoC dans `09/secrets`. Taille non mesurée.
+
+**Effort** (sans conversion en pw) : 75 commits de la brique, tous dans ce dossier, du 19/11/2026 à 15:39:21 (heure de Paris, `967b6e04`) au 19/11/2026 à 22:26:16 (`26c94f8b`), soit 6 h 46 min 55 s entre le premier et le dernier commit, avant le commit de clôture. Estimation : 1,5 pw.

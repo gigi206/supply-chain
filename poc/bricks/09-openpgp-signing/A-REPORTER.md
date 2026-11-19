@@ -56,6 +56,8 @@ Avant la ligne « **Risqué → interdit** » :
 | GnuPG (ajouté le 19/11/2026, brique 09) | Branches amont des versions employées hors maintenance (2.4 depuis le 30/06/2026 ; 2.3 absente du tableau de fin de vie) ; 4 failles ouvertes sans DSA dans Debian 13 ; un éditeur dominant probable | Côté deb : Sequoia (`sq` pour signer, `sqv` déjà employé par apt d'après sa dépendance), relevé, non mesuré. Côté rpm : **aucune sortie mesurée**, `rpm-sign` 4.16 de Rocky 9.8 appelant gpg (`%__gpg_sign_cmd`) ; GnuPG 2.5 construit depuis l'archive amont signée reste possible, mais écarté par la décision D4 (a) du propriétaire du 19/11/2026 (paquets des distributions) |
 ```
 
+*Correction datée du 19/11/2026, 22:04:19 UTC (clôture)* : aux §1.3 (ligne Sequoia, « plan de sortie côté deb pour GnuPG (non mesuré) ») et §1.4 (« `sqv` déjà employé par apt d'après sa dépendance), relevé, non mesuré »), la vérification par sqv est désormais **mesurée** : apt 3.0.3 et 3.0.4 de Debian 13 vérifient `InRelease` et `Release.gpg` par sqv, même quand gpgv est installé ([O4](../poc/bricks/09-openpgp-signing/resultats/o4-predictions.md)). La signature par `sq` reste non mesurée, et le plan de sortie aussi. La branche principale a déjà intégré trois lignes GnuPG à partir de ces relevés, dans une forme à elle (commit `5d0e7868`, brique 05) ; le §1.4 est à rapprocher de cette ligne, pas à ajouter tel quel.
+
 ---
 
 ## 2. `docs/03-validation-briques.md`, tableau « Briques » : une ligne à ajouter
@@ -86,6 +88,12 @@ Avant la ligne « **Risqué → interdit** » :
 
 *Note datée du 19/11/2026, 20:53:54 UTC* : à la note précédente, ajouter « ; la copie `signes/sample-app-deb@60f25f5c…` ne porte pas la provenance de Chains, lue dans `builds/sample-app-deb` : O6 lira deux dépôts pour ce digest ».
 
+*Note datée du 19/11/2026, 22:04:19 UTC (clôture)* : la brique est close (« Clore la brique 09 », décision du propriétaire). **La ligne ci-dessous remplace la ligne initiale, la ligne de remplacement de 18:37:49 UTC et toutes les notes de ce §2** ; elle intègre la correction de 18:41:53 UTC. Place : après la ligne 06 du tableau « Briques ». Les liens ne valent qu'après la fusion de la branche `claude/brique-09-sec-fdb4c6`.
+
+```
+| 09 | openpgp-signing | **Validé (local)** ; **seuil atteint sur le laptop** (19/11/2026, décision du propriétaire « Clore la brique 09 »), avec réserves (la porte ne juge pas l'attestation de lien ; clé OpenPGP en fichier sur l'hôte d'administration, sans phrase de passe, pour le PoC seulement ; jetons d'horodatage non vérifiés) | Clé du PoC RSA 4096 v4 `29BA1C48…BCF03A86`, créée par gpg 2.4.7 sans réseau. rpm signé dans une racine Rocky 9.8 (gpg 2.3.3, rpm-sign 4.16) : en-tête principal et charge utile inchangés (B1), accepté par rpmkeys et par dnf de Rocky 9.8 (`gpgcheck=1`, `repo_gpgcheck=1`). Dépôt apt signé (`InRelease`, `Release.gpg` armuré, SHA-512), deb inchangé (`f66bbeb2…`), accepté par apt 3.0.3 et 3.0.4 avec `Signed-By`, vérifié par sqv ; SHA-1 et `Release.gpg` binaire refusés. rpm signé, copie du manifeste deb et dépôts rpm et apt publiés dans Zot (`signes/**`, par digest), chacun avec une attestation de lien signée par la clé Transit `lien`, vérifiée en anonyme par cosign et par un contrôle indépendant (B1 recalculé, identité du deb, chaînes des dépôts) ; clé jetable et témoins refusés | [README](../poc/bricks/09-openpgp-signing/README.md) (section « Clôture »), [O3](../poc/bricks/09-openpgp-signing/resultats/o3-predictions.md), [O4](../poc/bricks/09-openpgp-signing/resultats/o4-predictions.md), [O5](../poc/bricks/09-openpgp-signing/resultats/o5-signes-predictions.md) ; décisions D1 à D4 du 19/11/2026, toutes en (a) ; O6 (contrôle du lien par la porte) non fait ; rien installé au niveau système |
+```
+
 ## 3. `README.md` racine, ligne 33
 
 Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
@@ -106,6 +114,12 @@ Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 
 *Note datée du 19/11/2026, 20:50:29 UTC* : en plus des notes de 18:58:46 et 19:50:00 UTC, lire « reste O5 réel dans Zot (lecture, referrers) » ainsi : « rpm, deb et dépôts signés publiés dans Zot (`signes/**`), chacun avec une attestation de lien signée par la clé Transit `lien` et vérifiée sur l'hôte (cosign et contrôle indépendant) ; non vérifiée par la porte ni par Kyverno ». Ce texte atteint, sur l'hôte, le seuil de la ligne 33 (« rpm, deb et dépôt signés ; attestation de lien vérifiée »). La clôture de la brique reste au propriétaire.
 
+*Note datée du 19/11/2026, 22:04:19 UTC (clôture)* : la brique est close. **Le texte ci-dessous remplace les deux textes de remplacement et toutes les notes de ce §3.** Ancre relue sur la branche principale au commit `867bd680` : ligne 33, « **Signature OpenPGP (09)** : non commencée. », dans la puce « **Licences (13a)** ». Remplacer cette phrase par :
+
+```
+**Signature OpenPGP (09)** : **seuil atteint le 19/11**, avec réserves : rpm, deb (par le dépôt apt) et dépôts rpm et apt signés sur l'hôte, publiés dans Zot avec une attestation de lien vérifiée par cosign et par un contrôle indépendant ; la porte ne juge pas le lien, et la clé OpenPGP est un fichier sur l'hôte, pour le PoC seulement ([clôture](poc/bricks/09-openpgp-signing/README.md)).
+```
+
 ---
 
 ## 4. `docs/adr/README.md`, ligne de l'ADR 0003
@@ -115,6 +129,11 @@ Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 ```
  ; **brique 09 (préparée à sec le 19/11/2026)** : décision du propriétaire D1 (a) du 19/11/2026, « deb signé » = dépôt apt signé (`Release.gpg`, `InRelease`), `.deb` bit-identique et lien par identité d'empreinte ; aucun chemin publié et maintenu de gpg vers un HSM PKCS#11 (gnupg-pkcs11-scd « Risqué » à la lettre ; moteurs PKCS#11 et TPM d'obs-sign non publiés) ; **décision du propriétaire D2 (a) du 19/11/2026, pour le PoC seulement** : clé OpenPGP en fichier 0600 sur l'hôte d'administration, hors du cluster, comme la clé des tâches de J6 ; **écart de production à écrire dans l'ADR** (texte au §4 bis de `poc/bricks/09-openpgp-signing/A-REPORTER.md`) ; **décision du propriétaire D3 (a) du 19/11/2026** : attestation de lien (énoncé in-toto) émise par le service de signature après vérification de la provenance de Chains sur le manifeste non signé, signée par cosign avec une clé Transit `lien` distincte (provenance, `tsa`, tâches) ; l'hôte d'administration détient un jeton OpenBao borné à `lien` et un accès en lecture à Zot ; **décision du propriétaire D4 (a) du 19/11/2026** : GnuPG des distributions (`gnupg2` 2.3.3-5.el9_7 de Rocky 9.8 pour rpm, `gnupg` 2.4.7-21+deb13u1 de Debian 13 pour deb), branches amont hors maintenance, failles à suivre au ré-audit ; clé RSA 4096 v4 et SHA-512, non bornées par `default-sequoia.config` d'apt de Debian 13 (lecture du fichier ; sqv non mesuré ; banc O0 sous gpgv 2.4.8 seulement) ; expiration et certificat de révocation à part
 ```
+
+*Correction datée du 19/11/2026, 22:04:19 UTC (clôture)* : dans le texte ci-dessus, avant intégration :
+- lire « **brique 09 (close le 19/11/2026)** » au lieu de « brique 09 (préparée à sec le 19/11/2026) » ;
+- lire « clé RSA 4096 v4 et SHA-512, **acceptées par apt 3.0.3 et 3.0.4 de Debian 13, qui vérifie par sqv** (mesure O4) ; SHA-1 refusé » au lieu de « clé RSA 4096 v4 et SHA-512, non bornées par `default-sequoia.config` d'apt de Debian 13 (lecture du fichier ; sqv non mesuré ; banc O0 sous gpgv 2.4.8 seulement) » ;
+- ajouter, après la décision D3 (a) : « ; **réalisée** le 19/11/2026 (O5) : quatre attestations de lien dans Zot, vérifiées par cosign et par un contrôle indépendant ; **non jugées par la porte** (O6 non fait) ».
 
 ---
 
@@ -287,3 +306,13 @@ Après le tableau du §4 (sous la ligne « Sources : … »), ajouter :
 - **Réserve qui reste.** La porte ne juge pas l'attestation de lien.
 - **Secret `lien`.** Il ne sert plus à rien et expire seul le 22/11/2026.
 - **Clôture de la brique.** Elle revient au propriétaire ([carte](resultats/o6-carte.md), dernière note).
+
+*Note datée du 19/11/2026, 22:04:19 UTC (clôture)* :
+- **Décision.** Le propriétaire a écrit « Clore la brique 09 » dans cette session. La brique est close sans O6 ([README](README.md), section « Clôture »).
+- **Ce qui reste à intégrer**, relu sur la branche principale au commit `867bd680` :
+  - **déjà intégré** : §4 quinquies (compte Zot `poc-lien`, commit `4fe5e8a3`) et trois lignes GnuPG du doc 04, dans une forme à elle (commit `5d0e7868`, brique 05) ;
+  - **non intégré** : §1.1 à §1.3 (sauf GnuPG), §2 (ligne de clôture ci-dessus), §3 (texte de clôture ci-dessus), §4 avec sa correction de clôture, §5 (doc 00) ;
+  - **non intégré, à traiter en priorité** : §4 quater, `tools/secrets-depot.sh` ne connaît aucun secret de la 09 ;
+  - **ADR 0003** (§4 bis et §4 ter) : texte prêt, l'ADR reste à rédiger.
+- **Liens.** Les liens vers `poc/bricks/09-openpgp-signing/` ne valent qu'après la fusion de la branche `claude/brique-09-sec-fdb4c6`, jamais poussée.
+- **Rien à faire dans le cluster.** Le jeton `lien` expire seul au plus tard le 22/11/2026 à 19:49:36 UTC. La clé Transit `lien`, la politique `lien-signature`, le compte `poc-lien` et les objets de `signes/**` restent en place.
