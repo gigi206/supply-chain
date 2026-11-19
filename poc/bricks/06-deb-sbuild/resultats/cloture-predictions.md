@@ -74,3 +74,8 @@ La part des autres briques dans ces blocs n'est pas séparée : le bloc du 16/11
 - **CL7** (haute) : 16 lignes contiennent « privileged » dans 13 fichiers suivis de la 06, hors `resultats/` et `.md`. Toutes sont classées : 4 définitions de `PRIVILEGIE`, 2 lignes de contexte de correctifs, 4 tâches privilégiées, 2 pods d'essai sous Kata, 3 lectures ou mesures, 1 réglage du noyau de `sc-replay`. 0 non classée.
 - **CL8** (haute) : chaque bloc `capabilities` est un `drop ALL` ; aucune ligne `SYS_ADMIN`, `hostPID`, `hostNetwork` ni `hostPath`.
 - **CL9** (haute) : lus avec `grep -a`, les en-têtes de pod gardent tous leurs contextes privilégiés sous `kata` ; `diag-exec-releve.log` a au moins un en-tête, sous `kata`.
+
+## Note datée du 19/11/2026, écrite à 14:59:23 UTC : premier passage du complément en KO sur un défaut du script
+
+- Passage de 14:59:06 UTC, gardé dans [`cloture-denominateur-1.log`](cloture-denominateur-1.log) : 3 KO en F, sur les blocs YAML `drop:` / `- ALL` des trois tâches signées (`prefetch-deb`, `preparer-deb`, `prefetch-gomod`). Le script resserrait les espaces avant de changer le retour à la ligne en espace : il comparait « drop:  - ALL », avec deux espaces, à « drop: - ALL ». Les blocs sont bien des `drop ALL`. Défaut du script, pas de la plateforme.
+- Correctif : le retour à la ligne est changé avant le resserrage. Le script passe à `49157d226c8fa848…`. CL7 à CL9 ne changent pas ; seul le passage suivant compte.

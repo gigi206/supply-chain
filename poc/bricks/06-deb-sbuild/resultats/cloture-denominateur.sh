@@ -46,7 +46,7 @@ while IFS= read -r l; do
   n=$((n + 1)); f=${l%%:*}; i=$(cut -d: -f2 <<<"$l")
   case "$l" in
     *'"capabilities": {"drop": ["ALL"]}'*|*'capabilities: {drop: ["ALL"]}'*|*'capabilities: {drop: [ALL]}'*) ok "$f:$i : drop ALL" ;;
-    *capabilities:) s=$(sed -n "$((i + 1)),$((i + 2))p" "$f" | tr -s ' ' | tr '\n' ' ')
+    *capabilities:) s=$(sed -n "$((i + 1)),$((i + 2))p" "$f" | tr '\n' ' ' | tr -s ' ')   # retour à la ligne changé en espace avant le resserrage
       case "$s" in " drop: [ALL] "*|" drop: - ALL "*) ok "$f:$i : drop ALL (bloc YAML)" ;; *) ko "$f:$i : bloc capabilities autre : $s" ;; esac ;;
     *) ko "autre forme : ${l:0:160}" ;;
   esac
