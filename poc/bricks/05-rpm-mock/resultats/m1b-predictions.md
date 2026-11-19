@@ -2005,3 +2005,15 @@ Dans tous les cas, `$T/auth` est absent à la fin. Il ne couvre ni Zot, ni le vr
 **FL2, copies corrigées et `m1b-pipeline.sh` (témoin déjà corrigé)** (journal `m1b-filtre-banc.log`) : 33 OK, 0 KO, code 0.
 
 **FL3, portée** : seule la ligne `filtre()` change. Les journaux des mesures passées et de celle de cette nuit restent sortis du filtre inopérant ; le correctif ne vaut que pour les lancements qui suivent son application.
+
+## Prédictions NU1 et NU2, écrites à 2026-11-19T20:54:04Z UTC : comptage de nuit, avant toute lecture
+
+Le masquage de `m1b.sh` et de `m1b-builders.sh` est inopérant cette nuit (FL3). Avant de lire un journal de la mesure de 00:01 UTC, je compte ses lignes jeton/token avec [`m1b-nuit-compte.sh`](m1b-nuit-compte.sh) (sha256 `bfa17b64d43bcc9e…`). Le script n'affiche que des nombres.
+
+**Base relevée à 2026-11-19T20:54:04Z UTC sur les journaux de l'essai du 19/11** ([`m1b-nuit-compte-base.log`](m1b-nuit-compte-base.log)) (préfixes `m1b` et `m1bt3`, ceux que lit `jk-verif.py`) : 0 ligne dans chacun des dix fichiers (`m1b-prealables`, `m1b-prealables_boot`, `m1b-pod_c`, `m1b-pod_e`, les quatre `m1b-builders-m1bt3-*`, `m1b-jour-kata-repetition`, et le journal du lanceur non suivi). Le seul journal `m1b*.log` du dépôt qui en compte une est `m1b-refus-prefetch-2.log` (la ligne de yq déjà connue). Le lanceur ne le produit pas. Les deux journaux du banc de `filtre` en comptent par construction (témoins inventés).
+
+**NU1** : cette nuit, le script lancé sans fichier (fichiers nouveaux ou modifiés de `resultats/`, plus la sortie de la tâche d'attente) donne 0 ligne pour chaque fichier.
+
+**Règle d'arrêt, fixée avant la mesure** : si un fichier compte une ligne ou plus, je ne lis pas ce fichier, je ne montre pas la sortie de `jk-verif.py`, je ne commite rien et je ne lance pas `m1b_sortie`. Je rapporte les seuls comptes et j'attends ta décision.
+
+**NU2, portée du contrôle des secrets** : `tools/secrets-depot.sh` cherche les valeurs littérales des secrets des briques 08 et 10 dans les fichiers modifiés ou nouveaux. Il ne trouve pas un jeton qu'il ne connaît pas (par exemple un jeton de compte de service du cluster), ni les secrets de la brique 09. Pour un jeton inconnu, le comptage est le seul garde-fou de cette nuit.

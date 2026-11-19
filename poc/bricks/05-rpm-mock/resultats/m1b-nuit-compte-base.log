@@ -1,0 +1,14 @@
+# base du comptage de nuit, 2026-11-19T20:54:04Z ; script sha256 bfa17b64d43bcc9edaee5d65eed4848138a82a3fbc1ed5509d5f001f1f7628d8
+poc/bricks/05-rpm-mock/resultats/m1b-prealables.log : 0
+poc/bricks/05-rpm-mock/resultats/m1b-prealables_boot.log : 0
+poc/bricks/05-rpm-mock/resultats/m1b-pod_c.log : 0
+poc/bricks/05-rpm-mock/resultats/m1b-pod_e.log : 0
+poc/bricks/05-rpm-mock/resultats/m1b-builders-m1bt3-prealables.log : 0
+poc/bricks/05-rpm-mock/resultats/m1b-builders-m1bt3-banc.log : 0
+poc/bricks/05-rpm-mock/resultats/m1b-builders-m1bt3-essai_prefetch.log : 0
+poc/bricks/05-rpm-mock/resultats/m1b-builders-m1bt3-essai_construire.log : 0
+poc/bricks/05-rpm-mock/resultats/m1b-jour-kata-repetition.log : 0
+poc/bricks/05-rpm-mock/resultats/m1b-jour-kata.log : 0
+poc/bricks/05-rpm-mock/resultats/m1b-refus-prefetch-2.log : 1
+# total 1 ; fichiers 11
+# code 0
