@@ -701,3 +701,14 @@ La provenance reste à préparer, sur le modèle de M4c. Sa forme dépend des r�
   - La note précédente vaut donc pour tout le dépôt.
 - **Cette nuit** : les journaux de la mesure sortiront de ce `filtre`, donc non masqués. Avant toute lecture, je compterai leurs lignes jeton/token sans les afficher, et `secrets-depot.sh` tranchera avant le commit.
 - **Correction des deux scripts** : dans un tour de jour, après `jk-verif.py` et le commit du résultat, avec leurs bancs. Elle n'est pas prévue cette nuit.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T20:40:20Z UTC : correctif de `filtre` préparé à sec, banc passé
+
+**Correctif** : [`m1b-filtre.patch`](../m1b-filtre.patch). Prédictions FL1 à FL3 commitées avant le banc (`c02b722`). Le banc a tourné à 20:39:44 UTC.
+- **FL1, tenue** : [`m1b-filtre-banc-avant.log`](m1b-filtre-banc-avant.log), sur `m1b.sh` `373ae334…` et `m1b-builders.sh` `82004de2…` tels qu'ils sont dans le dépôt. Chaque script a 4 OK et 7 KO, soit 8 OK et 14 KO au total, code 1. Aucune ligne jeton/token n'est masquée, quelle que soit sa casse. Les adresses sont bien retirées.
+- **FL2, tenue** : [`m1b-filtre-banc.log`](m1b-filtre-banc.log), sur les deux copies corrigées et sur `m1b-pipeline.sh` `f1982fdd…`. Résultat : 33 OK, 0 KO, code 0.
+- **FL3** : c'est une portée, pas une mesure. Les journaux de la mesure de cette nuit sortiront encore du filtre inopérant ; la règle de nuit tient (compter les lignes jeton/token avant toute lecture).
+
+**Pas appliqué**. L'application est un rejeu de `git apply` sur le dépôt, suivi du banc sur les scripts du dépôt (attendu : 22 OK). Elle viendra après la mesure de 00:01 UTC et le commit de son résultat ; ces deux scripts ne changent pas avant.
+
+**Bancs complets des deux scripts** (étape `banc` de chacun, podman local) : ils ne sont pas rejoués pour ce correctif. Seule la ligne `filtre()` change, et elle n'agit que sur les journaux.

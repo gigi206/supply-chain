@@ -1,0 +1,33 @@
+# m1b-filtre-banc.sh, début 2026-11-19T20:39:44Z
+sed : sed (GNU sed) 4.9
+## poc/bricks/05-rpm-mock/m1b.sh : sha256 373ae33436d298e30c9f940bb254870e174ff886ca0986cca99cf61680748041
+OK   une seule ligne MASQUE= et une seule ligne filtre()
+   filtre() { sed -E -e 's/<[^>]*@[^>]*>/<adresse retirée>/g' -e "$MASQUE"; }
+KO   jeton en minuscules masqué (code 0, sortie : valeur SENTINELLE-jeton ici)
+KO   TOKEN en capitales masqué (code 0, sortie : TOKEN=SENTINELLE-A)
+KO   Token au milieu masqué (code 0, sortie : x-auth-Token: SENTINELLE-B)
+KO   Jeton au début masqué (code 0, sortie : Jeton de service SENTINELLE-C)
+OK   barre verticale seule gardée
+OK   ligne ordinaire gardée
+OK   adresse retirée
+KO   adresse et jeton : masquée (code 0, sortie : <adresse retirée> token)
+KO   trois lignes : un
+token SENTINELLE-D
+trois
+KO   témoin encore visible
+## poc/bricks/05-rpm-mock/m1b-builders.sh : sha256 82004de28016ee2796095afe603104e802c963993e0b4bdf196b21219f33cfa7
+OK   une seule ligne MASQUE= et une seule ligne filtre()
+   filtre() { sed -E -e 's/<[^>]*@[^>]*>/<adresse retirée>/g' -e "$MASQUE"; }
+KO   jeton en minuscules masqué (code 0, sortie : valeur SENTINELLE-jeton ici)
+KO   TOKEN en capitales masqué (code 0, sortie : TOKEN=SENTINELLE-A)
+KO   Token au milieu masqué (code 0, sortie : x-auth-Token: SENTINELLE-B)
+KO   Jeton au début masqué (code 0, sortie : Jeton de service SENTINELLE-C)
+OK   barre verticale seule gardée
+OK   ligne ordinaire gardée
+OK   adresse retirée
+KO   adresse et jeton : masquée (code 0, sortie : <adresse retirée> token)
+KO   trois lignes : un
+token SENTINELLE-D
+trois
+KO   témoin encore visible
+# bilan : OK 8 ; KO 14 ; fin 2026-11-19T20:39:44Z

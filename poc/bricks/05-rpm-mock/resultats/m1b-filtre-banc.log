@@ -1,0 +1,42 @@
+# m1b-filtre-banc.sh, début 2026-11-19T20:39:44Z
+sed : sed (GNU sed) 4.9
+## /tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/8e4ef563-ec63-44dd-b5a2-5f0729c4e8b2/scratchpad/filtre/b/poc/bricks/05-rpm-mock/m1b.sh : sha256 9f8851d6f1a5e8c567d2c48be069dc2e135e2b6c5d01fd50ca1ea4c0c3e53f78
+OK   une seule ligne MASQUE= et une seule ligne filtre()
+   filtre() { sed -E 's/<[^>]*@[^>]*>/<adresse retirée>/g' | sed "$MASQUE"; }   # MASQUE est en BRE : hors de sed -E (banc du 19/11)
+OK   jeton en minuscules masqué
+OK   TOKEN en capitales masqué
+OK   Token au milieu masqué
+OK   Jeton au début masqué
+OK   barre verticale seule gardée
+OK   ligne ordinaire gardée
+OK   adresse retirée
+OK   adresse et jeton : masquée
+OK   trois lignes : seule celle du motif est remplacée
+OK   aucun témoin visible en sortie
+## /tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/8e4ef563-ec63-44dd-b5a2-5f0729c4e8b2/scratchpad/filtre/b/poc/bricks/05-rpm-mock/m1b-builders.sh : sha256 31e01ae0face66a619e7c592176aa90eb0bb21524058a4cbc64bb043f7499756
+OK   une seule ligne MASQUE= et une seule ligne filtre()
+   filtre() { sed -E 's/<[^>]*@[^>]*>/<adresse retirée>/g' | sed "$MASQUE"; }   # MASQUE est en BRE : hors de sed -E (banc du 19/11)
+OK   jeton en minuscules masqué
+OK   TOKEN en capitales masqué
+OK   Token au milieu masqué
+OK   Jeton au début masqué
+OK   barre verticale seule gardée
+OK   ligne ordinaire gardée
+OK   adresse retirée
+OK   adresse et jeton : masquée
+OK   trois lignes : seule celle du motif est remplacée
+OK   aucun témoin visible en sortie
+## poc/bricks/05-rpm-mock/m1b-pipeline.sh : sha256 f1982fdd442427fcd0489a8475a683e5bdf35340f1c470bcdd52c4f855a71801
+OK   une seule ligne MASQUE= et une seule ligne filtre()
+   filtre() { sed -E 's/<[^>]*@[^>]*>/<adresse retirée>/g' | sed "$MASQUE"; }   # MASQUE est en BRE : hors de sed -E (banc du 19/11)
+OK   jeton en minuscules masqué
+OK   TOKEN en capitales masqué
+OK   Token au milieu masqué
+OK   Jeton au début masqué
+OK   barre verticale seule gardée
+OK   ligne ordinaire gardée
+OK   adresse retirée
+OK   adresse et jeton : masquée
+OK   trois lignes : seule celle du motif est remplacée
+OK   aucun témoin visible en sortie
+# bilan : OK 33 ; KO 0 ; fin 2026-11-19T20:39:44Z
