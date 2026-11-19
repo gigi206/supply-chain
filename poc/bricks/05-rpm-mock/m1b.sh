@@ -173,9 +173,20 @@ echo "archive du pod : $(stat -c %s /w/p.tar) octets, $(tar -tf /w/p.tar | wc -l
 df -k /w | awk "NR == 2 {print \"après archive, /w : capacité \" \$2 \" kB ; utilisés \" \$3 \" kB\"}"
 true'
 
-pod_essai() { # a|b : pod $N-<x>, installation, archive rapatriée sous $T/p-<x>.tar
-  local x=$1 p=$N-$1 s
-  [ -s "$T/entrees.tar" ] && [ -s "$T/pod-$p.json" ] || echec "lancer d'abord l'étape prealables"
+pod_essai() { # a|b|c [limite] : pod $N-<x>, installation, archive rapatriée sous $T/p-<x>.tar ; avec une limite, dnf tourne
+  # sous cette limite de fichiers ouverts, souple puis dure (ajout du 19/11/2026 pour pod_c, après m1b-cloexec-banc.log) ;
+  # sans limite, SONDE_INSTALL est passée telle quelle, comme pour pod_a
+  local x=$1 lim=${2:-} p=$N-$1 s sonde=$SONDE_INSTALL
+  [ -s "$T/entrees.tar" ] || echec "lancer d'abord l'étape prealables"
+  if [ ! -s "$T/pod-$p.json" ]; then
+    [ -z "$(kubectl get pod -n builds --field-selector "metadata.name=$p" -o name < /dev/null 2> /dev/null)" ] || echec "pod $p déjà présent (relancer sous un autre PREFIXE)"
+    pod_json "$p"
+  fi
+  if [ -n "$lim" ]; then
+    [ "$(grep -c '^umask 022$' <<< "$sonde")" = 1 ] || echec "ligne umask 022 de SONDE_INSTALL introuvable"
+    sonde=$(sed "s|^umask 022\$|umask 022\nulimit -Sn $lim \&\& ulimit -Hn $lim \|\| { echo \"KO   limite $lim refusée\"; exit 1; }\necho \"limite de fichiers ouverts avant dnf : \$(ulimit -Sn) / \$(ulimit -Hn)\"|" <<< "$sonde")
+    echo "sonde d'installation : limite $lim ajoutée après umask 022"
+  fi
   [ ! -e "$T/p-$x.tar" ] || echec "$T/p-$x.tar existe (relancer sous un autre PREFIXE)"
   a_blanc "$T/pod-$p.json"
   kubectl create -f "$T/pod-$p.json" < /dev/null > /dev/null
@@ -186,7 +197,7 @@ pod_essai() { # a|b : pod $N-<x>, installation, archive rapatriée sous $T/p-<x>
   copier "$p" "$T/entrees.tar" /w/entrees.tar
   copier "$p" "$T/entrees.sha256" /w/entrees.sha256
   sed -e "s|@ZOT@|${REG_HOTE%:*}|g" -e "s|@ZOT_PORT@|${REG_HOTE##*:}|g" <<< "$SONDE_POD" | dans "$p" "pod-$x-temoins" || { pod_retirer "$p"; echec "témoins du pod $p"; }
-  if ! sed -e "s|@S@|$S_ATT|g" -e "s|@NOMS@|$NOMS|g" <<< "$SONDE_INSTALL" | dans "$p" "pod-$x-install"; then
+  if ! sed -e "s|@S@|$S_ATT|g" -e "s|@NOMS@|$NOMS|g" <<< "$sonde" | dans "$p" "pod-$x-install"; then
     echo "installation : exec en échec ; état du pod : $(kubectl get pod -n builds "$p" -o json < /dev/null | jq -r '"phase \(.status.phase) ; \([.status.containerStatuses[]?.state | to_entries[0] | "\(.key) \(.value.reason // "")"] | join(", "))"')"   # raisons, jamais les messages
     kubectl exec -n builds "$p" -- tail -n 30 /w/dnf.log < /dev/null 2>&1 | filtre | sed 's/^/   dnf.log : /' || true
     pod_retirer "$p"; echec "installation du pod $p"
@@ -231,6 +242,7 @@ etape_banc() { # hôte seul, hors ligne : SONDE_POD et SONDE_INSTALL jouées tel
 }
 etape_pod_a() { pod_essai a; }
 etape_pod_b() { pod_essai b; }
+etape_pod_c() { pod_essai c 1024; }   # ajout du 19/11/2026 (« Oui, après pod A ») : durée de dnf dans Kata sous une limite basse
 
 etape_comparer() {
   local a b
@@ -245,7 +257,7 @@ etape_comparer() {
   done
 }
 
-[ $# -ge 1 ] || { echo "usage : $0 <étape>… (prealables banc pod_a pod_b comparer)" >&2; exit 2; }
+[ $# -ge 1 ] || { echo "usage : $0 <étape>… (prealables banc pod_a pod_b pod_c comparer)" >&2; exit 2; }
 for e in "$@"; do
   declare -F "etape_$e" > /dev/null || { echo "étape inconnue : $e" >&2; exit 2; }
   echo "# m1b.sh $e (PREFIXE $N), début $(date -u +%FT%TZ)"
