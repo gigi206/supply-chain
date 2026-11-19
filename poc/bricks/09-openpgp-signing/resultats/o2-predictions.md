@@ -154,3 +154,17 @@ Lancé après le commit des prédictions (`5f9076d2`). [Journal](o2-banc_chroot.
 Dossier du banc effacé dans l'espace de noms, par un chemin littéral, à 16:15:03 UTC. **Restent non mesurés** : gpg 2.4.7 (K5 et K5b au sens strict), le téléchargement et l'installation des racines, mmdebstrap sur l'hôte (DR1).
 
 **Signalé** : deux journaux commités plus tôt, `o2-banc.log` et `o2-banc-premier-passage.log`, nomment les interfaces réseau de l'hôte (BC5a). La garde ne fait désormais que les compter.
+
+## Note datée du 19/11/2026, écrite à 16:18:00 UTC : `rocky_telecharger` passée, RT1 tenue, RT2 relevée
+
+Lancée sur l'accord du propriétaire (« Oui, lance-la », en réponse à « Je lance rocky_telecharger (réseau vers vault 9.8, téléchargement seul) ? »), sur le commit `78f0d183`. [Journal](o2-rocky_telecharger.log) : 16:16:32 à 16:17:04 UTC, code 0 ; `o2.sh` `8205c78d…`, `o2-interne.sh` `7c91e50f…`.
+
+- **RT1 tenue** : `dnf-3 --installroot --downloadonly --downloaddir` code 0 ; les trois paquets épinglés téléchargés ; **101 rpm sur 101 égaux en sha256 au `primary` vérifié**.
+- **RT2 (relevé)** : **101 rpm, 38 746 077 octets**, chacun listé (nom, origine, taille, sha256) dans le journal et dans [la liste des téléchargements](releve-amont-telechargements.tsv). Ils sont rangés hors du dépôt, dans `~/.cache/supply-chain-poc/09/o2/rocky/o2/rpm`. Rien n'est installé.
+- **Constat non prédit** : le journal de dnf, hors du dépôt, montre deux fois « Importing GPG key 0x350D275D » depuis `/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9`, puis « Key imported successfully ». dnf a donc déjà écrit la clé Rocky dans la base rpm de la racine (`racine/var/lib/rpm`). Il a aussi laissé dans la racine ses journaux (`var/log/dnf*`) et un reste de cache (`racine/o2/cache/expired_repos.json`, car `cachedir` est relatif à l'installroot).
+
+**Adaptation de `rocky_installer` avant son lancement** (`o2.sh`, deux lignes) :
+- l'import de la clé est sauté si `gpg-pubkey-350d275d` est déjà dans la base rpm de la racine ;
+- `./o2` est exclu de l'archive.
+
+**RI1 reste la prédiction** de cette étape. Elle s'y ajoute que le journal dira « clé Rocky 350d275d déjà dans la base rpm de la racine » (confiance haute : constat ci-dessus).

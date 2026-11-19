@@ -265,13 +265,13 @@ etape_rocky_installer() {
   [ ! -e "$RR/usr" ] || ko "$RR déjà peuplée"
   absent "$W/rocky98-racine.tar"
   controle_rpm "$WR/o2/rpm" | grep -q '^OK' || ko "rpm non conformes : rien n'est installé"
-  dans_hors "$WR" /bin/sh -c 'rpm --root /racine --import /etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9 && /usr/bin/dnf-3 -y --installroot=/racine --releasever=9 --setopt=reposdir=/o2/aucun --setopt=localpkg_gpgcheck=True --setopt=install_weak_deps=False --setopt=tsflags=nodocs install /o2/rpm/*.rpm' \
+  dans_hors "$WR" /bin/sh -c '{ rpm --root /racine -q gpg-pubkey-350d275d >/dev/null 2>&1 && echo "clé Rocky 350d275d déjà dans la base rpm de la racine (importée par rocky_telecharger)" || rpm --root /racine --import /etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9; } && /usr/bin/dnf-3 -y --installroot=/racine --releasever=9 --setopt=reposdir=/o2/aucun --setopt=localpkg_gpgcheck=True --setopt=install_weak_deps=False --setopt=tsflags=nodocs install /o2/rpm/*.rpm' \
     > "$W/rocky-installer-dnf.log" 2>&1
   rc=$?; echo "dnf hors ligne : code $rc ; dernières lignes :"; tail -4 "$W/rocky-installer-dnf.log" | sed 's/^/  | /'
   [ "$rc" = 0 ] || ko "installation Rocky hors ligne"
   racine_rpm "$RR" "$W/rocky-paquets.txt"
   dans_hors "$RR" gpg --version | head -1 | sed 's/^/  gpg de la racine Rocky : /'
-  ns_hors tar -C "$RR" --numeric-owner --sort=name -cf "$W/rocky98-racine.tar" .
+  ns_hors tar -C "$RR" --numeric-owner --sort=name --exclude=./o2 -cf "$W/rocky98-racine.tar" .   # ./o2 : cache de dnf laissé par rocky_telecharger
   echo "archive rocky98-racine.tar : $(stat -c %s "$W/rocky98-racine.tar") octets, sha256 $(sha256sum < "$W/rocky98-racine.tar" | cut -c1-64)"
 }
 
