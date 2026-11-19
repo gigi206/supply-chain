@@ -354,3 +354,7 @@ CL1 reste valable. Elle porte sur une clé créée par gpg 2.4.7 sous K1 et K2 :
 Désormais, les étapes avec réseau d'O2 refusent de tourner, puisque le dossier des secrets existe (K1). Aucune session ne lit ni ne liste ce dossier. Prochaine étape : `essai`, sans réseau, avec la clé du PoC (ES1 à ES5).
 
 *Note datée du 19/11/2026, 17:19:02 UTC, avant le lancement d'`essai`* : ES1 à ES5 sont inchangées. Leur confiance devient haute : la répétition (RP4) a passé E1 à E8 avec une clé jetable de même forme. Ce qui est neuf avec `essai` : la clé du PoC elle-même, expirant dans un an.
+
+## Note datée du 19/11/2026, 17:19:23 UTC : `essai` passée, ES1 à ES5 tenues ; O2 terminé
+
+Étape `essai` passée de 17:19:11 à 17:19:12 UTC, code 0 ([journal](o2-essai.log)), avec la clé du PoC `29BA1C48…BCF03A86`. ES1 : la signature de la racine Debian est vérifiée par gpgv et sqv. ES2 (K5) : la clé importée dans 2.3.3 y signe. ES3 : les vérifications croisées sont acceptées (E4, E5). ES4 (K5b) : une clé jetable de 2.3.3 est importée par 2.4.7, et Rocky vérifie sa signature. ES5 : K3 tenue. **Le jalon O2 est terminé** : deux racines contrôlées, une clé du PoC, signature et vérification croisées sous les deux versions de gpg. Pas encore mesuré : rpmsign, createrepo_c, apt-ftparchive sur la vraie clé, et le vérificateur réel d'apt et de dnf (jalons suivants).
