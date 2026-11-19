@@ -1,0 +1,23 @@
+étape prealables commencée : 2026-11-19T17:52:34Z ; o3.sh 481133d071ec577a… ; o3-interne.sh 338121142fbed806… ; o2-interne.sh 7c91e50fd7921f89…
+OK   copie locale du rpm égale à 864d55f486f423ce… (2173376 octets)
+OK   o2/rocky/racine/usr/bin/rpmsign présent
+OK   o2/rocky/racine/usr/bin/createrepo_c présent
+OK   o2/rocky/racine/usr/bin/gpg2 présent
+OK   manifeste de l'amorce Rocky 9.8 ed654c694190 dans le cache local
+OK   clé publique du PoC présente (test -f, dossier non listé)
+macros de signature de la racine Rocky :
+  35:%__gpg			/usr/bin/gpg2
+  317:#%_gpg_name
+  318:#%_gpg_path
+  665:	%{?_gpg_digest_algo:--digest-algo %{_gpg_digest_algo}} \
+  668:	-u "%{_gpg_name}" -sbo %{__signature_filename} %{__plaintext_filename}
+  729:%_pkgverify_level digest
+dépendances du rpm (racine Rocky, rpm -qpR) :
+  rpmlib(CompressedFileNames) <= 3.0.4-1
+  rpmlib(FileDigests) <= 4.6.0-1
+  rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+  rpmlib(PayloadIsZstd) <= 5.4.18-1
+place libre sous /home/gigi/.cache/supply-chain-poc/09 : 103490 Mo
+OK   /home/gigi/.cache/supply-chain-poc/09/o3 absent
+étape prealables finie : 2026-11-19T17:52:34Z
+OK   K3 : aucune ligne de bloc OpenPGP armuré dans le journal
