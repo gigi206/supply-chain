@@ -311,3 +311,10 @@ Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.
 - **Clé publique** : [`resultats/lien-cle-publique.pem`](resultats/lien-cle-publique.pem), SPKI sha256 `42529342…`.
 - **Rien d'autre n'a changé** : les clés `chains`, `scanner` et `tsa` sont inchangées.
 - **Ce qui manque encore** : aucune politique ni aucun jeton ne permet de signer avec `lien`. Ce sont les deuxième et troisième accords : jeton OpenBao borné, puis lecture de Zot.
+
+*Note datée du 19/11/2026, 19:50:00 UTC* : **O5 réel, deuxième accord (« Oui ») : accès borné à la clé `lien` créé** ([prédictions et résultats](resultats/o5-openbao-predictions.md)).
+- **Politique** [`lien-signature`](politique/lien-signature.hcl) : lecture de la clé `lien`, signature, révocation de soi.
+- **Jeton** : un jeton de service avec cette seule politique, sans `default`, orphelin, 72 h non renouvelables. Il expire au plus tard le 22/11/2026 à 19:49:36 UTC. Le script l'a écrit dans `09/secrets` ; sa valeur n'est jamais affichée.
+- **Essais sur le vrai OpenBao** : avec ce jeton, lecture et signature `lien` acceptées, et la signature est vérifiée par OpenSSL avec la clé publique archivée. Les neuf autres essais sont refusés en 403 : autres clés, export, kv, politiques, jeton enfant, consultation de soi.
+- **Mes choix**, à contester si besoin : durée, révocation de soi (non essayée), fichier en clair.
+- **Reste pour O5 réel** : lecture de Zot (troisième accord) ; route de l'hôte vers OpenBao pour cosign `hashivault://` ; attestations réelles et referrers.

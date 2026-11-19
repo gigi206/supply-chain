@@ -98,3 +98,34 @@ L'accord couvre **la clé seule**. Il ne couvre ni politique, ni jeton, ni rôle
 **En cas de KO après les écritures.** La politique et le jeton restent en place, et l'étape refuse toute relance. Le retrait passe par `racine` : `bao token revoke -accessor <accesseur>`, puis `bao policy delete lien-signature`, puis effacement des deux fichiers par chemins littéraux. **Ce retrait n'est ni scripté ni passé au banc.** Après un KO, je m'arrête et je rends compte ; je n'improvise pas de retrait.
 
 **Portée.** Les essais passent par `kubectl exec` et `bao` dans `openbao-0`. Ils ne mesurent pas cosign `hashivault://lien` depuis l'hôte, et la route de l'hôte vers OpenBao (redirection de port ou autre) n'est pas décidée. Les 72 h courent dès la création.
+
+## Note datée du 19/11/2026, 19:50:00 UTC : `acces_lien` passée (19:49:30 à 19:49:36 UTC, code 0), toutes les prédictions tenues
+
+Journal : [o5-openbao-acces_lien.log](o5-openbao-acces_lien.log).
+
+**J1 tenue.** Politiques avant : `chains-signature`, `chains-zot`, `default`, `horodatage-zot`, `root`, `scan-zot`, `scanner-signature` et `tsa-signature`.
+
+**J2 tenue.**
+
+**J3 tenue** : `lien-signature,service,true,false,259200,true,true,0`. Le secret fait 26 octets, préfixe `s.` ; il est en 0600, son accesseur aussi. **Il expire au plus tard le 22/11/2026 à 19:49:36 UTC**, 72 h après la fin de l'étape, et n'est pas renouvelable.
+
+**Essais, E1 à E8 tenus :**
+- **E1** : lecture de la clé `lien` acceptée.
+- **E2** : signature avec `lien` acceptée. Signature `vault:v1:`, 72 octets DER. **OpenSSL 4.1.0 la vérifie avec `lien-cle-publique.pem`** (« Verified OK ») ; la même signature sur une autre entrée est refusée (« Verification failure »).
+- **E3 à E8** : les neuf autres essais sont refusés, chacun avec « Code: 403 … permission denied ».
+  - signatures avec `chains`, `tsa` et `scanner` ;
+  - lecture de `chains` ;
+  - export de `lien` ;
+  - lecture de `kv/horodatage/zot` ;
+  - liste des politiques ;
+  - jeton enfant ;
+  - consultation de soi (E8, confiance moyenne, désormais mesurée).
+
+**J4 et K tenues** : K3, K4, K5 et aucune ligne masquée.
+
+**État dans OpenBao :**
+- clé `lien` ;
+- politique `lien-signature` ;
+- un jeton de service borné, détenu par l'hôte d'administration.
+
+Rien n'est écrit dans Zot. cosign `hashivault://lien` depuis l'hôte n'est pas mesuré, et la route de l'hôte vers OpenBao n'est pas décidée. Le dossier `~/.cache/supply-chain-poc/09/o5-essai-signature` et le dossier du banc sont effacés après le commit de cette note.

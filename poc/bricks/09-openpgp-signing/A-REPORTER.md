@@ -78,6 +78,8 @@ Avant la ligne « **Risqué → interdit** » :
 
 *Note datée du 19/11/2026, 19:39:00 UTC* : en plus de la note de 18:56:05 UTC, la ligne de remplacement de `docs/03` lit « O5 réel (clé Transit `lien`, referrer dans Zot) en attente d'accords » ainsi : « **clé Transit `lien` créée dans OpenBao** (`ecdsa-p256`, non exportable, 19/11/2026, accord du propriétaire) ; **jeton borné et lecture de Zot en attente d'accords** ».
 
+*Note datée du 19/11/2026, 19:50:00 UTC* : en plus des notes de 18:56:05 et 19:39:00 UTC, lire dans la ligne de remplacement de `docs/03` « jeton borné et lecture de Zot en attente d'accords » ainsi : « **politique `lien-signature` et jeton borné créés** (72 h, non renouvelable, essais de droits sur OpenBao) ; **lecture de Zot en attente d'accord** ».
+
 ## 3. `README.md` racine, ligne 33
 
 Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
@@ -93,6 +95,8 @@ Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 ```
 
 *Note datée du 19/11/2026, 18:58:46 UTC* : dans le texte de remplacement ci-dessus, lire « reste l'attestation de lien (O5) » ainsi : « attestation de lien éprouvée sur un banc hôte à clés cosign jetables ; reste O5 réel (clé Transit `lien`, referrer et lecture de Zot) ».
+
+*Note datée du 19/11/2026, 19:50:00 UTC* : en plus de la note de 18:58:46 UTC, lire « reste O5 réel (clé Transit `lien`, referrer et lecture de Zot) » ainsi : « clé Transit `lien` et accès borné créés dans OpenBao ; reste O5 réel dans Zot (lecture, referrers) ».
 
 ---
 
@@ -184,6 +188,10 @@ Règles de lecture des sessions : ajouter `~/.cache/supply-chain-poc/09/secrets/
 - Le banc garde ses clés jetables hors du dépôt et les efface après archivage.
 - Pour O5 réel, la clé `lien` reste dans Transit et n'existe pas comme fichier.
 - Proposition, sans urgence : étendre le refus à toute ligne qui commence par cinq tirets suivis de « BEGIN » et se termine par « PRIVATE KEY » puis cinq tirets, ancrée en début de ligne. La relecture du 16:48:49 UTC vaut aussi ici : avant l'ajout, chercher les fichiers suivis qui citent la ligne entière.
+
+*Note datée du 19/11/2026, 19:50:00 UTC (brique 09, deuxième accord d'O5)* : le jeton OpenBao borné à la clé `lien` est un nouveau secret sur l'hôte. Le script l'a écrit dans `~/.cache/supply-chain-poc/09/secrets/openbao-lien.secret` (0600), avec son accesseur dans `openbao-lien.accesseur`.
+- **À faire** : ajouter **`openbao-lien.secret`** (pas l'accesseur, pas tout le dossier) à la boucle de la ligne 8 de `tools/secrets-depot.sh`, qui ne lit pas `09/secrets` sur cette branche.
+- **Réserve** : sa valeur ne fait que 26 octets sur une seule ligne ; il n'est pas vérifié que la boucle accepte une ligne de cette longueur. À relire avec la seconde correction de 17:13:47 UTC.
 
 ---
 
