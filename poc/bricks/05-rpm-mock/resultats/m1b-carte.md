@@ -387,3 +387,14 @@ La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de 
   - **bootstrap** : `all`, outils de `99790c13`. `b063feb3…` a 2 608 membres, comme `boot-racine.tar` ([`m1b-boot.log`](m1b-boot.log)).
 - **Recommandation** (passée par le conseiller) : une règle, pas une exception. Chaque image garde la langue qu'elle avait dans S1, posée explicitement par la tâche (`.rpmmacros` sous `env -i`) : `en_US` pour l'outillage, `all` pour le bootstrap.
 - **Le revers** : `all` pour le bootstrap contredit la valeur `en_US` annoncée le 19/11 dans la décision « Absent ».
+
+## Décision du 19/11/2026, consignée à 2026-11-19T12:59:38Z UTC : « all, comme S1 »
+
+**Décision du propriétaire** (réponse reçue avant 2026-11-19T12:59:38Z UTC, heure exacte non relevée) : « all, comme S1 ». La question était : « Quelle langue pour le bootstrap ? », entre `all` comme S1 et `en_US` comme annoncé le 19/11. Ma recommandation, passée par le conseiller, était `all`.
+
+- **Règle** : chaque image garde la langue qu'elle avait dans S1, posée explicitement par la tâche (`.rpmmacros` dans un `HOME` à elle, sous `env -i`) :
+  - `en_US` pour l'outillage, cible `7c07083c…` ;
+  - `all` pour le bootstrap, cible `b063feb3…`.
+- **La valeur `en_US` annoncée le 19/11** dans la décision « Absent » ne vaut donc que pour l'outillage.
+- **Suite** : le pod d'essai du bootstrap dans Kata, avec la sonde du banc de la langue, sous la limite autour de dnf seul.
+- **Ce n'est un accord** pour aucune écriture dans Zot ni pour aucun changement du cluster. Le pod d'essai est lancé sous l'accord permanent du 18/11.

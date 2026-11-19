@@ -1260,3 +1260,35 @@ Journaux : [`m1b-boot-langue.log`](m1b-boot-langue.log) ; complément sur l'hôt
 - **« Le bootstrap de référence, celui que mock a utilisé de M2 à M4c »** : c'est trop fort. `b063feb3…` exclut `etc/machine-id`, `var/cache/dnf` et les journaux de dnf, que `boot-racine.tar` de S1 avait, et sa racine et son `tar` diffèrent. Ce qui est mesuré : les mêmes langues que `boot-racine.tar` (2 608 membres sous `usr/share/locale`, dont 1 239 `.mo`, [`m1b-boot.log`](m1b-boot.log)) et la même liste `rpm -qa` (153 lignes). Il faut lire « sur les langues et la liste de paquets ».
 - **« Ce n'est plus la base, plus les dix lignes »** : c'est faux au niveau des paquets, où les deux variantes donnent la liste de S1 (décision « Dix lignes » tenue). L'écart est au niveau des fichiers : 55 `dnf.mo` de la base n'y sont plus. Le mécanisme n'est pas lu.
 - **Un seul passage** : `4171b0d3…` vient d'un seul passage ; sa reproductibilité n'est pas établie.
+
+### pod_e, bootstrap dans Kata : prédictions (note écrite à 2026-11-19T13:01:46Z UTC, avant le lancement)
+
+Décision du propriétaire : « all, comme S1 ».
+
+- **Changement de `m1b.sh`** : deux étapes neuves, `prealables_boot` et `pod_e`. Les étapes existantes ne changent pas. La version prête a le sha256 `373ae33436d298e3…`. Sa syntaxe et celle des deux sondes rendues sont vérifiées ; shellcheck ne signale rien.
+  - **`prealables_boot`** (hôte et lecture) : il relit `dnf97.conf`, la couche `812c4412…`, `repomd.xml` et les métadonnées de BaseOS 9.7, ainsi que les dix rpm, contre le banc du 18/11 et `s1-hote97.log`. Il fait l'archive de transfert : couche, miroir, clés, `dnf97.conf`, `h/.rpmmacros` (`%_install_langs all`) et `aucun/`. Il relit les politiques, puis admet le pod `m1b-e` à blanc.
+  - **`pod_e`** (cluster) : il crée le pod Kata au label `construire-rpm`, sur l'image de l'amorce, avec les ressources et le contexte du pas `construire`. Il copie les entrées par morceaux et relève les témoins.
+  - **La sonde du pod** est celle du banc de la langue, avec les mêmes noms de chemins sous `/m` (lien vers `/w/m`). La liste `rpm -qa` est comparée sur l'hôte par sha256, faute de `cmp` dans l'amorce. L'archive est rapatriée, puis le pod est supprimé.
+- **Écart avec le banc de la langue** : la sonde n'a pas été rejouée telle quelle sur l'hôte avant le pod. Le banc des sondes de l'outillage l'avait fait. Il reste 1,35 G sur /home : un tel banc, puis le pod, n'y tiendraient pas ensemble. Les commandes sont celles du banc de la langue ; seuls changent les chemins de `/w` et l'affichage de la liste.
+- **Place** : environ 115 Mo d'entrées et 242 Mo d'archive rapatriée, dans `$T`.
+
+- **PE1** : `prealables_boot` rend 0. Tous les sha256 sont conformes, avec 10 rpm sur 10, et le pod est admis à blanc.
+- **PE2** : le pod est prêt sous `kata`, au label `construire-rpm`. Les entrées sont revérifiées dans le pod (code 0).
+- **PE3** :
+  - les témoins réseau échouent (codes non nuls) ;
+  - sous `env -i`, rpm de python lit `[en_US]` avec `HOME=/root` et `[all]` avec `HOME=/m/h` ;
+  - les versions sont celles de LG0.
+- **PE4** :
+  - l'extraction de la couche rend 0, sans rien sur stderr, et `rpm -qa` donne 147 lignes avant ;
+  - la limite vaut `1024 / 1024` dans le sous-shell. Celle du shell reste celle du pod après (2³⁰ attendu, `1073741824`) ;
+  - dnf-3 rend 0 en moins de 60 s, avec 6 installations et 4 montées. La boucle de rpm est bornée par la limite, et la durée n'est pas mesurée dans Kata pour le bootstrap.
+- **PE5** : la liste `rpm -qa` après est celle de S1 (sha256 égal), la racine passe en 555, et `tar` rend 0, sans rien sur stderr.
+- **PE6** (confiance moyenne) : l'archive vaut `b063feb3…` octet pour octet. Ce qui change par rapport au banc de la langue :
+  - un vrai root dans une VM Kata, et non un espace de noms ;
+  - un tmpfs ;
+  - un autre noyau ;
+  - une extraction de la couche dans Kata.
+
+  Si elle diffère, le comparateur membre à membre contre `z-b1.tar` nomme chaque écart.
+
+**Portée prévue.** Si PE6 est tenue, le bootstrap est reproduit dans un pod Kata hors réseau, le même jour, entrées livrées par copie, racine seule. Rien n'est établi pour un autre jour, ni pour la tâche elle-même. Le point 1 A reste non établi.
