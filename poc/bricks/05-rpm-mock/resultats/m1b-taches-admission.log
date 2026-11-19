@@ -1,0 +1,25 @@
+# début 2026-11-19T16:10:52Z ; HEAD b191330016e8 ; webhook sha256:61ef794b055f…
+## TD1 rendus de m1bt3
+OK   prefetch-racine-rpm.yaml (sha256) : b0fdff3895df59897ebc30333689b24f748124ed98e1f610cb4405a170534a05
+OK   construire-racine-rpm.yaml (sha256) : de77ba0a70b4cee401448e7f6dc161094c71b2594204425a838d7dc45bf97b08
+OK   pipeline-o.yaml (sha256) : 13836c388b47fe701360631db59239f67b8d787568d2af3491707422d78bfda0
+OK   pipeline-b.yaml (sha256) : b2443188125b63b71539cb61c73d314dd21f11aaba3a673ab263a644794870f7
+tâches et pipelines dans builds avant : 0
+## TD2 tâches ; TD3 pipelines
+prefetch-racine-rpm : ["tekton.dev/v1beta1","Task","prefetch-racine-rpm",5,0]
+OK   prefetch-racine-rpm admis à blanc (code de kubectl, lignes du motif) : 0 0
+construire-racine-rpm : ["tekton.dev/v1beta1","Task","construire-racine-rpm",13,0]
+OK   construire-racine-rpm admis à blanc (code de kubectl, lignes du motif) : 0 0
+pipeline-o : ["tekton.dev/v1beta1","Pipeline","builder-mock-rocky9",0,3]
+OK   pipeline-o admis à blanc (code de kubectl, lignes du motif) : 0 0
+pipeline-b : ["tekton.dev/v1beta1","Pipeline","builder-rocky9-bootstrap",0,3]
+OK   pipeline-b admis à blanc (code de kubectl, lignes du motif) : 0 0
+## TD4 témoins
+OK   témoin tâche : seule la clé du pas change : égal
+OK   témoin tâche refusé (code 1)
+OK   témoin tâche : motif « strict decoding error: unknown field » (lignes) : 1
+OK   témoin pipeline refusé (code 1)
+OK   témoin pipeline : motif « strict decoding error: unknown field » (lignes) : 1
+## TD5 rien n'est créé
+OK   noms des tâches et pipelines de builds, avant = après : égal
+# fin 2026-11-19T16:10:53Z ; KO 0

@@ -1839,3 +1839,13 @@ Journal : [`m1b-amorce-fraicheur.log`](m1b-amorce-fraicheur.log), de 15:59:33 à
 - **TD5** (haute) : les noms des tâches et pipelines de `builds` sont les mêmes avant et après.
 
 **Lecture prévue.** Si TD1 à TD5 tiennent, le point « `--dry-run=server` » est fait pour les rendus de `m1bt3`. La mesure du 20/11 rendra de nouveau ces quatre objets sous `m1bt-20`. JT1 veut les mêmes scripts ; les objets entiers ne sont pas comparés, et la validation ne vaudra donc pour eux que si leurs sha256 sont égaux à ceux de TD1. Un refus de TD2 ou TD3 changerait le gabarit, donc les scripts rendus, et la mesure du 20/11 serait à repréparer.
+
+### Validation par Tekton : résultat (note écrite le 19/11/2026 à 16:11:17 UTC)
+
+Journal : [`m1b-taches-admission.log`](m1b-taches-admission.log), de 16:10:52 à 16:10:53 UTC, à HEAD `b191330`, code 0, 0 KO. **TD1 à TD5 tenues.**
+- **TD1** : les quatre rendus sont ceux de `m1bt3`.
+- **TD2 et TD3** : les deux tâches (5 et 13 paramètres) et les deux pipelines (3 tâches chacune) sont admises par le webhook de Tekton (`sha256:61ef794b055f…`), sans motif de refus. Les paramètres à tiret bas et le champ `resources` passent.
+- **TD4** : les deux témoins sont refusés (code 1), chacun avec une ligne du motif de décodage strict. Le témoin de pipeline, de confiance moyenne, tient aussi : le décodage strict porte sur les pipelines comme sur les tâches.
+- **TD5** : `builds` n'avait aucune tâche ni pipeline avant le passage, et n'en a toujours aucune.
+
+**Portée.** La validation vaut pour les rendus de `m1bt3`. Elle vaudra pour ceux de `m1bt-20` si leurs sha256 sont égaux à ceux de TD1. Elle ne dit rien de la résolution des bundles, ni de la vérification des signatures, ni de l'exécution par le contrôleur : ces trois points viennent avec `SIGNER=1` et les PipelineRuns.

@@ -583,3 +583,11 @@ Le point « choix sur le curl de l'amorce » devient « fraîcheur de l'amorce (
 **Choix à poser au propriétaire avant `SIGNER=1`** :
 - **(a)** amorce figée, en réserve mesurée ;
 - **(b)** outillage des tâches rafraîchi, ce qui referait les références et la mesure d'un autre jour.
+
+## Note datée du 19/11/2026, écrite à 16:11:17 UTC : validation par Tekton passée
+
+TD1 à TD5 tenues ([`m1b-taches-admission.log`](m1b-taches-admission.log)) : les deux tâches et les deux pipelines rendues sous `m1bt3` sont admises en `--dry-run=server`, et deux témoins sont refusés par le décodage strict. Rien n'est créé. Le point « `--dry-run=server` » est fait. Restent avant signature :
+- la mesure d'un autre jour (à partir du 20/11 à 00:00 UTC), où les sha256 des quatre rendus de `m1bt-20` seront à confronter à ceux de TD1 ;
+- le choix sur la fraîcheur de l'amorce ;
+- la ligne GnuPG de docs/04 (session de la brique 09) ;
+- les deux politiques de réseau, un accord pour chacune.
