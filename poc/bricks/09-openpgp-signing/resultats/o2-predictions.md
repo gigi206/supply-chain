@@ -210,3 +210,11 @@ Le dossier de l'amorce a été effacé à 16:24:57 UTC, dans l'espace de noms et
 Confiance moyenne-haute : la cause est lue dans le fichier ; le nombre de `.deb` est celui du premier passage.
 
 **Effet possible sur `debian_racine`** : la racine minbase de mmdebstrap ne vient pas de l'image Docker. Ce que mmdebstrap lit de la configuration d'apt de l'amorce n'est pas lu. Si des `.deb` y manquaient aussi, le contrôle le dirait (« 0 sur 0 », KO).
+
+## Note datée du 19/11/2026, écrite à 16:26:26 UTC : relance de `debian_amorce` passée, DA1 et DA2 tenues
+
+Relance sur l'accord du propriétaire (« Oui, relance-la », en réponse à « Je relance debian_amorce corrigée (réseau, mmdebstrap réinstallé) ? »), sur le commit `ea2bce94`. [Journal](o2-debian_amorce.log) : 16:25:53 à 16:26:00 UTC, code 0 ; `o2.sh` `9c817f68…`, `o2-interne.sh` `7c91e50f…`.
+
+- **DA2 tenue** : « docker-clean mis de côté dans o2/ » ; **20 `.deb` sur 20 égaux au `Packages.xz` vérifié** ; code 0. Aucune ligne « Permission denied ».
+- **DA1 tenue** : apt code 0 ; `InRelease` égal à `0584fba3…` ; mmdebstrap 1.5.7 installé.
+- **Téléchargements** : 20 `.deb`, **14 298 692 octets**, listés avec leur sha256 dans le journal et dans [la liste des téléchargements](releve-amont-telechargements.tsv). Le premier passage avait reçu les mêmes 20 paquets (« 14.3 MB ») sans les garder ; ils ne sont pas listés.

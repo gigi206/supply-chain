@@ -187,3 +187,23 @@ o2/tpm2-tss-3.2.3-1.el9.x86_64.rpm	https://dl.rockylinux.org/vault/rocky/9.8 (dn
 o2/tzdata-2026f-1.el9_8.noarch.rpm	https://dl.rockylinux.org/vault/rocky/9.8 (dnf-3 --downloadonly, gpgcheck=1, repo_gpgcheck=1)	512166	e7b667d0803c25fee4dc9ced528249aa2d26a438a7b63430b92a343aeb031d30
 o2/xz-libs-5.2.5-8.el9_8.1.x86_64.rpm	https://dl.rockylinux.org/vault/rocky/9.8 (dnf-3 --downloadonly, gpgcheck=1, repo_gpgcheck=1)	93203	9448b78049827ff885b8fae8a4d56d6fe4a800edea89e62eefe8822b8e0d361c
 o2/zlib-1.2.11-40.el9.x86_64.rpm	https://dl.rockylinux.org/vault/rocky/9.8 (dnf-3 --downloadonly, gpgcheck=1, repo_gpgcheck=1)	92187	fcd8ca717c72aeb30ea69b4f892dc021e507d8835e7b03aff501cb094db083ea
+o2/libexpat1_2.8.3-1~deb13u1_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	122672	38abe0e710a07688e9c149d74536e67cfee0364bdb64dd6d644c32a1cfad389f
+o2/libffi8_3.4.8-2_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	24144	0ebdc340de33333639c3c63874cd4b15ac2e83dfa1ef3053b7eefaf4919f4f68
+o2/libgdbm-compat4t64_1.24-2_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	50280	2cbd43cf2dfbf57ff48188b5d79d29cf7ea8f0dedaa61ab0bcc02eceff50ea01
+o2/libgdbm6t64_1.24-2_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	75176	e7b42c68c391e278733adb3c1efdacd24d660862bd7bac0efbc10a91e5696dfc
+o2/libncursesw6_6.5+20250216-2_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	135484	47baa2e11579583654583a066b69bd5a5d2f22423081f707ed6c0c3ba6d538b7
+o2/libperl5.40_5.40.1-6+deb13u1_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	4325996	e44777ff47ad248d1debd57e1f96ab5e89061a341008ae39880ba3b5fc15f273
+o2/libpython3-stdlib_3.13.5-1_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	10180	7e142ed64a81ccdd39714f213467bd365736ef341adb2be11be981f638b9175f
+o2/libpython3.13-minimal_3.13.5-2+deb13u5_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	863168	a4aa6a9a8c77f87bfe545e1d14ec42c001d189ace90e3aa75deec882b39dee49
+o2/libpython3.13-stdlib_3.13.5-2+deb13u5_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	1958624	db161322a3481d2c0c3b9a3b9a03c3ab0e2b1718f54b88755fb4a3f939165b84
+o2/libreadline8t64_8.2-6_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	168832	eeadf2b5e755c9f183883feea2d9b5b28560284275d5f54d3e55d0923b1d0967
+o2/media-types_13.0.0_all.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	29336	0788e4b0b72db1bcf74a19cb24c3511e7770ad0b341f0f30e361701c3072f53e
+o2/mmdebstrap_1.5.7-1+deb13u1_all.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	134004	df731ee92b0ad40f9618b8b1c98c2e90635224f6b21c0905dab65ca099c8fe14
+o2/netbase_6.5_all.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	12436	76bafa92947ebd37b0a6f9ec6570412041f56edebc1c66d323731216d318471e
+o2/perl-modules-5.40_5.40.1-6+deb13u1_all.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	3013728	4c46cdd8f3135aa1c95f07e817f8e5d9be590687441ac1c27e3a8c49400f35ce
+o2/perl_5.40.1-6+deb13u1_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	267736	ef145c247787d6f40dcdefd5b417502484827cde0d555998c17fd5b27ec1e1dd
+o2/python3-minimal_3.13.5-1_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	27248	a5d2371bebf3689f676e3f3bae800371bcc4392a8a51269e23d528249b399615
+o2/python3.13-minimal_3.13.5-2+deb13u5_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	2224552	c1fda9e7b1bf15b2fa75a238d8a8710e142fe14c722fc650c5fc614f078c9073
+o2/python3.13_3.13.5-2+deb13u5_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	757492	460c1fd72845516ac3ce9d1686916f3ab2e4c86f8a9746e14d26243a47e2b98d
+o2/python3_3.13.5-1_amd64.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	28244	c1388174dc7140e6c19a6dd39f8a0dcb38a835cd66c65644e0dded43d5223cb0
+o2/readline-common_8.2-6_all.deb	http://snapshot.debian.org/archive/debian/20261105T000000Z (apt de l'amorce)	69360	f77e8aa0bf0de618f11cb0b21658a4ed60f177d63b3cf26d7fc3706b6d0eaaa9

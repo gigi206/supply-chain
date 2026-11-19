@@ -1,0 +1,32 @@
+étape debian_amorce commencée : 2026-11-19T16:25:53Z ; o2.sh 9c817f6823e8407a… ; o2-interne.sh 7c91e50fd7921f89…
+OK   couche 37fb86c2a767 de 7378260c0a09 extraite dans /home/gigi/.cache/supply-chain-poc/09/o2/debian-amorce
+docker-clean mis de côté dans o2/
+apt dans l'amorce : code 0 ; dernières lignes :
+  | running python post-rtupdate hooks for python3.13...
+  | Setting up mmdebstrap (1.5.7-1+deb13u1) ...
+  | Processing triggers for libc-bin (2.41-12+deb13u4) ...
+OK   InRelease lu par apt égal à celui vérifié par le relevé
+  téléchargé : libexpat1_2.8.3-1~deb13u1_amd64.deb (122672 octets, sha256 38abe0e710a07688e9c149d74536e67cfee0364bdb64dd6d644c32a1cfad389f)
+  téléchargé : libffi8_3.4.8-2_amd64.deb (24144 octets, sha256 0ebdc340de33333639c3c63874cd4b15ac2e83dfa1ef3053b7eefaf4919f4f68)
+  téléchargé : libgdbm-compat4t64_1.24-2_amd64.deb (50280 octets, sha256 2cbd43cf2dfbf57ff48188b5d79d29cf7ea8f0dedaa61ab0bcc02eceff50ea01)
+  téléchargé : libgdbm6t64_1.24-2_amd64.deb (75176 octets, sha256 e7b42c68c391e278733adb3c1efdacd24d660862bd7bac0efbc10a91e5696dfc)
+  téléchargé : libncursesw6_6.5+20250216-2_amd64.deb (135484 octets, sha256 47baa2e11579583654583a066b69bd5a5d2f22423081f707ed6c0c3ba6d538b7)
+  téléchargé : libperl5.40_5.40.1-6+deb13u1_amd64.deb (4325996 octets, sha256 e44777ff47ad248d1debd57e1f96ab5e89061a341008ae39880ba3b5fc15f273)
+  téléchargé : libpython3-stdlib_3.13.5-1_amd64.deb (10180 octets, sha256 7e142ed64a81ccdd39714f213467bd365736ef341adb2be11be981f638b9175f)
+  téléchargé : libpython3.13-minimal_3.13.5-2+deb13u5_amd64.deb (863168 octets, sha256 a4aa6a9a8c77f87bfe545e1d14ec42c001d189ace90e3aa75deec882b39dee49)
+  téléchargé : libpython3.13-stdlib_3.13.5-2+deb13u5_amd64.deb (1958624 octets, sha256 db161322a3481d2c0c3b9a3b9a03c3ab0e2b1718f54b88755fb4a3f939165b84)
+  téléchargé : libreadline8t64_8.2-6_amd64.deb (168832 octets, sha256 eeadf2b5e755c9f183883feea2d9b5b28560284275d5f54d3e55d0923b1d0967)
+  téléchargé : media-types_13.0.0_all.deb (29336 octets, sha256 0788e4b0b72db1bcf74a19cb24c3511e7770ad0b341f0f30e361701c3072f53e)
+  téléchargé : mmdebstrap_1.5.7-1+deb13u1_all.deb (134004 octets, sha256 df731ee92b0ad40f9618b8b1c98c2e90635224f6b21c0905dab65ca099c8fe14)
+  téléchargé : netbase_6.5_all.deb (12436 octets, sha256 76bafa92947ebd37b0a6f9ec6570412041f56edebc1c66d323731216d318471e)
+  téléchargé : perl-modules-5.40_5.40.1-6+deb13u1_all.deb (3013728 octets, sha256 4c46cdd8f3135aa1c95f07e817f8e5d9be590687441ac1c27e3a8c49400f35ce)
+  téléchargé : perl_5.40.1-6+deb13u1_amd64.deb (267736 octets, sha256 ef145c247787d6f40dcdefd5b417502484827cde0d555998c17fd5b27ec1e1dd)
+  téléchargé : python3-minimal_3.13.5-1_amd64.deb (27248 octets, sha256 a5d2371bebf3689f676e3f3bae800371bcc4392a8a51269e23d528249b399615)
+  téléchargé : python3.13-minimal_3.13.5-2+deb13u5_amd64.deb (2224552 octets, sha256 c1fda9e7b1bf15b2fa75a238d8a8710e142fe14c722fc650c5fc614f078c9073)
+  téléchargé : python3.13_3.13.5-2+deb13u5_amd64.deb (757492 octets, sha256 460c1fd72845516ac3ce9d1686916f3ab2e4c86f8a9746e14d26243a47e2b98d)
+  téléchargé : python3_3.13.5-1_amd64.deb (28244 octets, sha256 c1388174dc7140e6c19a6dd39f8a0dcb38a835cd66c65644e0dded43d5223cb0)
+  téléchargé : readline-common_8.2-6_all.deb (69360 octets, sha256 f77e8aa0bf0de618f11cb0b21658a4ed60f177d63b3cf26d7fc3706b6d0eaaa9)
+OK   sha256 des .deb conformes au Packages vérifié : 20 sur 20
+  mmdebstrap 1.5.7
+étape debian_amorce finie : 2026-11-19T16:26:00Z
+OK   K3 : aucune ligne de bloc OpenPGP armuré dans le journal
