@@ -1903,3 +1903,38 @@ Journal : [`sortie-m1b_sec.log`](../../08c-durcissement/resultats/sortie-m1b_sec
 - **NS2** : chacune des quatre contre-épreuves signale ce qu'elle vise.
 
 Rien n'est posé. Restent `m1b_sortie` puis `m1b_sans_sortie`, chacune sur ton accord, après la mesure du 20/11, et ensuite `m1b_temoins`.
+
+## Signature des tâches et des pipelines : prédictions écrites le 19/11/2026 à 17:15:51 UTC, avant tout lancement
+
+**Script** : [`m1b-signature.sh`](../m1b-signature.sh) (sha256 `abe1e507ae92b3ff…`), étape `taches`, journal à venir `m1b-signature-taches.log`. C'est un script neuf, sur le modèle de l'étape `taches` de `m4c.sh`. `m1b-builders.sh`, cité par JK et JT, n'est pas touché.
+- **Entrées** : les quatre objets que `prealables` rendra sous `m1bt-20` cette nuit. Leur sha256 doit égaler celui que Tekton a validé (TD1), sinon le script s'arrête avant toute signature.
+- **Premier passage**, `SIGNER=1` :
+  - les deux tâches sont signées par `tkn` avec la clé des tâches ;
+  - elles sont relues : égales aux tâches rendues, signature exceptée, et image de l'amorce figée ;
+  - elles sont versionnées sous `builders/` ;
+  - leurs bundles sont poussés dans Zot (tag `m1b`). **Ces écritures sont définitives.**
+  - Le script imprime les deux lignes à ajouter à `taches.yml`, puis s'arrête.
+- **Second passage**, après ta revue de `taches.yml` :
+  - chaque pipeline reçoit les références réelles de ses trois tâches, dont `publier-image` `d21931f3…`, lue dans la liste ;
+  - c'est le seul changement admis, et il est contrôlé ;
+  - chaque pipeline est admise, signée, relue, puis poussée (`tekton/pipelines/<nom>`, tag `m1b`).
+- **Garde** : 1 Gio libre au moins sur `/` de sc-stockage avant toute poussée.
+
+**Banc** : [`m1b-signature-banc.log`](m1b-signature-banc.log), 48 OK, 0 KO, joué à 17:15 UTC sur ce même sha256. C'est la vraie fonction, avec le vrai `tkn`, une clé jetable et les rendus de `m1bt3`. Le dry-run, Zot et `sur` sont faux. Le banc couvre huit cas :
+1. première passe ;
+2. passe rejouée sans changement ;
+3. tâches absentes de la liste ;
+4. rien de versionné ;
+5. tâches listées : deux pipelines signées et vérifiées par `tkn` ;
+6. rendu altéré, refusé avant toute signature ;
+7. tâche refusée à l'admission ;
+8. Zot bas.
+
+Dans tous les cas, `$T/auth` est absent à la fin. Il ne couvre ni Zot, ni le vrai dry-run, ni Tekton, ni la clé réelle.
+
+**Conditions de lancement** : la mesure du 20/11 tenue, avec les rendus de `m1bt-20` égaux à TD1, puis ton accord pour les écritures dans Zot. Les politiques réseau ne sont pas requises pour signer ; elles le sont avant les PipelineRuns.
+
+- **SG1** (haute) : premier passage `SIGNER=1` en code 0. Les quatre rendus égalent TD1, les quatre objets sont admis, et les deux tâches sont signées et relues (égales au rendu, image `ed654c69…`). Deux signatures versionnées sont écrites, deux bundles poussés, et deux lignes « à ajouter » sont imprimées. Les pipelines ne sont pas signées. Au moins 1 Gio libre sur `/` de sc-stockage (3 978 911 744 octets à 16:50:58 UTC).
+- **SG2** (haute) : les deux bundles poussés ont des digests reproductibles. Le second passage les repousse à l'identique : `tkn` fixe la date de création, comme mesuré en M4b et M4c.
+- **SG3** (haute) : second passage en code 0, après revue. Les deux pipelines ne diffèrent du rendu que par les trois références. Elles sont admises, signées, relues et poussées, et leurs deux références sont imprimées.
+- **SG4** (moyenne) : `tkn task verify` et `tkn pipeline verify`, avec la clé publique des tâches, acceptent les quatre objets signés. Le banc ne l'a mesuré qu'avec la clé jetable.

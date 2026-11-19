@@ -1,0 +1,59 @@
+# m1b-signature-banc.sh, 2026-11-19T17:15:17Z ; m1b-signature.sh abe1e507ae92b3ffbfc172426c5658417ec7cfd3ed3e8e909a56ed1beb427eef
+# tkn 0.46.2 ; yq v4.54.3 ; liste revue f96b9d164670437e7b32e4e4122b3e26ed4dd48c1d0fd541e168f8000e9a9a34
+OK   clé jetable du banc (P-256) : 1
+## SIGNER=1, première passe
+OK   première passe (code 0)
+OK   première passe : $T/auth absent à la fin : absent
+OK   première passe : appels de kubectl hors dry-run serveur : 0
+OK   première passe : nouvelles signatures : 2
+OK   première passe : à ajouter à la liste : 2
+OK   première passe : signatures versionnées : prefetch-racine-rpm construire-racine-rpm
+OK   première passe : poussées (deux tâches, tag m1b) : tekton/tasks/prefetch-racine-rpm:m1b tekton/tasks/construire-racine-rpm:m1b
+OK   première passe : prefetch-racine-rpm vérifiée par tkn (clé publique du banc) : vérifiée
+OK   première passe : prefetch-racine-rpm, digest poussé = fichier versionné : fc58a589852f6eac2e5bd499a7c9499bd60d3d242607dd4c0f86f69fc3d3630b
+OK   première passe : construire-racine-rpm vérifiée par tkn (clé publique du banc) : vérifiée
+OK   première passe : construire-racine-rpm, digest poussé = fichier versionné : 75ecd09b450ac6cf21d281e78ca9d1070c9b565939ca3900361a81640dd8e582
+## SIGNER=1, rejouée sans changement
+OK   rejouée (code 0)
+OK   rejouée : $T/auth absent à la fin : absent
+OK   rejouée : appels de kubectl hors dry-run serveur : 0
+OK   rejouée : aucune nouvelle signature : 0
+OK   rejouée : signatures versionnées inchangées : inchangées
+## sans SIGNER, absentes de la liste
+OK   absentes de la liste (code 1)
+OK   absentes de la liste : $T/auth absent à la fin : absent
+OK   absentes de la liste : appels de kubectl hors dry-run serveur : 0
+## sans SIGNER, rien de versionné
+OK   rien de versionné (code 1)
+OK   rien de versionné : $T/auth absent à la fin : absent
+OK   rien de versionné : appels de kubectl hors dry-run serveur : 0
+OK   rien de versionné : ni versionnement ni poussée : [] 0
+## les deux listées : pipelines
+OK   liste du banc : yq la lit, deux clés de plus : 2
+OK   les deux listées (code 0)
+OK   les deux listées : $T/auth absent à la fin : absent
+OK   les deux listées : appels de kubectl hors dry-run serveur : 0
+OK   listées : poussées (deux tâches, deux pipelines) : tekton/tasks/prefetch-racine-rpm:m1b tekton/tasks/construire-racine-rpm:m1b tekton/pipelines/builder-mock-rocky9:m1b tekton/pipelines/builder-rocky9-bootstrap:m1b
+OK   listées : builder-mock-rocky9 vérifiée par tkn : vérifiée
+OK   listées : builder-mock-rocky9, références = tâches listées et publier-image de la liste : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:fc58a589852f6eac2e5bd499a7c9499bd60d3d242607dd4c0f86f69fc3d3630b sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:75ecd09b450ac6cf21d281e78ca9d1070c9b565939ca3900361a81640dd8e582 sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   listées : builder-rocky9-bootstrap vérifiée par tkn : vérifiée
+OK   listées : builder-rocky9-bootstrap, références = tâches listées et publier-image de la liste : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:fc58a589852f6eac2e5bd499a7c9499bd60d3d242607dd4c0f86f69fc3d3630b sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:75ecd09b450ac6cf21d281e78ca9d1070c9b565939ca3900361a81640dd8e582 sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   listées : seul changement relu, deux pipelines : 2
+## rendu altéré : refus avant toute signature
+OK   rendu altéré : une seule ligne changée : 1
+OK   rendu altéré (code 1)
+OK   rendu altéré : $T/auth absent à la fin : absent
+OK   rendu altéré : appels de kubectl hors dry-run serveur : 0
+OK   rendu altéré : ni versionnement ni poussée : [] 0
+OK   rendu altéré : aucune signature dans $T : 0
+## tâche refusée à l'admission
+OK   admission refusée (code 1)
+OK   admission refusée : $T/auth absent à la fin : absent
+OK   admission refusée : appels de kubectl hors dry-run serveur : 0
+OK   admission refusée : ni versionnement ni poussée : [] 0
+## disque de Zot bas
+OK   Zot bas (code 1)
+OK   Zot bas : $T/auth absent à la fin : absent
+OK   Zot bas : appels de kubectl hors dry-run serveur : 0
+OK   Zot bas : ni versionnement ni poussée : [] 0
+# fin 2026-11-19T17:15:21Z ; OK 48 ; KO 0
