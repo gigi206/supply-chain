@@ -173,10 +173,13 @@ echo "archive du pod : $(stat -c %s /w/p.tar) octets, $(tar -tf /w/p.tar | wc -l
 df -k /w | awk "NR == 2 {print \"après archive, /w : capacité \" \$2 \" kB ; utilisés \" \$3 \" kB\"}"
 true'
 
-pod_essai() { # a|b|c [limite] : pod $N-<x>, installation, archive rapatriée sous $T/p-<x>.tar ; avec une limite, dnf tourne
+pod_essai() { # a|b|c|d [limite|-] [proc] : pod $N-<x>, installation, archive rapatriée sous $T/p-<x>.tar ; avec une limite, dnf tourne
   # sous cette limite de fichiers ouverts, souple puis dure (ajout du 19/11/2026 pour pod_c, après m1b-cloexec-banc.log) ;
   # sans limite, SONDE_INSTALL est passée telle quelle, comme pour pod_a
-  local x=$1 lim=${2:-} p=$N-$1 s sonde=$SONDE_INSTALL
+  # avec « proc » (ajout du 19/11/2026 pour pod_d, décision « Mesurer aussi /proc ») : /proc monté dans la racine installée avant
+  # dnf, démonté juste après dnf et avant tar, sans limite basse
+  local x=$1 lim=${2:-} pr=${3:-} p=$N-$1 s sonde=$SONDE_INSTALL
+  [ "$lim" != - ] || lim=""
   [ -s "$T/entrees.tar" ] || echec "lancer d'abord l'étape prealables"
   if [ ! -s "$T/pod-$p.json" ]; then
     [ -z "$(kubectl get pod -n builds --field-selector "metadata.name=$p" -o name < /dev/null 2> /dev/null)" ] || echec "pod $p déjà présent (relancer sous un autre PREFIXE)"
@@ -186,6 +189,12 @@ pod_essai() { # a|b|c [limite] : pod $N-<x>, installation, archive rapatriée so
     [ "$(grep -c '^umask 022$' <<< "$sonde")" = 1 ] || echec "ligne umask 022 de SONDE_INSTALL introuvable"
     sonde=$(sed "s|^umask 022\$|umask 022\nulimit -Sn $lim \&\& ulimit -Hn $lim \|\| { echo \"KO   limite $lim refusée\"; exit 1; }\necho \"limite de fichiers ouverts avant dnf : \$(ulimit -Sn) / \$(ulimit -Hn)\"|" <<< "$sonde")
     echo "sonde d'installation : limite $lim ajoutée après umask 022"
+  fi
+  if [ "$pr" = proc ]; then
+    [ "$(grep -c '^r=\$?; echo "dnf code' <<< "$sonde")" = 1 ] || echec "ligne du code de dnf introuvable dans SONDE_INSTALL"
+    sonde=$(sed -e "s|^umask 022\$|umask 022\nmkdir -p /w/m/i/proc \&\& mount -t proc proc /w/m/i/proc \|\| { echo \"KO   montage de /proc dans la racine\"; exit 1; }\necho \"/proc monté dans la racine avant dnf : \$(grep -c ' /w/m/i/proc proc ' /proc/mounts) montage(s) ; mode de la racine \$(stat -c %a /w/m/i) ; mode du point de montage \$(stat -c %a /w/m/i/proc)\"|" \
+      -e "s|^\(r=\$?; echo \"dnf code.*\)\$|\1\numount /w/m/i/proc \&\& echo \"/proc démonté de la racine après dnf : \$(grep -c ' /w/m/i/proc ' /proc/mounts) montage(s) restant(s)\" \|\| { echo \"KO   démontage de /proc\"; exit 1; }|" <<< "$sonde")
+    echo "sonde d'installation : /proc monté dans la racine avant dnf, démonté après"
   fi
   [ ! -e "$T/p-$x.tar" ] || echec "$T/p-$x.tar existe (relancer sous un autre PREFIXE)"
   a_blanc "$T/pod-$p.json"
@@ -243,6 +252,7 @@ etape_banc() { # hôte seul, hors ligne : SONDE_POD et SONDE_INSTALL jouées tel
 etape_pod_a() { pod_essai a; }
 etape_pod_b() { pod_essai b; }
 etape_pod_c() { pod_essai c 1024; }   # ajout du 19/11/2026 (« Oui, après pod A ») : durée de dnf dans Kata sous une limite basse
+etape_pod_d() { pod_essai d - proc; }   # ajout du 19/11/2026 (« Mesurer aussi /proc ») : /proc monté dans la racine, limite par défaut
 
 etape_comparer() {
   local a b
@@ -257,7 +267,7 @@ etape_comparer() {
   done
 }
 
-[ $# -ge 1 ] || { echo "usage : $0 <étape>… (prealables banc pod_a pod_b pod_c comparer)" >&2; exit 2; }
+[ $# -ge 1 ] || { echo "usage : $0 <étape>… (prealables banc pod_a pod_b pod_c pod_d comparer)" >&2; exit 2; }
 for e in "$@"; do
   declare -F "etape_$e" > /dev/null || { echo "étape inconnue : $e" >&2; exit 2; }
   echo "# m1b.sh $e (PREFIXE $N), début $(date -u +%FT%TZ)"
