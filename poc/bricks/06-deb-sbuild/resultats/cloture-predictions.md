@@ -90,3 +90,7 @@ Journal : [`cloture-denominateur.log`](cloture-denominateur.log), 14:59:24 UTC, 
 - **CL9** : lus avec `grep -a`, 33 en-têtes de pod, 19 sous Kata et 14 sans RuntimeClass ; les 7 contextes privilégiés affichés sont sous Kata. `diag-exec-releve.log` a un en-tête, sous Kata.
 
 **Portée.** Dans les fichiers de la 06, tout usage privilégié est sous Kata, ou n'est qu'une lecture. Les journaux archivés le confirment pour les pods dont le contexte est affiché, et l'admission refuse un pod privilégié hors Kata (N7 le 16/11, état de 14:54:14 UTC). Cela ne dit rien des pods d'autres briques, ni de `kube-system` et `kyverno`, hors de la politique.
+
+## Clôture décidée (note écrite le 19/11/2026 à 15:24:58 UTC)
+
+Réponse du propriétaire : « Clore maintenant », avec la réserve du rejeu de zéro sur 1.0.0-1. La section de clôture est dans le [README de la brique](../README.md).

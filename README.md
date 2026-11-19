@@ -22,9 +22,9 @@ Plateforme de **supply-chain logicielle** auto-hébergée. Elle vise à :
 >   - cert-manager (08d) : non installé.
 > - **Seuils atteints sur le laptop** : 01 (02/11), 19 et 19b (02/11), 10 (03/11, avec les écarts D1 (b) et D2 (a)). Les briques 02, 03, 04, 07a et 13a sont validées en local et restent à compléter ; le scan de la 07a est en service.
 > - **deb (06)** :
->   - jalons S1 à S5a tenus les 10 et 11/11, dont un deb bit-identique sur deux builds (S3) ;
->   - S6a fait le 14/11 ;
->   - le seuil de la brique n'est pas encore déclaré atteint.
+>   - jalons S1 à S5a tenus les 10 et 11/11, reprise après le rejeu de zéro le 13/11, S6a et S6b faits le 14/11 ;
+>   - révision 1.0.0-2 portée jusqu'à la VSA et à la porte le 16/11 ;
+>   - **seuil atteint le 19/11**, avec réserves, dont un rejeu de zéro mesuré sur 1.0.0-1 seulement ([clôture](poc/bricks/06-deb-sbuild/README.md)).
 > - **rpm (05)** :
 >   - M2 à M4 et M5a tenus les 17 et 18/11 ;
 >   - M1 non réévalué : les images d'outillage ont été construites hors de la plateforme ;

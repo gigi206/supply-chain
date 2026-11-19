@@ -355,3 +355,7 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 - **Conséquence pour cet ADR** : l'isolation réseau du build rpm repose sur la seule NetworkPolicy du pod. Le build deb en a deux, la politique et sbuild `--chroot-mode=unshare`. Aucune décision ne change ici ; une seconde barrière pour la voie rpm reste à décider avec le propriétaire.
 
 **Additif du 18/11/2026, 19:07 UTC : portée du constat réseau de M5a** ([détail](../../poc/bricks/05-rpm-mock/resultats/m5-predictions.md)). Le constat ci-dessus porte sur la seule configuration mesurée : mock 6.9, `--hermetic-build`, `--isolation=simple`, pod Kata privilégié. La cause est lue dans le code de mock 6.9 (lecture) : rpmbuild n'est placé dans un espace de noms réseau à part qu'avec nspawn (`condUnshareNet`), et nspawn échoue dans ce pod (étape `essais`).
+
+**Additif du 19/11/2026, écrit à 15:24:58 UTC : brique 06 close** ([clôture](../../poc/bricks/06-deb-sbuild/README.md)), sur le choix du propriétaire « Clore maintenant ».
+- **Mesuré** : dans les fichiers de la 06, tout usage privilégié est sous Kata ou n'est qu'une lecture (16 lignes classées) ; les pods `construire` tournent sous Kata en S4a, S4d et S4d3 ; hors Kata, Pod Security refuse `construire-deb` (N7) et la porte refuse la provenance (U12).
+- **Conséquence pour cet ADR** : la voie A (pod Kata privilégié, D1 a) tient pour le deb jusqu'au seuil. La clause « 0 pod privilégié sur l'hôte » se lit avec cette décision : le pod est privilégié dans la VM de Kata, pas sur l'hôte.

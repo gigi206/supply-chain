@@ -2114,3 +2114,27 @@ packaging de S4c, digest attendu de S4d). L'égalité avec le deb d'OBS reste bo
 - 2026-11-16T21:01:48Z : révision 1.0.0-2, ligne 12 : `DISTRO=rke2 s6a.sh porte` (16/11, 21:00:48 à 21:01:18 UTC, code 0) : **W1 à W7 et U14 tenues**, porte du deb sur D : ec en succès, horodatage 8/8, VSA `1/1`, scan `ok` ; cascade de la révision faite.
 - 2026-11-16T21:15:12Z : décision du propriétaire sur les trois tags `I:` de lintian restants sur 1.0.0-2 (« Oui, pas de révision ») : **pas de révision dédiée** ; `poc/packaging` inchangé, rien lancé ([`lintian-tags-info.md`](resultats/lintian-tags-info.md)).
 - 2026-11-19T15:00:01Z : relevé de clôture, en lecture seule, sur la demande « on peut commencer la clôture de la 06 ? » : [`cloture-releve.sh`](resultats/cloture-releve.sh) (14:54:13 à 14:54:14 UTC, code 0) et [`cloture-denominateur.sh`](resultats/cloture-denominateur.sh) (14:59:24 UTC, code 0), deux premiers passages arrêtés sur des défauts de script et gardés en `-1.log`. **CL1 à CL9 tenues** : dans les fichiers de la 06, tout usage privilégié est sous Kata ou n'est qu'une lecture (16 lignes classées) ; capacités toutes en `drop ALL` ; `pods-isolation` en `Deny`, `builds` en `restricted`, 0 pod privilégié hors Kata hors `kube-system` ; 6:34:16 de commits depuis le 14/11, borne basse, blocs partagés avec d'autres briques ([prédictions et résultats](resultats/cloture-predictions.md)). **Le seuil n'est pas déclaré** : décision du propriétaire attendue.
+
+## Clôture (19/11/2026, écrite à 15:24:58 UTC ; choix du propriétaire : « Clore maintenant »)
+
+Question posée : « Je clos la 06 maintenant, avec la réserve du rejeu de zéro sur 1.0.0-1, ou j'attends le rejeu ? ». Réponse : « Clore maintenant ».
+
+**Le seuil est atteint sur le laptop, avec des réserves.** Il porte sur la révision 1.0.0-2 (deb `f66bbeb2…`, artefact `builds/sample-app-deb@sha256:60f25f5c…`).
+
+| Élément du seuil | Résultat | Preuve |
+|---|---|---|
+| Bit-identique | Deb `f66bbeb2` identique sur deux builds sbuild hors réseau (S3), sur deux exécutions de la pipeline sous Kata (S4d, artefact `60f25f5c` égal au digest attendu de prealables) et à la reconstruction hors ligne dans `sc-replay` (`PASSED`, VSA signée et poussée) | [`s3-comparaison.log`](resultats/s3-comparaison.log), [`s4d-pipeline.log`](resultats/s4d-pipeline.log), [`s6b-rebuild.log`](resultats/s6b-rebuild.log), [`s6b-vsa.log`](resultats/s6b-vsa.log) |
+| 0 pod privilégié sur l'hôte | Les seuls pods privilégiés de la 06 tournent sous Kata (D1 a). Les 16 lignes « privileged » des fichiers de la 06 sont toutes classées, capacités toutes en `drop ALL`. Pods `construire` sous Kata en S4a, S4d et S4d3 (webhook et rattrapage). Hors Kata, `construire-deb` est refusé par Pod Security (N7, 16/11), et la porte refuse une provenance sans Kata (U12). À l'heure du relevé : `pods-isolation` en `Deny`, `builds` en `restricted`, 0 pod privilégié hors Kata hors `kube-system` | [`cloture-releve.log`](resultats/cloture-releve.log), [`cloture-denominateur.log`](resultats/cloture-denominateur.log), [`s5-kata.log`](resultats/s5-kata.log), [`s4d2-reel.log`](resultats/s4d2-reel.log), [`s4d3-chemins.log`](resultats/s4d3-chemins.log) ; [prédictions CL1 à CL9](resultats/cloture-predictions.md) |
+
+**Réserves** :
+- **Rejeu de zéro** : celui du 13/11 (S5b, reprise du bloc 06) porte sur 1.0.0-1 ; 1.0.0-2 n'a pas été rejoué de zéro. C'est la réserve acceptée par le propriétaire.
+- **Égalité avec OBS** : bornée à 1.0.0-1 (`0b489d43`).
+- **Déduplication** entre deux fermetures deb : non mesurée, il n'en existe qu'une (S2).
+- **`PACKAGING_ARTIFACT_INPUTS`** : poussé depuis l'hôte sous `entrees/`, sans provenance de la plateforme.
+- **Image de build `sbuild-debian13`** : construite et signée par la plateforme (S4a), mais sa provenance n'est pas jugée par la porte ; son digest n'est revu qu'à travers `taches.yml`.
+- **TaskRuns isolés** : la plateforme admet un TaskRun isolé d'une tâche signée, avec des paramètres libres ; il ne publie rien, et la porte ne juge que les PipelineRuns.
+- **Dépendances de sbuild** : apt ne les protège pas ; la confrontation au verrou est la seule barrière.
+- **Lecture de la clause** : un pod privilégié dans Kata n'est pas privilégié sur l'hôte (décision D1 a du 10/11). `kube-system` et `kyverno` sont hors de la politique, donc hors de la clause.
+- **Hors de la 06** : l'option E (`outils-prefetch` construite dans la chaîne) relève de la brique 03 ; la signature OpenPGP relève de la 09.
+
+**Effort** (aucune conversion nouvelle) : 0,696 à 0,701 pw consommés au 14/11, selon la note de ce jour (base de 40 h par pw), puis 6:34:16 de commits jusqu'au 19/11 à 14:54:10 UTC. Ce second chiffre est une borne basse, et ses blocs sont partagés avec d'autres briques (la 05 le 16/11). Les deux chiffres ne sont pas additionnés.
