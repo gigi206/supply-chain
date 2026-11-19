@@ -960,3 +960,45 @@ Journaux : [`m1b-tar-amorce.log`](m1b-tar-amorce.log) et, pour la localisation d
 - **TA4 (lecture)** : deux membres de `a8` ont un en-tête `SCHILY.xattr.security.capability`, aucun autre xattr.
 
 **Conséquence.** Les octets de l'archive, et donc la couche de l'image, dépendent de la version de `tar`. La cible du pod et de la tâche, qui archivent avec le `tar` de l'amorce, est `7c07083c…`, pas `06c289ad…`. Le contenu est le même. La référence du bootstrap `f2652169…` a aussi été écrite par le `tar` de l'hôte : elle est à refaire avec le `tar` de l'image qui l'archivera. La cause côté code de `tar` n'est pas lue.
+
+### Pod d'essai Kata hors ligne (m1b.sh) : prédictions (note écrite à 2026-11-19T08:58:50Z UTC, avant tout lancement)
+
+Le script est [`m1b.sh`](../m1b.sh), préparé à sec. Créer les deux pods est une écriture dans le cluster, prévue au point 4 de la carte. Elle est lancée sous l'accord permanent du 18/11 (« Ne me demande plus oui ou non. Sur ce genre de réponse estime que je vais répondre oui »). Rien d'autre ne change : ni politique ni label neufs (le label `construire-rpm` est déjà coupé par `construction-rpm-sans-sortie`), rien dans Zot, ni tâche ni signature. Si l'admission à blanc refuse les pods, ou s'ils demandent un changement, le passage s'arrête et je te le signale. Il crée deux pods d'essai, une installation chacun, sur l'image de l'amorce `ed654c69`. Les entrées (clés, miroir partiel, `dnf.conf`) sont celles du banc de l'amorce du 18/11. Elles sont livrées par copie, pas par une tâche de prefetch.
+
+**prealables** (hôte, lecture et création à blanc)
+- **PP1** : `a8.tar`, `dnf.conf` et S (`1793914619`) sont égaux à ceux du banc. Les 199 rpm de la liste épinglée sont présents dans le miroir, au bon sha256.
+- **PP2** : `construction-rpm-sans-sortie` est relue, et aucune politique de builds n'autorise de trafic à `construire-rpm`.
+- **PP3** (confiance moyenne) : les deux pods sont admis à blanc côté serveur. L'image vient d'`amont/`, ce que les pods au label `construire-rpm` n'ont pas encore utilisé.
+
+**banc** (hôte seul, hors ligne, avant tout pod)
+- **PB1** : les deux sondes des pods tournent telles quelles, avec les mêmes `sed`, dans une racine de l'amorce extraite à neuf. Tous les outils sont présents (`dnf`, `rpm`, `tar`, `sha256sum`, `find`, `bash`, `timeout`, ainsi que `getent`, `awk` et `df`). Les entrées sont revérifiées (code 0). La S recalculée vaut `1793914619`.
+- **PB2** : dnf rend le code 0. 201 paquets sont installés, dont 2 `gpg-pubkey`. La racine de l'arbre est en 555. `tar` rend le code 0. L'archive a 13 332 membres.
+- **PB3** : l'archive du banc vaut `7c07083c…` octet pour octet. `env -i`, le lien `/m` et les substitutions ne changent donc rien.
+  - Si PB3 est tenue, seul Kata reste en cause pour PK6.
+  - Si elle ne l'est pas, je corrige sur l'hôte, sans aller au cluster.
+- **Témoins réseau du banc** : relevés, sans pari. Le banc tourne sous `unshare -n`.
+- **Place** : environ 1,5 G sur /home pour le banc et environ 0,9 G sous le dossier de travail pour les pods. `df` est relevé avant et après ; rien n'est nettoyé.
+
+**pod_a et pod_b** (cluster ; `pod_a` d'abord, son journal est lu avant de lancer `pod_b`)
+- **PK1** : le pod est prêt sous `kata`, au label `construire-rpm`. Les entrées sont copiées par morceaux, puis revérifiées dans le pod (code 0).
+- **PK2** : `%_install_langs` vaut `en_US`. Les versions sont celles du banc : `rpm-4.16.1.3-40.el9`, `dnf-4.14.0-34.el9_8.rocky.0.1`, `libsolv-0.7.24-4.el9`, `libdnf-0.69.0-18.el9.rocky.0.1`, `tar-1.34-11.el9`. La S recalculée dans le pod vaut `1793914619`.
+- **PK3** : les témoins réseau échouent, en TCP vers Zot comme en DNS public (codes non nuls).
+- **PK4** (lecture, sans pari) : le umask par défaut du conteneur, jamais relevé. dnf tourne sous `umask 022` posé explicitement.
+- **PK5** :
+  - dnf rend le code 0 ;
+  - 201 paquets sont installés, dont 2 `gpg-pubkey` ;
+  - la racine de l'arbre est en 555 ;
+  - `tar` rend le code 0, sans rien sur stderr ;
+  - l'archive a 13 332 membres.
+- **PK6** (confiance moyenne) : l'archive de chaque pod vaut `7c07083c…` octet pour octet. Ce qui change par rapport au banc :
+  - un vrai root dans une VM Kata, et non un espace de noms ;
+  - `env -i` au lieu de l'environnement de l'hôte ;
+  - un tmpfs ;
+  - un autre noyau.
+- **Durée** : sans pari. L'étape `racine` de S1 avait duré 5 694 s, pour une cause inconnue. Les pods tournent en arrière-plan.
+
+**comparer** (hôte)
+- **PC1** : `p-a.tar` et `p-b.tar` sont identiques.
+- **PC2** : si PK6 n'est pas tenue, le comparateur membre à membre contre `a8` nomme chaque écart. Aucun pari sur leur nature.
+
+**Portée prévue.** Si PK6 et PC1 sont tenues, la mesure couvre deux pods Kata du cluster, le même jour. Les entrées y sont livrées par copie, et seule l'archive de la racine est faite : pas de couche de configuration, pas de layout. Rien ne sera établi pour le bootstrap, ni pour un autre jour, ni pour la tâche elle-même.
