@@ -360,3 +360,5 @@ Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.
 - **Kyverno.** Les deux fichiers de politiques Kyverno du dépôt (08 `admission.yaml`, 08c `durcissement.yaml`) ne visent que des pods et des objets Tekton : aucune règle ne vise un rpm, un deb ou un dépôt. O6 ne touche que la porte.
 - **Rpm.** La porte n'a jamais rendu de verdict archivé sur le rpm `builds/sample-app-rpm@07b7bd6f…` (réserve « Porte sans tâche rpm » de la 05). P1 est rechiffré en **P1-deb** (1 j, estimation) et **P1-rpm**, qui attend l'extension de la porte à la voie rpm, hors de la 09.
 - **Question au propriétaire** : P1-deb ou N ([carte](resultats/o6-carte.md), correction datée).
+
+*Note datée du 19/11/2026, 21:15:33 UTC (O6)* : le lien du deb relie la copie `signes/sample-app-deb` à son propre digest. La signature OpenPGP du deb est celle du dépôt apt. P1-deb seul n'a donc pas de substance, et la question devient **N (recommandé), ou la voie deb : P1-deb + P2-apt, 1,5 j estimé** ([carte](resultats/o6-carte.md), dernière note). Le secret `lien` ne sert à aucune des deux.

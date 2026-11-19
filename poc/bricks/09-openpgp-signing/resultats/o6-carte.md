@@ -98,3 +98,27 @@ Relecture du conseiller. Trois points de la carte dépassaient ce que j'avais v�
 **Secret `lien`** : la voie P n'emploie que la clé publique (`lien.pub`). Le secret gardé pour O6 n'y sert pas.
 
 **Question au propriétaire, mise à jour** : **P1-deb ou N ?** T n'est pas proposée, car elle rouvre D2 (a). P1-rpm attend l'extension de la porte à la voie rpm, hors de la 09.
+
+## Note datée du 19/11/2026, 21:15:33 UTC : la voie deb n'a de substance qu'avec le dépôt apt ; recommandation N
+
+**Ce que dit le lien du deb.** J'ai lu le prédicat archivé [`o5-signes-predicat-deb.json`](o5-signes-predicat-deb.json).
+- `unsigned.manifest` vaut `sha256:60f25f5c…` dans `builds/sample-app-deb`.
+- `signed` porte `manifestCopiedFrom` `builds/sample-app-deb`, dans `signes/sample-app-deb`, au même digest.
+- Le prédicat n'a pas de champ `b1`. Le contrôle d'O5 n'y vérifie que l'identité.
+
+Le lien du deb relie donc un objet à sa propre copie. Le paquet deb n'est pas signé en OpenPGP : sa signature est celle du dépôt (`InRelease` de `depot-apt`, D1). **P1-deb seul n'apporterait à la porte qu'une vérification de signature, rien sur la signature OpenPGP.** La forme utile est P1-deb + P2-apt, soit 1,5 j d'après les estimations de cette carte, non mesurées.
+
+**Deux formulations corrigées** (plus fortes que la mesure) :
+- « le Job complet de la porte l'admet depuis S6a » se lit « l'a admis le 16/11/2026 (S6a), mesure non refaite depuis » ;
+- « la porte actuelle refuse les quatre objets » se lit « la politique de la porte *du dépôt* (`porte.rego` et `taches.yml` du commit courant, pas la ConfigMap en service) les refuse, rejouée sur l'hôte ».
+
+**Recommandation : N.**
+- Le seuil de la brique est atteint sur l'hôte. O6 est optionnel et hors estimation.
+- La moitié où le lien porte de la substance (rpm, B1 recalculé) attend une extension de la porte hors de la 09.
+- P touche trois fichiers partagés de la 08 et demande un accord de cluster.
+
+L'autre option est la **voie deb** : P1-deb + P2-apt, 1,5 j estimé, contrôle du lien du deb et du dépôt apt par la porte.
+
+**Secret `lien`** : aucune des deux options ne l'emploie (la voie P ne lit que `lien.pub`). Il expire seul le 22/11/2026, au plus tard à 19:49:36 UTC.
+
+**Question au propriétaire** : N, ou la voie deb ?
