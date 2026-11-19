@@ -1292,3 +1292,25 @@ Décision du propriétaire : « all, comme S1 ».
   Si elle diffère, le comparateur membre à membre contre `z-b1.tar` nomme chaque écart.
 
 **Portée prévue.** Si PE6 est tenue, le bootstrap est reproduit dans un pod Kata hors réseau, le même jour, entrées livrées par copie, racine seule. Rien n'est établi pour un autre jour, ni pour la tâche elle-même. Le point 1 A reste non établi.
+
+### pod_e, bootstrap dans Kata : résultat, 19/11/2026 (note écrite à 2026-11-19T13:03:47Z UTC)
+
+Journaux : [`m1b-prealables_boot.log`](m1b-prealables_boot.log) (13:01:55 à 13:01:56 UTC, code 0) et [`m1b-pod_e.log`](m1b-pod_e.log) (13:02:04 à 13:03:08 UTC, code 0).
+
+**PE1 à PE6 tenues.**
+- **PE1** : les entrées sont conformes, avec 6 fichiers de métadonnées et 10 rpm sur 10, et le pod `m1b-e` est admis à blanc.
+- **PE2** : le pod est prêt sous `kata`, au label `construire-rpm`, sur le nœud `sc-build`. Les 22 fichiers d'entrée sont revérifiés dans le pod (code 0).
+- **PE3** :
+  - les deux témoins réseau échouent (code 124) ;
+  - sous `env -i`, rpm de python lit `[en_US]` avec `HOME=/root` et `[all]` avec `HOME=/m/h` ;
+  - les versions sont celles de LG0.
+- **PE4** :
+  - l'extraction de la couche rend 0, sans rien sur stderr, et `rpm -qa` donne 147 lignes avant ;
+  - la limite vaut `1024 / 1024` dans le sous-shell, et celle du shell reste `1073741824` après ;
+  - dnf-3 rend 0 en 5 s, avec 6 installations et 4 montées.
+- **PE5** : la liste `rpm -qa` après est celle de S1 (sha256 `1ca7c54b…`, 153 lignes), la racine passe en 555, et `tar` rend 0 sans rien sur stderr.
+- **PE6** : l'archive vaut `b063feb3…` octet pour octet.
+
+**Portée.** Le bootstrap est reproduit au bit près dans un pod Kata hors réseau : même jour, même nœud, entrées livrées par copie, racine seule. Ni couche de configuration, ni layout. Avec l'outillage (`pod_a` à `pod_c`), les deux racines de M1b sont reproduites dans Kata, avec les valeurs décidées : langue posée par la tâche, limite autour de dnf seul, racine 0555, machine-id absent. Rien n'est établi pour un autre jour dans Kata, ni pour la tâche elle-même : le point 1 A reste non établi au sens de la carte.
+
+**Place** : `/home` avait 77 684 756 kB libres à 13:01:56 UTC, contre 1 353 808 kB à 12:51:51 UTC ([`m1b-boot-langue.log`](m1b-boot-langue.log)). La brique n'a rien effacé entre les deux relevés ; l'origine de la place libérée n'est pas relevée.

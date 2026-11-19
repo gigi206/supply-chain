@@ -398,3 +398,10 @@ La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de 
 - **La valeur `en_US` annoncée le 19/11** dans la décision « Absent » ne vaut donc que pour l'outillage.
 - **Suite** : le pod d'essai du bootstrap dans Kata, avec la sonde du banc de la langue, sous la limite autour de dnf seul.
 - **Ce n'est un accord** pour aucune écriture dans Zot ni pour aucun changement du cluster. Le pod d'essai est lancé sous l'accord permanent du 18/11.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T13:03:47Z UTC : bootstrap dans Kata, résultat
+
+- **`pod_e`** redonne `b063feb3…` octet pour octet, hors réseau, en 5 s de dnf sous la limite autour de dnf seul, avec la langue `all` posée par la tâche ([résultat](m1b-predictions.md), [journal](m1b-pod_e.log)).
+- **Les deux racines de M1b sont reproduites dans Kata** : l'outillage `7c07083c…` (`pod_a`, `pod_b`, `pod_c`) et le bootstrap `b063feb3…` (`pod_e`). La portée reste étroite : même jour, même nœud, entrées par copie, racine seule.
+- **Reste pour le point 1 A** : un autre jour dans Kata (après 00:00 UTC le 20/11), puis la tâche elle-même, avec couche de configuration et layout.
+- **Ce qui suit** dans la carte : les deux tâches neuves (prefetch runc et constructeur Kata sans sortie), chacune avec son pod d'essai, puis leurs changements du cluster, chacun avec son accord (point 4).
