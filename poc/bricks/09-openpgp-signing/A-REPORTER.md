@@ -64,6 +64,12 @@ Avant la ligne « **Risqué → interdit** » :
 | 09 | openpgp-signing | **Préparé à sec** (19/11/2026, branche `claude/brique-09-sec-fdb4c6`) ; banc O0 sur l'hôte tenu, rien installé, cluster et Zot intacts | Dépôt apt signé autour d'une copie de D (`f66bbeb2…`) : `Release.gpg` et `InRelease` vérifiés par gpgv 2.4.8, chaîne `Release` → `Packages` → deb tenue, 5 témoins refusés ou détectés ; gpgv 2.4.8 accepte une signature SHA-1 de `Release` (refus par apt de Debian 13 non établi) ; `apt-ftparchive` 3.2.1 ignore `SOURCE_DATE_EPOCH` pour `Date`. Ni rpm, ni `createrepo_c`, ni sqv, ni le gpg des distributions cibles mesurés | [README](../poc/bricks/09-openpgp-signing/README.md), [banc](../poc/bricks/09-openpgp-signing/resultats/banc-depot-deb-predictions.md) ; décisions D1 à D4 prises le 19/11/2026, toutes en (a) ; O2 préparé à sec ([carte](../poc/bricks/09-openpgp-signing/resultats/o2-carte.md)) : relevé et banc des gardes de la clé tenus (gpg de l'hôte, clé jetable), construction des racines et clé du PoC non lancées |
 ```
 
+*Note datée du 19/11/2026, 18:37:49 UTC* : la ligne ci-dessus décrit l'état d'avant O2. À l'intégration, **la remplacer par celle-ci** :
+
+```
+| 09 | openpgp-signing | **En cours, hors cluster** (19/11/2026, branche `claude/brique-09-sec-fdb4c6`) ; O0, O2, O3 et O4 tenus sur l'hôte, sans réseau pour toute étape qui touche la clé, rien installé, cluster et Zot intacts ; O5 (attestation de lien) en attente d'accords | Clé du PoC RSA 4096 v4 `29BA1C48…BCF03A86`, sans phrase de passe (décision du propriétaire), créée par gpg 2.4.7 dans une racine Debian 13 sans réseau. rpm signé dans une racine Rocky 9.8 (gpg 2.3.3, rpm-sign 4.16) : en-tête principal et charge utile inchangés (B1), accepté par rpmkeys et dnf d'une amorce Rocky 9.8 (`gpgcheck=1`, `repo_gpgcheck=1`), 3 témoins refusés. Dépôt apt signé (`InRelease`, `Release.gpg` armuré, SHA-512), deb inchangé (`f66bbeb2…`), accepté par apt 3.0.3 et 3.0.4 avec `Signed-By`, 7 témoins refusés. apt de Debian 13 vérifie par sqv même quand gpgv est installé ; il refuse une signature SHA-1 de `Release` et un `Release.gpg` binaire. `apt-ftparchive` 3.0.3 ignore `SOURCE_DATE_EPOCH`. `rpmsign --delsign` ne rend pas le rpm d'origine | [README](../poc/bricks/09-openpgp-signing/README.md), prédictions et résultats [O2](../poc/bricks/09-openpgp-signing/resultats/o2-predictions.md), [O3](../poc/bricks/09-openpgp-signing/resultats/o3-predictions.md), [O4](../poc/bricks/09-openpgp-signing/resultats/o4-predictions.md) ; décisions D1 à D4 du 19/11/2026, toutes en (a) ; écart : amorces de vérification réutilisées depuis O2, contrôlées par le sha256 de leur couche seulement |
+```
+
 ---
 
 ## 3. `README.md` racine, ligne 33
@@ -72,6 +78,12 @@ Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 
 ```
 **Signature OpenPGP (09)** : préparée à sec le 19/11/2026 (branche à part, non fusionnée) ; banc O0 sur l'hôte tenu ; D1 à D4 décidées le 19/11/2026 (« deb signé » = dépôt apt signé, `.deb` intact ; clé OpenPGP en fichier sur l'hôte d'administration, pour le PoC seulement ; attestation de lien signée par la clé Transit `lien` après vérification de la provenance de Chains ; GnuPG des distributions) ; O2 préparé à sec (racines sur l'hôte depuis les dépôts signés, décision du 19/11/2026), construction et clé non lancées.
+```
+
+*Note datée du 19/11/2026, 18:37:57 UTC* : texte ci-dessus d'avant O2. À l'intégration, **le remplacer par celui-ci** :
+
+```
+**Signature OpenPGP (09)** : en cours hors cluster depuis le 19/11/2026 (branche à part, non fusionnée) ; D1 à D4 décidées le 19/11/2026 (« deb signé » = dépôt apt signé, `.deb` intact ; clé OpenPGP en fichier sur l'hôte d'administration, sans phrase de passe, pour le PoC seulement ; attestation de lien signée par la clé Transit `lien` après vérification de la provenance de Chains ; GnuPG des distributions) ; rpm signé et dépôt rpm signé vérifiés par dnf de Rocky 9.8, dépôt apt signé vérifié par apt de Debian 13 (sqv) ; reste l'attestation de lien (O5)
 ```
 
 ---

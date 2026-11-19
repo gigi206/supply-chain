@@ -161,3 +161,33 @@ Passée de 18:36:18 à 18:36:22 UTC, code 0, aucune ligne KO ni ÉCART ([journal
 - **Bac à sable** : le `chown _apt` du dossier de téléchargement a passé (aucune ligne de refus), et l'avertissement « unsandboxed » du premier passage n'apparaît plus (0 ligne).
 
 Les dossiers `o4/repetition*` sont effacés après le commit de cette note. Suite : `signer` avec la clé du PoC, mêmes prédictions.
+
+## Note datée du 19/11/2026, 18:37:40 UTC : `signer` passée avec la clé du PoC, mêmes résultats que la répétition ; O4 terminé
+
+Passée de 18:36:57 à 18:36:59 UTC, code 0, aucune ligne KO ni ÉCART ([journal](o4-signer.log)), mêmes scripts que la relance de la répétition. Clé du PoC importée : `29BA1C48…BCF03A86`. Le dépôt est signé avec `algo 1, keyid C0658591BCF03A86`, `version 4`, `digest algo 10`, sur Release.gpg armuré comme sur InRelease. La clé du témoin `autre-cle` est `38ED2445…5D3A6A7B`.
+
+Le journal compte 63 lignes OK. La répétition en comptait 66, dont 3 viennent de l'étape `creer` de sa clé jetable. Toutes les prédictions de la correction de 18:35:46 UTC sont tenues, dans la racine (apt 3.0.3) comme dans l'amorce (apt 3.0.4) :
+- quatre deb téléchargés par apt, égaux à `f66bbeb2…` et relus sur l'hôte ;
+- les sept témoins refusés avec leur motif ;
+- 6 lignes « SHA1 is not considered secure since 2013-02-01 » ;
+- 34 lignes « Sub-process /usr/bin/sqv » ; aucune ne nomme gpgv ;
+- R1 de nouveau : `Date` « Thu, 19 Nov 2026 18:36:57 +0000 » malgré `SOURCE_DATE_EPOCH`.
+
+**Produits gardés pour O5**, dans `~/.cache/supply-chain-poc/09/o4/signer/` (hors du dépôt) :
+- `depot/dists/poc/InRelease` : `9113af02f3d78bf6250f1c5b3dd5360e3b9e06b22fa55499137ee09df2337a8e` ;
+- `Release` : `b6f2617f73a79c5af2e73b6d2c69a23b46ae0698a0af7909a650164f4d7ab043` ;
+- `Release.gpg` : `72b930effcbed24ad5d5250b7c6df8ddd86b3f9a19f23e5469332818ce08a417` ;
+- deb inchangé `f66bbeb2…` ;
+- clé publique exportée : `20bcaf43…`.
+
+Aucun fichier de ce dossier ne porte d'en-tête de clé privée. Compte fait sur l'hôte avant cette note : 0 fichier. `o4/signer-vierge` et `o4/signer-racine-apt` seront effacés après le commit.
+
+**Jalon O4 tenu.** Critère du README : deb téléchargé égal à `f66bbeb2…` ; témoins refusés par apt.
+- **Prédiction 3 du README tenue côté apt** : une clé RSA 4096 v4 est acceptée par apt 3.0.3 et 3.0.4.
+- **Prédiction 5 tenue** : apt vérifie par sqv, même avec gpgv installé.
+- **Prédiction 6 tenue** : le deb servi est égal à `f66bbeb2…`.
+- **Correction datée 1 du README tranchée** : apt de Debian 13 refuse une signature SHA-1 de `Release`. Le message de sqv est « Policy rejected non-revocation signature (Text) requiring collision resistance ».
+- **Constats nouveaux** :
+  - un `Release.gpg` binaire est refusé (« unsupported binary format ») ; le dépôt publié a donc un `Release.gpg` armuré, et un dépôt sans `InRelease` est accepté sous cette forme. Ce dernier point compte pour la recommandation du README sur CVE-2025-68972 ;
+  - `apt-ftparchive` 3.0.3 ignore `SOURCE_DATE_EPOCH`, comme le 3.2.1 de l'hôte.
+- **Écart consigné** : l'image de l'amorce `7378260c…` a déjà servi en O2, et son apt 3.0.4 n'est contrôlé que par le sha256 de sa couche. Il est atténué par le passage complet dans la racine Debian, dont l'apt 3.0.3 a été vérifié paquet par paquet en O2.
