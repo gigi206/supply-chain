@@ -528,3 +528,16 @@ Réponses lues avant 14:12:23 UTC, aux deux questions posées après les notes p
 3. Rejouer `prealables`, `banc`, `essai_prefetch` et `essai_construire` sous un préfixe neuf.
 
 La mesure d'un autre jour, à partir de 00:00 UTC le 20/11, reste prévue telle quelle.
+
+## Note datée du 19/11/2026, écrite à 14:21:39 UTC : base vérifiée et déclarée, essais rejoués
+
+- **Ce qui a été fait.** Le changement « Vérifier et déclarer » est fait, et `prealables`, `banc` et les deux essais sont rejoués sous `m1bt3`.
+- **Résultat : BV1 à BV4 tenues.** Les détails sont dans [`m1b-predictions.md`](m1b-predictions.md).
+- **Point ouvert fermé.** L'annotation `base.digest` est maintenant contrôlée.
+
+**Restent avant signature** :
+- la mesure d'un autre jour, à partir de 00:00 UTC le 20/11 ;
+- le `--dry-run=server` par Tekton ;
+- les cas refusés ;
+- docs/04, pour curl et GnuPG ;
+- les deux politiques de réseau, un accord pour chacune.

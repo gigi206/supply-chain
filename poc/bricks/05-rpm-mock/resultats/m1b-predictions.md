@@ -1533,3 +1533,29 @@ Les deux pods seraient admis à blanc sous les labels neufs. Leurs politiques r�
 **Pari le moins sûr** : BV3, sur la lecture anonyme d'un **manifeste** dans Zot. Celle d'un blob du même dépôt est mesurée (EP2), celle d'un manifeste ne l'est pas. Si Zot la refuse, le prefetch s'arrête sur « HTTP 401 » ; il faudrait alors revoir la lecture, sans changer la politique de Zot sans accord.
 
 **Hors de portée** : le cas « déclaré mais non écrit » dans un vrai TaskRun. Les pods d'essai ne passent pas par Tekton, donc il reste lu dans le code et non mesuré jusqu'au premier PipelineRun de l'outillage.
+
+### Base vérifiée et déclarée : résultat (note écrite à 14:21:39 UTC)
+
+Journaux sous `m1bt3`, tous à code 0 :
+
+| Étape | Journal | Heures UTC |
+|---|---|---|
+| `prealables` | [`m1b-builders-m1bt3-prealables.log`](m1b-builders-m1bt3-prealables.log) | fin 14:14:49 |
+| `banc` | [`m1b-builders-m1bt3-banc.log`](m1b-builders-m1bt3-banc.log) | fin 14:15:33 |
+| `essai_prefetch` | [`m1b-builders-m1bt3-essai_prefetch.log`](m1b-builders-m1bt3-essai_prefetch.log) | 14:15:38 à 14:17:57 |
+| `essai_construire` | [`m1b-builders-m1bt3-essai_construire.log`](m1b-builders-m1bt3-essai_construire.log) | 14:18:07 à 14:20:43 |
+
+**BV1 à BV4 tenues.**
+- **BV1** : `bash -n` passe et shellcheck ne signale rien, sur les quatre scripts.
+  - Les scripts de construction ont le même sha256 que sous `m1bt2` (`956e39c2…` et `cad7f550…`, relevés dans les deux journaux de `prealables`).
+  - Les scripts de prefetch passent à 46 600 et 15 876 caractères en base64.
+  - Il y a toujours 224 et 20 entrées attendues.
+- **BV2** : mêmes digests, `70f8c412…` et `6de899ac…`, et mêmes `image.tar`, `26ce192f…` et `e574aaa1…`.
+- **BV3** :
+  - le pod du bootstrap lit dans Zot, sans compte, le manifeste `ee90dc0e…` : 573 octets, image OCI à une couche, `812c4412…`. Le pari le moins sûr est tenu : la lecture anonyme d'un manifeste est maintenant mesurée ;
+  - le résultat vaut `{"uri":"oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux","digest":"sha256:ee90dc0e…"}` ;
+  - l'outillage affiche « aucune base », et le fichier du résultat y est absent ;
+  - les deux arbres sont égaux aux entrées du banc.
+- **BV4** : dans Kata, sur le PVC, les digests et les `image.tar` sont les mêmes qu'au banc. Aucun pod ni PVC `m1bt3-` ne reste.
+
+**Portée** : l'annotation `base.digest ee90dc0e…` de l'image du bootstrap est maintenant contrôlée par le prefetch, ce qui ferme le point ouvert. Le cas « déclaré mais non écrit » reste lu dans le code, sans être mesuré dans un TaskRun. Ces pods ne passent pas par Tekton.
