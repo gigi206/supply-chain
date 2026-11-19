@@ -149,6 +149,10 @@ pendant une signature la lirait quand même.
 
 Règles de lecture des sessions : ajouter `~/.cache/supply-chain-poc/09/secrets/` aux chemins à ne jamais lire ni lister.
 
+*Correction datée du 19/11/2026, 16:48:49 UTC (brique 09, relecture avant `cle`)* : le second ajout ci-dessus, pris à la lettre, bloquerait la brique elle-même. `git grep -n 'BEGIN PGP'` trouve la ligne d'en-tête complète dans deux fichiers suivis : ce fichier (ligne 148, entre accents graves) et `o2-interne.sh` (ligne 58, argument de `grep -qx`). Dans les deux cas, l'en-tête n'est pas seul sur sa ligne. Le motif proposé devient donc : une ligne qui est **exactement** l'en-tête, du début à la fin de la ligne (`grep -x -F`). Deux points de plus, lus dans le script le même jour :
+- `secrets-depot.sh` commence par `cd "$(dirname "$0")/.."` : chaque arbre de travail lance **sa propre copie**. Un ajout sur la branche principale ne protège les commits de la branche de la brique 09 qu'après fusion ou reprise du commit dans cette branche ;
+- la boucle de la ligne 8 ignore un fichier absent (`[ -f "$f" ] || continue`). Tant que `09/secrets` n'existe pas, l'ajout ne change rien. Après `cle`, il n'est pas encore vérifié que chaque ligne de l'export armuré fait au moins quelques caractères : une ligne très courte (fin du bloc base64, ou ligne de somme si l'export en porte une) deviendrait un motif très court, cause de faux refus. À relever sur l'export réel, sans l'afficher : nombre de lignes et longueur minimale seulement.
+
 ---
 
 ## 5. `docs/00-etude-existant.md`, ligne 106 : correction datée
