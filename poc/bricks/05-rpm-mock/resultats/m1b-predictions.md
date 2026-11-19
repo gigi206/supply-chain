@@ -1402,3 +1402,51 @@ Journal : [`m1b-outil-forme.log`](m1b-outil-forme.log) (13:23:44 à 13:24:10 UTC
 - l'essai ne passe pas par Tekton, et porte les labels existants ;
 - rien n'est signé ni écrit dans Zot ;
 - il a lieu le même jour : le point 1 A demande encore un autre jour.
+
+### Tâches neuves, `prealables` : résultat (note écrite à 2026-11-19T13:46:27Z UTC)
+
+Journaux :
+- [`m1b-builders-prealables-1.log`](m1b-builders-prealables-1.log) (début 2026-11-19T13:44:16Z, code 1). Mon contrôle d'égalité des paramètres `depots`, `liste` et `cles` entre les deux tâches comparait par `==` de yq deux listes de dictionnaires. Il a rendu `false` sur des valeurs égales. Il compare maintenant les deux JSON en texte.
+- [`m1b-builders-prealables-2.log`](m1b-builders-prealables-2.log) (début 2026-11-19T13:44:39Z, code 1). shellcheck signale SC2034 dans le script de construction : `url` est lue mais jamais utilisée dans la revérification des dépôts. La variable est remplacée par `_` dans la tâche.
+- [`m1b-builders-prealables.log`](m1b-builders-prealables.log) (début 2026-11-19T13:44:49Z, fin 13:44:53 UTC, code 0).
+
+**Correction datée des prédictions** : ces deux corrections changent `builders/construire-racine-rpm.yaml`, dont le sha256 passe à `3a2c00b2565324dd…`, et `m1b-builders.sh`, qui passe à `ab2969fd0e6ad3bd…`. Elles ont été faites après le commit des prédictions. Les dossiers de `prealables` sont aussi devenus neufs à chaque passage (`mktemp`), sans rien effacer. Aucune autre ligne des tâches ne change.
+
+**TQ1 à TQ5 tenues** au troisième passage.
+- **TQ1** : les valeurs sont égales aux bancs et aux journaux archivés, et les copies de `builders/` aussi.
+- **TQ2** : aucun marqueur ne reste dans les deux pipelines, et les paramètres sont ceux des tâches. Le contexte de sécurité et les ressources du constructeur sont ceux de `construire-rpm` signée.
+- **TQ3** : l'analyseur de la tâche redonne les trois fichiers de S1 octet pour octet (87, 1 047 et 1 043 octets).
+- **TQ4** : `bash -n` passe et shellcheck ne signale rien, une fois SC2034 corrigé. Les quatre scripts font en base64, sous la borne de 131 071 :
+
+  | Script | Octets | base64 |
+  |---|---|---|
+  | prefetch, outillage | 33 697 | 44 932 |
+  | prefetch, bootstrap | 10 590 | 14 120 |
+  | construction, outillage | 37 708 | 50 280 |
+  | construction, bootstrap | 14 125 | 18 836 |
+
+- **TQ5** : 224 entrées attendues pour l'outillage, 20 pour le bootstrap.
+
+### Tâches neuves, `banc` : résultat (note écrite à 2026-11-19T13:46:27Z UTC)
+
+Journal : [`m1b-builders-banc.log`](m1b-builders-banc.log) (13:45:03 à 13:45:45 UTC, code 0). Les deux scripts de construction substitués ont été joués tels quels sur l'hôte, hors réseau, dans une racine de l'amorce extraite à neuf.
+
+**TC1 à TC5 tenues.**
+- **TC1** : les entrées assemblées sont égales aux entrées attendues. Les deux scripts rendent 0. Les trois témoins réseau échouent, pour chaque image.
+- **TC2** :
+  - rpm de python lit `[en_US]` pour l'outillage et `[all]` pour le bootstrap ;
+  - la limite vaut `1024 / 1024` dans le sous-shell ;
+  - dnf-3 rend 0, en 26 s pour l'outillage (199 installations) et en 3 s pour le bootstrap (6 installations, 4 montées).
+- **TC3** : la tâche a trouvé chaque racine conforme, et a donc continué :
+  - outillage : `7c07083c…`, 343 930 880 octets, 13 332 membres ;
+  - bootstrap : `b063feb3…`, 241 981 440 octets, 11 472 membres.
+
+  Les écarts nommés avec `pod_e` n'ont rien changé : chemins `/m/i` et `/m/cache`, deux `rpm --root -qa` après dnf, liens vers le workspace.
+- **TC4** : les layouts sont relus par python et par oras.
+  - outillage : manifeste `sha256:70f8c412…` (553 octets), 2 couches, `Env` de S1, `image.tar` de sha256 `26ce192f…` ;
+  - bootstrap : manifeste `sha256:6de899ac…` (624 octets), 1 couche, configuration `{}`, les deux annotations de base, `image.tar` de sha256 `e574aaa1…`.
+- **TC5** : le contenu de la couche de configuration est celui de S1, fichier par fichier. Son sha256 vaut `04f0fe15…`, contre `f5710d47…` pour S1. Le comparateur membre à membre ne nomme aucun champ en cause : la cause de l'écart n'est pas relevée ici.
+
+**Autres relevés** : pic de `/w`, 868 Mo pour l'outillage et 512 Mo pour le bootstrap (sur l'hôte, `/w` est un dossier ext4, pas un tmpfs). `memory.peak` est absent hors cgroup.
+
+**Portée.** Sur l'hôte, les scripts qui seraient signés retrouvent les deux racines au bit près, puis écrivent un layout valide. Les digests `70f8c412…` et `6de899ac…` servent de référence aux pods d'essai. Rien n'est encore mesuré dans Kata ni par le prefetch.

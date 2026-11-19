@@ -163,7 +163,7 @@ spec:
           || ko "empreinte de la clé : $nom"
       done < /tmp/cles
       nd=0
-      while read -r nom url sha sig; do
+      while read -r nom _ sha sig; do
         [ -n "$nom" ] || continue
         [ "$(sha256sum < "$e/miroir/$nom/repodata/repomd.xml" | cut -c1-64)" = "$sha" ] || ko "$nom : repomd.xml altéré"
         [ "$sig" = - ] || [ -s "$e/miroir/$nom/repodata/repomd.xml.asc" ] || ko "$nom : signature de repomd.xml absente"

@@ -105,8 +105,8 @@ etape_prealables() {
   echo "## fichiers de configuration de l'outillage, tirés de la couche de S1 ($COUCHE_CONFIG_S1)"
   attendu "configuration de 99790c13 : diff_id de la couche 2" "$(jq -r '.rootfs.diff_ids[1]' "$BANC_IMAGE/$CONFIG_S1")" "sha256:$DIFF_CONFIG_S1"
   attendu "couche de configuration de S1, décompressée" "$(gzip -dc < "$BANC_IMAGE/$COUCHE_CONFIG_S1" | sha256sum | cut -c1-64)" "$DIFF_CONFIG_S1"
-  x=$T/config-s1; [ ! -e "$x" ] || echec "$x existe (relancer sous un autre PREFIXE)"
-  mkdir -p "$x"; tar -xzf "$BANC_IMAGE/$COUCHE_CONFIG_S1" -C "$x"
+  x=$(mktemp -d "$T/config-s1.XXXXXX"); echo "$x" > "$T/config-s1.chemin"   # dossier neuf à chaque passage, jamais effacé
+  tar -xzf "$BANC_IMAGE/$COUCHE_CONFIG_S1" -C "$x"
   ( cd "$x" && find . -type f | sed 's|^\./||' | sort ) > "$T/config-s1.noms"
   attendu "fichiers de la couche de S1" "$(paste -sd' ' "$T/config-s1.noms")" "etc/containers/storage.conf etc/mock/poc-rocky-9.7-pret-x86_64.cfg etc/mock/poc-rocky-9.7-x86_64.cfg"
   while read -r f; do
@@ -142,8 +142,9 @@ etape_prealables() {
     f=$T/pipeline-$x.yaml
     attendu "pipeline $x : paramètres de prefetch = ceux de la tâche" "$(yq -o=json -I=0 '[.spec.tasks[0].params[].name]' "$f")" "$(yq -o=json -I=0 '[.spec.params[].name]' "$T/prefetch-racine-rpm.yaml")"
     attendu "pipeline $x : paramètres de construire = ceux de la tâche" "$(yq -o=json -I=0 '[.spec.tasks[1].params[].name]' "$f")" "$(yq -o=json -I=0 '[.spec.params[].name]' "$T/construire-racine-rpm.yaml")"
-    attendu "pipeline $x : depots, liste et cles identiques entre prefetch et construire" \
-      "$(yq -o=json -I=0 '[.spec.tasks[0].params[] | select(.name == "depots" or .name == "liste" or .name == "cles")] == [.spec.tasks[1].params[] | select(.name == "depots" or .name == "liste" or .name == "cles")]' "$f")" true
+    attendu "pipeline $x : depots, liste et cles identiques entre prefetch et construire (JSON comparés en texte)" \
+      "$([ "$(yq -o=json -I=0 '[.spec.tasks[0].params[] | select(.name == "depots" or .name == "liste" or .name == "cles")]' "$f")" = \
+          "$(yq -o=json -I=0 '[.spec.tasks[1].params[] | select(.name == "depots" or .name == "liste" or .name == "cles")]' "$f")" ] && echo identiques || echo différents)" identiques
     attendu "pipeline $x : sous-dossiers des workspaces" "$(yq -o=json -I=0 '[.spec.tasks[].workspaces[].subPath]' "$f")" '["entrees","entrees","image","image"]'
   done
   attendu "pipeline o : dnf_conf_sha256 = sha256 de dnf.conf du banc" "$(yq '.spec.tasks[1].params[] | select(.name == "dnf_conf_sha256") | .value' "$T/pipeline-o.yaml")" "$(sha256sum < "$BANC_O/dnf.conf" | cut -c1-64)"
@@ -152,13 +153,13 @@ etape_prealables() {
   attendu "pipeline b : liste rendue = liste du bootstrap" "$(yq '.spec.tasks[0].params[] | select(.name == "liste") | .value' "$T/pipeline-b.yaml" | sed '/^$/d' | cmp -s - "$LISTE_B" && echo égale || echo différente)" égale
   echo "## analyseur du paramètre fichiers (section de la tâche), sur la valeur rendue"
   yq '.spec.tasks[1].params[] | select(.name == "fichiers") | .value' "$T/pipeline-o.yaml" > "$T/fichiers-rendus.txt"
-  x=$T/config-analyse; [ ! -e "$x" ] || echec "$x existe"
+  x=$(mktemp -d "$T/config-analyse.XXXXXX")
   awk 'index($0, "python3 -I - /tmp/fichiers /w/cc <<") > 0 {b = 1; next} b && $0 == "PY" {exit} b' \
     <(yq '.spec.steps[0].script' "$T/construire-racine-rpm.yaml") > "$T/analyseur.py"
   attendu "analyseur extrait (lignes)" "$([ "$(wc -l < "$T/analyseur.py")" -gt 10 ] && echo ok)" ok
   python3 -I "$T/analyseur.py" "$T/fichiers-rendus.txt" "$x" | sed 's/^/     /'
   attendu "fichiers produits = fichiers de la couche de S1, octet pour octet" \
-    "$(diff -r "$x" "$T/config-s1" > /dev/null && echo identiques || echo différents)" identiques
+    "$(diff -r "$x" "$(cat "$T/config-s1.chemin")" > /dev/null && echo identiques || echo différents)" identiques
   echo "## scripts substitués comme par Tekton"
   substituer "$T/prefetch-racine-rpm.yaml" "$T/pipeline-o.yaml" 0 "$T/script-po.sh" sortie=/workspace/sortie
   substituer "$T/prefetch-racine-rpm.yaml" "$T/pipeline-b.yaml" 0 "$T/script-pb.sh" sortie=/workspace/sortie
@@ -313,7 +314,7 @@ etape_banc() {
   echo "couche de configuration du banc : $x ; S1 : sha256:$DIFF_CONFIG_S1"
   mkdir -p "$D/config-banc" && tar -xf "$D/layout-o/blobs/sha256/${x#sha256:}" -C "$D/config-banc"
   attendu "contenu de la couche de configuration = celui de S1, fichier par fichier" \
-    "$(diff -r "$D/config-banc" "$T/config-s1" > /dev/null && echo identique || echo différent)" identique
+    "$(diff -r "$D/config-banc" "$(cat "$T/config-s1.chemin")" > /dev/null && echo identique || echo différent)" identique
   gzip -dc < "$BANC_IMAGE/$COUCHE_CONFIG_S1" > "$D/config-s1.tar"
   python3 -I "$h05/resultats/m1b-repro2-comparer.py" "$D/config-s1.tar" "$D/layout-o/blobs/sha256/${x#sha256:}" 2>&1 | sed 's/^/   comparer : /' || true
   echo "place libre de /home après : $(df -k --output=avail "$HOME" | tail -1 | tr -d ' ') kB ; dossier laissé : $D"
