@@ -58,3 +58,19 @@ Journal : [`cloture-releve.log`](cloture-releve.log), de 14:54:13 à 14:54:14 UT
 | 19/11, 14:53:40 à 14:54:10 | 2 | 0:00:30 | — |
 
 La part des autres briques dans ces blocs n'est pas séparée : le bloc du 16/11 après-midi contient du travail de la 05. Aucune conversion en pw n'est faite ici.
+
+## Note datée du 19/11/2026, écrite à 14:59:04 UTC : preuves relevées dans les journaux, et complément CL7 à CL9
+
+**Pourquoi.** CL1 à CL5 portent sur les scripts et sur l'admission d'aujourd'hui. Elles ne disent pas qu'aucun autre usage privilégié n'existe : la partie A n'a pas de dénominateur archivé. Et `diag-exec-releve.log` n'a pas été lu (limite de CL3).
+
+**Preuves relevées, lignes exactes des journaux archivés** :
+- S4a (13/11, 14:52:43 UTC, [`s4a-pipeline.log`](s4a-pipeline.log)) : « A12 s4a-builder-1-construire : runtimeClassName : kata ».
+- S4d (14/11, 22:58:42 UTC, [`s4d-pipeline.log`](s4d-pipeline.log)) : les pods `construire` des deux exécutions sous `kata`. La RuntimeClass dans la spec signée n'est relevée qu'au premier passage de S4d (11/11, 19:57:27 UTC, [`s4d-provenance.log`](s4d-provenance.log), 1.0.0-1).
+- S4d3 (15/11, 20:25:09 UTC, [`s4d3-chemins.log`](s4d3-chemins.log)) : webhook et rattrapage, pod `construire` sous `kata`, `preparer` et `publier` sans RuntimeClass.
+- S5, N7 (16/11, 15:32:49 UTC, [`s5-kata.log`](s5-kata.log)) : hors Kata, `PodAdmissionFailed` et refus de Pod Security (compte à 1) ; témoin sous Kata, deb `f66bbeb2`.
+- U12 (14/11, 23:15:02 UTC, [`s4d2-reel.log`](s4d2-reel.log)) : la provenance réelle du deb passe toutes les règles de la porte (aucune violation) ; l'énoncé modifié « hors Kata » est refusé par `porte.construction_kata`. **Précision** du libellé de la première note : U12 est la règle Kata jugée sur la provenance réelle (acceptée) et sur un témoin modifié (refusé).
+
+**Complément** : [`cloture-denominateur.sh`](cloture-denominateur.sh) (sha256 `74deffb1b3a628fd…`), en lecture seule, sans cluster. Journal à venir : `cloture-denominateur.log`.
+- **CL7** (haute) : 16 lignes contiennent « privileged » dans 13 fichiers suivis de la 06, hors `resultats/` et `.md`. Toutes sont classées : 4 définitions de `PRIVILEGIE`, 2 lignes de contexte de correctifs, 4 tâches privilégiées, 2 pods d'essai sous Kata, 3 lectures ou mesures, 1 réglage du noyau de `sc-replay`. 0 non classée.
+- **CL8** (haute) : chaque bloc `capabilities` est un `drop ALL` ; aucune ligne `SYS_ADMIN`, `hostPID`, `hostNetwork` ni `hostPath`.
+- **CL9** (haute) : lus avec `grep -a`, les en-têtes de pod gardent tous leurs contextes privilégiés sous `kata` ; `diag-exec-releve.log` a au moins un en-tête, sous `kata`.
