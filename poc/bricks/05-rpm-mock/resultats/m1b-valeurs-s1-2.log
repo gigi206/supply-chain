@@ -1,0 +1,14 @@
+# m1b-valeurs-s1-2.sh, début 2026-11-19T08:35:39Z
+OK   a8 : sha256 06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5 (référence 06c289ad…)
+OK   b5 : sha256 05d35d64f09692b13bd08af86b405607bca75c72d359550864fcf89a0321a59a (référence 05d35d64…)
+OK   a3 : sha256 0c00666acc4836fd956043fcb3d0f85101b8726c9a7b1747746cc2ecf1d95d89 (référence 0c00666a…)
+OK   x1 : sha256 28634a12c5e99aae558a0cd6719d8f87fad6bac329724f0afafee252e6b78ab3 (référence 28634a12…)
+OK   couche-812c4412 : sha256 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09 (référence 812c4412…)
+a8 : 13332 membres ; membre racine : '.' mode 0o555 ; etc/machine-id : absent
+b5 : 15865 membres ; membre racine : '.' mode 0o555 ; etc/machine-id : absent
+a3 : 26533 membres ; membre racine : '.' mode 0o555 ; etc/machine-id : absent
+x1 : 11472 membres ; membre racine : '.' mode 0o775 ; etc/machine-id : absent
+couche-812c4412 : 11170 membres ; membre racine : aucun ; etc/machine-id : 0 octet(s), mode 0o644
+## paquet filesystem : filesystem-3.16-5.el9.x86_64.rpm, sha256 cabe98453b9517158c5a045cfec0418b747c874da2717d183f4296f240bdf8d9
+rpm -K : commande introuvable
+entrées « / » : 0

@@ -234,3 +234,10 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **Mode de la racine** : `.` vaut 0555 dans les deux archives de S1 et dans les couches des deux registres de banc. La couche faite par `crane append` garde donc le membre `.` et son mode : ce mode entre dans le digest de l'image. Les références du banc ont 0775 (`mkdir` de l'hôte) ; aucune n'a le mode de S1.
 - **Précision** : la remarque « la couche n'a pas de membre `.` » de [`m1b-boot-modes.log`](m1b-boot-modes.log) porte sur la couche amont de Rocky (`812c4412`), pas sur une couche faite par la brique.
 - **umask** : celui du pod n'est pas relevé. Ce qui est mesuré : sous 022, le banc redonne le mode de `var/lib/dnf` de `racine.tar`.
+
+## Correction datée du 19/11/2026, écrite à 2026-11-19T08:36:06Z UTC : second relevé des valeurs
+
+- **Relevé** (début 08:35:39 UTC, lecture seule) : [`m1b-valeurs-s1-2.sh`](m1b-valeurs-s1-2.sh), [journal](m1b-valeurs-s1-2.log). Il s'est arrêté avec le code 127 dans sa dernière section : `rpm` n'est pas sur l'hôte. Le mode que le paquet `filesystem` donne à `/` n'est donc pas lu. Les sections précédentes sont complètes.
+- **Correction** : la note de 08:33:55 UTC dit « Les références du banc ont 0775 ; aucune n'a le mode de S1 ». C'est faux pour trois des quatre. `.` vaut 0555 dans `a8` (`06c289ad…`), `b5` (`05d35d64…`) et `a3` (`0c00666a…`), comme dans S1. Seule `x1` (`28634a12…`, bootstrap) a 0775.
+- **Précision** : « qui vient de la base » est désormais mesuré. La couche amont `812c4412` a un `etc/machine-id` vide (0 octet, mode 0644). « Écrit à l'installation », pour `racine.tar`, reste seulement cohérent avec le `%post` de systemd lu sur le banc.
+- **machine-id** : il est absent des quatre références (`a8`, `b5`, `a3`, `x1`).
