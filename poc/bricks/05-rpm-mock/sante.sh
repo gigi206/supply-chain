@@ -20,6 +20,9 @@
 #   dnf         ajoutée à sec le 18/11/2026 (M1b, décision « Oui 9.8 ») : dnf 4 et les bibliothèques qu'il exécute (libdnf, librepo,
 #               libsolv), que la tâche Kata de M1b lancera par dnf --installroot depuis l'amorce rockylinux:9.8 ; mêmes relevés que
 #               voie2 ; fichiers de ces paquets listés dans vault/rocky/9.8/BaseOS (liste non signée : indice de version seulement).
+#   curl        ajoutée à sec le 19/11/2026 (M1b) : curl, que prefetch-racine-rpm exécute depuis l'amorce rockylinux:9.8 ; mêmes
+#               relevés que dnf, plus les avis publiés par le projet sur curl.se (vuln.json) ; curl et libcurl (et leurs variantes
+#               minimal) listés dans vault/rocky/9.8/BaseOS. GnuPG relève de la session de la brique 09.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/sante.sh <étape>…   (journal : resultats/sante-<étape>.log)
 set -uo pipefail
@@ -253,6 +256,45 @@ etape_dnf() {
     done
   done
   rm -f -- "${T:?}/liste.html"
+}
+
+etape_curl() { # ajoutée à sec le 19/11/2026 (M1b) : curl, que prefetch-racine-rpm exécute depuis l'amorce rockylinux:9.8
+  local d a h c n f
+  d=$(date -u -d '90 days ago' +%Y-%m-%dT00:00:00Z); a=$(date -u -d '1 year ago' +%Y-%m-%d)
+  echo "M1b : curl, transport du prefetch (intégrité ancrée par les sha256 et les signatures fixés par la pipeline) ; commits depuis $d, avis depuis $a"
+  printf 'curl\tcurl/curl\ttransport\toui\n' > "$T/projets-curl.tsv"
+  "$repo/tools/health/scorecard.sh" "$T/projets-curl.tsv"
+  releve_depot curl/curl "$d" "$a"
+  echo "## avis de sécurité publiés par le projet (curl.se/docs/vuln.json ; le projet ne les publie pas comme avis GitHub)"
+  h=$(curl -sSL --proto =https --max-time 60 -o "$T/vuln.json" -w '%{http_code}' https://curl.se/docs/vuln.json) || h="$h, curl en échec"
+  if [ "$h" = 200 ]; then
+    python3 -I - "$T/vuln.json" "$a" <<'PY' || echo "KO   vuln.json : lecture"
+import json, sys
+v, a = json.load(open(sys.argv[1], encoding="utf-8")), sys.argv[2]
+r = sorted((x.get("published", "")[:10], x.get("id", "?"), (x.get("database_specific") or {}).get("severity", "?")) for x in v)
+n = [x for x in r if x[0] >= a]
+print(f"avis listés : {len(r)} ; publiés depuis {a} : {len(n)} ; gravités : " + ", ".join(f"{s} {sum(1 for x in n if x[2] == s)}" for s in sorted({x[2] for x in n})))
+for x in n[-6:]:
+    print(f"  {x[1]} {x[0]} {x[2]}")
+PY
+  else echo "KO   curl.se/docs/vuln.json : HTTP $h, non lu"; fi
+  echo "## fichiers dans vault/rocky/9.8/BaseOS (décision « Oui 9.8 » ; liste non signée, indice de version seulement)"
+  h=$(curl -sSL --max-time 60 -o "$T/liste.html" -w '%{http_code}' "https://dl.rockylinux.org/vault/rocky/9.8/BaseOS/x86_64/os/Packages/c/") || h="$h, curl en échec"
+  if [ "$h" = 200 ]; then
+    for n in curl curl-minimal; do
+      f=$(grep -oE "\"$n-[0-9][^\"]*\.x86_64\.rpm\"" "$T/liste.html" | tr -d '"' | sort -uV | tail -2)
+      if [ -n "$f" ]; then sed "s/^/  BaseOS : /" <<<"$f"; else echo "  BaseOS : aucun fichier $n-<version>.x86_64.rpm (liste lue, HTTP 200)"; fi
+    done
+  else echo "KO   BaseOS Packages/c/ : HTTP $h, liste non lue"; fi
+  h=$(curl -sSL --max-time 60 -o "$T/liste.html" -w '%{http_code}' "https://dl.rockylinux.org/vault/rocky/9.8/BaseOS/x86_64/os/Packages/l/") || h="$h, curl en échec"
+  if [ "$h" = 200 ]; then
+    for n in libcurl libcurl-minimal; do
+      f=$(grep -oE "\"$n-[0-9][^\"]*\.x86_64\.rpm\"" "$T/liste.html" | tr -d '"' | sort -uV | tail -2)
+      if [ -n "$f" ]; then sed "s/^/  BaseOS : /" <<<"$f"; else echo "  BaseOS : aucun fichier $n-<version>.x86_64.rpm (liste lue, HTTP 200)"; fi
+    done
+  else echo "KO   BaseOS Packages/l/ : HTTP $h, liste non lue"; fi
+  echo "version exécutée par le prefetch (essai du 19/11, m1b-builders-m1bt3-essai_prefetch.log) : $(grep -o 'curl [0-9.]*' "$R/m1b-builders-m1bt3-essai_prefetch.log" | sort -u | tr '\n' ' ')"
+  # liste.html et vuln.json restent dans $T (cache du relevé), récrits au prochain passage
 }
 
 for e in "$@"; do

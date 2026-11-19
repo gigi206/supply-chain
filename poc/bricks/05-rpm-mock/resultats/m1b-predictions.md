@@ -1655,3 +1655,26 @@ Journal : [`m1b-builders-m1bt4-prealables.log`](m1b-builders-m1bt4-prealables.lo
 - **Ce qui s'est passé.** Le premier passage, du 19/11 à 15:36:15 UTC, à HEAD `f39a39d`, est gardé dans [`m1b-refus-banc-1.log`](m1b-refus-banc-1.log). RZ1 à RZ3 y ont tenu. Le cas `b-couche` s'est ensuite arrêté avant d'être joué : python n'a pas pu ouvrir en écriture la copie de `couche.tar.gz`. La copie garde le mode du cache OCI (`0444`), alors que les autres entrées copiées sont inscriptibles. Rien n'a été altéré ; RZ8 n'a pas été relevée.
 - **Correction** : `chmod u+w` sur la copie, juste après le contrôle qui refuse d'altérer un lien dur. Rien d'autre ne change. Le script corrigé a le sha256 `6db7ea19eb7c55d1…`.
 - **Relance** : le banc complet est rejoué, RZ1 à RZ8, dans un journal neuf, `m1b-refus-banc.log`. Les prédictions ne changent pas.
+
+### Cas refusés de la construction, au banc : résultat (note écrite le 19/11/2026 à 15:39:07 UTC)
+
+Journal : [`m1b-refus-banc.log`](m1b-refus-banc.log), de 15:37:11 à 15:38:31 UTC, à HEAD `e21469b`, code 0, 0 KO. Premier passage arrêté : [`m1b-refus-banc-1.log`](m1b-refus-banc-1.log) (correction datée ci-dessus).
+
+**RZ1 à RZ8 tenues.**
+- **Témoins** : RZ1, bootstrap, code 0, `sha256:6de899ac…` ; RZ6, outillage, code 0, `sha256:70f8c412…`. Ce sont les manifestes de `m1bt3`.
+- **RZ2 et RZ7, racine fixée fausse** : dnf tourne, la racine construite vaut `b063feb3…` (bootstrap) ou `7c07083c…` (outillage), puis la tâche s'arrête sur « racine différente de la valeur fixée par la pipeline », avec la valeur fausse dans le message.
+- **RZ3, RZ4, RZ5, entrées altérées d'un octet** : refus « rpm altéré : baseos97 dbus-libs-1.12.20-8.el9.x86_64.rpm », « couche altérée » et « baseos97 : repomd.xml altéré », chacun avant dnf.
+- Dans les cinq refus : code 1, une seule ligne `KO`, égale au message de la garde visée, et ni `image.tar` ni résultat `DIGEST_CONSTRUIT`.
+- **RZ8** : les entrées des bancs du 18/11 et la couche amont du cache sont inchangées. La liste des entrées de l'outillage vaut `93f2a63e…`, la même que celle de l'arbre écrit par le prefetch de `m1bt3`.
+
+**Portée.** Au banc, sur l'hôte, hors ligne, la tâche de construction refuse une racine fixée fausse, ainsi qu'un rpm, une couche ou un `repomd.xml` altérés après le prefetch, chacun par sa garde. Ce n'est mesuré ni dans Kata, ni dans un TaskRun. Les cas du prefetch (`repomd` faux, autre manifeste, bon manifeste avec une couche fausse) restent à jouer, dans un pod du cluster.
+
+**Place** : 100 679 212 kB libres sur /home après le banc, contre 107 346 784 kB au début du premier passage (journaux des deux passages). La taille des deux dossiers `m1b-refus-banc-*` n'est pas relevée ; aucun script ne les relit.
+
+## Relevé de santé de curl : ce qui est relevé, écrit le 19/11/2026 à 15:39:07 UTC, avant le lancement
+
+**Pourquoi.** docs/04 n'a pas de ligne pour curl, que `prefetch-racine-rpm` exécute depuis l'amorce (point ouvert d'avant signature). GnuPG relève de la session de la brique 09 et n'est pas relevé ici.
+
+**Relevé** : étape `curl` ajoutée à [`sante.sh`](../sante.sh) (sha256 `c1f036e1e113d33a…`), mêmes relevés que l'étape `dnf` (Scorecard, dernière release, commits sur 90 jours, auteurs et domaines, fusionneurs, SECURITY.md, avis GitHub), plus les avis publiés par le projet dans `curl.se/docs/vuln.json`, et les fichiers `curl`, `curl-minimal`, `libcurl` et `libcurl-minimal` listés dans vault 9.8 BaseOS. Journal à venir : `sante-curl.log`. Lectures publiques seulement (API de GitHub, API de Scorecard, curl.se, dl.rockylinux.org), quelques centaines de Ko.
+
+**Sans pari sur le verdict.** Ce qui le ferait « Risqué » au sens de docs/04 : aucune release depuis plus de 12 mois, dépôt archivé, mainteneur unique sans soutien, compromission non résolue. Ce qui le ferait « À surveiller » : un critère manquant, dont un Scorecard sous 6. La version exécutée est celle de Rocky (curl 7.76.1, lue dans l'essai du 19/11), pas la release amont : les correctifs suivent le rythme de la distribution, comme pour dnf. Le verdict proposé passera par le conseiller avant d'être écrit dans docs/04.
