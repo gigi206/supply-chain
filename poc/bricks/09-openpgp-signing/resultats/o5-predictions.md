@@ -60,3 +60,22 @@ Le second passage, à 18:53:19 UTC, donne le code 0 ([journal](o5-prealables.log
 **Lecture attendue.** cosign seul ne suffit pas à vérifier un lien : il prouve qui a signé l'énoncé et sur quel fichier, pas que le prédicat dit vrai (T2, T3). Le contrôle indépendant, lui, ne vérifie pas la signature (T1). O5 réel doit donc faire les deux, comme le protocole l'écrit (« vérification par cosign et par un contrôle indépendant de B1 »).
 
 **Suite pour O5 réel**, non mesurée ici : cosign recommande un fichier `--signing-config` sans journal de transparence plutôt que les drapeaux dépréciés. À relire avant O5 réel.
+
+## Note datée du 19/11/2026, 18:54:55 UTC : premier passage de `banc` (18:54:24 à 18:54:27 UTC, code 1), correction avant relance
+
+Le journal est gardé : [o5-banc-premier-passage.log](o5-banc-premier-passage.log).
+
+**Une seule cause pour les 8 KO.** Le contrôle indépendant exigeait `_type` = `https://in-toto.io/Statement/v1`, mais `attest-blob` de cosign 3.1.4 écrit `https://in-toto.io/Statement/v0.1`. Je n'avais pas lu cette valeur, et aucune prédiction ne la portait. Le contrôle s'arrête à la forme : C1, C2, C3 et le volet « contrôle » de T2, T3 et T4 **ne sont pas mesurés** par ce passage.
+
+**Mesuré et tenu dans ce passage :**
+- **G1** : les deux clés sont créées sans réseau.
+- **G2** : chaque clé privée porte 1 ligne « ENCRYPTED SIGSTORE PRIVATE KEY » et 0 ligne du motif de `garde-cle-privee.sh`. L'écart est confirmé : la garde ne voit pas une clé cosign.
+- **A1** : les quatre `attest-blob` rendent le code 0.
+- **V1** : les quatre bundles donnent « Verified OK ».
+- **F1** : le bundle est `application/vnd.dev.sigstore.bundle.v0.3+json`, et `verificationMaterial` ne porte que `publicKey`.
+- **T1** : cosign refuse, code 1, avec « accepted signatures do not match threshold, Found: 0, Expected 1 ».
+- **T2 et T3, côté cosign** : « Verified OK », comme prédit.
+- **T4, côté cosign** : refus, code 1, avec « provided artifact digests do not match digests in statement ».
+- **K** est tenu.
+
+**Correction.** `o5-lien.py` accepte exactement `Statement/v0.1`, la valeur mesurée ; tout autre `_type` reste refusé. Les prédictions ne changent pas. Le dossier du banc, avec les clés jetables de ce passage, est effacé avant la relance, puisque `banc` refuse un dossier existant.

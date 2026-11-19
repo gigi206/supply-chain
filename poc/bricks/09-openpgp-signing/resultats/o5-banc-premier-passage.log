@@ -1,0 +1,60 @@
+étape banc commencée : 2026-11-19T18:54:24Z ; o5.sh 25878d8ba621fed8… ; o5-lien.py 4ced34ebd96e6a86…
+### valeurs archivées
+OK   valeurs archivées et fichiers gardés relus (10 contrôles)
+### clés cosign jetables (sans mot de passe, hors du dépôt, jamais affichées)
+OK   clé lien : publique fd044eab88c1592e… ; en-tête de la clé privée : 1 ligne(s) « ENCRYPTED SIGSTORE PRIVATE KEY », 0 ligne(s) du motif de garde-cle-privee.sh
+OK   clé autre : publique b4978608b7c93c52… ; en-tête de la clé privée : 1 ligne(s) « ENCRYPTED SIGSTORE PRIVATE KEY », 0 ligne(s) du motif de garde-cle-privee.sh
+### prédicats (valeurs relues dans les journaux archivés)
+     prédicat rpm : lien rpm-b1, origine sha256:07b7bd6feb48… / 864d55f486f423ce…
+     prédicat deb : lien identity, origine sha256:60f25f5c3fb5… / f66bbeb2aba31e52…
+     prédicat depot-rpm : lien repository, origine sha256:07b7bd6feb48… / 864d55f486f423ce…, 8 fichiers couverts
+     prédicat depot-apt : lien repository, origine sha256:60f25f5c3fb5… / f66bbeb2aba31e52…, 5 fichiers couverts
+     prédicat rpm-autre-manifeste : unsigned.manifest remplacé par une valeur archivée du deb
+     prédicat rpm-autre-fichier : unsigned.file remplacé par une valeur archivée du deb
+     rpm à charge altérée : dernier octet (2173375) inversé au bit 0 ; sha256 1325d4bdb44ea10ac89be85b21d991fd2075345c84e9fe5210a3688ce5ea1e69
+### L1 à L4 : attest-blob (clé lien) puis vérification par cosign et par le contrôle indépendant
+OK   attest-blob rpm : code 0
+OK   rpm : cosign verify-blob-attestation : Verified OK
+     | REFUS forme : _type 'https://in-toto.io/Statement/v0.1'
+KO   rpm : contrôle indépendant : code 3
+     énoncé archivé : o5-enonce-rpm.json ; mediaType du bundle application/vnd.dev.sigstore.bundle.v0.3+json ; verificationMaterial : publicKey
+OK   attest-blob deb : code 0
+OK   deb : cosign verify-blob-attestation : Verified OK
+     | REFUS forme : _type 'https://in-toto.io/Statement/v0.1'
+KO   deb : contrôle indépendant : code 3
+     énoncé archivé : o5-enonce-deb.json ; mediaType du bundle application/vnd.dev.sigstore.bundle.v0.3+json ; verificationMaterial : publicKey
+OK   attest-blob depot-rpm : code 0
+OK   depot-rpm : cosign verify-blob-attestation : Verified OK
+     | REFUS forme : _type 'https://in-toto.io/Statement/v0.1'
+KO   depot-rpm : contrôle indépendant : code 3
+     énoncé archivé : o5-enonce-depot-rpm.json ; mediaType du bundle application/vnd.dev.sigstore.bundle.v0.3+json ; verificationMaterial : publicKey
+OK   attest-blob depot-apt : code 0
+OK   depot-apt : cosign verify-blob-attestation : Verified OK
+     | REFUS forme : _type 'https://in-toto.io/Statement/v0.1'
+KO   depot-apt : contrôle indépendant : code 3
+     énoncé archivé : o5-enonce-depot-apt.json ; mediaType du bundle application/vnd.dev.sigstore.bundle.v0.3+json ; verificationMaterial : publicKey
+### T1 : clé étrangère (énoncé du rpm signé par la clé autre)
+OK   T1 clé étrangère : cosign refuse, code 1, motif « signature|verif » : Error: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+### T2 : lien vers un autre digest (énoncé signé par la clé lien, prédicat faux)
+OK   T2 autre-manifeste (cosign ne lit pas le prédicat) : cosign verify-blob-attestation : Verified OK
+     | REFUS forme : _type 'https://in-toto.io/Statement/v0.1'
+KO   T2 autre-manifeste : contrôle indépendant : code 3, motif « lien : manifeste non signé » attendu
+OK   T2 autre-fichier (cosign ne lit pas le prédicat) : cosign verify-blob-attestation : Verified OK
+     | REFUS forme : _type 'https://in-toto.io/Statement/v0.1'
+KO   T2 autre-fichier : contrôle indépendant : code 3, motif « lien : fichier non signé » attendu
+### T3 : rpm à charge altérée (énoncé valide, signé par la clé lien, sujet = rpm altéré)
+OK   T3 (sujet = rpm altéré) : cosign verify-blob-attestation : Verified OK
+     | REFUS forme : _type 'https://in-toto.io/Statement/v0.1'
+KO   T3 charge altérée : contrôle indépendant : code 3, motif « B1 : octets différents » attendu
+### T4 : énoncé du rpm signé présenté avec le rpm altéré
+OK   T4 sujet : cosign refuse, code 1, motif « digest|subject|match » : Error: failed to verify signature: provided artifact digests do not match digests in statement
+     | REFUS forme : _type 'https://in-toto.io/Statement/v0.1'
+KO   T4 sujet : contrôle indépendant : code 3, motif « sujet » attendu
+### contrôles de fin
+     forme d'un bundle : application/vnd.dev.sigstore.bundle.v0.3+json ; clés : dsseEnvelope, mediaType, verificationMaterial
+OK   aucun en-tête de clé privée dans les bundles, les prédicats ni resultats/
+     archivés : resultats/o5-predicat-rpm.json et resultats/o5-enonce-{rpm,deb,depot-rpm,depot-apt}.json
+à effacer après archivage (chemin littéral ; clés jetables comprises) : /home/gigi/.cache/supply-chain-poc/09/o5/banc
+étape banc finie : 2026-11-19T18:54:27Z
+OK   K3 : aucune ligne de bloc armuré (OpenPGP ou clé privée) dans le journal
+bilan : 8 ligne(s) KO
