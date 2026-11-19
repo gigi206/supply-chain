@@ -1168,3 +1168,21 @@ Journaux :
 - **`lastlog`** : 17 520 octets valent 60 enregistrements de 292 octets, soit jusqu'à l'uid 59. Dans `etc/passwd` de `a8`, l'uid 59 est `tss`, compte du paquet `tpm2-tss`, installé en 193ᵉ position sur 199. L'hypothèse d'un `useradd` qui remplit `lastlog` une fois le fichier créé est cohérente, mais pas lue dans les scriptlets.
 - **Vocabulaire** : là où la note dit « un scriptlet », il faut lire « un scriptlet ou un déclencheur de fichiers » ; ni l'un ni l'autre n'a été lu.
 - **Un seul passage** : `fb33228f…` vient d'un seul `pod_d`. Sa reproductibilité n'est pas établie.
+
+### Référence du bootstrap avec le tar de l'amorce : prédictions (note écrite à 2026-11-19T12:45:13Z UTC, avant le lancement)
+
+La référence du bootstrap `f2652169…` a été écrite par le `tar` 1.35 de l'hôte ; la tâche archivera avec le `tar` 1.34 de l'amorce. Pour l'outillage, le même changement de `tar` a changé les octets (`06c289ad…` devenu `7c07083c…`) par les seuls champs `devmajor` et `devminor`, sans changer le contenu ([`m1b-tar-amorce-ecart.log`](m1b-tar-amorce-ecart.log)).
+
+- **Script** : [`m1b-boot-amorce.sh`](m1b-boot-amorce.sh), sha256 `f95152655df741e3…`. Il reprend la méthode de `m1b-tar-amorce.sh` :
+  - les copies `b1` et `b2` en 0555 du banc du 19/11 (`m1b-boot-0555`, 08:40:18 UTC) sont ré-archivées par le `tar` de l'amorce, dans la racine d'outils du banc de l'amorce (chroot, umask 022) ;
+  - les options, la borne S (`1766985142`) et les exclusions sont celles de `m1b-boot-0555.sh` ;
+  - chaque copie est montée en lecture seule sur `/mnt` (dossier vide) de la racine d'outils, dans un espace de montage à part ;
+  - hors ligne, rien n'est installé. Environ 0,5 Go écrit dans un dossier neuf ; il reste 2,8 G sur /home.
+
+- **BA1** : le `tar` de l'amorce est `tar-1.34-11.el9`. Chaque ré-archivage rend le code 0, sans rien sur stderr, avec 11 472 membres. La copie est vue en 555 sous `/mnt`, et l'écriture y est refusée.
+- **BA2** (confiance moyenne) : l'archive diffère de `f2652169…`. Les en-têtes de `y1.tar` ont `devmajor` et `devminor` vides, ceux de `z-b1.tar` les ont à `0000000`.
+- **BA3** : le comparateur membre à membre contre `y1.tar` ne trouve aucun écart (0 d'un seul côté, 0 différent).
+- **BA4** : `z-b1.tar` et `z-b2.tar` sont identiques octet à octet.
+- **BA5** : `/mnt` de la racine d'outils reste vide, et les racines des copies restent en 555.
+
+**Conséquence prévue.** Si BA1 à BA4 sont tenues, le sha256 de `z-b1.tar` devient la cible du bootstrap pour le pod et la tâche, à la place de `f2652169…`, comme `7c07083c…` pour l'outillage. Rien n'est mesuré dans Kata ; c'est le pod d'essai du bootstrap qui suit.
