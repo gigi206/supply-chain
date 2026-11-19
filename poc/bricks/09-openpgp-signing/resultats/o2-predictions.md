@@ -246,3 +246,12 @@ Décision du propriétaire : « Refaire en entier », en réponse à « Accepter
   3. commiter ;
   4. effacer l'archive `debian13.tar` et la racine `o2/racine-debian13` dans l'espace de noms, par des chemins littéraux ;
   5. relancer `debian_racine` (accord donné par « Refaire en entier »).
+
+## Prédictions de la relance de `debian_racine` (écrites à 16:34:29 UTC, avant tout lancement)
+
+`o2.sh` modifié sur une ligne : `--skip=essential/unlink` est ajouté à l'appel de mmdebstrap. Le reste est inchangé, et la racine actuelle sera effacée avant la relance.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| DR3 | Le journal de mmdebstrap dit « skipping essential/unlink as requested » ; **le crochet trouve un `.deb` par paquet installé (106 environ), tous égaux au `Packages.xz` vérifié** ; plus aucun paquet installé sans `.deb` contrôlé (`o2-controle-versions.sh` relancé : 0) | moyenne-haute : option lue dans le script ; le nombre exact dépend de la résolution, qui ne devrait pas changer (même instantané, mêmes paquets demandés) |
+| DR4 | Les sept versions épinglées sont de nouveau installées, avec gpg 2.4.7 et un code 0 ; l'archive diffère de `45f376e6…`, sans que ce soit exigé | haute pour les versions ; l'empreinte de l'archive n'est pas prédite |

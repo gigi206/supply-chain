@@ -301,7 +301,7 @@ etape_debian_racine() {
   sans_cle
   [ -x "$WDA/usr/bin/mmdebstrap" ] || ko "debian_amorce d'abord"
   absent "$WDA/o2/debian13.tar"; absent "$RD"
-  dans_avec "$WDA" mmdebstrap --mode=root --variant=minbase --include="$DEB_PAQUETS" --skip=cleanup/apt/lists \
+  dans_avec "$WDA" mmdebstrap --mode=root --variant=minbase --include="$DEB_PAQUETS" --skip=cleanup/apt/lists --skip=essential/unlink \
     --aptopt='Acquire::Check-Valid-Until "false"' \
     --customize-hook='for f in "$1"/var/cache/apt/archives/*.deb; do echo "deb racine ${f##*/} $(sha256sum < "$f" | cut -c1-64)"; done' \
     --customize-hook='dpkg-query --admindir="$1/var/lib/dpkg" -W -f="paquet \${Package} \${Version}\n"' \
