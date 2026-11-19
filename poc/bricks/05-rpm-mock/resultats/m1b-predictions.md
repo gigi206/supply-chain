@@ -1314,3 +1314,28 @@ Journaux : [`m1b-prealables_boot.log`](m1b-prealables_boot.log) (13:01:55 à 13:
 **Portée.** Le bootstrap est reproduit au bit près dans un pod Kata hors réseau : même jour, même nœud, entrées livrées par copie, racine seule. Ni couche de configuration, ni layout. Avec l'outillage (`pod_a` à `pod_c`), les deux racines de M1b sont reproduites dans Kata, avec les valeurs décidées : langue posée par la tâche, limite autour de dnf seul, racine 0555, machine-id absent. Rien n'est établi pour un autre jour dans Kata, ni pour la tâche elle-même : le point 1 A reste non établi au sens de la carte.
 
 **Place** : `/home` avait 77 684 756 kB libres à 13:01:56 UTC, contre 1 353 808 kB à 12:51:51 UTC ([`m1b-boot-langue.log`](m1b-boot-langue.log)). La brique n'a rien effacé entre les deux relevés ; l'origine de la place libérée n'est pas relevée.
+
+### Outils de l'amorce, relevé (note écrite à 2026-11-19T13:23:32Z UTC)
+
+Journal : [`m1b-amorce-outils.log`](m1b-amorce-outils.log) (13:21:40 à 13:21:42 UTC, code 0), lecture hors ligne de la couche `99c753a8…` de l'amorce `ed654c69…`, sans prédictions : c'est un relevé, pas une mesure de comportement.
+
+- **Présents** : `curl`, `gpgv`, `gpg`, `sha256sum`, `python3` (avec `ssl` et `urllib`), `tar`, `gzip`, `timeout`, `getent`, `rpm`, `dnf-3`, `bash`, `find`, `stat`.
+- **Absents** : `skopeo`, `createrepo_c`, `cmp`, `jq`, `xz`, `wget`.
+- **Clés** : la clé de Rocky de l'amorce (`etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9`, 1 750 octets) est celle des bancs de l'outillage et du bootstrap, octet pour octet. Aucun membre ne cite EPEL : la clé d'EPEL (1 656 octets, sha256 `fcf0eab4…`, empreinte `FF8AD134…`) devra entrer par une autre voie.
+
+### Banc de l'outillage sous la forme de la tâche : prédictions (note écrite à 2026-11-19T13:23:32Z UTC, avant le lancement)
+
+**Objet.** La cible `7c07083c…` et les pods `pod_a` à `pod_c` ont été installés par `/usr/bin/dnf` avec `HOME=/root` : la langue `en_US` venait alors de la macro de l'amorce. Pour `pod_c`, la limite entourait toute la sonde. La tâche poserait la forme du bootstrap (`pod_e`) : `dnf-3`, la limite dans un sous-shell qui n'entoure que dnf, `HOME=/m/h` avec `.rpmmacros` à `%_install_langs en_US`, et la racine en 0555. Cette forme n'a jamais tourné pour l'outillage. [`m1b-outil-forme.sh`](m1b-outil-forme.sh) (sha256 `82919aa8a5eed26c…`) la joue une fois sur l'hôte, hors réseau, dans la racine d'outils de l'amorce du banc du 18/11, sur son miroir, en lecture seule.
+
+- **OF0** : les versions sont celles de LG0. Le miroir est en lecture seule, avec 199 rpm. rpm de python lit `[en_US]` avec `HOME=/root` comme avec `HOME=/m/h`.
+- **OF1** : la limite vaut `1024 / 1024` dans le sous-shell. Celle du shell est inchangée après.
+- **OF2** : dnf-3 rend 0 en moins de 120 s. 201 paquets sont installés, dont 2 `gpg-pubkey`, comme `pod_c`.
+- **OF3** : la racine vaut déjà 555 avant le `chmod` (`pod_c`). `etc/machine-id` existe (33 octets), mais l'archive l'exclut. `tar` rend 0, sans rien sur stderr.
+- **OF4** (confiance moyenne) : `f.tar` vaut `7c07083c…` octet pour octet. Les écarts avec la cible sont nommés ici :
+  - `dnf-3` au lieu de `/usr/bin/dnf`, qui est un lien vers `dnf-3` dans l'amorce ;
+  - la langue lue dans `.rpmmacros` plutôt que dans la macro de l'image, à valeur égale ;
+  - la limite autour de dnf seul.
+
+  Si `f.tar` diffère, le comparateur membre à membre contre `a8-amorce.tar` nomme chaque écart.
+
+**Portée prévue.** Si OF4 est tenue, la forme de la tâche redonne l'outillage sur l'hôte. Ce n'est mesuré ni dans Kata, ni par la tâche.

@@ -1,0 +1,44 @@
+# m1b-amorce-outils.sh, début 2026-11-19T13:21:40Z ; dossier /home/gigi/.cache/supply-chain-poc/05/m1b-amorce-outils-20261119T132140Z
+## 1. manifeste et couche
+OK   manifeste de l'amorce : ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+OK   nombre de couches : 1
+OK   couche : 99c753a880cc03bbe9da8bf6e354c8ba2d99f19058e87b8a55b6487ffcf52f8a
+membres de la couche : 11170
+## 2. outils
+présent : usr/bin/curl
+présent : usr/bin/gpgv
+présent : usr/bin/gpg
+présent : usr/bin/sha256sum
+présent : usr/bin/python3
+présent : usr/lib64/python3.9/ssl.py
+présent : usr/lib64/python3.9/lib-dynload/_ssl.cpython-39-x86_64-linux-gnu.so
+présent : usr/lib64/python3.9/urllib/request.py
+présent : usr/bin/tar
+présent : usr/bin/gzip
+présent : usr/bin/timeout
+présent : usr/bin/getent
+présent : usr/bin/rpm
+présent : usr/bin/dnf-3
+présent : usr/bin/bash
+présent : usr/bin/find
+présent : usr/bin/stat
+absent  : usr/bin/skopeo
+absent  : usr/bin/createrepo_c
+absent  : usr/bin/cmp
+absent  : usr/bin/jq
+absent  : usr/bin/xz
+absent  : usr/bin/wget
+## 3. clés
+membre : etc/pki/rpm-gpg/
+membre : etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+membre : etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9-Testing
+clé de Rocky de l'amorce : 1750 octets, sha256 3a66e521e7a4abac9768d889c7cd60a8250f59512b275cf576c8a10ff34624c1
+OK   empreinte de la clé de Rocky de l'amorce : 21CB256AE16FC54C6E652949702D426D350D275D
+clé de Rocky de /home/gigi/.cache/supply-chain-poc/05/m1b-outil-amorce-20261118T212517Z/outils/m/cles : 1750 octets, sha256 3a66e521e7a4abac9768d889c7cd60a8250f59512b275cf576c8a10ff34624c1
+OK   clé de Rocky de l'amorce = celle du banc, octet pour octet
+clé de Rocky de /home/gigi/.cache/supply-chain-poc/05/m1b-boot-20261118T214226Z/outils/m/cles : 1750 octets, sha256 3a66e521e7a4abac9768d889c7cd60a8250f59512b275cf576c8a10ff34624c1
+OK   clé de Rocky de l'amorce = celle du banc, octet pour octet
+aucun membre ne cite EPEL
+clé d'EPEL du banc de l'outillage : 1656 octets, 29 lignes, sha256 fcf0eab4f05a1c0de6363ac4b707600a27a9d774e9b491059e59e6921b255a84
+OK   empreinte de la clé d'EPEL du banc : FF8AD1344597106ECE813B918A3872BF3228467C
+# fin 2026-11-19T13:21:42Z
