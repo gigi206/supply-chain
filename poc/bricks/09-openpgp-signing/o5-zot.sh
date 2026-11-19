@@ -126,6 +126,7 @@ etape_droits_zot() {
 import hashlib, io, json, os, sys, tarfile
 d, texte = sys.argv[1], sys.argv[2].encode()
 os.makedirs(os.path.join(d, "blobs", "sha256"))
+open(os.path.join(d, "oci-layout"), "w").write('{"imageLayoutVersion":"1.0.0"}')
 def ecrire(b):
     h = hashlib.sha256(b).hexdigest(); open(os.path.join(d, "blobs", "sha256", h), "wb").write(b); return "sha256:" + h
 t = io.BytesIO()

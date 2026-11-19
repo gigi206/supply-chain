@@ -147,3 +147,20 @@ Zot a été relancé à 20:24:09 UTC, puis une seconde fois, sans le vouloir, à
 | D8 | `poc-ecriture`, écriture dans `signes/` : refusée (le motif le plus long remplace `**`) | moyenne-haute : dit par la session principale, pas encore mesuré |
 | D9 | Manifeste et referrer relus en anonyme ; aucun tag dans `signes/essai-09` | haute |
 | K6 | Ni mot de passe, ni hash, ni chaîne d'authentification dans le journal ; aucune ligne KO | haute |
+
+## Note datée du 19/11/2026, 20:27:53 UTC : premier passage de `droits_zot` (20:27:33 UTC, code 1), rien d'écrit dans Zot ; correction avant relance
+
+Le journal est gardé : [o5-zot-droits_zot-premier-passage.log](o5-zot-droits_zot-premier-passage.log).
+
+**Cause : un défaut de mon script.** Le layout OCI jetable n'avait pas de fichier `oci-layout`, et `oras cp` le refusait (« invalid OCI Image Layout ») avant tout contact avec Zot. Aucune image n'a donc été poussée, et les refus de ce passage ne mesurent rien :
+- **D2, D3, D7 et D8** : refus du layout, pas de Zot ;
+- **D1** : refusée pour cette raison ;
+- **D4 et D5** : refus, l'image n'existant pas (« failed to resolve ») ;
+- **D6** : la « suppression acceptée » vient de `oras manifest delete --force`, qui ignore une référence inexistante ;
+- **D9** : rien à relire.
+
+**Rien n'a été écrit dans `signes/`** : D9 ne relit aucun manifeste ni aucun tag.
+
+**Effet de bord.** La configuration de registre de `poc-lien` est écrite (`09/secrets/zot-poc-lien-docker`) ; la relance la réutilise. La configuration du témoin a été vidée.
+
+**Correction.** Le script écrit `oci-layout` (`imageLayoutVersion 1.0.0`). Les prédictions ne changent pas. Le dossier de travail est effacé avant la relance.
