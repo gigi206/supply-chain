@@ -1043,3 +1043,21 @@ Journaux : [`m1b-cloexec-banc.log`](m1b-cloexec-banc.log), [`m1b-cloexec-compara
 - **CX4 non tenue** : C et D ne valent pas `7c07083c…`. Le seul membre qui diffère est `var/lib/rpm/rpmdb.sqlite-shm`, entre le banc des sondes et C (taille et contenu) comme entre C et D (contenu). Ce banc ajoutait `--setopt=keepcache=0`, absent de `SONDE_INSTALL`. Le lien entre cette option et l'écart n'est pas mesuré. Le fichier `-shm` est la mémoire partagée de SQLite.
 
 **Lecture.** Le mécanisme est montré sur l'hôte : avant chaque scriptlet, l'ouverture de `/proc/self/fd` échoue, et rpm parcourt alors tous les descripteurs jusqu'à la limite dure. La limite du pod vaut 2³⁰ (mesurée), soit environ 2 048 fois plus d'appels par scriptlet. **Ce qui n'est pas mesuré** : le nombre d'appels et la durée dans le pod. Les mesurer demande un passage dans Kata avec une limite basse, en abaissant d'abord la limite souple. Le fichier `rpmdb.sqlite-shm` devient aussi un candidat à l'exclusion. Ce n'est pas décidé.
+
+### pod_c, limite basse dans Kata : prédictions (note écrite à 2026-11-19T10:01:51Z UTC, avant le lancement)
+
+Décision du propriétaire : « Oui, après pod A », en réponse à « Je prépare un pod d'essai Kata à limite basse pour mesurer la durée ? ».
+
+- **Changement de `m1b.sh`** :
+  - nouvelle étape `pod_c`, soit `pod_essai c 1024` ;
+  - pour ce seul pod, deux lignes sont insérées après `umask 022` : `ulimit -Sn 1024 && ulimit -Hn 1024`, la limite souple d'abord, puis un relevé de la limite ;
+  - `pod_a` et `pod_b` reçoivent `SONDE_INSTALL` telle quelle.
+- **Application différée** : le changement n'est appliqué qu'après la fin de `pod_a`, parce que bash relit le script en cours d'exécution. La version prête a le sha256 `a9361f70ed0f4f21…` ; son rendu de la sonde a été essayé hors du cluster.
+- **Ordre** : `pod_c` d'abord, puis `pod_b` à l'identique de `pod_a`. Le pod est créé dans le cluster sous l'accord permanent du 18/11 : ni politique, ni label neufs, rien dans Zot.
+
+- **PL1** : la limite relevée avant dnf vaut `1024 / 1024`.
+- **PL2** : dnf rend le code 0 en moins de 300 s, contre la durée de `pod_a`, qui reste à relever.
+- **PL3** (confiance moyenne) : l'archive vaut `7c07083c…`. Si elle diffère, le pari est que seul `var/lib/rpm/rpmdb.sqlite-shm` diffère, comme dans le banc de l'hôte.
+- **PL4** : même nombre de paquets (201) et racine en 555, comme `pod_a`.
+
+**Portée prévue.** Si PL1 et PL2 tiennent, la lenteur de dnf dans Kata vient de la limite de fichiers ouverts. La durée de S1 n'est pas remesurée.
