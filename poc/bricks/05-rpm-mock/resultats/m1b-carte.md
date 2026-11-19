@@ -486,3 +486,30 @@ Cette note prépare le choix 2 de la note « avant signature ». Elle ne change 
   - Cela règle le point ouvert de l'annotation.
   - Forme lue dans le cache OCI de l'hôte ([`m1b-base-manifeste.log`](m1b-base-manifeste.log), 14:06:30 UTC) : `ee90dc0e…` est un manifeste d'image (`application/vnd.oci.image.manifest.v1+json`, 573 octets) à une couche, `812c4412…`. Pas d'index à résoudre. Le dépôt est celui de l'annotation, `amont/rockylinux/rockylinux`.
   - En revanche, la tâche change : `prealables`, `banc` et `essai_prefetch` sont à rejouer avant la mesure d'un autre jour.
+
+## Note datée du 19/11/2026, écrite à 14:09:16 UTC : correction datée de la note de 14:06:10, et coût de la vérification du manifeste
+
+**Corrections** de la note « résultat objet déclaré mais non écrit » :
+- **Heure.** Son en-tête dit 14:06:10 UTC. La ligne qui cite [`m1b-base-manifeste.log`](m1b-base-manifeste.log) (14:06:30 UTC) a été écrite après, avant le commit.
+- **Ligne d'abord tronquée.** La première écriture de cette ligne avait perdu ses termes cités, par une erreur de shell de ma part. Elle a été récrite avant le commit.
+- **Chains.** La phrase « il ne parcourt que les résultats émis » ne s'appuyait, dans le journal archivé, que sur `isStructuredResult`. La boucle est maintenant archivée dans [`m1b-chains-entrees.log`](m1b-chains-entrees.log) (14:08:49 UTC) :
+  - `ExtractStructuredTargetFromResults` parcourt `objResults` (ligne 292) et retient les noms à suffixe `ARTIFACT_INPUTS` (ligne 293) ;
+  - `RetrieveMaterialsFromStructuredResults` (ligne 263) en fait les matériaux.
+
+**`prefetch-rpm` signée** (même journal) : elle contrôle le manifeste par `skopeo copy --preserve-digests`, puis compare son digest à celui de la source (ligne 123). skopeo est absent de l'amorce `rockylinux:9.8`. Dans `prefetch-racine-rpm`, la lecture se ferait donc par curl : `/v2/<dépôt>/manifests/sha256:<h>`, puis sha256 des octets lus. La lecture anonyme d'un manifeste dans Zot n'est pas mesurée. Celle du blob de la couche l'est.
+
+**Coût de la vérification, sans la déclaration** : le manifeste serait lu dans `/tmp` du prefetch, pas dans le workspace. Le prefetch contrôlerait que sa couche unique est la couche fixée.
+- **Ce qui ne change pas** :
+  - `construire-racine-rpm` ;
+  - ses revérifications ;
+  - les comptes de 224 et 20 entrées.
+- **Ce qui change** :
+  - le paramètre `couche` du prefetch, qui prend le digest du manifeste en plus ;
+  - le rendu des deux pipelines.
+- **À rejouer sous un préfixe neuf** :
+  - `prealables` et `banc`. Le banc ne joue que la construction, mais il est enchaîné aux autres étapes ;
+  - `essai_prefetch`, puis `essai_construire`, qui lit le PVC du préfixe.
+
+**Avec la déclaration** : `BASE_ARTIFACT_INPUTS`, sur la forme de `BOOTSTRAP_ARTIFACT_INPUTS`. Il serait écrit pour le bootstrap seulement. Le cas de l'outillage, déclaré mais non écrit, est lu dans le code et non mesuré. Il ne le serait qu'au premier PipelineRun de l'outillage, après signature. Si la lecture est fausse, il faut une signature et une revue de plus.
+
+**Calendrier** : la mesure d'un autre jour porte sur la section dnf et tar du constructeur, que ce changement ne touche pas. Elle reste valable sur la forme actuelle, quelle que soit la réponse.

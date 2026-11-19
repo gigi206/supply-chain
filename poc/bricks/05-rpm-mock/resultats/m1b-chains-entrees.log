@@ -1,0 +1,58 @@
+# m1b-chains-entrees.sh, début 2026-11-19T14:08:49Z
+Chains : v0.29.9, signable.go sha256 ec11524451cc0940fb3d1bf6bfce2efaf217ebe53f721bee8118c237fa69c33b
+
+### RetrieveMaterialsFromStructuredResults (ligne 263)
+263: func RetrieveMaterialsFromStructuredResults(ctx context.Context, objResults []objects.Result) []common.ProvenanceMaterial {
+264: 	logger := logging.FromContext(ctx)
+265: 	// Retrieve structured provenance for inputs.
+266: 	mats := []common.ProvenanceMaterial{}
+267: 	ssts := ExtractStructuredTargetFromResults(ctx, objResults, ArtifactsInputsResultName)
+268: 	for _, s := range ssts {
+269: 		alg, digest, err := ParseDigest(s.Digest)
+270: 		if err != nil {
+271: 			logger.Debugf("Digest for %s not in the right format: %s, %v", s.URI, s.Digest, err)
+272: 			continue
+273: 		}
+274: 		mats = append(mats, common.ProvenanceMaterial{
+275: 			URI:    s.URI,
+276: 			Digest: map[string]string{alg: digest},
+277: 		})
+278: 	}
+279: 	return mats
+280: }
+
+### ExtractStructuredTargetFromResults (ligne 284)
+284: func ExtractStructuredTargetFromResults(ctx context.Context, objResults []objects.Result, categoryMarker string) []*StructuredSignable {
+285: 	logger := logging.FromContext(ctx)
+286: 	objs := []*StructuredSignable{}
+287: 	if categoryMarker != ArtifactsInputsResultName && categoryMarker != ArtifactsOutputsResultName {
+288: 		return objs
+289: 	}
+290: 
+291: 	// TODO(#592): support structured results using Run
+292: 	for _, res := range objResults {
+293: 		if strings.HasSuffix(res.Name, categoryMarker) {
+294: 			valid, err := isStructuredResult(res, categoryMarker)
+295: 			if err != nil {
+296: 				logger.Debugf("ExtractStructuredTargetFromResults: %v", err)
+297: 			}
+298: 			if valid {
+299: 				logger.Debugf("Extracted Structured data from Result %s, %s", res.Value.ObjectVal["uri"], res.Value.ObjectVal["digest"])
+300: 				objs = append(objs, &StructuredSignable{URI: res.Value.ObjectVal["uri"], Digest: res.Value.ObjectVal["digest"]})
+301: 			}
+302: 		}
+303: 	}
+304: 	return objs
+305: }
+
+## prefetch-rpm signée (4123539575b1f798…) : manifeste et résultat
+20:  - name: BOOTSTRAP_ARTIFACT_INPUTS
+61:      SOURCE='$(params.source)'
+69:      case $SOURCE in sc-stockage.poc.test:5000/*@sha256:*) ;; *) ko "source invalide : $SOURCE" ;; esac
+70:      h=${SOURCE##*@sha256:}; case $h in *[!0-9a-f]*) ko "digest de la source invalide" ;; esac; [ ${#h} = 64 ] || ko "digest de la source invalide"
+71:      [ "$DOSSIER" = "${SOURCE%%:*}@${SOURCE##*@}" ] || ko "dossier incohérent avec la source : $DOSSIER"
+120:      skopeo copy --preserve-digests --src-cert-dir /etc/ca-poc "docker://$SOURCE" "dir:$D/$DOSSIER" > /tmp/skopeo.log 2>&1 </dev/null \
+123:      [ "$m" = "${SOURCE##*@}" ] || ko "manifeste copié : $m"
+124:      echo "skopeo copy --preserve-digests : en $(($(date +%s) - t)) s ; manifeste $m"
+126:      printf '{"uri":"oci://%s","digest":"%s"}' "${SOURCE%@*}" "${SOURCE##*@}" > '$(results.BOOTSTRAP_ARTIFACT_INPUTS.path)'
+# fin 2026-11-19T14:08:49Z
