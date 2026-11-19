@@ -1628,3 +1628,24 @@ Journal : [`m1b-builders-m1bt4-prealables.log`](m1b-builders-m1bt4-prealables.lo
 - **Un `repomd.xml` public différent** (JT3) : la source amont a bougé. Le prefetch s'arrête sur le sha256 fixé, ce qui est voulu. Pas de signature ; le choix des sources te revient.
 
 **Portée prévue.** Si tout tient, les deux racines et les deux images se reproduisent dans Kata sur deux jours (19 et 20/11), sur un seul nœud et un seul hôte. Le point 1 A serait établi dans ce cadre, pas au-delà : ni pour un autre nœud, ni après une mise à jour du noyau ou de Kata. La signature resterait suspendue aux points ouverts : `--dry-run=server`, cas refusés, docs/04 pour curl et GnuPG, les deux politiques de réseau.
+
+## Prédictions du 19/11/2026, écrites à 15:36:10 UTC : cas refusés de la construction, au banc
+
+**Pourquoi.** Aucun cas refusé n'est mesuré pour les tâches neuves (carte, note de 13:58:26 UTC). Ce banc couvre la tâche de construction, hors ligne, sur l'hôte. Les cas du prefetch (`repomd` faux, autre manifeste, bon manifeste avec une couche fausse) demandent un pod du cluster et la sortie réseau du prefetch ; ils sont à préparer à part.
+
+**Banc** : [`m1b-refus-banc.sh`](m1b-refus-banc.sh) (sha256 `779f6c763f122358…`), journal à venir `m1b-refus-banc.log`.
+- Il joue tels quels les scripts que `prealables` a rendus sous `m1bt3` (`script-co.sh` `956e39c2…`, `script-cb.sh` `cad7f550…`), relus au sha256. Ce sont aussi ceux que JT1 attend le 20/11.
+- Chaque cas ne change qu'une chose : une ligne du script, contrôlée par `diff`, ou un octet d'une entrée, sur une copie réelle et jamais sur un lien dur. Il a sa racine de l'amorce extraite à neuf et le même chroot que l'étape `banc` (`unshare -n`, entrées en lecture seule).
+- Un refus ne compte que si le code est non nul, s'il n'y a qu'une ligne `KO` et si c'est exactement le message de la garde visée. Il faut aussi que ni `image.tar` ni le résultat `DIGEST_CONSTRUIT` ne soient écrits. Un refus pour une autre cause est donc un échec de la prédiction.
+- Ni cluster, ni Zot, ni réseau.
+
+- **RZ1** (haute) : témoin du bootstrap, script tel quel : code 0, résultat `sha256:6de899ac…`.
+- **RZ2** (haute) : bootstrap avec `RACINE` remplacée par la racine de l'outillage. dnf tourne, la racine construite vaut `b063feb3…`, puis la tâche s'arrête sur « racine différente de la valeur fixée par la pipeline ».
+- **RZ3** (haute) : un octet inversé dans `dbus-libs-1.12.20-8.el9.x86_64.rpm` : refus « rpm altéré : baseos97 … », avant dnf.
+- **RZ4** (haute) : un octet inversé dans `couche.tar.gz` : refus « couche altérée », avant dnf et avant l'extraction.
+- **RZ5** (haute) : un octet inversé dans `repomd.xml` de `baseos97` : refus « baseos97 : repomd.xml altéré », avant dnf.
+- **RZ6** (haute) : témoin de l'outillage, script tel quel : code 0, résultat `sha256:70f8c412…`.
+- **RZ7** (haute) : outillage avec `RACINE` remplacée par celle du bootstrap. La racine construite vaut `7c07083c…`, puis refus sur la racine.
+- **RZ8** (haute) : les entrées des bancs du 18/11 et la couche amont du cache OCI sont inchangées après le banc (sha256 de la liste, avant et après).
+
+**Portée prévue.** Si tout tient, la tâche de construction refuse au banc une racine fixée fausse, et un rpm, une couche ou un `repomd.xml` altérés après le prefetch, chacun par sa garde. Ce n'est pas mesuré dans Kata ni dans un TaskRun. La signature d'une clé ou d'un `repomd.xml` n'est pas rejouée ici : la tâche de construction ne contrôle que leur sha256, et c'est le prefetch qui vérifie les signatures.
