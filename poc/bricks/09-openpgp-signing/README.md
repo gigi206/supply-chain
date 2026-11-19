@@ -326,3 +326,11 @@ Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.
   - les écritures dans Zot (rpm signé, dépôts signés, attestations de lien en referrers), point 4 de la liste « Accords » ;
   - la route de l'hôte vers OpenBao, pour que cosign signe par `hashivault://lien` ;
   - les jetons d'horodatage, non vérifiés ici.
+
+*Note datée du 19/11/2026, 20:15:12 UTC* : **O5 réel, accord « Ok » : cosign signe avec la clé Transit `lien`** ([prédictions et résultats](resultats/o5-cosign-predictions.md)).
+- **Route** : redirection de port sur `127.0.0.1` vers `openbao-0`, fermée à la fin de chaque étape.
+- **Lecture** : `cosign public-key --key hashivault://lien` rend la clé archivée.
+- **Signature** : un énoncé d'essai signé par `hashivault://lien` est vérifié hors réseau avec la clé archivée, et le témoin est refusé.
+- **Mode banc** : le banc a révélé un défaut du script, une clé publique mal choisie en mode banc. Il est corrigé avant le vrai passage.
+- **Décision « Oui, signes/** »** ; `compte_zot` est passée.
+- **Reste pour O5** : application par la session principale (§4 quinquies d'`A-REPORTER.md`, redémarrage de Zot), `droits_zot`, publication et attestations réelles.

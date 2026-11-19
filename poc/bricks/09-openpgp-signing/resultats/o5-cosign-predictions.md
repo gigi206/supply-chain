@@ -45,3 +45,23 @@ Les cas couverts : nominal ; autre clé rendue ; redirection en échec ; signatu
 | K | K3 et K5 tenus ; redirection fermée ; aucune ligne KO | haute |
 
 **Rien n'est écrit dans Zot.** La seule écriture possible dans OpenBao est une signature (Transit ne garde rien). Le dossier `~/.cache/supply-chain-poc/09/o5-cosign` est effacé après archivage.
+
+## Note datée du 19/11/2026, 20:15:12 UTC : `cle` et `essai` passées, toutes les prédictions tenues
+
+**`cle`**, de 20:14:43 à 20:14:44 UTC, code 0 ([journal](o5-cosign-cle.log)).
+- **PF1 tenue** : redirection `127.0.0.1:35689 → openbao-0:8200`, puis fermée (processus arrêté, port fermé). La NetworkPolicy d'OpenBao ne l'a pas bloquée.
+- **CC1 tenue** : le client hashivault fonctionne avec `VAULT_TLS_SERVER_NAME` et un jeton sans politique `default`.
+- **CC2 tenue** : la clé rendue est la clé archivée (SPKI `42529342…`).
+- **K tenue**.
+
+Contrôle hors du script, juste après : aucun processus `kubectl port-forward` restant.
+
+**`essai`**, à 20:14:53 UTC, code 0 ([journal](o5-cosign-essai.log)).
+- **CE1 tenue** : `cosign attest-blob --key hashivault://lien`, code 0.
+- **CE2 tenue** : bundle v0.3 (`verificationMaterial` : `publicKey`), vérifié hors réseau avec la clé archivée, « Verified OK ».
+- **CE3 tenue** : refus, « provided artifact digests do not match digests in statement ».
+- **K tenue**. Aucune redirection restante.
+
+**Archivés** : le bundle d'essai, public, signé par la vraie clé `lien` sur un énoncé d'essai ([o5-cosign-essai.bundle.json](o5-cosign-essai.bundle.json)), et son entrée ([o5-cosign-essai-entree.txt](o5-cosign-essai-entree.txt)). Le dossier de travail est effacé après le commit de cette note.
+
+**Portée.** Le chemin complet de signature d'O5 réel est mesuré, de l'hôte à la clé Transit `lien` puis à la vérification hors réseau. Il ne reste, pour O5, que les écritures dans Zot, qui attendent la session principale (§4 quinquies d'`A-REPORTER.md`), puis `droits_zot`, la publication et les attestations réelles.

@@ -1,0 +1,12 @@
+étape cle commencée : 2026-11-19T20:14:43Z ; o5-cosign.sh bfad5b267fc64b36…
+OK   secret lien présent dans 09/secrets (non lu par la session)
+OK   clé publique archivée : SPKI sha256 42529342ceb102ad76f45285b2655d38265eebbe0c956f53706dcedf08e8d861
+     cosign v3.1.4 ; kubectl v1.35.10
+OK   redirection ouverte : 127.0.0.1:35689 → openbao-0:8200 (processus 2330610)
+OK   redirection fermée : processus 2330610 arrêté, 127.0.0.1:35689 n'écoute plus
+OK   cosign public-key --key hashivault://lien : code 0
+OK   clé lue par cosign dans OpenBao = clé publique archivée (SPKI 42529342ceb102ad76f45285b2655d38265eebbe0c956f53706dcedf08e8d861)
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-cosign
+étape cle finie : 2026-11-19T20:14:44Z
+OK   K3 : aucune ligne de bloc privé dans le journal
+OK   K5 : valeur du secret lien absente du journal et du dossier de travail
