@@ -647,3 +647,20 @@ Le relevé [`m1b-avant-signature-releve.log`](m1b-avant-signature-releve.log) a 
 - somme des écarts entre commits consécutifs : 6,45 h pour les écarts de 30 min au plus, 7,57 h pour ceux de 60 min au plus.
 
 L'estimation de la carte est « 3 j, décision à 6 ».
+
+## Note datée du 19/11/2026, écrite à 18:00:37 UTC : ligne GnuPG de docs/04, écrite
+
+À ta demande (« Oui, demande-lui »), la session de la brique 09 a fourni son verdict proposé : « À surveiller, chemin critique ». Je l'ai relu dans ses journaux, sur sa branche non fusionnée `claude/brique-09-sec-fdb4c6` : `releve-amont.log` (commit `74e7b94c`) et `releve-complements-3.log` (commit `96b7e6f7`). Les lignes citées sont conformes.
+- `swdb.lst` est vérifié par gpgv avec la clé `6DAA6E64…`.
+- Versions amont : 2.5.24 du 23/09/2026 et 2.4.9 du 30/12/2025.
+- Le tableau de fin de vie n'a **aucune ligne 2.3**.
+- Rocky 9.8 livre `gnupg2` 2.3.3-5.el9_7.
+
+J'ai écrit à 18:00:17 UTC trois lignes dans docs/04, limitées à GnuPG : §3, §4 et §6. Les autres projets de la brique 09 (apt, devscripts, Sequoia) restent à sa session. J'y ajoute une mesure de la brique 05 : aucun erratum de sécurité de Rocky 9.8 ne porte un `gnupg2` plus récent ([`m1b-amorce-fraicheur.log`](m1b-amorce-fraicheur.log)). Les journaux de la brique 09 ne sont pas sur cette branche ; docs/04 les cite par branche et par commit, sans lien.
+- **Réserve** : la série 2.3 n'a plus de maintenance amont, seulement celle de Rocky. Les avis de GnuPG qui touchent la 2.3.3 ne sont pas lus.
+- **Contre-contrôle** : gpgv n'est pas la seule garde du contenu. Les clés, les `repomd.xml` et les rpm sont fixés par sha256 dans la pipeline (RZ, PX).
+
+Le point « ligne GnuPG de docs/04 » est fait. **Restent avant signature** :
+- la mesure d'un autre jour (00:01 UTC le 20/11) ;
+- `m1b_sortie`, déjà accordée pour après la mesure, puis `m1b_sans_sortie` sur son propre accord, puis `m1b_temoins` ;
+- puis le premier passage de `m1b-signature.sh` (`SIGNER=1`), sur ton accord pour les écritures dans Zot.
