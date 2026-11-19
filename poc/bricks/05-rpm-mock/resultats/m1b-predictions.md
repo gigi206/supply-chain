@@ -1895,3 +1895,11 @@ Les étapes 2 à 4 ne viennent qu'**après la mesure du 20/11**, pour qu'elle to
 - **NT4** (moyenne) : un pod runc à ce label est admis. Seuls les pods d'essai Kata ont été relevés « admis à blanc » sous ce label. Le témoin est runc, et ne dit donc rien du chemin réseau propre à Kata. M3 l'a mesuré sous `construction-rpm-sans-sortie`.
 
 **Lecture prévue.** NT2 borne le prefetch signé sur l'amorce figée : il joint toute adresse publique en 443, pas seulement vault et EPEL. C'est la borne réseau de la réserve « (a) Figée », déjà écrite comme telle.
+
+### m1b_sec : résultat (note écrite le 19/11/2026 à 16:26:19 UTC)
+
+Journal : [`sortie-m1b_sec.log`](../../08c-durcissement/resultats/sortie-m1b_sec.log), à 16:25:54 UTC, code 0, aucun KO, à HEAD `40dd0a7`. **NS1 et NS2 tenues.**
+- **NS1** : les huit politiques du dépôt se lisent, et tous les invariants tiennent. Le prefetch de M1b n'est sélectionné que par `prefetch-racine-rpm-sortie`. La construction de M1b est sélectionnée par `builds-sans-internet` et par `construction-racine-rpm-sans-sortie`, qui n'autorise rien et porte les types `Egress+Ingress`.
+- **NS2** : chacune des quatre contre-épreuves signale ce qu'elle vise.
+
+Rien n'est posé. Restent `m1b_sortie` puis `m1b_sans_sortie`, chacune sur ton accord, après la mesure du 20/11, et ensuite `m1b_temoins`.

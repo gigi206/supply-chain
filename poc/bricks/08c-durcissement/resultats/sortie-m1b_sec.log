@@ -1,0 +1,26 @@
+# sortie-builds.sh m1b_sec, 2026-11-19T16:25:54Z
+## invariants sur les politiques du dépôt (aucune lecture du cluster)
+OK   politiques lues dans le dépôt (kind et namespace builds) : 8
+politiques de builds : NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy prefetch-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, NetworkPolicy construction-rpm-sans-sortie, CiliumNetworkPolicy prefetch-racine-rpm-sortie, NetworkPolicy construction-racine-rpm-sans-sortie
+OK   politiques qui sélectionnent un pod de prefetch-gomod : CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-image : 
+OK   politiques à sortie CIDR dont les pods seraient aussi sous un refus : 
+OK   labels exclus d'un refus sans politique de sortie dédiée : 
+OK   politiques qui sélectionnent un pod de prefetch-deb : CiliumNetworkPolicy prefetch-deb-sortie
+OK   politiques qui sélectionnent un pod de builds sans label : CiliumNetworkPolicy builds-sans-internet
+OK   politiques qui sélectionnent un pod de prefetch-rpm : CiliumNetworkPolicy prefetch-rpm-sortie
+OK   politiques qui sélectionnent un pod de prefetch-racine-rpm : CiliumNetworkPolicy prefetch-racine-rpm-sortie
+OK   politiques qui sélectionnent un pod de construire-racine-rpm : CiliumNetworkPolicy builds-sans-internet, NetworkPolicy construction-racine-rpm-sans-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-racine-rpm : 
+OK   types des NetworkPolicy qui sélectionnent un pod de construire-racine-rpm : Egress+Ingress
+## contre-épreuve : NotIn sans prefetch-racine-rpm, l'invariant de sortie CIDR doit signaler prefetch-racine-rpm-sortie
+OK   politiques à sortie CIDR sous un refus, NotIn sans prefetch-racine-rpm : CiliumNetworkPolicy prefetch-racine-rpm-sortie
+## contre-épreuve : sans prefetch-racine-rpm-sortie, l'invariant des labels exclus doit signaler prefetch-racine-rpm
+OK   politiques lues dans le dépôt (kind et namespace builds) : 8
+OK   labels exclus d'un refus sans politique de sortie dédiée, sans prefetch-racine-rpm-sortie : tekton.dev/task=prefetch-racine-rpm
+## contre-épreuve : sans construction-racine-rpm-sans-sortie, seul le refus des adresses publiques sélectionne la construction
+OK   politiques lues dans le dépôt (kind et namespace builds) : 8
+OK   politiques qui sélectionnent un pod de construire-racine-rpm, sans sa politique : CiliumNetworkPolicy builds-sans-internet
+## contre-épreuve : construction-racine-rpm-sans-sortie avec une règle de sortie, l'invariant d'autorisation doit la signaler
+OK   politiques lues dans le dépôt (kind et namespace builds) : 8
+OK   politiques qui autorisent du trafic à un pod de construire-racine-rpm, règle ajoutée : NetworkPolicy construction-racine-rpm-sans-sortie

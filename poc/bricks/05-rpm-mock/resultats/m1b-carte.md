@@ -611,3 +611,18 @@ TD1 à TD5 tenues ([`m1b-taches-admission.log`](m1b-taches-admission.log)) : les
 - la mesure d'un autre jour (à partir du 20/11 à 00:00 UTC), avec les sha256 des quatre rendus de `m1bt-20` à confronter à ceux de TD1 ;
 - la ligne GnuPG de docs/04 (session de la brique 09) ;
 - les deux politiques de réseau, un accord pour chacune.
+
+## Note datée du 19/11/2026, écrite à 16:26:19 UTC : politiques réseau des tâches neuves, préparées
+
+Les deux politiques sont écrites dans le dépôt, NON POSÉES :
+- `prefetch-racine-rpm-sortie` (DNS, adresses publiques en 443, Zot), avec `prefetch-racine-rpm` ajouté au `NotIn` de `builds-sans-internet` ;
+- `construction-racine-rpm-sans-sortie` (ni entrée ni sortie).
+
+Elles se posent par `sortie-builds.sh` (08c), chacune par son étape et sur son accord : `m1b_sortie`, puis `m1b_sans_sortie`. Les témoins viennent ensuite, par `m1b_temoins`. Le contrôle sur le dépôt, `m1b_sec`, tient (NS1 et NS2, [`sortie-m1b_sec.log`](../../08c-durcissement/resultats/sortie-m1b_sec.log)).
+- **Ordre** : après la mesure du 20/11, pour qu'elle tourne dans le même cluster que le 19/11.
+- **Conséquence connue** : après `m1b_sortie`, `s1.sh prealables` attend toujours un `NotIn` à trois labels. Il sera à adapter avant le rejeu M5b.
+
+**Restent avant signature** :
+- la mesure d'un autre jour (à partir du 20/11 à 00:00 UTC, programmée à 00:01 UTC), avec les sha256 des rendus de `m1bt-20` à confronter à TD1 ;
+- la ligne GnuPG de docs/04 (session de la brique 09) ;
+- `m1b_sortie` et `m1b_sans_sortie`, un accord pour chacune, puis `m1b_temoins`.
