@@ -1,0 +1,4 @@
+contrôle des versions commencé : 2026-11-19T16:28:16Z ; journal de mmdebstrap sha256 0db0d8d02dd4c63f… ; Packages.xz sha256 7778d3e3f303b7dd…
+paquets installés : 106 ; dont .deb contrôlé par sha256 (debian_racine) : 47 ; sans .deb contrôlé : 59
+OK   versions installées présentes dans le Packages.xz vérifié : 106 sur 106
+contrôle des versions fini : 2026-11-19T16:28:17Z

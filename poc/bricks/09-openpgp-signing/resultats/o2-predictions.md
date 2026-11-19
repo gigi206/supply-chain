@@ -255,3 +255,28 @@ Décision du propriétaire : « Refaire en entier », en réponse à « Accepter
 |---|---|---|
 | DR3 | Le journal de mmdebstrap dit « skipping essential/unlink as requested » ; **le crochet trouve un `.deb` par paquet installé (106 environ), tous égaux au `Packages.xz` vérifié** ; plus aucun paquet installé sans `.deb` contrôlé (`o2-controle-versions.sh` relancé : 0) | moyenne-haute : option lue dans le script ; le nombre exact dépend de la résolution, qui ne devrait pas changer (même instantané, mêmes paquets demandés) |
 | DR4 | Les sept versions épinglées sont de nouveau installées, avec gpg 2.4.7 et un code 0 ; l'archive diffère de `45f376e6…`, sans que ce soit exigé | haute pour les versions ; l'empreinte de l'archive n'est pas prédite |
+
+## Note datée du 19/11/2026, écrite à 16:36:26 UTC : relance de `debian_racine` passée, DR3 et DR4 tenues
+
+Relance sur la décision « Refaire en entier », sur le commit `39ec389c`.
+- **Effacé avant la relance** (à 16:35:01 UTC, dans l'espace de noms, par chemins littéraux) : l'ancienne archive `debian13.tar` et l'ancienne racine `o2/racine-debian13`.
+- **Archivé** : le journal du premier passage ([journal](o2-debian_racine-premier-passage.log)), celui du contrôle des versions ([journal](o2-controle-versions-premier-passage.log)), et le journal de mmdebstrap de ce passage, hors du dépôt (`debian-mmdebstrap-premier-passage.log`).
+
+[Journal de la relance](o2-debian_racine.log) : 16:35:05 à 16:35:49 UTC, code 0 ; `o2.sh` `b4a25981…`. [Contrôle des versions](o2-controle-versions.log) : 16:35:49 UTC, code 0.
+
+- **DR3 tenue** :
+  - « skipping essential/unlink » apparaît une fois dans le journal de mmdebstrap ;
+  - **106 `.deb` sur 106 sont égaux au `Packages.xz` vérifié** ;
+  - 106 paquets installés, dont 106 avec un `.deb` contrôlé par sha256, et 0 sans ;
+  - 106 versions sur 106 figurent dans l'index signé.
+- **DR4 tenue** :
+  - les sept versions épinglées sont installées, gpg 2.4.7, code 0 ;
+  - l'archive fait 205 667 840 octets (même taille qu'au premier passage), sha256 `015611d6…`, différent de `45f376e6…` comme prévu.
+- **Téléchargements** : 106 `.deb` listés avec leur sha256 dans le journal et dans [la liste des téléchargements](releve-amont-telechargements.tsv). Le crochet ne relève pas les tailles.
+
+**État d'O2** :
+- les deux racines de signature sont prêtes, avec tous leurs paquets contrôlés ;
+- Rocky : 101 rpm contre le `primary` vérifié ;
+- Debian : 106 `.deb` contre le `Packages.xz` vérifié ;
+- aucune clé du PoC n'existe ;
+- restent `cle` et `essai`, chacune avec son accord.
