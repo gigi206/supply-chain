@@ -55,3 +55,46 @@ L'accord couvre **la clé seule**. Il ne couvre ni politique, ni jeton, ni rôle
 **Suite d'O5 réel**, à accorder dans cet ordre :
 1. un jeton OpenBao borné à `transit/sign/lien` (et à la lecture de `transit/keys/lien`), avec sa politique ;
 2. un accès en lecture à Zot.
+
+# Deuxième accord : politique `lien-signature` et accès borné à la clé `lien`
+
+*Écrit le 19/11/2026 à 19:49:18 UTC, avant tout lancement d'`acces_lien`.*
+
+**Accord.** Question posée : « Accordez-vous le deuxième point : un jeton OpenBao et sa politique, bornés à la clé `lien` (signer avec elle et la lire, rien d'autre) ? ». Réponse du propriétaire, reçue avant l'heure ci-dessus : « Oui ».
+
+**Mes choix, que le « Oui » ne couvre pas mot pour mot** (à contester par le propriétaire) :
+- **Jeton de service** : politique `lien-signature` seule, **sans la politique `default`**, orphelin, durée **72 h**, explicite et **non renouvelable**. Passé ce délai, il faudra le recréer avec la même étape, après retrait.
+- **Révocation de soi** : la politique ([`politique/lien-signature.hcl`](../politique/lien-signature.hcl)) ajoute `auth/token/revoke-self`, comme `scanner-signature`. Ce droit **ne sera pas essayé**, puisque l'essai détruirait le jeton.
+- **Stockage en clair** : le jeton est écrit par le script dans `~/.cache/supply-chain-poc/09/secrets/openbao-lien.secret` (0600), avec son accesseur à côté (`openbao-lien.accesseur`). Ni la session ni le journal ne voient sa valeur.
+- **Vocabulaire du journal** : le masquage remplace toute ligne qui contient « jeton » ou « token ». L'étape s'appelle donc `acces_lien`, le fichier porte l'extension `.secret`, et le journal dit « secret lien ».
+
+**Banc hors cluster** ([o5-openbao-banc.sh](../o5-openbao-banc.sh)) : faux `bao`, avec droits filtrés selon le jeton présenté et signature par une clé ECDSA jetable. Cinq passages ; les quatre premiers sont gardés avec leur cause :
+1. **19:44:23 UTC, 28 OK et 3 KO** ([journal](o5-openbao-banc-jeton-premier-passage.log)). En cas d'échec, OpenSSL 4.1.0 écrit sa pile d'erreurs sur stderr avant « Verification failure ». Correction : seule la sortie standard est jugée.
+2. **19:44:49 UTC, 30 OK et 1 KO** ([journal](o5-openbao-banc-jeton-deuxieme-passage.log)). Le chemin du banc et le nom d'étape `jeton_lien` contenaient « jeton », donc des lignes étaient masquées, dont l'heure de fin. Correction : l'étape devient `acces_lien`.
+3. **19:45:30 UTC, 31 OK** ([journal](o5-openbao-banc-jeton-troisieme-passage.log)). Il restait une ligne masquée : le nom de fichier `openbao-lien.token`. Correction : `.secret`, et un verdict « aucune ligne masquée » est ajouté.
+4. **19:45:47 UTC, 32 OK** ([journal](o5-openbao-banc-jeton-quatrieme-passage.log)). La relecture du conseiller a montré que, dans le cas « fuite », la valeur du secret factice atteignait la sortie standard : 1 occurrence, mesurée. K5 ne vidait le journal qu'après le `tee`. Correction : le journal est d'abord écrit en 0600 sans affichage, contrôlé par K3, K4 et K5, puis affiché. Le préfixe du secret n'est plus affiché (seulement « oui » ou « non »).
+5. **19:48:47 UTC, 33 OK et 0 KO**, sur le script final `208c3e7d…` ([journal](o5-openbao-banc-jeton.log)). Le banc juge aussi la sortie du cas « fuite ».
+
+**Le banc ne prouve pas les droits.** Le faux `bao` applique la liste que j'ai écrite. Les 11 essais seront mesurés pour la première fois sur le vrai OpenBao, après les deux écritures.
+
+## Prédictions d'`acces_lien`
+
+| N° | Prédiction | Confiance |
+|---|---|---|
+| J1 | OpenBao descellé ; clé `lien` toujours conforme ; clé publique égale à `lien-cle-publique.pem` ; politique `lien-signature` absente ; fichiers du secret absents | haute |
+| J2 | Écriture 1, politique : relue identique au fichier, hors commentaires et lignes vides | haute : même méthode que la 07a |
+| J3 | Écriture 2, jeton : relu par root via l'accesseur, `lien-signature,service,true,false,259200,true,true,0` (politiques, type, orphelin, renouvelable, durée maximale, durée restante, nom, usages) ; fichiers en 0600, préfixe `s.` | moyenne-haute : `-no-default-policy`, `-orphan` et `explicit_max_ttl` jamais relus dans ce dépôt |
+| E1 | Avec le jeton : lecture de `transit/keys/lien` acceptée | haute |
+| E2 | Signature `transit/sign/lien/sha2-256` acceptée ; `vault:v1:`, DER d'environ 70 octets ; **vérifiée sur l'hôte par OpenSSL avec la clé publique archivée** ; même signature sur une autre entrée refusée | haute pour l'accès ; moyenne-haute pour la vérification (format DER et hachage SHA-256 de Transit lus dans la 08, jamais vérifiés par OpenSSL ici) |
+| E3 | Signatures avec `chains`, `tsa` et `scanner` refusées (403) | haute |
+| E4 | Lecture de `transit/keys/chains` et export de la clé `lien` refusés | haute |
+| E5 | Lecture de `kv/horodatage/zot` refusée | haute |
+| E6 | Liste des politiques refusée | haute |
+| E7 | Création d'un jeton enfant refusée | haute : pas de droit sur `auth/token/create` |
+| E8 | Consultation de soi (`bao token lookup`) refusée, faute de politique `default` | moyenne : jamais mesurée dans ce dépôt |
+| J4 | Seule politique ajoutée : `lien-signature` ; clés Transit inchangées depuis `cle_lien` | haute |
+| K | K3, K4 et K5 tenus, aucune ligne masquée, aucune ligne KO | haute |
+
+**En cas de KO après les écritures.** La politique et le jeton restent en place, et l'étape refuse toute relance. Le retrait passe par `racine` : `bao token revoke -accessor <accesseur>`, puis `bao policy delete lien-signature`, puis effacement des deux fichiers par chemins littéraux. **Ce retrait n'est ni scripté ni passé au banc.** Après un KO, je m'arrête et je rends compte ; je n'improvise pas de retrait.
+
+**Portée.** Les essais passent par `kubectl exec` et `bao` dans `openbao-0`. Ils ne mesurent pas cosign `hashivault://lien` depuis l'hôte, et la route de l'hôte vers OpenBao (redirection de port ou autre) n'est pas décidée. Les 72 h courent dès la création.
