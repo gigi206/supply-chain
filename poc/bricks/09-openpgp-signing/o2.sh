@@ -16,6 +16,9 @@
 #                    versions épinglées contrôlées ; archive extraite dans la racine de signature.
 #   cle              ACCORD : clé du PoC créée dans la racine Debian (gpg 2.4.7), sans réseau, homedir tmpfs ; exports armurés.
 #   essai            ACCORD : sans réseau ; signatures et vérifications croisées dans les deux racines (K5), sens inverse (K5b).
+#   repetition       À SEC, sans réseau, sans installation : cle puis essai avec une clé JETABLE (même RSA 4096, même mécanique)
+#                    dans les deux racines construites, sorties dans un dossier de répétition ; formes des exports comptées,
+#                    jamais affichées (couverture de garde-cle-privee.sh, longueur des lignes pour tools/secrets-depot.sh).
 # Les étapes avec réseau refusent si le dossier des secrets existe (K1). Code non nul dès qu'une ligne « KO » est journalisée.
 # Usage (racine du dépôt) : poc/bricks/09-openpgp-signing/o2.sh <étape>   (journal : resultats/o2-<étape>.log)
 set -euo pipefail
@@ -43,6 +46,7 @@ WR=$W/rocky             # amorce Rocky extraite (utilisée une fois) ; racine de
 RR=$WR/racine
 WDA=$W/debian-amorce    # amorce Debian extraite (utilisée une fois)
 RD=$W/racine-debian13   # racine Debian de signature (archive de mmdebstrap extraite)
+WP=$W/repetition        # répétition de cle et essai avec une clé jetable (à effacer après archivage)
 LISTE=$R/releve-amont-telechargements.tsv
 mkdir -p "$BASE" "$R"
 cd "$BASE"
@@ -340,9 +344,42 @@ etape_essai() {
   rmdir "$W/x"
 }
 
+etape_repetition() {
+  set +e
+  [ -x "$RD/usr/bin/gpg" ] || ko "racine Debian absente : debian_racine d'abord"
+  [ -x "$RR/usr/bin/gpg" ] || ko "racine Rocky absente : rocky_installer d'abord"
+  absent "$WP"
+  mkdir -m 700 "$WP" "$WP/secrets" "$WP/x"
+  echo "### RP1 : clé jetable créée dans la racine Debian (gpg $(dans_hors "$RD" gpg --version | head -1 | cut -d' ' -f3)), même mécanique que cle"
+  LIENS="$WP/secrets:/o2/secrets:rw $I:/o2/interne.sh:ro" TMPFS="/o2/g" \
+    dans_hors "$RD" env GNUPGHOME=/o2/g O2_NOM="Banc 09 PoC cle jetable" O2_EXPIRE=2d /bin/bash /o2/interne.sh creer /o2/secrets
+  echo "  code $?"
+  for f in "$WP"/secrets/*; do echo "  $(basename "$f") : $(stat -c '%a %s' "$f") (mode, octets)"; done
+  echo "  dossier : $(stat -c %a "$WP/secrets")"
+  echo "### RP2 (K4) : seconde création, refus attendu"
+  LIENS="$WP/secrets:/o2/secrets:rw $I:/o2/interne.sh:ro" TMPFS="/o2/g" \
+    dans_hors "$RD" env GNUPGHOME=/o2/g O2_NOM="Banc 09 PoC cle jetable" O2_EXPIRE=2d /bin/bash /o2/interne.sh creer /o2/secrets
+  echo "  code $? (refus attendu)"
+  echo "### RP3 : formes des exports (lignes comptées, aucun contenu affiché)"
+  local f n pv pu rv mot lmin
+  for f in cle-openpgp.asc cle-publique.asc revocation.asc; do
+    n=$(wc -l < "$WP/secrets/$f")
+    pv=$(grep -c -E '^[[:space:]]*-----BEGIN PGP PRIVATE KEY BLOCK-----[[:space:]]*$' "$WP/secrets/$f")
+    pu=$(grep -c -x -e '-----BEGIN PGP PUBLIC KEY BLOCK-----' "$WP/secrets/$f")
+    rv=$(grep -c -x -e ':-----BEGIN PGP PUBLIC KEY BLOCK-----' "$WP/secrets/$f")
+    mot=$(grep -v -e '^-----' -e '^$' "$WP/secrets/$f" | wc -l)
+    lmin=$(grep -v -e '^-----' -e '^$' "$WP/secrets/$f" | awk 'NR == 1 || length($0) < m {m = length($0)} END {print m + 0}')
+    echo "  $f : $n lignes ; en-tête privé vu par la garde : $pv ; en-tête public : $pu ; en-tête public préfixé par deux-points : $rv ; lignes qui seraient des motifs de secrets-depot.sh : $mot, la plus courte de $lmin caractères"
+  done
+  echo "### RP4 : programme d'essai avec la clé jetable (E1 à E8 : K5 et K5b)"
+  ns_hors bash -c "$PROGRAMME_ESSAI" _ "$RD" "$RR" "$WP/secrets" "$I" "$WP/x"
+  rmdir "$WP/x"
+  echo "à effacer après archivage (chemin littéral, dans l'espace de noms) : $WP"
+}
+
 e=${1:-}
 case "$e" in
-  prealables|banc_chroot|rocky_telecharger|rocky_installer|debian_amorce|debian_racine|cle|essai)
+  prealables|banc_chroot|rocky_telecharger|rocky_installer|debian_amorce|debian_racine|cle|essai|repetition)
     L=$R/o2-$e.log
     set +e
     { echo "étape $e commencée : $(date -u '+%Y-%m-%dT%H:%M:%SZ') ; o2.sh $(sha256sum < "$here/o2.sh" | cut -c1-16)… ; o2-interne.sh $(sha256sum < "$I" | cut -c1-16)…"
@@ -351,8 +388,8 @@ case "$e" in
     if [ "$n" != 0 ]; then : > "$L"; echo "KO   K3 : $n ligne(s) de bloc OpenPGP dans le journal : journal vidé" | tee "$L"; exit 1; fi
     echo "OK   K3 : aucune ligne de bloc OpenPGP armuré dans le journal" | tee -a "$L"
     k=$(grep -c '^KO' "$L" || true)
-    [ "$e" = banc_chroot ] && k=$(grep -v 'refus attendu\|existe déjà : rien n.est écrasé' "$L" | grep -c '^KO' || true)
+    { [ "$e" = banc_chroot ] || [ "$e" = repetition ]; } && k=$(grep -v 'refus attendu\|existe déjà : rien n.est écrasé' "$L" | grep -c '^KO' || true)
     [ "$k" = 0 ] || { echo "bilan : $k ligne(s) KO" | tee -a "$L"; rc=1; }
     exit "$rc" ;;
-  *) echo "usage : $0 prealables | banc_chroot | rocky_telecharger | rocky_installer | debian_amorce | debian_racine | cle | essai" >&2; exit 64 ;;
+  *) echo "usage : $0 prealables | banc_chroot | rocky_telecharger | rocky_installer | debian_amorce | debian_racine | cle | essai | repetition" >&2; exit 64 ;;
 esac

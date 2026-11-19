@@ -280,3 +280,26 @@ Relance sur la décision « Refaire en entier », sur le commit `39ec389c`.
 - Debian : 106 `.deb` contre le `Packages.xz` vérifié ;
 - aucune clé du PoC n'existe ;
 - restent `cle` et `essai`, chacune avec son accord.
+
+## Prédictions de la répétition de `cle` et `essai` (écrites à 17:12:54 UTC, avant tout lancement)
+
+Cette répétition est demandée par la relecture du conseiller avant l'accord de `cle`. Plusieurs choses ne sont pas mesurées :
+- `creer` n'a jamais tourné sous gpg 2.4.7, alors que `cle` crée la clé dans la racine Debian ;
+- K5 et K5b ne sont pas mesurées dans les racines construites (`banc_chroot` a tourné dans l'amorce Rocky) ;
+- on ne sait pas si `garde-cle-privee.sh` couvre `revocation.asc`.
+
+La nouvelle étape `o2.sh repetition` est à sec : pas de réseau, pas d'installation. Elle utilise une clé jetable (RSA 4096 de `creer`, identité fictive sans adresse, 2 jours). Ses sorties vont dans `~/.cache/supply-chain-poc/09/o2/repetition`, effacé après archivage. `09/secrets` n'est ni créé ni lu.
+
+| N° | Prédiction | Confiance |
+|---|---|---|
+| RP0 | Les deux racines sont présentes ; journal d'en-tête avec les sha256 d'`o2.sh` et d'`o2-interne.sh` | haute |
+| RP1 | `creer` sous gpg 2.4.7, dans la racine Debian : code 0, gardes K1 et K2 tenues. Trois fichiers en 600, dossier en 700 ; clé RSA 4096 ; usages « s » sur la clé primaire | moyenne-haute : même script que BK1 (2.3.3), 2.4.7 jamais mesuré |
+| RP2 | Seconde création refusée (K4), code 1 | haute |
+| RP3a | `cle-openpgp.asc` : un en-tête privé vu par la garde, aucun en-tête public | haute |
+| RP3b | `cle-publique.asc` : un en-tête public, aucun en-tête privé | haute |
+| RP3c | `revocation.asc` : **aucun** en-tête privé, donc la garde ne le voit pas ; un en-tête public préfixé par deux-points, gpg l'écrivant ainsi pour éviter un usage accidentel | moyenne : forme de gpg 2.1 et suivants, non relue dans ce fichier |
+| RP3d | Les lignes de `revocation.asc` qui deviendraient des motifs de `secrets-depot.sh` comprennent des phrases d'explication et la ligne d'en-tête préfixée. Pour les exports, la ligne la plus courte fait moins de 16 caractères (fin du bloc base64 ou ligne de somme) | moyenne |
+| RP4 | Programme d'essai E1 à E8, tous à code 0 : la signature Debian est vérifiée par gpgv et sqv (ES1) ; K5 (2.4.7 vers 2.3.3) tenue (ES2) ; vérifications croisées acceptées (ES3) ; K5b tenue (ES4) | moyenne : ES2 jamais mesurée |
+| RP5 | K3 : aucun « BEGIN PGP » dans le journal ; seules les lignes KO de refus attendu sont présentes ; code final 0 | haute |
+
+Si RP3c est tenue, une note datée ajoutera `revocation.asc` aux limites de la garde. Couvrir ce fichier par la garde serait un vrai choix, à poser à part. Si RP1 ou RP4 échoue, aucune clé du PoC n'est créée et `cle` reste en attente.
