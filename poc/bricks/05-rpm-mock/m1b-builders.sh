@@ -148,6 +148,24 @@ etape_prealables() {
     attendu "pipeline $x : sous-dossiers des workspaces" "$(yq -o=json -I=0 '[.spec.tasks[].workspaces[].subPath]' "$f")" '["entrees","entrees","image","image"]'
   done
   attendu "pipeline o : dnf_conf_sha256 = sha256 de dnf.conf du banc" "$(yq '.spec.tasks[1].params[] | select(.name == "dnf_conf_sha256") | .value' "$T/pipeline-o.yaml")" "$(sha256sum < "$BANC_O/dnf.conf" | cut -c1-64)"
+  for x in o b; do   # la base annoncée par construire (annotations, couche) = celle que le prefetch contrôle (couche du prefetch)
+    attendu "pipeline $x : annotations et couche de construire = base contrôlée par le prefetch" \
+      "$(python3 -I - "$T/pipeline-$x.yaml" "$REG" <<'PY'
+import json, subprocess, sys
+f, reg = sys.argv[1:]
+v = lambda i, n: json.loads(subprocess.run(['yq', '-o=json', f'.spec.tasks[{i}].params[] | select(.name == "{n}") | .value', f],
+                                           capture_output=True, text=True, check=True).stdout)
+cp, cc, an = v(0, 'couche'), v(1, 'couche'), json.loads(v(1, 'annotations'))
+if cp == '-':
+    print('sans base' if cc == '-' and an == {} else f'incohérent : {cp!r} {cc!r} {an!r}')
+else:
+    d, m, c = cp.split(' ')
+    ok = (cc == c and an.get('org.opencontainers.image.base.digest') == 'sha256:' + m
+          and an.get('org.opencontainers.image.base.name') == f'{reg}/{d}')
+    print(f'base {d}@sha256:{m[:12]}, couche {c[:12]} : cohérentes' if ok else f'incohérent : {cp!r} {cc!r} {an!r}')
+PY
+)" "$([ "$x" = o ] && echo 'sans base' || echo "base amont/rockylinux/rockylinux@sha256:${BOOT_DIGEST:7:12}, couche ${COUCHE_BOOT:0:12} : cohérentes")"
+  done
   attendu "pipeline b : dnf_conf_sha256 = sha256 de dnf97.conf du banc" "$(yq '.spec.tasks[1].params[] | select(.name == "dnf_conf_sha256") | .value' "$T/pipeline-b.yaml")" "$CONF_B"
   attendu "pipeline o : liste rendue = m1b-listes-outillage.txt" "$(yq '.spec.tasks[0].params[] | select(.name == "liste") | .value' "$T/pipeline-o.yaml" | sed '/^$/d' | cmp -s - "$LISTE_O" && echo égale || echo différente)" égale
   attendu "pipeline b : liste rendue = liste du bootstrap" "$(yq '.spec.tasks[0].params[] | select(.name == "liste") | .value' "$T/pipeline-b.yaml" | sed '/^$/d' | cmp -s - "$LISTE_B" && echo égale || echo différente)" égale

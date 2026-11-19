@@ -1559,3 +1559,23 @@ Journaux sous `m1bt3`, tous à code 0 :
 - **BV4** : dans Kata, sur le PVC, les digests et les `image.tar` sont les mêmes qu'au banc. Aucun pod ni PVC `m1bt3-` ne reste.
 
 **Portée** : l'annotation `base.digest ee90dc0e…` de l'image du bootstrap est maintenant contrôlée par le prefetch, ce qui ferme le point ouvert. Le cas « déclaré mais non écrit » reste lu dans le code, sans être mesuré dans un TaskRun. Ces pods ne passent pas par Tekton.
+
+## Correction datée du 19/11/2026, écrite à 14:24:33 UTC : « l'annotation est contrôlée » dépassait la mesure
+
+- **Ce qui était écrit.** La note « Base vérifiée et déclarée : résultat » dit que l'annotation `base.digest` est « maintenant contrôlée par le prefetch, ce qui ferme le point ouvert ». La carte le dit aussi.
+- **Ce qui est mesuré.** Le prefetch contrôle le manifeste dont le digest figure dans son propre paramètre `couche`. L'annotation, elle, est écrite par `construire-racine-rpm` depuis un autre paramètre, `annotations`.
+  - Dans la pipeline rendue, ce sont deux littéraux indépendants.
+  - Ils ne sont égaux que parce que `m1b-builders.sh` les tire tous deux de la même variable.
+  - Aucun contrôle ne les reliait.
+- **Phrase juste.** Le manifeste passé au prefetch est contrôlé. Son égalité avec l'annotation n'est pas encore montrée.
+- **Remède, sans changer aucune tâche.** `prealables` reçoit un contrôle sur chaque pipeline rendue (`m1b-builders.sh` passe à `82004de28016ee27…`). Le contrôle exige, pour le bootstrap :
+  - `base.digest` égal à `sha256:` suivi du champ manifeste de `couche` du prefetch ;
+  - `base.name` égal à `sc-stockage.poc.test:5000/` suivi du dépôt ;
+  - la `couche` de construire égale au troisième champ.
+
+  Pour l'outillage, il exige « sans base » des deux côtés, avec des annotations `{}`.
+
+**AN1** : `prealables` est rejoué seul sous `PREFIXE=m1bt4`, dans le journal neuf `m1b-builders-m1bt4-prealables.log`.
+- Il rend 0.
+- Il affiche « sans base » pour l'outillage, et « base amont/rockylinux/rockylinux@sha256:ee90dc0e23c2, couche 812c44127102 : cohérentes » pour le bootstrap.
+- Les quatre scripts substitués gardent les sha256 de `m1bt3`, puisque les tâches et les valeurs ne changent pas. Les essais de `m1bt3` restent donc valables.

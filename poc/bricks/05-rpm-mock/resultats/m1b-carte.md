@@ -541,3 +541,11 @@ La mesure d'un autre jour, à partir de 00:00 UTC le 20/11, reste prévue telle 
 - les cas refusés ;
 - docs/04, pour curl et GnuPG ;
 - les deux politiques de réseau, un accord pour chacune.
+
+## Note datée du 19/11/2026, écrite à 14:24:33 UTC : correction de « point ouvert fermé »
+
+La note précédente dépassait la mesure. Le prefetch contrôle le manifeste de son paramètre `couche`. L'annotation vient d'un autre paramètre, et rien ne reliait les deux. Le point ouvert reste donc ouvert jusqu'au contrôle de cohérence ajouté à `prealables`. La correction détaillée et la prédiction AN1 sont dans [`m1b-predictions.md`](m1b-predictions.md).
+
+**Cas refusés à ajouter avant signature**, à jouer dans un pod de prefetch :
+- un manifeste valide mais autre : celui de l'amorce `ed654c69…`, dont la couche est `99c753a8…`. Le prefetch doit s'arrêter sur « manifeste de base » ;
+- le bon manifeste avec une couche fausse.
