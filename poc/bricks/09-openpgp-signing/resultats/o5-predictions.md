@@ -79,3 +79,34 @@ Le journal est gardé : [o5-banc-premier-passage.log](o5-banc-premier-passage.lo
 - **K** est tenu.
 
 **Correction.** `o5-lien.py` accepte exactement `Statement/v0.1`, la valeur mesurée ; tout autre `_type` reste refusé. Les prédictions ne changent pas. Le dossier du banc, avec les clés jetables de ce passage, est effacé avant la relance, puisque `banc` refuse un dossier existant.
+
+## Note datée du 19/11/2026, 18:56:05 UTC : `banc` relancé (18:55:07 à 18:55:10 UTC, code 0), toutes les prédictions tenues
+
+Journal : [o5-banc.log](o5-banc.log), avec `o5-lien.py` corrigé (`3230ff72…`) et de nouvelles clés jetables.
+
+**Tenues :**
+- **G1, G2, A1 et V1**, comme au premier passage. La garde ne voit pas une clé cosign, et `tools/secrets-depot.sh` n'a aucun motif `PRIVATE` (lu au dépôt) : aucun des deux contrôles d'avant commit ne refuserait une clé privée cosign.
+- **F1** : le bundle est en v0.3, avec `dsseEnvelope`, `mediaType` et `verificationMaterial` (`publicKey` seule).
+- **C1** : le contrôle indépendant accepte les quatre énoncés.
+- **C2** : B1 est recalculé sans rpm. L'en-tête principal est à l'octet 4504 dans les deux rpm (8 et 7 entrées de signature), le lead est égal, et les 2 168 872 octets qui suivent sont égaux.
+- **C3** :
+  - côté rpm, `repomd.xml` → 6 fichiers de repodata → `primary.xml.gz` → rpm `9f71d578…`, avec 8 fichiers couverts ;
+  - côté apt, `Release` → 2 index → `Packages` → deb `f66bbeb2…`, avec 5 fichiers couverts.
+- **T1** : refus de cosign, motif « accepted signatures do not match threshold, Found: 0, Expected 1 ».
+- **T2** : cosign accepte les deux prédicats faux ; le contrôle les refuse, sur « lien : manifeste non signé » puis « lien : fichier non signé ».
+- **T3** : cosign accepte l'énoncé du rpm altéré ; le contrôle le refuse sur « B1 : octets différents », avec un premier écart à 2 168 871 octets du début de l'en-tête principal, soit le dernier octet.
+- **T4** : cosign refuse (« provided artifact digests do not match digests in statement »), et le contrôle refuse sur « sujet ».
+- **K** : aucun en-tête de clé privée hors de `cles/`, aucune ligne de bloc armuré dans le journal, aucune ligne KO.
+
+**Constats.**
+- **cosign et le contrôle sont tous deux nécessaires.** cosign ne lit pas le prédicat : T2 et T3 passent chez lui. Le contrôle, lui, ne vérifie pas la signature : T1 passerait chez lui.
+- **Le nom du sujet est seulement le nom de base du fichier** (`repomd.xml`, `InRelease`, `rpm-altere.rpm`) : il ne porte ni chemin ni dépôt. Seul le sha256 lie le sujet.
+- **Les énoncés écrits par `attest-blob` sont `in-toto.io/Statement/v0.1`**, pas v1.
+
+**Archivés :**
+- les quatre énoncés, sans signature ni clé : [rpm](o5-enonce-rpm.json), [deb](o5-enonce-deb.json), [dépôt rpm](o5-enonce-depot-rpm.json) et [dépôt apt](o5-enonce-depot-apt.json) ;
+- le prédicat du rpm : [o5-predicat-rpm.json](o5-predicat-rpm.json).
+
+Le dossier `~/.cache/supply-chain-poc/09/o5/banc`, clés jetables comprises, est effacé après le commit de cette note.
+
+**Portée.** Ce banc tient la forme du prédicat, la double vérification et les trois refus du protocole, sur l'hôte et avec des clés jetables. Il ne tient pas O5 : il manque la signature par la clé Transit `lien`, le referrer dans Zot, le sujet de type manifeste et la vérification préalable de la provenance de Chains.

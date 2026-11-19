@@ -74,6 +74,8 @@ Avant la ligne « **Risqué → interdit** » :
 
 ---
 
+*Note datée du 19/11/2026, 18:56:05 UTC* : dans la ligne de remplacement ci-dessus, lire « O5 (attestation de lien) en attente d'accords » ainsi : « **O5 : banc hôte à sec tenu** (clés cosign jetables, sans réseau ; cosign et contrôle indépendant de B1 tous deux nécessaires) ; **O5 réel** (clé Transit `lien`, referrer dans Zot) **en attente d'accords** ».
+
 ## 3. `README.md` racine, ligne 33
 
 Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
@@ -172,6 +174,12 @@ Règles de lecture des sessions : ajouter `~/.cache/supply-chain-poc/09/secrets/
 - la boucle de la ligne 8 ignore un fichier absent (`[ -f "$f" ] || continue`). Tant que `09/secrets` n'existe pas, l'ajout ne change rien. Après `cle`, il n'est pas encore vérifié que chaque ligne de l'export armuré fait au moins quelques caractères : une ligne très courte (fin du bloc base64, ou ligne de somme si l'export en porte une) deviendrait un motif très court, cause de faux refus. À relever sur l'export réel, sans l'afficher : nombre de lignes et longueur minimale seulement.
 
 *Seconde correction datée du 19/11/2026, 17:13:47 UTC (brique 09, [répétition de `cle`](resultats/o2-repetition.log), RP3)* : mesure faite avec une clé jetable de même forme que celle de `cle` (RSA 4096, exports de `o2-interne.sh creer`). Si la boucle de la ligne 8 lit `cle-openpgp.asc` sans autre filtre que celui de la ligne 11, elle produit 53 motifs ; le plus court fait 5 caractères. Pour `revocation.asc`, elle produit 30 motifs, le plus court de 5 caractères. Un motif de 5 caractères cherché par `grep -F` peut se trouver dans un fichier sans rapport, d'où de faux refus. Ajout proposé à la ligne 11 : ne garder comme motifs que les lignes d'**au moins 16 caractères** (`awk 'length($0) >= 16'` après le `grep -v`), dans la boucle des secrets de 09 au moins. Autre constat : l'en-tête de `revocation.asc` est un en-tête de clé **publique** précédé de deux-points. Le second ajout de ce paragraphe (en-tête de clé privée) ne protège donc pas le certificat de révocation : seul le premier ajout (motifs tirés du fichier) le couvre.
+
+*Note datée du 19/11/2026, 18:56:05 UTC (brique 09, banc d'O5)* : **ni `garde-cle-privee.sh` ni `tools/secrets-depot.sh` ne voient une clé privée cosign.**
+- La clé privée créée par `cosign generate-key-pair` (3.1.4) commence par une ligne « BEGIN ENCRYPTED SIGSTORE PRIVATE KEY » entre cinq tirets. Le motif de la garde n'y trouve aucune ligne ([o5-banc.log](resultats/o5-banc.log)), et `secrets-depot.sh` n'a aucun motif `PRIVATE`.
+- Le banc garde ses clés jetables hors du dépôt et les efface après archivage.
+- Pour O5 réel, la clé `lien` reste dans Transit et n'existe pas comme fichier.
+- Proposition, sans urgence : étendre le refus à toute ligne qui commence par cinq tirets suivis de « BEGIN » et se termine par « PRIVATE KEY » puis cinq tirets, ancrée en début de ligne. La relecture du 16:48:49 UTC vaut aussi ici : avant l'ajout, chercher les fichiers suivis qui citent la ligne entière.
 
 ---
 
