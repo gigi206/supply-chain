@@ -1203,3 +1203,12 @@ Journal : [`m1b-boot-amorce.log`](m1b-boot-amorce.log).
 - **BA5** : `/mnt` de la racine d'outils reste vide, et les racines des copies restent en 555.
 
 **Conséquence.** La cible du bootstrap pour le pod et la tâche, qui archiveront avec le `tar` de l'amorce, est `b063feb3…`, à la place de `f2652169…`. Le contenu est le même. Comme pour l'outillage (`7c07083c…`), rien n'est encore mesuré dans Kata.
+
+**Correction datée du 19/11/2026, écrite à 2026-11-19T12:49:53Z UTC : langue du bootstrap.**
+- **Ce qui est faux** : BR7 dit le sha256 de `y1` (`f2652169…`) « référence du bootstrap pour les valeurs fixées le 19/11 ». La note de résultat de BR la dit pour « `en_US`, umask 022, racine 0555, machine-id absent ». Les deux notes de la référence avec le `tar` de l'amorce disent `b063feb3…` « cible du bootstrap pour le pod et la tâche ».
+- **Ce qui est mesuré** : l'arbre de cette référence a été installé par les outils de `a8` ([`m1b-boot.log`](m1b-boot.log)). `%_install_langs` y vaut `all`, et libsolv `0.7.24-6.el9_8`. La transaction y ajoute 32 membres sous `usr/share/locale` (2 576 dans la base nue, 2 608 après).
+- **Ce que donne l'amorce** : `%_install_langs` y vaut `en_US`, et libsolv `0.7.24-4.el9` ([`m1b-pod_a.log`](m1b-pod_a.log)).
+- **Correction** :
+  - `f2652169…` et `b063feb3…` sont des références du bootstrap pour la racine 0555, l'umask 022 et machine-id absent, mais avec les langues `all`, comme S1. Elles ne correspondent pas à la valeur `en_US` annoncée le 19/11 ;
+  - `b063feb3…` n'est la cible du pod et de la tâche que si la langue du bootstrap est `all`. Ce choix revient au propriétaire.
+- **Ce qui suit** : un banc de l'hôte sépare la langue des outils (amorce + `en_US`, amorce + `all` posée explicitement) avant la question.

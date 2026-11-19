@@ -363,3 +363,10 @@ La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de 
 - **Nouvelle cible du bootstrap** : `b063feb3…`. Elle remplace `f2652169…`, écrite par le `tar` de l'hôte. Le contenu est le même (0 écart membre à membre) ; seuls les champs `devmajor` et `devminor` changent ([résultat](m1b-predictions.md), [journal](m1b-boot-amorce.log)).
 - **Cibles pour le pod et la tâche** : `7c07083c…` pour l'outillage, `b063feb3…` pour le bootstrap.
 - **Suite** : le pod d'essai du bootstrap dans Kata, sous la limite de fichiers ouverts posée autour de dnf seul.
+
+## Correction datée du 19/11/2026, écrite à 2026-11-19T12:49:53Z UTC : langue du bootstrap
+
+- **Ce qui est faux** : la correction de 08:46:59 UTC range `f2652169…` parmi les cibles, et la note précédente donne `b063feb3…` comme cible du bootstrap pour le pod et la tâche. Or cet arbre a été installé avec les langues `all` (outils de `a8`, comme S1), et non `en_US`, valeur annoncée le 19/11 dans la décision « Absent » ([détail](m1b-predictions.md)).
+- **Correction** : `b063feb3…` est la cible du bootstrap seulement si sa langue est `all`. Ce choix revient au propriétaire. L'outillage reste en `en_US` (`7c07083c…`).
+- **Deux variables** : la langue (`all` contre `en_US`) et les outils (libsolv `0.7.24-6` dans `a8`, `0.7.24-4` dans l'amorce). La tâche peut poser la langue elle-même, quelle que soit l'image (ADR 0007). Un banc de l'hôte les sépare avant la question.
+- **Le pod du bootstrap attend** ce banc et ce choix.
