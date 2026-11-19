@@ -127,3 +127,12 @@ Quatre objets ont été poussés par `poc-lien` et relus en anonyme, sans aucun 
 - `signes/depot-apt@sha256:90909a86…`.
 
 Le dossier de l'étape est effacé.
+
+## Note datée du 19/11/2026, 20:49:43 UTC : `attester` passée (20:49:19 à 20:49:30 UTC, code 0), AT1 et AT2 tenues
+
+Journal : [o5-signes-attester.log](o5-signes-attester.log). Aucune ligne KO ; K3, K5 et K6 tenus.
+
+- **AT1** : les quatre objets étaient publiés, sans aucun referrer. Chains a été revérifiée à 20:49:20 UTC (4 et 8 enveloppes), et les quatre prédicats ont été acceptés par le contrôle indépendant avant toute signature.
+- **AT2** : quatre `cosign attest --key hashivault://lien`, à code 0, par la redirection `127.0.0.1:34445`. La redirection a été fermée ensuite, et le port n'écoute plus. Chaque objet porte désormais **une** attestation de lien, et aucun autre referrer.
+
+Prédicats signés, archivés : `o5-signes-predicat-{rpm,deb,depot-rpm,depot-apt}.json`, sans aucune adresse. Le dossier de l'étape est effacé.
