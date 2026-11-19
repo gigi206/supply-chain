@@ -1,0 +1,6 @@
+# m1b-cloexec-banc.sh, début 2026-11-19T09:34:18Z ; dossier /home/gigi/.cache/supply-chain-poc/05/m1b-cloexec-20261119T093418Z
+strace : strace -- version 6.19 ; place libre de /home : 9040080 kB
+OK   entrees.tar (m1b-prealables.log) : ba6f1f8852dfe4ec42bf67a1a65196520c57a64de6bb4fc84622739e9fd2e383
+OK   couche de l'amorce : 99c753a880cc03bbe9da8bf6e354c8ba2d99f19058e87b8a55b6487ffcf52f8a
+OK   entrées revérifiées (225 fichiers)
+## A : openat de /proc/self/fd, limite de l'hôte
