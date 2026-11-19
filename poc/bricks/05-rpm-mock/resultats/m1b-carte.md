@@ -553,3 +553,16 @@ La note précédente dépassait la mesure. Le prefetch contrôle le manifeste de
 ## Note datée du 19/11/2026, écrite à 15:33:13 UTC : mesure d'un autre jour, préparée
 
 La mesure prévue à partir du 20/11 à 00:00 UTC tient en une commande : [`m1b-jour-kata.sh`](m1b-jour-kata.sh). Elle rejoue l'ancienne forme (`pod_c` et `pod_e`, sous `m1b-20`) et la forme de la tâche (`m1b-builders.sh`, sous `m1bt-20`), puis confronte 21 valeurs à celles du 19/11. Les scripts ne changent pas. Les prédictions JK1 à JK3 et JT1 à JT5, ainsi que la lecture d'un écart, sont dans [`m1b-predictions.md`](m1b-predictions.md). Aucune signature avant le résultat.
+
+## Note datée du 19/11/2026, écrite à 15:47:22 UTC : cas refusés de la construction, et curl de l'amorce
+
+- **Cas refusés de la construction, au banc : RZ1 à RZ8 tenues** ([`m1b-refus-banc.log`](m1b-refus-banc.log)). Une racine fixée fausse, et un rpm, une couche ou un `repomd.xml` altérés, sont refusés chacun par sa garde, sans sortie écrite. Restent les cas du prefetch, à jouer dans un pod : `repomd` faux, autre manifeste, bon manifeste avec une couche fausse.
+- **curl** : ligne « À surveiller » ajoutée à docs/04. L'amorce exécute `curl-minimal-7.76.1-40.el9`, en retard de quatre révisions sur Rocky 9.8 : 9 corrections publiées par Rocky lui manquent, dont 4 de gravité « Medium » ([`m1b-curl-amorce.log`](m1b-curl-amorce.log)). **Nouveau point ouvert avant signature, à trancher par le propriétaire** : garder l'amorce figée avec ses contre-contrôles, ou rafraîchir le curl du prefetch.
+
+**Restent avant signature** :
+- la mesure d'un autre jour (à partir du 20/11 à 00:00 UTC) ;
+- le `--dry-run=server` ;
+- les trois cas refusés du prefetch ;
+- le choix sur le curl de l'amorce ;
+- la ligne GnuPG de docs/04 (session de la brique 09) ;
+- les deux politiques de réseau, un accord pour chacune.

@@ -1,0 +1,61 @@
+# m1b-curl-amorce.sh, début 2026-11-19T15:46:06Z ; HEAD 588a3da630b8
+## A : amorce rockylinux:9.8, couche 99c753a880cc…
+OK   couche de l'amorce : sha256 conforme
+     curl-minimal-7.76.1-40.el9.x86_64 construit le Tue Jan 27 02:27:43 2026
+     gnupg2-2.3.3-5.el9_7.x86_64 construit le Mon Jan 19 03:31:39 2026
+     libcurl-minimal-7.76.1-40.el9.x86_64 construit le Tue Jan 27 02:27:43 2026
+     changelog de curl-minimal dans l'amorce : 12 entrées, la plus récente : * Wed Jan 21 2026 Jacek Migacz <jmigacz@redhat.com> - 7.76.1-40
+OK   clé RPM-GPG-KEY-Rocky-9 de l'amorce : sha256 conforme
+## B : racine de 99790c13 (image de prefetch-rpm signée)
+OK   s1-image-essai-local.log relie 99790c13673d… à la couche e48fc4d689da…
+OK   couche e48fc4d689da… : sha256 conforme, 140611406 octets
+     curl-7.76.1-40.el9_8.9.x86_64 construit le Fri Oct 30 05:43:02 2026
+     gnupg2-2.3.3-5.el9_7.x86_64 construit le Mon Jan 19 03:31:39 2026
+     libcurl-7.76.1-40.el9_8.9.x86_64 construit le Fri Oct 30 05:43:02 2026
+## C : avis du projet curl touchant 7.76.1, publiés depuis un an
+     vuln.json : 651245 octets, sha256 795ea0649e403352860ece7d758e3f8423f6f15ba9b78284c496b60e482f1ffc
+     avis touchant 7.76.1 depuis 2025-11-19 : 36 ; gravités :  26 Low; 10 Medium;
+## D : changelog Rocky de curl-minimal (vault 9.8 BaseOS)
+OK   repomd.xml de vault 9.8 BaseOS : sha256 abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163, signature valide (clé primaire 21CB256AE16FC54C6E652949702D426D350D275D)
+OK   153db37424f13b27a8dd56868e6b11557f405f4c654161a69061464839339015-other.xml.gz : 4188483 octets, sha256 conforme à repomd.xml
+     curl-minimal dans vault 9.8 BaseOS : 5 révision(s) : 7.76.1-40.el9, 7.76.1-40.el9_8.5, 7.76.1-40.el9_8.7, 7.76.1-40.el9_8.8, 7.76.1-40.el9_8.9
+     changelog de la dernière (7.76.1-40.el9_8.9) : 10 entrées dans other
+     paquet de l'amorce : curl-minimal-7.76.1-40.el9.x86_64
+     CVE-2026-94266 (Low, publié le 2026-10-14) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-92391 (Low, publié le 2026-10-14) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-92390 (Low, publié le 2026-10-14) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-92389 (Low, publié le 2026-10-14) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-92388 (Low, publié le 2026-10-14) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-86414 (Low, publié le 2026-10-14) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-87866 (Low, publié le 2026-10-14) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-87865 (Low, publié le 2026-10-14) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-86409 (Low, publié le 2026-10-14) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-87864 (Low, publié le 2026-10-14) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-82209 (Low, publié le 2026-09-02) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-80231 (Low, publié le 2026-09-02) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-80230 (Low, publié le 2026-09-02) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-19931 (Medium, publié le 2026-09-02) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-18924 (Low, publié le 2026-09-02) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-11856 (Medium, publié le 2026-06-24) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 mentionne
+     CVE-2026-9547 (Low, publié le 2026-06-24) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 mentionne
+     CVE-2026-8927 (Medium, publié le 2026-06-24) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 mentionne
+     CVE-2026-8932 (Low, publié le 2026-06-24) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 mentionne
+     CVE-2026-8924 (Low, publié le 2026-06-24) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 mentionne
+     CVE-2026-8458 (Low, publié le 2026-06-24) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 mentionne
+     CVE-2026-8286 (Low, publié le 2026-06-24) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 mentionne
+     CVE-2026-7168 (Medium, publié le 2026-04-29) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-6429 (Medium, publié le 2026-04-29) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-6276 (Low, publié le 2026-04-29) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-6253 (Medium, publié le 2026-04-29) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-5773 (Low, publié le 2026-04-29) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-5545 (Medium, publié le 2026-04-29) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-4873 (Low, publié le 2026-04-29) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-3784 (Low, publié le 2026-03-11) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2026-3783 (Medium, publié le 2026-03-11) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 mentionne
+     CVE-2026-1965 (Medium, publié le 2026-03-11) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 mentionne
+     CVE-2025-15224 (Low, publié le 2026-01-07) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2025-15079 (Low, publié le 2026-01-07) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2025-14524 (Low, publié le 2026-01-07) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+     CVE-2025-14017 (Medium, publié le 2026-01-07) : changelog de l'amorce ne mentionne pas ; 7.76.1-40.el9_8.9 ne mentionne pas
+place libre de /home : 100051128 kB ; dossier laissé : /home/gigi/.cache/supply-chain-poc/05/m1b-curl-amorce-20261119T154606Z
+# fin 2026-11-19T15:46:10Z ; KO 0

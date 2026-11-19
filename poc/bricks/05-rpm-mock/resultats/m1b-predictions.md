@@ -1701,3 +1701,21 @@ Journal : [`m1b-refus-banc.log`](m1b-refus-banc.log), de 15:37:11 à 15:38:31 UT
 - Un avis mentionné dans le changelog est corrigé selon Rocky. Un avis absent n'est pas pour autant une faille : la version 7.76.1 peut ne pas avoir le code touché, ou Red Hat peut ne pas corriger un avis de faible gravité. On écrira donc « en retard de révisions », jamais « vulnérable », sans lecture plus poussée.
 - La décision qui en découle, garder le curl figé de l'amorce avec ses contre-contrôles ou rafraîchir l'amorce, ce qui referait les références, te revient avant `SIGNER=1`. Rien ne change dans l'amorce ni dans les tâches avant la mesure du 20/11.
 - `gnupg2` est relevé pour information. Sa ligne dans docs/04 revient à la session de la brique 09.
+
+### curl exécuté par les prefetch : résultat (note écrite le 19/11/2026 à 15:47:22 UTC)
+
+Journal : [`m1b-curl-amorce.log`](m1b-curl-amorce.log), de 15:46:06 à 15:46:10 UTC, à HEAD `588a3da`, code 0, 0 KO.
+
+**CA1, CA2 et CA4 tenues ; CA3 et CA5 lues.**
+- **CA1** : l'amorce porte `curl-minimal` et `libcurl-minimal` en `7.76.1-40.el9`, construits le 27/01/2026, et `gnupg2-2.3.3-5.el9_7`, sans `curl` ni `libcurl` complets. Son changelog de `curl-minimal` a 12 entrées, la plus récente du 21/01/2026 (`7.76.1-40`).
+- **CA2** : la racine de `99790c13`, image de `prefetch-rpm`, porte `curl` et `libcurl` en `7.76.1-40.el9_8.9`, construits le 30/10/2026, et le même `gnupg2`.
+- **CA4** : le `repomd.xml` de vault 9.8 BaseOS (`abac8b17…`, celui que fixe la pipeline de l'outillage) a une signature valide par la clé de Rocky de l'amorce, et `other` est conforme. `curl-minimal` y a 5 révisions : `40.el9`, `el9_8.5`, `el9_8.7`, `el9_8.8` et `el9_8.9`.
+- **CA3** (lecture) : 36 avis du projet curl publiés depuis le 19/11/2025 comptent 7.76.1 parmi les versions touchées, 26 « Low » et 10 « Medium ». Le seul « High » de l'année (`CURL-CVE-2026-92392`, 14/10/2026, [`sante-curl.log`](sante-curl.log)) ne la compte pas.
+- **CA5** (lecture) : le changelog du paquet de l'amorce n'en mentionne aucun. Celui de `40.el9_8.9` en mentionne 9 : 4 « Medium » (`CVE-2026-11856`, `CVE-2026-8927`, `CVE-2026-3783`, `CVE-2026-1965`) et 5 « Low ». Les 27 autres ne sont mentionnés dans aucun des deux.
+
+**Lecture.**
+- Le curl de l'amorce est **en retard de quatre révisions** sur Rocky 9.8. Il n'a pas 9 corrections que Rocky a publiées pour des avis touchant 7.76.1, dont 4 de gravité « Medium ». L'absence d'une mention ne prouve pas qu'une faille est présente : la gravité, le code de 7.76.1 et le choix de Red Hat n'ont pas été lus.
+- Ce retard vient de l'image `rockylinux:9.8` du 27/01/2026, figée par digest (`ed654c69…`, D4 a). Il touche le prefetch de M1b. Il ne touche pas `prefetch-rpm`, déjà signé, dont l'image porte `el9_8.9`.
+- **Contre-contrôles en place** : curl n'est qu'un transport. Ce qu'il écrit n'est gardé que si le sha256 est fixé par la pipeline, ou si la signature passe gpgv et `rpm -K`. Le pod tourne en runc, sous l'UID 65532, en Pod Security `restricted` ; il n'a pas de secret, et sa sortie réseau ne sera ouverte qu'à DNS, au 443 public et à Zot. Une faille de curl ne peut donc pas changer le contenu d'une entrée sans être vue. Elle peut viser le pod lui-même, par un serveur ou un intermédiaire TLS hostile ; ce n'est pas mesuré.
+- **Choix avant `SIGNER=1`, qui te revient** : garder l'amorce figée, avec ces contre-contrôles, ou rafraîchir le curl du prefetch. Rafraîchir demande une image dérivée ou une autre amorce, et refait les références. Rien ne change avant la mesure du 20/11.
+- `gnupg2` est en `el9_7` dans les deux images. Le fait est transmis à la session de la brique 09 ; sa ligne n'est pas écrite ici.
