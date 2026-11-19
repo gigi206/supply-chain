@@ -100,3 +100,18 @@ Il juge une sortie de `cosign verify-attestation`, déjà vérifiée par cosign.
 ## Note datée du 19/11/2026, 20:48:15 UTC : `construire` passée (20:48:09 UTC), CO1 et CO2 tenues
 
 Journal : [o5-signes-construire.log](o5-signes-construire.log). Aucune ligne KO. Les digests sont ceux du banc : rpm `sha256:fa5b175786dc…`, depot-rpm `sha256:ed666ab80dd1…`, depot-apt `sha256:90909a869321…`. La seconde construction donne les mêmes. Adresses fictives : 0, 4 et 2. Le dossier `09/o5-signes/construire` est gardé pour la suite ; la seconde construction est effacée.
+
+## Note datée du 19/11/2026, 20:48:54 UTC : `essai_attest` passée (20:48:26 à 20:48:41 UTC, code 0), EA1 à EA4 tenues
+
+Journal : [o5-signes-essai_attest.log](o5-signes-essai_attest.log). Aucune ligne KO ; K3, K5 et K6 tenus.
+- **EA1** : Chains revérifiée, 4 enveloppes (rpm) et 8 (deb) ; trois poussées par `poc-lien` acceptées.
+- **EA2** : `cosign attest` avec la clé jetable, sous `poc-lien`, rend le code 0 trois fois. Chaque objet porte un seul referrer `application/vnd.dev.sigstore.bundle.v0.3+json`, annoté du type lien. **Aucun tag** : la condition CEL ne gêne pas cosign.
+- **EA3** (relevé) : `verify-attestation --new-bundle-format` rend une ligne. C'est une enveloppe DSSE (clés `payload`, `payloadType`, `signatures`), et non un bundle. `_type` vaut `https://in-toto.io/Statement/v0.1`. Le sujet est `192.168.161.13:5000/signes/essai-09-attest`, avec un digest sha256.
+- **EA4** : le prédicat réel est accepté par le contrôle indépendant, sur les octets tirés de Zot. Le témoin « autre manifeste » est refusé sur le manifeste non signé, le témoin « rpm altéré » sur le rpm signé. Avec la clé `lien`, l'attestation jetable est refusée : « accepted signatures do not match threshold, Found: 0, Expected 1 ».
+
+**Objets laissés dans Zot** :
+- `signes/essai-09-attest@sha256:fa5b1757…` et `signes/essai-09-autre@sha256:fa5b1757…` ;
+- `signes/essai-09-altere@sha256:fdde6876…` ;
+- un referrer jetable sur chacun.
+
+Le dossier de l'étape, qui contenait la clé jetable, est effacé. La suite, `publier`, peut partir.
