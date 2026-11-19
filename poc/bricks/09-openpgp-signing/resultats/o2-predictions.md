@@ -303,3 +303,29 @@ La nouvelle étape `o2.sh repetition` est à sec : pas de réseau, pas d'install
 | RP5 | K3 : aucun « BEGIN PGP » dans le journal ; seules les lignes KO de refus attendu sont présentes ; code final 0 | haute |
 
 Si RP3c est tenue, une note datée ajoutera `revocation.asc` aux limites de la garde. Couvrir ce fichier par la garde serait un vrai choix, à poser à part. Si RP1 ou RP4 échoue, aucune clé du PoC n'est créée et `cle` reste en attente.
+
+## Note datée du 19/11/2026, écrite à 17:13:47 UTC : répétition passée, RP0 et RP2 à RP5 tenues, RP1 tenue sauf un détail
+
+Étape `repetition` passée de 17:12:57 à 17:13:02 UTC, code 0 ([journal](o2-repetition.log)), sur le commit `aece06a9` des prédictions (`o2.sh` `1a6f9cd0…`, `o2-interne.sh` `7c91e50f…`).
+- **RP1, tenue sauf un détail** : `creer` fonctionne sous gpg 2.4.7 dans la racine Debian. Code 0, K1 et K2 tenues, RSA 4096, trois fichiers en 600 dans un dossier en 700.
+  - Le détail non tenu : les usages valent `scSC`, pas « s » seul. gpg ajoute la certification à la clé primaire.
+  - Le même `scSC` figurait déjà dans le [journal de `banc_chroot`](o2-banc_chroot.log) (l.10) ; la prédiction ne l'avait pas relu.
+  - CL1 ne prédit pas les usages, et reste valable.
+- **RP2** : la seconde création est refusée (K4), code 1.
+- **RP3a à RP3c** :
+  - la garde voit l'en-tête privé de `cle-openpgp.asc` (1) ;
+  - `cle-publique.asc` porte un en-tête public seulement ;
+  - `revocation.asc` ne porte **aucun** en-tête privé, mais un en-tête public préfixé par deux-points (1). **La garde locale ne couvre donc pas le certificat de révocation.**
+- **RP3d, en partie** : la ligne la plus courte qui deviendrait un motif de `secrets-depot.sh` fait 5 caractères (clé privée, 53 lignes-motifs), 4 (clé publique, 27) et 5 (révocation, 30). La nature de ces lignes n'a pas été relue. La présence de phrases d'explication dans `revocation.asc` n'est pas mesurée, car le contenu n'est pas lu.
+- **RP4** : E1 à E8 donnent tous le code 0.
+  - ES1 : signature de la racine Debian vérifiée par gpgv et par sqv.
+  - ES2 (K5) : la clé créée par 2.4.7 s'importe dans 2.3.3 et y signe.
+  - ES3 : les vérifications croisées sont acceptées.
+  - ES4 (K5b) : une clé de 2.3.3 s'importe dans 2.4.7 et y signe, et Rocky vérifie la signature.
+  - Ces mesures portent sur une clé jetable de même forme (RSA 4096, SHA-512), pas sur la clé du PoC.
+- **RP5** : K3 tenue, aucune ligne KO en dehors du refus attendu.
+
+**Conséquences** :
+- La garde a une limite de plus : `revocation.asc` n'est pas vu.
+- Le §4 quater d'`A-REPORTER.md` reçoit une seconde correction datée sur la longueur des motifs.
+- Le dossier `~/.cache/supply-chain-poc/09/o2/repetition` sera effacé après le commit de cette note.

@@ -277,3 +277,5 @@ Préparation demandée par le propriétaire (« Oui, prépare O2 »). Décision 
 - **Limites** : un export binaire, une clé sans en-tête et un fichier ignoré ne sont pas vus.
 - **Routine de commit de la branche, désormais** : `mise exec -- make reuse`, `tools/secrets-depot.sh`, puis `poc/bricks/09-openpgp-signing/garde-cle-privee.sh`.
 - **Prochaine question au propriétaire** : l'accord de `cle`, qui porte sur la phrase de passe et sur la clé publique dans le dépôt ou non.
+
+*Note datée du 19/11/2026, 17:13:47 UTC* : la [répétition de `cle` et `essai`](resultats/o2-predictions.md) avec une clé jetable est passée sous gpg 2.4.7 et 2.3.3 (K5 et K5b mesurées sur une clé de même forme). La garde locale a une limite de plus : `revocation.asc` porte un en-tête public précédé de deux-points, qu'elle ne voit pas.
