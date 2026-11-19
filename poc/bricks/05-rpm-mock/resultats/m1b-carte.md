@@ -626,3 +626,24 @@ Elles se posent par `sortie-builds.sh` (08c), chacune par son étape et sur son 
 - la mesure d'un autre jour (à partir du 20/11 à 00:00 UTC, programmée à 00:01 UTC), avec les sha256 des rendus de `m1bt-20` à confronter à TD1 ;
 - la ligne GnuPG de docs/04 (session de la brique 09) ;
 - `m1b_sortie` et `m1b_sans_sortie`, un accord pour chacune, puis `m1b_temoins`.
+
+## Note datée du 19/11/2026, écrite à 16:51:28 UTC : relevé avant la préparation de la signature
+
+Le relevé [`m1b-avant-signature-releve.log`](m1b-avant-signature-releve.log) a été fait à 16:50:58 UTC, en lecture seule. Le premier passage, [`-1.log`](m1b-avant-signature-releve-1.log), est gardé : son motif ne lisait pas les références de la liste revue.
+
+- **La ConfigMap `porte` du cluster est en retard sur le dépôt.**
+  - `policy.yaml`, `policy-trusted-task.yaml` et `porte.rego` sont égaux.
+  - `taches.yml` diffère : la ConfigMap a été écrite le 13/11 à 12:47:49 UTC (`managedFields`), et il lui manque les trois entrées ajoutées le 18/11 (`prefetch-rpm` `9afe09db…`, `preparer-rpm` `2f65f390…`, `construire-rpm` `d7f01398…`, commits `05e2fe8` et `1d5e27d`). Je l'ai vu en comparant la donnée déployée au dépôt, sans rien afficher d'autre.
+  - Aucun journal de M4 ne l'avait relevé. La porte du cluster n'approuve donc encore aucune tâche rpm. Ce n'est pas un obstacle à la signature, mais à tout passage d'un artefact rpm par la porte.
+  - La remettre à jour (`politique.sh`, étape de la porte) est un changement du cluster, qui te revient.
+- **Zot**, sur `/` de sc-stockage (`/var/lib/zot` est sur le même système de fichiers) : 3 978 911 744 octets libres.
+  - Le 18/11 à 09:23:32 UTC, il y en avait 4 476 362 752 (relevé avant `publier` de M4a), soit environ 497 Mo de moins en 31 h environ.
+  - Les écritures de la brique depuis lors ne sont pas retranchées de ce chiffre. L'origine de la croissance de `/` reste non attribuée.
+  - La garde des PipelineRuns de M4 vaut 1 Gio.
+- **Liste revue** : `publier-fermeture` vaut `7fa92ad3…`, comme dans M4b. `prefetch-racine-rpm` et `construire-racine-rpm` n'y ont pas d'entrée, comme prévu avant la signature.
+
+**Effort de M1b**, par les dates d'auteur des commits qui nomment M1b :
+- 119 commits, du 18/11 à 19:38:40 UTC au 19/11 à 16:26:20 UTC, sur deux jours de commits ;
+- somme des écarts entre commits consécutifs : 6,45 h pour les écarts de 30 min au plus, 7,57 h pour ceux de 60 min au plus.
+
+L'estimation de la carte est « 3 j, décision à 6 ».

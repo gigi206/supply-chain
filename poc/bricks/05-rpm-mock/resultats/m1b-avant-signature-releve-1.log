@@ -1,0 +1,15 @@
+# début 2026-11-19T16:50:19Z ; HEAD a8fd9c6201f7
+## ConfigMap porte (porte) contre le dépôt
+policy.yaml : déployé 4b66ea3fd0849315… ; dépôt 4b66ea3fd0849315… ; égal
+policy-trusted-task.yaml : déployé 6094974e1fc85476… ; dépôt 6094974e1fc85476… ; égal
+porte.rego : déployé f16c81acc094b3f2… ; dépôt f16c81acc094b3f2… ; égal
+taches.yml : déployé cdac17f17549350b… ; dépôt f96b9d164670437e… ; DIFFÉRENT
+## place de sc-stockage
+/ : utilisés 16041455616 octets ; libres 3979460608 octets
+/var/lib/zot (point de montage /) : utilisés 16041455616 octets ; libres 3979460608 octets
+## liste revue (dépôt)
+prefetch-rpm : 1 entrée(s), 0 référence(s)
+construire-rpm : 1 entrée(s), 0 référence(s)
+prefetch-racine-rpm : 0 entrée(s), 0 référence(s)
+construire-racine-rpm : 0 entrée(s), 0 référence(s)
+# fin 2026-11-19T16:50:20Z
