@@ -347,3 +347,13 @@ Cette note complète, sans la réécrire, la note « pods d'essai Kata, et lente
 **Lecture de l'image amont, non probante** : la couche `812c4412…` (11 170 membres) n'a aucun des 20 chemins. Mais elle ne contient ni `usr/lib/tmpfiles.d/systemd.conf` ni systemd. Elle ne dit donc pas ce que Rocky publie quand systemd est installé.
 
 **La décision « Limite seule » ne change pas.**
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T12:43:34Z UTC : patch de `s1.sh` reclassé
+
+La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de `s1.sh` : la même limite autour de dnf aux étapes `racine` et `boot_racine`. Le propriétaire a répondu « continue » à la proposition de le préparer, puis de refaire la référence du bootstrap. **Le patch n'est pas préparé.** Il est reclassé : utile seulement si S1 est relancé.
+
+- **Aucun appelant** : `rejeu.sh` de la 08 ne lance que `s1.sh amorce` de la 06, et rien de la 05. Le `Makefile` ne cite pas la 05. Relevé par `git grep` à 2026-11-19T12:43:34Z UTC.
+- **Ce qui remplace ces étapes** : M1b construit l'outillage et le bootstrap par deux tâches neuves de la plateforme. Leurs étapes durables entreront dans `rejeu.sh` à la place des images d'essai (point 5 de cette carte). La limite y sera posée par la tâche (décision « Limite seule »).
+- **`s1.sh` n'est pas touché** : son empreinte, `362af7ef…`, est citée par les bancs archivés.
+- **Non remesuré** : les 5 694 s de `racine` et les 761 s de `boot_racine` de S1. La même cause y reste probable, sans mesure.
+- **Suite** : la référence du bootstrap avec le tar de l'amorce, puis un pod d'essai du bootstrap dans Kata, sous la limite posée autour de dnf seul.
