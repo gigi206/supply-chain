@@ -55,3 +55,17 @@ Passée de 17:57:11 à 17:57:15 UTC, code 0 ([journal](o3-repetition.log)), avec
 - **K3 tenue**.
 
 Les dossiers `o3/repetition`, `o3/repetition-secrets` et `o3/repetition-vierge` sont effacés après le commit de cette note. Suite : `signer` avec la clé du PoC, mêmes prédictions, sauf S3 désormais attendue non tenue.
+
+## Note datée du 19/11/2026, 17:58:04 UTC : `signer` passée avec la clé du PoC, mêmes résultats que la répétition ; O3 terminé
+
+Passée de 17:57:42 à 17:57:45 UTC, code 0 ([journal](o3-signer.log)), mêmes scripts que la répétition. Les résultats sont identiques à ceux de la `repetition`, avec la clé du PoC `29BA1C48…BCF03A86` (identifiant rpm `c0658591bcf03a86`). S1, S2a à S2c, B1, S4, S5, V1 à V7 et K3 sont tenues ; S3 n'est pas tenue, comme attendu : `--delsign` donne `259b69b9…`, la même valeur que dans la répétition.
+
+**Produits gardés pour O5**, dans `~/.cache/supply-chain-poc/09/o3/signer/` (hors du dépôt) :
+- rpm signé `depot/sample-app-1.0.0-2.el9.x86_64.rpm` : sha256 `9f71d578d3b13bc5c4a996a9cbacf60d1d5083d744ef2313054764fd9925567b`, 2 173 376 octets ;
+- `repomd.xml` : `f1d1bc09…` ;
+- `repomd.xml.asc` : `ce0f600e…` ;
+- clé publique exportée.
+
+Aucun fichier de ce dossier ne porte d'en-tête de clé privée. Compte fait sur l'hôte à l'écriture de cette note : 0 fichier. L'amorce de vérification `o3/signer-vierge` sera effacée après le commit.
+
+**Jalon O3 tenu** (critère du README : rpm signé vérifié ; en-tête principal et charge utile inchangés ; dépôt accepté, témoins refusés). Prédictions du README : la 1 est tenue (B1) ; la 2 n'est pas tenue (`--delsign`) ; la 3 est tenue côté rpm (RSA 4096 v4 accepté par `rpmkeys` et dnf de Rocky 9.8), et reste à mesurer côté apt en O4.
