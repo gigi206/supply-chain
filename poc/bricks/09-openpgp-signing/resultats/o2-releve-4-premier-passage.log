@@ -1,0 +1,10 @@
+quatrième relevé O2 commencé : 2026-11-19T16:32:05Z ; mmdebstrap de l'amorce sha256 c8a55d9731e81c00…
+## page de manuel installée (usr/share/man/man1/mmdebstrap.1.gz) : lignes sur --skip, essential/unlink, essential-hook, archives
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+  File "/home/linuxbrew/.linuxbrew/Cellar/python@3.15/3.15.2/lib/python3.15/gzip.py", line 66, in open
+    binary_file = GzipFile(filename, gz_mode, compresslevel)
+  File "/home/linuxbrew/.linuxbrew/Cellar/python@3.15/3.15.2/lib/python3.15/gzip.py", line 211, in __init__
+    fileobj = self.myfileobj = builtins.open(filename, mode or 'rb')
+                               ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/gigi/.cache/supply-chain-poc/09/o2/debian-amorce/usr/share/man/man1/mmdebstrap.1.gz'

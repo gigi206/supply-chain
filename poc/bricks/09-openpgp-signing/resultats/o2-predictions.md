@@ -233,3 +233,16 @@ Lancée sur l'accord du propriétaire (« Oui, lance-la », en réponse à « Je
 - **Contrôle complémentaire** ([`o2-controle-versions.sh`](../o2-controle-versions.sh), [journal](o2-controle-versions.log), 16:28:16 UTC, local, sans relance) : **106 versions installées sur 106 figurent dans le `Packages.xz` vérifié**. Il ne prouve pas le contenu des fichiers des 59 paquets essentiels.
 - **Pour un contrôle complet** : garder les `.deb` essentiels, par une option de mmdebstrap (une option `--skip=essential/unlink` existerait, **non lue**), ou par un crochet `--essential-hook`. Cela demande une relance de `debian_racine`, avec son accord. La racine actuelle reste en place.
 - **Téléchargements** : 47 `.deb` listés avec leur sha256 (taille non relevée par le crochet). Les 59 paquets essentiels téléchargés par mmdebstrap n'ont laissé aucune trace de fichier, et ne sont pas listés.
+
+## Note datée du 19/11/2026, écrite à 16:32:42 UTC : décision « Refaire en entier » ; option de mmdebstrap lue ; relance NON préparée ni lancée
+
+Décision du propriétaire : « Refaire en entier », en réponse à « Accepter ce contrôle partiel des paquets essentiels Debian, ou refaire debian_racine en les gardant ? ».
+
+- **Option lue** ([`o2-releve-4.sh`](../o2-releve-4.sh), [journal](o2-releve-4.log), 16:32:16 UTC, local, dans le script de mmdebstrap installé dans l'amorce) : `--skip=essential/unlink` existe en 1.5.7. Aux lignes 3990 et 3991 du script, il est testé et annonce « skipping essential/unlink as requested ». Sans lui, les `.deb` sont retirés à la ligne 4002 (`unlink "$options->{root}/$deb"`). `--essential-hook` existe aussi (ligne 5743).
+- Premier passage du relevé archivé ([journal](o2-releve-4-premier-passage.log)) : la page de manuel est absente de l'amorce `slim`.
+- **Suite prévue, NON faite** :
+  1. ajouter `--skip=essential/unlink` à `debian_racine` ;
+  2. écrire la prédiction DR3 : 106 `.deb` environ, tous égaux au `Packages.xz` vérifié ;
+  3. commiter ;
+  4. effacer l'archive `debian13.tar` et la racine `o2/racine-debian13` dans l'espace de noms, par des chemins littéraux ;
+  5. relancer `debian_racine` (accord donné par « Refaire en entier »).
