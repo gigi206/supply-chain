@@ -1,0 +1,36 @@
+banc commencé : 2026-11-19T19:57:17Z ; o5-zot-controle.py d4a9d7a1b9f3006a… ; o5-zot-banc.sh ac2ccf6920650212…
+### layouts
+OK   nominal : code 0
+     | OK   manifeste : sha256 des octets lus = sha256:9cea382c95fe5c4ccd1d274c7d11a082c49c7d42b9f042f36d6e67ffd2245f18
+     | OK   manifeste : application/vnd.oci.image.manifest.v1+json application/vnd.oci.image.config.v1+json 1 application/vnd.oci.image.layer.v1.tar
+     | OK   couche sha256:b2498fa23a97e86d… (10240 octets) = diff_ids de la configuration sha256:dcb9d8a858b9b5be…
+     |      membres de la couche : 1
+     |      fichier.bin : 3700 octets, mode 0o644, sha256 49b2578415ce5f7cd69146665422ebe6f475689ee9a9d980f6bdfcdc737c87dd
+     | OK   fichier de la couche = 49b2578415ce5f7cd69146665422ebe6f475689ee9a9d980f6bdfcdc737c87dd (lien manifeste → fichier recalculé)
+OK   autre-contenu : code 3, motif « fichier de la couche »
+OK   deux-membres : code 3, motif « couche : membres »
+OK   autre-nom : code 3, motif « couche : membres »
+OK   gzip : code 3, motif « types »
+OK   diff-ids : code 3, motif « diff_ids »
+KO   manifeste-altere : code 0 (attendu 3, motif « sha256 des octets »)
+     | OK   manifeste : sha256 des octets lus = sha256:9cea382c95fe5c4ccd1d274c7d11a082c49c7d42b9f042f36d6e67ffd2245f18
+     | OK   manifeste : application/vnd.oci.image.manifest.v1+json application/vnd.oci.image.config.v1+json 1 application/vnd.oci.image.layer.v1.tar
+     | OK   couche sha256:b2498fa23a97e86d… (10240 octets) = diff_ids de la configuration sha256:dcb9d8a858b9b5be…
+     |      membres de la couche : 1
+     |      fichier.bin : 3700 octets, mode 0o644, sha256 49b2578415ce5f7cd69146665422ebe6f475689ee9a9d980f6bdfcdc737c87dd
+     | OK   fichier de la couche = 49b2578415ce5f7cd69146665422ebe6f475689ee9a9d980f6bdfcdc737c87dd (lien manifeste → fichier recalculé)
+OK   lien-symbolique : code 3, motif « couche : membres »
+OK   nominal, autre digest demandé : code 3, motif « index »
+### enveloppes
+OK   enveloppes nominales : code 0
+     | OK   2 enveloppe(s), toutes SLSA v1, un seul sujet = sha256:9cea382c95fe5c4ccd1d274c7d11a082c49c7d42b9f042f36d6e67ffd2245f18
+     |      buildType : 1 valeur(s) : https://tekton.dev/chains/v2/slsa
+     |      builder : 1 valeur(s) : https://tekton.dev/chains/v2
+     |      invocationId : 2 valeur(s) : inv-1, inv-2
+OK   une enveloppe d'un autre sujet : code 3, motif « sujet »
+OK   deux sujets : code 3, motif « sujet »
+OK   SLSA v0.2 : code 3, motif « predicateType »
+OK   aucune enveloppe : code 3, motif « aucune enveloppe »
+bilan : 13 OK, 1 KO
+banc fini : 2026-11-19T19:57:18Z
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-zot-banc
