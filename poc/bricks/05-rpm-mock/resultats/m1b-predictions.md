@@ -1061,3 +1061,22 @@ Décision du propriétaire : « Oui, après pod A », en réponse à « Je prép
 - **PL4** : même nombre de paquets (201) et racine en 555, comme `pod_a`.
 
 **Portée prévue.** Si PL1 et PL2 tiennent, la lenteur de dnf dans Kata vient de la limite de fichiers ouverts. La durée de S1 n'est pas remesurée.
+
+### pod_a : résultat, 19/11/2026, de 08:59:58 à 10:38:10 UTC, code 0 (note écrite à 2026-11-19T10:39:07Z UTC)
+
+Journal : [`m1b-pod_a.log`](m1b-pod_a.log). Le premier lancement de `pod_c`, refusé sans créer de pod, est gardé dans [`m1b-pod_c-1.log`](m1b-pod_c-1.log) : l'étape n'était pas encore dans `m1b.sh`.
+
+**PK1 à PK6 tenues.**
+- **PK1** : `m1b-a` est prêt sur `sc-build`, sous `kata`, au label `construire-rpm`. `entrees.tar` est copié en 4 morceaux puis revérifié dans le pod : 225 fichiers, code 0.
+- **PK2** : `%_install_langs` vaut `en_US`. Les versions sont celles du banc (`rpm-4.16.1.3-40.el9`, `dnf-4.14.0-34.el9_8.rocky.0.1`, `libsolv-0.7.24-4.el9`, `libdnf-0.69.0-18.el9.rocky.0.1`, `tar-1.34-11.el9`), et la S recalculée vaut `1793914619`.
+- **PK3** : les témoins TCP vers Zot et DNS public rendent le code 124, c'est-à-dire un délai dépassé.
+- **PK4** (lecture) : le umask par défaut du conteneur vaut 0022. L'invité a 3 vCPU, noyau 6.18.56.
+- **PK5** :
+  - dnf rend le code 0 ;
+  - 201 paquets sont installés, dont 2 `gpg-pubkey` ;
+  - la racine est en 555, et `etc/machine-id` (33 octets) est exclu de l'archive ;
+  - `tar` rend le code 0 sans rien sur stderr, et l'archive a 13 332 membres.
+- **PK6 tenue** : l'archive faite dans le pod vaut `7c07083c…` octet pour octet, et elle est rapatriée au même sha256.
+- **Durée** : dnf a pris 5 811 s, de 09:00:44 à 10:37:35 UTC, contre 23 s sur l'hôte. La cause est étudiée à part : [constat](#constat-pendant-pod_a--lenteur-de-dnf-dans-le-pod-note-écrite-à-2026-11-19t093037z-utc-pendant-le-passage-demande-du-propriétaire) et vérification sur l'hôte.
+
+**Portée.** Dans un pod Kata du cluster, hors réseau, l'installation de l'outillage par le dnf de l'amorce redonne l'archive de l'hôte au bit près. C'est un seul pod, un seul jour. Les entrées sont livrées par copie, et seule la racine est archivée : pas de couche de configuration, pas de layout. PC1, la comparaison avec `pod_b`, reste à faire.
