@@ -102,3 +102,38 @@ Lancés après le commit des prédictions (`9a086ae5`).
 **Passage raté archivé** : [premier passage](o2-banc-premier-passage.log), arrêté après BC5a. `set -e` coupait la fonction au premier refus attendu. C'était un défaut du script, corrigé par `set +e` dans la fonction du banc. Le dossier du banc ne contenait encore aucun fichier ; il a été effacé avant la relance.
 
 Le dossier du banc (clé jetable comprise) a été effacé à 16:03:25 UTC. Rien de ce banc ne mesure gpg 2.4.7 ni 2.3.3 : **K5 et K5b restent des prédictions** (ES2, ES4). `construire`, `cle` et `essai` ne sont pas lancées.
+
+## Correction datée du 19/11/2026, écrite à 16:13:44 UTC : `o2.sh` restructuré après relecture du conseiller ; nouvelles prédictions
+
+**Écart corrigé.** La version de `o2.sh` commitée en `9a086ae5` ne faisait pas ce que décrivait l'option (a) de la carte, approuvée par le propriétaire :
+- côté Rocky, elle installait en ligne en une seule passe, sans contrôle des rpm contre le `primary` vérifié et sans installation hors ligne ;
+- elle n'archivait que la racine Debian ;
+- `construire` était tout ou rien : un échec de mmdebstrap (CR5, confiance faible) aurait bloqué la relance et jeté la racine Rocky.
+
+Rien de cette version n'avait été lancé, hormis `prealables`. **Les prédictions CR1 à CR7 sont remplacées** par celles qui suivent ; CL1 et ES1 à ES5 restent valables.
+
+**Nouvelle structure** : une étape à la fois, chacune refuse un dossier cible déjà présent. Les étapes avec réseau refusent si le dossier des secrets existe (K1). Le code de sortie est non nul dès qu'une ligne `KO` est journalisée. Si K3 échoue, le journal est vidé. Le sha256 des deux scripts est écrit en tête de chaque journal.
+
+### `banc_chroot` (À SEC : sans réseau, sans installation, lancé après le commit de ces prédictions)
+
+Interprétation de « sans rien installer » : l'amorce Rocky du cache local est extraite et son gpg déjà présent est exécuté sous `chroot`, comme en 05 (`m1b-amorce-lecture.sh`). Rien n'est ajouté à la racine.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| BK0 | Amorce extraite ; `gpg --version` donne 2.3.3 ; `rpm -q gnupg2` donne `gnupg2-2.3.3-5.el9_7.x86_64` (mesure de la session principale) | haute |
+| BK1 | Création d'une clé jetable par gpg 2.3.3 dans la même mécanique que `cle` (liens, tmpfs sous chroot, K1, K2) : code 0, RSA 4096, trois fichiers 600, export armuré | moyenne-haute : mêmes commandes qu'au banc O2, sous 2.3.3 et sous chroot pour la première fois |
+| BK2 | Seconde création : refus (K4) | haute |
+| BK3 | Programme d'essai (racine Rocky pour D et pour R) : E1, E3, E6, E7 signent ; E2, E4, E5, E8 vérifient par gpgv (sqv absent de l'amorce Rocky) | moyenne-haute |
+| BK4 | E9 à E11 : clé jetable créée par le gpg 2.4.8 de l'hôte, importée dans 2.3.3 et utilisée pour signer, signature vérifiée par gpgv 2.3.3. C'est un indice pour K5 (création par 2.4.x, import par 2.3.3), pas sa mesure, puisque la version est 2.4.8 et non 2.4.7 | moyenne |
+| BK5 | K3 tenue ; seuls les refus attendus de BK2 sont des lignes `KO` ; code 0 | moyenne-haute |
+
+### Étapes avec accord, NON LANCÉES
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| RT1 | `rocky_telecharger` : `dnf-3 --installroot --downloadonly --downloaddir` du dnf 4.14 de l'amorce, depuis vault 9.8 (`repo_gpgcheck=1`) : code 0 ; les trois paquets épinglés téléchargés ; **tous les rpm égaux en sha256 au `primary` vérifié** | moyenne : `--downloaddir` avec `--downloadonly` est une option du cœur de dnf 4 (documentation, non relue au tag) ; jamais lancé dans ce PoC |
+| RT2 | Nombre et taille des rpm | relevé, non prédit ; chacun journalisé |
+| RI1 | `rocky_installer` : clé Rocky importée dans la racine vide, installation hors ligne avec `localpkg_gpgcheck` : code 0 ; paquets épinglés installés ; toutes les signatures par la clé `702d426d350d275d` ; gpg 2.3.3 dans la racine ; archive écrite | moyenne : mécanisme mesuré en 05 (`m1b-repro`), mais avec `localpkg_gpgcheck` pour la première fois |
+| DA1 | `debian_amorce` : `apt-get update` puis mmdebstrap 1.5.7-1+deb13u1 installé, code 0 ; `InRelease` égal à `0584fba3…` ; **tous les `.deb` égaux au `Packages.xz` vérifié** | moyenne-haute : chemin de la 06, mais sur l'hôte |
+| DR1 | `debian_racine` : `mmdebstrap --mode=root` dans l'espace de noms utilisateur : code 0 | **faible** (voir les replis de la carte) |
+| DR2 | Si DR1 tient : `.deb` égaux au `Packages.xz` vérifié ; sept versions épinglées installées ; gpg 2.4.7 dans la racine | moyenne |

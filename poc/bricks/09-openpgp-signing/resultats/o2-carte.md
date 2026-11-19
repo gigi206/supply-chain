@@ -66,3 +66,35 @@ Question posée dans le cadre de fin de tour : « Racines de signature d'O2 : re
 - **(a) retenue pour le PoC** : chaque amorce ne sert qu'une fois, pour produire une racine neuve depuis les dépôts signés (`vault/rocky/9.8`, instantané Debian `20261105T000000Z`). **(b)**, racines produites par la plateforme, devient la **cible de production**, à écrire dans l'ADR 0003 (proposé dans `A-REPORTER.md`). **(c)** est écartée.
 - **Correction de la phrase précédente** (« `gnupg2` n'est pas à installer ») : elle valait pour un ajout de paquets dans l'amorce, c'est-à-dire l'option (c). Avec (a), la racine Rocky est neuve (`dnf --installroot`). `gnupg2` y est donc installé depuis vault, dans la même révision 2.3.3-5.el9_7 que celle de l'amorce.
 - Suite : `o2.sh` et ses prédictions ; `construire` et `cle` attendent un accord nommé.
+
+## Étapes d'O2, replis, échecs et effacement (ajouté le 19/11/2026 à 16:13:44 UTC, après relecture du conseiller)
+
+`o2.sh` suit l'option (a) étape par étape. Chaque étape a son journal, refuse un dossier cible déjà présent et demande son accord :
+
+| Étape | Réseau | Clé | Écrit |
+|---|---|---|---|
+| `prealables` | non | non | journal seulement (fait) |
+| `banc_chroot` | non | jetable | `~/.cache/supply-chain-poc/09/o2-banc-chroot` (à sec, sans installation) |
+| `rocky_telecharger` | oui | absente (K1) | `o2/rocky` (amorce extraite, rpm téléchargés et contrôlés contre le `primary` vérifié) |
+| `rocky_installer` | non | absente | racine `o2/rocky/racine` (installation hors ligne, `localpkg_gpgcheck`) et `o2/rocky98-racine.tar` |
+| `debian_amorce` | oui | absente (K1) | `o2/debian-amorce` (mmdebstrap installé ; `.deb` contrôlés contre le `Packages.xz` vérifié) |
+| `debian_racine` | oui | absente (K1) | `o2/debian-amorce/o2/debian13.tar`, racine `o2/racine-debian13` |
+| `cle` | non | créée | `~/.cache/supply-chain-poc/09/secrets` |
+| `essai` | non | lue | journal seulement (tmpfs) |
+
+Les contrôles relisent deux dossiers du relevé, qui sont donc gardés : `releve-20261119T144438Z` (`primary` de Rocky) et `o2-releve-20261119T154234Z` (`Packages.xz`).
+
+**Replis de DR1** (`mmdebstrap --mode=root` dans l'espace de noms utilisateur, confiance faible), chacun avec sa prédiction et son accord, aucun lancé :
+1. `--mode=unshare` lancé en root dans l'espace de noms. D'après le manuel de trixie, ce mode isole aussi les espaces de montage, de processus, uts et ipc ([relevé](o2-releve-3.log)). Ce qu'il fait exactement quand il est lancé en root n'est pas lu en entier (paragraphe tronqué à 1 800 caractères).
+2. Espace de noms réseau propre à mmdebstrap, pour permettre le montage de `sysfs`, avec une sortie réseau à fournir. Ce n'est pas trivial sans privilège : à étudier.
+3. Repli hors (a) : racine Debian produite dans un pod Kata, comme en 06. Ce serait une décision du propriétaire.
+
+**Échecs** :
+- un échec laisse son dossier cible, et l'étape refuse ensuite de repartir ;
+- un échec de `cle` laisse `~/.cache/supply-chain-poc/09/secrets`, qui bloque à la fois `cle` et toutes les étapes avec réseau. L'effacement manuel est à décider : il détruit la clé partielle.
+
+**Effacement** : les arbres extraits appartiennent à des sous-UID. Ils s'effacent dans l'espace de noms, par un chemin littéral, par exemple :
+
+```bash
+unshare --map-auto --map-root-user rm -r --one-file-system /home/gigi/.cache/supply-chain-poc/09/o2-banc-chroot
+```

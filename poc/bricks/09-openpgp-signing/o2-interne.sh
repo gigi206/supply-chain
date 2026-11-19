@@ -17,7 +17,7 @@ tmpfs_ou_ko() {
 }
 reseau_ou_ko() {
   n=$(awk -F: 'NR > 2 {gsub(/ /, "", $1); print $1}' /proc/self/net/dev | paste -sd' ')
-  [ "$n" = lo ] || ko "interfaces réseau visibles : [$n] (K1)"
+  [ "$n" = lo ] || ko "$(wc -w <<<"$n") interfaces réseau visibles, dont autre chose que lo (K1 ; noms non journalisés)"
   echo "OK   réseau absent : seule l'interface lo est visible (K1)"
 }
 gpgx() { gpg --batch --no-tty --quiet "$@"; }
@@ -42,7 +42,8 @@ case "${1:-}" in
     [ -d "$S" ] || ko "dossier des secrets absent : $S"
     for f in cle-openpgp.asc cle-publique.asc revocation.asc; do [ ! -e "$S/$f" ] || ko "$S/$f existe déjà : rien n'est écrasé (K4)"; done
     echo "gpg : $(gpg --version | head -1)"
-    parametres "PoC supply-chain signature des paquets et des depots" "cle de PoC, fichier sur l'hote d'administration" "1y"
+    # O2_NOM et O2_EXPIRE : identité et durée d'une clé de banc (jetable) ; par défaut, la clé du PoC
+    parametres "${O2_NOM:-PoC supply-chain signature des paquets et des depots}" "${O2_COMMENTAIRE:-cle de PoC, fichier sur l'hote d'administration}" "${O2_EXPIRE:-1y}"
     gpgx --gen-key "$GNUPGHOME/parametres" 2>/dev/null
     F=$(gpgx --with-colons --list-secret-keys | awk -F: '$1=="fpr"{print $10; exit}')
     [ -n "$F" ] || ko "clé non créée"

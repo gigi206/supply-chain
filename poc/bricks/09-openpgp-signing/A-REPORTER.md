@@ -144,7 +144,7 @@ pendant une signature la lirait quand même.
 ## 4 quater. `tools/secrets-depot.sh` et règles de lecture des sessions
 
 `tools/secrets-depot.sh` ne lit aujourd'hui que `08/secrets` et `10/secrets` ([relevé d'O2](resultats/o2-releve.log), §4), et n'a aucun motif « BEGIN PGP ». Deux ajouts proposés, à faire **avant** l'étape `cle` d'O2 :
-- ajouter `"$HOME"/.cache/supply-chain-poc/09/secrets/*` à la boucle de la ligne 8. La clé privée est exportée armurée : chacune de ses lignes devient un motif ;
+- ajouter à la boucle de la ligne 8 **seulement** `"$HOME"/.cache/supply-chain-poc/09/secrets/cle-openpgp.asc` et `…/09/secrets/revocation.asc`, pas tout le dossier. La boucle fait de chaque ligne de chaque fichier un motif (ligne 11), puis refuse tout fichier modifié qui en contient un (lignes 22 à 25). Si la clé publique (`cle-publique.asc`, même dossier) était lue, ses lignes deviendraient des motifs et tout commit de la clé publique échouerait. La clé privée est exportée armurée : chacune de ses lignes devient un motif ;
 - refuser tout fichier modifié ou nouveau qui contient la ligne `-----BEGIN PGP PRIVATE KEY BLOCK-----`. Ce contrôle vaut aussi pour une clé d'une autre origine.
 
 Règles de lecture des sessions : ajouter `~/.cache/supply-chain-poc/09/secrets/` aux chemins à ne jamais lire ni lister.

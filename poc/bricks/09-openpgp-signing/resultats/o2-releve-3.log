@@ -1,0 +1,25 @@
+troisième relevé O2 commencé : 2026-11-19T16:11:12Z
+## mode "sudo, root" (373 caractères)
+  This mode directly executes chroot and is the same mode of operation as is used by debootstrap. It is the only mode that can directly create a directory chroot with the right permi
+  ssions. If the chroot directory is not accessible by the _apt user, then apt sandboxing will be automatically disabled. This mode needs to be able to mount and thus requires \f(CWC
+  AP_SYS_ADMIN.
+## mode unshare (4258 caractères)
+  When used as a normal (not root) user, this mode uses Linux user namespaces to allow unprivileged use of chroot and creation of files that appear to be owned by the superuser insid
+  e the unshared namespace. A tarball created in this mode will be bit-by-bit identical to a tarball created with the root mode. With this mode, the only binaries that will run as th
+  e root user will be newuidmap\|(1) and newgidmap\|(1) via their setuid bit. Running those successfully requires /etc/subuid and /etc/subgid to have an entry for your username. This
+   entry was usually created by adduser\|(8) already. The unshared user will not automatically have access to the same files as you do. This is intentional and an additional security
+   against unintended changes to your files that could theoretically result from running mmdebstrap and package maintainer scripts. To copy files in and out of the chroot, either use
+   globally readable or writable directories or use special hooks like copy-in and copy-out. Besides the user namespace, the mount, pid (process ids), uts (hostname) and ipc namespac
+  es will be unshared as well. See the man pages of namespaces\|(7) and unshare\|(2) as well as the manual pages they are linking to. A directory chroot created with this mode will e
+  nd up with wrong ownership information (seen from outside the unshared user namespace). For correct ownership information, the directory must be accessed from a user namespace with
+   the right subuid/subgid offset, like so: $ lxc-usernsexec -- lxc-unshare -s MOUNT|PID|UTSNAME|IPC -- \e > /usr/sbin/chroot ./debian-rootfs /bin/bash Or without LXC: $ mmdebstrap -
+  -unshare-helper /usr/sbin/chroot ./debian-rootfs /bin/bash Or without mmdebstrap: $ unshare --map-auto --map-user=65536 --map-group=65536 --keep-caps -- \e > /usr/sbin/chroot ./deb
+## mode chrootless (1129 caractères)
+  Uses the dpkg option \f(CW--force-script-chrootless to install packages into TARGET without dpkg and apt inside TARGET but using apt and dpkg from the machine running mmdebstrap. M
+  aintainer scripts are run without chrooting into TARGET and rely on their dependencies being installed on the machine running mmdebstrap. Only very few packages support this mode. 
+  Namely, as of 2022, not all essential packages support it.  See https://wiki.debian.org/Teams/Dpkg/Spec/InstallBootstrap or the dpkg-root-support usertag of debian-dpkg@lists.debia
+  n.org in the Debian bug tracking system. WARNING: if this option is used carelessly with packages that do not support \f(CWDPKG_ROOT, this mode can result in undesired changes to t
+  he system running mmdebstrap because maintainer-scripts will be run without chroot\|(1). Make sure to run this mode without superuser privileges and/or inside a throw-away chroot e
+  nvironment like so: mmdebstrap --variant=apt --include=mmdebstrap \e --customize-hook=chroot "$1" mmdebstrap --mode=chrootless --variant=apt unstable chrootless.tar \e --customize-
+  hook=copy-out chrootless.tar . unstable /dev/null
+troisième relevé O2 fini : 2026-11-19T16:11:12Z
