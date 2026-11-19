@@ -1,0 +1,15 @@
+étape rocky_installer commencée : 2026-11-19T16:21:44Z ; o2.sh fdae5389cd01c61a… ; o2-interne.sh 7c91e50fd7921f89…
+dnf hors ligne : code 0 ; dernières lignes :
+  |   xz-libs-5.2.5-8.el9_8.1.x86_64                                                
+  |   zlib-1.2.11-40.el9.x86_64                                                     
+  | 
+  | Complete!
+racine : 102 paquets ; liste sha256 8f2c435f46e4d6c8da027bcd257fa908d92b423c28481454e331fe25e2b865e9
+OK   gnupg2-2.3.3-5.el9_7 installé
+OK   rpm-sign-4.16.1.3-40.el9 installé
+OK   createrepo_c-0.20.1-4.el9 installé
+clés de signature citées :       1 (none)     101 702d426d350d275d
+  gpg de la racine Rocky : gpg (GnuPG) 2.3.3
+archive rocky98-racine.tar : 101693440 octets, sha256 33dc260653b35ffd7c0aeeb99b354f62858b385130f8840a66756bf778f5a783
+étape rocky_installer finie : 2026-11-19T16:22:01Z
+OK   K3 : aucune ligne de bloc OpenPGP armuré dans le journal

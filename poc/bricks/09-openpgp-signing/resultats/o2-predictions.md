@@ -168,3 +168,18 @@ Lancée sur l'accord du propriétaire (« Oui, lance-la », en réponse à « Je
 - `./o2` est exclu de l'archive.
 
 **RI1 reste la prédiction** de cette étape. Elle s'y ajoute que le journal dira « clé Rocky 350d275d déjà dans la base rpm de la racine » (confiance haute : constat ci-dessus).
+
+## Note datée du 19/11/2026, écrite à 16:22:39 UTC : `rocky_installer` passée, RI1 tenue
+
+Lancée sur l'accord du propriétaire (« Oui, lance-la », en réponse à « Je lance rocky_installer (installation hors ligne des 101 rpm contrôlés) ? »), sur le commit `e5650282`. [Journal](o2-rocky_installer.log) : 16:21:44 à 16:22:01 UTC, code 0 ; `o2.sh` `fdae5389…`, `o2-interne.sh` `7c91e50f…`.
+
+- **RI1 tenue** :
+  - installation hors ligne (`dans_hors`), code 0 ;
+  - racine de **102 paquets** : les 101 rpm contrôlés, plus `gpg-pubkey`, seule ligne « (none ») ; liste `8f2c435f…` ;
+  - `gnupg2-2.3.3-5.el9_7`, `rpm-sign-4.16.1.3-40.el9` et `createrepo_c-0.20.1-4.el9` installés ;
+  - **101 paquets sur 101 signés par la clé `702d426d350d275d`** ;
+  - gpg 2.3.3 dans la racine ;
+  - archive `rocky98-racine.tar` de 101 693 440 octets, sha256 `33dc2606…`, `./o2` exclu. Elle n'est pas reproductible, et ce n'était pas exigé.
+- **Ajout à RI1 en partie tenu** : le message « clé Rocky 350d275d déjà dans la base rpm de la racine » est bien écrit, mais à la ligne 1 du journal de dnf (`~/.cache/supply-chain-poc/09/o2/rocky-installer-dnf.log`, hors du dépôt). Il n'est pas dans le journal de l'étape, contrairement à ce qu'annonçait la prédiction.
+- **Limite** : le journal ne montre pas explicitement le contrôle des signatures à l'installation (`localpkg_gpgcheck=True`). Les 101 lignes « Verifying » de dnf sont la vérification d'après installation. Ce qui est établi : les 101 rpm sont égaux au `primary` vérifié (RT1), et chacun porte la signature de la clé Rocky (`RSAHEADER`, ci-dessus).
+- **Rien n'est fait côté Debian. Aucune clé du PoC n'existe.**
