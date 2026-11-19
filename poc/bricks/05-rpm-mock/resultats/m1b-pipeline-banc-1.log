@@ -1,0 +1,102 @@
+# m1b-pipeline-banc.sh, 2026-11-19T18:37:51Z ; m1b-pipeline.sh 1e64f41d511d6f14164758dd697b7ea5d3ff76f70dbc016f5e2616103fe55c7e
+# yq v4.54.3 ; jq jq-1.8.1 ; liste revue f96b9d164670437e7b32e4e4122b3e26ed4dd48c1d0fd541e168f8000e9a9a34
+OK   liste du banc : yq la lit, deux clés de plus : 2
+OK   journaux d'essai repris (lignes : po pb co cb) : 13 10 27 22
+## succès
+OK   succès (code 0)
+OK   succès : PipelineRuns créés : 4
+OK   succès : kubectl delete : 0
+KO   succès : sentinelles dans la sortie et les journaux copiés : 20 (attendu : 0)
+OK   succès : ordre des PipelineRuns et pipelines : m1b-o-1 m1b-o-2 m1b-b-1 m1b-b-2
+OK   succès : pipeline de chaque PipelineRun (nom) : builder-mock-rocky9 builder-mock-rocky9 builder-rocky9-bootstrap builder-rocky9-bootstrap
+OK   succès : bundle de chaque PipelineRun = référence de la signature : sc-stockage.poc.test:5000/tekton/pipelines/builder-mock-rocky9@sha256:5848ccb63ca2f0a41e2d23931dc44ef34b75ca32ac2d0900d2d4f02e47c522ae sc-stockage.poc.test:5000/tekton/pipelines/builder-rocky9-bootstrap@sha256:e8139878015506450d8a4f51ef5c2f9f6c9bb758d3ba2256d6c55a45737989b1
+OK   succès : journaux des pas copiés dans R : 8
+KO   succès : lignes masquées dans les journaux copiés : 0 (attendu : 8)
+OK   succès : contrôles OK : 113
+OK   succès : tailles lues dans le journal d'essai : 2
+OK   succès : outillage, résultat déclaré non écrit relevé : 2
+OK   succès : garde de place relevée avec la taille : 4
+## gardes avant toute création
+OK   mesure divergente (code 1)
+OK   mesure divergente : PipelineRuns créés : 0
+OK   mesure divergente : kubectl delete : 0
+OK   mesure divergente : sentinelles dans la sortie et les journaux copiés : 0
+OK   pipeline autre au tag m1b (code 1)
+OK   pipeline autre au tag m1b : PipelineRuns créés : 0
+OK   pipeline autre au tag m1b : kubectl delete : 0
+OK   pipeline autre au tag m1b : sentinelles dans la sortie et les journaux copiés : 0
+OK   tâche hors de la liste revue (code 1)
+OK   tâche hors de la liste revue : PipelineRuns créés : 0
+OK   tâche hors de la liste revue : kubectl delete : 0
+OK   tâche hors de la liste revue : sentinelles dans la sortie et les journaux copiés : 0
+OK   NotIn à trois labels (code 1)
+OK   NotIn à trois labels : PipelineRuns créés : 0
+OK   NotIn à trois labels : kubectl delete : 0
+OK   NotIn à trois labels : sentinelles dans la sortie et les journaux copiés : 0
+OK   NetworkPolicy de construction absente (code 1)
+OK   NetworkPolicy de construction absente : PipelineRuns créés : 0
+OK   NetworkPolicy de construction absente : kubectl delete : 0
+OK   NetworkPolicy de construction absente : sentinelles dans la sortie et les journaux copiés : 0
+OK   politique qui autorise la construction (code 1)
+OK   politique qui autorise la construction : PipelineRuns créés : 0
+OK   politique qui autorise la construction : kubectl delete : 0
+OK   politique qui autorise la construction : sentinelles dans la sortie et les journaux copiés : 0
+OK   PipelineRun déjà présent (code 1)
+OK   PipelineRun déjà présent : PipelineRuns créés : 0
+OK   PipelineRun déjà présent : kubectl delete : 0
+OK   PipelineRun déjà présent : sentinelles dans la sortie et les journaux copiés : 0
+OK   dépôt déjà présent (code 1)
+OK   dépôt déjà présent : PipelineRuns créés : 2
+OK   dépôt déjà présent : kubectl delete : 0
+KO   dépôt déjà présent : sentinelles dans la sortie et les journaux copiés : 10 (attendu : 0)
+OK   espace sous la garde, taille comprise (code 1)
+OK   espace sous la garde, taille comprise : PipelineRuns créés : 0
+OK   espace sous la garde, taille comprise : kubectl delete : 0
+OK   espace sous la garde, taille comprise : sentinelles dans la sortie et les journaux copiés : 0
+OK   refus à l'admission (code 1)
+OK   refus à l'admission : PipelineRuns créés : 0
+OK   refus à l'admission : kubectl delete : 0
+OK   refus à l'admission : sentinelles dans la sortie et les journaux copiés : 0
+## contrôles après création
+OK   prefetch de l'outillage en échec (code 1)
+OK   prefetch de l'outillage en échec : PipelineRuns créés : 1
+OK   prefetch de l'outillage en échec : kubectl delete : 0
+KO   prefetch de l'outillage en échec : sentinelles dans la sortie et les journaux copiés : 2 (attendu : 0)
+OK   prefetch en échec : preuve imprimée avant le KO : 1
+OK   digest autre (outillage) (code 1)
+OK   digest autre (outillage) : PipelineRuns créés : 4
+OK   digest autre (outillage) : kubectl delete : 0
+KO   digest autre (outillage) : sentinelles dans la sortie et les journaux copiés : 20 (attendu : 0)
+OK   digests divergents (code 1)
+OK   digests divergents : PipelineRuns créés : 4
+OK   digests divergents : kubectl delete : 0
+KO   digests divergents : sentinelles dans la sortie et les journaux copiés : 20 (attendu : 0)
+OK   construction sans Kata (code 1)
+OK   construction sans Kata : PipelineRuns créés : 1
+OK   construction sans Kata : kubectl delete : 0
+KO   construction sans Kata : sentinelles dans la sortie et les journaux copiés : 5 (attendu : 0)
+OK   témoin réseau absent (code 1)
+OK   témoin réseau absent : PipelineRuns créés : 1
+OK   témoin réseau absent : kubectl delete : 0
+KO   témoin réseau absent : sentinelles dans la sortie et les journaux copiés : 5 (attendu : 0)
+OK   couches (code 1)
+OK   couches : PipelineRuns créés : 1
+OK   couches : kubectl delete : 0
+KO   couches : sentinelles dans la sortie et les journaux copiés : 5 (attendu : 0)
+OK   non signé par Chains (code 1)
+OK   non signé par Chains : PipelineRuns créés : 1
+OK   non signé par Chains : kubectl delete : 0
+KO   non signé par Chains : sentinelles dans la sortie et les journaux copiés : 5 (attendu : 0)
+OK   base du bootstrap autre (code 1)
+OK   base du bootstrap autre : PipelineRuns créés : 3
+OK   base du bootstrap autre : kubectl delete : 0
+KO   base du bootstrap autre : sentinelles dans la sortie et les journaux copiés : 15 (attendu : 0)
+OK   base écrite pour l'outillage (code 1)
+OK   base écrite pour l'outillage : PipelineRuns créés : 1
+OK   base écrite pour l'outillage : kubectl delete : 0
+KO   base écrite pour l'outillage : sentinelles dans la sortie et les journaux copiés : 5 (attendu : 0)
+OK   PipelineRun jamais terminé (code 1)
+OK   PipelineRun jamais terminé : PipelineRuns créés : 1
+OK   PipelineRun jamais terminé : kubectl delete : 0
+KO   PipelineRun jamais terminé : sentinelles dans la sortie et les journaux copiés : 2 (attendu : 0)
+# fin 2026-11-19T18:38:52Z ; OK 83 ; KO 13

@@ -1938,3 +1938,33 @@ Dans tous les cas, `$T/auth` est absent à la fin. Il ne couvre ni Zot, ni le vr
 - **SG2** (haute) : les deux bundles poussés ont des digests reproductibles. Le second passage les repousse à l'identique : `tkn` fixe la date de création, comme mesuré en M4b et M4c.
 - **SG3** (haute) : second passage en code 0, après revue. Les deux pipelines ne diffèrent du rendu que par les trois références. Elles sont admises, signées, relues et poussées, et leurs deux références sont imprimées.
 - **SG4** (moyenne) : `tkn task verify` et `tkn pipeline verify`, avec la clé publique des tâches, acceptent les quatre objets signés. Le banc ne l'a mesuré qu'avec la clé jetable.
+
+## PipelineRuns des deux images : prédictions écrites le 19/11/2026 à 18:42:00 UTC, avant tout lancement
+
+**Script** : [`m1b-pipeline.sh`](../m1b-pipeline.sh) (sha256 `3d33642d9c088bf9…`), étape `pipeline`, journal à venir `m1b-pipeline-pipeline.log`. C'est un script neuf, sur le modèle de l'étape `pipeline` de `m4c.sh`. `m1b-builders.sh` et `m1b-signature.sh` ne sont pas touchés.
+- **Quatre PipelineRuns**, l'un après l'autre : `m1b-o-1`, `m1b-o-2` (`builder-mock-rocky9`), puis `m1b-b-1`, `m1b-b-2` (`builder-rocky9-bootstrap`). Aucun paramètre : tout est fixé par la pipeline signée. Kata pour la seule tâche `construire`. Rien n'est purgé ; une relance se fait sous un autre `PREFIXE`.
+- **Gardes, toutes avant la première création** :
+  - la mesure d'un autre jour (`m1bt-20`) a redonné les digests de `m1bt3`, sinon refus ; les tailles des `image.tar` sont lues dans son journal d'essai ;
+  - chaque pipeline est relue dans Zot au tag `m1b`, ses trois tâches sont celles de la signature et sont dans la liste revue, son dépôt et sa racine sont ceux attendus ;
+  - les politiques du cluster tiennent les invariants de `m1b_sortie` et `m1b_sans_sortie` (`NotIn` à quatre labels) ;
+  - aucun des quatre noms n'existe.
+- **Avant chaque création** : dépôt de l'image absent avant le premier PipelineRun, place libre sur `/` de sc-stockage d'au moins 1 Gio plus la taille de l'`image.tar` (343 951 360 octets pour l'outillage, 241 991 680 pour le bootstrap, d'après `m1bt3`), dry-run serveur.
+
+**Banc** : [`m1b-pipeline-banc.log`](m1b-pipeline-banc.log), 96 OK, 0 KO, joué à 18:39:29 UTC sur ce même sha256 (banc `m1b-pipeline-banc.sh`, sha256 `c31198cf6c46bc94…`). C'est la vraie fonction, avec le vrai `commun.sh` et le vrai `selecteurs.jq`. Les journaux des pas sont les blocs réels des essais de `m1bt3`. `kubectl`, `oras`, `sleep` et `sur` sont faux. 21 cas : succès, dix gardes, dix contrôles après création. Dans chaque cas : aucun `kubectl delete`, aucune sentinelle de message ou de variable d'environnement en sortie.
+- **Premier passage gardé** : [`m1b-pipeline-banc-1.log`](m1b-pipeline-banc-1.log), 83 OK, 13 KO, sur une version antérieure du script (`1e64f41d…`). Les 13 KO portent tous sur le masquage, et c'est un défaut du script : `filtre` passait le motif `MASQUE`, écrit en BRE, à `sed -E`, qui ne masquait donc rien. Corrigé avant le second passage ; détail dans la carte.
+- **Non couvert** : Tekton (résolution des bundles, Trusted Resources, pods réels, montages, résultat déclaré non écrit), Kata, Kyverno, Chains, Zot, Cilium.
+
+**Conditions de lancement** :
+1. la mesure du 20/11 tenue ;
+2. `m1b_sortie`, `m1b_sans_sortie` et `m1b_temoins` passées ;
+3. la signature (`SIGNER=1`), ta revue de `taches.yml` et le second passage ;
+4. ton accord : `publier-image` écrit dans Zot, et ces écritures sont définitives.
+
+- **PN1** (haute) : les gardes passent sur cet état et les quatre PipelineRuns sont créés dans cet ordre. Chacun finit `True|Succeeded`. Les pods tournent sur sc-build, sous Kata pour `construire` seule.
+- **PN2** (moyenne) : le prefetch de l'outillage réussit, bien que `BASE_ARTIFACT_INPUTS` soit déclaré et non écrit. Le résultat est absent de son TaskRun. Ce n'est qu'une lecture du code de Tekton : aucun TaskRun réel ne l'a fait (reliquat accepté du choix 2).
+- **PN3** (haute) : le prefetch du bootstrap écrit `BASE_ARTIFACT_INPUTS` = `oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux`, digest `sha256:ee90dc0e…`. Les nombres de rpm vérifiés (199 et 10) et la liste des sha256 des entrées sont ceux des essais de `m1bt3`.
+- **PN4** (haute) : `construire` voit ses trois témoins réseau échouer et ses entrées en lecture seule. Sa racine est conforme à la valeur fixée (`7c07083c…`, `b063feb3…`). Son manifeste et `DIGEST_CONSTRUIT` égalent les digests de `m1bt3` (`70f8c412…`, `6de899ac…`).
+- **PN5** (moyenne) : `publier-image` publie chaque image au digest construit, puis la relit. Zot la relit en lecture anonyme avec deux couches (outillage) ou une (bootstrap). Cette tâche n'a jamais poussé que le rpm de M4c (2 Mo, une couche). Ici, l'outillage pèse 344 Mo à deux couches non compressées. Le `sed` de la tâche lit bien le digest des deux `index.json` du banc de `m1bt3` ; le volume `emptyDir` et le temps de poussée ne sont pas mesurés.
+- **PN6** (haute) : pour chaque image, deux exécutions donnent le même digest, égal à celui de `m1bt3` et de la mesure d'un autre jour.
+- **PN7** (moyenne) : Chains signe les quatre PipelineRuns (annotation). Les signatures et attestations de l'image relèvent de l'étape provenance, à préparer.
+- **Relevé, sans pari** : la place prise dans Zot. Les couches attendues pèsent environ 586 Mo, pour les deux premiers PipelineRuns seulement. Mais `/` de sc-stockage dérive d'environ 0,5 Go par jour sans écriture de la brique.

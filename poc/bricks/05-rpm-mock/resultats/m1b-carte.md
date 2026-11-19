@@ -664,3 +664,26 @@ Le point « ligne GnuPG de docs/04 » est fait. **Restent avant signature** :
 - la mesure d'un autre jour (00:01 UTC le 20/11) ;
 - `m1b_sortie`, déjà accordée pour après la mesure, puis `m1b_sans_sortie` sur son propre accord, puis `m1b_temoins` ;
 - puis le premier passage de `m1b-signature.sh` (`SIGNER=1`), sur ton accord pour les écritures dans Zot.
+
+## Note datée du 19/11/2026, écrite à 18:42:00 UTC : étape des PipelineRuns préparée à sec
+
+J'ai préparé à sec, pendant l'attente de la mesure, le point « deux PipelineRuns par image » : le script neuf [`m1b-pipeline.sh`](../m1b-pipeline.sh), étape `pipeline`, **non lancée**. Prédictions PN1 à PN7 dans [`m1b-predictions.md`](m1b-predictions.md). Banc à 96 OK, 0 KO ([`m1b-pipeline-banc.log`](m1b-pipeline-banc.log)). Rien n'a été créé dans le cluster ni écrit dans Zot.
+
+**Constat du banc** : le masquage des journaux ne masquait rien.
+- `MASQUE` est un motif sed en BRE (`jeton\|token`). Passé à `sed -E`, le `\|` devient un `|` littéral, et aucune ligne n'est masquée.
+- Le premier passage du banc l'a trouvé dans mon script : [`m1b-pipeline-banc-1.log`](m1b-pipeline-banc-1.log), 13 KO. C'est corrigé, `MASQUE` passe maintenant par un `sed` à part.
+- La même fonction `filtre` se trouve dans `m1b.sh` et `m1b-builders.sh`. Testée sur une ligne `jeton=x`, elle ne la masque pas non plus.
+- **Portée relevée** : sur les 103 journaux `m1b*.log` archivés, une seule ligne contient « jeton » ou « token ». C'est un message d'erreur de yq (« next token »), dans `m1b-refus-prefetch-2.log`. Aucun secret n'est exposé : les pods de M1b n'en portent aucun.
+- **Correction** : `m1b.sh` et `m1b-builders.sh` ne doivent pas changer avant la fin de la mesure de cette nuit. Je les corrigerai après, par un commit à part.
+
+**Garde de place** : 1 Gio, comme en M4, plus la taille de l'`image.tar` de l'image à pousser, lue dans le journal d'essai de la mesure.
+
+**ConfigMap `porte`** : elle n'est lue que par le Job de jugement de la porte (`politique/porte-job.yaml`, espace `porte`), pas à l'admission des PipelineRuns. M4b et M4c sont passés avec elle périmée. Elle comptera pour tout verdict de la porte sur ces images. Je la joindrai à la demande d'accord pour les écritures dans Zot.
+
+**Restent avant les PipelineRuns** :
+- la mesure d'un autre jour ;
+- `m1b_sortie`, `m1b_sans_sortie` et `m1b_temoins` ;
+- la signature, ta revue de `taches.yml` et le second passage ;
+- ton accord pour les écritures dans Zot.
+
+La provenance reste à préparer, sur le modèle de M4c. Sa forme dépend des résultats réels de PN2.
