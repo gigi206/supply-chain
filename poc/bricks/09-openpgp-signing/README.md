@@ -298,3 +298,10 @@ La clé OpenPGP du PoC est créée **sans phrase de passe**, pour le PoC seuleme
 - **Refus du protocole** : clé étrangère, refusée par cosign ; lien vers un autre digest et rpm à charge altérée, acceptés par cosign et refusés par le contrôle. **Les deux vérifications sont donc nécessaires.**
 - **Premier passage** : code 1 (18:54:24 UTC). Mon contrôle exigeait `Statement/v1`. Une note datée a été commitée avant la relance.
 - **Reste pour O5 réel**, avec les accords : clé Transit `lien` (cosign `hashivault://`), jeton OpenBao, accès à Zot (referrer, provenance de Chains du manifeste non signé). Il faut aussi relire le fichier `--signing-config`, car cosign déclare dépréciés les drapeaux hors ligne employés ici.
+
+*Correction datée du 19/11/2026, 18:58:46 UTC* : dans la note précédente, « les deux vérifications sont donc nécessaires » est trop fort.
+- **Mesuré** : le contrôle indépendant est nécessaire, puisque T2 et T3 passent chez cosign.
+- **Par construction seulement** : cosign est nécessaire. Le contrôle ne lit pas la signature, mais il n'a pas tourné sur le bundle de la clé étrangère.
+- **Relu, pas recalculé** : le lien manifeste ↔ fichier vient des journaux archivés des briques 05 et 06 ; aucune couche OCI n'est lue.
+
+Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.

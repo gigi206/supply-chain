@@ -90,6 +90,8 @@ Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 **Signature OpenPGP (09)** : en cours hors cluster depuis le 19/11/2026 (branche à part, non fusionnée) ; D1 à D4 décidées le 19/11/2026 (« deb signé » = dépôt apt signé, `.deb` intact ; clé OpenPGP en fichier sur l'hôte d'administration, sans phrase de passe, pour le PoC seulement ; attestation de lien signée par la clé Transit `lien` après vérification de la provenance de Chains ; GnuPG des distributions) ; rpm signé et dépôt rpm signé vérifiés par dnf de Rocky 9.8, dépôt apt signé vérifié par apt de Debian 13 (sqv) ; reste l'attestation de lien (O5)
 ```
 
+*Note datée du 19/11/2026, 18:58:46 UTC* : dans le texte de remplacement ci-dessus, lire « reste l'attestation de lien (O5) » ainsi : « attestation de lien éprouvée sur un banc hôte à clés cosign jetables ; reste O5 réel (clé Transit `lien`, referrer et lecture de Zot) ».
+
 ---
 
 ## 4. `docs/adr/README.md`, ligne de l'ADR 0003

@@ -110,3 +110,14 @@ Journal : [o5-banc.log](o5-banc.log), avec `o5-lien.py` corrigé (`3230ff72…`)
 Le dossier `~/.cache/supply-chain-poc/09/o5/banc`, clés jetables comprises, est effacé après le commit de cette note.
 
 **Portée.** Ce banc tient la forme du prédicat, la double vérification et les trois refus du protocole, sur l'hôte et avec des clés jetables. Il ne tient pas O5 : il manque la signature par la clé Transit `lien`, le referrer dans Zot, le sujet de type manifeste et la vérification préalable de la provenance de Chains.
+
+## Correction datée du 19/11/2026, 18:58:46 UTC, après relecture du conseiller : trois réserves sur la note précédente
+
+1. **Les motifs de T1 et de T4 ne discriminent pas.**
+   - Les deux refus de cosign commencent par « failed to verify signature » : le motif de T1 (`signature|verif`) attraperait aussi T4.
+   - « do not match threshold » contient « match » : le motif de T4 (`digest|subject|match`) attraperait aussi T1.
+   - Les deux refus restent établis par les messages cités dans le journal : seuil de signatures (0 sur 1) pour T1, digest du sujet pour T4. Les motifs, eux, ne les distinguent pas. C'est un écart de même nature que le motif SHA1 d'O4.
+2. **« cosign est nécessaire » vaut par construction, pas par mesure.** Le contrôle indépendant n'a jamais tourné sur le bundle de T1. Qu'il l'aurait accepté se déduit de son code, qui ne lit pas la signature ; ce n'est pas mesuré. Seul l'autre sens est mesuré : le contrôle est nécessaire, par T2 et T3.
+3. **Le lien manifeste ↔ fichier est relu, pas recalculé.**
+   - Le prédicat et le contrôle lisent `07b7bd6f…` / `864d55f4…` et `60f25f5c…` / `f66bbeb2…` dans les mêmes journaux archivés (`m4c-comparaison.log`, `s4d-pipeline.log`), par la même fonction.
+   - « Égal à la valeur archivée » prouve que l'énoncé dit ce que les journaux disent. Il ne prouve pas que le manifeste contient ce fichier : le banc ne lit aucune couche OCI. Cette preuve reste à O5 réel, avec la lecture de Zot. Elle s'ajoute à la portée écrite plus haut.
