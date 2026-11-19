@@ -228,3 +228,16 @@ Question posée dans le cadre de fin de tour : « Pour D3, le service de signatu
 - **Coûts déjà écrits, désormais engagés** : l'hôte d'administration détiendra un jeton OpenBao borné à la clé `lien` et un accès en lecture à Zot. Création de la clé `lien`, du jeton et de sa politique : **accord à demander** avant O5 (liste « Accords », point 2).
 - La forme exacte du prédicat (type, champs) sera écrite avec les prédictions d'O5.
 - **Rien n'est lancé.** Question suivante : D4 (version de GnuPG).
+
+## Décision du propriétaire du 19/11/2026 : D4 (a) (consignée à 15:35:24 UTC)
+
+Question posée dans le cadre de fin de tour : « Pour D4, signer avec le GnuPG des distributions (2.3.3 Rocky, 2.4.7 Debian) ? ». Réponse du propriétaire, reçue avant l'heure ci-dessus : « Oui, option (a) ».
+
+- **D4 (a) retenue** : la signature passe par les paquets des distributions.
+  - rpm : `gnupg2` 2.3.3-5.el9_7 de Rocky 9.8, imposé par `rpm-sign-libs` (`/usr/bin/gpg2`).
+  - deb : `gnupg` 2.4.7-21+deb13u1 et `gpgv` 2.4.7-21+deb13u1+b5 de Debian 13.
+  - Versions relevées le 19/11/2026 ; l'épinglage d'O2 suivra la source figée décidée pour la brique 05.
+- **D4 (b)**, GnuPG 2.5.24 construit depuis l'archive amont, est écartée.
+- **À suivre** : branches amont hors maintenance (2.4 depuis le 30/06/2026, 2.3 absente du tableau de fin de vie) ; les 4 failles ouvertes sans DSA de Debian 13 sont à relever à chaque ré-audit. Les vérifications se font sur `Release` + `Release.gpg`, ou sur le texte sorti de la vérification, jamais sur un `InRelease` brut (CVE-2025-68972).
+- **D1 à D4 sont décidées.** Selon D2, l'outillage de signature tourne sur l'hôte d'administration. Les « images de signature » du jalon O2 sont donc à relire : il faut un **environnement de signature** Rocky 9.8 et un Debian 13 qui tournent sur l'hôte, par exemple des conteneurs podman (podman est présent sur l'hôte). Leur forme n'est pas tranchée ici ; elle sera proposée, avec ses prédictions, avant O2.
+- **Rien n'est lancé.** Prochaine étape : préparer O2 à sec. Elle demande les accords de la liste « Accords » : clé OpenPGP du PoC, puis clé `lien`, jeton OpenBao et accès à Zot avant O5.

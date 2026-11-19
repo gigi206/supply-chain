@@ -51,7 +51,7 @@ Avant la ligne « **Risqué → interdit** » :
 ### 1.4 §6, plans de sortie : une ligne à ajouter
 
 ```
-| GnuPG (ajouté le 19/11/2026, brique 09) | Branches amont des versions employées hors maintenance (2.4 depuis le 30/06/2026 ; 2.3 absente du tableau de fin de vie) ; 4 failles ouvertes sans DSA dans Debian 13 ; un éditeur dominant probable | Côté deb : Sequoia (`sq` pour signer, `sqv` déjà employé par apt d'après sa dépendance), relevé, non mesuré. Côté rpm : **aucune sortie mesurée**, `rpm-sign` 4.16 de Rocky 9.8 appelant gpg (`%__gpg_sign_cmd`) ; GnuPG 2.5 construit depuis l'archive amont signée reste possible (décision D4 de la brique 09) |
+| GnuPG (ajouté le 19/11/2026, brique 09) | Branches amont des versions employées hors maintenance (2.4 depuis le 30/06/2026 ; 2.3 absente du tableau de fin de vie) ; 4 failles ouvertes sans DSA dans Debian 13 ; un éditeur dominant probable | Côté deb : Sequoia (`sq` pour signer, `sqv` déjà employé par apt d'après sa dépendance), relevé, non mesuré. Côté rpm : **aucune sortie mesurée**, `rpm-sign` 4.16 de Rocky 9.8 appelant gpg (`%__gpg_sign_cmd`) ; GnuPG 2.5 construit depuis l'archive amont signée reste possible, mais écarté par la décision D4 (a) du propriétaire du 19/11/2026 (paquets des distributions) |
 ```
 
 ---
@@ -59,7 +59,7 @@ Avant la ligne « **Risqué → interdit** » :
 ## 2. `docs/03-validation-briques.md`, tableau « Briques » : une ligne à ajouter
 
 ```
-| 09 | openpgp-signing | **Préparé à sec** (19/11/2026, branche `claude/brique-09-sec-fdb4c6`) ; banc O0 sur l'hôte tenu, rien installé, cluster et Zot intacts | Dépôt apt signé autour d'une copie de D (`f66bbeb2…`) : `Release.gpg` et `InRelease` vérifiés par gpgv 2.4.8, chaîne `Release` → `Packages` → deb tenue, 5 témoins refusés ou détectés ; gpgv 2.4.8 accepte une signature SHA-1 de `Release` (refus par apt de Debian 13 non établi) ; `apt-ftparchive` 3.2.1 ignore `SOURCE_DATE_EPOCH` pour `Date`. Ni rpm, ni `createrepo_c`, ni sqv, ni le gpg des distributions cibles mesurés | [README](../poc/bricks/09-openpgp-signing/README.md), [banc](../poc/bricks/09-openpgp-signing/resultats/banc-depot-deb-predictions.md) ; décisions D1 à D4 attendues |
+| 09 | openpgp-signing | **Préparé à sec** (19/11/2026, branche `claude/brique-09-sec-fdb4c6`) ; banc O0 sur l'hôte tenu, rien installé, cluster et Zot intacts | Dépôt apt signé autour d'une copie de D (`f66bbeb2…`) : `Release.gpg` et `InRelease` vérifiés par gpgv 2.4.8, chaîne `Release` → `Packages` → deb tenue, 5 témoins refusés ou détectés ; gpgv 2.4.8 accepte une signature SHA-1 de `Release` (refus par apt de Debian 13 non établi) ; `apt-ftparchive` 3.2.1 ignore `SOURCE_DATE_EPOCH` pour `Date`. Ni rpm, ni `createrepo_c`, ni sqv, ni le gpg des distributions cibles mesurés | [README](../poc/bricks/09-openpgp-signing/README.md), [banc](../poc/bricks/09-openpgp-signing/resultats/banc-depot-deb-predictions.md) ; décisions D1 à D4 prises le 19/11/2026, toutes en (a) ; O2 à préparer |
 ```
 
 ---
@@ -69,7 +69,7 @@ Avant la ligne « **Risqué → interdit** » :
 Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 
 ```
-**Signature OpenPGP (09)** : préparée à sec le 19/11/2026 (branche à part, non fusionnée) ; banc O0 sur l'hôte tenu ; D1 à D3 décidées le 19/11/2026 (« deb signé » = dépôt apt signé, `.deb` intact ; clé OpenPGP en fichier sur l'hôte d'administration, pour le PoC seulement ; attestation de lien signée par la clé Transit `lien` après vérification de la provenance de Chains) ; D4 attendue avant tout passage dans le cluster.
+**Signature OpenPGP (09)** : préparée à sec le 19/11/2026 (branche à part, non fusionnée) ; banc O0 sur l'hôte tenu ; D1 à D4 décidées le 19/11/2026 (« deb signé » = dépôt apt signé, `.deb` intact ; clé OpenPGP en fichier sur l'hôte d'administration, pour le PoC seulement ; attestation de lien signée par la clé Transit `lien` après vérification de la provenance de Chains ; GnuPG des distributions) ; O2 à préparer, rien lancé.
 ```
 
 ---
@@ -79,7 +79,7 @@ Remplacer « **Signature OpenPGP (09)** : non commencée. » par :
 À la fin de la cellule « Décision attendue », ajouter :
 
 ```
- ; **brique 09 (préparée à sec le 19/11/2026)** : décision du propriétaire D1 (a) du 19/11/2026, « deb signé » = dépôt apt signé (`Release.gpg`, `InRelease`), `.deb` bit-identique et lien par identité d'empreinte ; aucun chemin publié et maintenu de gpg vers un HSM PKCS#11 (gnupg-pkcs11-scd « Risqué » à la lettre ; moteurs PKCS#11 et TPM d'obs-sign non publiés) ; **décision du propriétaire D2 (a) du 19/11/2026, pour le PoC seulement** : clé OpenPGP en fichier 0600 sur l'hôte d'administration, hors du cluster, comme la clé des tâches de J6 ; **écart de production à écrire dans l'ADR** (texte au §4 bis de `poc/bricks/09-openpgp-signing/A-REPORTER.md`) ; **décision du propriétaire D3 (a) du 19/11/2026** : attestation de lien (énoncé in-toto) émise par le service de signature après vérification de la provenance de Chains sur le manifeste non signé, signée par cosign avec une clé Transit `lien` distincte (provenance, `tsa`, tâches) ; l'hôte d'administration détient un jeton OpenBao borné à `lien` et un accès en lecture à Zot ; clé RSA 4096 v4 et SHA-512, non bornées par `default-sequoia.config` d'apt de Debian 13 (lecture du fichier ; sqv non mesuré ; banc O0 sous gpgv 2.4.8 seulement) ; expiration et certificat de révocation à part
+ ; **brique 09 (préparée à sec le 19/11/2026)** : décision du propriétaire D1 (a) du 19/11/2026, « deb signé » = dépôt apt signé (`Release.gpg`, `InRelease`), `.deb` bit-identique et lien par identité d'empreinte ; aucun chemin publié et maintenu de gpg vers un HSM PKCS#11 (gnupg-pkcs11-scd « Risqué » à la lettre ; moteurs PKCS#11 et TPM d'obs-sign non publiés) ; **décision du propriétaire D2 (a) du 19/11/2026, pour le PoC seulement** : clé OpenPGP en fichier 0600 sur l'hôte d'administration, hors du cluster, comme la clé des tâches de J6 ; **écart de production à écrire dans l'ADR** (texte au §4 bis de `poc/bricks/09-openpgp-signing/A-REPORTER.md`) ; **décision du propriétaire D3 (a) du 19/11/2026** : attestation de lien (énoncé in-toto) émise par le service de signature après vérification de la provenance de Chains sur le manifeste non signé, signée par cosign avec une clé Transit `lien` distincte (provenance, `tsa`, tâches) ; l'hôte d'administration détient un jeton OpenBao borné à `lien` et un accès en lecture à Zot ; **décision du propriétaire D4 (a) du 19/11/2026** : GnuPG des distributions (`gnupg2` 2.3.3-5.el9_7 de Rocky 9.8 pour rpm, `gnupg` 2.4.7-21+deb13u1 de Debian 13 pour deb), branches amont hors maintenance, failles à suivre au ré-audit ; clé RSA 4096 v4 et SHA-512, non bornées par `default-sequoia.config` d'apt de Debian 13 (lecture du fichier ; sqv non mesuré ; banc O0 sous gpgv 2.4.8 seulement) ; expiration et certificat de révocation à part
 ```
 
 ---
