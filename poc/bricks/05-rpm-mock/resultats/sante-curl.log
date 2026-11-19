@@ -1,0 +1,42 @@
+# sante.sh curl, 2026-11-19T15:39:13Z
+M1b : curl, transport du prefetch (intégrité ancrée par les sha256 et les signatures fixés par la pipeline) ; commits depuis 2026-08-21T00:00:00Z, avis depuis 2025-11-19
+Relevé du 2026-11-19 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| curl | curl/curl | transport | oui | 9.1 | 2026-11-19 | 10 | 10 | 0 | 10 |
+## curl/curl
+nom final curl/curl, archivé false, licence NOASSERTION, dernier push 2026-11-19
+dernière release : curl-8_23_0 du 2026-10-14
+commits depuis 2026-08-21T00:00:00Z : 1063 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+      354 vszakats	vsz.me
+      231 bagder	haxx.se
+      161 icing	eissing.org
+       27 MegaManSec	users.noreply.github.com
+       23 cmeister2	gmail.com
+       12 hja-oss	hja.pt
+       11 jay	yahoo.com
+       11 Marti2203	comp.nus.edu.sg
+       10 cla7aye15I4nd	outlook.com
+        9 dfandrich	coneharvesters.com
+fusionneurs des 100 dernières PR : MarcelRaad 6, bagder 42, cmeister2 19, dfandrich 19, gvanem 3, jay 6, kdudka 2, mback2k 2, uranix 1
+SECURITY.md : SECURITY.md
+avis publiés : 0 ; depuis un an : 0
+## avis de sécurité publiés par le projet (curl.se/docs/vuln.json ; le projet ne les publie pas comme avis GitHub)
+avis listés : 239 ; publiés depuis 2025-11-19 : 69 ; gravités : High 1, Low 53, Medium 15
+  CURL-CVE-2026-92389 2026-10-14 Low
+  CURL-CVE-2026-92390 2026-10-14 Low
+  CURL-CVE-2026-92391 2026-10-14 Low
+  CURL-CVE-2026-92392 2026-10-14 High
+  CURL-CVE-2026-94265 2026-10-14 Low
+  CURL-CVE-2026-94266 2026-10-14 Low
+## fichiers dans vault/rocky/9.8/BaseOS (décision « Oui 9.8 » ; liste non signée, indice de version seulement)
+  BaseOS : curl-7.76.1-40.el9_8.8.x86_64.rpm
+  BaseOS : curl-7.76.1-40.el9_8.9.x86_64.rpm
+  BaseOS : curl-minimal-7.76.1-40.el9_8.8.x86_64.rpm
+  BaseOS : curl-minimal-7.76.1-40.el9_8.9.x86_64.rpm
+  BaseOS : libcurl-7.76.1-40.el9_8.8.x86_64.rpm
+  BaseOS : libcurl-7.76.1-40.el9_8.9.x86_64.rpm
+  BaseOS : libcurl-minimal-7.76.1-40.el9_8.8.x86_64.rpm
+  BaseOS : libcurl-minimal-7.76.1-40.el9_8.9.x86_64.rpm
+version exécutée par le prefetch (essai du 19/11, m1b-builders-m1bt3-essai_prefetch.log) : curl 7.76.1 
