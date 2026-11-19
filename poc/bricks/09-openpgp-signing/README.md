@@ -179,3 +179,39 @@ Question posée dans le cadre de fin de tour : « Pour « deb signé » (D1), ga
 - **`debsign` n'est pas employé pour l'instant** : la pipeline S4d ne publie ni `.changes` ni `.buildinfo` (corrections datées ci-dessus, point 2). La ligne devscripts proposée au doc 04 reste donc sans usage.
 - **D1 (b)**, signature intégrée au `.deb` par `debsigs`, est écartée.
 - **Rien n'est lancé.** Question suivante : D2 (garde de la clé), puis D3 et D4.
+
+## Décision du propriétaire du 19/11/2026 : D2 (a), pour le PoC seulement (consignée à 15:28:58 UTC)
+
+Question posée dans le cadre de fin de tour : « Pour D2, garder la clé OpenPGP en fichier sur l'hôte d'administration, hors cluster ? ». Réponse du propriétaire, reçue avant l'heure ci-dessus, recopiée telle quelle :
+
+> Brique 09, D2 : garde de la clé OpenPGP (décision pour le PoC seulement)
+>
+> Pour le PoC, la clé OpenPGP des rpm, des deb et des dépôts est un fichier de clé (0600)
+> sur l'hôte d'administration, hors du cluster, comme la clé des tâches de J6. Le cluster
+> ne voit jamais la clé privée. OpenBao sert seulement à l'attestation de lien (clé Transit
+> « lien », D3), parce que Transit ne fait pas d'OpenPGP.
+>
+> Ce choix ne vaut que pour le PoC. Il n'est pas acceptable en production :
+> - la clé est copiable : root sur l'hôte ou une sauvegarde suffit pour la récupérer ;
+> - l'hôte d'administration porte déjà d'autres secrets (clé des tâches, accès au cluster) ;
+> - aucun journal de signature ne vit à l'abri du signataire, et il n'y a ni quorum
+>   ni limite d'usage ;
+> - c'est un écart avec le doc 02, qui place le service de signature dans la zone Confiance.
+>
+> Pour la production, une vraie solution reste à trouver. Elle doit garder la clé dans un
+> matériel dont elle ne sort pas, et passer par un service de signature isolé et journalisé.
+> Aucune voie actuelle n'est à la fois maintenue et compatible avec notre chaîne :
+> - un jeton matériel OpenPGP (YubiKey, Nitrokey) sur un hôte dédié marche avec gpg et
+>   rpmsign, mais il n'a pas été mesuré ;
+> - un HSM réseau en PKCS#11 n'a aucun pont maintenu vers gpg ;
+> - les services tout faits (sigul, debusine) sont écartés aujourd'hui.
+>
+> Cet écart et cette recherche sont à écrire dans l'ADR 0003, et à reprendre avant toute
+> mise en production.
+
+Conséquences pour le protocole :
+- **D2 (a) retenue pour le PoC** : clé OpenPGP en fichier 0600 sur l'hôte d'administration, hors du cluster. D2 (b) et D2 (c) ne sont pas retenues pour le PoC.
+- **D3 est orientée par cette réponse** : elle nomme la clé Transit « lien » pour l'attestation de lien. La question D3 reste à confirmer, pour l'émetteur et pour la vérification de la provenance de Chains avant signature.
+- **Écart de production** à écrire dans l'ADR 0003 (texte proposé dans [`A-REPORTER.md`](A-REPORTER.md), §4). Il est à reprendre avant toute mise en production.
+- Le jeton matériel OpenPGP reste **non mesuré** ; aucune mesure n'est prévue dans cette brique.
+- **Rien n'est lancé.** Question suivante : D3, puis D4.
