@@ -276,3 +276,13 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
   - outillage : `7c07083c…`, avec le `tar` de l'amorce, pour le pod et la tâche ;
   - bootstrap : `f2652169…` reste une archive du `tar` de l'hôte ; elle est à refaire avec le `tar` de l'image qui l'archivera.
 - **Ce n'est un accord** pour aucune écriture dans le cluster ni dans Zot.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T10:46:01Z UTC : pods d'essai Kata, et lenteur de dnf
+
+- **Outillage dans Kata** : `pod_a` (limite par défaut) et `pod_c` (limite de fichiers ouverts à 1 024) donnent l'archive `7c07083c…` au bit près, hors réseau ([`m1b-pod_a.log`](m1b-pod_a.log), [`m1b-pod_c.log`](m1b-pod_c.log)). La portée est étroite : l'outillage seul, deux pods du même nœud, le même jour, des entrées livrées par copie, la racine seule (ni couche de configuration, ni layout). Le point 1 A n'est donc pas établi au sens de la carte : il manque le bootstrap, un autre jour et la tâche elle-même. `pod_b` est en cours.
+- **Lenteur** : dnf met 5 811 s dans `pod_a` et 40 s dans `pod_c`. La cause est mesurée : avant chaque scriptlet, rpm 4.16 ne peut pas ouvrir `/proc/self/fd` dans la racine installée. Il appelle alors `fcntl` sur chaque descripteur jusqu'à la limite dure, qui vaut 2³⁰ dans le pod ([banc de l'hôte](m1b-cloexec-banc.log), [lecture du source](m1b-rpm-cloexec.log)).
+- **Remède retenu pour la tâche, révisable à la revue de `taches.yml`** : abaisser la limite souple, puis la limite dure, à 1 024, dans un sous-shell qui n'entoure que dnf. Seule la valeur 1 024 est mesurée.
+- **Autres voies, non retenues** : monter `/proc` dans la racine installée (non mesuré, cela touche l'arbre et l'archivage) ; changer la limite par défaut du runtime de Kata (changement du cluster, à soumettre au propriétaire).
+- **mock n'est pas concerné en pratique** : `mock --hermetic-build` dure de 46 à 54 s dans Kata dans les journaux archivés ([`m4c-essai.log`](m4c-essai.log) par exemple). Pourquoi la boucle ne le ralentit pas n'est pas mesuré.
+- **Non remesuré** : les 5 694 s de l'étape `racine` et les 761 s de `boot_racine` de S1. La même cause y est probable.
+- **Point ouvert, distinct de la vitesse** : `var/lib/rpm/rpmdb.sqlite-shm` a varié entre deux installations de l'hôte avec `keepcache=0` ([comparaison](m1b-cloexec-comparaison.log)). Il n'a pas varié entre le banc des sondes, `pod_a` et `pod_c`. C'est un risque pour la reproductibilité ; l'exclure n'est pas décidé.
