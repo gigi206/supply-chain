@@ -76,3 +76,25 @@ La voie P a donc deux formes :
 - **P-ec** : un second passage d'ec sur `SIGNE`, avec la clé `lien` et une politique qui n'inclut que des règles du lien, en rego sur `input.attestations`. Les règles seraient testables par `ec opa test`, comme `porte_test.rego`. Il faut une source de politique de plus dans la ConfigMap, et lire le contrôle de signature à vide déjà vu au banc C (la règle `porte.image_signature` n'aurait pas cours ici). Rien de cette forme n'est mesuré.
 
 L'estimation de P1 ne change pas (1 j, confiance moyenne). Elle vaut pour l'une ou l'autre forme, dont le choix est laissé au moment d'écrire P1.
+
+## Correction datée du 19/11/2026, 21:13:46 UTC : P1 rechiffré, et Kyverno borné à ce qui est lu
+
+Relecture du conseiller. Trois points de la carte dépassaient ce que j'avais vérifié.
+
+**1. La voie P supposait que la porte admet déjà les manifestes non signés.** Recherche dans les résultats archivés de la 05, de la 06, de la 07a et de la 10, sans rien relancer :
+- **deb `builds/sample-app-deb@60f25f5c…`** : le Job complet de la porte l'admet depuis S6a de la 06 (`VERDICT|s6a-deb|true|…`, [s6a-porte.log](../../06-deb-sbuild/resultats/s6a-porte.log), 16/11/2026). ec, horodatage (8/8), VSA (1/1) et scan sont admis. Avant S6a, la porte le refusait faute de VSA et de scan (S4d3 et S5). La copie `signes/sample-app-deb` a le même digest.
+- **rpm `builds/sample-app-rpm@07b7bd6f…`** : **aucun verdict de la porte n'est archivé** (aucune ligne `VERDICT` qui le nomme). La 05 garde la réserve « Porte sans tâche rpm » ([m5b-carte.md](../../05-rpm-mock/resultats/m5b-carte.md), §4). `_constructions` de `porte.rego` ne nomme que `construire-image` et `construire-deb`, et `vsa.sh` comme le contrôle de scan exigent des énoncés dans `builds/vsa/` et `builds/scan/`. Je n'ai pas vérifié s'ils existent pour ce rpm.
+
+**P1 rechiffré** :
+- **P1-deb** : 1 j, confiance moyenne, inchangé. Le manifeste jugé par ec est déjà admis par la porte complète.
+- **P1-rpm** : il faut d'abord étendre la porte à la voie rpm (règle Kata pour `construire-rpm`, VSA de la 10, scan de la 07a), comme S4d2a l'a fait pour le deb. Ce travail relève de la 05, de la 10 et de la 07a, pas de la 09. **Il n'est pas chiffré ici.** Tant qu'il n'est pas fait, un contrôle du lien du rpm signé s'appuierait sur un manifeste que la porte n'a jamais admis.
+
+**2. « Cinq violations, toutes dues à l'absence de provenance de Chains »** (additif ci-dessus) : trop fort, voir la correction datée des [prédictions](o6-porte-banc-predictions.md). Seul est mesuré que ces violations restent avec la clé `lien`.
+
+**3. Kyverno.** J'ai lu les deux fichiers de politiques Kyverno du dépôt : [`admission.yaml`](../../08-trust-plane/politique/admission.yaml) de la 08 et [`durcissement.yaml`](../../08c-durcissement/politiques/kyverno/durcissement.yaml) de la 08c. Le second ne vise que des pods, le premier des pods et des objets Tekton. Aucune de leurs règles ne vise un rpm, un deb ou un dépôt.
+- La ligne « Risques » du README (« sans attestation de lien vérifiée à l'admission, Kyverno refuserait ou laisserait passer selon la règle ») ne s'appliquerait qu'à une image de pod construite à partir du rpm signé. Il n'en existe aucune dans le PoC.
+- Cette ligne et les notes d'O5 (« porte et Kyverno (O6) ») se lisent donc ainsi : O6 ne touche que la porte.
+
+**Secret `lien`** : la voie P n'emploie que la clé publique (`lien.pub`). Le secret gardé pour O6 n'y sert pas.
+
+**Question au propriétaire, mise à jour** : **P1-deb ou N ?** T n'est pas proposée, car elle rouvre D2 (a). P1-rpm attend l'extension de la porte à la voie rpm, hors de la 09.

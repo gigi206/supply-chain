@@ -273,3 +273,8 @@ Après le tableau du §4 (sous la ligne « Sources : … »), ajouter :
   - Kyverno est sans objet : il n'admet que des images de pods.
 - **Mesure O6-M0** ([prédictions et résultat](resultats/o6-porte-banc-predictions.md)). La porte de la 08 telle quelle refuse les quatre objets de `signes/**`. Avec la clé `lien`, ec vérifie pourtant l'attestation de lien. Le banc était hors cluster : Zot jetable, lecture anonyme, aucune écriture.
 - **Rien n'est à reporter dans les fichiers partagés** tant que le propriétaire n'a pas choisi. Si c'est P, les ajouts toucheront `porte-job.yaml`, la ConfigMap `porte` et `politique.sh porte` de la 08. Ils seront écrits ici mot pour mot avant tout passage.
+
+*Correction datée du 19/11/2026, 21:13:46 UTC (O6)* : la note précédente, et celles d'O5 qui disent « porte et Kyverno (O6) », vont trop loin.
+- **Kyverno.** Les deux fichiers de politiques Kyverno du dépôt (08 `admission.yaml`, 08c `durcissement.yaml`) ne visent que des pods et des objets Tekton : aucune règle ne vise un rpm, un deb ou un dépôt. O6 ne touche que la porte.
+- **Rpm.** La porte n'a jamais rendu de verdict archivé sur le rpm `builds/sample-app-rpm@07b7bd6f…` (réserve « Porte sans tâche rpm » de la 05). P1 est rechiffré en **P1-deb** (1 j, estimation) et **P1-rpm**, qui attend l'extension de la porte à la voie rpm, hors de la 09.
+- **Question au propriétaire** : P1-deb ou N ([carte](resultats/o6-carte.md), correction datée).

@@ -56,3 +56,8 @@ Script : [`o6-porte-banc.sh`](../o6-porte-banc.sh). Carte : [`o6-carte.md`](o6-c
 - un passage de plus d'ec, avec une politique qui n'inclut que des règles du lien, écrites en rego sur `input.attestations`.
 
 Je les écris dans la carte sans en retenir aucune. Ce banc n'a rien mesuré au-delà : ni règle rego du lien, ni Job réel.
+
+*Correction datée du 19/11/2026, 21:13:46 UTC (relecture du conseiller)* : j'ai écrit plus haut que les cinq violations de M0-4 étaient « toutes dues à l'absence de provenance de Chains et de signature d'image ». C'est trop fort. Le message du commit `13564b19` dit la même chose, plus fort encore.
+- **`porte.image_signature`** porte sur la signature d'image, pas sur la provenance.
+- **`slsa_source_correlated.source_code_reference_provided`** apparaît aussi sur une image *avec* provenance dès qu'ec est lancé par `--image`, sans source attendue (R5 de la brique 10, `r5-referrer_porte.log`, ligne 23). Ce banc l'a lancé ainsi.
+- **Ce qui est mesuré, sans plus** : ces cinq violations restent quand la clé `lien` est fournie. Ce banc n'attribue pas leur cause règle par règle.

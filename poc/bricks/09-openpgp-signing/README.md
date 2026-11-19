@@ -355,3 +355,8 @@ Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.
   - Ces estimations ne sont pas mesurées.
 - **Mesure O6-M0** ([résultat](resultats/o6-porte-banc-predictions.md)) : la porte de la 08 telle quelle refuse les objets de `signes/**`. ec vérifie l'attestation de lien avec la clé `lien`.
 - **En attente** : décision du propriétaire.
+
+*Correction datée du 19/11/2026, 21:13:46 UTC (O6)* : la note précédente, et celles d'O5 qui disent « porte et Kyverno (O6) », vont trop loin.
+- **Kyverno.** Les deux fichiers de politiques Kyverno du dépôt (08 `admission.yaml`, 08c `durcissement.yaml`) ne visent que des pods et des objets Tekton : aucune règle ne vise un rpm, un deb ou un dépôt. O6 ne touche que la porte.
+- **Rpm.** La porte n'a jamais rendu de verdict archivé sur le rpm `builds/sample-app-rpm@07b7bd6f…` (réserve « Porte sans tâche rpm » de la 05). P1 est rechiffré en **P1-deb** (1 j, estimation) et **P1-rpm**, qui attend l'extension de la porte à la voie rpm, hors de la 09.
+- **Question au propriétaire** : P1-deb ou N ([carte](resultats/o6-carte.md), correction datée).
