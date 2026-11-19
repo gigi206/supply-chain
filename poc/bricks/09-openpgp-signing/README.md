@@ -346,3 +346,12 @@ Voir la [correction datée](resultats/o5-predictions.md) des prédictions d'O5.
 - **Vérification.** En anonyme, cosign vérifie avec la clé archivée, puis le contrôle indépendant recalcule sur les octets tirés de Zot : B1 pour le rpm, l'identité du deb, la chaîne de chaque dépôt.
 - **Témoins.** La clé jetable est refusée. Les témoins faux, dans `signes/essai-09-*`, sont refusés par le contrôle.
 - **Réserves** : jetons d'horodatage non vérifiés ; porte et Kyverno (O6) non faits.
+
+*Note datée du 19/11/2026, 21:10:59 UTC* : **O6 chiffré à sec** ([carte](resultats/o6-carte.md)).
+- **Voies** :
+  - **P**, contrôle du lien par la porte : 1 j pour les paquets, + 0,5 j pour les dépôts, + 1 j pour l'horodatage ;
+  - **T**, tâche signée : au moins 3 j, contraire à D2 (a) ;
+  - **N**, pas d'O6.
+  - Ces estimations ne sont pas mesurées.
+- **Mesure O6-M0** ([résultat](resultats/o6-porte-banc-predictions.md)) : la porte de la 08 telle quelle refuse les objets de `signes/**`. ec vérifie l'attestation de lien avec la clé `lien`.
+- **En attente** : décision du propriétaire.

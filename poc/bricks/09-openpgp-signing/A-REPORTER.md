@@ -264,3 +264,12 @@ Après le tableau du §4 (sous la ligne « Sources : … »), ajouter :
 - **Taille.** Chaque couche fait environ 2 Mo : 2 181 120 octets pour le rpm (et autant pour le rpm altéré), 2 191 360 pour le dépôt rpm, 1 966 080 pour le dépôt apt, plus la couche du deb, recopiée. Je n'ai pas mesuré l'espace pris sur le disque de Zot.
 - **Garde horaire.** Toute écriture de la brique dans Zot est refusée par `o5-signes.sh` entre 23:30 et 08:00 UTC (mesure de M1b).
 - **Secret `lien`.** Il expire au plus tard le 22/11/2026 à 19:49:36 UTC. Aucune signature `lien` n'est prévue d'ici là.
+
+*Note datée du 19/11/2026, 21:10:59 UTC (O6 chiffré à sec)* :
+- **Carte d'O6** ([o6-carte.md](resultats/o6-carte.md)). Trois voies, au choix du propriétaire :
+  - **P** : contrôle du lien par la porte ;
+  - **T** : tâche signée, contraire à D2 (a) ;
+  - **N** : pas d'O6.
+  - Kyverno est sans objet : il n'admet que des images de pods.
+- **Mesure O6-M0** ([prédictions et résultat](resultats/o6-porte-banc-predictions.md)). La porte de la 08 telle quelle refuse les quatre objets de `signes/**`. Avec la clé `lien`, ec vérifie pourtant l'attestation de lien. Le banc était hors cluster : Zot jetable, lecture anonyme, aucune écriture.
+- **Rien n'est à reporter dans les fichiers partagés** tant que le propriétaire n'a pas choisi. Si c'est P, les ajouts toucheront `porte-job.yaml`, la ConfigMap `porte` et `politique.sh porte` de la 08. Ils seront écrits ici mot pour mot avant tout passage.

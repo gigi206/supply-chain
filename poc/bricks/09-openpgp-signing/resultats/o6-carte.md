@@ -64,3 +64,15 @@ Elle dit si P peut s'appuyer sur ec avec la clé `lien`, ou s'il faut un contene
 ## Question au propriétaire (après O6-M0)
 
 Une seule : **P1, T ou N ?** Puis, si P1 : P2 et PH, une question à la fois.
+
+## Additif du 19/11/2026, écrit à 21:10:42 UTC : O6-M0 passée, deux formes possibles pour P
+
+O6-M0 est passée (21:09:53 à 21:10:00 UTC), et ses sept prédictions sont tenues ([résultat](o6-porte-banc-predictions.md), [journal](o6-porte-banc.log)).
+- **La porte actuelle refuse les quatre objets de `signes/**`**, avec la clé de Chains comme avec la clé `lien`. Elle ne peut donc pas juger un objet signé telle quelle : P garde le manifeste non signé comme `IMAGE` jugée par ec.
+- **ec vérifie l'attestation de lien quand on lui donne la clé `lien`** : 1 attestation comptée, contrôles de signature réussis. Il reste cinq violations, toutes dues à l'absence de provenance de Chains.
+
+La voie P a donc deux formes :
+- **P-sh** : un conteneur `lien` sur le modèle de `vsa.sh` (cosign et `sh`). C'est la forme déjà en service pour la VSA, et la plus courte à écrire.
+- **P-ec** : un second passage d'ec sur `SIGNE`, avec la clé `lien` et une politique qui n'inclut que des règles du lien, en rego sur `input.attestations`. Les règles seraient testables par `ec opa test`, comme `porte_test.rego`. Il faut une source de politique de plus dans la ConfigMap, et lire le contrôle de signature à vide déjà vu au banc C (la règle `porte.image_signature` n'aurait pas cours ici). Rien de cette forme n'est mesuré.
+
+L'estimation de P1 ne change pas (1 j, confiance moyenne). Elle vaut pour l'une ou l'autre forme, dont le choix est laissé au moment d'écrire P1.
