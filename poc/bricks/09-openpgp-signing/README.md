@@ -145,3 +145,14 @@ Prédictions du banc : [`resultats/banc-depot-deb-predictions.md`](resultats/ban
 - Le Scorecard de `gpg/gnupg` (3,5) est celui d'un miroir que les mainteneurs ne suivent pas, pas celui du projet : GnuPG est jugé au §4 du doc 04 (hors GitHub).
 - Le délai de correction des CVE de GnuPG n'est pas mesuré.
 - Les cibles 2c de B8 (alma-9, centos-stream-10, debian-12, ubuntu-24.04) ont leurs propres vérificateurs (rpm-sequoia, gpgv, apt 2.x), non relevés.
+
+## Additif du 19/11/2026, écrit à 15:00:47 UTC : banc O0 passé, prédictions tenues
+
+Banc lancé après le commit des prédictions (`96b7e6f7`) : `prealables` à 14:58:01 UTC (4 OK), `banc` de 14:58:04 à 14:58:06 UTC (14 OK, 0 ÉCART), code 0 pour les deux. Détail et lecture : [note datée](resultats/banc-depot-deb-predictions.md#note-datée-du-19112026-écrite-à-145910-utc--banc-passé-toutes-les-prédictions-tenues).
+
+- Dépôt apt signé (RSA 4096, v4, SHA-512) autour d'une copie de D : `Release.gpg` et `InRelease` vérifiés par gpgv 2.4.8 ; chaîne `Release` → `Packages` → `f66bbeb2…` tenue, deb inchangé ; témoins refusés ou détectés (Release et InRelease altérés, clé étrangère, Packages et deb altérés).
+- **gpgv 2.4.8 accepte une signature SHA-1**, que `default-sequoia.config` d'apt de Debian 13 refuse depuis le 01/02/2026 : un contrôle par gpgv ne remplace pas le vérificateur d'apt, d'où la mesure par apt en O4.
+- **`apt-ftparchive` 3.2.1 (celui de l'hôte, pas le 3.0.3 de trixie) ignore `SOURCE_DATE_EPOCH`** pour le champ `Date` de `Release` (relevé non prédit) : la date de `Release` est à fixer autrement avant O4.
+- Le dossier du banc, clé jetable comprise, a été effacé après archivage.
+- **Incident** pendant l'écriture de la note (hors du banc) : des accents graves dans une commande `bash -c` ont été exécutés par zsh, dont `gpgconf --kill all` **sans `--homedir`**, qui a arrêté les démons de GnuPG du trousseau par défaut de l'utilisateur (ils redémarrent à la demande ; aucune clé lue ni affichée). Détail dans la [note du banc](resultats/banc-depot-deb-predictions.md#incident-du-19112026-vers-145829-utc-après-le-banc-hors-du-script).
+- Ajouts proposés aux fichiers partagés : [`A-REPORTER.md`](A-REPORTER.md).

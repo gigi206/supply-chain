@@ -34,3 +34,26 @@ Code attendu : 0, 4 OK.
 | BD12 | Le deb du dépôt reste égal à `f66bbeb2…` à la fin | haute |
 
 Code attendu : 0, 14 OK (BD1, BD2, BD3+BD4, BD6, BD7, BD8, BD9, cinq BD10, BD11, BD12). Durée : moins de 2 min (deux clés RSA 4096). Dossier neuf `~/.cache/supply-chain-poc/09/banc-depot-deb-<horodatage>`, à effacer après archivage du journal (aucun script ne le relit).
+
+## Note datée du 19/11/2026, écrite à 14:59:10 UTC : banc passé, toutes les prédictions tenues
+
+Lancé après le commit des prédictions (`96b7e6f7`). Journaux : [prealables](banc-depot-deb-prealables.log) (14:58:01 UTC, code 0, 4 OK, 0 ÉCART) et [banc](banc-depot-deb.log) (14:58:04 à 14:58:06 UTC, code 0, 14 OK, 0 ÉCART).
+
+- **PR1 tenue** : gpg et gpgv 2.4.8 (`2.4.8-4ubuntu3.1`). Relevés : `apt-ftparchive` est celui d'**apt 3.2.1** d'Ubuntu (`3.2.1ubuntu0.1`), pas le 3.0.3 de trixie ; `dpkg-deb` 1.23.7 ; python3 3.15.2 par le shim de mise dans `~/.cache/supply-chain-poc/09`.
+- **PR2 à PR5 tenues** : neuf outils absents ; copie du deb égale à `f66bbeb2…` ; copie rpm `m3` égale à `864d55f4…`, copie `banc-m3-2-1` à `1407b7ef…` ; `.changes` de S3 de 1 323 octets (`32796934…`), une ligne porte le sha256 du deb. Son contenu n'est pas affiché.
+- **BD1 à BD4 et BD6 à BD12 tenues** : clés `F8BD3922…B167` (signataire) et `DB423EAF…CE5A` (témoin), RSA 4096, usage `scSC`, expiration au 21/11/2026 ; une strophe `sample-app 1.0.0-2 amd64`, `SHA256 f66bbeb2…` ; `Release.gpg` et `InRelease` vérifiés par gpgv, texte sorti d'`InRelease` égal à `Release` octet pour octet ; signature v4, RSA, SHA-512 ; N1 et N2 refusés (code 1), N3 refusé (code 2), N4 et N5 détectés par la chaîne ; **gpgv 2.4.8 accepte une signature SHA-1** (code 0, aucun avertissement dans le journal) ; deb inchangé à la fin.
+- **BD5 (relevé, non prédit)** : `apt-ftparchive` 3.2.1 **ignore `SOURCE_DATE_EPOCH`** pour le champ `Date` (date de l'exécution, 14:58:06 UTC, au lieu du 17/11/2025). Les deux sorties sont identiques parce qu'elles tombent dans la même seconde. Un `Release` reproductible demande donc une date passée par option (non lu, à lire avant O4).
+- **Hors portée, rappel** : ni gpg 2.4.7 ni 2.3.3, ni sqv, ni rpm ne sont mesurés. BD11 montre seulement que gpgv ne reflète pas la politique d'apt de trixie.
+- Dossier du banc effacé à 14:58:16 UTC (clé jetable comprise), après archivage des journaux ; aucun script ne le relit. Le `gpg-agent` de son `--homedir` a été arrêté par le script (`gpgconf --homedir … --kill all`).
+
+## Incident du 19/11/2026, vers 14:58:29 UTC (après le banc, hors du script)
+
+La première écriture de la note ci-dessus passait par une commande `bash -c "…"` lancée depuis zsh, avec des accents graves dans la chaîne, ce que les règles de la session interdisent. **zsh a exécuté le contenu de ces accents graves** comme des commandes. La note écrite était corrompue ; elle n'a jamais été commitée et a été réécrite avec l'outil d'écriture.
+
+Commandes réellement exécutées par erreur, d'après la sortie de la commande :
+- `dpkg-deb` sans argument (erreur d'usage, aucun effet) et `apt-ftparchive` sans argument (affichage de l'aide) ;
+- `gpg-agent` sans option : il a répondu « gpg-agent running and available », donc il a trouvé l'agent du trousseau par défaut déjà lancé ;
+- **`gpgconf --kill all` sans `--homedir`** : cette commande arrête les démons de GnuPG (agent, dirmngr, keyboxd, scdaemon) du **trousseau par défaut de l'utilisateur**. Ils redémarrent à la première demande. Aucune clé ni aucun fichier n'a été lu, écrit ou affiché ;
+- les autres mots (empreintes, noms de fichiers) ont échoué en « command not found ».
+
+Désormais, aucun texte ne passe par `bash -c` avec des accents graves : les notes sont écrites avec l'outil d'écriture.
