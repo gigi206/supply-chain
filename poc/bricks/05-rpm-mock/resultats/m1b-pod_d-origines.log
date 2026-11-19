@@ -1,0 +1,8 @@
+# m1b-pod_d-origines.sh, début 2026-11-19T12:24:23Z
+couche 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09 : sha256 recalculé 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+couche amont : proc type 5 mode 0o755
+a8 etc/passwd : systemd-coredump uid 999 gid 999 shell /sbin/nologin
+a8 etc/passwd : tss uid 59 gid 59 shell /usr/sbin/nologin
+a8 etc/passwd, uid 59 : tss
+60 × 292 = 17520
+# fin 2026-11-19T12:24:23Z

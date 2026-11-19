@@ -1162,3 +1162,9 @@ Journaux :
 - **limite de fichiers ouverts à 1 024** : même vitesse (40 s), même archive `7c07083c…` que les références ;
 - **`/proc` monté dans la racine** : même vitesse, mais un autre contenu. Le garder demanderait de refaire les références.
 - **S1** ([`m1b-pod_d-s1.log`](m1b-pod_d-s1.log), [script](m1b-pod_d-s1.sh)) : aucun des 20 chemins n'existe dans `racine.tar` (13 341 membres, `./proc` en 555) ni dans `boot-racine.tar` (11 482 membres, `./proc` en 755, venu de l'image amont). Sur ce point, les racines de S1 ressemblent à celles faites sans `/proc`, pas à `pod_d`.
+
+**Note datée du 19/11/2026, écrite à 2026-11-19T12:25:00Z UTC, sur la note de résultat de `pod_d`** ([`m1b-pod_d-origines.log`](m1b-pod_d-origines.log), [script](m1b-pod_d-origines.sh)) :
+- **`./proc` de `boot-racine.tar`** : la note l'a dit « venu de l'image amont » sans l'avoir lu. C'est maintenant lu. La couche amont `812c4412…` de l'image rockylinux 9.7, recalculée depuis le cache OCI local, a `proc` en 755.
+- **`lastlog`** : 17 520 octets valent 60 enregistrements de 292 octets, soit jusqu'à l'uid 59. Dans `etc/passwd` de `a8`, l'uid 59 est `tss`, compte du paquet `tpm2-tss`, installé en 193ᵉ position sur 199. L'hypothèse d'un `useradd` qui remplit `lastlog` une fois le fichier créé est cohérente, mais pas lue dans les scriptlets.
+- **Vocabulaire** : là où la note dit « un scriptlet », il faut lire « un scriptlet ou un déclencheur de fichiers » ; ni l'un ni l'autre n'a été lu.
+- **Un seul passage** : `fb33228f…` vient d'un seul `pod_d`. Sa reproductibilité n'est pas établie.

@@ -292,3 +292,19 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 **Décision du propriétaire** (réponse reçue avant 2026-11-19T10:51:48Z UTC, heure exacte non relevée) : « Mesurer aussi /proc ». La question était : « Pour la tâche : limite seule, ou mesurer aussi /proc ? ». Ma recommandation, passée par le conseiller, était la limite seule.
 - **Conséquence** : la voie « `/proc` monté dans la racine installée », notée « non retenue » dans la note précédente, est mesurée par un pod à part, `pod_d`, après `pod_b`. Le remède de la tâche sera choisi ensuite, sur les deux mesures.
 - **Ce n'est un accord** pour aucune écriture dans Zot ni pour aucun changement du cluster. Le pod d'essai est lancé sous l'accord permanent du 18/11.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T12:25:00Z UTC : les deux mesures sont faites
+
+Cette note complète, sans la réécrire, la note « pods d'essai Kata, et lenteur de dnf ». Celle-ci disait de `/proc` dans la racine « non mesuré », et de la limite « remède retenu ». Le choix reste au propriétaire, sur les deux mesures.
+
+- **`pod_b`** redonne `7c07083c…` au bit près (dnf 5 724 s), et `p-a.tar` = `p-b.tar` ([`m1b-comparer.log`](m1b-comparer.log)). Trois pods Kata (a, b, c) donnent donc la même archive de l'outillage. La portée reste celle des prédictions : même nœud, même jour, racine seule.
+- **Limite de fichiers ouverts à 1 024** (`pod_c`) : 40 s, même archive `7c07083c…`.
+- **`/proc` monté dans la racine installée** (`pod_d`) : 40 s aussi, mais une autre archive (`fb33228f…`, un seul passage) :
+  - 20 chemins déclarés dans `tmpfiles.d` (dossiers vides, `btmp`, `wtmp`, `lastlog`, lien `/var/log/README`) ;
+  - `./proc` en 755 ;
+  - deux mtimes ([écarts](m1b-pod_d-ecarts.log), [tmpfiles.d](m1b-pod_d-tmpfiles.log)).
+- **Le vrai constat** : le contenu de l'image ne dépend pas de la limite de fichiers ouverts, mais de la présence de `/proc` dans la racine installée. C'est une entrée implicite de la construction, désormais mesurée.
+- **S1** : aucun des 20 chemins n'est dans `racine.tar` ni dans `boot-racine.tar` ([`m1b-pod_d-s1.log`](m1b-pod_d-s1.log)). Les images de M2 à M4c avaient donc le contenu « sans `/proc` ».
+- **Le revers de « sans `/proc` »** : la création des chemins de `tmpfiles.d` y échoue en silence, et la limite seule fige ce contenu-là. Pour une racine de construction où systemd ne démarre pas, l'effet n'est pas mesuré.
+- **mock** : `pod_d` rend cohérente l'hypothèse que mock ne boucle pas parce qu'il monte `/proc` dans son chroot. C'est cohérent, non mesuré pour mock.
+- **Recommandation** (passée par le conseiller) : la limite seule. Elle garde les références et le contenu des images déjà éprouvées, sans montage dans l'arbre. `/proc` monté demanderait de refaire les références, et un second `pod_d` pour établir sa reproductibilité. Ce n'est pas une décision.
