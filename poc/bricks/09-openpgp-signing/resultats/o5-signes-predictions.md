@@ -96,3 +96,7 @@ Il juge une sortie de `cosign verify-attestation`, déjà vérifiée par cosign.
 **Objets laissés dans Zot après `essai_attest`** :
 - `signes/essai-09-attest` et `signes/essai-09-autre`, au digest du rpm signé, avec leur referrer jetable ;
 - `signes/essai-09-altere`, au digest du rpm altéré, avec son referrer jetable.
+
+## Note datée du 19/11/2026, 20:48:15 UTC : `construire` passée (20:48:09 UTC), CO1 et CO2 tenues
+
+Journal : [o5-signes-construire.log](o5-signes-construire.log). Aucune ligne KO. Les digests sont ceux du banc : rpm `sha256:fa5b175786dc…`, depot-rpm `sha256:ed666ab80dd1…`, depot-apt `sha256:90909a869321…`. La seconde construction donne les mêmes. Adresses fictives : 0, 4 et 2. Le dossier `09/o5-signes/construire` est gardé pour la suite ; la seconde construction est effacée.
