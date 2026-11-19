@@ -1019,3 +1019,15 @@ Journaux :
   - trois points ne sont pas lus : le passage dans la racine avant le scriptlet (chroot), les correctifs de Rocky sur `rpm-4.16.1.3-40.el9`, et le lien avec les 5 694 s de l'étape `racine` de S1.
 - **Ce qui la trancherait** : un essai à part, avec une limite dure basse (`ulimit -Hn`) ou `/proc` monté dans la racine. Les fichiers installés ne devraient pas en dépendre ; c'est à mesurer.
 - **Rien n'est changé** dans `pod_a`, qui continue. `pod_b` gardera le même script, pour que PC1 compare deux passages identiques.
+
+### Vérification de l'explication sur l'hôte : prédictions (note écrite à 2026-11-19T09:34:17Z UTC, avant le lancement)
+
+Le propriétaire a demandé, le 19/11 : « il faut vérifier ton explication ». Le banc [`m1b-cloexec-banc.sh`](m1b-cloexec-banc.sh) tourne sur l'hôte, hors ligne, sans rien installer. Il reprend la racine de l'amorce, les entrées de `prealables` et l'installation de `SONDE_INSTALL`. Il fait quatre installations : A tracée sur les `openat` de `/proc/self/fd`, B tracée sur le nombre de `fcntl`, C et D sans trace, avec la limite dure de l'hôte (524 288) puis avec 1 024.
+
+- **CX1** : dans A, au moins une ouverture de `/proc/self/fd` échoue avec `ENOENT`. Le reste des résultats est relevé, sans pari.
+- **CX2** : dans B, le nombre de `fcntl` divisé par 524 285 est proche, à 5 % près, du nombre d'ouvertures en `ENOENT` de A. Cela montrerait une boucle complète par ouverture ratée.
+- **CX3** : D est plus court que C.
+- **CX4** : les archives de C et de D valent toutes deux `7c07083c…`. Le contenu installé ne dépendrait donc pas de la limite.
+- **CX5** : dnf rend le code 0 dans les quatre installations.
+
+**Portée prévue.** Le mécanisme serait montré sur l'hôte, avec une limite de 524 288. Dans le pod, la limite de 2³⁰ est mesurée, mais le nombre d'appels n'y est pas compté : ce banc ne le mesure pas. Un pod d'essai à limite basse le mesurerait.
