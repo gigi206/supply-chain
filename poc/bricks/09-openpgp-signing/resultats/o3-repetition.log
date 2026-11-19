@@ -1,0 +1,169 @@
+étape repetition commencée : 2026-11-19T17:57:11Z ; o3.sh 481133d071ec577a… ; o3-interne.sh 326e3a9d4dc11918… ; o2-interne.sh 7c91e50fd7921f89…
+### clé jetable créée dans la racine Rocky (o2-interne.sh creer, RSA 4096, 2 jours)
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+gpg : gpg (GnuPG) 2.3.3
+  primaire : algo 1, 4096 bits, créée 2026-11-19, expire 2026-11-21, usages scSC
+  empreinte : DDB39800D6085BC2C19E31845DC95DEFF32C3F99
+  cle-openpgp.asc : 600 3461 (mode, octets), sha256 5957e2e84fed9c3362c5ccd06dc2b0cdeb15f2d7bc28b825cdd1eed66e99adfc
+  cle-publique.asc : 600 1713 (mode, octets), sha256 1cfc907793c4cc470ea14b8f45f791cc623257ed6c09e295904bdb3eac03f78b
+  revocation.asc : 600 1847 (mode, octets), sha256 5572d362ad9d25c27d1c972321d1d269e2767951c30a4aca9c79ab4baac159ee
+OK   clé privée exportée armurée (K3)
+empreinte créée : DDB39800D6085BC2C19E31845DC95DEFF32C3F99
+  code 0
+OK   rpm d'entrée égal à 864d55f486f423ce… (M4c)
+### signer (racine Rocky, sans réseau, GNUPGHOME sur tmpfs)
+OK   réseau absent : seule l'interface lo est visible (K1)
+OK   GNUPGHOME sur tmpfs (/o2/g)
+outils : rpm-4.16.1.3-40.el9.x86_64 rpm-sign-4.16.1.3-40.el9.x86_64 createrepo_c-0.20.1-4.el9.x86_64 gnupg2-2.3.3-5.el9_7.x86_64
+clé importée : DDB39800D6085BC2C19E31845DC95DEFF32C3F99
+     | warning: Could not set GPG_TTY to stdin: Inappropriate ioctl for device
+     | /o2/t/depot/sample-app-1.0.0-2.el9.x86_64.rpm:
+OK   S1 rpmsign --addsign (gpg2 de la racine, SHA-512) : code 0
+S2 en-têtes (rpm -qp) :
+     entree/sample-app-1.0.0-2.el9.x86_64.rpm : SIGPGP=(none) | RSAHEADER=(none) | SHA256HEADER=7d4d47e7ea5440de29072ad2ac7a40a22f550dd651f9e6f35940d191448808dc | PAYLOADDIGEST=7042078a036784231d30791be9a8abc4b1622a9de13d6e886f4b1b8be56f3793
+     depot/sample-app-1.0.0-2.el9.x86_64.rpm : SIGPGP=(none) | RSAHEADER=RSA/SHA512, Thu Nov 19 17:57:13 2026, Key ID 5dc95deff32c3f99 | SHA256HEADER=7d4d47e7ea5440de29072ad2ac7a40a22f550dd651f9e6f35940d191448808dc | PAYLOADDIGEST=7042078a036784231d30791be9a8abc4b1622a9de13d6e886f4b1b8be56f3793
+     | /o2/t/delsign/sample-app-1.0.0-2.el9.x86_64.rpm:
+OK   S3 rpmsign --delsign sur une copie : code 0
+     delsign : 259b69b95f93534d75fd26d9ab8de7ead3102c74464dc64062631f63d7d0f0d5 ; entrée : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+clé publique exportée : 1713 octets
+     | 
+OK   S4 createrepo_c du dépôt signé : code 0
+     | 
+OK   S5 repomd.xml.asc (signature détachée armurée, SHA-512) : code 0
+clé jetable du témoin « autre clé » : EF3AB0315165E09E4C9952DFFDA0FF7A47078E79
+     témoin autre-cle : 8 fichiers de métadonnées, signé par EF3AB0315165E09E…
+     témoin repomd-modifie : 8 fichiers de métadonnées, signé par DDB39800D6085BC2…
+     témoin rpm-non-signe : 8 fichiers de métadonnées, signé par DDB39800D6085BC2…
+  code 0
+### B1 sur l'hôte
+     entrée : 2173376 octets, sha256 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f, en-tête de signature à 7 entrées, en-tête principal à l'octet 4504
+     signé  : 2173376 octets, sha256 7e23d9fc3fc63ee3ddfede74b40e16f08c81a988c8f65416a6a917743dcf42c2, en-tête de signature à 8 entrées, en-tête principal à l'octet 4504
+     à partir de l'en-tête principal : entrée 161080ff4dd8f324…, signé 161080ff4dd8f324…
+OK   B1 : octets égaux à partir de l'en-tête principal (en-tête principal et charge utile inchangés)
+OK   lead : 96 premiers octets égaux
+     témoin altere.rpm : dernier octet de la charge utile inversé (bit de poids faible), sha256 94858f2f4d966f36…
+dépôts de dnf écrits : autre-cle depot repomd-modifie rpm-non-signe
+### vérifier (amorce Rocky 9.8 neuve, sans réseau)
+OK   couche 99c753a880cc de ed654c694190 extraite dans /home/gigi/.cache/supply-chain-poc/09/o3/repetition-vierge
+OK   réseau absent : seule l'interface lo est visible (K1)
+outils : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch gnupg2-2.3.3-5.el9_7.x86_64 ; clés dans la base rpm : gpg-pubkey-350d275d-6279464b
+     | /o2/t/depot/sample-app-1.0.0-2.el9.x86_64.rpm:
+     |     Header V4 RSA/SHA512 Signature, key ID f32c3f99: NOKEY
+     |     Header SHA256 digest: OK
+     |     Header SHA1 digest: OK
+     |     Payload SHA256 digest: OK
+     |     MD5 digest: OK
+OK   V1 rpmkeys --checksig du rpm signé, clé du PoC absente (NOKEY attendu) : NOKEY mentionné (1 ligne(s)), code 1 relevé
+     | 
+OK   V2 import de la clé publique dans la base rpm : code 0
+     gpg-pubkey-350d275d-6279464b Rocky Enterprise Software Foundation - Release key 2022 <adresse retirée> public key;gpg-pubkey-f32c3f99-6aff3878 Banc 09 O3 cle jetable (cle de PoC, fichier sur l'hote d'administration) public key
+     | /o2/t/depot/sample-app-1.0.0-2.el9.x86_64.rpm:
+     |     Header V4 RSA/SHA512 Signature, key ID f32c3f99: OK
+     |     Header SHA256 digest: OK
+     |     Header SHA1 digest: OK
+     |     Payload SHA256 digest: OK
+     |     MD5 digest: OK
+OK   V3 rpmkeys --checksig du rpm signé : code 0
+     | /o2/t/temoins/altere.rpm:
+     |     Header V4 RSA/SHA512 Signature, key ID f32c3f99: OK
+     |     Header SHA256 digest: OK
+     |     Header SHA1 digest: OK
+     |     Payload SHA256 ALT digest: BAD (Expected eecb69c66cf633fff645b636a10c34497a5de4220da4ee07e4fc29198d047e91 != 5a9fc241f7beb195b3bea191a73cd15b2ed05fbeb7393ae28dd1acaabd0ee4d5)
+     |     Payload SHA256 digest: BAD (Expected 7042078a036784231d30791be9a8abc4b1622a9de13d6e886f4b1b8be56f3793 != 5a9fc241f7beb195b3bea191a73cd15b2ed05fbeb7393ae28dd1acaabd0ee4d5)
+     |     MD5 digest: BAD (Expected 30cec3d90473ff36044f6a52d45da9ac != 3ed678b6d74144ac74127a2714f0f8d8)
+OK   V4 rpm altéré d'un octet (refus attendu) : code 1, motif :     MD5 digest: BAD (Expected 30cec3d90473ff36044f6a52d45da9ac != 3ed678b6d74144ac74127a2714f0f8d8)
+### V5 rpm d'origine non signé (code relevé, pas de refus prédit par rpmkeys)
+     | /o2/t/entree/sample-app-1.0.0-2.el9.x86_64.rpm:
+     |     Header SHA256 digest: OK
+     |     Header SHA1 digest: OK
+     |     Payload SHA256 digest: OK
+     |     MD5 digest: OK
+     code 0
+     | Brique 09 O3 autre-cle                           34 kB/s | 659  B     00:00    
+     | Brique 09 O3 autre-cle                          1.6 MB/s | 1.7 kB     00:00    
+     | Importing GPG key 0xF32C3F99:
+     |  Userid     : "Banc 09 O3 cle jetable (cle de PoC, fichier sur l'hote d'administration)"
+     |  Fingerprint: DDB3 9800 D608 5BC2 C19E 3184 5DC9 5DEF F32C 3F99
+     |  From       : /o2/t/cle-publique.asc
+     | Brique 09 O3 autre-cle                          103 kB/s | 659  B     00:00    
+     | Error: Failed to download metadata for repo 'o3-autre-cle': repomd.xml GPG signature verification error: Bad GPG signature
+OK   V6 dnf, témoin autre-cle (refus attendu) : code 1, motif : Error: Failed to download metadata for repo 'o3-autre-cle': repomd.xml GPG signature verification error: Bad GPG signature
+OK   sample-app non installé après le témoin autre-cle
+     | Brique 09 O3 repomd-modifie                      45 kB/s | 833  B     00:00    
+     | Brique 09 O3 repomd-modifie                     1.6 MB/s | 1.7 kB     00:00    
+     | Importing GPG key 0xF32C3F99:
+     |  Userid     : "Banc 09 O3 cle jetable (cle de PoC, fichier sur l'hote d'administration)"
+     |  Fingerprint: DDB3 9800 D608 5BC2 C19E 3184 5DC9 5DEF F32C 3F99
+     |  From       : /o2/t/cle-publique.asc
+     | Brique 09 O3 repomd-modifie                     133 kB/s | 833  B     00:00    
+     | Error: Failed to download metadata for repo 'o3-repomd-modifie': repomd.xml GPG signature verification error: Bad GPG signature
+OK   V6 dnf, témoin repomd-modifie (refus attendu) : code 1, motif : Error: Failed to download metadata for repo 'o3-repomd-modifie': repomd.xml GPG signature verification error: Bad GPG signature
+OK   sample-app non installé après le témoin repomd-modifie
+     | Brique 09 O3 rpm-non-signe                       43 kB/s | 833  B     00:00    
+     | Brique 09 O3 rpm-non-signe                      1.6 MB/s | 1.7 kB     00:00    
+     | Importing GPG key 0xF32C3F99:
+     |  Userid     : "Banc 09 O3 cle jetable (cle de PoC, fichier sur l'hote d'administration)"
+     |  Fingerprint: DDB3 9800 D608 5BC2 C19E 3184 5DC9 5DEF F32C 3F99
+     |  From       : /o2/t/cle-publique.asc
+     | Brique 09 O3 rpm-non-signe                      117 kB/s | 1.1 kB     00:00    
+     | Dependencies resolved.
+     | ================================================================================
+     |  Package          Architecture Version             Repository              Size
+     | ================================================================================
+     | Installing:
+     |  sample-app       x86_64       1.0.0-2.el9         o3-rpm-non-signe       2.1 M
+     | 
+     | Transaction Summary
+     | ================================================================================
+     | Install  1 Package
+     | 
+     | Total size: 2.1 M
+     | Installed size: 5.7 M
+     | Downloading Packages:
+     | Package sample-app-1.0.0-2.el9.x86_64.rpm is not signed
+     | Error: GPG check FAILED
+OK   V6 dnf, témoin rpm-non-signe (refus attendu) : code 1, motif : Error: GPG check FAILED
+OK   sample-app non installé après le témoin rpm-non-signe
+     | Brique 09 O3 depot                               44 kB/s | 833  B     00:00    
+     | Brique 09 O3 depot                              1.6 MB/s | 1.7 kB     00:00    
+     | Importing GPG key 0xF32C3F99:
+     |  Userid     : "Banc 09 O3 cle jetable (cle de PoC, fichier sur l'hote d'administration)"
+     |  Fingerprint: DDB3 9800 D608 5BC2 C19E 3184 5DC9 5DEF F32C 3F99
+     |  From       : /o2/t/cle-publique.asc
+     | Brique 09 O3 depot                              124 kB/s | 1.1 kB     00:00    
+     | Dependencies resolved.
+     | ================================================================================
+     |  Package            Architecture   Version               Repository        Size
+     | ================================================================================
+     | Installing:
+     |  sample-app         x86_64         1.0.0-2.el9           o3-depot         2.1 M
+     | 
+     | Transaction Summary
+     | ================================================================================
+     | Install  1 Package
+     | 
+     | Total size: 2.1 M
+     | Installed size: 5.7 M
+     | Downloading Packages:
+     | Running transaction check
+     | Transaction check succeeded.
+     | Running transaction test
+     | Transaction test succeeded.
+     | Running transaction
+     |   Preparing        :                                                        1/1 
+     |   Installing       : sample-app-1.0.0-2.el9.x86_64                          1/1 
+     |   Verifying        : sample-app-1.0.0-2.el9.x86_64                          1/1 
+     | 
+     | Installed:
+     |   sample-app-1.0.0-2.el9.x86_64                                                 
+     | 
+     | Complete!
+OK   V7 dnf, dépôt signé (gpgcheck=1, repo_gpgcheck=1) : code 0
+     installé : sample-app-1.0.0-2.el9 ; RSAHEADER=RSA/SHA512, Thu Nov 19 17:57:13 2026, Key ID 5dc95deff32c3f99
+  code 0
+produits : rpm signé 7e23d9fc3fc63ee3ddfede74b40e16f08c81a988c8f65416a6a917743dcf42c2 ; repomd.xml 97756451a79345c34ffc458aa123c370a60666ea4ae40f2125df1f943e4d6c1d ; repomd.xml.asc eef05f261c389dcb0b85c6880033e83b050038f8032d95c89215a7912bb300ce
+à effacer après archivage (chemins littéraux, dans l'espace de noms) : /home/gigi/.cache/supply-chain-poc/09/o3/repetition-vierge et /home/gigi/.cache/supply-chain-poc/09/o3/repetition
+à effacer aussi : /home/gigi/.cache/supply-chain-poc/09/o3/repetition-secrets
+étape repetition finie : 2026-11-19T17:57:15Z
+OK   K3 : aucune ligne de bloc OpenPGP armuré dans le journal

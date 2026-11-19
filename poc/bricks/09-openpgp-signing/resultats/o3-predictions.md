@@ -34,3 +34,24 @@ Le rpm signé n'est pas reproductible d'une signature à l'autre, car la signatu
 - **V1 révisée** : seule la mention NOKEY est jugée, et le code est relevé. La prédiction sur le code est abandonnée : elle était de confiance moyenne, et un code 0 aurait compté KO sans défaut de la chaîne.
 - **Amorce réutilisée** : le vérificateur est l'amorce Rocky 9.8 `ed654c69…`, que `rocky_telecharger` a déjà utilisée en O2. Le texte proposé pour l'ADR (§4 ter d'`A-REPORTER.md`) dit que chaque amorce ne sert qu'une fois. Ici, elle sert à vérifier, sans aucune clé privée. Son rpm et son dnf viennent de l'image amont, contrôlée seulement par le sha256 de sa couche, pas par le `primary` vérifié. Un vérificateur contrôlé avec dnf demanderait le réseau, que K1 refuse tant que la clé existe sur l'hôte. Cet écart ira dans le rapport final.
 - **Installation** : rien n'est installé sur l'hôte. V7 installe `sample-app` par dnf **dans l'amorce de vérification**, qui est jetée ensuite.
+
+## Note datée du 19/11/2026, 17:57:34 UTC : `repetition` passée, toutes les prédictions tenues sauf S3
+
+Passée de 17:57:11 à 17:57:15 UTC, code 0 ([journal](o3-repetition.log)), avec une clé jetable `DDB39800…F32C3F99` (RSA 4096, créée par gpg 2.3.3). `o3-interne.sh` est celui de la correction (`326e3a9d…`).
+- **S1 tenue** : code 0. rpm avertit « Could not set GPG_TTY to stdin », sans effet.
+- **S2a, S2b et S2c tenues** : le rpm signé porte `RSAHEADER=RSA/SHA512`, avec la clé `5dc95deff32c3f99` ; `SIGPGP` reste `(none)` ; `SHA256HEADER` (`7d4d47e7…`) et `PAYLOADDIGEST` (`7042078a…`) sont égaux à ceux de l'entrée.
+- **B1 tenue** : à partir de l'en-tête principal, les octets sont égaux, et le lead aussi. Le rpm signé a la même taille que l'entrée (2 173 376 octets). L'en-tête de signature passe de 7 à 8 entrées, mais l'en-tête principal reste à l'octet 4504 : le remplissage réservé de l'en-tête de signature absorbe la signature.
+- **S3 non tenue** (confiance faible) : `rpmsign --delsign` donne `259b69b9…`, pas `864d55f4…`. Retirer la signature ne rend pas le fichier d'origine. Le second contrôle de B1 par `--delsign` est donc écarté ; B1 repose sur la comparaison d'octets.
+- **S4 et S5 tenues** : code 0.
+- **V1 tenue** : « Header V4 RSA/SHA512 Signature, key ID f32c3f99: NOKEY », code 1 relevé.
+- **V2 et V3 tenues** : la signature est « OK » après import.
+- **V4 tenue** : le rpm altéré d'un octet est refusé, code 1. « Payload SHA256 digest: BAD » ; la signature d'en-tête reste OK, puisque seule la charge utile change.
+- **V5 tenue** : le rpm non signé passe `-K` avec le code 0, empreintes seules.
+- **V6 tenue** pour les trois témoins, chacun avec le code 1, et `sample-app` n'est jamais installé :
+  - autre clé : « repomd.xml GPG signature verification error: Bad GPG signature » ;
+  - `repomd.xml` modifié : même message ;
+  - rpm non signé : « Package sample-app-1.0.0-2.el9.x86_64.rpm is not signed » puis « Error: GPG check FAILED ».
+- **V7 tenue** : dnf importe la clé de `gpgkey` avec `-y`, sans terminal, puis installe `sample-app`, code 0. Le paquet installé porte `RSAHEADER`.
+- **K3 tenue**.
+
+Les dossiers `o3/repetition`, `o3/repetition-secrets` et `o3/repetition-vierge` sont effacés après le commit de cette note. Suite : `signer` avec la clé du PoC, mêmes prédictions, sauf S3 désormais attendue non tenue.
