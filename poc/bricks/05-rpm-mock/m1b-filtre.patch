@@ -1,0 +1,24 @@
+diff -ru a/poc/bricks/05-rpm-mock/m1b-builders.sh b/poc/bricks/05-rpm-mock/m1b-builders.sh
+--- a/poc/bricks/05-rpm-mock/m1b-builders.sh	2026-11-19 21:38:33.276607958 +0100
++++ b/poc/bricks/05-rpm-mock/m1b-builders.sh	2026-11-19 21:38:33.306162178 +0100
+@@ -70,7 +70,7 @@
+ 
+ attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)" >&2; exit 1; }; }
+ echec() { echo "KO   $*" >&2; exit 1; }
+-filtre() { sed -E -e 's/<[^>]*@[^>]*>/<adresse retirée>/g' -e "$MASQUE"; }
++filtre() { sed -E 's/<[^>]*@[^>]*>/<adresse retirée>/g' | sed "$MASQUE"; }   # MASQUE est en BRE : hors de sed -E (banc du 19/11)
+ indenter() { sed 's/^/        /'; }
+ 
+ liste_b() { # liste du bootstrap au format de la tâche, tirée de s1-hote97.log (dix lignes vérifiées par hote97)
+diff -ru a/poc/bricks/05-rpm-mock/m1b.sh b/poc/bricks/05-rpm-mock/m1b.sh
+--- a/poc/bricks/05-rpm-mock/m1b.sh	2026-11-19 21:38:33.274939102 +0100
++++ b/poc/bricks/05-rpm-mock/m1b.sh	2026-11-19 21:38:33.306021227 +0100
+@@ -45,7 +45,7 @@
+ 
+ attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)" >&2; exit 1; }; }
+ echec() { echo "KO   $*" >&2; exit 1; }
+-filtre() { sed -E -e 's/<[^>]*@[^>]*>/<adresse retirée>/g' -e "$MASQUE"; }
++filtre() { sed -E 's/<[^>]*@[^>]*>/<adresse retirée>/g' | sed "$MASQUE"; }   # MASQUE est en BRE : hors de sed -E (banc du 19/11)
+ 
+ pod_json() { # nom : pod d'essai Kata, image de l'amorce, contexte et ressources du pas construire de construire-rpm signée,
+   # label construire-rpm, tmpfs /w ; sans PVC

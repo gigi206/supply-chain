@@ -1982,3 +1982,26 @@ Dans tous les cas, `$T/auth` est absent à la fin. Il ne couvre ni Zot, ni le vr
 **Banc v2** : [`m1b-pipeline-banc-v2.log`](m1b-pipeline-banc-v2.log), 109 OK, 0 KO, joué à 18:46:12 UTC sur ce sha256 (banc `d76ade3109e8a225…`). Il a 24 cas : relance sous un autre préfixe après publication de l'outillage, garde d'entrée des deux images, et place tombée après le premier PipelineRun. Le banc précédent ([`m1b-pipeline-banc.log`](m1b-pipeline-banc.log)) reste valable pour l'ancien sha256.
 
 **Prédictions** : PN1 à PN7 sont inchangées. Les gardes de PN1 comprennent désormais les deux dépôts absents et la place pour les deux images.
+
+## Prédictions FL1 à FL3, écrites le 19/11/2026 à 2026-11-19T20:39:36Z UTC, avant tout lancement : correctif du masquage de `filtre`
+
+**Objet** : le défaut établi par le banc des PipelineRuns. Dans `m1b.sh` et `m1b-builders.sh`, `MASQUE` est écrit en BRE mais passé à `sed -E`. Le motif ne reconnaît alors que la chaîne littérale `jeton|token`, et aucune ligne n'est masquée.
+
+**Correctif préparé à sec** : [`m1b-filtre.patch`](../m1b-filtre.patch), sha256 `2f8ea0a31ef93280…`. Il change une ligne par script et reprend la forme de `m1b-pipeline.sh` : `sed -E` pour les adresses, puis un `sed` sans `-E` pour `MASQUE`.
+- **Copies corrigées**, hors du dépôt : `m1b.sh` `9f8851d6f1a5e8c5…`, `m1b-builders.sh` `31e01ae0face66a6…`.
+- **Contrôles faits** :
+  - `git apply --check` passe sur le dépôt ;
+  - `bash -n` passe sur les deux copies ;
+  - shellcheck donne la même sortie sur chaque copie que sur son original (seulement des notes de niveau info, déjà présentes).
+- **Pas appliqué** : `m1b.sh` (`373ae334`) et `m1b-builders.sh` (`82004de2`) ne changent pas avant la fin de la mesure de 00:01 UTC et le commit de son résultat.
+
+**Banc** : [`m1b-filtre-banc.sh`](m1b-filtre-banc.sh), sha256 `31150d3aa3d5a4c6…`.
+- Il extrait des scripts la ligne `MASQUE=` et la ligne `filtre()`, telles qu'elles sont écrites, et les évalue seules ; rien d'autre ne tourne.
+- Les témoins sont des mots inventés (`SENTINELLE-…`, une adresse en `exemple.test`). Ni cluster, ni Zot, ni réseau.
+- Onze contrôles par script : une seule ligne de chaque, quatre lignes jeton/token en casses diverses, une barre verticale seule, une ligne ordinaire, une adresse, une adresse avec jeton, trois lignes dont une seule masquée, aucun témoin visible.
+
+**FL1, scripts actuels du dépôt** (journal `m1b-filtre-banc-avant.log`) : pour chacun, 4 OK (une seule ligne, barre verticale, ligne ordinaire, adresse) et 7 KO (les quatre jeton/token, adresse avec jeton, trois lignes, témoin visible). Code du banc 1. Ce journal sert de preuve du défaut.
+
+**FL2, copies corrigées et `m1b-pipeline.sh` (témoin déjà corrigé)** (journal `m1b-filtre-banc.log`) : 33 OK, 0 KO, code 0.
+
+**FL3, portée** : seule la ligne `filtre()` change. Les journaux des mesures passées et de celle de cette nuit restent sortis du filtre inopérant ; le correctif ne vaut que pour les lancements qui suivent son application.
