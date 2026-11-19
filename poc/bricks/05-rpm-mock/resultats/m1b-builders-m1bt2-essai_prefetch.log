@@ -1,0 +1,44 @@
+# m1b-builders.sh essai_prefetch (PREFIXE m1bt2), début 2026-11-19T13:49:13Z
+OK   prefetch-rpm-sortie : sélecteur : {"matchLabels":{"tekton.dev/task":"prefetch-rpm"}}
+OK   construction-rpm-sans-sortie : sélecteur, types, règles : [{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]
+OK   admis à blanc : m1bt2-w.json
+OK   admis à blanc : m1bt2-po.json
+OK   admis à blanc : m1bt2-pb.json
+relevé : m1bt2-po.json sous le label prefetch-racine-rpm : admis à blanc
+PVC m1bt2-w créé (2Gi, local-path, liaison au premier pod)
+pod m1bt2-po prêt : nœud sc-build, runtimeClassName «  », label prefetch-rpm
+OK   script copié dans m1bt2-po (sha256) : e6439514b9a87c3633d8b1a6212b9b26ba3cae0de6a602c5fffe096cf1b6e530
+## essai-po : début 2026-11-19T13:49:19Z
+     uid=65532 gid=65532 groups=65532 ; RPM version 4.16.1.3 ; gpgv (GnuPG) 2.3.3 ; curl 7.76.1 ; Python 3.9.25
+     clé RPM-GPG-KEY-Rocky-9 (image) : 1750 octets, sha256 et empreinte conformes
+     clé RPM-GPG-KEY-EPEL-9 (paramètre cle_sup) : 1656 octets, sha256 et empreinte conformes
+     baseos98 : repomd.xml abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163, signature valide (RPM-GPG-KEY-Rocky-9)
+     baseos98 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+     appstream98 : repomd.xml a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b, signature valide (RPM-GPG-KEY-Rocky-9)
+     appstream98 : 7 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+     epel9 : repomd.xml e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61, non signé (ancre : sha256 fixé par la pipeline)
+     epel9 : 5 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+     rpm téléchargés, sha256 égal à la liste et à primary : 199, 113665783 octets
+     rpm -K : rc 0, 199 OK sur 199
+     entrées : 224 fichiers, 227117890 octets ; liste des sha256 : 93f2a63ef2e49607d2844e07d7dfc7f793537f350be492c4acf82815ec280535 ; en 99 s
+## essai-po : code 0, fin 2026-11-19T13:50:59Z
+arbre écrit par le pod m1bt2-po : 224 fichiers, liste 93f2a63ef2e49607d2844e07d7dfc7f793537f350be492c4acf82815ec280535
+OK   arbre du pod m1bt2-po = entrées du banc, fichier par fichier
+OK   retrait du pod m1bt2-po (code de kubectl) : 0
+pod m1bt2-pb prêt : nœud sc-build, runtimeClassName «  », label prefetch-rpm
+OK   script copié dans m1bt2-pb (sha256) : 28376376daf5e46e5c6e1c5420f218e6553f2df63ae1cfc7d80f81a7f1e8db9f
+## essai-pb : début 2026-11-19T13:51:32Z
+     uid=65532 gid=65532 groups=65532 ; RPM version 4.16.1.3 ; gpgv (GnuPG) 2.3.3 ; curl 7.76.1 ; Python 3.9.25
+     clé RPM-GPG-KEY-Rocky-9 (image) : 1750 octets, sha256 et empreinte conformes
+     baseos97 : repomd.xml fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258, signature valide (RPM-GPG-KEY-Rocky-9)
+     baseos97 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+     rpm téléchargés, sha256 égal à la liste et à primary : 10, 1984355 octets
+     rpm -K : rc 0, 10 OK sur 10
+     couche amont/rockylinux/rockylinux sha256:812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09 : 87054388 octets, conforme
+     entrées : 20 fichiers, 115664404 octets ; liste des sha256 : 7af63de76df231b2c106629aff7ce628282053dd5831d50bc157dafcb6ca2325 ; en 11 s
+## essai-pb : code 0, fin 2026-11-19T13:51:43Z
+arbre écrit par le pod m1bt2-pb : 20 fichiers, liste 7af63de76df231b2c106629aff7ce628282053dd5831d50bc157dafcb6ca2325
+OK   arbre du pod m1bt2-pb = entrées du banc, fichier par fichier
+OK   retrait du pod m1bt2-pb (code de kubectl) : 0
+PVC m1bt2-w gardé pour essai_construire : Bound pvc-7e5aee9b-9fd0-416d-9613-75656f2164e5
+# fin essai_prefetch 2026-11-19T13:52:15Z

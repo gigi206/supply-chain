@@ -1,0 +1,72 @@
+# m1b-builders.sh essai_construire (PREFIXE m1bt2), début 2026-11-19T13:52:26Z
+OK   prefetch-rpm-sortie : sélecteur : {"matchLabels":{"tekton.dev/task":"prefetch-rpm"}}
+OK   construction-rpm-sans-sortie : sélecteur, types, règles : [{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]
+OK   admis à blanc : m1bt2-co.json
+OK   admis à blanc : m1bt2-cb.json
+relevé : m1bt2-co.json sous le label construire-racine-rpm : admis à blanc
+pod m1bt2-co prêt : nœud sc-build, runtimeClassName « kata », label construire-rpm
+OK   script copié dans m1bt2-co (sha256) : 956e39c260a74aac9c9f71639af15ca4acc9986cf6ad52d18dddbac90ec2fee4
+## essai-co : début 2026-11-19T13:52:32Z
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     versions : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 
+     témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     entrées revérifiées : 2 clé(s), 3 dépôt(s), 199 rpm, couche aucune
+     %_install_langs lu par rpm de python, env -i HOME=/m/h : [en_US] ; umask 0022
+     tmpfs /w : 1 Mo (avant dnf)
+     limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 1073741824 / 1073741824
+     dnf-3 code 0 en 43 s ; 883 lignes de journal
+     résumé de la transaction : Install  199 Packages
+     paquets installés : 201, dont gpg-pubkey 2
+     tmpfs /w : 534 Mo (après dnf)
+     racine passée en 555 ; etc/machine-id : 33 octet(s), exclu de l'archive
+     racine : 343930880 octets, 13332 membres, sha256 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+     racine conforme à la valeur fixée par la pipeline
+     tmpfs /w : 329 Mo (racine archivée, arbre retiré)
+     fichier de configuration etc/containers/storage.conf : 87 octets
+     fichier de configuration etc/mock/poc-rocky-9.7-pret-x86_64.cfg : 1047 octets
+     fichier de configuration etc/mock/poc-rocky-9.7-x86_64.cfg : 1043 octets
+     sha256 0d58dc2b87a8fc12582dd81e39be8f97e238a52f339c2b55a4fa00f813cbed39  etc/containers/storage.conf
+     sha256 0fc0b59ae434303098cb5c2785adf94b2851b93056425ecfa6f1a63aa6a176af  etc/mock/poc-rocky-9.7-pret-x86_64.cfg
+     sha256 a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31  etc/mock/poc-rocky-9.7-x86_64.cfg
+     couche de configuration : 10240 octets, sha256 04f0fe15c7f1594432bcdb10944e197f143b4a8cbd80783be1f3fb594e93953f
+     couches : 2 ; configuration sha256:f4d99de2ad5db30a2b2bec8657e30165713e76ed0d91087f009c48849e4639a8 (294 octets) ; manifeste sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae (553 octets)
+     image.tar : 343951360 octets, sha256 26ce192f90b645aedf3e02ef925d38bbea17a127c3b0707c4aa564764f1dd659, en 4 s
+     pic du tmpfs /w : 862 Mo sur 88 relevés ; memory.peak du cgroup : 1360482304
+## essai-co : code 0, fin 2026-11-19T13:54:04Z
+OK   DIGEST_CONSTRUIT du pod m1bt2-co = celui du banc : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   image.tar du pod m1bt2-co = celle du banc (sha256) : 26ce192f90b645aedf3e02ef925d38bbea17a127c3b0707c4aa564764f1dd659
+OK   retrait du pod m1bt2-co (code de kubectl) : 0
+pod m1bt2-cb prêt : nœud sc-build, runtimeClassName « kata », label construire-rpm
+OK   script copié dans m1bt2-cb (sha256) : cad7f5501dfe61a370baff4a44e56c7c8bb9a3e739e428294a5073b2221b541c
+## essai-cb : début 2026-11-19T13:54:13Z
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     versions : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 
+     témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     entrées revérifiées : 1 clé(s), 1 dépôt(s), 10 rpm, couche 812c44127102…
+     %_install_langs lu par rpm de python, env -i HOME=/m/h : [all] ; umask 0022
+     couche extraite par le tar de l'amorce : racine 755 ; rpm -qa avant : 147 lignes
+     tmpfs /w : 238 Mo (avant dnf)
+     limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 1073741824 / 1073741824
+     dnf-3 code 0 en 5 s ; 85 lignes de journal
+     résumé de la transaction : Install  6 Packages
+     résumé de la transaction : Upgrade  4 Packages
+     paquets installés : 153, dont gpg-pubkey 1
+     tmpfs /w : 272 Mo (après dnf)
+     racine passée en 555 ; etc/machine-id : 0 octet(s), exclu de l'archive
+     racine : 241981440 octets, 11472 membres, sha256 b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+     racine conforme à la valeur fixée par la pipeline
+     tmpfs /w : 231 Mo (racine archivée, arbre retiré)
+     couches : 1 ; configuration sha256:ff96017c3f06a35a11d06a454930ec797002708cd0187ac46d7febe0891444a2 (163 octets) ; manifeste sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 (624 octets)
+     image.tar : 241991680 octets, sha256 e574aaa17ed8c4a68b58f2580f762e2e5718f43a7e7734fabfffab95fc3b321b, en 4 s
+     pic du tmpfs /w : 503 Mo sur 45 relevés ; memory.peak du cgroup : 711454720
+## essai-cb : code 0, fin 2026-11-19T13:55:00Z
+OK   DIGEST_CONSTRUIT du pod m1bt2-cb = celui du banc : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   image.tar du pod m1bt2-cb = celle du banc (sha256) : e574aaa17ed8c4a68b58f2580f762e2e5718f43a7e7734fabfffab95fc3b321b
+OK   retrait du pod m1bt2-cb (code de kubectl) : 0
+OK   retrait du PVC m1bt2-w (code de kubectl) : 0
+OK   pods et PVC restants au préfixe m1bt2- : 0
+# fin essai_construire 2026-11-19T13:55:03Z

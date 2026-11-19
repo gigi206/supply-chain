@@ -421,3 +421,14 @@ La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de 
 
   L'admission à blanc sous ces labels neufs est relevée par les essais.
 - **Ensuite** : signature (`SIGNER=1`) et revue de `taches.yml` par le propriétaire, deux PipelineRuns par image (même digest), provenance.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T13:56:06Z UTC : tâches neuves, essais
+
+- **Tenus** ([résultat](m1b-predictions.md)) : le prefetch runc écrit, sur un PVC, des entrées égales à celles des bancs, fichier par fichier. Le constructeur Kata, sans réseau, les relit et retrouve les deux racines. Il donne les mêmes digests d'image que le banc de l'hôte : `70f8c412…` pour l'outillage et `6de899ac…` pour le bootstrap.
+- **Un correctif en route** : `^` est admis dans les noms de rpm (`passt`), et la relance a eu lieu sous `m1bt2`.
+- **Admission** : les deux pods seraient admis à blanc sous les labels neufs.
+- **Reste avant signature** :
+  - les deux choix de la note précédente (paramètre `racine`, résultat `*_ARTIFACT_INPUTS`) ;
+  - les deux politiques réseau, avec le `NotIn` de `builds-sans-internet`, chacune sur accord ;
+  - puis `SIGNER=1` et la revue de `taches.yml`.
+- **Autre jour** : relance des pods de l'outillage et du bootstrap à partir de 00:00 UTC le 20/11, sous l'ancienne forme, à part de la forme de la tâche.

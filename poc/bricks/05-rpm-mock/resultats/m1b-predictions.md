@@ -1460,3 +1460,44 @@ Journal : [`m1b-builders-essai_prefetch-1.log`](m1b-builders-essai_prefetch-1.lo
 - **Correctif** : `^` est admis dans `builders/prefetch-racine-rpm.yaml`, dont le sha256 passe à `60f4577f0da05a20…`. Le nom passe toujours non encodé à curl, comme au banc ; seul `+` est encodé, comme dans `prefetch-rpm`.
 - **Ménage** : le pod raté et son PVC, vide, sont retirés.
 - **Relance** sous le préfixe neuf `m1bt2`, puisque le script de prefetch change. `prealables` et `banc` sont rejoués sous ce préfixe, dans des journaux neufs (`m1b-builders-m1bt2-<étape>.log`). Les prédictions TQ à EC valent telles quelles pour cette relance, avec `m1bt2-w` et le préfixe `m1bt2-` à la place de `m1bt-w` et `m1bt-`. Les scripts de construction ne changent pas : TC doit redonner les mêmes digests, `70f8c412…` et `6de899ac…`.
+
+### Tâches neuves, essais sous `m1bt2` : résultat (note écrite à 2026-11-19T13:56:06Z UTC)
+
+Journaux, tous en code 0 :
+- [`m1b-builders-m1bt2-prealables.log`](m1b-builders-m1bt2-prealables.log) (13:48:27 à 13:48:30 UTC) et [`m1b-builders-m1bt2-banc.log`](m1b-builders-m1bt2-banc.log) (13:48:30 à 13:49:13 UTC) : TQ et TC tenues de nouveau. Le banc redonne `70f8c412…` et `6de899ac…`, les mêmes digests que sous `m1bt`.
+- [`m1b-builders-m1bt2-essai_prefetch.log`](m1b-builders-m1bt2-essai_prefetch.log) (13:49:13 à 13:52:15 UTC).
+- [`m1b-builders-m1bt2-essai_construire.log`](m1b-builders-m1bt2-essai_construire.log) (13:52:26 à 13:55:03 UTC).
+
+**EP1 à EP3 tenues.**
+- **EP1** : les politiques sont relues. Le PVC `m1bt2-w` et les deux pods sont admis à blanc. Relevé : le pod est aussi admis à blanc sous le label neuf `prefetch-racine-rpm`.
+- **EP2** :
+  - signatures de `repomd.xml` valides pour `baseos98`, `appstream98` et `baseos97`. `epel9` n'est pas signé : son ancre est le sha256 fixé ;
+  - `rpm -K` à 199 OK sur 199, puis 10 sur 10 ;
+  - le blob `812c4412…` (87 054 388 octets) est lu dans Zot sans compte, par curl avec la CA du PoC.
+
+  Durées des scripts : 99 s pour l'outillage (224 fichiers, 227 117 890 octets), 11 s pour le bootstrap (20 fichiers, 115 664 404 octets).
+- **EP3** : chaque arbre écrit est égal aux entrées du banc, fichier par fichier (listes `93f2a63e…` et `7af63de7…`).
+
+**EC1 à EC4 tenues.**
+- **EC1** : les pods sont admis à blanc et prêts sous `kata`, sur `sc-build`. Relevé : le pod est aussi admis à blanc sous le label neuf `construire-racine-rpm`.
+- **EC2** :
+  - les deux scripts rendent 0 et les trois témoins échouent (code 124) ;
+  - les entrées sont lues sur le PVC en virtiofs, en lecture seule, et revérifiées ;
+  - dnf-3 rend 0 en 43 s (outillage) et 5 s (bootstrap) ;
+  - les deux racines sont conformes : `7c07083c…` et `b063feb3…`.
+- **EC3** : `DIGEST_CONSTRUIT` et le sha256 d'`image.tar` sont ceux du banc, pour les deux images :
+  - outillage : `sha256:70f8c412…`, `image.tar` `26ce192f…` ;
+  - bootstrap : `sha256:6de899ac…`, `image.tar` `e574aaa1…`.
+- **EC4** : les pods et le PVC sont retirés, et aucun objet au préfixe `m1bt2-` ne reste.
+
+**Autres relevés** :
+- pic de `/w`, 862 Mo et 503 Mo ;
+- `memory.peak` du cgroup, 1 360 482 304 et 711 454 720 octets, sous la limite de 6 Gi ;
+- limite du shell hors du sous-shell, 2³⁰.
+
+**Portée.** Les scripts qui seraient signés font la chaîne complète sans Tekton. Le prefetch runc télécharge et vérifie les entrées ; le constructeur Kata, sans réseau, les lit sur le même PVC. Les deux racines de M1b sont retrouvées au bit près, et chaque image a le même digest sur l'hôte et dans Kata. Restent hors de portée :
+- l'essai porte les labels existants, et ne passe pas par Tekton ;
+- rien n'est signé, rien n'est écrit dans Zot ;
+- tout est mesuré le même jour : le point 1 A demande encore un autre jour.
+
+Les deux pods seraient admis à blanc sous les labels neufs. Leurs politiques réseau restent à poser, sur accord.
