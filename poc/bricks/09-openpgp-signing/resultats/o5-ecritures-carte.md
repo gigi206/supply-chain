@@ -73,3 +73,18 @@ Aucun autre compte n'écrit dans `signes/**`, et `poc-lien` n'écrit nulle part 
 - **Redémarrage de Zot** : il touche toutes les sessions qui lisent ou écrivent Zot. C'est à la session principale de le placer.
 - **Chaque étape suit la méthode des étapes précédentes** : banc, prédictions commitées, lancement, notes datées.
 - **Hors O5** : porte et Kyverno (O6) ; horodatage des attestations de lien.
+
+## Note datée du 19/11/2026, 20:03:31 UTC, après relecture du conseiller : compléments et corrections
+
+1. **Texte pour la session principale.** La ligne « texte prêt, `A-REPORTER.md` » du tableau 1 n'était pas vraie au commit `763556e3`. Le texte est écrit à cette heure-ci, au §4 quinquies d'`A-REPORTER.md`.
+2. **Valeurs archivées.** Le nom (`openbao.openbao.svc.cluster.local`) et la fin de validité (27/04/2027) du certificat d'OpenBao, cités au §4, viennent désormais d'un relevé archivé : [o5-ecritures-releve.log](o5-ecritures-releve.log). Le même relevé cite le bloc de `poc-replay` de `stockage.sh` et le dépôt des referrers de la 07a.
+3. **Motif le plus long.** L'entrée `signes/**` remplace toute autre entrée pour ces dépôts ; elle doit donc porter elle-même la lecture anonyme. `droits_zot` essaiera :
+   - la lecture anonyme ;
+   - le refus d'écriture dans `signes/**` pour les autres comptes (au moins `poc-images` et `poc-scan`, avec leurs mots de passe lus par le script seul) ;
+   - le refus d'écriture de `poc-lien` hors de `signes/**`.
+4. **Précédent des referrers.** La 07a range les attestations du scanner dans `builds/scan/sample-app`, un dépôt distinct de celui de l'image (`builds/sample-app`), et les lit par l'API referrers de ce dépôt. **La copie `signes/sample-app-deb` du manifeste `60f25f5c…` est donc peut-être inutile** : l'attestation `identity` pourrait être un referrer de `60f25f5c…` rangé dans `signes/sample-app-deb`, sans copier le manifeste. `droits_zot` essaiera les deux formes ; le tableau du §3 sera figé ensuite.
+5. **Renouvellement du jeton.** `acces_lien` refuse si la politique existe. Pour émettre un nouveau jeton, il faut une étape distincte : elle garde la politique, la relit contre le fichier versionné, puis n'émet qu'un jeton. Elle est à écrire et à passer au banc avant usage.
+6. **`VAULT_TOKEN`.** Le script ne passe jamais le jeton par `env VAR=valeur`, qui le met en argument. Il l'exporte depuis le fichier, dans son propre processus.
+7. **Premier contact avec OpenBao par cosign.** Ce sera une lecture seule : `cosign public-key --key hashivault://lien`, comparée à `lien-cle-publique.pem`. On ne sait pas si le client hashivault fonctionne sans la politique `default`, par exemple s'il consulte son propre jeton, ce qu'E8 refuse.
+8. **Témoins.** `poc-lien` ne peut rien supprimer : tout objet d'essai (`signes/essai-09`, témoins faux) **reste dans Zot**. Les témoins faux sont signés par une clé cosign jetable. Ils sont vérifiés avec cette clé jetable, pour que ce soit le contrôle indépendant, et non cosign, qui les refuse.
+9. **Redirection de port vers OpenBao.** Elle ouvre un nouveau chemin de l'hôte vers le plan de confiance. **Elle relève d'un accord à part**, demandé après celui-ci ; rien n'est lancé vers OpenBao d'ici là.

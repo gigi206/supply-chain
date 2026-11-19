@@ -197,6 +197,39 @@ Règles de lecture des sessions : ajouter `~/.cache/supply-chain-poc/09/secrets/
 
 ---
 
+## 4 quinquies. Brique 08 : compte Zot `poc-lien` (O5 de la brique 09, quatrième accord du propriétaire)
+
+*Écrit le 19/11/2026 à 20:03:31 UTC, à sec ; rien n'est appliqué.* Accord : « Oui, prépare-le », en réponse à « Accordez-vous les écritures dans Zot pour O5, avec un compte dédié ? ». La carte est dans [`resultats/o5-ecritures-carte.md`](resultats/o5-ecritures-carte.md).
+
+**`poc/bricks/08-trust-plane/stockage.sh`, étape `zot`.** Insérer ce bloc juste après celui de `poc-replay` (lignes 87 à 95 au commit `0b520377`, d'après le [relevé](resultats/o5-ecritures-releve.log)), et compléter la ligne 9 de l'en-tête :
+
+```bash
+  # poc-lien (brique 09, O5, quatrième accord du propriétaire du 19/11/2026) : attestations de lien, rpm signé et dépôts signés,
+  # signes/** seulement, création par digest seulement. Seule sa ligne htpasswd (hash bcrypt) est lue, dans le dossier de la
+  # brique 09 ; le mot de passe n'est jamais lu ici. Absente : compte non créé.
+  local h09=$HOME/.cache/supply-chain-poc/09/secrets/zot-poc-lien.htpasswd
+  if [ -s "$h09" ]; then
+    grep -qxE 'poc-lien:\$2b\$12\$[./A-Za-z0-9]{53}' "$h09" || { echo "KO   ligne htpasswd de poc-lien inattendue" >&2; exit 1; }
+    (umask 077 && cat "$h09" >> "$d/htpasswd") && echo "htpasswd : poc-lien, bcrypt, coût 12 (hash fourni par la brique 09)"
+  else
+    echo "htpasswd : poc-lien absent (brique 09, O5 non appliqué)"
+  fi
+```
+
+```
+#              ; poc-lien (brique 09, O5 : attestations de lien, rpm et dépôts signés, signes/** par digest seulement ; hash lu dans le dossier de la brique)
+```
+
+**`poc/bricks/08-trust-plane/stockage/zot.json`.** Je ne l'ai pas lu : la règle des sessions l'interdit. Je ne peux donc pas en citer le texte. L'entrée est à écrire par analogie avec celle de `builds/scan/**` (`poc-scan`) :
+- **motif** `signes/**` ;
+- **lecture anonyme**, portée par l'entrée elle-même : d'après `stockage.sh` (ligne 77), le motif le plus long remplace les autres ;
+- **`poc-lien`** : création seulement, et par digest seulement, avec la même condition CEL que `poc-scan` ; ni mise à jour, ni suppression ;
+- **aucun autre compte** sur `signes/**`, et `poc-lien` n'est cité dans aucune autre entrée.
+
+**Application.** `mise run confiance:stockage -- zot` **redémarre Zot sur sc-stockage**. C'est à la session principale de choisir le moment, après l'étape `compte_zot` de la brique 09, qui écrit la ligne htpasswd. Contrainte : le jeton `lien` d'OpenBao expire au plus tard le 22/11/2026 à 19:49:36 UTC. Au-delà, la brique 09 en émettra un nouveau.
+
+---
+
 ## 5. `docs/00-etude-existant.md`, ligne 106 : correction datée
 
 Après le tableau du §4 (sous la ligne « Sources : … »), ajouter :
