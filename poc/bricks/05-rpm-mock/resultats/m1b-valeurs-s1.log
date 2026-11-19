@@ -1,0 +1,14 @@
+# m1b-valeurs-s1.sh, début 2026-11-19T08:33:20Z
+OK   boot-racine.tar : sha256 égal à boot-racine.sha256 (8ae17f92b27377fff20009d0a88740b1bf9045d533f0506949d6e209c970f1f2)
+racine.tar : sha256 d7433a050469836de7317de87f2421d3bc7eaa52052cf422518809e276a94a9d
+OK   blob banc-image/e48fc4d689daa5ec : 140611406 octets, sha256 = nom
+OK   blob banc-boot-image/22495746e2884528 : 97742593 octets, sha256 = nom
+racine.tar : 13341 membres ; premier '.' mode 0o555 ; membre racine : '.' mode 0o555
+     etc/machine-id : './etc/machine-id', 33 octet(s), mode 0o444, type 'fichier'
+boot-racine.tar : 11482 membres ; premier '.' mode 0o555 ; membre racine : '.' mode 0o555
+     etc/machine-id : './etc/machine-id', 0 octet(s), mode 0o644, type 'fichier'
+banc-image/couche e48fc4d689daa5ec : 13341 membres ; premier '.' mode 0o555 ; membre racine : '.' mode 0o555
+     etc/machine-id : './etc/machine-id', 33 octet(s), mode 0o444, type 'fichier'
+banc-boot-image/couche 22495746e2884528 : 11482 membres ; premier '.' mode 0o555 ; membre racine : '.' mode 0o555
+     etc/machine-id : './etc/machine-id', 0 octet(s), mode 0o644, type 'fichier'
+# fin 2026-11-19T08:33:25Z

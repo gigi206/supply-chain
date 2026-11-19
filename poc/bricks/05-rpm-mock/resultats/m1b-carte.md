@@ -226,3 +226,11 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **AJ1 à AJ7 tenues** : les quatre bancs relancés le 19/11 UTC (00:00:38 à 00:06:05) redonnent les quatre références du 18/11 (`05d35d64…`, `06c289ad…`, `0c00666a…`, `28634a12…`), 8 OK sur 8 ([détail](m1b-predictions.md), [journal](m1b-autre-jour.log)).
 - **Intervalle réel** : 140 à 229 min, un autre jour UTC et non 24 h.
 - **Le point 1 A reste non établi** (ni pod Kata, ni autre hôte). Suite : les valeurs de la carte, à décider avec le propriétaire.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T08:33:55Z UTC : valeurs de S1 relevées avant la question
+
+- **Relevé** (08:33:20 à 08:33:25 UTC, lecture seule) : [`m1b-valeurs-s1.sh`](m1b-valeurs-s1.sh), [journal](m1b-valeurs-s1.log). Les deux faits d'archive ont d'abord été vus par un `tar -tvf` non archivé, juste avant l'écriture du script.
+- **machine-id dans S1** : `racine.tar` a un `etc/machine-id` rempli (33 octets, mode 0444), écrit à l'installation. `boot-racine.tar` a un fichier vide (0 octet, mode 0644), qui vient de la base. Les quatre références du banc l'excluent : aucune ne contient de fichier vide.
+- **Mode de la racine** : `.` vaut 0555 dans les deux archives de S1 et dans les couches des deux registres de banc. La couche faite par `crane append` garde donc le membre `.` et son mode : ce mode entre dans le digest de l'image. Les références du banc ont 0775 (`mkdir` de l'hôte) ; aucune n'a le mode de S1.
+- **Précision** : la remarque « la couche n'a pas de membre `.` » de [`m1b-boot-modes.log`](m1b-boot-modes.log) porte sur la couche amont de Rocky (`812c4412`), pas sur une couche faite par la brique.
+- **umask** : celui du pod n'est pas relevé. Ce qui est mesuré : sous 022, le banc redonne le mode de `var/lib/dnf` de `racine.tar`.
