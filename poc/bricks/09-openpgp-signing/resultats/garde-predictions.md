@@ -24,3 +24,14 @@ Banc : `garde-banc.sh`, sur l'hôte, sans réseau ni installation. Clé jetable 
 | GB12 | GNUPGHOME et copie effacés à la fin | haute |
 
 Limites connues, non testées comme refus : un export binaire (non armuré) n'est pas lu (`-I`) ; une clé recopiée sans sa ligne d'en-tête n'est pas vue ; la garde ne lit pas l'historique déjà commité.
+
+## Résultat (note du 19/11/2026, 17:09:54 UTC)
+
+Banc passé du 19/11/2026 à 17:09:24 au 19/11/2026 à 17:09:27 UTC, code 0 ([journal](garde-banc.log)) : **GB0 à GB12 tenues, GB11b comprise**. Garde de sha256 `3a83f89d35c4ea48…`, banc de sha256 `55efc5fb234f8e2d…`, sur le commit `36dbe85` des prédictions.
+- GB1 : l'arbre réel passe. Le fichier non suivi compté est le journal du banc, en cours d'écriture.
+- GB3 à GB7 sont refusés et la garde nomme le bon fichier. GB5 montre que la lecture de l'index compte : la clé n'y est que dans l'index, et `--untracked` ne la voit pas.
+- GB7 (confiance moyenne) est tenue : la clé à fins de ligne CRLF est refusée.
+- GB9 : la limite attendue est confirmée. Un fichier ignoré n'est pas lu.
+- Pour une clé ed25519 jetable, l'export privé fait 11 lignes, dont 6 de 16 caractères ou plus, en-têtes exclus. Cette mesure ne vaut pas pour la clé RSA 4096 de `cle`. Elle confirme seulement qu'un export armuré compte des lignes courtes (§4 quater d'`A-REPORTER.md`).
+
+Désormais, la garde se lance avant chaque commit de la branche, après `mise exec -- make reuse` et `tools/secrets-depot.sh`.

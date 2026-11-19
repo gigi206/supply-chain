@@ -267,3 +267,13 @@ Préparation demandée par le propriétaire (« Oui, prépare O2 »). Décision 
 - **Nouvelles étapes**, chacune avec son accord : `rocky_telecharger`, `rocky_installer` (hors ligne), `debian_amorce`, `debian_racine`, `cle`, `essai`. Les replis de mmdebstrap, les échecs et l'effacement sont dans la [carte](resultats/o2-carte.md).
 - **`banc_chroot` passé à sec** (16:14:50 à 16:14:55 UTC, BK0 à BK5 tenues, [journal](resultats/o2-banc_chroot.log)). Il a tourné dans l'amorce Rocky du cache local, sans réseau ni installation, avec des clés jetables. Il mesure la mécanique de `cle` et `essai` sous gpg 2.3.3, et l'import dans 2.3.3 d'une clé créée par 2.4.8. gpg 2.4.7 n'est pas mesuré.
 - **Accord à demander maintenant** : celui de la première étape seulement, `rocky_telecharger`. Il ouvre le réseau vers `vault/rocky/9.8` et télécharge les rpm de la racine Rocky dans `~/.cache/supply-chain-poc/09/o2/rocky`, avant tout contrôle contre le `primary` vérifié. Rien n'est installé à cette étape.
+
+## Additif du 19/11/2026, écrit à 17:09:54 UTC : racines d'O2 prêtes ; garde locale contre une clé privée (« Garde locale d'abord »)
+
+- **Racines prêtes** : les quatre étapes de construction ont passé, avec leurs accords. Résultats et notes datées dans les [prédictions d'O2](resultats/o2-predictions.md). Racine Rocky : 101 rpm conformes au `primary` vérifié, gpg 2.3.3. Racine Debian : 106 `.deb` sur 106 conformes au `Packages.xz` vérifié, gpg 2.4.7, après la relance avec `--skip=essential/unlink`. Aucune clé du PoC n'existe.
+- **Constat avant `cle`** : `tools/secrets-depot.sh` ne connaît pas `09/secrets`, ni sur cette branche ni sur la branche principale. Chaque arbre de travail lance sa propre copie du script. Le second ajout du §4 quater d'`A-REPORTER.md` aurait bloqué la brique elle-même : correction datée de 16:48:49 UTC, commit `cb9b91da`.
+- **Décision du propriétaire** : « Garde locale d'abord ». `garde-cle-privee.sh` refuse l'en-tête de clé privée seul sur sa ligne, dans l'index et dans l'arbre de travail. Elle n'affiche que des noms de fichiers.
+- **Banc** : `garde-banc.sh`, avec une clé jetable sur tmpfs dans une copie de la branche. Passé de 17:09:24 à 17:09:27 UTC, GB0 à GB12 tenues ([prédictions et résultat](resultats/garde-predictions.md), [journal](resultats/garde-banc.log)).
+- **Limites** : un export binaire, une clé sans en-tête et un fichier ignoré ne sont pas vus.
+- **Routine de commit de la branche, désormais** : `mise exec -- make reuse`, `tools/secrets-depot.sh`, puis `poc/bricks/09-openpgp-signing/garde-cle-privee.sh`.
+- **Prochaine question au propriétaire** : l'accord de `cle`, qui porte sur la phrase de passe et sur la clé publique dans le dépôt ou non.
