@@ -118,3 +118,32 @@ Journal : [o5-zot-compte_zot.log](o5-zot-compte_zot.log).
 La ligne htpasswd de `poc-lien` est dans `09/secrets/zot-poc-lien.htpasswd`, et le mot de passe dans `zot-poc-lien.password`, tous deux en 0600. Ni l'un ni l'autre n'a été affiché.
 
 **Rien n'est appliqué à Zot.** La suite revient à la session principale : §4 quinquies d'`A-REPORTER.md`, puis `mise run confiance:stockage -- zot`. Ensuite viendra `droits_zot`, à préparer.
+
+## Prédictions de `droits_zot`, écrites le 19/11/2026 à 20:27:29 UTC, avant tout lancement
+
+**Application, relue dans le dépôt.** La session principale a appliqué le §4 quinquies (accord du propriétaire « Maintenant »), au commit `4fe5e8a3` de `claude/focused-fermi-ul5y20`. Ce commit touche `stockage.sh` (7 lignes contiennent `poc-lien`) et `stockage/zot.json`. D'après son message, l'entrée `signes/**` de `zot.json` porte :
+- la lecture anonyme ;
+- pour `poc-lien` : lecture, et création à condition que `req.referenceType != "tag"` ;
+- aucun autre compte.
+
+Zot a été relancé à 20:24:09 UTC, puis une seconde fois, sans le vouloir, à 20:24:42 UTC. **Contrainte** : la mesure de M1b part à 00:01 UTC et lit Zot. Cette étape ne redémarre pas Zot et écrit peu.
+
+**Étape** ([`o5-zot.sh`](../o5-zot.sh) `droits_zot`), calquée sur `replay.sh droits_zot` (brique 10) :
+- **Configuration de `poc-lien`** : écrite par le script dans `09/secrets/zot-poc-lien-docker/config.json` (0600) et gardée pour la publication et pour cosign. C'est un secret de plus, à signaler à `secrets-depot.sh`.
+- **Témoin `poc-ecriture`** : son mot de passe est lu par le script dans `08/secrets`, mis dans une configuration temporaire, puis vidée.
+- **Image jetable** : une couche, un fichier daté.
+- **Pas de banc** : il faudrait un registre local, donc une installation sur l'hôte.
+- **Les objets d'essai restent dans Zot**, puisque `poc-lien` ne peut rien supprimer.
+
+| N° | Prédiction | Confiance |
+|---|---|---|
+| D1 | `poc-lien`, par digest dans `signes/essai-09` : accepté | haute |
+| D2 | `poc-lien`, par tag : refusé | haute : condition CEL décrite |
+| D3 | `poc-lien`, hors de `signes/**` (`builds/essai-09`) : refusé | haute |
+| D4 | `poc-lien`, referrer (`oras attach`) sur `signes/essai-09@image` : accepté | moyenne-haute : un referrer est poussé par digest ; la condition CEL n'a pas été lue sur un referrer |
+| D5 | `poc-lien`, referrer dans un dépôt où le sujet est absent (`signes/essai-09-sans-sujet`) : refusé par `oras attach`, sujet introuvable | moyenne : décide si la copie `signes/sample-app-deb` du manifeste `60f25f5c…` est nécessaire (refus : copie nécessaire) |
+| D6 | `poc-lien`, suppression : refusée | haute |
+| D7 | Anonyme, écriture dans `signes/` : refusée | haute |
+| D8 | `poc-ecriture`, écriture dans `signes/` : refusée (le motif le plus long remplace `**`) | moyenne-haute : dit par la session principale, pas encore mesuré |
+| D9 | Manifeste et referrer relus en anonyme ; aucun tag dans `signes/essai-09` | haute |
+| K6 | Ni mot de passe, ni hash, ni chaîne d'authentification dans le journal ; aucune ligne KO | haute |

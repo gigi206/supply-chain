@@ -102,9 +102,80 @@ etape_compte_zot() {
   echo "     suite : la session principale ajoute le bloc du §4 quinquies d'A-REPORTER à stockage.sh et l'entrée signes/** à zot.json, puis redémarre Zot"
 }
 
+# droits_zot (après l'application par la session principale, commit 4fe5e8a3 de la 08) : droits de poc-lien sur signes/**, essayés
+# sur des dépôts jetables signes/essai-09*, comme replay.sh droits_zot (brique 10). Configuration de registre de poc-lien écrite par
+# ce script dans 09/secrets/zot-poc-lien-docker/config.json (0600, gardée pour la publication et cosign) ; témoin poc-ecriture
+# (mot de passe lu par ce script dans 08/secrets) dans une configuration temporaire, vidée à la fin. Rien n'est supprimé dans Zot :
+# poc-lien ne le peut pas, et les objets d'essai restent.
+DCFG=$S9/zot-poc-lien-docker
+TEMOIN=$S9/temoin-poc-ecriture-docker
+S8=$HOME/.cache/supply-chain-poc/08/secrets
+etape_droits_zot() {
+  set +e
+  local x=$W/droits img autre r rp
+  [ -s "$MDP" ] || { ko "mot de passe de poc-lien absent (compte_zot)"; return 1; }
+  [ ! -e "$W" ] || { ko "$W existe déjà : rien n'est réutilisé"; return 1; }
+  mkdir -p "$x" "$W/docker-vide"
+  if [ ! -s "$DCFG/config.json" ]; then
+    (umask 077 && mkdir -p "$DCFG" && printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REG_HOTE" "$(printf 'poc-lien:%s' "$(cat "$MDP")" | base64 -w0)" > "$DCFG/config.json")
+    echo "OK   configuration de registre de poc-lien écrite dans 09/secrets/zot-poc-lien-docker (mode $(stat -c %a "$DCFG/config.json"))"
+  else echo "OK   configuration de registre de poc-lien déjà présente (mode $(stat -c %a "$DCFG/config.json"))"; fi
+  (umask 077 && mkdir -p "$TEMOIN" && printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REG_HOTE" "$(printf 'poc-ecriture:%s' "$(cat "$S8/zot-poc-ecriture.password")" | base64 -w0)" > "$TEMOIN/config.json")
+  # image jetable : un layout OCI, une couche tar d'un fichier daté (digest neuf à chaque passage)
+  python3 -I - "$x/image" "essai des droits de poc-lien, brique 09, $(date -u '+%Y-%m-%dT%H:%M:%SZ')" <<'PY'
+import hashlib, io, json, os, sys, tarfile
+d, texte = sys.argv[1], sys.argv[2].encode()
+os.makedirs(os.path.join(d, "blobs", "sha256"))
+def ecrire(b):
+    h = hashlib.sha256(b).hexdigest(); open(os.path.join(d, "blobs", "sha256", h), "wb").write(b); return "sha256:" + h
+t = io.BytesIO()
+with tarfile.open(fileobj=t, mode="w", format=tarfile.USTAR_FORMAT) as tf:
+    i = tarfile.TarInfo("essai.txt"); i.size = len(texte); i.mtime = 0; tf.addfile(i, io.BytesIO(texte))
+c = ecrire(t.getvalue()); n = len(t.getvalue())
+cfg = json.dumps({"architecture": "amd64", "os": "linux", "rootfs": {"type": "layers", "diff_ids": [c]}}).encode(); dc = ecrire(cfg)
+m = json.dumps({"schemaVersion": 2, "mediaType": "application/vnd.oci.image.manifest.v1+json",
+                "config": {"mediaType": "application/vnd.oci.image.config.v1+json", "digest": dc, "size": len(cfg)},
+                "layers": [{"mediaType": "application/vnd.oci.image.layer.v1.tar", "digest": c, "size": n}]}).encode()
+dm = ecrire(m)
+json.dump({"schemaVersion": 2, "manifests": [{"mediaType": "application/vnd.oci.image.manifest.v1+json", "digest": dm, "size": len(m)}]},
+          open(os.path.join(d, "index.json"), "w"))
+print(dm)
+PY
+  img=$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["manifests"][0]["digest"])' "$x/image/index.json")
+  echo "image jetable : $img"
+  essai() { # libellé attendu(accepte|refus) commande… : résultat d'une écriture
+    local l=$1 att=$2; shift 2
+    if "$@" < /dev/null > "$x/sortie" 2>&1; then r=accepte; else r=refus; fi
+    [ "$r" = "$att" ] && echo "OK   $l : $r$([ "$r" = refus ] && echo " ($(grep -m1 -iE 'error|denied|unauthor|forbidden|not found' "$x/sortie" | cut -c1-140))")" \
+      || echo "KO   $l : $r (attendu $att) : $(grep -m1 -iE 'error|denied|unauthor|forbidden|not found' "$x/sortie" | cut -c1-140)"
+  }
+  local L1=(--to-registry-config "$DCFG/config.json" --to-ca-file "$CA") A1=(--registry-config "$DCFG/config.json" --ca-file "$CA")
+  echo "### poc-lien"
+  essai "poc-lien, par digest dans signes/essai-09" accepte "$ORAS" cp "${L1[@]}" --from-oci-layout "$x/image@$img" "$REG_HOTE/signes/essai-09@$img"
+  essai "poc-lien, par tag dans signes/essai-09" refus "$ORAS" cp "${L1[@]}" --from-oci-layout "$x/image@$img" "$REG_HOTE/signes/essai-09:tag-interdit"
+  essai "poc-lien, par digest dans builds/essai-09 (hors de signes/**)" refus "$ORAS" cp "${L1[@]}" --from-oci-layout "$x/image@$img" "$REG_HOTE/builds/essai-09@$img"
+  printf '{"essai":"referrer de poc-lien"}' > "$x/bundle.json"
+  attacher() { (cd "$x" && "$ORAS" attach "${A1[@]}" --artifact-type application/vnd.dev.sigstore.bundle.v0.3+json "$REG_HOTE/$1@$img" bundle.json:application/vnd.dev.sigstore.bundle.v0.3+json); }
+  essai "poc-lien, referrer (oras attach) sur signes/essai-09@image" accepte attacher signes/essai-09
+  essai "poc-lien, referrer dans signes/essai-09-sans-sujet, sujet absent de ce dépôt" refus attacher signes/essai-09-sans-sujet
+  essai "poc-lien, suppression du manifeste" refus "$ORAS" manifest delete "${A1[@]}" --force "$REG_HOTE/signes/essai-09@$img"
+  echo "### autres"
+  essai "anonyme, par digest dans signes/essai-09-anonyme" refus env DOCKER_CONFIG="$W/docker-vide" "$ORAS" cp --to-ca-file "$CA" --from-oci-layout "$x/image@$img" "$REG_HOTE/signes/essai-09-anonyme@$img"
+  essai "poc-ecriture, par digest dans signes/essai-09-ecriture (motif le plus long)" refus "$ORAS" cp --to-registry-config "$TEMOIN/config.json" --to-ca-file "$CA" --from-oci-layout "$x/image@$img" "$REG_HOTE/signes/essai-09-ecriture@$img"
+  : > "$TEMOIN/config.json"; echo "     configuration temporaire du témoin poc-ecriture vidée ($(wc -c < "$TEMOIN/config.json") octet)"
+  echo "### lecture anonyme"
+  autre=$(anonyme "$ORAS" manifest fetch --descriptor --ca-file "$CA" "$REG_HOTE/signes/essai-09@$img" 2>/dev/null | jq -r .digest)
+  [ "$autre" = "$img" ] && echo "OK   manifeste relu en anonyme : $img" || ko "lecture anonyme du manifeste : ${autre:-rien}"
+  rp=$(curl -fsS --cacert "$CA" "https://$REG_HOTE/v2/signes/essai-09/referrers/$img" | jq -r '[.manifests[] | .artifactType] | join(",")')
+  [ "$rp" = application/vnd.dev.sigstore.bundle.v0.3+json ] && echo "OK   referrers relus en anonyme : $rp" || ko "referrers : ${rp:-rien}"
+  echo "     tags de signes/essai-09 : $(anonyme "$ORAS" repo tags --ca-file "$CA" "$REG_HOTE/signes/essai-09" 2>/dev/null | paste -sd' ' | sed 's/^$/aucun/')"
+  echo "     objets laissés dans Zot (poc-lien ne peut rien supprimer) : signes/essai-09@$img et son referrer"
+  echo "à effacer après archivage (chemin littéral) : $W"
+}
+
 e=${1:-}
 case "$e" in
-  compte_zot)
+  compte_zot|droits_zot)
     L=$R/o5-zot-$e.log
     set +e
     (umask 077 && : > "$L")
@@ -114,6 +185,8 @@ case "$e" in
     n=0
     [ -s "$MDP" ] && n=$(grep -c -F -f "$MDP" "$L" || true)
     [ -s "$HTP" ] && [ "$n" = 0 ] && n=$(cut -d: -f2 "$HTP" | grep -c -F -f - "$L" || true)
+    [ -s "$MDP" ] && [ "$n" = 0 ] && n=$(printf 'poc-lien:%s' "$(cat "$MDP")" | base64 -w0 | grep -c -F -f - "$L" || true)
+    [ -s "$S8/zot-poc-ecriture.password" ] && [ "$n" = 0 ] && n=$(grep -c -F -f "$S8/zot-poc-ecriture.password" "$L" || true)
     if [ "$n" != 0 ]; then : > "$L"; echo "KO   K6 : mot de passe ou hash de poc-lien dans le journal : journal vidé" > "$L"; chmod 644 "$L"; cat "$L"; exit 1; fi
     echo "OK   K6 : ni le mot de passe ni le hash de poc-lien dans le journal" >> "$L"
     k=$(grep -c '^KO' "$L" || true)
@@ -132,5 +205,5 @@ case "$e" in
     [ "$k" = 0 ] || { echo "bilan : $k ligne(s) KO" >> "$L"; rc=1; }
     cat "$L"
     exit "$rc" ;;
-  *) echo "usage : $0 lecture | compte_zot" >&2; exit 64 ;;
+  *) echo "usage : $0 lecture | compte_zot | droits_zot" >&2; exit 64 ;;
 esac
