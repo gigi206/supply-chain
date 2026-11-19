@@ -405,3 +405,19 @@ La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de 
 - **Les deux racines de M1b sont reproduites dans Kata** : l'outillage `7c07083c…` (`pod_a`, `pod_b`, `pod_c`) et le bootstrap `b063feb3…` (`pod_e`). La portée reste étroite : même jour, même nœud, entrées par copie, racine seule.
 - **Reste pour le point 1 A** : un autre jour dans Kata (après 00:00 UTC le 20/11), puis la tâche elle-même, avec couche de configuration et layout.
 - **Ce qui suit** dans la carte : les deux tâches neuves (prefetch runc et constructeur Kata sans sortie), chacune avec son pod d'essai, puis leurs changements du cluster, chacun avec son accord (point 4).
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T13:44:07Z UTC : tâches neuves, préparation à sec
+
+- **Écrites** : `prefetch-racine-rpm`, `construire-racine-rpm` et le gabarit `builder-rpm` (dossier [`builders/`](../builders/)), avec [`m1b-builders.sh`](../m1b-builders.sh). [Prédictions TQ, TC, EP et EC](m1b-predictions.md).
+- **Forme mesurée d'abord sur l'hôte** :
+  - outils et clés de l'amorce ([relevé](m1b-amorce-outils.log)) ;
+  - outillage sous la forme de la tâche, `7c07083c…` retrouvé ([résultat](m1b-outil-forme.log)).
+- **Deux choix sont à poser au propriétaire avant toute signature.** Les changer après coûterait une signature et une revue de plus.
+  1. Le paramètre `racine` : la pipeline fixe le sha256 attendu de la racine, et la tâche s'arrête s'il diffère. Un rejeu qui ne reproduit pas échoue alors au lieu de publier un autre digest.
+  2. Aucun résultat `*_ARTIFACT_INPUTS` dans le prefetch : les ancres (sha256 des `repomd.xml`, couche de base) ne sont que des paramètres de la pipeline signée. `prefetch-rpm` déclare au moins l'image de bootstrap. Ici, la base `ee90dc0e…` du bootstrap pourrait l'être de même.
+- **Changements du cluster**, à soumettre un par un, chacun avec son accord :
+  - sortie de `prefetch-racine-rpm` (DNS, adresses publiques en 443, Zot), et son ajout au `NotIn` de `builds-sans-internet` ;
+  - politique sans sortie de `construire-racine-rpm`, posée avant son premier TaskRun.
+
+  L'admission à blanc sous ces labels neufs est relevée par les essais.
+- **Ensuite** : signature (`SIGNER=1`) et revue de `taches.yml` par le propriétaire, deux PipelineRuns par image (même digest), provenance.

@@ -1,0 +1,10 @@
+baseos97 dbus-libs-1.12.20-8.el9.x86_64.rpm ab81c1e16482f333aa285db120051b099b56661d4620f0f1af05f8e69126e97b
+baseos97 python3-dateutil-2.9.0.post0-1.el9_7.noarch.rpm 1825dd1546532526d71f83acf473b2e9726074c2b18f146800d2972086df2dc8
+baseos97 python3-dbus-1.2.18-2.el9.0.1.x86_64.rpm f432c1bbcacfba197cd5d93a530c635691967f86ce76266cf253df57c933f987
+baseos97 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch.rpm 3da2880ea5da6191bebb5f5fcdb66a807b04a58237011046d91c84db456d58bf
+baseos97 python3-six-1.15.0-9.el9.noarch.rpm 752fc8b137a10cedd07c59478bd0822830d7502b7ce6d5cbb5c5f8cb5b4f1f1c
+baseos97 python3-systemd-234-19.el9.x86_64.rpm 4206bba0157aba914a7ea3b722f341fe5fad58fa80647181d52ace65a33ce8e8
+baseos97 dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm b2381a62f9974c4da89169f3531587a5513656b9692c40fb687e56fd29798bb6
+baseos97 dnf-data-4.14.0-31.el9.rocky.0.1.noarch.rpm 8bb408b00fd787c19b717aa90311a5efd6a41863111ed989469f4899e2066904
+baseos97 python3-dnf-4.14.0-31.el9.rocky.0.1.noarch.rpm 415035e84912af52be5596ebd06775c2f4d07e33b00fe8d1aa6488927deba45c
+baseos97 yum-4.14.0-31.el9.rocky.0.1.noarch.rpm bb4d1ddb75fdd38ae8bad8bc70da357792d51607cf7de129c471acfcbbdc24e6

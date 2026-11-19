@@ -1352,3 +1352,53 @@ Journal : [`m1b-outil-forme.log`](m1b-outil-forme.log) (13:23:44 à 13:24:10 UTC
 - **OF4** : `f.tar` vaut `7c07083c…` octet pour octet (343 930 880 octets, 13 332 membres).
 
 **Portée.** Sur l'hôte, hors réseau, la forme que la tâche poserait (dnf-3, limite autour de dnf seul, langue `en_US` posée par `.rpmmacros`, racine 0555) redonne l'outillage. Les deux images ont donc maintenant une même forme d'installation, mesurée. Rien n'est mesuré dans Kata sous cette forme pour l'outillage, ni par une tâche.
+
+### Tâches neuves de M1b, préparation et essais : prédictions (note écrite à 2026-11-19T13:44:07Z UTC, avant tout lancement)
+
+**Objet.** Les deux tâches neuves du point 2 de la carte et le gabarit de pipeline sont écrits à sec. Ils sont éprouvés avant toute signature, sans politique neuve ni écriture dans Zot.
+- [`builders/prefetch-racine-rpm.yaml`](../builders/prefetch-racine-rpm.yaml) (`738775b096b39a63…`) : runc, UID 65532, sur l'amorce. Il vérifie les clés, puis le `repomd.xml` de chaque dépôt (sha256 fixé, plus gpgv si le dépôt est signé), chaque métadonnée, chaque rpm de la liste (trouvé dans `primary`, puis `rpm -K`) et la couche de base (blob de Zot).
+- [`builders/construire-racine-rpm.yaml`](../builders/construire-racine-rpm.yaml) (`57b3987439d824e6…`) : Kata privilégié, root, sur l'amorce. Il revérifie les entrées, relève les témoins réseau et installe sous la forme mesurée. Il compare la racine à la valeur fixée et arrête la tâche si elle diffère. Il écrit ensuite la couche de configuration et le layout OCI à la main.
+- [`builders/builder-rpm.yaml`](../builders/builder-rpm.yaml) (`8c4e23bf70a2c031…`) : un gabarit rendu deux fois (`builder-mock-rocky9`, `builder-rocky9-bootstrap`), prefetch, construire, puis `publier-image` inchangée.
+- Les entrées que les pipelines fixent sont copiées des bancs sous `builders/` : deux `dnf.conf`, la clé d'EPEL, les trois fichiers de configuration de S1, la liste du bootstrap. `prealables` contrôle leur égalité avec les bancs.
+- [`m1b-builders.sh`](../m1b-builders.sh) (`19cf578efe481286…`) conduit quatre étapes. Les pods d'essai portent les labels existants `prefetch-rpm` et `construire-rpm`, dont les politiques sont posées. Un vrai PVC les enchaîne : le constructeur lit ce que le prefetch a écrit.
+
+**Écarts avec les formes mesurées**, nommés avant la mesure :
+- **pour les deux images** : `miroir` et `cles` sont atteints par des liens vers le workspace, au lieu de copies ;
+- **pour le bootstrap**, par rapport à `pod_e` :
+  - les chemins sont `/m/i`, `/m/cache` et `/m/dnf.conf`, au lieu de `/m/b-all`, `/m/cache-all` et `/m/dnf97.conf` ;
+  - deux `rpm --root -qa` suivent dnf, contre un seul dans la sonde. `var/lib/rpm/rpmdb.sqlite-shm` est dans l'archive et a déjà varié sur l'hôte : c'est le premier membre à regarder si `b063feb3…` n'est pas retrouvé ;
+- **pour l'outillage** : l'archive est écrite dans `/w`, puis l'arbre est retiré avant le layout.
+
+**TQ, `prealables`** (hôte, hors ligne) :
+- **TQ1** : l'étape rend 0. Les valeurs des pipelines sont égales aux bancs et aux journaux archivés, et les copies de `builders/` aussi.
+- **TQ2** : les deux pipelines sont rendues sans marqueur restant. Les paramètres des pas sont ceux des tâches. Le contexte de sécurité et les ressources du constructeur sont ceux du pas `construire` de `construire-rpm` signée.
+- **TQ3** : l'analyseur du paramètre `fichiers`, extrait de la tâche, redonne les trois fichiers de la couche de S1 octet pour octet.
+- **TQ4** : les quatre scripts substitués passent `bash -n` ; shellcheck ne signale rien (confiance moyenne). Leur base64 reste sous la borne de 131 071, avec 1 000 de marge.
+- **TQ5** (confiance moyenne) : entrées attendues du prefetch, 224 fichiers pour l'outillage (199 rpm, 23 fichiers de `repodata`, 2 clés), et 20 pour le bootstrap (10 rpm, 8 de `repodata`, 1 clé, la couche).
+
+**TC, `banc`** (hôte, hors ligne : racine de l'amorce extraite à neuf, chroot sous `unshare -n`) :
+- **TC1** : les entrées assemblées sont égales aux entrées attendues. Les deux scripts rendent 0. Les trois témoins réseau échouent.
+- **TC2** : rpm de python lit `[en_US]` pour l'outillage et `[all]` pour le bootstrap. dnf-3 rend 0, sous la limite `1024 / 1024`.
+- **TC3** : la tâche trouve la racine conforme, `7c07083c…` pour l'outillage et `b063feb3…` pour le bootstrap, au bit près. Confiance moyenne pour le bootstrap, à cause des écarts ci-dessus.
+- **TC4** : les deux layouts sont relus par python (blobs, tailles, `diff_ids`) et par oras. Le manifeste a le digest du résultat. L'outillage a 2 couches et `Env` ; le bootstrap a 1 couche et les deux annotations de base.
+- **TC5** (confiance moyenne) : le contenu de la couche de configuration est celui de S1, fichier par fichier. Son sha256 diffère de `f5710d47…` : S1 l'a archivée par le tar de l'hôte, la tâche par celui de l'amorce.
+- Les digests des deux images ne sont pas prédits. Ils sont relevés, et servent de référence aux pods.
+
+**EP, `essai_prefetch`** (cluster : PVC `m1bt-w`, deux pods runc au label `prefetch-rpm`) :
+- **EP1** : les politiques sont relues. Le PVC et les pods sont admis à blanc. L'admission sous le label neuf `prefetch-racine-rpm` est relevée, sans prédiction.
+- **EP2** : les deux scripts rendent 0 :
+  - signatures de `repomd.xml` valides pour `baseos98`, `appstream98` et `baseos97` ;
+  - `rpm -K` à 199 OK sur 199, puis 10 sur 10 ;
+  - blob `812c4412…` lu dans Zot sans compte (confiance moyenne : la lecture anonyme du blob par `curl` n'a jamais été mesurée).
+- **EP3** : chaque arbre écrit est égal aux entrées du banc, fichier par fichier.
+
+**EC, `essai_construire`** (cluster : deux pods Kata au label `construire-rpm`, entrées lues sur le PVC en lecture seule) :
+- **EC1** : les pods sont admis à blanc et prêts sous `kata`. L'admission sous le label neuf `construire-racine-rpm` est relevée, sans prédiction.
+- **EC2** : les deux scripts rendent 0. Les témoins échouent, et la racine est conforme pour les deux images.
+- **EC3** : `DIGEST_CONSTRUIT` et le sha256 d'`image.tar` sont égaux à ceux du banc, pour les deux images.
+- **EC4** : les pods et le PVC sont retirés. Aucun objet au préfixe `m1bt-` ne reste.
+
+**Portée prévue.** Si TC à EC sont tenues, les scripts qui seraient signés redonnent les deux racines, et donnent le même digest d'image sur l'hôte et dans Kata. Les entrées sont téléchargées par le prefetch, et non copiées. Restent hors de portée :
+- l'essai ne passe pas par Tekton, et porte les labels existants ;
+- rien n'est signé ni écrit dans Zot ;
+- il a lieu le même jour : le point 1 A demande encore un autre jour.

@@ -1,0 +1,122 @@
+# Brique 05, M1b (carte resultats/m1b-carte.md, transposition 1 de S4a) : pipeline de la plateforme qui construit une image rpm
+# (outillage de mock ou bootstrap) et la publie dans builds/builders/<image>. Un seul gabarit, rendu deux fois par m1b-builders.sh :
+# builder-mock-rocky9 et builder-rocky9-bootstrap. Signée par la clé des tâches et publiée en bundle (tekton/pipelines/<nom>) ; ses
+# tâches sont tirées de leurs bundles signés, épinglés par digest. Toutes ses entrées sont fixées ici (dépôts et sha256 de leurs
+# repomd.xml, liste des rpm, clés, couche de base, dnf.conf, noms, langue, SOURCE_DATE_EPOCH, sha256 attendu de la racine, fichiers
+# de configuration, configuration et annotations de l'image, dépôt de sortie) : la signature de la pipeline couvre ces choix, que le
+# créateur du PipelineRun ne peut pas changer. Le créateur (depuis l'hôte, sans déclencheur) fournit le workspace sortie (PVC) et le
+# runtimeClassName de la tâche construire (taskRunSpecs). Un seul workspace, lié par sous-dossier : prefetch écrit entrees/,
+# construire le lit en lecture seule et écrit image/, publier lit image/.
+# @NOM@, @PREFETCH@, @CONSTRUIRE@, @PUBLIER@, @DEPOTS@, @LISTE@, @CLES@, @CLE_SUP@, @COUCHE_PREFETCH@, @COUCHE@, @DNF_CONF@,
+# @DNF_CONF_SHA256@, @NOMS@, @LANGUE@, @SDE@, @RACINE@, @FICHIERS@, @CONFIG@, @ANNOTATIONS@, @IMAGE@ : m1b-builders.sh.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: @NOM@
+spec:
+  workspaces:
+  - name: sortie
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: prefetch
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PREFETCH@
+      - name: name
+        value: prefetch-racine-rpm
+      - name: kind
+        value: task
+    params:
+    - name: depots
+      value: |
+@DEPOTS@
+    - name: liste
+      value: |
+@LISTE@
+    - name: cles
+      value: |
+@CLES@
+    - name: cle_sup
+      value: |
+@CLE_SUP@
+    - name: couche
+      value: "@COUCHE_PREFETCH@"
+    workspaces:
+    - name: sortie
+      workspace: sortie
+      subPath: entrees
+  - name: construire
+    runAfter: [prefetch]
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @CONSTRUIRE@
+      - name: name
+        value: construire-racine-rpm
+      - name: kind
+        value: task
+    params:
+    - name: depots
+      value: |
+@DEPOTS@
+    - name: liste
+      value: |
+@LISTE@
+    - name: cles
+      value: |
+@CLES@
+    - name: couche
+      value: "@COUCHE@"
+    - name: dnf_conf
+      value: |
+@DNF_CONF@
+    - name: dnf_conf_sha256
+      value: "@DNF_CONF_SHA256@"
+    - name: noms
+      value: "@NOMS@"
+    - name: langue
+      value: "@LANGUE@"
+    - name: sde
+      value: "@SDE@"
+    - name: racine
+      value: "@RACINE@"
+    - name: fichiers
+      value: |
+@FICHIERS@
+    - name: config
+      value: '@CONFIG@'
+    - name: annotations
+      value: '@ANNOTATIONS@'
+    workspaces:
+    - name: entrees
+      workspace: sortie
+      subPath: entrees
+    - name: sortie
+      workspace: sortie
+      subPath: image
+  - name: publier
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PUBLIER@
+      - name: name
+        value: publier-image
+      - name: kind
+        value: task
+    params:
+    - name: image
+      value: @IMAGE@
+    - name: digest
+      value: $(tasks.construire.results.DIGEST_CONSTRUIT)
+    workspaces:
+    - name: sortie
+      workspace: sortie
+      subPath: image

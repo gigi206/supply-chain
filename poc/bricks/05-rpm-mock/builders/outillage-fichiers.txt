@@ -1,0 +1,41 @@
+=== etc/containers/storage.conf
+[storage]
+driver = "overlay"
+graphroot = "/w/containers"
+runroot = "/w/run-containers"
+=== etc/mock/poc-rocky-9.7-pret-x86_64.cfg
+include('templates/rocky-9.tpl')
+config_opts['root'] = 'poc-rocky-9.7-pret-x86_64'
+config_opts['target_arch'] = 'x86_64'
+config_opts['legal_host_arches'] = ('x86_64',)
+config_opts['basedir'] = '/w/mock'
+config_opts['cache_topdir'] = '/w/mock-cache'
+config_opts['use_bootstrap_image'] = True
+config_opts['bootstrap_image'] = 'sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2'
+config_opts['bootstrap_image_ready'] = True
+config_opts['macros']['%_buildhost'] = 'reproducible'
+config_opts['macros']['%source_date_epoch_from_changelog'] = '1'
+config_opts['macros']['%use_source_date_epoch_as_buildtime'] = '1'
+config_opts['macros']['%clamp_mtime_to_source_date_epoch'] = '1'
+for r in ('BaseOS', 'AppStream', 'CRB', 'extras'):
+    config_opts['dnf.conf'] = config_opts['dnf.conf'].replace(
+        'mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=%s-$releasever\n' % r,
+        'baseurl=https://dl.rockylinux.org/vault/rocky/9.7/%s/x86_64/os/\n' % r)
+=== etc/mock/poc-rocky-9.7-x86_64.cfg
+include('templates/rocky-9.tpl')
+config_opts['root'] = 'poc-rocky-9.7-x86_64'
+config_opts['target_arch'] = 'x86_64'
+config_opts['legal_host_arches'] = ('x86_64',)
+config_opts['basedir'] = '/w/mock'
+config_opts['cache_topdir'] = '/w/mock-cache'
+config_opts['use_bootstrap_image'] = True
+config_opts['bootstrap_image'] = 'sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2'
+config_opts['bootstrap_image_ready'] = False
+config_opts['macros']['%_buildhost'] = 'reproducible'
+config_opts['macros']['%source_date_epoch_from_changelog'] = '1'
+config_opts['macros']['%use_source_date_epoch_as_buildtime'] = '1'
+config_opts['macros']['%clamp_mtime_to_source_date_epoch'] = '1'
+for r in ('BaseOS', 'AppStream', 'CRB', 'extras'):
+    config_opts['dnf.conf'] = config_opts['dnf.conf'].replace(
+        'mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=%s-$releasever\n' % r,
+        'baseurl=https://dl.rockylinux.org/vault/rocky/9.7/%s/x86_64/os/\n' % r)
