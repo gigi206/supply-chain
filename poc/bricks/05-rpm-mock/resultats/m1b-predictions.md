@@ -1212,3 +1212,22 @@ Journal : [`m1b-boot-amorce.log`](m1b-boot-amorce.log).
   - `f2652169…` et `b063feb3…` sont des références du bootstrap pour la racine 0555, l'umask 022 et machine-id absent, mais avec les langues `all`, comme S1. Elles ne correspondent pas à la valeur `en_US` annoncée le 19/11 ;
   - `b063feb3…` n'est la cible du pod et de la tâche que si la langue du bootstrap est `all`. Ce choix revient au propriétaire.
 - **Ce qui suit** : un banc de l'hôte sépare la langue des outils (amorce + `en_US`, amorce + `all` posée explicitement) avant la question.
+
+### Langue du bootstrap, séparée des outils : prédictions (note écrite à 2026-11-19T12:51:34Z UTC, avant le lancement)
+
+- **Script** : [`m1b-boot-langue.sh`](m1b-boot-langue.sh), sha256 `459f07c14e9db3e1…`. Banc de l'hôte, hors réseau, sans rien installer sur l'hôte. La racine d'outils de l'amorce (banc du 18/11, lecture seule) installe deux fois la base `rockylinux:9.7` et les dix lignes, avec la sonde prévue pour le pod :
+  - la couche `812c4412…` est extraite par le `tar` de l'amorce, sans podman ;
+  - dnf-3 tourne sous `env -i`, umask 022, `SOURCE_DATE_EPOCH`=S et `container=oci`. La limite de fichiers ouverts est mise à 1 024, souple puis dure, dans un sous-shell qui n'entoure que dnf : c'est la forme décidée, jamais mesurée telle quelle (`pod_c` la posait pour toute la sonde) ;
+  - `en` : `HOME=/root`, macro de l'amorce telle quelle ; `all` : `HOME=/m/h`, dont `.rpmmacros` pose `%_install_langs all` ;
+  - la racine de l'arbre passe en 0555 avant l'archive. L'archive est faite par le `tar` de l'amorce, avec les options, la borne S et les exclusions de la référence.
+- **Montages** : un dossier neuf sur `/m` de la racine d'outils, dans un espace de noms à part, et le miroir du 18/11 en lecture seule sur `/m/miroir`. Le banc s'arrête, sans rien effacer, s'il reste moins de 1,5 Go ; il en reste environ 2,3.
+
+- **LG0** : la racine d'outils a `rpm-4.16.1.3-40.el9`, `python3-dnf-4.14.0-34.el9_8.rocky.0.1`, `libsolv-0.7.24-4.el9` et `tar-1.34-11.el9`. Le miroir est en lecture seule. Sous `env -i`, rpm de python lit `[en_US]` avec `HOME=/root` et `[all]` avec `HOME=/m/h`. Confiance moyenne pour la lecture de `.rpmmacros` sous `env -i`.
+- **LG1** : l'extraction par le `tar` de l'amorce rend 0, sans rien sur stderr. `rpm -qa` donne 147 lignes avant l'installation.
+- **LG2** : dnf-3 rend 0 deux fois. La limite vaut `1024 / 1024` dans le sous-shell, et celle du shell reste celle de l'hôte après. Chaque transaction compte 6 installations et 4 montées. La liste `rpm -qa` après (153 lignes) est égale à celle de S1.
+- **LG3** : `tar` rend 0, sans rien sur stderr, et la racine est en 555.
+- **LG4** (décisive, confiance moyenne) : `z-all.tar` vaut `b063feb3…` octet pour octet. Ce qui change par rapport à la référence : libsolv `-4` au lieu de `-6`, une extraction par le `tar` 1.34 et non 1.35, `env -i`, et la limite. Si elle diffère, le comparateur membre à membre nomme chaque écart.
+- **LG5** (sans pari) : `z-en.tar` contre `z-all.tar`. Le comparateur nomme les écarts ; le banc compte les membres sous `usr/share/locale`. La transaction ajoute 32 membres de locale sous `all` ; sous `en_US`, les quatre montées peuvent aussi en retirer de la base.
+- **LG6** : le `/m` de la racine d'outils garde le même nombre d'entrées, et `/mnt` reste vide.
+
+**Ce qui départagera.** Si LG4 est tenue, seule la langue distingue l'amorce des outils de `a8` pour le bootstrap. La question au propriétaire porte alors sur la langue du bootstrap : `all` comme S1, ou `en_US` comme annoncé le 19/11.
