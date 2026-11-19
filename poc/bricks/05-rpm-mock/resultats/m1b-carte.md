@@ -549,3 +549,7 @@ La note précédente dépassait la mesure. Le prefetch contrôle le manifeste de
 **Cas refusés à ajouter avant signature**, à jouer dans un pod de prefetch :
 - un manifeste valide mais autre : celui de l'amorce `ed654c69…`, dont la couche est `99c753a8…`. Le prefetch doit s'arrêter sur « manifeste de base » ;
 - le bon manifeste avec une couche fausse.
+
+## Note datée du 19/11/2026, écrite à 15:33:13 UTC : mesure d'un autre jour, préparée
+
+La mesure prévue à partir du 20/11 à 00:00 UTC tient en une commande : [`m1b-jour-kata.sh`](m1b-jour-kata.sh). Elle rejoue l'ancienne forme (`pod_c` et `pod_e`, sous `m1b-20`) et la forme de la tâche (`m1b-builders.sh`, sous `m1bt-20`), puis confronte 21 valeurs à celles du 19/11. Les scripts ne changent pas. Les prédictions JK1 à JK3 et JT1 à JT5, ainsi que la lecture d'un écart, sont dans [`m1b-predictions.md`](m1b-predictions.md). Aucune signature avant le résultat.

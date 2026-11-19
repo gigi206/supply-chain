@@ -1596,3 +1596,35 @@ Journal : [`m1b-builders-m1bt4-prealables.log`](m1b-builders-m1bt4-prealables.lo
   - `couche` de construire changée.
 
 **Portée** : dans les pipelines que `m1b-builders.sh` rend, l'annotation de base est maintenant égale au manifeste que le prefetch contrôle. La pipeline signée, elle, n'aura ce contrôle qu'à son rendu par ce script. Aucune tâche ne le refait à l'exécution.
+
+## Prédictions du 19/11/2026, écrites à 15:33:13 UTC : mesure d'un autre jour dans Kata (à partir du 20/11 à 00:00 UTC)
+
+**Ce qui est mesuré.** Le 19/11, les deux racines et les deux images ont été reproduites dans Kata, mais le même jour. Le point 1 A demande un autre jour. Rien n'a changé dans les scripts depuis : `m1b.sh` a le sha256 `373ae33436d298e3…` (celui de `pod_e`), `m1b-builders.sh` `82004de28016ee27…` (celui de `m1bt4`, dont `prealables` rend les mêmes quatre scripts que `m1bt3`).
+
+**Lanceur** : [`m1b-jour-kata.sh`](m1b-jour-kata.sh) (sha256 `43f21076910a424e…`), une seule commande, qui refuse de partir avant le 20/11 à 00:00 UTC (essayé le 19/11 à 15:32:32 UTC : code 2, rien lancé). Il enchaîne huit étapes, chacune dans un journal neuf, et s'arrête à la première en échec ou sur un journal déjà présent :
+- **ancienne forme**, sous le préfixe `m1b-20` : `prealables`, `pod_c` (outillage, limite posée dans le shell, comme le 19/11), `prealables_boot`, `pod_e` (bootstrap, limite dans le sous-shell de dnf) ; journaux `m1b-20-<étape>.log`. `pod_a` et `pod_b` ne sont pas rejoués : à la limite par défaut, chacun dure environ 97 min, sans rien dire de plus sur le contenu ;
+- **forme de la tâche**, sous le préfixe `m1bt-20` : `prealables`, `banc`, `essai_prefetch`, `essai_construire` ; journaux `m1b-builders-m1bt-20-<étape>.log` ;
+- **bilan** : 21 valeurs relues dans les journaux neufs et confrontées à celles du 19/11 (`m1b-pod_c.log`, `m1b-pod_e.log`, `m1b-builders-m1bt3-*.log`). Les motifs ont été essayés sur les journaux du 19/11 contre eux-mêmes : 21 OK. Journal du lanceur : `m1b-jour-kata.log`.
+
+**Écritures** : quatre pods d'essai et un PVC dans `builds`, sous des labels existants, retirés par les scripts (accord permanent du 18/11). Ni politique, ni signature, ni écriture dans Zot.
+
+**Téléchargements** (pods de prefetch, sortie posée le 16/11) : environ 113,7 Mo de rpm (199 paquets) et les métadonnées de BaseOS et AppStream 9.8 depuis `dl.rockylinux.org/vault/rocky/9.8`, et d'EPEL depuis `dl.fedoraproject.org/pub/archive/epel/9.8`. S'y ajoutent, depuis Zot sur le laptop, 10 rpm (environ 2 Mo), les métadonnées de BaseOS 9.7 et la couche amont `812c4412…` (87 Mo). Les sha256 sont contrôlés par le script, contre les valeurs fixées par la pipeline.
+
+**Ancienne forme**
+- **JK1** (haute) : `prealables` et `prealables_boot` rendent 0, entrées conformes, pods admis à blanc.
+- **JK2** (haute) : dans `pod_c`, les témoins réseau échouent, la limite vaut `1024 / 1024`, dnf rend 0 en moins de 300 s (40 s le 19/11), 201 paquets dont 2 `gpg-pubkey`, racine en 555. L'archive vaut `7c07083c…` octet pour octet.
+- **JK3** (haute) : dans `pod_e`, dnf-3 rend 0, la liste `rpm -qa` après vaut `1ca7c54b…` (celle de S1), et l'archive vaut `b063feb3…` octet pour octet.
+
+**Forme de la tâche**
+- **JT1** (haute) : `prealables` rend 0 et rend les quatre mêmes scripts que le 19/11 (`script-po` `a93deebb…`, `script-pb` `912520ea…`, `script-co` `956e39c2…`, `script-cb` `cad7f550…`), contrôle de cohérence de la base compris (AN1).
+- **JT2** (haute) : au `banc`, les racines valent `7c07083c…` et `b063feb3…`, les manifestes `70f8c412…` (outillage) et `6de899ac…` (bootstrap), comme le 19/11.
+- **JT3** (moyenne) : au prefetch, les `repomd.xml` publics sont ceux du 19/11 (`abac8b17…` BaseOS 9.8, `a3ca4230…` AppStream 9.8, `e86fdcd8…` EPEL), comme `fa6d5054…` (BaseOS 9.7, dans Zot). Les arbres écrits ont les listes `93f2a63e…` (224 fichiers) et `7af63de7…` (20 fichiers). La confiance est moyenne parce que ces sources sont hors du laptop : vault et l'archive d'EPEL sont présentés comme figés, ce qui n'est vérifié que d'un jour à l'autre.
+- **JT4** (haute) : `BASE_ARTIFACT_INPUTS` vaut `ee90dc0e…` pour le bootstrap et reste absent pour l'outillage.
+- **JT5** (haute) : dans Kata, `construire` rend les manifestes `70f8c412…` et `6de899ac…` et les `image.tar` `26ce192f…` et `e574aaa1…`, égaux au banc du jour et au 19/11. PVC retiré, 0 objet restant au préfixe.
+
+**Ce qu'un écart voudrait dire**
+- **Une racine différente** (JK2, JK3, JT2 ou JT5) : elle ne se reproduit pas d'un jour à l'autre, et le point 1 A n'est pas établi. Dans la forme de la tâche, `construire` s'arrête alors sur la racine (« Garder l'arrêt »), ce qui est voulu. Pas de signature ; le comparateur nomme les membres, et la suite est une décision avec toi.
+- **Une racine égale, mais un manifeste ou une `image.tar` différents** : la cause est dans la couche de configuration ou dans le layout, pas dans dnf. Pas de signature avant d'avoir lu l'écart.
+- **Un `repomd.xml` public différent** (JT3) : la source amont a bougé. Le prefetch s'arrête sur le sha256 fixé, ce qui est voulu. Pas de signature ; le choix des sources te revient.
+
+**Portée prévue.** Si tout tient, les deux racines et les deux images se reproduisent dans Kata sur deux jours (19 et 20/11), sur un seul nœud et un seul hôte. Le point 1 A serait établi dans ce cadre, pas au-delà : ni pour un autre nœud, ni après une mise à jour du noyau ou de Kata. La signature resterait suspendue aux points ouverts : `--dry-run=server`, cas refusés, docs/04 pour curl et GnuPG, les deux politiques de réseau.
