@@ -432,3 +432,15 @@ La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de 
   - les deux politiques réseau, avec le `NotIn` de `builds-sans-internet`, chacune sur accord ;
   - puis `SIGNER=1` et la revue de `taches.yml`.
 - **Autre jour** : relance des pods de l'outillage et du bootstrap à partir de 00:00 UTC le 20/11, sous l'ancienne forme, à part de la forme de la tâche.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T13:58:26Z UTC : avant signature, ordre et points ouverts
+
+- **Portée des essais, précisée** : aucune des deux images n'a été poussée, tirée ni exécutée. Les essais établissent le digest et un layout valide, relu par python et oras, et rien de plus. Les images ne sont pas « prêtes ».
+- **Ordre proposé** : aucune signature avant la mesure d'un autre jour. Les écritures dans Zot sont définitives, et le paramètre `racine` ferait échouer la tâche si l'autre jour ne reproduisait pas. À partir de 00:00 UTC le 20/11, deux relances sont prévues :
+  - l'ancienne forme (pods de l'outillage et du bootstrap), comme témoin ;
+  - `m1b-builders.sh`, sous un préfixe neuf, puisque c'est la forme de la tâche qui serait signée.
+- **Points ouverts avant signature, aucun n'est mesuré** :
+  - validation par Tekton : les deux tâches et les deux pipelines rendues, en `--dry-run=server`, comme `m4b-taches-admission`. Les noms de paramètres à tiret bas et le champ `resources` n'ont jamais été vus par le webhook ;
+  - refus : aucun cas refusé n'est mesuré. À jouer au moins une `racine` fausse et un rpm altéré au banc, et un `repomd` faux dans un pod de prefetch, comme le cas refusé d'`essai_tache` de M4b ;
+  - annotation de base du bootstrap : `base.digest ee90dc0e…` est écrite dans le manifeste, alors que seule la couche `812c4412…` est contrôlée. Un remède possible, non retenu : le prefetch lirait le manifeste `ee90dc0e…` dans Zot, contrôlerait son sha256 et en tirerait la couche. C'est lié au choix 2, à poser après lecture, dans la source de Tekton v1.15.5, du sort d'un résultat objet déclaré mais non écrit ;
+  - docs/04 n'a de ligne ni pour curl ni pour GnuPG, que le prefetch utilise depuis l'amorce. `prefetch-rpm` les utilise déjà, depuis l'image de M3. À vérifier comme dnf l'a été.
