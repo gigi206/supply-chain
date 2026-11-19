@@ -339,3 +339,18 @@ CL1 reste valable. Elle porte sur une clé créée par gpg 2.4.7 sous K1 et K2 :
 | CL2 | Usages de la clé primaire : `scSC`, comme en RP1. Identité : nom et commentaire par défaut d'`o2-interne.sh`, sans adresse | haute |
 | CL3 | Chaque fichier est plus grand que son équivalent de la répétition, de moins de 200 octets : clé privée au-dessus de 3457, clé publique au-dessus de 1709, révocation au-dessus de 1848 octets. Cause attendue : l'identité par défaut est plus longue que celle de la clé jetable | moyenne |
 | CL4 | Code 0, aucune ligne KO. Après `cle`, `garde-cle-privee.sh` passe sur l'arbre réel, car la clé est hors du dépôt | haute |
+
+## Note datée du 19/11/2026, écrite à 17:19:02 UTC : `cle` passée, CL1, CL3 et CL4 tenues, CL2 en partie
+
+Étape `cle` passée de 17:18:37 à 17:18:38 UTC, code 0 ([journal](o2-cle.log)), avec les mêmes scripts que la répétition (`o2.sh` `1a6f9cd0…`, `o2-interne.sh` `7c91e50f…`).
+
+- **CL1 tenue** : clé créée par gpg 2.4.7, avec K1 et K2 tenues. RSA 4096, créée le 2026-11-19, expire le 2027-11-19. Les trois fichiers sont en 600 et le dossier des secrets en 700. K3 tenue.
+- **CL2 en partie** : les usages valent `scSC`. L'identité n'est pas affichée par `decrire`, donc pas mesurée dans le journal.
+- **CL3 tenue** : clé privée de 3498 octets (+41), clé publique de 1749 (+40), révocation de 1877 (+29).
+- **CL4 tenue** : code 0, aucune ligne KO. `garde-cle-privee.sh` passe ensuite sur l'arbre réel (17:18:42 UTC, sortie non archivée en journal ; il repasse avant le commit de cette note).
+
+**Empreinte de la clé du PoC** : `29BA1C48A39C099B7070DCD8C0658591BCF03A86`.
+
+Désormais, les étapes avec réseau d'O2 refusent de tourner, puisque le dossier des secrets existe (K1). Aucune session ne lit ni ne liste ce dossier. Prochaine étape : `essai`, sans réseau, avec la clé du PoC (ES1 à ES5).
+
+*Note datée du 19/11/2026, 17:19:02 UTC, avant le lancement d'`essai`* : ES1 à ES5 sont inchangées. Leur confiance devient haute : la répétition (RP4) a passé E1 à E8 avec une clé jetable de même forme. Ce qui est neuf avec `essai` : la clé du PoC elle-même, expirant dans un an.
