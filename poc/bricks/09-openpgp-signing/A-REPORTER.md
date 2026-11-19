@@ -316,3 +316,8 @@ Après le tableau du §4 (sous la ligne « Sources : … »), ajouter :
   - **ADR 0003** (§4 bis et §4 ter) : texte prêt, l'ADR reste à rédiger.
 - **Liens.** Les liens vers `poc/bricks/09-openpgp-signing/` ne valent qu'après la fusion de la branche `claude/brique-09-sec-fdb4c6`, jamais poussée.
 - **Rien à faire dans le cluster.** Le jeton `lien` expire seul au plus tard le 22/11/2026 à 19:49:36 UTC. La clé Transit `lien`, la politique `lien-signature`, le compte `poc-lien` et les objets de `signes/**` restent en place.
+
+*Correction datée du 19/11/2026, 22:07:15 UTC (clôture)* : dans la note précédente, la liste « Ce qui reste à intégrer » est imprécise sur le §1.
+- **§1.1** : rien n'est intégré. Le §2 du doc 04 n'a aucune ligne GnuPG.
+- **§1.2, §1.3 et §1.4** : seul GnuPG est intégré, dans la forme de la 05 (doc 04, §3, §4 et §6, lignes 131, 152 et 200 au commit `867bd680`). La ligne « chemin critique » du §1.2 est à rapprocher de celle-là. Le reste de ces sections n'est pas intégré : apt, devscripts, Sequoia et les verdicts « Risqué ».
+- **§4 quater** : `garde-cle-privee.sh` ne cherche que l'en-tête de clé privée. Jusqu'à l'intégration du §4 quater, aucun contrôle de commit ne voit `revocation.asc`, `openbao-lien.secret`, `zot-poc-lien.password` ni `zot-poc-lien-docker/config.json`. Les identifiants de `poc-lien` n'expirent pas.
