@@ -1,0 +1,30 @@
+# m1b.sh banc (PREFIXE m1b), début 2026-11-19T08:59:15Z
+dossier du banc : /home/gigi/.cache/supply-chain-poc/05/m1b-banc-sondes-20261119T085915Z ; place libre de /home avant : 10780880 kB
+OK   manifeste ed654c69 (cache de s1.sh amorce) : ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+OK   couche 99c753a880cc : 99c753a880cc03bbe9da8bf6e354c8ba2d99f19058e87b8a55b6487ffcf52f8a
+     invité : 7.0.0-31-generic, 16 vCPU ; uid 0 ; umask du conteneur : 0022
+     %_install_langs : [en_US]
+     versions : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 
+     entrées revérifiées dans le pod : rc 0 ; fichiers 225 ; lignes de la liste 225
+     lien /m vers /w/m posé
+     S recalculée dans le pod : 1793914619
+     témoin TCP Zot 192.168.161.13:5000 (5 s) : rc 1
+     témoin DNS dl.rockylinux.org (5 s) : rc 2
+     avant dnf, /w : capacité 599879200 kB ; utilisés 559029852 kB
+     (code : 0)
+     dnf, début 2026-11-19T08:59:18Z
+     dnf code 0 en 23 s ; 883 lignes de journal ; fin 2026-11-19T08:59:41Z
+     lignes « scriptlet », « warning » ou « error » (casse ignorée) : 29
+     paquets installés : 201, dont gpg-pubkey 2
+     racine de l arbre : 555 ; etc/machine-id : 33 octet(s), mode 444
+     tar code 0 ; stderr 0 lignes
+     archive du pod : 343930880 octets, 13332 membres, sha256 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+     après archive, /w : capacité 599879200 kB ; utilisés 559918604 kB
+     (code : 0)
+OK   archive du banc relue sur l'hôte : 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+OK   archive du banc = cible 7c07083c… octet pour octet
+   comparer : membres : 13332 et 13332
+   comparer : seulement d'un côté : 0 ; présents des deux côtés et différents : 0
+   comparer : champs en cause : aucun
+place libre de /home après : 9415192 kB
+# fin banc 2026-11-19T08:59:45Z
