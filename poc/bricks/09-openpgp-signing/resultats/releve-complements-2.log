@@ -1,0 +1,19 @@
+second complément commencé : 2026-11-19T14:47:53Z
+
+## obs-sign : fichiers signd* (API GitHub, contenu de la racine)
+  ref 2.8.5 : [('signd', 'file', 115015), ('signd.8', 'file', 719)]
+  ref master : [('signd', 'file', 62182), ('signd.8', 'file', 721), ('signd_gcrypt', 'file', 14309), ('signd_openssl', 'file', 2924), ('signd_pkcs11', 'file', 6641), ('signd_privileged', 'file', 22069), ('signd_ssl', 'file', 3881), ('signd_tpm', 'file', 9827)]
+  commits de master postérieurs au tag 2.8.5 (2026-02-05T14:47:32Z), messages citant pkcs11 ou tpm :
+    commits : 22
+     2026-02-10T09:58:15Z Simplify pkcs11_sign and move pkcs11 Initialize call
+
+## gnupg2 au security tracker de Debian : section « Open issues » (fichier du passage complements-20261119T144707Z)
+  Bug | bookworm | trixie | forky | sid | Description
+  CVE-2026-105712 | vulnerable (no DSA, postponed) | vulnerable (no DSA) | fixed | fixed | gpgtar in GnuPG before 2.5.19 can allow file overwrite via crafted dat ...
+  CVE-2026-57062 | vulnerable (no DSA, postponed) | vulnerable (no DSA) | fixed | fixed | CMS (Cryptographic Message Syntax) parsing in gpgsm in GnuPG through 2 ...
+  CVE-2026-24882 | fixed | vulnerable (no DSA) | fixed | fixed | In GnuPG before 2.5.17, a stack-based buffer overflow exists in tpm2da ...
+  CVE-2025-68972 | vulnerable (no DSA) | vulnerable (no DSA) | vulnerable | vulnerable | In GnuPG through 2.4.8, if a signed message has \f at the end of a pla ...
+  CVE-2025-30258 | vulnerable (no DSA) | fixed | fixed | fixed | In GnuPG before 2.5.5, if a user chooses to import a certificate with ...
+  Bug | bookworm | trixie | forky | sid | Description
+  CVE-2022-3219 | vulnerable | vulnerable | vulnerable | vulnerable | GnuPG can be made to spin on a relatively small input by (for example) ...
+second complément fini : 2026-11-19T14:47:54Z

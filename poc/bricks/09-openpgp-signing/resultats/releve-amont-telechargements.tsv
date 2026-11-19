@@ -1,0 +1,79 @@
+nom	origine	octets	sha256
+swdb.lst	https://versions.gnupg.org/swdb.lst	6658	5781e592fa0a5cfbfd1146a1c510297ee56282c1703dd4b8427a2bc7530274e2
+swdb.lst.sig	https://versions.gnupg.org/swdb.lst.sig	147	98d7c60fec8fde05e14c0a3a897442867050dad66d6088bb67156d652bf92308
+signature_key.asc	https://gnupg.org/signature_key.asc	6466	6f57d0e17fefd2238bd037aebf03efa960641629dd61dd9d47f122a829f6e375
+signature_key.html	https://gnupg.org/signature_key.html	15484	9d6cd8bfdf70c3d80d35edf7de03b4a897b18e31b5673a1007e761f5d1c31353
+gnupg-download.html	https://gnupg.org/download/index.html	19817	7d98b8070242b72254e9e6b40085a4ce467dc3f14bd01c44f44721fa1dd50e5e
+gnupg-security.html	https://gnupg.org/documentation/security.html	8004	ad2d230a9fd90bfeaca2cb9dff7bcbf44a63f017ece6b1263f053fb9a8a07345
+gpg_gnupg-repo.json	https://api.github.com/repos/gpg/gnupg	6679	235c97c9fd9155d6bb6689579be23c5169804d2ad8248a26202cdf731f893963
+gpg_gnupg-releases.json	https://api.github.com/repos/gpg/gnupg/releases?per_page=5	5	2ba33ca0557f1bb5b7ba88d67f9d0093c7185a36ec51fe2b7bd9372d3e001d6d
+gpg_gnupg-tags.json	https://api.github.com/repos/gpg/gnupg/tags?per_page=5	2431	ba942cb1a0ff343dfecff2f7956c9029ecef81eeca49d2768220407f5527addc
+gpg_gnupg-commits.json	https://api.github.com/repos/gpg/gnupg/commits?since=2026-08-21T14:44:38Z&per_page=100	389975	77612e67d9c593f36c2bcd344cc4a3ec71b3e81e435cd841dbf116c8ea377884
+openSUSE_obs-sign-repo.json	https://api.github.com/repos/openSUSE/obs-sign	6807	c3bf8415ab6283b5a01a0531b9ef16e74160485fd40f7bd9ac795f2498e3463a
+openSUSE_obs-sign-releases.json	https://api.github.com/repos/openSUSE/obs-sign/releases?per_page=5	5	2ba33ca0557f1bb5b7ba88d67f9d0093c7185a36ec51fe2b7bd9372d3e001d6d
+openSUSE_obs-sign-tags.json	https://api.github.com/repos/openSUSE/obs-sign/tags?per_page=5	2376	51b1017c0cddd2d9fc99d40489fc72c610e950fe0d52781ec1b251540cb08af7
+openSUSE_obs-sign-commits.json	https://api.github.com/repos/openSUSE/obs-sign/commits?since=2026-08-21T14:44:38Z&per_page=100	45075	c78aa0d2572af6e3fb5d8cde7b4f75fa81373432728db9d6fb2626ece57e8daa
+softhsm_SoftHSMv2-repo.json	https://api.github.com/repos/softhsm/SoftHSMv2	6744	242dcf8e81562769a44db0ef3b60588f51e609cb144006f125b0f2ce17e70c23
+softhsm_SoftHSMv2-releases.json	https://api.github.com/repos/softhsm/SoftHSMv2/releases?per_page=5	22569	ecf0d347eb53b43fa897e1f005d9f5b6a68019d79adcf9fa7eed0213b787ba9a
+softhsm_SoftHSMv2-tags.json	https://api.github.com/repos/softhsm/SoftHSMv2/tags?per_page=5	2368	1356441fe2df8e17171395ce2efed1b9b5a0a4f218125e660a88459fdc411dd9
+softhsm_SoftHSMv2-commits.json	https://api.github.com/repos/softhsm/SoftHSMv2/commits?since=2026-08-21T14:44:38Z&per_page=100	64312	bd0a64fabc1069ed530506b58c21903a0e76ad6e95c4f86d47a8b0515ad1bb51
+alonbl_gnupg-pkcs11-scd-repo.json	https://api.github.com/repos/alonbl/gnupg-pkcs11-scd	5861	df8eeaeb9b83ac564ef3c28ab4c86db5d46b629908a9807562dfd00b0e61ffe8
+alonbl_gnupg-pkcs11-scd-releases.json	https://api.github.com/repos/alonbl/gnupg-pkcs11-scd/releases?per_page=5	21988	abd5d5a2519731aee982d519d0afc918565c076006d9ee305c1aca328776837d
+alonbl_gnupg-pkcs11-scd-tags.json	https://api.github.com/repos/alonbl/gnupg-pkcs11-scd/tags?per_page=5	2799	1bc76506cbd33dabc8009458c1697eb4b89f497274c467397d1bd3428ccd03d0
+alonbl_gnupg-pkcs11-scd-commits.json	https://api.github.com/repos/alonbl/gnupg-pkcs11-scd/commits?since=2026-08-21T14:44:38Z&per_page=100	5	2ba33ca0557f1bb5b7ba88d67f9d0093c7185a36ec51fe2b7bd9372d3e001d6d
+fedora-infra_siguldry-repo.json	https://api.github.com/repos/fedora-infra/siguldry	6916	6a94038b346b01c277e15dc9e8551b84565a7cb8f6d4315eb9d17b3be83332f3
+fedora-infra_siguldry-releases.json	https://api.github.com/repos/fedora-infra/siguldry/releases?per_page=5	14054	b9fd0ec01d14994ad289dd06b5eddc5fcc5d16703c4f7030bc3c09f29f84a779
+fedora-infra_siguldry-tags.json	https://api.github.com/repos/fedora-infra/siguldry/tags?per_page=5	2708	5c92d5be3b593ee47e03c73a1d2350d8c7a2fe0c3b4f51113068f3bcc84ed43a
+fedora-infra_siguldry-commits.json	https://api.github.com/repos/fedora-infra/siguldry/commits?since=2026-08-21T14:44:38Z&per_page=100	359278	227a3d4b0cb25e506bec2839fd773c35ffbd6f454868c18786c0ad55429e3096
+LeSuisse_vault-gpg-plugin-repo.json	https://api.github.com/repos/LeSuisse/vault-gpg-plugin	6090	a6149dbe14c3ef660c9190dc3a97eaed9b86ecaad9e66dc24046747b1d8be5bc
+LeSuisse_vault-gpg-plugin-releases.json	https://api.github.com/repos/LeSuisse/vault-gpg-plugin/releases?per_page=5	647751	fb64472c9ac0cf0946af49c21e4d6cac38b98fb624331b82167e8740e6a8568f
+LeSuisse_vault-gpg-plugin-tags.json	https://api.github.com/repos/LeSuisse/vault-gpg-plugin/tags?per_page=5	2483	1f6034c40cb346133cee1e484980123e2c8d02972eaa692d580f234984dcafe0
+LeSuisse_vault-gpg-plugin-commits.json	https://api.github.com/repos/LeSuisse/vault-gpg-plugin/commits?since=2026-08-21T14:44:38Z&per_page=100	75546	9cb4e7da0b98ef2a76f9ccfd44c2034b0850a0167151533171172d8be638eed8
+gl_apt-team_apt-projet.json	https://salsa.debian.org/api/v4/projects/apt-team%2Fapt (projet)	814	e4d492c135b798b994ad0fde5cb78675e3fe149b4c29e28af6668962ed14d143
+gl_apt-team_apt-tags.json	https://salsa.debian.org/api/v4/projects/apt-team%2Fapt (tags)	8782	d9c502b13c45b9c9fbaca231b9f5f7aab839429d77cedb4d7f762109ee9b8483
+gl_apt-team_apt-commits.json	https://salsa.debian.org/api/v4/projects/apt-team%2Fapt (commits)	97411	fea4301c5a1c20065fbb5e32e6eba6ff9b7ee79fc347c54cdd520ce10ecf54f5
+gl_debian_devscripts-projet.json	https://salsa.debian.org/api/v4/projects/debian%2Fdevscripts (projet)	847	629900cc93575b1666e6a26bea834042171dd0ff97da0a8b771e63fc19f1fe9c
+gl_debian_devscripts-tags.json	https://salsa.debian.org/api/v4/projects/debian%2Fdevscripts (tags)	8074	072c4a1c4e741c9bfcae82fd507661cab76421cfd13e45a6b9b8b33849aacad7
+gl_debian_devscripts-commits.json	https://salsa.debian.org/api/v4/projects/debian%2Fdevscripts (commits)	32135	786f659b5e019b7f39011dd0cc0d767bed0c00562b93213d5616755d2c2c07a3
+gl_debian_gnupg2-projet.json	https://salsa.debian.org/api/v4/projects/debian%2Fgnupg2 (projet)	984	d125a74adc633d765f4bb62cd21c49181ef6060a4e57923da96201131e5035b9
+gl_debian_gnupg2-tags.json	https://salsa.debian.org/api/v4/projects/debian%2Fgnupg2 (tags)	8322	93b0655b794a9ea582f8c130724cd686cb5d3c829a57a8ca3f43328e7e37d3d4
+gl_debian_gnupg2-commits.json	https://salsa.debian.org/api/v4/projects/debian%2Fgnupg2 (commits)	1801	7a89e9baee4851d4a7e2e43af34acd708bfc976555654966a56bb38d5c0e012c
+gl_debian_debsigs-projet.json	https://salsa.debian.org/api/v4/projects/debian%2Fdebsigs (projet)	775	1e333665a1f82a28a27efb280afbad6dfa8a9c0f25a5672527e0d8762dbbfb55
+gl_debian_debsigs-tags.json	https://salsa.debian.org/api/v4/projects/debian%2Fdebsigs (tags)	9107	6a9c8f838cd1bc23293e46c1f864d0ba10163cd4bf233f78acfb0495c28c3f5a
+gl_debian_debsigs-commits.json	https://salsa.debian.org/api/v4/projects/debian%2Fdebsigs (commits)	2	4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
+gl_debian_reprepro-projet.json	https://salsa.debian.org/api/v4/projects/debian%2Freprepro (projet)	1692	ab055ec45e12d2078c9b3a6d693f60096accf62e075b60393fdf74b22b4aefdd
+gl_debian_reprepro-tags.json	https://salsa.debian.org/api/v4/projects/debian%2Freprepro (tags)	4130	07d2f712c68d804b35508ccb1902ea4ae2a081d677c7b1f98624e05425cb944b
+gl_debian_reprepro-commits.json	https://salsa.debian.org/api/v4/projects/debian%2Freprepro (commits)	2	4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
+gl_sequoia-pgp_sequoia-sqv-projet.json	https://gitlab.com/api/v4/projects/sequoia-pgp%2Fsequoia-sqv (projet)	840	47a3d20d8f3809fb891558dba7c0a5d7b4318cca025c3d3d104c6b309cec4fe4
+gl_sequoia-pgp_sequoia-sqv-tags.json	https://gitlab.com/api/v4/projects/sequoia-pgp%2Fsequoia-sqv (tags)	6947	905b3055b00c2a18edec4f250a1b20399c531087b1bf466bc363e4a7aeb075d9
+gl_sequoia-pgp_sequoia-sqv-commits.json	https://gitlab.com/api/v4/projects/sequoia-pgp%2Fsequoia-sqv (commits)	2	4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
+gl_sequoia-pgp_sequoia-projet.json	https://gitlab.com/api/v4/projects/sequoia-pgp%2Fsequoia (projet)	892	4c52e0dcb14e15a5b0815bfe5f38791754b7926e928a6f7aff92a6f4b9c67548
+gl_sequoia-pgp_sequoia-tags.json	https://gitlab.com/api/v4/projects/sequoia-pgp%2Fsequoia (tags)	7133	d895ab5b6a132e19647b3278df545c19b387d8ef4ecb8ed083817840d579f3cb
+gl_sequoia-pgp_sequoia-commits.json	https://gitlab.com/api/v4/projects/sequoia-pgp%2Fsequoia (commits)	21867	23e94fa99a3f9eaaf5041d32beae7199f72f24d9df162ddc28379b6e10c73e1b
+apt-default-sequoia.config	https://salsa.debian.org/apt-team/apt/-/raw/3.0.3/debian/default-sequoia.config	541	eacdcdb5edffbbeddefcf26b05d2de91fe36c638cf2b56adfb6cc91df1164f01
+apt-sqv.cc	https://salsa.debian.org/apt-team/apt/-/raw/3.0.3/methods/sqv.cc	11857	941dc55b488ab5192d29f0038ac4811fab868b0c9d34719bc53b9dd554fbe4e5
+apt-control	https://salsa.debian.org/apt-team/apt/-/raw/3.0.3/debian/control	6206	2301cec70b95f601952fddb7a3dc6a954f87902e1a5d521c47889a2eec688650
+rpmsign.8	https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/doc/rpmsign.8	3700	c08d9d716510b8999dd921e24af9e35c5429b543ca9ad4bc8de9d4216f449b31
+rpm-macros.in	https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/macros.in	44132	077e87cff9c0d65d5abe9e197a0fdec5e18c8da01210d77a4dcb627f5ca84630
+rpmio_rpmpgp.c	https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/rpmio/rpmpgp.c	37863	d81eb1ae12490c9734444abdc4dded95724cc9c6afea02fbd8fcdfa0646dde93
+rpmio_digest_openssl.c	https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/rpmio/digest_openssl.c	20164	112f45e512e7c5a0bc3afce2dcf1bc6d4e6f2e3ae5df46a6f5bb58bf64547613
+rpmio_digest_libgcrypt.c	https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/rpmio/digest_libgcrypt.c	13286	3a679e80bbdd1aa7c8049848f2467b6f546bda95c3e25ecd7f84a681f157deac
+rpmio_digest_nss.c	https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/rpmio/digest_nss.c	12286	1cfa319e7936386db7b30c8cf1d9c587785007f346661fa24d17fea0c7c1bcc8
+RPM-GPG-KEY-Rocky-9	https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9	1750	3a66e521e7a4abac9768d889c7cd60a8250f59512b275cf576c8a10ff34624c1
+rocky-BaseOS-repomd.xml	https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/repodata/repomd.xml	4449	abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+rocky-BaseOS-repomd.xml.asc	https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/repodata/repomd.xml.asc	833	fd9d161f8d35f144ebf0e5135ea33f7a8502922539687842e858af02b392b7a3
+rocky-BaseOS-primary.xml.gz	https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/repodata/793c43d3d0c90b65a09f916bea356d3d8451e8c4d07523305a8e4164352bdbc3-primary.xml.gz	45549029	793c43d3d0c90b65a09f916bea356d3d8451e8c4d07523305a8e4164352bdbc3
+rocky-AppStream-repomd.xml	https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/repodata/repomd.xml	4918	a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+rocky-AppStream-repomd.xml.asc	https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/repodata/repomd.xml.asc	833	f1a898396cf281e4431d1b62d7ebf9d4285d054276f1ef2ed7acfe82c63be741
+rocky-AppStream-primary.xml.gz	https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/repodata/9b5505979705394a1cfd3acb6fe27f64fdd503a51d19612118cf7830fb588b00-primary.xml.gz	2700960	9b5505979705394a1cfd3acb6fe27f64fdd503a51d19612118cf7830fb588b00
+fedora-signatures.html	https://docs.fedoraproject.org/en-US/security/cryptography/signatures/	635	b588c53f4b17ff6681d520b647f0210931567f9a91d5f824753d80b5c35ad635
+siguldry-README.md	https://raw.githubusercontent.com/fedora-infra/siguldry/HEAD/README.md	2093	b7272c347b652aadb9aae24fc9e316c3c0de9c579e0fe68317d73b0d9b1734cc
+vault-gpg-plugin-README.md	https://raw.githubusercontent.com/LeSuisse/vault-gpg-plugin/HEAD/README.md	2098	8ce093491d03b29a5cd8c8de1276630ac8f6976a05223043ba5bd57f349e52ba
+debusine-configure-hsm.rst	https://freexian-team.pages.debian.net/debusine/_sources/howtos/configure-hsm.rst.txt	7627	2d2e932eea04fc435ce1d407550178a92f3279baa89c240ee3b4587bde46af54
+debsign.1.gz	https://manpages.debian.org/trixie/devscripts/debsign.1.en.gz	6196	9843b982e9a9117ce3feeb5896238832381caaab24a5d66dddd06dfb95913900
+debsigs.1p.gz	https://manpages.debian.org/trixie/debsigs/debsigs.1p.en.gz	4621	21e756fbb9fa2e1b700c0528d0ddbb85109cef4c04ce99742550f2f8312adbeb
+complements-20261119T144707Z/obs-sign-sign.8	https://raw.githubusercontent.com/openSUSE/obs-sign/2.8.5/sign.8	5613	41f553b9ae6145c0cc06aa586c13ab54b38697654c0ec96e91d7013d5106b425
+complements-20261119T144707Z/obs-sign-signd.8	https://raw.githubusercontent.com/openSUSE/obs-sign/2.8.5/signd.8	719	bf75231bcf2c50db6a19e9aec682ce3ebe990d087f05b0426f89895ec94bd292
+complements-20261119T144707Z/obs-sign-sign.conf.5	https://raw.githubusercontent.com/openSUSE/obs-sign/2.8.5/sign.conf.5	4596	76bc31cba4438a63404855e9fcbdcd072a0e9b1589ca13a791d9e0883ed5a621
+complements-20261119T144707Z/fedora-signatures.html	https://docs.fedoraproject.org/en-US/fedora/security-team/cryptography/signatures/	42096	e408292ebc51d410b8d822fe1f7bbb59a26b5d4525f6816772683d87b111589c
+complements-20261119T144707Z/tracker-gnupg2.html	https://security-tracker.debian.org/tracker/source-package/gnupg2	9724	c45cf0780037b46aa727b1e594fece20273a97082f5553ee262f553d235a2014

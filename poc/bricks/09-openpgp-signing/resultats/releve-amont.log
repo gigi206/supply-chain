@@ -1,0 +1,496 @@
+relevé commencé : 2026-11-19T14:44:38Z
+dossier des téléchargements : /home/gigi/.cache/supply-chain-poc/09/releve-20261119T144438Z (neuf) ; homedir gpg dédié : /home/gigi/.cache/supply-chain-poc/09/gnupg-releve-20261119T144438Z (neuf, 0700)
+fenêtre des 90 jours : depuis 2026-08-21T14:44:38Z
+gpg de l'hôte : gpg (GnuPG) 2.4.8 ; gpgv : gpgv (GnuPG) 2.4.8
+
+## 1. GnuPG amont : swdb.lst signé, clés de release
+téléchargé : swdb.lst (6658 octets, sha256 5781e592fa0a5cfbfd1146a1c510297ee56282c1703dd4b8427a2bc7530274e2) depuis https://versions.gnupg.org/swdb.lst
+téléchargé : swdb.lst.sig (147 octets, sha256 98d7c60fec8fde05e14c0a3a897442867050dad66d6088bb67156d652bf92308) depuis https://versions.gnupg.org/swdb.lst.sig
+téléchargé : signature_key.asc (6466 octets, sha256 6f57d0e17fefd2238bd037aebf03efa960641629dd61dd9d47f122a829f6e375) depuis https://gnupg.org/signature_key.asc
+téléchargé : signature_key.html (15484 octets, sha256 9d6cd8bfdf70c3d80d35edf7de03b4a897b18e31b5673a1007e761f5d1c31353) depuis https://gnupg.org/signature_key.html
+empreintes de signature_key.asc (gpg --show-keys, homedir dédié) :
+  fpr 6DAA6E64A76D2840571B4902528897B826403ADA algo 22 bits 255 créée 2020-08-24
+  uid Werner Koch (dist signing 2020)
+  fpr AC8E115BF73E2D8D47FA9908E98E9B2D19C6C8BD algo 22 bits 255 créée 2021-05-19
+  uid Niibe Yutaka (GnuPG Release Key)
+  fpr 3B761AE4E63BF3519CE7D63BECB664CBE1332EEF algo 1 bits 3072 créée 2025-05-09
+  uid Alexander Kulbartsch (GnuPG Release Key)
+  fpr D02AE49173BDAD56E4F88223707E56D3DEF4115C algo 22 bits 255 créée 2026-07-20
+  uid Ingo Klöcker (Release Signing Key 2026)
+  fpr 02F38DFF731FF97CB039A1DA549E695E905BA208 algo 19 bits 256 créée 2021-10-15
+  uid GnuPG.com (Release Signing Key 2021)
+  fpr 1493269DE61F124AA69A316E3ADF34EBDBB200A4 algo 19 bits 384 créée 2026-02-23
+  uid GnuPG.com (Release Signing Key 2026)
+empreintes citées dans signature_key.html (même site, recoupement faible) :
+  02F38DFF731FF97CB039A1DA549E695E905BA208
+  1493269DE61F124AA69A316E3ADF34EBDBB200A4
+  3B761AE4E63BF3519CE7D63BECB664CBE1332EEF
+  6DAA6E64A76D2840571B4902528897B826403ADA
+  AC8E115BF73E2D8D47FA9908E98E9B2D19C6C8BD
+  D02AE49173BDAD56E4F88223707E56D3DEF4115C
+clés converties en trousseau : /home/gigi/.cache/supply-chain-poc/09/releve-20261119T144438Z/gnupg-cles.gpg (4714 octets, produit localement)
+vérification de swdb.lst par gpgv contre ces clés :
+  gpgv: Signature faite le jeu. 19 nov. 2026 13:31:16 CET
+  gpgv:                avec la clef EDDSA 6DAA6E64A76D2840571B4902528897B826403ADA
+  gpgv: Bonne signature de « Werner Koch (dist signing 2020) »
+lignes gnupg de swdb.lst :
+  gnupg26_ver 2.5.24
+  gnupg26_date 2026-09-23
+  gnupg26_branch master
+  gnupg24_ver 2.4.9
+  gnupg24_date 2025-12-30
+  gnupg24_branch STABLE-BRANCH-2-4
+  gnupg22_ver 2.2.44
+  gnupg22_date 2024-08-12
+  gnupg22_branch STABLE-BRANCH-2-2
+  gnupg1_branch STABLE-BRANCH-1-4
+  gnupg1_ver 1.4.23
+  gnupg1_date 2018-06-11
+téléchargé : gnupg-download.html (19817 octets, sha256 7d98b8070242b72254e9e6b40085a4ce467dc3f14bd01c44f44721fa1dd50e5e) depuis https://gnupg.org/download/index.html
+page de téléchargement, phrases sur la fin de vie et les branches :
+  « For end-of-life dates see further down. »
+  « 4 to RISC OS End-of-life announcements We announce the end-of-life date for a current stable version at the time a new stable version is released. »
+  « For most other packages we don't maintain branches and thus there is no end-of-life; always use the latest version. »
+  « End-of-life Birth GnuPG 1. »
+  « 12 tba¹ 2026-01-29 (1) : Long Term Support. »
+  « (3) : Extended Long Term Support contract available. »
+téléchargé : gnupg-security.html (8004 octets, sha256 ad2d230a9fd90bfeaca2cb9dff7bcbf44a63f017ece6b1263f053fb9a8a07345) depuis https://gnupg.org/documentation/security.html
+page sécurité, phrases sur le signalement :
+  « ty Check Release Keys Supported Systems Release Notes Mirrors GIT Documentation Overview Manuals Guides HOWTOs FAQs Mailing Lists 3rd Party Support Bug Tracker Security Blog Security The GnuPG Project takes the security of software it develops very seriously. »
+  « Threat Model of libgcrypt Libgcrypt has been developed for use in a wide variety of platforms with different security needs. »
+  « Security contact If you found a severe security problem and you do not want to publish it, please report it by mail to security at gnupg. »
+  « We prefer reports in plain text format; if needed we can also work with PDF files. »
+  « For security reasons we won't read any other complex data formats (e. »
+  « Thus please write a non-encrypted message to the security address and ask for the keys of the developers at duty and then encrypt the mail to all of them. »
+
+## 2. Dépôts GitHub (API anonyme) : GnuPG (miroir gpg/gnupg), obs-sign, SoftHSMv2, gnupg-pkcs11-scd, siguldry, vault-gpg-plugin
+### gpg/gnupg
+  archivé False, défaut master, dernier push 2026-11-18T23:03:20Z, licence GPL-3.0, miroir None, description « The GNU Privacy Guard. NOTE: Maintainers are not tracking this mirror. Do not make pull requests here, nor comment any commits, submit them usual way to bug tracker (https://www.gnupg.org/documentation/bts.html) or to the mailing list (https://www.gnupg.org/documentation/mailing-lists.html). »
+  releases GitHub : 0 lue(s)
+  tags (ordre de l'API, 5 au plus) : ['post-nuke-of-trailing-ws', 'gnupg-2.6-base', 'gnupg-2.5.24', 'gnupg-2.5.23', 'gnupg-2.5.22']
+  commit du premier tag : b008274afdbe375b32a7e66dbd073e200f6f0587
+  commits depuis 90 jours : 90 ; auteurs distincts 4
+  domaines des adresses d'auteur : {'gnupg.org': 60, 'fsij.org': 24, 'gentoo.org': 4, 'gnupg.com': 2}
+  part du premier auteur : 60 commits sur 90
+  dernier commit : 2026-11-18T11:10:26Z
+  date du commit du premier tag (pas de release GitHub) : 2011-02-04T11:57:53Z auteur 2011-02-04T11:57:53Z
+  SECURITY.md (raw, branche par défaut) : HTTP 404
+  .github/SECURITY.md (raw, branche par défaut) : HTTP 404
+  docs/SECURITY.md (raw, branche par défaut) : HTTP 404
+  Scorecard (API publique) : 3.5 2026-11-16 Maintained 10 Signed-Releases -1 Code-Review 0 Vulnerabilities None
+### openSUSE/obs-sign
+  archivé False, défaut master, dernier push 2026-10-08T12:01:17Z, licence GPL-2.0, miroir None, description « sign daemon and client for remote gpg signing. »
+  releases GitHub : 0 lue(s)
+  tags (ordre de l'API, 5 au plus) : ['obs_2.0.4', 'obs_2.0.2', 'obs_2.0.0', '2.8.5', '2.8.4']
+  commit du premier tag : 36361bd575f67454c49dc62c8c7443bf355266ff
+  commits depuis 90 jours : 10 ; auteurs distincts 1
+  domaines des adresses d'auteur : {'suse.de': 10}
+  part du premier auteur : 10 commits sur 10
+  dernier commit : 2026-10-08T12:00:22Z
+  date du commit du premier tag (pas de release GitHub) : 2010-07-13T14:51:34Z auteur 2010-07-13T14:51:34Z
+  SECURITY.md (raw, branche par défaut) : HTTP 404
+  .github/SECURITY.md (raw, branche par défaut) : HTTP 404
+  docs/SECURITY.md (raw, branche par défaut) : HTTP 404
+curl: (22) The requested URL returned error: 404
+  Scorecard (API publique) : n/d
+### softhsm/SoftHSMv2
+  archivé False, défaut main, dernier push 2026-11-11T11:34:48Z, licence NOASSERTION, miroir None, description « SoftHSM version 2 »
+  releases GitHub : 2 lue(s)
+    2.7.0 publiée 2026-01-20T06:56:40Z brouillon False préversion False fichiers []
+    2.7.0-rc1 publiée 2026-01-12T06:36:15Z brouillon False préversion True fichiers []
+  tags (ordre de l'API, 5 au plus) : ['2.7.0', '2.7.0-rc1', '2.6.1', '2.6.0', '2.6.0-rc1']
+  commit du premier tag : 13e6e86b83748fef74046dbf0c91f664b7acc1c3
+  commits depuis 90 jours : 11 ; auteurs distincts 8
+  domaines des adresses d'auteur : {'users.noreply.github.com': 5, 'php.net': 2, 'parhuet.fr': 1, 'cybernative.ai': 1, 'permobil.com': 1, 'hotmail.com': 1}
+  part du premier auteur : 3 commits sur 11
+  dernier commit : 2026-11-11T11:34:47Z
+  SECURITY.md (raw, branche par défaut) : HTTP 404
+  .github/SECURITY.md (raw, branche par défaut) : HTTP 404
+  docs/SECURITY.md (raw, branche par défaut) : HTTP 404
+curl: (22) The requested URL returned error: 404
+  Scorecard (API publique) : n/d
+### alonbl/gnupg-pkcs11-scd
+  archivé False, défaut master, dernier push 2025-11-26T13:33:32Z, licence NOASSERTION, miroir None, description « PKCS#11 GnuPG SCD »
+  releases GitHub : 5 lue(s)
+    gnupg-pkcs11-scd-0.9.3 publiée 2024-10-27T19:03:46Z brouillon False préversion False fichiers ['gnupg-pkcs11-scd-0.9.3.tar.bz2']
+    gnupg-pkcs11-scd-0.11.0 publiée 2024-10-27T19:08:28Z brouillon False préversion False fichiers ['gnupg-pkcs11-scd-0.11.0.tar.bz2']
+    gnupg-pkcs11-scd-0.10.0 publiée 2022-01-04T19:50:01Z brouillon False préversion False fichiers ['gnupg-pkcs11-scd-0.10.0.tar.bz2']
+    gnupg-pkcs11-scd-0.9.2 publiée 2019-01-05T20:16:56Z brouillon False préversion False fichiers ['gnupg-pkcs11-scd-0.9.2.tar.bz2']
+    gnupg-pkcs11-scd-0.9.1 publiée 2017-09-25T22:10:06Z brouillon False préversion False fichiers ['gnupg-pkcs11-scd-0.9.1.tar.bz2']
+  tags (ordre de l'API, 5 au plus) : ['gnupg-pkcs11-scd-0.11.0', 'gnupg-pkcs11-scd-0.10.0', 'gnupg-pkcs11-scd-0.9.3', 'gnupg-pkcs11-scd-0.9.2', 'gnupg-pkcs11-scd-0.9.1']
+  commit du premier tag : 59829789bfe82b9df9fc1b9fe1a40a5b83e9d89a
+  commits depuis 90 jours : 0 ; auteurs distincts 0
+  domaines des adresses d'auteur : {}
+  part du premier auteur : 0 commits sur 0
+  SECURITY.md (raw, branche par défaut) : HTTP 404
+  .github/SECURITY.md (raw, branche par défaut) : HTTP 404
+  docs/SECURITY.md (raw, branche par défaut) : HTTP 404
+curl: (22) The requested URL returned error: 404
+  Scorecard (API publique) : n/d
+### fedora-infra/siguldry
+  archivé False, défaut main, dernier push 2026-11-16T07:22:59Z, licence None, miroir None, description « Signing server and client tooling to interact with it »
+  releases GitHub : 5 lue(s)
+    siguldry-0.9.1 publiée 2026-11-13T18:47:53Z brouillon False préversion False fichiers []
+    siguldry-pkcs11-4.0.0 publiée 2026-10-29T15:34:38Z brouillon False préversion False fichiers []
+    siguldry-pkcs11-3.0.0 publiée 2026-10-20T23:19:50Z brouillon False préversion False fichiers []
+    siguldry-fedora-autopen-0.2.2 publiée 2026-09-24T15:15:00Z brouillon False préversion False fichiers []
+    siguldry-pkcs11-2.2.0 publiée 2026-09-23T21:08:49Z brouillon False préversion False fichiers []
+  tags (ordre de l'API, 5 au plus) : ['siguldry-pkcs11-4.0.0', 'siguldry-pkcs11-3.0.0', 'siguldry-pkcs11-2.2.0', 'siguldry-pkcs11-2.1.0', 'siguldry-pkcs11-2.0.0']
+  commit du premier tag : d679f1f7697671e8408f7d49fe231f3121155ecd
+  commits depuis 90 jours : 60 ; auteurs distincts 4
+  domaines des adresses d'auteur : {'microsoft.com': 38, 'users.noreply.github.com': 20, 'and.org': 1, 'vates.tech': 1}
+  part du premier auteur : 38 commits sur 60
+  dernier commit : 2026-11-13T18:33:01Z
+  SECURITY.md (raw, branche par défaut) : HTTP 404
+  .github/SECURITY.md (raw, branche par défaut) : HTTP 404
+  docs/SECURITY.md (raw, branche par défaut) : HTTP 404
+curl: (22) The requested URL returned error: 404
+  Scorecard (API publique) : n/d
+### LeSuisse/vault-gpg-plugin
+  archivé False, défaut main, dernier push 2026-11-14T03:24:00Z, licence MIT, miroir None, description « "Transit like" secret backend plugin for PGP/GPG in Hashicorp Vault »
+  releases GitHub : 5 lue(s)
+    v0.6.3 publiée 2025-01-02T13:08:26Z brouillon False préversion False fichiers ['checksums.txt', 'checksums.txt.bundle', 'darwin_amd64.zip', 'darwin_amd64.zip.bundle', 'darwin_arm64.zip', 'darwin_arm64.zip.bundle', 'freebsd_386.zip', 'freebsd_386.zip.bundle']
+    v0.6.2 publiée 2023-10-14T12:24:30Z brouillon False préversion False fichiers ['checksums.txt', 'checksums.txt.bundle', 'darwin_amd64.zip', 'darwin_amd64.zip.bundle', 'darwin_arm64.zip', 'darwin_arm64.zip.bundle', 'freebsd_386.zip', 'freebsd_386.zip.bundle']
+    v0.6.1 publiée 2023-06-17T10:05:02Z brouillon False préversion False fichiers ['checksums.txt', 'checksums.txt.bundle', 'darwin_amd64.zip', 'darwin_arm64.zip', 'freebsd_386.zip', 'freebsd_amd64.zip', 'freebsd_arm.zip', 'freebsd_arm64.zip']
+    v0.5.0 publiée 2021-12-29T19:52:22Z brouillon False préversion False fichiers ['darwin_amd64.zip', 'darwin_amd64.zip.asc', 'darwin_arm64.zip', 'darwin_arm64.zip.asc', 'freebsd_386.zip', 'freebsd_386.zip.asc', 'freebsd_amd64.zip', 'freebsd_amd64.zip.asc']
+    v0.4.0 publiée 2021-12-28T16:22:05Z brouillon False préversion False fichiers ['darwin_amd64.zip', 'darwin_amd64.zip.asc', 'darwin_arm64.zip', 'darwin_arm64.zip.asc', 'freebsd_386.zip', 'freebsd_386.zip.asc', 'freebsd_amd64.zip', 'freebsd_amd64.zip.asc']
+  tags (ordre de l'API, 5 au plus) : ['v0.6.3', 'v0.6.2', 'v0.6.1', 'v0.6.0', 'v0.5.0']
+  commit du premier tag : 36cd187e43eb2b76d1235b774793a724fa104c8e
+  commits depuis 90 jours : 16 ; auteurs distincts 1
+  domaines des adresses d'auteur : {'users.noreply.github.com': 16}
+  part du premier auteur : 16 commits sur 16
+  dernier commit : 2026-11-02T15:33:52Z
+  SECURITY.md (raw, branche par défaut) : HTTP 404
+  .github/SECURITY.md (raw, branche par défaut) : HTTP 404
+  docs/SECURITY.md (raw, branche par défaut) : HTTP 404
+curl: (22) The requested URL returned error: 404
+  Scorecard (API publique) : n/d
+
+## 3. Dépôts GitLab : salsa (apt, devscripts, gnupg2 de Debian, debsigs, debsig-verify, reprepro), gitlab.com (Sequoia)
+### https://salsa.debian.org apt-team/apt
+  archivé None, dernière activité 2026-11-18T20:18:59.040Z, défaut main
+    tag 3.3.8 commit 2026-11-16T22:18:54.000+01:00
+    tag 3.3.3ubuntu0.2 commit 2026-11-09T13:27:26.000+00:00
+    tag 3.2.2 commit 2026-11-09T12:25:22.000+00:00
+    tag 3.3.7 commit 2026-11-06T11:58:06.000+01:00
+    tag 3.3.6 commit 2026-11-04T13:22:47.000+01:00
+  commits depuis 90 jours (branche par défaut) : 100 (page pleine : au moins 100) ; auteurs distincts 9 ; premier auteur 79
+  domaines des adresses d'auteur : {'debian.org': 82, 'gmail.com': 10, 'canonical.com': 6, 'fifthhorseman.net': 1, 'danner.de': 1}
+### https://salsa.debian.org debian/devscripts
+  archivé None, dernière activité 2026-11-11T10:22:12.533Z, défaut main
+    tag v2.26.15 commit 2026-11-07T17:56:32.000+01:00
+    tag v2.26.14 commit 2026-11-07T12:47:01.000+01:00
+    tag v2.26.13 commit 2026-10-01T10:43:35.000+02:00
+    tag v2.26.12 commit 2026-09-18T23:27:26.000+02:00
+    tag debian/2.26.11_bpo13+1 commit 2026-08-23T17:07:41.000+02:00
+  commits depuis 90 jours (branche par défaut) : 39 ; auteurs distincts 16 ; premier auteur 10
+  domaines des adresses d'auteur : {'debian.org': 22, 'layer-acht.org': 10, 'canonical.com': 5, 'burtonindustry.com': 1, 'raspberrypi.com': 1}
+### https://salsa.debian.org debian/gnupg2
+  archivé None, dernière activité 2026-10-10T13:37:54.430Z, défaut debian/unstable
+    tag debian/2.4.9-8 commit 2026-10-10T15:48:52.000+02:00
+    tag debian/2.4.9-7 commit 2026-07-11T16:44:15.000+02:00
+    tag debian/2.4.9-6 commit 2026-07-04T17:22:52.000+02:00
+    tag debian/2.4.9-5 commit 2026-06-23T19:22:05.000+02:00
+    tag debian/2.4.9-4 commit 2026-03-05T13:16:19.000+01:00
+  commits depuis 90 jours (branche par défaut) : 2 ; auteurs distincts 1 ; premier auteur 2
+  domaines des adresses d'auteur : {'bebt.de': 2}
+### https://salsa.debian.org debian/debsigs
+  archivé None, dernière activité 2026-08-04T18:40:18.797Z, défaut debian/unstable
+    tag archive/debian/0.2.2-2 commit 2026-01-07T01:23:37.000+02:00
+    tag debian/0.2.2-2 commit 2026-01-07T01:23:37.000+02:00
+    tag archive/debian/0.2.2-1 commit 2024-11-22T18:23:46.000+02:00
+    tag debian/0.2.2-1 commit 2024-11-22T18:23:46.000+02:00
+    tag release/0.2.2 commit 2024-11-22T18:04:13.000+02:00
+  commits depuis 90 jours (branche par défaut) : 0 ; auteurs distincts 0 ; premier auteur 0
+  domaines des adresses d'auteur : {}
+### https://salsa.debian.org debian/debsig-verify
+curl: (22) The requested URL returned error: 404
+  ÉCHEC projet
+curl: (22) The requested URL returned error: 404
+  ÉCHEC tags
+curl: (22) The requested URL returned error: 404
+  ÉCHEC commits
+### https://salsa.debian.org debian/reprepro
+  archivé None, dernière activité 2026-10-16T17:15:41.128Z, défaut debian
+    tag reprepro-debian-5.5.1-1 commit 2026-06-26T00:37:31.000+02:00
+    tag reprepro-5.5.1 commit 2026-06-26T00:27:11.000+02:00
+    tag reprepro-debian-5.5.0-1 commit 2026-06-24T11:25:42.000+02:00
+    tag reprepro-5.5.0 commit 2026-06-24T11:15:22.000+02:00
+    tag reprepro-debian-5.4.6+really5.3.2-2 commit 2026-01-12T21:55:02.000+01:00
+  commits depuis 90 jours (branche par défaut) : 0 ; auteurs distincts 0 ; premier auteur 0
+  domaines des adresses d'auteur : {}
+### https://gitlab.com sequoia-pgp/sequoia-sqv
+  archivé None, dernière activité 2026-11-13T23:14:52.675Z, défaut main
+    tag v1.5.0 commit 2026-07-03T12:20:55.000+02:00
+    tag v1.4.0 commit 2026-06-22T17:36:18.000+02:00
+    tag v1.3.0 commit 2025-03-06T18:48:53.000+01:00
+    tag v1.2.1 commit 2024-04-19T08:50:00.000+02:00
+    tag v1.2.0 commit 2024-04-18T16:35:39.000+02:00
+  commits depuis 90 jours (branche par défaut) : 0 ; auteurs distincts 0 ; premier auteur 0
+  domaines des adresses d'auteur : {}
+### https://gitlab.com sequoia-pgp/sequoia
+  archivé None, dernière activité 2026-11-17T18:52:40.944Z, défaut main
+    tag openpgp/v2.4.2 commit 2026-10-14T20:52:14.000+02:00
+    tag net/v0.31.0 commit 2026-10-14T20:27:05.000+02:00
+    tag openpgp/v2.4.1 commit 2026-07-09T13:55:54.000+02:00
+    tag openpgp/v2.4.0 commit 2026-07-02T22:17:05.000+02:00
+    tag buffered-reader/v1.4.1 commit 2026-07-02T21:57:57.000+02:00
+  commits depuis 90 jours (branche par défaut) : 27 ; auteurs distincts 5 ; premier auteur 16
+  domaines des adresses d'auteur : {'sequoia-pgp.org': 16, 'pitsidianak.is': 5, 'ngg.hu': 3, 'gmail.com': 2, 'redhat.com': 1}
+
+## 4. Debian 13 (madison, suites trixie)
+   apt stable 3.0.3
+   apt proposed-updates 3.0.4
+   apt-utils stable 3.0.3
+   apt-utils proposed-updates 3.0.4
+   debsig-verify stable 0.33 0.33+b4
+   debsigs stable 0.2.2-1
+   debusine-signing stable 0.11.3+deb13u1
+   devscripts stable 2.25.15+deb13u1
+   gnupg stable 2.4.7-21+deb13u1
+   gnupg-pkcs11-scd stable 0.10.0-5 0.10.0-5+b1
+   gpg stable 2.4.7-21+deb13u1+b5
+   gpg-agent stable 2.4.7-21+deb13u1+b5
+   gpgv stable 2.4.7-21+deb13u1+b5
+   reprepro stable 5.4.6+really5.3.2-1+deb13u1
+   softhsm2 stable 2.6.1-3
+   sq stable 1.3.1-2+b2
+   sqv stable 1.3.0-3+b2
+   absent de trixie (madison) : dpkg-sig
+   absent de trixie (madison) : obs-signd
+
+## 5. apt 3.0.3 (salsa) : vérificateur et politique
+téléchargé : apt-default-sequoia.config (541 octets, sha256 eacdcdb5edffbbeddefcf26b05d2de91fe36c638cf2b56adfb6cc91df1164f01) depuis https://salsa.debian.org/apt-team/apt/-/raw/3.0.3/debian/default-sequoia.config
+  # Default APT Sequoia configuration. To overwrite, consider copying this
+  # to /etc/crypto-policies/back-ends/apt-sequoia.config and modify the
+  # desired values.
+  [asymmetric_algorithms]
+  dsa2048 = 2024-02-01
+  dsa3072 = 2024-02-01
+  dsa4096 = 2024-02-01
+  brainpoolp256 = 2028-02-01
+  brainpoolp384 = 2028-02-01
+  brainpoolp512 = 2028-02-01
+  rsa2048  = 2030-02-01
+  
+  [hash_algorithms]
+  sha1.second_preimage_resistance = 2026-02-01    # Extend the expiry for legacy repositories
+  sha224 = 2026-02-01
+  
+  [packets]
+  signature.v3 = 2026-02-01   # Extend the expiry
+téléchargé : apt-sqv.cc (11857 octets, sha256 941dc55b488ab5192d29f0038ac4811fab868b0c9d34719bc53b9dd554fbe4e5) depuis https://salsa.debian.org/apt-team/apt/-/raw/3.0.3/methods/sqv.cc
+  methods/sqv.cc, lignes citant gpgv, sqv, policy, Signed-By :
+    4:#include <apt-pkg/gpgv.h>
+    17:   std::optional<std::string> policy{};
+    18:   void SetPolicy();
+    31:SQVMethod::SQVMethod() : aptMethod("sqv", "1.1", SingleInstance | SendConfig | SendURIEncoded)
+    35:void SQVMethod::SetPolicy()
+    39:      "APT_SEQUOIA_CRYPTO_POLICY",
+    40:      "/etc/crypto-policies/back-ends/apt-sequoia.config",
+    41:      "/var/lib/crypto-config/profiles/current/apt-sequoia.config",
+    42:      // Sequoia overrides
+    43:      "SEQUOIA_CRYPTO_POLICY",
+    44:      "/etc/crypto-policies/back-ends/sequoia.config",
+    45:      "/var/lib/crypto-config/profiles/current/sequoia.config",
+    47:      "/usr/share/apt/default-sequoia.config",
+    50:   if (policy)
+    53:   policy = "";
+    55:   for (auto policy : policies)
+    57:      if (not strchr(policy, '/'))
+    59:	 if (auto value = getenv(policy))
+    61:	    this->policy = value;
+    65:      else if (FileExists(policy))
+    67:	 this->policy = policy;
+    72:   if (not policy->empty())
+    75:	 std::clog << "Setting SEQUOIA_CRYPTO_POLICY=" << *policy << std::endl;
+    76:      setenv("SEQUOIA_CRYPTO_POLICY", policy->c_str(), 1);
+    87:   SetPolicy();
+téléchargé : apt-control (6206 octets, sha256 2301cec70b95f601952fddb7a3dc6a954f87902e1a5d521c47889a2eec688650) depuis https://salsa.debian.org/apt-team/apt/-/raw/3.0.3/debian/control
+  debian/control, dépendances vers sqv ou gpgv :
+    31:               sqv (>= 1.3.0) [amd64 arm64 armel armhf i386 mips64el ppc64el riscv64 s390x hurd-amd64 hurd-i386 loong64 powerpc ppc64 sparc64] <!pkg.apt.nosqv> | gpgv,
+
+## 6. rpm amont, tag rpm-4.16.1.3 (base de rpm-4.16.1.3 de Rocky, correctifs de la distribution non lus)
+téléchargé : rpmsign.8 (3700 octets, sha256 c08d9d716510b8999dd921e24af9e35c5429b543ca9ad4bc8de9d4216f449b31) depuis https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/doc/rpmsign.8
+  rpmsign.8, options et macros :
+    8:\fBrpm\fR \fB--addsign|--resign\fR [\fBrpmsign-options\fR] \fB\fIPACKAGE_FILE\fB\fR\fI ...\fR
+    10:\fBrpm\fR \fB--delsign\fR \fB\fIPACKAGE_FILE\fB\fR\fI ...\fR
+    14:[\fb--rpmv3\fR]
+    15:[\fb--fskpath \fIKEY\fb\fR] [\fB--signfiles\fR]
+    19:Both of the \fB--addsign\fR and \fB--resign\fR
+    28:\fBrpm\fR \fB--delsign\fR \fB\fIPACKAGE_FILE\fB\fR\fI ...\fR
+    36:\fB--rpmv3\fR
+    44:\fB--fskpath \fIKEY\fB\fR
+    45:Used with \fB--signfiles\fR, use file signing key \fIKey\fR.
+    47:\fB--signfiles\fR
+    52:private key) must be set before signing the package, it can be configured on the command line with \fB--fskpath\fR or the macro %_file_signing_key.
+    69:\fB%_gpg_name\fR
+    79:%_gpg_name John Doe <adresse retirée>
+    80:%__gpg /usr/bin/gpg
+    85:for per-user configuration. Typically it's sufficient to set just %_gpg_name.
+téléchargé : rpm-macros.in (44132 octets, sha256 077e87cff9c0d65d5abe9e197a0fdec5e18c8da01210d77a4dcb627f5ca84630) depuis https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/macros.in
+  macros.in, commande de signature :
+    35:%__gpg			@__GPG@
+    36-%__grep			@__GREP@
+    37-%__gzip			@__GZIP@
+    38-%__id			@__ID@
+    39-%__id_u			%{__id} -u
+    --
+    333:#%_gpg_name
+    334-#%_gpg_path
+    335-
+    336-#	The port and machine name of an HTTP proxy host (used for FTP/HTTP).
+    337-#
+    --
+    679:%__gpg_sign_cmd			%{__gpg} \
+    680-	gpg --no-verbose --no-armor \
+    681-	%{?_gpg_digest_algo:--digest-algo %{_gpg_digest_algo}} \
+    682-	--no-secmem-warning \
+    683-	%{?_gpg_sign_cmd_extra_args:%{_gpg_sign_cmd_extra_args}} \
+téléchargé : rpmio_rpmpgp.c (37863 octets, sha256 d81eb1ae12490c9734444abdc4dded95724cc9c6afea02fbd8fcdfa0646dde93) depuis https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/rpmio/rpmpgp.c
+  rpmio/rpmpgp.c : occurrences EDDSA 4, RSA 4, ECDSA 1
+téléchargé : rpmio_digest_openssl.c (20164 octets, sha256 112f45e512e7c5a0bc3afce2dcf1bc6d4e6f2e3ae5df46a6f5bb58bf64547613) depuis https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/rpmio/digest_openssl.c
+  rpmio/digest_openssl.c : occurrences EDDSA 23, RSA 2, ECDSA 0
+téléchargé : rpmio_digest_libgcrypt.c (13286 octets, sha256 3a679e80bbdd1aa7c8049848f2467b6f546bda95c3e25ecd7f84a681f157deac) depuis https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/rpmio/digest_libgcrypt.c
+  rpmio/digest_libgcrypt.c : occurrences EDDSA 21, RSA 2, ECDSA 0
+téléchargé : rpmio_digest_nss.c (12286 octets, sha256 1cfa319e7936386db7b30c8cf1d9c587785007f346661fa24d17fea0c7c1bcc8) depuis https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-4.16.1.3/rpmio/digest_nss.c
+  rpmio/digest_nss.c : occurrences EDDSA 0, RSA 2, ECDSA 0
+
+## 7. Rocky 9.8 (BaseOS, AppStream) : repomd.xml vérifié, versions dans primary.xml
+téléchargé : RPM-GPG-KEY-Rocky-9 (1750 octets, sha256 3a66e521e7a4abac9768d889c7cd60a8250f59512b275cf576c8a10ff34624c1) depuis https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+  empreinte de la clé : 21CB256AE16FC54C6E652949702D426D350D275D (attendue 21CB256AE16FC54C6E652949702D426D350D275D, doc 04)
+téléchargé : rocky-BaseOS-repomd.xml (4449 octets, sha256 abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163) depuis https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/repodata/repomd.xml
+téléchargé : rocky-BaseOS-repomd.xml.asc (833 octets, sha256 fd9d161f8d35f144ebf0e5135ea33f7a8502922539687842e858af02b392b7a3) depuis https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/repodata/repomd.xml.asc
+  BaseOS : repomd.xml vérifié par gpgv avec la clé Rocky 9
+téléchargé : rocky-BaseOS-primary.xml.gz (45549029 octets, sha256 793c43d3d0c90b65a09f916bea356d3d8451e8c4d07523305a8e4164352bdbc3) depuis https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/repodata/793c43d3d0c90b65a09f916bea356d3d8451e8c4d07523305a8e4164352bdbc3-primary.xml.gz
+  BaseOS : primary.xml.gz égal au sha256 du repomd vérifié
+    gnupg2 2.3.3-5.el9_7 construit 2026-01-19 sha256 47ecef51db73418e…
+    gpgme 1.15.1-6.el9 construit 2022-05-13 sha256 b1f03906b959728f…
+    libgcrypt 1.10.0-11.el9 construit 2024-11-05 sha256 350f4bc7f8c9f5a9…
+    libgcrypt 1.10.0-13.el9_8 construit 2026-08-04 sha256 7f1640e5c53049df…
+    opensc 0.23.0-6.el9 construit 2025-11-04 sha256 76dd75e189477c50…
+    p11-kit 0.26.2-1.el9 construit 2026-02-11 sha256 4b93036b1461c4b3…
+    p11-kit 0.26.4-1.el9_8 construit 2026-08-03 sha256 1a1fe3ea461295cf…
+    rpm 4.16.1.3-40.el9 construit 2025-12-28 sha256 5a6be9d462199f8f…
+    rpm-sequoia 1.10.2.1-1.el9_8 construit 2026-10-06 sha256 de6093050721bfa5…
+    rpm-sequoia 1.9.0.1-1.el9 construit 2025-11-03 sha256 f2b0aeec2559e255…
+    rpm-sign 4.16.1.3-40.el9 construit 2025-12-28 sha256 f2aa2cc9af024610…
+    rpm-sign-libs 4.16.1.3-40.el9 construit 2025-12-28 sha256 fcbeb250428a8690…
+    absents de ce dépôt : ['createrepo_c', 'gnupg2-smime', 'sequoia-sq', 'sequoia-sqv', 'softhsm']
+téléchargé : rocky-AppStream-repomd.xml (4918 octets, sha256 a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b) depuis https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/repodata/repomd.xml
+téléchargé : rocky-AppStream-repomd.xml.asc (833 octets, sha256 f1a898396cf281e4431d1b62d7ebf9d4285d054276f1ef2ed7acfe82c63be741) depuis https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/repodata/repomd.xml.asc
+  AppStream : repomd.xml vérifié par gpgv avec la clé Rocky 9
+téléchargé : rocky-AppStream-primary.xml.gz (2700960 octets, sha256 9b5505979705394a1cfd3acb6fe27f64fdd503a51d19612118cf7830fb588b00) depuis https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/repodata/9b5505979705394a1cfd3acb6fe27f64fdd503a51d19612118cf7830fb588b00-primary.xml.gz
+  AppStream : primary.xml.gz égal au sha256 du repomd vérifié
+    createrepo_c 0.20.1-4.el9 construit 2025-11-01 sha256 6a12a9566e616076…
+    gnupg2-smime 2.3.3-5.el9_7 construit 2026-01-19 sha256 9d5c90deab7c6e96…
+    softhsm 2.6.1-11.el9 construit 2025-11-04 sha256 9d192427c2774b49…
+    absents de ce dépôt : ['gnupg2', 'gpgme', 'libgcrypt', 'opensc', 'p11-kit', 'rpm', 'rpm-sequoia', 'rpm-sign', 'rpm-sign-libs', 'sequoia-sq', 'sequoia-sqv']
+
+## 8. EPEL 9 (liste de répertoire NON SIGNÉE) : obs-signd, sigul, gnupg-pkcs11-scd
+  obs-signd-2.5.10-2.20210907git5c32050.el9.x86_64.rpm
+  sigul-1.4-1.el9.x86_64.rpm
+  sigul-bridge-1.4-1.el9.x86_64.rpm
+  sigul-server-1.4-1.el9.x86_64.rpm
+  gnupg-pkcs11-scd-0.10.0-8.el9.x86_64.rpm
+
+## 9. sigul (pagure.io) et siguldry
+  tags de https://pagure.io/sigul.git (git ls-remote, aucune écriture) :
+    refs/tags/sigul-0.205
+    refs/tags/sigul-0.206
+    refs/tags/sigul-0.207
+    refs/tags/v1.0-alpha.1
+    refs/tags/v1.1
+    refs/tags/v1.2
+    refs/tags/v1.3
+    refs/tags/v1.4
+  changelog du paquet sigul d'EPEL 9 (mdapi.fedoraproject.org), 4 entrées :
+     2025-04-22 - Update to v1.4
+     2025-04-21 - Update to v1.3
+     2024-02-27 - Update to v1.2
+     2024-01-27 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+téléchargé : fedora-signatures.html (635 octets, sha256 b588c53f4b17ff6681d520b647f0210931567f9a91d5f824753d80b5c35ad635) depuis https://docs.fedoraproject.org/en-US/security/cryptography/signatures/
+  documentation Fedora sur la signature, phrases citant Sigul ou Siguldry :
+
+## 10. Fonctions : HSM et forme des signatures, lues dans les textes amont
+curl: (22) The requested URL returned error: 404
+ÉCHEC du téléchargement : obs-sign-README.md depuis https://raw.githubusercontent.com/openSUSE/obs-sign/HEAD/README.md
+curl: (22) The requested URL returned error: 404
+ÉCHEC du téléchargement : obs-sign-README depuis https://raw.githubusercontent.com/openSUSE/obs-sign/HEAD/README
+  obs-sign README, lignes citant pkcs11, hsm, card, rpm, deb, gpg :
+téléchargé : siguldry-README.md (2093 octets, sha256 b7272c347b652aadb9aae24fc9e316c3c0de9c579e0fe68317d73b0d9b1734cc) depuis https://raw.githubusercontent.com/fedora-infra/siguldry/HEAD/README.md
+  siguldry README, lignes citant pkcs11, hsm, openpgp, rpm, production :
+    9:that provide a PKCS#11 interface.
+    11:The primary interface for clients is offered by the `libsiguldry_pkcs11.so` PKCS #11 module.
+    12:With this, any tool that can use PKCS #11 can use keys stored in the Siguldry server. This includes,
+    13:but is not limited to, `openssl` via [pkcs11-provider](github.com/latchset/pkcs11-provider/),
+    14:[Sequoia PGP](https://sequoia-pgp.org/) via its cryptoki keystore backend, `sbsign`, `pesign`,
+    19:server, bridge, or client. Some tools included in this repository are RPM-specific, but it is not a
+    26:in a production scenario, these components run on dedicated hosts.
+téléchargé : vault-gpg-plugin-README.md (2098 octets, sha256 8ce093491d03b29a5cd8c8de1276630ac8f6976a05223043ba5bd57f349e52ba) depuis https://raw.githubusercontent.com/LeSuisse/vault-gpg-plugin/HEAD/README.md
+  vault-gpg-plugin README, lignes citant OpenBao, Vault, sign :
+    1:# Vault Plugin: GPG Secret Backend [![Build Status](https://github.com/LeSuisse/vault-gpg-plugin/workflows/CI/badge.svg)](https://github.com/LeSuisse/vault-gpg-plugin/actions?query=workflow%3ACI) [![Code coverage](https://codecov.io/gh/LeSuisse/vault-gpg-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/LeSuisse/vault-gpg-plugin)
+    3:This is a standalone plugin for [HashiCorp Vault](https://www.github.com/hashicorp/vault).
+    5:[transit secret backend](https://www.vaultproject.io/docs/secrets/transit) proposes.
+    10:This backend has similar use cases with the [transit secret backend](https://www.vaultproject.io/docs/secrets/transit)
+    15:This is a [Vault plugin](https://www.vaultproject.io/docs/internals/plugins.html), you need to have a working installation
+    16:of Vault to use it.
+    18:To learn how to use plugins with Vault, see the [documentation on plugin backends](https://www.vaultproject.io/docs/plugin)
+    19:on the official Vault website. You can download and decompress the pre-compiled plugin binary for your architecture
+    20:from the [latest release on GitHub](https://github.com/LeSuisse/vault-gpg-plugin/releases). SHA256 checksum for the
+    21:pre-compiled plugin binary is also provided in the archive so it can be registered to your Vault plugin catalog.
+    23:All archives available from the [release tab on GitHub](https://github.com/LeSuisse/vault-gpg-plugin/releases).
+    24:All archives are signed using [Cosign](https://docs.sigstore.dev/cosign/verify/):
+téléchargé : debusine-configure-hsm.rst (7627 octets, sha256 2d2e932eea04fc435ce1d407550178a92f3279baa89c240ee3b4587bde46af54) depuis https://freexian-team.pages.debian.net/debusine/_sources/howtos/configure-hsm.rst.txt
+  debusine, guide HSM, lignes citant static, OpenPGP, tested :
+    10:with using `PKCS #11 <https://en.wikipedia.org/wiki/PKCS_11>`__, but we have
+    11:currently only tested it with `YubiHSM 2
+    12:<https://docs.yubico.com/hardware/yubihsm-2/hsm-2-user-guide/index.html>`__
+    13:devices.  The remainder of this document describes how to set up a YubiHSM 2
+    17:Install packages needed to use the YubiHSM 2
+    25:       libengine-pkcs11-openssl p11-kit-modules \
+    26:       yubihsm-connector yubihsm-pkcs11 yubihsm-shell
+    31:The YubiHSM 2 quick start guide gives some  `examples of key generation
+    32:<https://docs.yubico.com/hardware/yubihsm-2/hsm-2-user-guide/hsm2-quick-start.html#add-a-new-authentication-key>`__,
+    41:Debusine currently only supports using "static" PKCS #11 signing keys: that
+    46:<https://docs.yubico.com/hardware/yubihsm-2/hsm-2-user-guide/hsm2-intro-core-concepts.html#domains>`__,
+    53:<https://docs.yubico.com/hardware/yubihsm-2/hsm-2-user-guide/hsm2-intro-core-concepts.html#capabilities>`__
+  debusine, ticket 1099 (salsa, API) : opened « OpenPGP signing via YubiHSM » mis à jour 2026-11-02T11:19:50.780Z
+téléchargé : debsign.1.gz (6196 octets, sha256 9843b982e9a9117ce3feeb5896238832381caaab24a5d66dddd06dfb95913900) depuis https://manpages.debian.org/trixie/devscripts/debsign.1.en.gz
+  debsign.1 (trixie), ce qui est signé :
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+  File "/home/linuxbrew/.linuxbrew/Cellar/<adresse retirée>/3.15.2/lib/python3.15/gzip.py", line 352, in read
+    return self._buffer.read(size)
+           ~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/linuxbrew/.linuxbrew/Cellar/<adresse retirée>/3.15.2/lib/python3.15/compression/_common/_streams.py", line 118, in readall
+    while data := self.read(sys.maxsize):
+                  ~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/linuxbrew/.linuxbrew/Cellar/<adresse retirée>/3.15.2/lib/python3.15/gzip.py", line 606, in read
+    if not self._read_gzip_header():
+           ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/linuxbrew/.linuxbrew/Cellar/<adresse retirée>/3.15.2/lib/python3.15/gzip.py", line 575, in _read_gzip_header
+    last_mtime = _read_gzip_header(self._fp)
+  File "/home/linuxbrew/.linuxbrew/Cellar/<adresse retirée>/3.15.2/lib/python3.15/gzip.py", line 520, in _read_gzip_header
+    raise BadGzipFile('Not a gzipped file (%r)' % magic)
+gzip.BadGzipFile: Not a gzipped file (b'.T')
+téléchargé : debsigs.1p.gz (4621 octets, sha256 21e756fbb9fa2e1b700c0528d0ddbb85109cef4c04ce99742550f2f8312adbeb) depuis https://manpages.debian.org/trixie/debsigs/debsigs.1p.en.gz
+  debsigs.1p (trixie), membres ajoutés au .deb :
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+  File "/home/linuxbrew/.linuxbrew/Cellar/<adresse retirée>/3.15.2/lib/python3.15/gzip.py", line 352, in read
+    return self._buffer.read(size)
+           ~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/linuxbrew/.linuxbrew/Cellar/<adresse retirée>/3.15.2/lib/python3.15/compression/_common/_streams.py", line 118, in readall
+    while data := self.read(sys.maxsize):
+                  ~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/linuxbrew/.linuxbrew/Cellar/<adresse retirée>/3.15.2/lib/python3.15/gzip.py", line 606, in read
+    if not self._read_gzip_header():
+           ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/linuxbrew/.linuxbrew/Cellar/<adresse retirée>/3.15.2/lib/python3.15/gzip.py", line 575, in _read_gzip_header
+    last_mtime = _read_gzip_header(self._fp)
+  File "/home/linuxbrew/.linuxbrew/Cellar/<adresse retirée>/3.15.2/lib/python3.15/gzip.py", line 520, in _read_gzip_header
+    raise BadGzipFile('Not a gzipped file (%r)' % magic)
+gzip.BadGzipFile: Not a gzipped file (b'.\\')
+  dpkg-sig, tracker Debian : HTTP 200
+relevé fini : 2026-11-19T14:45:47Z
