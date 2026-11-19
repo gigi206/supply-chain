@@ -308,3 +308,19 @@ Cette note complète, sans la réécrire, la note « pods d'essai Kata, et lente
 - **Le revers de « sans `/proc` »** : la création des chemins de `tmpfiles.d` y échoue en silence, et la limite seule fige ce contenu-là. Pour une racine de construction où systemd ne démarre pas, l'effet n'est pas mesuré.
 - **mock** : `pod_d` rend cohérente l'hypothèse que mock ne boucle pas parce qu'il monte `/proc` dans son chroot. C'est cohérent, non mesuré pour mock.
 - **Recommandation** (passée par le conseiller) : la limite seule. Elle garde les références et le contenu des images déjà éprouvées, sans montage dans l'arbre. `/proc` monté demanderait de refaire les références, et un second `pod_d` pour établir sa reproductibilité. Ce n'est pas une décision.
+
+## Décision du 19/11/2026, consignée à 2026-11-19T12:27:41Z UTC : « Limite seule »
+
+**Décision du propriétaire** (réponse reçue avant 2026-11-19T12:27:41Z UTC, heure exacte non relevée) : « Limite seule ». La question était : « Quel remède pour la tâche ? », entre la limite de fichiers ouverts et `/proc` monté dans la racine installée. Ma recommandation, passée par le conseiller, était la limite seule.
+
+- **Conséquence pour la tâche à venir** :
+  - la tâche abaisse la limite de fichiers ouverts à 1 024, la souple puis la dure, dans un sous-shell qui n'entoure que dnf ;
+  - elle n'y monte pas `/proc` ;
+  - elle affiche la limite et la durée de dnf, et refuse de continuer si la limite dure dépasse le seuil ;
+  - seule la valeur 1 024 est mesurée (`pod_c`).
+- **Les références ne changent pas** : la cible de l'outillage reste `7c07083c…`. Le contenu « sans `/proc` » est celui des racines de S1.
+- **Reste ouvert** :
+  - le patch à part de `s1.sh`, la même limite autour de dnf aux étapes `racine` et `boot_racine` ;
+  - l'exclusion éventuelle de `var/lib/rpm/rpmdb.sqlite-shm` ;
+  - la référence du bootstrap, à refaire avec le tar de l'image qui archivera.
+- **Révisable** à la revue de `taches.yml`, qui reste soumise au propriétaire. Ce n'est un accord pour aucune écriture dans Zot ni pour aucun changement du cluster.
