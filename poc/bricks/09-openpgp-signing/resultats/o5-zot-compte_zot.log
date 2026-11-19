@@ -1,0 +1,10 @@
+étape compte_zot commencée : 2026-11-19T20:09:40Z ; o5-zot.sh 74c74e9981f2025d…
+OK   mot de passe et ligne htpasswd de poc-lien absents de 09/secrets
+     mkpasswd : /usr/bin/mkpasswd ; whois 5.6.6
+OK   mot de passe : 48 caractères hexadécimaux (openssl rand -hex 24), jamais affiché
+OK   ligne htpasswd conforme au motif proposé pour stockage.sh (poc-lien, bcrypt, coût 12)
+OK   hash recalculé depuis le mot de passe avec le même sel : égal à la ligne htpasswd
+OK   modes : zot-poc-lien.password 600, zot-poc-lien.htpasswd 600
+     suite : la session principale ajoute le bloc du §4 quinquies d'A-REPORTER à stockage.sh et l'entrée signes/** à zot.json, puis redémarre Zot
+étape compte_zot finie : 2026-11-19T20:09:41Z
+OK   K6 : ni le mot de passe ni le hash de poc-lien dans le journal

@@ -110,3 +110,11 @@ Le §2 est retenu tel quel. La suite, dans cet ordre :
 | CZ1 | `09/secrets` existe, sans `zot-poc-lien.password` ni `zot-poc-lien.htpasswd` | haute |
 | CZ2 | Mot de passe de 48 caractères hexadécimaux, ligne `poc-lien:$2b$12$…` conforme au motif proposé pour `stockage.sh`, hash recalculé égal avec le même sel, modes 600 | haute : même outil (`mkpasswd` de whois 5.6.6) que la 08 et la 10 |
 | K6 | Ni le mot de passe ni le hash dans le journal ; aucune ligne KO ; code 0 | haute |
+
+## Note datée du 19/11/2026, 20:09:56 UTC : `compte_zot` passée (20:09:40 à 20:09:41 UTC, code 0), CZ1, CZ2 et K6 tenues
+
+Journal : [o5-zot-compte_zot.log](o5-zot-compte_zot.log).
+
+La ligne htpasswd de `poc-lien` est dans `09/secrets/zot-poc-lien.htpasswd`, et le mot de passe dans `zot-poc-lien.password`, tous deux en 0600. Ni l'un ni l'autre n'a été affiché.
+
+**Rien n'est appliqué à Zot.** La suite revient à la session principale : §4 quinquies d'`A-REPORTER.md`, puis `mise run confiance:stockage -- zot`. Ensuite viendra `droits_zot`, à préparer.

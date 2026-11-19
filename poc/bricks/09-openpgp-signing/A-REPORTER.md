@@ -195,6 +195,8 @@ Règles de lecture des sessions : ajouter `~/.cache/supply-chain-poc/09/secrets/
 - **À faire** : ajouter **`openbao-lien.secret`** (pas l'accesseur, pas tout le dossier) à la boucle de la ligne 8 de `tools/secrets-depot.sh`, qui ne lit pas `09/secrets` sur cette branche.
 - **Réserve** : sa valeur ne fait que 26 octets sur une seule ligne ; il n'est pas vérifié que la boucle accepte une ligne de cette longueur. À relire avec la seconde correction de 17:13:47 UTC.
 
+*Note datée du 19/11/2026, 20:09:56 UTC (brique 09, `compte_zot`)* : un troisième secret de la brique 09 est sur l'hôte, `~/.cache/supply-chain-poc/09/secrets/zot-poc-lien.password` (0600, 48 caractères hexadécimaux). À ajouter aussi à la boucle de la ligne 8 de `tools/secrets-depot.sh`. La ligne htpasswd `zot-poc-lien.htpasswd` ne porte que le hash ; `stockage.sh` la lira (§4 quinquies).
+
 ---
 
 ## 4 quinquies. Brique 08 : compte Zot `poc-lien` (O5 de la brique 09, quatrième accord du propriétaire)
