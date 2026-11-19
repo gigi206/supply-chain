@@ -1,0 +1,49 @@
+banc commencé : 2026-11-19T19:37:56Z ; o5-openbao.sh 6537f746edf1d7f3… ; o5-openbao-banc.sh 84d978c9cbf1e25d…
+### 1. nominal : releve puis cle_lien (chains, tsa, scanner présentes)
+OK   releve : code 0, aucune ligne KO
+OK   releve : lien absente, aucune écriture
+OK   cle_lien : code 0, aucune ligne KO
+OK   cle_lien : une seule écriture, sur lien
+OK   cle_lien : relecture conforme
+OK   cle_lien : clé publique exportée = clé du faux bao
+OK   cle_lien : autres clés inchangées
+OK   jeton factice absent des journaux et sorties
+OK   faux bao jamais appelé sans le jeton
+### 2. cle_lien relancée : clé et fichier déjà présents
+OK   relance : refus (KO), aucune écriture
+### 3. clé lien présente, fichier absent
+OK   clé présente : refus, aucune écriture, pas de fichier
+OK   releve : signale la clé présente
+### 4. OpenBao scellé
+OK   scellé : refus avant toute écriture
+### 5. écriture qui modifie aussi chains
+OK   autre clé modifiée : détectée
+### 6. clé créée exportable
+OK   clé exportable : détectée
+### journal nominal de cle_lien (extrait)
+     | étape cle_lien commencée : 2026-11-19T19:37:56Z ; o5-openbao.sh 6537f746edf1d7f3… ; BANC
+     | OpenBao : version 2.7.2-banc, initialisé true, scellé false
+     | OK   OpenBao initialisé et descellé
+     | avant :
+     |      chains ecdsa-p256 1 false
+     |      scanner ecdsa-p256 1 false
+     |      tsa ecdsa-p256 1 false
+     | ### création (seule écriture de l'étape)
+     |      | Success! Data written to: transit/keys/lien
+     | OK   bao write -f transit/keys/lien : code 0
+     | ### relecture
+     | OK   clé lien (type, exportable, sauvegarde en clair, suppression, version, signature) : ecdsa-p256,false,false,false,1,true
+     |      Public-Key: (256 bit field, 128 bit security level);NIST CURVE: P-256
+     | OK   clé publique exportée : /home/gigi/.cache/supply-chain-poc/09/o5-banc-openbao/cas-nominal/resultats/lien-cle-publique.pem (fichier sha256 af66d586515829805249c03aa398745b6b3920b5ca46d8420631235f758aaa42 ; SPKI sha256 ccefacc29f0faf6d2a1c1f38dd39782ff8c1eb62b3e31ee2cdf2e501ae4d8ce8)
+     | après :
+     |      chains ecdsa-p256 1 false
+     |      lien ecdsa-p256 1 false
+     |      scanner ecdsa-p256 1 false
+     |      tsa ecdsa-p256 1 false
+     | OK   seule différence : transit/keys/lien ajoutée ; les autres clés Transit sont inchangées (type, version, exportable)
+     | étape cle_lien finie : 2026-11-19T19:37:56Z
+     | OK   K3 : aucune ligne de bloc privé dans le journal
+     | OK   K4 : valeur du jeton root absente du journal
+bilan : 15 OK, 0 KO
+banc fini : 2026-11-19T19:37:57Z
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/09/o5-banc-openbao
