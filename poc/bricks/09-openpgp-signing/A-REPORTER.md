@@ -280,3 +280,10 @@ Après le tableau du §4 (sous la ligne « Sources : … »), ajouter :
 - **Question au propriétaire** : P1-deb ou N ([carte](resultats/o6-carte.md), correction datée).
 
 *Note datée du 19/11/2026, 21:15:33 UTC (O6)* : le lien du deb relie la copie `signes/sample-app-deb` à son propre digest. La signature OpenPGP du deb est celle du dépôt apt. P1-deb seul n'a donc pas de substance, et la question devient **N (recommandé), ou la voie deb : P1-deb + P2-apt, 1,5 j estimé** ([carte](resultats/o6-carte.md), dernière note). Le secret `lien` ne sert à aucune des deux.
+
+*Décision datée du 19/11/2026, consignée à 21:26:03 UTC (O6)* :
+- **Réponse du propriétaire.** Elle est relayée par la session principale. Il a répondu « Oui » à « Elle recommande N, pas d'O6. L'alternative est la voie deb (P1-deb + P2-apt), estimée à 1,5 j. ».
+- **Lecture.** Je lis ce « Oui » comme **N : pas d'O6 dans la 09**. Si ce n'est pas ce que le propriétaire voulait dire, une note datée corrigera cette lecture.
+- **Réserve qui reste.** La porte ne juge pas l'attestation de lien.
+- **Secret `lien`.** Il ne sert plus à rien et expire seul le 22/11/2026.
+- **Clôture de la brique.** Elle revient au propriétaire ([carte](resultats/o6-carte.md), dernière note).

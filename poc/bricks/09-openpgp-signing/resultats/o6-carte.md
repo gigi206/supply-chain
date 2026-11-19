@@ -122,3 +122,14 @@ L'autre option est la **voie deb** : P1-deb + P2-apt, 1,5 j estimé, contrôle d
 **Secret `lien`** : aucune des deux options ne l'emploie (la voie P ne lit que `lien.pub`). Il expire seul le 22/11/2026, au plus tard à 19:49:36 UTC.
 
 **Question au propriétaire** : N, ou la voie deb ?
+
+## Décision datée du 19/11/2026, consignée à 21:26:03 UTC : « Oui », lu comme N (pas d'O6)
+
+- **Réponse relayée par la session principale.** Le propriétaire a répondu « Oui » à ce message : « Elle recommande N, pas d'O6. L'alternative est la voie deb (P1-deb + P2-apt), estimée à 1,5 j. »
+- **Lecture.** La session principale et moi lisons ce « Oui » comme une acceptation de la recommandation, N. Le mot exact du propriétaire est « Oui ». Il ne nomme pas l'option. Si le propriétaire voulait la voie deb, cette décision se corrige par une note datée.
+- **Effet.**
+  - O6 n'est pas fait dans la 09 : aucune règle de la porte, aucun Job, rien dans le cluster ni dans Zot.
+  - La réserve reste écrite : la porte ne juge pas l'attestation de lien.
+  - Le contrôle du lien par la porte attend que la porte soit étendue à la voie rpm, ce qui ne relève pas de la 09.
+- **Secret `lien`.** Il ne sert plus à rien. Il expire seul le 22/11/2026, au plus tard à 19:49:36 UTC, et aucune signature `lien` n'est prévue d'ici là.
+- **Clôture de la brique.** Elle reste au propriétaire (`A-REPORTER.md`, §3).
