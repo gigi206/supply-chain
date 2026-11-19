@@ -566,3 +566,12 @@ La mesure prévue à partir du 20/11 à 00:00 UTC tient en une commande : [`m1b-
 - le choix sur le curl de l'amorce ;
 - la ligne GnuPG de docs/04 (session de la brique 09) ;
 - les deux politiques de réseau, un accord pour chacune.
+
+## Note datée du 19/11/2026, écrite à 15:54:36 UTC : cas refusés du prefetch joués
+
+PX1 à PX5 tenues ([`m1b-refus-prefetch.log`](m1b-refus-prefetch.log)). Le point « les trois cas refusés du prefetch » de la note précédente est fait. Restent avant signature :
+- la mesure d'un autre jour (à partir du 20/11 à 00:00 UTC) ;
+- le `--dry-run=server` ;
+- le choix sur le curl de l'amorce ;
+- la ligne GnuPG de docs/04 (session de la brique 09) ;
+- les deux politiques de réseau, un accord pour chacune.

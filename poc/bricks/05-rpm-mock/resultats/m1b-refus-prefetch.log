@@ -1,0 +1,73 @@
+# m1b-refus-prefetch.sh, début 2026-11-19T15:51:32Z ; HEAD 19808d46a2f7
+OK   script-pb.sh rendu sous m1bt3 : sha256 912520eae2810d58…
+OK   prefetch-rpm-sortie : sélecteur {"matchLabels":{"tekton.dev/task":"prefetch-rpm"}}
+## cas temoin : début 2026-11-19T15:51:32Z
+     pod m1brp2-temoin prêt : nœud sc-build, runtimeClassName «  »
+        uid=65532 gid=65532 groups=65532 ; RPM version 4.16.1.3 ; gpgv (GnuPG) 2.3.3 ; curl 7.76.1 ; Python 3.9.25
+        clé RPM-GPG-KEY-Rocky-9 (image) : 1750 octets, sha256 et empreinte conformes
+        baseos97 : repomd.xml fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258, signature valide (RPM-GPG-KEY-Rocky-9)
+        baseos97 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+        rpm téléchargés, sha256 égal à la liste et à primary : 10, 1984355 octets
+        rpm -K : rc 0, 10 OK sur 10
+        manifeste de base amont/rockylinux/rockylinux@sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 : 573 octets, image OCI à une couche, sha256:812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+        couche amont/rockylinux/rockylinux sha256:812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09 : 87054388 octets, conforme
+        résultat BASE_ARTIFACT_INPUTS : oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+        entrées : 20 fichiers, 115664404 octets ; liste des sha256 : 7af63de76df231b2c106629aff7ce628282053dd5831d50bc157dafcb6ca2325 ; en 7 s
+     code 0 ; lignes KO 0 ; BASE_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux","digest":"sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2"} ; couche.tar.gz : présente
+OK   temoin : témoin, code 0, BASE_ARTIFACT_INPUTS ee90dc0e…, couche écrite
+OK   temoin : pod m1brp2-temoin retiré
+## cas temoin : fin 2026-11-19T15:52:12Z
+## cas repomd : début 2026-11-19T15:52:12Z
+     script : « baseos97 https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os fa6d50542ea30eff797235527b46f0d21b7ec41599… » devient « baseos97 https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os abac8b17ece74b6f242af937c8143f2e76537eb6a8… »
+     pod m1brp2-repomd prêt : nœud sc-build, runtimeClassName «  »
+        uid=65532 gid=65532 groups=65532 ; RPM version 4.16.1.3 ; gpgv (GnuPG) 2.3.3 ; curl 7.76.1 ; Python 3.9.25
+        clé RPM-GPG-KEY-Rocky-9 (image) : 1750 octets, sha256 et empreinte conformes
+        KO   baseos97 : repomd.xml différent du sha256 fixé
+        command terminated with exit code 1
+     code 1 ; lignes KO 1 ; BASE_ARTIFACT_INPUTS : absent ; couche.tar.gz : absente
+OK   repomd : code 1, refus « baseos97 : repomd.xml différent du sha256 fixé »
+OK   repomd : ni BASE_ARTIFACT_INPUTS ni couche.tar.gz
+OK   repomd : pod m1brp2-repomd retiré
+## cas repomd : fin 2026-11-19T15:52:46Z
+## cas manifeste : début 2026-11-19T15:52:46Z
+     script : « COUCHE='amont/rockylinux/rockylinux ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 812c44127… » devient « COUCHE='amont/rockylinux/rockylinux ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d 812c44127… »
+     pod m1brp2-manifeste prêt : nœud sc-build, runtimeClassName «  »
+        uid=65532 gid=65532 groups=65532 ; RPM version 4.16.1.3 ; gpgv (GnuPG) 2.3.3 ; curl 7.76.1 ; Python 3.9.25
+        clé RPM-GPG-KEY-Rocky-9 (image) : 1750 octets, sha256 et empreinte conformes
+        baseos97 : repomd.xml fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258, signature valide (RPM-GPG-KEY-Rocky-9)
+        baseos97 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+        rpm téléchargés, sha256 égal à la liste et à primary : 10, 1984355 octets
+        rpm -K : rc 0, 10 OK sur 10
+        Traceback (most recent call last):
+          File "<stdin>", line 4, in <module>
+        AssertionError: ['sha256:99c753a880cc03bbe9da8bf6e354c8ba2d99f19058e87b8a55b6487ffcf52f8a']
+        KO   manifeste de base : image OCI à une seule couche, la couche fixée, attendue
+        command terminated with exit code 1
+     code 1 ; lignes KO 1 ; BASE_ARTIFACT_INPUTS : absent ; couche.tar.gz : absente
+OK   manifeste : code 1, refus « manifeste de base : image OCI à une seule couche, la couche fixée, attendue »
+OK   manifeste : ni BASE_ARTIFACT_INPUTS ni couche.tar.gz
+OK   manifeste : assertion « AssertionError: ['sha256:99c753a880cc03bbe9da8bf6e354c8ba2d99f19058e87b8a55b6487ffcf52f8a'] »
+OK   manifeste : pod m1brp2-manifeste retiré
+## cas manifeste : fin 2026-11-19T15:53:26Z
+## cas couche : début 2026-11-19T15:53:26Z
+     script : « COUCHE='amont/rockylinux/rockylinux ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 812c44127… » devient « COUCHE='amont/rockylinux/rockylinux ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 99c753a88… »
+     pod m1brp2-couche prêt : nœud sc-build, runtimeClassName «  »
+        uid=65532 gid=65532 groups=65532 ; RPM version 4.16.1.3 ; gpgv (GnuPG) 2.3.3 ; curl 7.76.1 ; Python 3.9.25
+        clé RPM-GPG-KEY-Rocky-9 (image) : 1750 octets, sha256 et empreinte conformes
+        baseos97 : repomd.xml fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258, signature valide (RPM-GPG-KEY-Rocky-9)
+        baseos97 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+        rpm téléchargés, sha256 égal à la liste et à primary : 10, 1984355 octets
+        rpm -K : rc 0, 10 OK sur 10
+        Traceback (most recent call last):
+          File "<stdin>", line 4, in <module>
+        AssertionError: ['sha256:812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09']
+        KO   manifeste de base : image OCI à une seule couche, la couche fixée, attendue
+        command terminated with exit code 1
+     code 1 ; lignes KO 1 ; BASE_ARTIFACT_INPUTS : absent ; couche.tar.gz : absente
+OK   couche : code 1, refus « manifeste de base : image OCI à une seule couche, la couche fixée, attendue »
+OK   couche : ni BASE_ARTIFACT_INPUTS ni couche.tar.gz
+OK   couche : assertion « AssertionError: ['sha256:812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09'] »
+OK   couche : pod m1brp2-couche retiré
+## cas couche : fin 2026-11-19T15:54:05Z
+OK   pods restants au préfixe m1brp2- : 0
+# fin 2026-11-19T15:54:05Z ; KO 0

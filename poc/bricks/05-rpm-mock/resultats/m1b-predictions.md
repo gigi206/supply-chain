@@ -1750,3 +1750,17 @@ Journal : [`m1b-curl-amorce.log`](m1b-curl-amorce.log), de 15:46:06 à 15:46:10 
 - **Ce qui s'est passé.** Le deuxième passage, du 19/11 à 15:50:47 UTC, à HEAD `9990c3d`, est gardé dans [`m1b-refus-prefetch-2.log`](m1b-refus-prefetch-2.log). La relecture du sélecteur de `prefetch-rpm-sortie` et du script a passé. Puis le rendu du premier pod s'est arrêté : `yq` lisait les ressources dans le gabarit `builders/prefetch-racine-rpm.yaml`, dont le marqueur `@AMORCE@` n'est pas du YAML valide. C'est le même défaut que lors de la clôture de la 06. Aucun pod n'a été créé (0 pod `m1brp` dans `builds`, relevé juste après). Le dossier de travail `m1brp-05` a été créé, avec un pod rendu non valide.
 - **Correction** : les ressources sont lues dans la tâche rendue sous `m1bt3` (`prefetch-racine-rpm.yaml`, sans marqueur), celle d'où vient `script-pb.sh`. Le préfixe peut être posé par `PREFIXE`. Rien d'autre ne change. Le script corrigé a le sha256 `80f627643ce52606…`.
 - **Relance** : sous le préfixe `m1brp2`, puisque `m1brp-05` existe, dans un journal neuf, `m1b-refus-prefetch.log`. PX5 se lit donc pour le préfixe `m1brp2-`. Les autres prédictions ne changent pas.
+
+### Cas refusés du prefetch : résultat (note écrite le 19/11/2026 à 15:54:36 UTC)
+
+Journal : [`m1b-refus-prefetch.log`](m1b-refus-prefetch.log), de 15:51:32 à 15:54:05 UTC, à HEAD `19808d4`, sous le préfixe `m1brp2`, code 0, 0 KO. Les deux premiers passages, arrêtés avant tout pod, sont gardés en `-1.log` et `-2.log` (corrections datées ci-dessus).
+
+**PX1 à PX5 tenues.**
+- **PX1** : le témoin rend 0, `BASE_ARTIFACT_INPUTS` vaut `ee90dc0e…`, `couche.tar.gz` est écrite, et l'arbre a la liste `7af63de7…`, celle de `m1bt3`.
+- **PX2** : avec le `repomd.xml` de `baseos97` fixé à `abac8b17…`, le prefetch s'arrête sur « baseos97 : repomd.xml différent du sha256 fixé », avant les métadonnées et les rpm.
+- **PX3** : avec le manifeste `ed654c69…` et la couche fixée `812c4412…`, le manifeste est lu et passe son contrôle de sha256. Le prefetch s'arrête ensuite sur la garde du manifeste, avec `AssertionError: ['sha256:99c753a8…']`, la couche lue dans ce manifeste.
+- **PX4** : avec le bon manifeste et une couche fausse, même garde, avec `AssertionError: ['sha256:812c4412…']`.
+- Dans les trois refus : code 1, une seule ligne `KO`, ni `BASE_ARTIFACT_INPUTS` ni `couche.tar.gz`.
+- **PX5** : les quatre pods sont retirés, et il ne reste aucun pod au préfixe `m1brp2-`.
+
+**Portée.** Dans un pod runc du cluster, le prefetch refuse un `repomd.xml` autre que celui fixé, un autre manifeste de base, et une couche autre que celle du manifeste. Chaque refus vient de sa garde, sans sortie écrite. Avec RZ1 à RZ8 et AN1, les cas refusés demandés avant signature sont joués. Rien n'est mesuré dans un TaskRun.
