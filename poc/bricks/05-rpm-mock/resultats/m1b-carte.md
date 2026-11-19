@@ -256,3 +256,15 @@ Suite sans attendre la réponse, sous l'accord permanent : le banc de reproducti
 - **BR0 à BR6 tenues** (08:40:18 à 08:40:23 UTC) : la copie des arbres du 18/11, racine passée en 0555, donne deux fois la même archive, `f2652169…`. Elle ne diffère de `28634a12…` que par le mode de `.` ([résultat](m1b-predictions.md), [journal](m1b-boot-0555.log)).
 - **Références pour les valeurs fixées le 19/11** : `05d35d64…` (outils de `99790c13`), `06c289ad…` (outils de l'amorce), `0c00666a…` (racine), `f2652169…` (bootstrap). Toutes ont la racine en 0555 et machine-id absent.
 - **Le point 1 A reste non établi** (ni pod Kata, ni autre hôte).
+
+## Correction datée du 19/11/2026, écrite à 2026-11-19T08:46:59Z UTC : rôle des quatre références
+
+- **Ce qui est faux** : la note de 08:41:01 UTC range les quatre archives sous « Références pour les valeurs fixées le 19/11 ». Seules deux correspondent à ces valeurs.
+- **Ce qui est mesuré pour les quatre** : la racine est en 0555 et `etc/machine-id` est absent ([`m1b-valeurs-s1-2.log`](m1b-valeurs-s1-2.log), [`m1b-boot-0555.log`](m1b-boot-0555.log)).
+- **Cibles** :
+  - `06c289ad…` pour l'outillage (outils de l'amorce, `en_US`, umask 022) ;
+  - `f2652169…` pour le bootstrap.
+- **Témoins seulement** :
+  - `05d35d64…` : outils de `99790c13`, langues `all`, umask 0002 ;
+  - `0c00666a…` : troisième banc, 26 533 membres contre 13 332 pour `a8` ; ses langues et son umask ne sont pas établis dans cette carte.
+- **Archives écrites par le `tar` de l'hôte** : les quatre références viennent de la fonction `archive()` des bancs (`ns tar`). La tâche archivera avec le `tar` de l'amorce : ce point est à mesurer avant le pod.
