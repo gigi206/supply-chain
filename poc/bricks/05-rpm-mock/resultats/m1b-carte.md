@@ -378,3 +378,12 @@ La note « Limite seule » rangeait sous « Reste ouvert » un patch à part de 
 - **Les deux listes `rpm -qa`** sont celles de S1 (153 lignes).
 - **Défaut du banc** : `cmp` est absent de l'amorce. La comparaison des listes a été faite ensuite sur l'hôte, et la sonde du pod ne doit pas compter sur `cmp`.
 - **Question au propriétaire** : la langue du bootstrap, `all` comme S1, ou `en_US` comme annoncé le 19/11.
+
+## Note datée du 19/11/2026, écrite à 2026-11-19T12:55:19Z UTC : règle des langues, avant la question
+
+- **Correction** de la note de résultat LG : voir la correction datée dans les prédictions. « Le bootstrap que mock a utilisé » se limite aux langues et à la liste de paquets ; l'écart de `en_US` porte sur des fichiers, pas sur des paquets.
+- **Ce que garde chaque image dans S1**, d'après les journaux archivés :
+  - **outillage** : `en_US`, outils de l'amorce. `a8` a 34 membres sous `usr/share/locale`, comme `racine.tar` ([`m1b-outil-amorce.log`](m1b-outil-amorce.log)) ;
+  - **bootstrap** : `all`, outils de `99790c13`. `b063feb3…` a 2 608 membres, comme `boot-racine.tar` ([`m1b-boot.log`](m1b-boot.log)).
+- **Recommandation** (passée par le conseiller) : une règle, pas une exception. Chaque image garde la langue qu'elle avait dans S1, posée explicitement par la tâche (`.rpmmacros` sous `env -i`) : `en_US` pour l'outillage, `all` pour le bootstrap.
+- **Le revers** : `all` pour le bootstrap contredit la valeur `en_US` annoncée le 19/11 dans la décision « Absent ».

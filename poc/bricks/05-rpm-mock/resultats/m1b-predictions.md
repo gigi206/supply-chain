@@ -1255,3 +1255,8 @@ Journaux : [`m1b-boot-langue.log`](m1b-boot-langue.log) ; complément sur l'hôt
 - Avec `all` posée explicitement, l'amorce redonne le bootstrap de référence, celui que mock a utilisé de M2 à M4c, déjà retrouvé un autre jour UTC (`28634a12…`, de même contenu à la racine et au `tar` près).
 - Avec `en_US`, le bootstrap perd 55 traductions que la base `rockylinux:9.7` publiée contient. Ce n'est plus « la base, plus les dix lignes ».
 - **Place** : il reste 1 353 808 kB sous `$HOME` après le banc.
+
+**Correction datée du 19/11/2026, écrite à 2026-11-19T12:55:19Z UTC, sur la note de résultat de la langue du bootstrap :**
+- **« Le bootstrap de référence, celui que mock a utilisé de M2 à M4c »** : c'est trop fort. `b063feb3…` exclut `etc/machine-id`, `var/cache/dnf` et les journaux de dnf, que `boot-racine.tar` de S1 avait, et sa racine et son `tar` diffèrent. Ce qui est mesuré : les mêmes langues que `boot-racine.tar` (2 608 membres sous `usr/share/locale`, dont 1 239 `.mo`, [`m1b-boot.log`](m1b-boot.log)) et la même liste `rpm -qa` (153 lignes). Il faut lire « sur les langues et la liste de paquets ».
+- **« Ce n'est plus la base, plus les dix lignes »** : c'est faux au niveau des paquets, où les deux variantes donnent la liste de S1 (décision « Dix lignes » tenue). L'écart est au niveau des fichiers : 55 `dnf.mo` de la base n'y sont plus. Le mécanisme n'est pas lu.
+- **Un seul passage** : `4171b0d3…` vient d'un seul passage ; sa reproductibilité n'est pas établie.
