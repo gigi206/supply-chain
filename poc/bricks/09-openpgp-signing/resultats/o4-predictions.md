@@ -63,3 +63,34 @@ Pour `sha1`, le refus est attribuable au condensat si la construction tient, car
 Les en-têtes publics « SIGNED MESSAGE » et « SIGNATURE » qu'apt pourrait recopier dans sa sortie sont remplacés à la journalisation. Sans cela, la garde K3 viderait le journal. Un en-tête de clé privée n'est pas remplacé et reste attrapé par K3.
 
 P5a et P5b sont jugées par une ligne OK ou ÉCART, jamais KO : ce sont des prédictions sur un choix d'apt, pas des défauts de la chaîne. Le seul effet d'un écart à V5 (confiance faible) serait une ligne KO, et donc un code 1. Si la `repetition` n'échoue que sur V5, `signer` est lancée quand même ; l'écart est consigné. Tout autre KO arrête la suite et fait l'objet d'une note datée avant toute relance.
+
+## Note datée du 19/11/2026, 18:31:26 UTC : premier passage de `repetition`, code 1 (6 lignes KO)
+
+Passée de 18:30:34 à 18:30:38 UTC, code 1 ([journal](o4-repetition-premier-passage.log)), avec une clé jetable `46129DE4…65025E3C` (RSA 4096, créée par gpg 2.4.7). Scripts `o4.sh` `cc7e6665…` et `o4-interne.sh` `c50ff7c5…`.
+
+**Tenues** :
+- **A1, A2 et L1** : la strophe porte `f66bbeb2…` ; Packages (823 octets) et Packages.gz (571 octets) sont égaux à Release.
+- **A3, pour le code et pour Release.gpg** : `algo 1, keyid 766B346B65025E3C`, `version 4`, `digest algo 10`.
+- **V1** : `apt-get update` du dépôt signé, code 0, avec la clé armurée en `Signed-By`.
+- **V3** : code 0.
+- **V4**, pour les quatre témoins, code 100 chacun, et `sample-app` reste inconnu :
+  - `autre-cle` : « Sub-process /usr/bin/sqv returned an error code (1), error message is: Missing key 7D9D75DB…, which is needed to verify signature » ;
+  - `release-modifie` : « Message has been manipulated » ;
+  - `packages-modifie` : « Hash Sum mismatch » sur Packages.gz (Filesize 571 attendu, 582 reçu) ;
+  - `sans-signed-by` : « Missing key 46129DE4… ».
+- **V5**, confiance faible : le témoin SHA-1 est refusé, code 100, avec « Policy rejected non-revocation signature (Text) requiring collision resistance because: SHA1 is not considered secure since 2013-02-01T00:00:00Z ». **Cette mesure tranche la correction datée 1 du README** : apt de Debian 13, par sqv, refuse une signature SHA-1 de `Release`.
+- **V6 pour `depot`** : code 0. Le deb est écrit dans le dossier courant, égal à `f66bbeb2…` (1 953 492 octets), relu dans l'amorce puis sur l'hôte.
+- **V7** : « Hash Sum mismatch » (Filesize 1 953 492 attendu, 1 953 493 reçu), code 100, aucun deb écrit.
+- **K3, sur son périmètre** : aucun bloc dans le journal, aucun en-tête de clé privée dans `o4/repetition`, deb du dépôt inchangé.
+
+**Relevés** :
+- **R1** : `apt-ftparchive` 3.0.3 ignore aussi `SOURCE_DATE_EPOCH`. Avec `SOURCE_DATE_EPOCH=1763337600`, la `Date` vaut « Thu, 19 Nov 2026 18:30:36 +0000 », l'heure du lancement ; les deux sorties sont identiques. La date est donc celle de l'exécution, non celle de `SOURCE_DATE_EPOCH`.
+- **apt de l'amorce est en 3.0.4**, non en 3.0.3 comme dans la racine : l'image `7378260c…` est plus récente que l'instantané de la racine. Les prédictions disaient « apt 3.0.3 » pour le vérificateur ; c'est faux pour l'amorce.
+- `apt-get download` avertit : « Download is performed unsandboxed as root as file '/root/o4/depot/…' couldn't be accessed by user '_apt' ». Le dossier courant est sous `/root`, en 700. La vérification des empreintes a quand même lieu, comme le montre V7.
+
+**Non tenues ou non mesurées** :
+- **V2 non tenue, et V6 pour `sans-inrelease` en conséquence** : apt refuse un `Release.gpg` **binaire**. Il répond « Detached signature file '…Release.gpg' is in unsupported binary format » (« got 'NODATA' »), code 100. Le banc O0 et ce script signent `Release.gpg` sans `--armor`, et gpgv 2.4.8 l'acceptait. apt 3.0.4 par sqv ne l'accepte pas. Le dépôt `depot` est accepté parce qu'apt prend `InRelease` d'abord. **Constat utile pour D1 et pour la recommandation du README** sur CVE-2025-68972 (« vérifier `Release` + `Release.gpg` ») : un `Release.gpg` doit être armuré pour apt de Debian 13. La ligne KO du contrôle sur l'hôte (« deb téléchargé (sans-inrelease) : absent ») en découle.
+- **P5a et P5b non mesurées par la méthode prévue** : `Debug::Acquire::gpgv=true` n'a produit aucune ligne « Preparing to exec » (0 ligne, dans la racine comme dans l'amorce). Deux lignes ÉCART, comme prévu pour ce cas. Dans l'amorce, les messages de refus nomment le vérificateur : « Sub-process /usr/bin/sqv » pour `autre-cle`, `release-modifie`, `sha1` et `sans-signed-by`. **P5a est donc tenue**, mais par ces messages, pas par le relevé de débogage. **P5b reste non mesurée** : dans la racine, seul le dépôt accepté a été passé, sans message qui nomme le binaire.
+- **Trois lignes KO viennent d'un défaut du script, pas de la chaîne** : la garde de construction (`sig_ok`) lit `InRelease` par `gpg --list-packets`. Sur un message signé en clair, gpg s'arrête au paquet de données littérales et n'affiche pas le paquet de signature. D'où « InRelease n'est pas une signature v4 RSA… » pour le dépôt (A3), `autre-cle` et `sha1`. Pour la même raison, la garde n'a pas jugé l'`InRelease` des témoins ; seul leur `Release.gpg` l'a été : `digest algo 10` avec la clé `23A69D77…` pour `autre-cle`, `digest algo 2` avec la clé du dépôt pour `sha1`. **Vérifié sur l'hôte avant cette note** (heure non relevée), avec un trousseau jetable dans `$XDG_RUNTIME_DIR`, effacé ensuite : `gpg --list-packets` sur le bloc de signature **extrait** de l'`InRelease` du dépôt donne `algo 1, keyid 766B346B65025E3C`, `version 4`, `digest algo 10` (sortie non archivée en journal).
+
+Les dossiers `o4/repetition*` restent en place jusqu'à la correction ; ils seront effacés avant la relance.
