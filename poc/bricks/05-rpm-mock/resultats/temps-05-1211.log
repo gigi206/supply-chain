@@ -44,3 +44,6 @@ premier commit : 196ee34 ; dernier : 636f6b8
 premier commit : 196ee34 ; dernier : a4360d3b
 376 commits, 42.82 h
 # M1b et sa cascade, même méthode : de 1e25df1 à a4360d3b : 177 commits, 16.38 h (écarts <= 1 h), 44.44 h de bout en bout ; de 636f6b8 à a4360d3b : 41 commits, 5.38 h
+# nouveau relevé, même méthode (date d auteur, écarts <= 1 h), 2026-11-20T20:07:45Z à HEAD df0edb54, pour le dossier de clôture ; contrôle : 376 commits, 42.82 h à a4360d3b, égal au relevé ci-dessus ; les relevés ci-dessus ne sont pas réécrits
+premier commit : 196ee34 ; dernier touchant la brique : 3d09ede7
+396 commits, 46.78 h

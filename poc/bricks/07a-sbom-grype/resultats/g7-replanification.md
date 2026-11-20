@@ -599,3 +599,17 @@ Les contenus prédits N1 à N9 de la note de 19:28:08Z sont inchangés. Seules l
 | E11 | 75 blobs, tous en 200, aucun `BLOB-KO`. 36 manifestes ont 2 blobs ; la base `vulndb/grype` du 2026-11-20 en a 3 | tenue |
 
 C'est l'état « avant » de référence pour la lecture après le n°9 : `AVANT=resultats/g7-etat-avant-2.log`. Il remplace le journal v1 dans la consigne de la note de 20:00:02Z.
+
+## Note de 2026-11-20T20:08:18Z : prédictions N2, N3, N4, et dépendance du point 4 à la date du rejeu (rien n'est réécrit au-dessus)
+
+**Prédictions manquantes**, relevées par le conseiller. La consigne de 20:00:02Z fait lire les n°2 à n°9, mais seules N1, N5 à N9 étaient écrites. Mêmes hypothèses que N1 : une base poussée par jour vers 08:05, rétention inchangée, aucun redémarrage de Zot.
+
+| # | Balayage (fenêtre de lecture) | Prédit |
+|---|---|---|
+| N2 | n°2 (21/11 12:00 → 22/11 12:00) | 9 `keep` dans `vulndb/grype` (tags du 13 au 21/11). Aucune suppression |
+| N3 | n°3 (22/11 12:00 → 23/11 12:00) | 10 `keep`. Aucune suppression |
+| N4 | n°4 (23/11 12:00 → 24/11 12:00) | 11 `keep`. Aucune suppression |
+
+À partir du n°5, il y a 12 tags : 11 `keep` et 1 retrait par balayage (N5 à N9).
+
+**Dépendance** : l'option (b) du point 4 (une tâche le 29/11 à 05:40 UTC) suppose que le rejeu de M5b n'a pas lieu avant. Si le rejeu passait le 28/11 après le n°8, il effacerait Loki, et il faudrait lire le n°8 avant de le lancer. **La date du rejeu se tranche donc en premier** ([dossiers de décision de la 05](../../05-rpm-mock/resultats/dossiers-decision.md), dossier 1 et ses corrections).

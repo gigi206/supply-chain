@@ -113,3 +113,35 @@ Plusieurs décisions passent par le même geste, ou doivent précéder le même 
 - **(a) et (b)** ensemble.
 
 **Couplages** : aucun avec G7 ni le rejeu. C'est à trancher quand le scan du rpm entrera dans la plateforme.
+
+## Corrections et compléments (note de 2026-11-20T20:07:45Z ; rien n'est réécrit au-dessus)
+
+Le conseiller a relu ce fichier avant la poussée. Les dossiers ci-dessus restent écrits tels quels. Voici ce qu'il y manquait.
+
+**Dossier 1, le cas le plus probable manquait.**
+- Le n°8 finit le 28/11 vers 02:52, d'après le calcul. Un rejeu « le 28/11 » tombe donc presque sûrement **après le n°8 et avant le n°9** : N8 est vu, N9 est perdu. « Avant le n°8 » suppose un rejeu en pleine nuit.
+- Comme le rejeu efface Loki, il faut alors **lire le n°8 avant de lancer le rejeu**.
+- La tâche (b) du point 4 de G7 (29/11 à 05:40) lirait un Loki vide si le rejeu passait avant elle. **Le choix de la tâche dépend donc de la date du rejeu**, qui se tranche en premier.
+- Options révisées :
+  - (i) rejeu après la lecture du n°9, le 29/11 à partir de 05:40 environ ;
+  - (ii) rejeu le 28/11 après la lecture du n°8, à partir de 05:00 environ : N9 et le premier scan du deb ne sont pas vus ;
+  - (iii) rejeu plus tôt : G7 repart de zéro.
+
+**Dossier 3, option (ii) : affirmation sans mesure.** « Le rejeu repart avec la marge mesurée le 20/11 » n'est pas établi : un rejeu de zéro recrée un Zot et un Loki vides. Le fait mesuré est celui-ci : S5b a recréé sc-stockage sur 20G le 13/11, et il restait 2 820 Mo libres le 20/11 à 15:59, sept jours plus tard.
+
+**Dossier 4, option (i) : portée de la mesure.** « Les digests actuels restent valables » n'est mesuré que sur les 9 bundles de la 05 (RE7). Pour les bundles des autres briques, c'est déduit : même fonction, même hôte, même fuseau.
+
+**Dossier 6, ce qui manquait pour trancher.**
+- **Seuil « bit-identique »** : `m3_comparaison`, le 17/11 à 20:21:03 UTC. Elle donne les mêmes NEVRA et les mêmes sha256 pour le src.rpm (`c802e60a…`) et le rpm (`864d55f4…`) entre deux `--hermetic-build` dans deux répertoires, avec « écarts du critère : 0 » (README de la 05, journal du 17/11). Le rpm de M4b, de M4c et de leurs reprises sur M1b est ce même rpm.
+- **Seuil « 0 pod privilégié sur l'hôte »**, lu comme le test 4 de la 08 (D1 (a)) : R8 de M5a. `construire-rpm` sans Kata est refusé par Pod Security (`PodAdmissionFailed`), et aucun pod n'est créé (`m5-predictions.md`, bilan de M5a). Ce test a été rejoué dans la cascade (RJ1 à RJ12).
+- Le **rejeu de zéro**, quatrième élément du jalon M5, n'est pas passé : c'est M5b.
+- **Effort**, même méthode que `temps-05-1211.log` (date d'auteur, écarts d'au plus 1 h entre commits touchant la brique) : **46.78 h, 396 commits**, au dernier commit de la brique (`3d09ede7`). Le contrôle de la méthode redonne 42.82 h à `a4360d3b`, comme le relevé précédent. L'estimation du README est de 2,5 pw, avec décision à 5 pw. Je ne convertis pas les heures.
+
+**Recommandations, avec leurs contraintes** (passées par le conseiller) :
+- **Dossier 1 : (i), rejeu après la lecture du n°9.** Il coûte un jour, et c'est la seule occasion de voir supprimer un scan du deb. Contrainte : aucun passage de `stockage.sh zot` d'ici là.
+- **Dossier 3 : (i), `vm.sh` à 30G**, ce qui est cohérent avec « Agrandir maintenant ». Contrainte : le modifier avant le rejeu, avec un banc de `vm.sh` à sec.
+- **Dossier 4 : (iii) pour ce rejeu**, `TZ` laissé à l'hôte. On ne modifie pas `commun.sh` juste avant un rejeu jamais exécuté, et `m5b-republier.sh` pose déjà `TZ` pour la 05. La décision pour toute la plateforme peut venir après.
+- **Dossier 5 : (i), une barrière, en réserve écrite.** La seconde rouvrirait la signature et la cascade.
+- **Dossier 2** : pas de recommandation. Ce que Zot permet par dépôt n'est pas relu.
+- **Dossier 6** : pas de recommandation. C'est ta décision, et elle dépend de la date du rejeu.
+- **Dossier 7** : pas de recommandation, puisque le scan du rpm n'est pas dans la plateforme.

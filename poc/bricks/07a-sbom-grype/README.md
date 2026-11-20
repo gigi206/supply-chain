@@ -358,3 +358,12 @@ Mesure hors réseau sur l'hôte ([`rpm-distro.sh`](rpm-distro.sh), [prédictions
 - la durée croît avec le nombre de dépôts (1732 à 2407 s).
 
 Projection, calculée : premières suppressions réelles le 28/11 entre 01:37 et 02:52 UTC, scan du deb le 29/11 entre 02:16 et 03:36 UTC. Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T19:32:31Z.
+
+**Additif du 20/11/2026 (2026-11-20T20:08:18Z UTC), G7, point 4 préparé à sec, RIEN N'EST PLANIFIÉ** :
+- [`g7-etat.sh`](g7-etat.sh), en lecture anonyme de Zot, relève l'état avant les premières suppressions ([journal v2](resultats/g7-etat-avant-2.log)) :
+  - E1 à E11 sont tenues, sauf E3 : il y a 8 scans de deb, et non 7, dont 3 pour le deb 1.0.0-1 ;
+  - 37 manifestes et 75 blobs répondent en 200 ;
+  - le premier scan du deb a été créé le 14/11 à 21:01:35 UTC ;
+  - le deb 1.0.0-1 garde des scans jusqu'au balayage n°11 (1/12), d'après le calcul.
+- Une seule lecture Loki après le n°9 suffit. Il y a trois options de tâche ; leur choix dépend de la date du rejeu de M5b.
+- Détail : [`g7-replanification.md`](resultats/g7-replanification.md), notes de 19:58 à 20:08 UTC.
