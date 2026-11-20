@@ -22,7 +22,7 @@ echo "# m1b-r1r8-banc.sh, $(date -u +%FT%TZ) ; m1b-r1r8.sh $(sha256sum < "$SCRIP
 
 echo "## A : copies"
 r=0; o=$(python3 -I "$RES/m1b-r1r8-copies.py" verifier "$M5" "$SCRIPT") || r=$?
-egal "produit de m5.sh (code, ligne)" "$r $o" "0 OK   m1b-r1r8.sh égal au produit de m5.sh (19 remplacements, 28 occurrences)"
+egal "produit de m5.sh (code, ligne)" "$r $o" "0 OK   m1b-r1r8.sh égal au produit de m5.sh (20 remplacements, 29 occurrences)"
 egal "m5.sh égal à celui du commit" "$(cd "$D" && git show HEAD:poc/bricks/05-rpm-mock/m5.sh | sha256sum | cut -c1-64)" "$(sha256sum < "$M5" | cut -c1-64)"
 
 echo "## B : syntaxe et shellcheck"

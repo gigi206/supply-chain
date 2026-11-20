@@ -2888,3 +2888,24 @@ Elle le publie deux fois au même digest que M4c (`07b7bd6f…`), et sa provenan
 - **RJ12** (haute), `retirer` : seuls les objets au label `poc.test/jalon=m1b-r1r8` sont supprimés. Les quatre PipelineRuns sont gardés, et rien n'est retiré de Zot.
 
 **Critère** : comme M5a. Chaque altération est refusée, et chaque témoin est accepté. Une acceptation de R4, de R6 ou du bras b de R7 serait un constat à te remonter, sans modifier de tâche signée.
+
+### Cascade avant M5b, rejeu de R1 à R8 : correction des prédictions, écrite le 20/11/2026 à 2026-11-20T14:23:15Z UTC, avant tout lancement
+
+**Erreur** : le banc 2 imprime « source locale entrees/ (m4c.sh prealables) : empreinte avant : 7153c806… ». Ce libellé vient de `m5.sh`, alors que la source est désormais `m1b-construction.sh local`. Le journal de `prealables` l'aurait gardé.
+
+**Correction** :
+- un vingtième remplacement compté change ce libellé. Le script compte désormais 20 remplacements et 29 occurrences ([`m1b-r1r8-copies.py`](m1b-r1r8-copies.py), `e7e2c58f28a5b4da…`) ;
+- `m1b-r1r8.sh` vaut maintenant `583ccbace2dd0cd1…`. Il ne diffère du script commité en `0595ad86` que par cette ligne ;
+- [`m1b-r1r8-banc-3.log`](m1b-r1r8-banc-3.log) donne 45 OK, 0 KO (banc `6274d321c067b4fd…`). Seule l'attente du compte change dans le banc.
+
+RJ1 à RJ12 ne changent pas.
+
+**Relevés avant le lancement, en lecture** :
+- à 14:22:45Z, les quatre PipelineRuns gardés existent, tous en `Succeeded` : `m4c-rpm-1`, `m4c-rpm-2`, `m1b-construction-1`, `m1b-construction-2` ;
+- à 14:22:52Z, sc-build est sans DiskPressure ni MemoryPressure. Il reste 8 429 Mo libres sous `/`, sur 30 033 Mo. Le jalon y ajoute environ 0,71 Go sur le PVC.
+
+**Ordre de lancement** (conseil du conseiller) :
+- `prealables` seule d'abord. Sa partie lecture n'est pas couverte par le banc, et un KO n'y coûte qu'un préfixe.
+- `fermeture` et `reseau` en arrière-plan, car leur durée dépasse 10 minutes.
+- Si `alterer` s'arrête, pas de relance sous le même préfixe.
+- Les classes de R4 et R6, les codes TCP de R7 et les motifs de R8 sont des relevés du script, et non des assertions. Le script de résultat les assertera, et les journaux de pod de R4 et de R6 seront archivés avant `retirer`.

@@ -60,6 +60,7 @@ T_LIST = [
     ('"$h05/construction/construire-rpm.signee.yaml"', '"$h05/construction/construire-rpm.m1b.signee.yaml"', 3),
     ('attendu "rpm du rootfs de l\'image d\'outillage (m5-sigmd5.sh)"', 'attendu "rpm du rootfs de l\'image d\'outillage de M1b"', 1),
     ('"$(enveloppes)" 4', '"$(enveloppes)" 8', 3),
+    ('attendu "source locale entrees/ (m4c.sh prealables) : empreinte avant"', 'attendu "source locale entrees/ (m1b-construction.sh local) : empreinte avant"', 1),   # ajouté après le banc 2
     ("kubectl get pipelinerun -n builds m4c-rpm-1 m4c-rpm-2 -o name", "kubectl get pipelinerun -n builds m4c-rpm-1 m4c-rpm-2 m1b-construction-1 m1b-construction-2 -o name", 3),
     ("PipelineRuns de M4c gardés", "PipelineRuns de M4c et de M4c refait gardés", 3),
     ('-o name < /dev/null | wc -l)" 2', '-o name < /dev/null | wc -l)" 4', 2),

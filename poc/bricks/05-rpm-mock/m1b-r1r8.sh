@@ -199,7 +199,7 @@ etape_prealables() {
   echo "## hôte, hors ligne"
   attendu "rpm du rootfs de l'image d'outillage de M1b" "$(dans_racine "$h05" /usr/bin/rpm --version)" "RPM version 4.16.1.3"
   echo "m5-alterer.py $(sha256sum < "$ALTERER" | cut -c1-64) ; m5-reseau.spec $(sha256sum < "$SPEC_SONDE" | cut -c1-64)"
-  attendu "source locale entrees/ (m4c.sh prealables) : empreinte avant" "$(python3 -I "$ALTERER" empreinte "$SOURCE_HOTE")" "$SOURCE_EMPREINTE"
+  attendu "source locale entrees/ (m1b-construction.sh local) : empreinte avant" "$(python3 -I "$ALTERER" empreinte "$SOURCE_HOTE")" "$SOURCE_EMPREINTE"
   [ ! -e "$b" ] || echec "$b existe déjà : relancer sous un autre PREFIXE"
   mkdir -p "$b"
   python3 -I "$ALTERER" faire "$SOURCE_HOTE" "$b/alt" | sed 's/^/     /'
