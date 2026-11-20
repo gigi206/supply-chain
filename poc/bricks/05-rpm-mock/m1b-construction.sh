@@ -104,7 +104,7 @@ PIPELINE_M4C=tekton/pipelines/sample-app-rpm@sha256:ca87437546266359925ff5cf2895
 FEUILLES_ATTENDUES=".spec.tasks[0].params[2].value
 .spec.tasks[0].params[4].value
 .spec.tasks[1].taskRef.params[0].value"   # fermeture rpm, artefact de packaging, bundle de construire-rpm (calcul à sec du 20/11)
-PIPELINE_REF=   # vide jusqu'à l'étape pipeline, puis épinglée par correction datée et banc rejoué ; construction refuse de tourner si vide
+PIPELINE_REF=$REG/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a   # étape pipeline du 20/11 (m1b-construction-pipeline.log) ; construction refuse de tourner si vide
 DIGEST_ESSAI=sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119   # essai du 20/11 (m1b-construction-essai.log), égal à M4c
 PVC_TAILLE=2Gi   # m4c.sh
 LIBRE_MIN=1073741824   # m4c.sh

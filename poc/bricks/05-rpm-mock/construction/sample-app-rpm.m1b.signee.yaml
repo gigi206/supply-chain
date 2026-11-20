@@ -1,0 +1,87 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  annotations:
+    tekton.dev/signature: MEYCIQCHDv4Y+A21JbpsfxMnF+bEbed+TLfBfQ+tdvQLhY+MPQIhAPKeAM738HGRQ5PndrxWAj1OP3kc+UaIzdn8jZCCdg2H
+  name: sample-app-rpm
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  results:
+  - description: ""
+    name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - description: ""
+    name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: preparer
+    params:
+    - name: depot
+      value: $(params.depot)
+    - name: commit
+      value: $(params.commit)
+    - name: fermeture-rpm
+      value: sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+    - name: fermeture-sources
+      value: sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+    - name: packaging
+      value: sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+    taskRef:
+      params:
+      - name: bundle
+        value: sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+      - name: name
+        value: preparer-rpm
+      - name: kind
+        value: task
+      resolver: bundles
+    workspaces:
+    - name: sortie
+      workspace: sortie
+  - name: construire
+    params:
+    - name: epoque
+      value: "1793229566"
+    runAfter:
+    - preparer
+    taskRef:
+      params:
+      - name: bundle
+        value: sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+      - name: name
+        value: construire-rpm
+      - name: kind
+        value: task
+      resolver: bundles
+    workspaces:
+    - name: entrees
+      subPath: entrees
+      workspace: sortie
+    - name: sortie
+      subPath: image
+      workspace: sortie
+  - name: publier
+    params:
+    - name: image
+      value: sc-stockage.poc.test:5000/builds/sample-app-rpm
+    - name: digest
+      value: $(tasks.construire.results.DIGEST_CONSTRUIT)
+    taskRef:
+      params:
+      - name: bundle
+        value: sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+      - name: name
+        value: publier-image
+      - name: kind
+        value: task
+      resolver: bundles
+    workspaces:
+    - name: sortie
+      subPath: image
+      workspace: sortie
+  workspaces:
+  - name: sortie

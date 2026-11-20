@@ -1016,3 +1016,7 @@ Les PipelineRuns de M4c refait publieront dans `builds/sample-app-rpm`, le dép�
 - la publication ne sera pas observable comme une apparition. Elle le sera par le nombre d'enveloppes d'attestation, relevé avant et après ;
 - Chains écrira sur des objets de M4c (`.att`, `.sig` de ce digest). L'accord nommé de lancement couvrira cette écriture ;
 - la porte jugera ensemble les attestations de M4c et celles de la cascade. Les étapes de vérification isolent les PipelineRuns refaits par leur uid.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T13:37:10Z UTC : pipeline de M4c refait signée
+
+À 13:36:05Z, sur ton accord nommé, PS1 tient : la pipeline `sample-app-rpm` de la cascade est signée et poussée sous `m1b` (`7d361cb1…`). Elle ne diffère de celle de M4c que par la fermeture, l'artefact et `construire-rpm`. `PIPELINE_REF` est épinglée, et le banc 6 donne 132 OK. Suite : `construction`, sur accord à part, puis le refus d'un `image_digest` altéré, la comparaison et la provenance.

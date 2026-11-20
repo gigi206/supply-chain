@@ -2625,3 +2625,18 @@ La garde « dépôt absent » de `m4c.sh` devient « artefact de M4c présent »
 - **Risque noté** : le PVC de 2 Gi reçoit `entrees/` (environ 463 Mo, contre 319 Mo en M4c) et `image.tar`. La marge reste large.
 
 Si PS1 et CO1 à CO3 tiennent, il restera la comparaison et la provenance, en lecture seule, pour tenir M4c refait. La provenance devra isoler les deux PipelineRuns refaits par leur uid, parmi les enveloppes de M4c.
+
+### M4c refait : résultat de `pipeline`, écrit le 20/11/2026 à 2026-11-20T13:37:10Z UTC
+
+`m1b-construction.sh pipeline` a tourné le 20/11/2026 à 13:36:05Z, sur ton accord nommé (« Oui, signe et pousse »), avec `SIGNER=1` et code 0 : [`m1b-construction-pipeline.log`](m1b-construction-pipeline.log), 38 OK, 0 KO, aucune ligne de jeton.
+
+- **PS1 tenue** : 38 OK, comme prédit (les 34 du banc et les quatre contrôles de `lire_bundle` sur le bundle neuf).
+  - Les gardes passent : l'essai archivé est sans écart et donne `07b7bd6f…`, le tag `m1b` était absent, le tag `m4c` est sur `ca874375…`, les trois tâches sont dans la liste revue, et 2 976 870 400 octets sont libres.
+  - La pipeline rendue est admise. Elle ne diffère de celle de M4c que par trois feuilles : `.spec.tasks[0].params[2].value` (fermeture), `.spec.tasks[0].params[4].value` (artefact) et `.spec.tasks[1].taskRef.params[0].value` (`construire-rpm`).
+  - La pipeline signée est versionnée sous [`construction/sample-app-rpm.m1b.signee.yaml`](../construction/sample-app-rpm.m1b.signee.yaml) (`8b96852f…`). Son bundle est **`tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a`**, sous le tag `m1b`.
+  - La relecture anonyme est égale à la version, signature comprise, et le tag `m4c` n'a pas bougé.
+- **Relevé** : 2 976 759 808 octets libres après la poussée.
+
+**Épinglage** : `PIPELINE_REF` vaut désormais ce digest dans `m1b-construction.sh` (sha256 `e2c6d681af893ba7…`). Les copies passent (104 contrôles), et le banc rejoué donne 132 OK, 0 KO : [`m1b-construction-banc-6.log`](m1b-construction-banc-6.log).
+
+**Suite** : `construction`, sur un accord nommé à part. Elle crée deux PipelineRuns qui republieront `builds/sample-app-rpm@07b7bd6f…`, et Chains ajoutera ses attestations à celles de M4c (4 enveloppes aujourd'hui, 8 prédites). Avant de tenir M4c refait, il faudra aussi un essai Kata avec `image_digest` altéré, car aucun refus de mock n'a encore été observé.

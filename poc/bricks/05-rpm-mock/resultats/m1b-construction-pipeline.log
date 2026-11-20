@@ -1,0 +1,49 @@
+# m1b-construction.sh pipeline, 2026-11-20T13:36:05Z
+OK   construction/preparer-rpm.yaml (sha256) : a7dfa37e23948209c6b63c815eef1d41fc9ae5404fed3de4708e4167920ad9bc
+OK   construction/construire-rpm.yaml (sha256) : e88f5521ede87f5b03330683939fd3494f5ff58544ded9a9326014e30b8d0f88
+OK   construction/sample-app-rpm.yaml (sha256) : a9917a65c994421f25735c03971906e99aac7982821185a135535910f0e8f7cd
+OK   construction/preparer-rpm.signee.yaml (sha256) : b32d073f75ca03aa48100f7052a23316297b8d5e318e7796ebc8a729b1d7acf9
+OK   construction/construire-rpm.m1b.signee.yaml (sha256) : 90151d43270fc2fa1a77765f4c6acdacdc2ecd2033d9bc0aa8494c5517f0a31b
+OK   preparer-rpm de M4c, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   construire-rpm de la cascade, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+OK   verrou neuf : dossier dir: du bootstrap (config.bootstrap_image et pull_digest) : sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   verrou neuf : image_digest du bootstrap : 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca
+OK   fermeture tirée : arbre de depot/ (chemin, taille, sha256) égal à celui de l'essai de M4b refait (sha256 de la liste) : a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014a
+OK   essai archivé (resultats/m1b-construction-essai.log) : digest de l'artefact, sans écart : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 1
+## gardes avant toute écriture (lecture anonyme)
+OK   tag m1b de la pipeline, absent : absent
+OK   tag m4c de la pipeline, sur celle de M4c : sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+OK   preparer-rpm de M4c, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   construire-rpm de la cascade, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+OK   publier-image, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   octets libres sur / de sc-stockage (porte /var/lib/zot) : 2976870400 (seuil 1073741824)
+## pipeline rendue (références de la liste revue, fermeture et artefact de la cascade) ; admission en dry-run serveur, rien n'est créé
+OK   pipeline : subPath des workspaces (preparer, construire, publier) : [null,"entrees","image","image"]
+OK   pipeline : entrées de preparer fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   pipeline : époque de construire (chaîne) : [{"name":"epoque","value":"1793229566"}]
+OK   pipeline : tâches (nom, tâche du bundle) : preparer:preparer-rpm construire:construire-rpm publier:publier-image
+OK   pipeline rendue admise (code de kubectl) : 0
+OK   bundle sample-app-rpm@sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be : manifeste relu (sha256) : sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+OK   bundle : une couche, pipeline sample-app-rpm : 1 pipeline sample-app-rpm
+OK   bundle : couche relue (sha256) : sha256:98efbbea9ea22b1368c72551fe32a6fbd6811c46f91c92f4eeed08f17ceb5f8d
+OK   bundle : un seul fichier dans la couche : 1
+OK   rendue : feuilles différentes de la pipeline de M4c : .spec.tasks[0].params[2].value .spec.tasks[0].params[4].value .spec.tasks[1].taskRef.params[0].value
+OK   pipeline rendue : références des tâches (bundles) : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5 sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+## signature (tkn 0.46.2), relue avant tout versionnement et toute poussée
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   pipeline signée : annotation de signature : true
+OK   pipeline signée : égale à la rendue, signature exceptée (normalisées) : égale
+signature versionnée : construction/sample-app-rpm.m1b.signee.yaml (sha256 8b96852f970da6e1bccab3491587705cff16cafdf3649e312f9d6b87208e66e8)
+## bundle, tag m1b (écriture définitive)
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+## relecture anonyme après
+OK   tag m1b de la pipeline, sur le bundle poussé : sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+OK   bundle sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a : manifeste relu (sha256) : sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+OK   bundle : une couche, pipeline sample-app-rpm : 1 pipeline sample-app-rpm
+OK   bundle : couche relue (sha256) : sha256:b94f0f8e603f5b3ecb8d3f4dbfb3a074a289cf1d39609e2286a72c2c8b642787
+OK   bundle : un seul fichier dans la couche : 1
+OK   bundle relu : égal à la pipeline signée (normalisés) : égal
+OK   bundle relu : signature égale à celle de la version : MEYCIQCHDv4Y+A21JbpsfxMnF+bEbed+TLfBfQ+tdvQLhY+MPQIhAPKeAM738HGRQ5PndrxWAj1OP3kc+UaIzdn8jZCCdg2H
+OK   tag m4c de la pipeline, inchangé : sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+octets libres sur / de sc-stockage après : 2976759808
+PIPELINE_REF à épingler (correction datée, banc rejoué) avant l'étape construction : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
