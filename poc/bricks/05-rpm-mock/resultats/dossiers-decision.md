@@ -319,3 +319,15 @@ Question du propriétaire : « Comment Konflux fonctionne lui en hermetic à tru
 **Décision du propriétaire** : « Gardons ce qu'on fait ». (i) reste la décision.
 
 **Demande du propriétaire, même message** : « avoir également les logs réseau du container pour voir ceux bloqués (normalement tous) et ceux autorisés (normalement aucun) ». C'est le J7 de la 19b (flux Hubble), resté optionnel. Il répond en partie à la limite « aucun contrôle continu trouvé » de ce dossier. Détail : [README de la 19b](../../19b-journalisation/README.md), note de 2026-11-20T21:28:28Z.
+
+## Décision du propriétaire sur le dossier 2 : rétention gardée pour ce rejeu (note de 2026-11-20T21:32:17Z ; rien n'est réécrit au-dessus)
+
+Question posée : « On retient (i) pour ce rejeu ? », après la recommandation du conseiller (i). **Réponse : « Oui ».**
+
+- `zot.json` n'est pas modifié : délai de 336 h, `mostRecentlyPushedCount: 11` et `deleteUntagged: true` pour `vulndb/grype` (relu à l'instant dans le dépôt). Le rejeu posera la même rétention.
+- Raisons retenues :
+  - (ii) et (iii) passeraient par un redémarrage de Zot, exclu avant le n°9 ;
+  - (ii) seule ne rend qu'environ 0,6 Go (calcul), et change ce que G7 mesure ;
+  - (iii) n'est pas essayée, et elle coûte la garantie « création seulement » ou un compte de plus ;
+  - le disque est à 30G (dossier 3).
+- **À revoir** avec le relevé `df` de sc-stockage du 21/11 vers 16:00 UTC et l'état du 29/11. Deux rythmes de remplissage ne sont pas rapprochés : 1,19 Go par jour le 18/11, et environ 200 Mo par jour attribués à grype. L'équilibre à environ 14 bases est un calcul ; la tâche du 29/11 le lira.
