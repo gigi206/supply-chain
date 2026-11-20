@@ -253,3 +253,11 @@ Question posée : « Je l'applique, ou on garde 20G ? », à propos de [`vm-30g.
 - La ligne 25, évaluée seule avec la règle de la ligne 27, donne sous k3s 15G, 30G et 30G, et sous RKE2 25G, 30G et 30G (confiance, build, stockage).
 
 **Portée** : rien ne tourne. Le disque actuel de sc-stockage est déjà à 30G depuis « Agrandir maintenant ». `vm.sh` ne crée de disque qu'au rejeu de M5b, qui recréera donc sc-stockage à 30G. Aucun banc de `vm.sh creer` n'est passé.
+
+## Décision du propriétaire sur le dossier 4 : `TZ` laissé à l'hôte pour ce rejeu (note de 2026-11-20T20:50:43Z ; rien n'est réécrit au-dessus)
+
+Question posée : (iii) laisser `TZ` à l'hôte pour ce rejeu, ou (i) `TZ=Europe/Paris` dans `bundle`. **Réponse : « Ta recommandation »**, donc (iii).
+
+- `08-trust-plane/commun.sh` n'est pas modifié. `bundle` reste sans `TZ=`, et les digests des bundles dépendent toujours du fuseau de l'hôte.
+- Pour la 05, `m5b-republier.sh` pose déjà `TZ=Europe/Paris` (relu à l'instant dans le dépôt). D'après RE1 à RE7, mesurés sur cet hôte, `TZ=Europe/Paris` redonne les 9 digests de la liste revue. Sur un autre hôte, c'est déduit, pas mesuré.
+- **Réserve** : les bundles des autres briques (01, 03, 06, 08) ne sont reproductibles que depuis un hôte réglé sur le même fuseau. La décision pour toute la plateforme reste ouverte, après le rejeu.
