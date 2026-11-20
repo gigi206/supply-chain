@@ -478,3 +478,8 @@ Elle part de la dernière ligne du balayage de redémarrage, le 19/11 à 21:03:4
 | N9 | n°9 | le 29/11, de 02:16 à 03:36 | scan du 14/11, **premier scan du deb**, base du 14/11, tag du 17/11 | 5,5 h (le deb) |
 
 Les contenus prédits N1 à N9 de la note de 19:28:08Z sont inchangés. Seules les plages s'élargissent.
+
+**Décision du propriétaire sur les résumés tirés de Grafana** (note de 2026-11-20T19:47:09Z) : « Oui ». La question posée était : « J'accepte ces résumés tirés de Grafana et je pousse ? ».
+- Les journaux `g7-balayage-*.log` gardent donc des heures, les noms des dépôts suivis et les raisons des décisions de rétention, en plus des comptes.
+- Aucune ligne brute de Grafana ni de Loki n'est archivée.
+- La consigne « comptes seulement » du 14/11 et de la note de 19:09:44Z est levée pour ces relevés.
