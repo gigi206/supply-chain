@@ -245,3 +245,5 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Mesuré** sur un registre crane local, sans Zot : les 9 signatures versionnées de la 05, poussées par `bundle` (`commun.sh`), redonnent les digests de la liste revue, quel que soit le tag.
 - **Mesuré** : le digest dépend du fuseau de l'hôte. tkn 0.46.2 écrit la date de création, l'époque 0, en heure locale. Sous `TZ=UTC`, les 9 digests changent.
 - **Conséquence** : un bundle n'est reproductible qu'à fichier signé, version de tkn et fuseau égaux, avec `SOURCE_DATE_EPOCH` absente. Ce n'est mesuré ni dans Zot ni à l'admission.
+
+**Précision du 20/11/2026, écrite à 2026-11-20T16:32:13Z UTC** : dans l'additif précédent, « version de tkn » n'est pas mesuré. La mesure est faite avec tkn 0.46.2 seulement. Un troisième passage, sous `TZ=Europe/Paris` posée, redonne les 9 digests de la liste revue.

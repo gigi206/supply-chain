@@ -1,0 +1,54 @@
+# m5b-republication-banc.sh, 2026-11-20T16:31:44Z, dépôt 60498f82
+## A  outils et environnement
+OK   A1 tkn (client) : 0.46.2
+OK   A2 crane : 0.20.6
+OK   A3 SOURCE_DATE_EPOCH : absente
+OK   A4 adresse du registre local : 127.0.0.1
+## B  fonction bundle extraite de commun.sh
+commun.sh : sha256 b0423ad12183013a… ; fonction extraite : 5 lignes
+OK   B1 bundle contenue telle quelle dans commun.sh : True
+OK   B2 bundle : tkn bundle push vers REG_HOTE : 1
+OK   B3 bundle : digest lu par crane : 1
+OK   B4 bundle : aucune option --ctime : 0
+OK   B5 config.json du banc : {}
+registre local : prêt (http, 127.0.0.1:5911)
+## C  republication des 9 signatures versionnées (tags m1b puis banc2)
+OK   C0 builders/prefetch-racine-rpm.signee.yaml : attendu unique dans le dépôt : 1
+OK   C1 builders/prefetch-racine-rpm.signee.yaml (tekton/tasks/prefetch-racine-rpm, tag m1b) : sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+OK   C2 builders/prefetch-racine-rpm.signee.yaml (tekton/tasks/prefetch-racine-rpm, tag banc2) : sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+KO   C3 builders/prefetch-racine-rpm.signee.yaml : date de création de la configuration : 1970-01-01T01:00:00+01:00 (attendu : 1970-01-01T00:00:00Z)
+OK   C0 builders/construire-racine-rpm.signee.yaml : attendu unique dans le dépôt : 1
+OK   C1 builders/construire-racine-rpm.signee.yaml (tekton/tasks/construire-racine-rpm, tag m1b) : sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
+OK   C2 builders/construire-racine-rpm.signee.yaml (tekton/tasks/construire-racine-rpm, tag banc2) : sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
+KO   C3 builders/construire-racine-rpm.signee.yaml : date de création de la configuration : 1970-01-01T01:00:00+01:00 (attendu : 1970-01-01T00:00:00Z)
+OK   C0 fermeture/prefetch-rpm.signee.yaml : attendu unique dans le dépôt : 1
+OK   C1 fermeture/prefetch-rpm.signee.yaml (tekton/tasks/prefetch-rpm, tag m1b) : sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+OK   C2 fermeture/prefetch-rpm.signee.yaml (tekton/tasks/prefetch-rpm, tag banc2) : sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+KO   C3 fermeture/prefetch-rpm.signee.yaml : date de création de la configuration : 1970-01-01T01:00:00+01:00 (attendu : 1970-01-01T00:00:00Z)
+OK   C0 fermeture/prefetch-rpm.m1b.signee.yaml : attendu unique dans le dépôt : 1
+OK   C1 fermeture/prefetch-rpm.m1b.signee.yaml (tekton/tasks/prefetch-rpm, tag m1b) : sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+OK   C2 fermeture/prefetch-rpm.m1b.signee.yaml (tekton/tasks/prefetch-rpm, tag banc2) : sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+KO   C3 fermeture/prefetch-rpm.m1b.signee.yaml : date de création de la configuration : 1970-01-01T01:00:00+01:00 (attendu : 1970-01-01T00:00:00Z)
+OK   C0 construction/construire-rpm.signee.yaml : attendu unique dans le dépôt : 1
+OK   C1 construction/construire-rpm.signee.yaml (tekton/tasks/construire-rpm, tag m1b) : sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+OK   C2 construction/construire-rpm.signee.yaml (tekton/tasks/construire-rpm, tag banc2) : sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+KO   C3 construction/construire-rpm.signee.yaml : date de création de la configuration : 1970-01-01T01:00:00+01:00 (attendu : 1970-01-01T00:00:00Z)
+OK   C0 construction/construire-rpm.m1b.signee.yaml : attendu unique dans le dépôt : 1
+OK   C1 construction/construire-rpm.m1b.signee.yaml (tekton/tasks/construire-rpm, tag m1b) : sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+OK   C2 construction/construire-rpm.m1b.signee.yaml (tekton/tasks/construire-rpm, tag banc2) : sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+KO   C3 construction/construire-rpm.m1b.signee.yaml : date de création de la configuration : 1970-01-01T01:00:00+01:00 (attendu : 1970-01-01T00:00:00Z)
+OK   C0 construction/preparer-rpm.signee.yaml : attendu unique dans le dépôt : 1
+OK   C1 construction/preparer-rpm.signee.yaml (tekton/tasks/preparer-rpm, tag m1b) : sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   C2 construction/preparer-rpm.signee.yaml (tekton/tasks/preparer-rpm, tag banc2) : sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+KO   C3 construction/preparer-rpm.signee.yaml : date de création de la configuration : 1970-01-01T01:00:00+01:00 (attendu : 1970-01-01T00:00:00Z)
+OK   C0 fermeture/prefetch-rpm-sample-app.m1b.signee.yaml : attendu unique dans le dépôt : 1
+OK   C1 fermeture/prefetch-rpm-sample-app.m1b.signee.yaml (tekton/pipelines/prefetch-rpm-sample-app, tag m1b) : sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+OK   C2 fermeture/prefetch-rpm-sample-app.m1b.signee.yaml (tekton/pipelines/prefetch-rpm-sample-app, tag banc2) : sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+KO   C3 fermeture/prefetch-rpm-sample-app.m1b.signee.yaml : date de création de la configuration : 1970-01-01T01:00:00+01:00 (attendu : 1970-01-01T00:00:00Z)
+OK   C0 construction/sample-app-rpm.m1b.signee.yaml : attendu unique dans le dépôt : 1
+OK   C1 construction/sample-app-rpm.m1b.signee.yaml (tekton/pipelines/sample-app-rpm, tag m1b) : sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+OK   C2 construction/sample-app-rpm.m1b.signee.yaml (tekton/pipelines/sample-app-rpm, tag banc2) : sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+KO   C3 construction/sample-app-rpm.m1b.signee.yaml : date de création de la configuration : 1970-01-01T01:00:00+01:00 (attendu : 1970-01-01T00:00:00Z)
+durée des poussées : 0 s ; place du registre local : 108 Kio
+dépôts du registre local : tekton/tasks/preparer-rpm tekton/pipelines/prefetch-rpm-sample-app tekton/pipelines/sample-app-rpm tekton/tasks/prefetch-racine-rpm tekton/tasks/construire-racine-rpm tekton/tasks/prefetch-rpm tekton/tasks/construire-rpm
+bilan : 36 OK, 9 KO

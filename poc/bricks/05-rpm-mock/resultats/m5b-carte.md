@@ -269,3 +269,17 @@ Le rejeu reste exclu avant la mesure de G7 du 28/11.
 
 **Prédiction, écrite avant le lancement** : le même banc, inchangé, sous `TZ=Europe/Paris` posée explicitement. Il utilise un dossier neuf (`banc-m5b-republication-paris`), le port 5911 et le journal `m5b-republication-banc-paris.log`.
 - **RE7** (haute) : même bilan que le premier passage, « 36 OK, 9 KO ». Les 9 C1 et les 9 C2 sont égaux aux attendus, et les 9 KO sont des C3 à `1970-01-01T01:00:00+01:00`.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:32:13Z UTC : RE7, résultat
+
+**Passage** le 20/11/2026 à 16:31:44 UTC, au dépôt `60498f82`, avec le même script sous `TZ=Europe/Paris` posée. Le banc rend 1 avec « bilan : 36 OK, 9 KO » ([`m5b-republication-banc-paris.log`](m5b-republication-banc-paris.log)). Le dossier du banc a été effacé après le passage.
+
+- **RE7 tenue** : les 9 C1 et les 9 C2 sont égaux aux attendus. Les 9 KO sont des C3 à `1970-01-01T01:00:00+01:00`.
+- Le remède est donc mesuré sur le banc : avec `TZ=Europe/Paris` posée, les 9 signatures versionnées redonnent la liste revue.
+
+**Ce qui reste à faire pour M5b sous C, rien n'est écrit** :
+- l'étape de republication, comme script frère, sans toucher aux `m1b-*.sh` de mesure. Elle pose `TZ=Europe/Paris` dans ce seul script, retire `SOURCE_DATE_EPOCH` et s'arrête au premier digest hors liste ;
+- le chemin du rejeu pour les gardes ;
+- le bloc 05 de `rejeu.sh`.
+
+**Décision ouverte, chez toi** : fixer `TZ` dans `bundle` (`commun.sh`), commun aux 41 appels, ou le laisser à l'hôte. Ce n'est pas bloquant pour M5b. Un digest hors liste échoue en KO dans les étapes de signature, par exemple dans `signer_tache` de `s4a.sh` (06).
