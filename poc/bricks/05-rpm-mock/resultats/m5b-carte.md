@@ -460,3 +460,21 @@ Les deux notes restent écrites telles quelles.
   - F3 à F6 s'arrêtent sans création.
 
 **Portée** : ni Zot (TLS, comptes), ni Tekton, ni l'admission réelle, ni Kyverno, Kata, Chains ou tkn. `s1.sh`, `m5b-republier.sh` et `rejeu.sh` ne sont pas exécutés. Les étapes `signature` et `images` ne sont mesurées que par leur chargement (C1, C3). Leur corps est celui, inchangé, des étapes passées de la cascade.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T17:48:37Z UTC : premier passage du banc de `m5b-rejeu.sh`, défaut de lint, prédiction du second passage
+
+**Passage** le 20/11/2026 à 17:47:35 UTC, au dépôt `1994623f`. Le banc rend 1 avec « bilan : 102 OK, 1 KO » ([`m5b-rejeu-banc.log`](m5b-rejeu-banc.log)).
+
+**Le KO, défaut du script** : « A1 shellcheck -x », lancé depuis la racine du dépôt.
+- Une directive `disable=SC2034` ne vaut que pour la première commande de sa ligne. Or `PREFIXE=$TAG; SIG=$TS` en a deux sur la même ligne.
+- Depuis le dossier de la brique, shellcheck suit le script sourcé, voit `SIG` lue, et passe : c'était mon contrôle avant le commit des prédictions. Depuis la racine, il ne le suit pas et signale `SIG`.
+- Le comportement n'est pas en cause : C3 mesure que `SIG` arrive bien au script sourcé.
+- **Correction** : deux lignes, chacune avec sa directive (sha256 du script `1b97d45351583386…`). Shellcheck passe depuis la racine et depuis le dossier.
+
+**Mesures valables de ce passage**, sur le script `1245c0e8…`, dont le comportement n'est pas changé par la correction :
+- RV1 en partie : bash -n, 9 `TAG` refusés, étape inconnue, aucun journal écrit, scripts de mesure inchangés, ni signature ni lecture de la clé.
+- **RV2 à RV6 tenues** : B1 à B8, C1 à C7, D1 à D5, E1 à E9, F1 à F6, chacun comme prédit.
+- Une ligne du journal est masquée par le filtre `jeton|token` : c'est le contrôle F1 « lignes jeton ou token non masquées », dont le libellé contient le motif. Le journal compte 101 lignes OK visibles pour 102 OK au bilan. Le seul KO étant A1, ce contrôle est donc un OK.
+- Le `cut -c1-170` des extraits (lignes `   | `) coupe des caractères multioctets : `grep` traite alors le journal comme binaire. C'est sans effet sur les comptes.
+
+**Prédiction du second passage, écrite avant le lancement** : RV1 à RV6 tenues, « bilan : 103 OK, 0 KO ». Le passage utilise un dossier neuf (`banc-m5b-rejeu-2`) et le journal `m5b-rejeu-banc-2.log`. Le premier journal reste tel quel, et son dossier (3,4 Mio, lu par aucun script) est effacé.

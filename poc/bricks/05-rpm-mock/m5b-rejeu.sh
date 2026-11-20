@@ -78,8 +78,10 @@ charger_signature() { # m1b-signature.sh ; ses sorties sous $TS, pas sous $W/m1b
   trap 'find "$T/auth" "$T0/auth" -depth -delete 2> /dev/null || true' EXIT   # copies de secrets ; sans rm
 }
 charger_images() { # m1b-pipeline.sh sous PREFIXE=$TAG, références des pipelines lues sous $TS ; globales (SIG=${SIG:-…} au
-  # shellcheck disable=SC2034  # lues par le script sourcé
-  PREFIXE=$TAG; SIG=$TS   # chargement : une locale serait perdue au retour), dans le sous-shell de l'étape
+  # shellcheck disable=SC2034  # lue par le script sourcé
+  PREFIXE=$TAG   # chargement : une locale serait perdue au retour), dans le sous-shell de l'étape
+  # shellcheck disable=SC2034  # lue par le script sourcé
+  SIG=$TS
   # shellcheck disable=SC1091
   . "$h05/m1b-pipeline.sh"
 }
