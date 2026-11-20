@@ -1,0 +1,313 @@
+# m5b-republier-banc.sh, 2026-11-20T16:48:12Z, dépôt ee848c5c
+m5b-republier.sh : sha256 885f5c53da860c44240bda0893970c5195c53aa5e1399dd265f86d8c7c8dc587
+## A  outils, script, environnement du banc
+OK   A1 tkn (client) : 0.46.2
+OK   A2 crane : 0.20.6
+OK   A3 script : mentions de taches.key : 0
+OK   A4 script : signatures (tkn task sign, tkn pipeline sign) : 0
+OK   A5 script : option --ctime : 0
+OK   A6 script : export TZ=Europe/Paris : 1
+OK   A7 script : unset SOURCE_DATE_EPOCH : 1
+OK   K1 TAG « m4c » : code : 2
+OK   K1 TAG « m4c » : message : 1
+OK   K1 TAG «  » : code : 2
+OK   K1 TAG «  » : message : 1
+OK   A8 REG_HOTE du banc, loopback : 127.0.0.1
+OK   A9 T dans le dossier du banc : oui
+OK   A10 P dans le dossier du banc : oui
+OK   A11 TZ après chargement : Europe/Paris
+OK   A12 SOURCE_DATE_EPOCH après chargement : absente
+## F  manifestes lus dans Zot (lecture anonyme)
+OK   F1 builds/builders/mock-rocky9 : référence complète unique : 1
+OK   F2 builds/builders/mock-rocky9 : sha256 du manifeste lu = digest : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   F1 plateforme/outils-horodatage : référence complète unique : 1
+OK   F2 plateforme/outils-horodatage : sha256 du manifeste lu = digest : sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+OK   F1 plateforme/outils-prefetch : référence complète unique : 1
+OK   F2 plateforme/outils-prefetch : sha256 du manifeste lu = digest : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   F1 builds/builders/rocky9-bootstrap : référence complète unique : 1
+OK   F2 builds/builders/rocky9-bootstrap : sha256 du manifeste lu = digest : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   F1 tekton/tasks/publier-fermeture : référence complète unique : 1
+OK   F2 tekton/tasks/publier-fermeture : sha256 du manifeste lu = digest : sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+OK   F1 builds/fermetures/sample-app-rpm : référence complète unique : 1
+OK   F2 builds/fermetures/sample-app-rpm : sha256 du manifeste lu = digest : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+OK   F1 builds/fermetures/sample-app-sources : référence complète unique : 1
+OK   F2 builds/fermetures/sample-app-sources : sha256 du manifeste lu = digest : sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+OK   F1 entrees/sample-app/packaging-rpm : référence complète unique : 1
+OK   F2 entrees/sample-app/packaging-rpm : sha256 du manifeste lu = digest : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   F1 tekton/tasks/publier-image : référence complète unique : 1
+OK   F2 tekton/tasks/publier-image : sha256 du manifeste lu = digest : sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+registre local : prêt (http, 127.0.0.1:5913)
+## K  cas refusés, avant le lot t
+OK   K2 taches sans les images : code : 1
+OK   K2 KO de référence absente : 1
+OK   K2 poussées : 0
+OK   K2 prefetch-rpm:banc-k2 : absent
+OK   F3 lot t : builds/builders/mock-rocky9 déposé (code HTTP) : 201
+OK   F3 lot t : plateforme/outils-prefetch déposé (code HTTP) : 201
+OK   F3 lot t : plateforme/outils-horodatage déposé (code HTTP) : 201
+## K  cas refusés, lot t déposé
+OK   K3 TZ=UTC : code : 1
+OK   K3 KO de fuseau : 1
+OK   K3 poussées : 0
+OK   K4 SOURCE_DATE_EPOCH=0 : code : 1
+OK   K4 KO de SOURCE_DATE_EPOCH : 1
+OK   K4 poussées : 0
+OK   K5 preparer-rpm altéré (troisième fichier) : code : 1
+OK   K5 h05 du banc rétabli : ~/Documents/git/github/gigi206/supply-chain/poc/bricks/05-rpm-mock
+OK   K5 deux premiers fichiers contrôlés en entier (tag lu) : 2
+OK   K5 KO de sha256 : 1
+OK   K5 poussées : 0
+OK   K5 prefetch-rpm:banc-k5 : absent
+OK   K6 construire-rpm:banc-k6 occupé par un autre manifeste (code HTTP) : 201
+OK   K6 tag occupé : code : 1
+OK   K6 KO de tag occupé : 1
+OK   K6 poussées : 0
+OK   K6 prefetch-rpm:banc-k6 : absent
+OK   K6 construire-rpm:banc-k6 non déplacé : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   K7 poussées sous TZ=UTC, sans garde d'entrée : code : 1
+OK   K7 KO de digest : 1
+OK   K7 poussées : 1
+OK   K7 prefetch-rpm:banc-k7 poussé, autre digest : autre
+OK   K7 construire-rpm:banc-k7 : absent
+## N  cas nominaux (tag banc)
+OK   N1 taches : code : 0
+OK   N1 poussées : 1
+OK   N1 prefetch-rpm:banc : sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+OK   N1 construire-rpm:banc : sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+OK   N1 preparer-rpm:banc : sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   N1 références contrôlées (1, 1, 2) :  1, 1, 2
+OK   K8 pipeline_fermeture avant le lot t-f : code : 1
+OK   K8 KO de référence absente : 1
+OK   K8 poussées : 0
+OK   F3 lot t-f : tekton/tasks/publier-fermeture déposé (code HTTP) : 201
+OK   F3 lot t-f : builds/builders/rocky9-bootstrap déposé (code HTTP) : 201
+OK   N2 pipeline_fermeture : code : 0
+OK   N2 poussées : 1
+OK   N2 prefetch-rpm-sample-app:banc : sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+OK   N2 références contrôlées :  3
+OK   K9 pipeline_construction avant le lot c : code : 1
+OK   K9 KO de référence absente : 1
+OK   K9 poussées : 0
+OK   F3 lot c : builds/fermetures/sample-app-rpm déposé (code HTTP) : 201
+OK   F3 lot c : builds/fermetures/sample-app-sources déposé (code HTTP) : 201
+OK   F3 lot c : entrees/sample-app/packaging-rpm déposé (code HTTP) : 201
+OK   F3 lot c : tekton/tasks/publier-image déposé (code HTTP) : 201
+OK   N3 pipeline_construction : code : 0
+OK   N3 poussées : 1
+OK   N3 sample-app-rpm:banc : sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+OK   N3 références contrôlées :  6
+OK   N4 taches relancée sur les mêmes tags : code : 0
+OK   N4 tags lus avant, déjà sur l'attendu : 3
+OK   N4 poussées : 1
+OK   N5 tekton/tasks/prefetch-rpm:banc, date de création : 1970-01-01T01:00:00+01:00
+OK   N5 tekton/tasks/construire-rpm:banc, date de création : 1970-01-01T01:00:00+01:00
+OK   N5 tekton/tasks/preparer-rpm:banc, date de création : 1970-01-01T01:00:00+01:00
+OK   N5 tekton/pipelines/prefetch-rpm-sample-app:banc, date de création : 1970-01-01T01:00:00+01:00
+OK   N5 tekton/pipelines/sample-app-rpm:banc, date de création : 1970-01-01T01:00:00+01:00
+OK   N6 authentification des poussées (configuration du banc) : {}
+dépôts du registre local : plateforme/outils-prefetch plateforme/outils-horodatage tekton/tasks/construire-rpm tekton/tasks/prefetch-rpm builds/builders/rocky9-bootstrap builds/fermetures/sample-app-rpm entrees/sample-app/packaging-rpm tekton/tasks/publier-image builds/builders/mock-rocky9 tekton/tasks/preparer-rpm tekton/tasks/publier-fermeture tekton/pipelines/prefetch-rpm-sample-app builds/fermetures/sample-app-sources tekton/pipelines/sample-app-rpm
+place du registre local : 68 Kio
+--- sortie du cas k2
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 127.0.0.1:5913 ; tag : banc-k2 ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## fermeture/prefetch-rpm.m1b.signee.yaml
+OK   sha256 du fichier : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   annotation de signature : true
+OK   tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c6… dans la liste revue : listée
+KO   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c4124532… : absent (attendu : sha256:70f8c4124532…)
+--- sortie du cas k3
+KO   fuseau : décalage de l'époque 0 (TZ=UTC) : +00:00 (attendu : +01:00)
+--- sortie du cas k4
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+KO   SOURCE_DATE_EPOCH : 0 (attendu : absente)
+--- sortie du cas k5
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 127.0.0.1:5913 ; tag : banc-k5 ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## fermeture/prefetch-rpm.m1b.signee.yaml
+OK   sha256 du fichier : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   annotation de signature : true
+OK   tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c6… dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c4124532… : sha256:70f8c4124532…
+références par digest du contenu signé : 1
+OK   tekton/tasks/prefetch-rpm:banc-k5 avant la poussée : absent
+## construction/construire-rpm.m1b.signee.yaml
+OK   sha256 du fichier : 90151d43270fc2fa1a77765f4c6acdacdc2ecd2033d9bc0aa8494c5517f0a31b
+OK   annotation de signature : true
+OK   tekton/tasks/construire-rpm@sha256:ca03f18908d0… dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c4124532… : sha256:70f8c4124532…
+références par digest du contenu signé : 1
+OK   tekton/tasks/construire-rpm:banc-k5 avant la poussée : absent
+## construction/preparer-rpm.signee.yaml
+KO   sha256 du fichier : b3c5f78126c9c8904df9c6b3a3821736b7304df079f839d1305f57f26874d0a7 (attendu : b32d073f75ca03aa48100f7052a23316297b8d5e318e7796ebc8a729b1d7acf9)
+--- sortie du cas k6
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 127.0.0.1:5913 ; tag : banc-k6 ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## fermeture/prefetch-rpm.m1b.signee.yaml
+OK   sha256 du fichier : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   annotation de signature : true
+OK   tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c6… dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c4124532… : sha256:70f8c4124532…
+références par digest du contenu signé : 1
+OK   tekton/tasks/prefetch-rpm:banc-k6 avant la poussée : absent
+## construction/construire-rpm.m1b.signee.yaml
+OK   sha256 du fichier : 90151d43270fc2fa1a77765f4c6acdacdc2ecd2033d9bc0aa8494c5517f0a31b
+OK   annotation de signature : true
+OK   tekton/tasks/construire-rpm@sha256:ca03f18908d0… dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c4124532… : sha256:70f8c4124532…
+références par digest du contenu signé : 1
+KO   tekton/tasks/construire-rpm:banc-k6 déjà sur sha256:70f8c4124532… (attendu : absent ou sha256:ca03f18908d0…) ; jamais déplacé ici
+--- sortie du cas k7
+poussée 1 : tekton/tasks/prefetch-rpm:banc-k7
+KO   fermeture/prefetch-rpm.m1b.signee.yaml poussé, digest : sha256:81fae36abdbb… (attendu : sha256:b9bbeba3e8c6…)
+--- sortie du cas n1
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 127.0.0.1:5913 ; tag : banc ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## fermeture/prefetch-rpm.m1b.signee.yaml
+OK   sha256 du fichier : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   annotation de signature : true
+OK   tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c6… dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c4124532… : sha256:70f8c4124532…
+références par digest du contenu signé : 1
+OK   tekton/tasks/prefetch-rpm:banc avant la poussée : absent
+## construction/construire-rpm.m1b.signee.yaml
+OK   sha256 du fichier : 90151d43270fc2fa1a77765f4c6acdacdc2ecd2033d9bc0aa8494c5517f0a31b
+OK   annotation de signature : true
+OK   tekton/tasks/construire-rpm@sha256:ca03f18908d0… dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c4124532… : sha256:70f8c4124532…
+références par digest du contenu signé : 1
+OK   tekton/tasks/construire-rpm:banc avant la poussée : absent
+## construction/preparer-rpm.signee.yaml
+OK   sha256 du fichier : b32d073f75ca03aa48100f7052a23316297b8d5e318e7796ebc8a729b1d7acf9
+OK   annotation de signature : true
+OK   tekton/tasks/preparer-rpm@sha256:2f65f3903e98… dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : plateforme/outils-horodatage@sha256:c7bebae2bd33… : sha256:c7bebae2bd33…
+OK   référence du contenu signé présente dans Zot : plateforme/outils-prefetch@sha256:68e0ae705de5… : sha256:68e0ae705de5…
+références par digest du contenu signé : 2
+OK   tekton/tasks/preparer-rpm:banc avant la poussée : absent
+relevé : octets libres sur / de sc-stockage (porte /var/lib/zot) avant les poussées : 99999999999
+banc : auth_zot remplacée (configuration vide)
+## poussées (tag banc, tkn 0.46.2, TZ=Europe/Paris)
+poussée 1 : tekton/tasks/prefetch-rpm:banc
+OK   fermeture/prefetch-rpm.m1b.signee.yaml poussé, digest : sha256:b9bbeba3e8c6…
+OK   tekton/tasks/prefetch-rpm:banc relu (lecture anonyme) : sha256:b9bbeba3e8c6…
+poussée 2 : tekton/tasks/construire-rpm:banc
+OK   construction/construire-rpm.m1b.signee.yaml poussé, digest : sha256:ca03f18908d0…
+OK   tekton/tasks/construire-rpm:banc relu (lecture anonyme) : sha256:ca03f18908d0…
+poussée 3 : tekton/tasks/preparer-rpm:banc
+OK   construction/preparer-rpm.signee.yaml poussé, digest : sha256:2f65f3903e98…
+OK   tekton/tasks/preparer-rpm:banc relu (lecture anonyme) : sha256:2f65f3903e98…
+poussées : 3
+--- sortie du cas k8
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 127.0.0.1:5913 ; tag : banc ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## fermeture/prefetch-rpm-sample-app.m1b.signee.yaml
+OK   sha256 du fichier : be99c8f946849d92fa92b7db354138bee1880ee123186406107d012f18215ffd
+OK   annotation de signature : true
+OK   digest attendu égal à PIPELINE_REF de m1b-fermeture.sh : sha256:61814acd6f15…
+KO   référence du contenu signé présente dans Zot : builds/builders/rocky9-bootstrap@sha256:6de899ac5da4… : absent (attendu : sha256:6de899ac5da4…)
+--- sortie du cas n2
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 127.0.0.1:5913 ; tag : banc ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## fermeture/prefetch-rpm-sample-app.m1b.signee.yaml
+OK   sha256 du fichier : be99c8f946849d92fa92b7db354138bee1880ee123186406107d012f18215ffd
+OK   annotation de signature : true
+OK   digest attendu égal à PIPELINE_REF de m1b-fermeture.sh : sha256:61814acd6f15…
+OK   référence du contenu signé présente dans Zot : builds/builders/rocky9-bootstrap@sha256:6de899ac5da4… : sha256:6de899ac5da4…
+OK   référence du contenu signé présente dans Zot : tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c6… : sha256:b9bbeba3e8c6…
+OK   référence du contenu signé présente dans Zot : tekton/tasks/publier-fermeture@sha256:7fa92ad3e4ad… : sha256:7fa92ad3e4ad…
+références par digest du contenu signé : 3
+OK   tekton/pipelines/prefetch-rpm-sample-app:banc avant la poussée : absent
+relevé : octets libres sur / de sc-stockage (porte /var/lib/zot) avant les poussées : 99999999999
+banc : auth_zot remplacée (configuration vide)
+## poussées (tag banc, tkn 0.46.2, TZ=Europe/Paris)
+poussée 1 : tekton/pipelines/prefetch-rpm-sample-app:banc
+OK   fermeture/prefetch-rpm-sample-app.m1b.signee.yaml poussé, digest : sha256:61814acd6f15…
+OK   tekton/pipelines/prefetch-rpm-sample-app:banc relu (lecture anonyme) : sha256:61814acd6f15…
+poussées : 1
+--- sortie du cas k9
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 127.0.0.1:5913 ; tag : banc ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## construction/sample-app-rpm.m1b.signee.yaml
+OK   sha256 du fichier : 8b96852f970da6e1bccab3491587705cff16cafdf3649e312f9d6b87208e66e8
+OK   annotation de signature : true
+OK   digest attendu égal à PIPELINE_REF de m1b-construction.sh : sha256:7d361cb1d5ea…
+KO   référence du contenu signé présente dans Zot : builds/fermetures/sample-app-rpm@sha256:0983898054a9… : absent (attendu : sha256:0983898054a9…)
+--- sortie du cas n3
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 127.0.0.1:5913 ; tag : banc ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## construction/sample-app-rpm.m1b.signee.yaml
+OK   sha256 du fichier : 8b96852f970da6e1bccab3491587705cff16cafdf3649e312f9d6b87208e66e8
+OK   annotation de signature : true
+OK   digest attendu égal à PIPELINE_REF de m1b-construction.sh : sha256:7d361cb1d5ea…
+OK   référence du contenu signé présente dans Zot : builds/fermetures/sample-app-rpm@sha256:0983898054a9… : sha256:0983898054a9…
+OK   référence du contenu signé présente dans Zot : builds/fermetures/sample-app-sources@sha256:50dc73f72d04… : sha256:50dc73f72d04…
+OK   référence du contenu signé présente dans Zot : entrees/sample-app/packaging-rpm@sha256:333b7322290a… : sha256:333b7322290a…
+OK   référence du contenu signé présente dans Zot : tekton/tasks/construire-rpm@sha256:ca03f18908d0… : sha256:ca03f18908d0…
+OK   référence du contenu signé présente dans Zot : tekton/tasks/preparer-rpm@sha256:2f65f3903e98… : sha256:2f65f3903e98…
+OK   référence du contenu signé présente dans Zot : tekton/tasks/publier-image@sha256:d21931f3807b… : sha256:d21931f3807b…
+références par digest du contenu signé : 6
+OK   tekton/pipelines/sample-app-rpm:banc avant la poussée : absent
+relevé : octets libres sur / de sc-stockage (porte /var/lib/zot) avant les poussées : 99999999999
+banc : auth_zot remplacée (configuration vide)
+## poussées (tag banc, tkn 0.46.2, TZ=Europe/Paris)
+poussée 1 : tekton/pipelines/sample-app-rpm:banc
+OK   construction/sample-app-rpm.m1b.signee.yaml poussé, digest : sha256:7d361cb1d5ea…
+OK   tekton/pipelines/sample-app-rpm:banc relu (lecture anonyme) : sha256:7d361cb1d5ea…
+poussées : 1
+--- sortie du cas n4
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 127.0.0.1:5913 ; tag : banc ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## fermeture/prefetch-rpm.m1b.signee.yaml
+OK   sha256 du fichier : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   annotation de signature : true
+OK   tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c6… dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c4124532… : sha256:70f8c4124532…
+références par digest du contenu signé : 1
+OK   tekton/tasks/prefetch-rpm:banc avant la poussée : sha256:b9bbeba3e8c6…
+## construction/construire-rpm.m1b.signee.yaml
+OK   sha256 du fichier : 90151d43270fc2fa1a77765f4c6acdacdc2ecd2033d9bc0aa8494c5517f0a31b
+OK   annotation de signature : true
+OK   tekton/tasks/construire-rpm@sha256:ca03f18908d0… dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c4124532… : sha256:70f8c4124532…
+références par digest du contenu signé : 1
+OK   tekton/tasks/construire-rpm:banc avant la poussée : sha256:ca03f18908d0…
+## construction/preparer-rpm.signee.yaml
+OK   sha256 du fichier : b32d073f75ca03aa48100f7052a23316297b8d5e318e7796ebc8a729b1d7acf9
+OK   annotation de signature : true
+OK   tekton/tasks/preparer-rpm@sha256:2f65f3903e98… dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : plateforme/outils-horodatage@sha256:c7bebae2bd33… : sha256:c7bebae2bd33…
+OK   référence du contenu signé présente dans Zot : plateforme/outils-prefetch@sha256:68e0ae705de5… : sha256:68e0ae705de5…
+références par digest du contenu signé : 2
+OK   tekton/tasks/preparer-rpm:banc avant la poussée : sha256:2f65f3903e98…
+relevé : octets libres sur / de sc-stockage (porte /var/lib/zot) avant les poussées : 99999999999
+banc : auth_zot remplacée (configuration vide)
+## poussées (tag banc, tkn 0.46.2, TZ=Europe/Paris)
+poussée 1 : tekton/tasks/prefetch-rpm:banc
+OK   fermeture/prefetch-rpm.m1b.signee.yaml poussé, digest : sha256:b9bbeba3e8c6…
+OK   tekton/tasks/prefetch-rpm:banc relu (lecture anonyme) : sha256:b9bbeba3e8c6…
+poussée 2 : tekton/tasks/construire-rpm:banc
+OK   construction/construire-rpm.m1b.signee.yaml poussé, digest : sha256:ca03f18908d0…
+OK   tekton/tasks/construire-rpm:banc relu (lecture anonyme) : sha256:ca03f18908d0…
+poussée 3 : tekton/tasks/preparer-rpm:banc
+OK   construction/preparer-rpm.signee.yaml poussé, digest : sha256:2f65f3903e98…
+OK   tekton/tasks/preparer-rpm:banc relu (lecture anonyme) : sha256:2f65f3903e98…
+poussées : 3
+bilan : 99 OK, 0 KO

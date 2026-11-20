@@ -349,3 +349,22 @@ Le banc remesure ces points (F3, K2, K8, K9).
 **Correction** : un compteur explicite remplace `${#LOT[@]}` (banc, sha256 `aca585e713fda4ea…`). Le script testé n'est pas modifié.
 
 **Prédiction du second passage, écrite avant le lancement** : RB1 à RB5 inchangées. Le passage utilise un dossier neuf (`banc-m5b-republier-2`), le port 5913 et le journal `m5b-republier-banc-2.log`. Le premier journal reste tel quel.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:49:06Z UTC : second passage du banc, résultat
+
+**Passage** le 20/11/2026 à 16:48:12 UTC, au dépôt `ee848c5c`. Le banc rend 0 avec « bilan : 99 OK, 0 KO » ([`m5b-republier-banc-2.log`](m5b-republier-banc-2.log)).
+
+- **RB1 tenue** : A1 à A12 et K1.
+- **RB2 tenue** : les 9 manifestes lus dans Zot ont un sha256 égal à leur digest. Les 9 dépôts locaux, plus celui de K6, rendent 201.
+- **RB3 tenue** : K2 à K9 échouent en code 1 avec le KO prévu, sans poussée, sauf K7.
+  - En K5, les deux premiers fichiers sont contrôlés en entier avant le KO du sha256 du troisième.
+  - En K6, le tag occupé n'est pas déplacé.
+  - En K7, une seule poussée, à `81fae36a…`, le même digest qu'au premier passage. `construire-rpm` n'est pas poussé.
+- **RB4 tenue** : N1 à N3 rendent 0, et les 5 digests poussés sont ceux de la liste revue et des `PIPELINE_REF` (`b9bbeba3…`, `ca03f189…`, `2f65f390…`, `61814acd…`, `7d361cb1…`). Ils contrôlent 1, 1, 2, 3 et 6 références. N4, relancée, lit les 3 tags déjà sur l'attendu et rend 0.
+- **RB5 tenue** : la date de création des 5 bundles est `1970-01-01T01:00:00+01:00`.
+
+**Portée** : registre crane local en http, sans authentification. Ne sont pas couverts : Zot (TLS, compte poc-ecriture), la garde de place réelle, le refus d'un journal déjà présent, Tekton, l'admission et Kyverno. Les deux dossiers du banc (280 et 440 Kio, lus par aucun script) ont été effacés après ce passage. Les journaux restent.
+
+**Ce qui reste pour M5b sous C, rien n'est écrit** :
+- le chemin du rejeu pour les gardes tournées vers M4b, M4c et les images d'essai (note de 16:18:58Z) ;
+- le bloc 05 de `rejeu.sh`, dans l'ordre de la note de 16:46:56Z.

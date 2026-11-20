@@ -247,3 +247,5 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Conséquence** : un bundle n'est reproductible qu'à fichier signé, version de tkn et fuseau égaux, avec `SOURCE_DATE_EPOCH` absente. Ce n'est mesuré ni dans Zot ni à l'admission.
 
 **Précision du 20/11/2026, écrite à 2026-11-20T16:32:13Z UTC** : dans l'additif précédent, « version de tkn » n'est pas mesuré. La mesure est faite avec tkn 0.46.2 seulement. Un troisième passage, sous `TZ=Europe/Paris` posée, redonne les 9 digests de la liste revue.
+
+**Suite du 20/11/2026, écrite à 2026-11-20T16:49:06Z UTC** : le remède est porté par l'étape de republication de la 05, [`m5b-republier.sh`](../../poc/bricks/05-rpm-mock/m5b-republier.sh). Elle exporte `TZ=Europe/Paris`, contrôle le décalage de l'époque 0, retire `SOURCE_DATE_EPOCH` et s'arrête au premier digest différent. Son banc, sur un registre local, redonne les 5 digests de la liste revue. `bundle` (`commun.sh`) reste inchangée : fixer `TZ` pour toute la plateforme est une décision ouverte.
