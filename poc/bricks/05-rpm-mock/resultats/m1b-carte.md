@@ -1036,3 +1036,20 @@ De 13:47:19Z à 13:49:36Z, sous l'accord permanent, RF1 et RF2 tiennent. Avec `b
 - `poc/packaging/verrou-rpm.json`, encore le verrou de M4a ;
 - l'adaptation de `s1.sh prealables` ;
 - le rejeu M5b, pas avant le 28/11.
+
+## Correction datée du 20/11/2026, écrite à 2026-11-20T13:56:10Z UTC : « cascade terminée » retiré ; lectures sur la porte et sur `m5.sh`
+
+**Erreur** : la note de 13:53:24Z et le message du commit `c1c64c68` disent « la cascade avant M5b est terminée ». C'est faux. La liste de la cascade (§5, carte de M1b) compte six points, et deux restent à faire :
+- les refus de M5a rejoués sur le nouveau bundle (R1 à R8) ;
+- l'adaptation de `s1.sh prealables` aux quatre labels.
+
+**M4c refait reste tenu** : CM1, CM2 et PV1 à PV3 ne changent pas.
+
+**Lectures faites après coup, en lecture seule, sans rien modifier** :
+- **ConfigMap `porte`** (namespace `porte`) : son `taches.yml` ne liste aucune version de `prefetch-rpm`, `preparer-rpm` ou `construire-rpm`. Ni celles de M4b et M4c, ni celles de la cascade ; seulement `publier-image` et `publier-fermeture`. La décision « Même dépôt » ne fait donc basculer aucun jugement de la porte : elle ne connaissait déjà pas les tâches de construction de M4c. Sa mise à jour reste une question à part, avant R1 à R8.
+- **`m5.sh`** exige exactement 4 enveloppes valides sur l'artefact de M4c (`état de départ`, `avant`, `après`). Depuis `construction`, il y en a 8. Rejoué tel quel, R1 à R8 s'arrêterait dès l'état de départ. C'est une conséquence de « Même dépôt » à traiter dans le point « refus de M5a rejoués », par un script frère, comme pour M4b et M4c.
+- **Rejeu de `provenance`** : l'étape exige « 8 4 » enveloppes. Un rejeu sous un autre `PREFIXE` s'arrêterait sur cette ligne. Noté, non corrigé.
+
+**ADR 0007** : la phrase « la porte les juge ensemble » est une lecture de `porte.rego`, et non une mesure. Le refus y est de la forme `some task in lib.tasks_from_pipelinerun`, sur toutes les provenances de PipelineRun du sujet. L'additif est précisé en ce sens.
+
+**Incident de rédaction** : le script qui a écrit la note de 13:53:24Z a d'abord écrit `m1b-predictions.md`, puis s'est arrêté sur une garde de la carte. Le fichier a été remis à son état commité (`git checkout` de ce seul fichier, 25 lignes ajoutées et aucune retirée), puis le script a été rejoué avec toutes ses gardes avant toute écriture.
