@@ -239,3 +239,17 @@ La note de 20:18:43Z laissait l'option (iii) non évaluée. Lecture du code de Z
 - Mesure de comparaison : 12 491 Mo libres sur sc-stockage après l'agrandissement à 30G du 20/11 (AG1 à AG5). Le passage de `vm.sh` à 30G est le dossier 3.
 
 Les options restent (i), (ii) et (iii). Ce fichier n'en tranche aucune.
+
+## Décision du propriétaire sur le dossier 3 : correctif appliqué (note de 2026-11-20T20:49:03Z ; rien n'est réécrit au-dessus)
+
+Question posée : « Je l'applique, ou on garde 20G ? », à propos de [`vm-30g.patch`](vm-30g.patch). **Réponse : « Ok ».** C'est l'option (i), celle que je recommandais.
+
+**Application** :
+- `08-trust-plane/vm.sh` : sha256 avant `6268db0da362ad84…`, après `2e725deee5ec0597…`. C'est l'empreinte de la copie contrôlée à sec (note de 20:20:55Z).
+- `patch -p0`, lancé depuis `08-trust-plane/`, essayé d'abord à sec. Le correctif est écrit pour ce dossier : un essai lancé depuis la racine du dépôt avait échoué sans rien modifier.
+
+**Contrôles repassés sur le dépôt** :
+- `bash -n` et shellcheck (`-S warning -x`) passent.
+- La ligne 25, évaluée seule avec la règle de la ligne 27, donne sous k3s 15G, 30G et 30G, et sous RKE2 25G, 30G et 30G (confiance, build, stockage).
+
+**Portée** : rien ne tourne. Le disque actuel de sc-stockage est déjà à 30G depuis « Agrandir maintenant ». `vm.sh` ne crée de disque qu'au rejeu de M5b, qui recréera donc sc-stockage à 30G. Aucun banc de `vm.sh creer` n'est passé.
