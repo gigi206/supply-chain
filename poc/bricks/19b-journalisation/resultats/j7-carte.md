@@ -56,3 +56,26 @@ C'est le J7 du [README](../README.md) de la 19b (« Flux réseau refusés (Hubbl
 ## Estimation
 
 0,5 j, décision avec le propriétaire à 1 j.
+
+## Corrections après relecture du conseiller (note de 2026-11-20T21:37:14Z ; rien n'est réécrit au-dessus)
+
+**1. Un couplage manquait : Loki, sur sc-stockage.** Écrire « J7 ne touche pas Zot » ne suffit pas. Les flux iraient dans Loki, sur sc-stockage :
+- c'est le disque dont le remplissage n'est pas expliqué (deux rythmes non rapprochés, `df` du 21/11) ;
+- c'est là que la tâche du 29/11 lit les balayages n°2 à n°9 ;
+- D9 de la 19b disait « J7 en option, après une mesure de volume ». La carte posait tout, puis mesurait.
+
+**Ordre corrigé des poses** :
+- **4a.** Export vers le fichier du nœud seulement, borné par la rotation (`fileMaxSizeMb` × `fileMaxBackups`, soit 60 Mo au plus avec les valeurs par défaut), puis mesure du volume sur ce fichier. Accord.
+- **4b.** Branche Alloy vers Loki, sur un **second accord**, au vu du volume mesuré. Elle remplace l'étape 5.
+
+**2. L'étape 6 prend la forme du bras b de R7 de M5a** : un pod d'essai Kata qui porte le label `tekton.dev/task=construire-rpm` et lance les mêmes témoins. Il exerce la même politique, sans tâche signée, sans Chains et sans PVC. Prédiction à écrire : aucun objet nouveau dans Zot, puisque `g7-etat.sh` compte les `.att`.
+
+**3. Points vérifiés depuis** :
+- **Refus d'un pod Kata dans Hubble : mesuré.** `kata-reseau-cilium-apres-redemarrage.log` de la 08, ligne 130 : « kata (10.42.1.233) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED) ». Le signal « zéro refus = export en panne » repose donc sur une mesure.
+- **Filtres** : `flow.proto` au tag dit « If multiple fields are set, then all fields must match ». Il faut donc **deux filtres**, l'un en source (`source_pod: builds/`), l'autre en destination (`destination_pod: builds/`).
+- **Estimation**, dans l'unité des jalons de la 19b (heures) : **4 h, décision avec le propriétaire à 8 h**. Elle remplace « 0,5 j, décision à 1 j ». Le seuil de la 19b est atteint depuis le 02/11 (`docs/03`) : J7 en est une extension, et l'effort compte sur la 19b.
+
+**4. Points non lus** :
+- que `/var/run/cilium` soit un `hostPath` du DaemonSet de Cilium : le `helm template` de l'étape 1 le dira ;
+- « alerte » : la 19 a un Alertmanager, mais son branchement sur Loki n'a pas été relu. D'ici là, lire « requête et panneau » ;
+- l'étape 2 (`hubble observe`) passe par un `kubectl exec` dans l'agent Cilium privilégié. Ce n'est pas une des lectures sans accord : elle sera **nommée dans la demande d'accord**, et seuls des comptes seront archivés, jamais de flux bruts.
