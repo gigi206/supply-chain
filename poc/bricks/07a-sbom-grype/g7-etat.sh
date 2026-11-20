@@ -9,6 +9,9 @@
 #     -> resultats/g7-etat-apres<SUFFIXE>.log ; relit en plus chaque digest listé dans le journal AVANT (tags de vulndb/grype,
 #        referrers) et donne son code HTTP, pour voir ce qui a disparu.
 # Un journal présent n'est jamais réécrit : SUFFIXE=-2 pour une relance.
+# v2 (20/11/2026, sur relecture du conseiller) : section 6, blobs (config et couches) de chaque manifeste présent (referrers,
+#   témoins, base grype la plus récente), HEAD dans le même dépôt, 200 attendu : aucun blob manquant après le gc (point 3 de la
+#   consigne du 14/11). La relecture des digests du journal avant passe en section 7.
 set -euo pipefail
 export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
@@ -40,7 +43,19 @@ referrers() { # dépôt-des-referrers dépôt-du-sujet sujet : une ligne REF par
   n=$(get "$1/referrers/$3" | jq -r --arg r "$1" --arg s "${3:7:12}" \
     '.manifests // [] | (map("REF|\($r)|\(.digest)|\(.annotations["org.opencontainers.image.created"] // "-")|\(.artifactType // "-")|sujet \($s)") | .[]), "COMPTE|\($r)|sujet \($s)|\(length)"')
   echo "$n"
+  for d in $(get "$1/referrers/$3" | jq -r '.manifests // [] | .[].digest'); do PRESENTS+=("$1|$d"); done
 }
+blobs() { # dépôt digest-du-manifeste : config et couches, HEAD dans le même dépôt ; une ligne BLOBS
+  local m b c n=0 ok=0
+  m=$(curl -sS --cacert "$P/ca-poc.crt" -H "$ACC" "$U/$1/manifests/$2")
+  for b in $(printf '%s' "$m" | jq -r '[.config.digest // empty] + [.layers // [] | .[].digest] | .[]'); do
+    n=$((n + 1)); c=$(code "$1/blobs/$b")
+    if [ "$c" = 200 ]; then ok=$((ok + 1)); else echo "BLOB-KO|$1|${2:0:19}|$b|$c"; fi
+  done
+  echo "BLOBS|$1|${2:0:19}|$n|$ok"
+  NB=$((NB + n)); NOK=$((NOK + ok))
+}
+PRESENTS=(); NB=0; NOK=0
 
 {
   echo "# g7-etat.sh $MOMENT, $(date -u +%Y-%m-%dT%H:%M:%SZ), dépôt $(git -C "$here" rev-parse --short=8 HEAD), script $(sha256sum < "$0" | cut -c1-16)"
@@ -66,15 +81,21 @@ referrers() { # dépôt-des-referrers dépôt-du-sujet sujet : une ligne REF par
     echo "TEMOIN|$g|${d:0:19}|$n"
     get "builds/scan/essai-scan/referrers/$d" | jq -r '.manifests // [] | .[] | "REF|builds/scan/essai-scan|\(.digest)|\(.annotations["org.opencontainers.image.created"] // "-")|\(.artifactType // "-")|témoin"'
     t=$((t + n))
+    for x in $(get "builds/scan/essai-scan/referrers/$d" | jq -r '.manifests // [] | .[].digest'); do PRESENTS+=("builds/scan/essai-scan|$x"); done
   done
   echo "COMPTE|builds/scan/essai-scan|tous les témoins|$t"
   echo "## 4. vulndb/grype : tags et digests"
   for g in $(get vulndb/grype/tags/list | jq -r '.tags // [] | .[]'); do echo "BASE|$g|$(digest_de vulndb/grype "$g")"; done
   echo "COMPTE|vulndb/grype|tags|$(get vulndb/grype/tags/list | jq '.tags // [] | length')"
+  g=$(get vulndb/grype/tags/list | jq -r '.tags // [] | sort | last // empty')
+  if [ -n "$g" ]; then PRESENTS+=("vulndb/grype|$(digest_de vulndb/grype "$g")"); fi
   echo "## 5. blob vide {} (H7, HEAD, 200 attendu)"
   for r in builds/vsa/sample-app builds/vsa/sample-app-deb builds/scan/sample-app; do echo "BLOB|$r|${VIDE:0:19}|$(code "$r/blobs/$VIDE")"; done
+  echo "## 6. blobs des manifestes présents (config et couches ; HEAD dans le même dépôt, 200 attendu)"
+  for x in "${PRESENTS[@]}"; do blobs "${x%%|*}" "${x#*|}"; done
+  echo "COMPTE|blobs|${#PRESENTS[@]} manifestes|$NB blobs|$NOK en 200"
   if [ "$MOMENT" = apres ]; then
-    echo "## 6. digests du journal avant ($AVANT), relus un par un (200 : présent ; 404 : supprimé)"
+    echo "## 7. digests du journal avant ($AVANT), relus un par un (200 : présent ; 404 : supprimé)"
     grep -E '^(REF|BASE)\|' "$here/$AVANT" | while IFS='|' read -r k a b _; do
       if [ "$k" = BASE ]; then echo "RELU|vulndb/grype|$a|$(code "vulndb/grype/manifests/$b")"; else echo "RELU|$a|$b|$(code "$a/manifests/$b")"; fi
     done

@@ -573,3 +573,17 @@ Les contenus prédits N1 à N9 de la note de 19:28:08Z sont inchangés. Seules l
 **Prédictions** : celles de N5 à N9, inchangées pour le contenu, et les conséquences de « Résultat de l'état avant ». Les heures sont des calculs ; un redémarrage de Zot les déplace sans changer ce qui doit être supprimé, sauf au balayage où tombe le redémarrage.
 
 **Hors de cette tâche** : la place libre sur sc-stockage. Le relevé du 21/11 vers 16:00 UTC est prévu à part, à la main.
+
+## Note de 2026-11-20T20:06:18Z : `g7-etat.sh` v2 (blobs), prédictions E9 à E11 avant relance (rien n'est réécrit au-dessus)
+
+**Correction, relevée par le conseiller.** La v1 ne lisait que des manifestes, plus le blob `{}`. Elle perdait donc le point 3 de la consigne du 14/11 : « aucun blob manquant » sur les manifestes qui restent et sur la base la plus récente. C'est pourtant le risque propre au gc avec déduplication. Les notes de 19:58 et de 20:00 ne le disaient pas.
+
+**v2** (sha256 `a12f0653831cb798…`) : une section 6 fait un HEAD, dans le même dépôt, de la config et de chaque couche de chaque manifeste présent. Elle couvre les referrers réels, les témoins et la base `vulndb/grype` la plus récente. Un blob qui ne rend pas 200 est listé (`BLOB-KO`). La relecture des digests du journal « avant » passe en section 7. `bash -n` passe, et shellcheck ne relève aucun avertissement.
+
+**Relance** sous `SUFFIXE=-2` (journal `g7-etat-avant-2.log`). Le journal v1 reste tel quel.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| E9 | Sections 1 à 5 identiques au journal v1, en-tête et heures exceptés. Aucun scan ni aucune base ne sont poussés avant le 21/11 vers 08:05 | haute |
+| E10 | 37 manifestes présents : 9 et 8 scans, 3 VSA, 16 témoins, 1 base | haute |
+| E11 | Tous les blobs en 200, aucun `BLOB-KO`. Chaque scan et chaque témoin a 2 blobs (config `{}` et bundle) | haute pour les 200 ; moyenne pour « 2 blobs » ; nombre de blobs de la base non prédit |
