@@ -251,3 +251,9 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 **Suite du 20/11/2026, écrite à 2026-11-20T16:49:06Z UTC** : le remède est porté par l'étape de republication de la 05, [`m5b-republier.sh`](../../poc/bricks/05-rpm-mock/m5b-republier.sh). Elle exporte `TZ=Europe/Paris`, contrôle le décalage de l'époque 0, retire `SOURCE_DATE_EPOCH` et s'arrête au premier digest différent. Son banc, sur un registre local, redonne les 5 digests de la liste revue. `bundle` (`commun.sh`) reste inchangée : fixer `TZ` pour toute la plateforme est une décision ouverte.
 
 **Précision du 20/11/2026, écrite à 2026-11-20T16:53:29Z UTC** : dans la suite précédente, « les 5 digests de la liste revue » se lit « les 5 digests attendus ». 3 sont des références de la liste revue (les tâches), et 2 sont les lignes `PIPELINE_REF` des scripts de mesure (les pipelines).
+
+**Suite du 20/11/2026, écrite à 2026-11-20T17:50:11Z UTC** : le chemin du rejeu de la 05 est écrit, [`m5b-rejeu.sh`](../../poc/bricks/05-rpm-mock/m5b-rejeu.sh).
+- Il réutilise les scripts de mesure sans les modifier, et retire les gardes qui renvoient à l'histoire (tags `m4a`, `m4b`, `m4c`, fermeture et artefact de M4b et M4c).
+- Les pipelines rpm sont lues par digest. La fermeture `09838980…` et l'artefact de packaging `333b7322…`, cités par la pipeline signée, sont exigés à leur digest. L'artefact rpm est relevé seulement.
+- Son banc sans cluster passe (103 OK).
+- Le bloc de `rejeu.sh` reste à écrire.

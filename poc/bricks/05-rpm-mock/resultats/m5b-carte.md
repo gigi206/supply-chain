@@ -491,3 +491,27 @@ Les deux notes restent écrites telles quelles.
 **Correction** : le motif exclut les journaux du banc (`! -name 'm5b-rejeu-banc*'`). Sha256 du banc : `cc4a2da9b3750d06…`. Le script n'est pas modifié.
 
 **Prédiction du troisième passage, écrite avant le lancement** : « bilan : 103 OK, 0 KO », RV1 à RV6 tenues. Il utilise le dossier `banc-m5b-rejeu-3` et le journal `m5b-rejeu-banc-3.log`. Le dossier du second passage (3,4 Mio, lu par aucun script) est effacé.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T17:50:11Z UTC : troisième passage du banc de `m5b-rejeu.sh`, résultat
+
+**Passage** le 20/11/2026 à 17:49:29 UTC, au dépôt `c25a4f27` (script `1b97d453…`). Le banc rend 0 avec « bilan : 103 OK, 0 KO » ([`m5b-rejeu-banc-3.log`](m5b-rejeu-banc-3.log)). Le journal compte 102 lignes OK visibles : la 103e est le contrôle F1 masqué par le filtre `jeton|token` (note de 17:48:37Z).
+
+- **RV1 tenue** : A1 à A5.
+- **RV2 tenue** : B1 rend 0, avec 4 rendus et 5 fichiers signés contrôlés et la mesure d'un autre jour pour les deux images. B2 à B7 s'arrêtent sur la garde visée, B2, B3, B4 et B6 avant tout chargement. B8 rend 0.
+- **RV3 tenue** : C1 à C7. Les sorties de la signature vont sous `$TS`, `SIGNER` est retirée, les deux dossiers `auth` sont retirés, et un journal présent est refusé en code 2.
+- **RV4 tenue** :
+  - `etape_local` réelle redonne `333b7322…` (8 OK).
+  - Deux poussées, puis P1 à P3.
+  - D2 (reprise) ne pousse rien. D3 à D5 s'arrêtent sans poussée.
+- **RV5 tenue** :
+  - Un PipelineRun, la pipeline `61814acd…` par digest, la fermeture `09838980…` et 230 couches.
+  - E2 (reprise) n'appelle pas `kubectl`.
+  - E6 s'arrête après une création, sur le renvoi à ta décision. Les six autres refus ne créent rien.
+- **RV6 tenue** :
+  - Un PipelineRun, la pipeline `7d361cb1…`, le commit `6391fd43…` et Kata pour `construire`.
+  - Le relevé dit « égaux » sur les objets réels de la cascade, et « différents » en F2, en code 0.
+  - F3 à F6 s'arrêtent sans création.
+
+**Portée**, inchangée : ni Zot, ni Tekton, ni l'admission réelle, ni Kyverno, Kata, Chains ou tkn. Les étapes `signature` et `images` ne sont mesurées que par leur chargement. Le dossier du banc (3,4 Mio, lu par aucun script) est effacé. Les trois journaux restent.
+
+**Ce qui reste pour M5b sous C** : le bloc 05 de `rejeu.sh`, dans l'ordre de la note de 17:47:22Z.
