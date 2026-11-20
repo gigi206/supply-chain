@@ -1,0 +1,138 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEYCIQClEQ2apt3xyi5hnDZxLczaNBa6nGrNWIwH3uWXAXVPlAIhAKx+To6X0nLoOxJkyblIEHZi0qNzP1+evzREXGjheiif
+  name: prefetch-rpm
+spec:
+  params:
+  - name: liste
+    type: string
+  - name: source
+    type: string
+  - name: dossier
+    type: string
+  - name: empreinte
+    type: string
+  - name: repomd
+    type: string
+  results:
+  - name: BOOTSTRAP_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  stepTemplate:
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsGroup: 65532
+      runAsNonRoot: true
+      runAsUser: 65532
+    volumeMounts:
+    - mountPath: /tmp
+      name: tmp
+  steps:
+  - env:
+    - name: HOME
+      value: /tmp
+    image: sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+    name: prefetch
+    resources:
+      limits:
+        cpu: "2"
+        memory: 2Gi
+      requests:
+        cpu: "2"
+        memory: 2Gi
+    script: |
+      #!/bin/sh
+      export LC_ALL=C
+      # Entrées fixées par la pipeline signée, écrites par substitution de Tekton et jamais lues dans une variable d'environnement :
+      # l'env du podTemplate d'un PipelineRun l'emporterait sur celui du pas (docs/podtemplates.md de Tekton v1.15.5).
+      cat > /tmp/liste <<'FIN_LISTE'
+      $(params.liste)
+      FIN_LISTE
+      SOURCE='$(params.source)'
+      DOSSIER='$(params.dossier)'
+      FP_ROCKY='$(params.empreinte)'
+      REPOMD='$(params.repomd)'
+      SORTIE='$(workspaces.sortie.path)'
+      LISTE_FICHIER=/tmp/liste
+      set -u
+      ko() { echo "KO   $*" >&2; exit 1; }
+      case $SOURCE in sc-stockage.poc.test:5000/*@sha256:*) ;; *) ko "source invalide : $SOURCE" ;; esac
+      h=${SOURCE##*@sha256:}; case $h in *[!0-9a-f]*) ko "digest de la source invalide" ;; esac; [ ${#h} = 64 ] || ko "digest de la source invalide"
+      [ "$DOSSIER" = "${SOURCE%%:*}@${SOURCE##*@}" ] || ko "dossier incohérent avec la source : $DOSSIER"
+      case $FP_ROCKY in *[!0-9A-F]*) ko "empreinte invalide" ;; esac; [ ${#FP_ROCKY} = 40 ] || ko "empreinte invalide"
+      case $REPOMD in *[!0-9a-f]*) ko "repomd invalide" ;; esac; [ ${#REPOMD} = 64 ] || ko "repomd invalide"
+      while read -r url sha taille reste; do
+        [ -n "$url" ] || continue
+        [ -z "$reste" ] || ko "ligne de liste à plus de trois champs : $url"
+        case $url in https://dl.rockylinux.org/vault/rocky/9.7/*.rpm) ;; *) ko "URL hors de vault 9.7 : $url" ;; esac
+        case $url in *..*|*[!A-Za-z0-9._/:+~-]*) ko "URL invalide : $url" ;; esac
+        case $sha in *[!0-9a-f]*) ko "sha256 invalide : $url" ;; esac; [ ${#sha} = 64 ] || ko "sha256 invalide : $url"
+        case $taille in ''|*[!0-9]*) ko "taille invalide : $url" ;; esac
+      done < "$LISTE_FICHIER"
+      for o in curl rpm createrepo_c skopeo sha256sum stat gpg; do command -v "$o" >/dev/null 2>&1 || ko "$o absent de l'image"; done
+      D=$SORTIE/depot
+      mkdir -p "$D" || ko "dossier $D non créé"
+      [ -z "$(ls -A "$D")" ] || ko "dossier $D non vide"
+      n=0
+      while read -r url sha taille; do
+        [ -n "$url" ] || continue
+        f=$D/${url##*/}
+        [ ! -e "$f" ] || ko "nom en double : ${url##*/}"
+        h=$(curl -sS --proto =https --max-time 120 -o "$f" -w "%{http_code}" "$(printf %s "$url" | sed "s/+/%2B/g")") || ko "curl en échec : $url"
+        [ "$h" = 200 ] || ko "HTTP $h : $url"
+        [ "$(sha256sum < "$f" | cut -c1-64)" = "$sha" ] || ko "sha256 différent : ${url##*/}"
+        [ "$(stat -c %s "$f")" = "$taille" ] || ko "taille différente : ${url##*/}"
+        n=$((n + 1))
+      done < "$LISTE_FICHIER"
+      echo "téléchargés et contrôlés (sha256, taille) : $n"
+      K=/etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+      [ -s "$K" ] || ko "clé de Rocky absente de l'image : $K"
+      fp=$(gpg --batch --with-colons --show-keys "$K" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}')
+      [ "$fp" = "$FP_ROCKY" ] || ko "empreinte de la clé de l'image : $fp"
+      echo "clé de Rocky de l'image : empreinte conforme (gpg)"
+      B=/tmp/rpmdb-$$
+      rpm --dbpath "$B" --initdb </dev/null || ko "rpmdb vide non créée"
+      rpm --dbpath "$B" --import "$K" </dev/null || ko "clé de Rocky non importée"
+      v=$(rpm --dbpath "$B" -q gpg-pubkey --qf '%{VERSION}\n' </dev/null)
+      [ "$v" = "$(printf %s "$FP_ROCKY" | tail -c 8 | tr 'A-F' 'a-f')" ] || ko "identifiant court de la clé importée : $v"
+      r=0; rpm --dbpath "$B" -K "$D"/*.rpm > /tmp/k.log 2>&1 </dev/null || r=$?
+      k=$(grep -c ': digests signatures OK$' /tmp/k.log)
+      echo "rpm -K : rc $r, $k OK sur $n"
+      [ "$r" = 0 ] && [ "$k" = "$n" ] || ko "signatures des rpm"
+      find "$D" -maxdepth 1 -name "*.rpm" -exec touch -h -d @0 {} + || ko "dates des rpm"
+      t=$(date +%s)
+      createrepo_c --compatibility --revision 0 --set-timestamp-to-revision --no-database "$D" > /tmp/createrepo.log 2>&1 </dev/null \
+        || { tail -n 20 /tmp/createrepo.log; ko "createrepo_c V2"; }
+      echo "repodata V2 : repomd.xml $(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64) ; fichiers $(ls "$D/repodata" | wc -l) ; en $(($(date +%s) - t)) s"
+      sed "s/^/repomd.xml V2 : /" "$D/repodata/repomd.xml"
+      [ "$(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64)" = "$REPOMD" ] || ko "repomd.xml différent de l'attendu (fixé par la pipeline)"
+      t=$(date +%s)
+      skopeo copy --preserve-digests --src-cert-dir /etc/ca-poc "docker://$SOURCE" "dir:$D/$DOSSIER" > /tmp/skopeo.log 2>&1 </dev/null \
+        || { tail -n 5 /tmp/skopeo.log; ko "skopeo copy"; }
+      m=sha256:$(sha256sum < "$D/$DOSSIER/manifest.json" | cut -c1-64)
+      [ "$m" = "${SOURCE##*@}" ] || ko "manifeste copié : $m"
+      echo "skopeo copy --preserve-digests : en $(($(date +%s) - t)) s ; manifeste $m"
+      echo "fermeture : $(find "$D" -type f | wc -l) fichiers, $(du -sb "$D" | cut -f1) octets"
+      printf '{"uri":"oci://%s","digest":"%s"}' "${SOURCE%@*}" "${SOURCE##*@}" > '$(results.BOOTSTRAP_ARTIFACT_INPUTS.path)'
+    volumeMounts:
+    - mountPath: /etc/ca-poc
+      name: ca-poc
+      readOnly: true
+  volumes:
+  - emptyDir: {}
+    name: tmp
+  - configMap:
+      name: ca-poc
+    name: ca-poc
+  workspaces:
+  - name: sortie

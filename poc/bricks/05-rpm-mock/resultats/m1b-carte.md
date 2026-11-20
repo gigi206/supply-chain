@@ -968,3 +968,7 @@ Le conseiller a trouvé un chemin hérité de `m4c.sh` dans l'essai de construct
 ## Note datée du 20/11/2026, écrite à 2026-11-20T10:53:19Z UTC : bundles de la cascade, essais passés
 
 `local` et les deux pods d'essai ont tourné de 10:47:55Z à 10:52:37Z. BL1, EP1 à EP3 et EC1 à EC3 tiennent ([résultat](m1b-predictions.md)). Sur l'image `70f8c412`, le prefetch rend l'arbre de `final` et la construction rend le rpm de M3 et l'artefact `07b7bd6f`. `taches` (signature, deux bundles sous `m1b`) attend ton accord nommé.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T10:54:47Z UTC : bundles de la cascade signés et poussés
+
+`taches` a tourné à 10:54:10Z, sur ton accord nommé (« Oui, signe et pousse »), et TB1 à TB3 tiennent ([résultat](m1b-predictions.md)). Bundles sous `m1b` : `prefetch-rpm@b9bbeba3…` et `construire-rpm@ca03f189…`. Les tags `m4b` et `m4c` n'ont pas bougé. Reste la revue de `taches.yml`.

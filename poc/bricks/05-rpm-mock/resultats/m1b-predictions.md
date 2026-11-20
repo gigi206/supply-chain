@@ -2304,3 +2304,20 @@ Les trois étapes ont tourné sous l'accord permanent, avec le script `3faa018b�
 | EC3 | oui | artefact `07b7bd6f…`, égal à l'essai de M4c |
 
 **Lecture** : sur les entrées de M4b et M4c, l'outillage de M1b rend les mêmes sorties que l'outillage d'essai : même fermeture, même rpm, même artefact. Les deux tâches neuves ne diffèrent des signées que par l'image. Restent à faire : la signature et les deux bundles (`taches`, sur ton accord), puis la revue de `taches.yml`.
+
+### Bundles de la cascade : résultat de `taches`, écrit le 20/11/2026 à 2026-11-20T10:54:47Z UTC
+
+Tu as donné l'accord nommé : « Oui, signe et pousse ». `taches` a tourné avec `SIGNER=1` de 2026-11-20T10:54:10Z à 10:54:14Z, avec code 0, 28 OK et 0 KO ([journal](m1b-bundles-taches.log)). Le dossier d'authentification a été retiré à la sortie.
+
+| Prédiction | Tenue | Mesure |
+|---|---|---|
+| TB1 | oui | rendus admis, témoin `computeResources` refusé ; les deux tâches signées sont égales au rendu et ne diffèrent de celles de M4b et M4c que par `.spec.steps[0].image` |
+| TB2 | oui | `m1b` absent des deux dépôts ; `m4b` sur `9afe09db…`, `m4c` sur `d7f01398…` ; 3 022 004 224 octets libres |
+| TB3 | oui | deux bundles sous `m1b`, relus anonymement à leurs digests ; `m4b` et `m4c` inchangés ; deux références « à ajouter » |
+
+**Relevé, sans pari** :
+- `tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc` (signée versionnée : [`fermeture/prefetch-rpm.m1b.signee.yaml`](../fermeture/prefetch-rpm.m1b.signee.yaml), `d28acd2283bdf964…`) ;
+- `tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5` (signée versionnée : [`construction/construire-rpm.m1b.signee.yaml`](../construction/construire-rpm.m1b.signee.yaml), `90151d43270fc2fa…`) ;
+- place libre sur / de sc-stockage : 3 022 004 224 octets avant, 3 021 639 680 après.
+
+**Suite** : ces deux références ne sont pas encore dans la liste revue (`taches.yml` de la 08). Tekton ne les acceptera qu'après ta revue.

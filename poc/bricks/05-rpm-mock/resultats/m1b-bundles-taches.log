@@ -1,0 +1,44 @@
+# m1b-bundles.sh taches, 2026-11-20T10:54:10Z
+OK   fermeture/prefetch-rpm.yaml (sha256) : 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c
+OK   fermeture/prefetch-rpm-sample-app.yaml (sha256) : ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+OK   construction/construire-rpm.yaml (sha256) : e88f5521ede87f5b03330683939fd3494f5ff58544ded9a9326014e30b8d0f88
+OK   fermeture/prefetch-rpm.signee.yaml (sha256) : 4123539575b1f7986f82f648913ee147348c7198399018f3520c7037eeade199
+OK   construction/construire-rpm.signee.yaml (sha256) : faab95fd9464d437aa0c0a98b63fce8fe0dd6a2e4f5c173fb2bcd632e6e2b70c
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   verrou de M4a et M4b (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   arbre de final (sha256) : fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+## gabarits rendus avec l'image neuve ; admission en dry-run serveur, rien n'est créé
+OK   taches : script de prefetch-rpm substitué, égal à celui de l'essai de M4b (sha256) : 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+OK   taches : script de construire-rpm substitué, égal à celui de l'essai de M4c (sha256) : 0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c
+OK   prefetch-rpm rendue admise (code de kubectl) : 0
+OK   construire-rpm rendue admise (code de kubectl) : 0
+OK   témoin refusé : champ inconnu (message mesuré le 18/11 en M4b) : 1
+## signatures (tkn 0.46.2) ; les deux tâches relues avant tout versionnement et toute poussée
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   prefetch-rpm signée : annotation de signature : true
+OK   prefetch-rpm signée : égale à la tâche rendue, signature exceptée (normalisées) : égale
+OK   construire-rpm signée : annotation de signature : true
+OK   construire-rpm signée : égale à la tâche rendue, signature exceptée (normalisées) : égale
+     .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771" -> "sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae"
+OK   prefetch-rpm signée contre celle de M4b : feuilles différentes : .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771" -> "sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae"
+     .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771" -> "sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae"
+OK   construire-rpm signée contre celle de M4c : feuilles différentes : .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771" -> "sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae"
+## gardes avant toute écriture
+OK   G1 tekton/tasks/prefetch-rpm:m1b, lecture anonyme (avant) : absent
+OK   G1 tekton/tasks/construire-rpm:m1b, lecture anonyme (avant) : absent
+OK   G2 tekton/tasks/prefetch-rpm:m4b, lecture anonyme (avant) : sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+OK   G2 tekton/tasks/construire-rpm:m4c, lecture anonyme (avant) : sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+OK   G3 octets libres sur / de sc-stockage (porte /var/lib/zot), avant : 3022004224 (seuil 1073741824)
+signatures versionnées : fermeture/prefetch-rpm.m1b.signee.yaml (sha256 d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2), construction/construire-rpm.m1b.signee.yaml (sha256 90151d43270fc2fa1a77765f4c6acdacdc2ecd2033d9bc0aa8494c5517f0a31b)
+## bundles, tag m1b (écritures définitives)
+prefetch-rpm : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+construire-rpm : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+## relecture anonyme après
+OK   P1 tekton/tasks/prefetch-rpm:m1b, lecture anonyme après : sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+OK   P1 tekton/tasks/construire-rpm:m1b, lecture anonyme après : sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+OK   P2 tekton/tasks/prefetch-rpm:m4b, lecture anonyme après : sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+OK   P2 tekton/tasks/construire-rpm:m4c, lecture anonyme après : sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+octets libres sur / de sc-stockage après : 3021639680
+SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
