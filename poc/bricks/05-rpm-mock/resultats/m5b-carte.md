@@ -283,3 +283,52 @@ Le rejeu reste exclu avant la mesure de G7 du 28/11.
 - le bloc 05 de `rejeu.sh`.
 
 **Décision ouverte, chez toi** : fixer `TZ` dans `bundle` (`commun.sh`), commun aux 41 appels, ou le laisser à l'hôte. Ce n'est pas bloquant pour M5b. Un digest hors liste échoue en KO dans les étapes de signature, par exemple dans `signer_tache` de `s4a.sh` (06).
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:46:56Z UTC : étape de republication écrite à sec, correction de l'hypothèse, prédictions du banc
+
+**Correction de la note de 16:18:58Z** (elle reste écrite telle quelle) : l'hypothèse de l'estimation est plus étroite qu'écrite.
+- Les 5 contenus signés à republier sous C citent par digest 12 références : les images `70f8c412…` et `6de899ac…`, la fermeture `09838980…`, l'artefact `333b7322…`, la fermeture de sources `50dc73f7…`, les outils `c7bebae2…` et `68e0ae70…`, les tâches `publier-fermeture` et `publier-image`, et les 3 tâches rpm elles-mêmes (relevé de `grep` sur les fichiers, signature exceptée).
+- Un bundle republié garde son digest (RE1 à RE7), mais ne sert que si ces objets existent dans Zot à leur digest. Les images, la fermeture et l'artefact sont recalculés par le rejeu, avec une confiance moyenne pour les images (note de 16:18:58Z).
+- Si l'un d'eux retombe sur un autre digest, il faut une nouvelle signature et une revue de `taches.yml`. C'est ta décision, comme écrit dans l'hypothèse.
+
+**Étape écrite, rien n'est lancé contre Zot ni le cluster** : [`m5b-republier.sh`](../m5b-republier.sh) (sha256 `885f5c53da860c44…`), script frère. Les `m1b-*.sh`, `commun.sh` et `rejeu.sh` ne sont pas touchés.
+- **Trois étapes**, dans l'ordre imposé par les références :
+  - `taches` : `prefetch-rpm` et `construire-rpm` (`*.m1b.signee.yaml`), puis `preparer-rpm` ;
+  - `pipeline_fermeture`, après les images et avant `m1b-fermeture.sh rpm` ;
+  - `pipeline_construction`, après la fermeture et l'artefact, avant `m1b-construction.sh construction`.
+- **Contrôles de tous les fichiers d'une étape, avant toute poussée** :
+  - sha256 du fichier épinglé, égal à celui des journaux de signature ;
+  - annotation de signature présente ;
+  - digest attendu épinglé et recoupé : référence exacte de la liste revue pour les tâches, ligne `PIPELINE_REF` du script de mesure pour les pipelines ;
+  - chaque référence par digest du contenu signé lue dans Zot (lecture anonyme) ;
+  - tag absent, ou déjà sur l'attendu (jamais déplacé).
+- **Poussées** par `bundle`, sous `TZ=Europe/Paris` exportée, avec un contrôle d'entrée du décalage de l'époque 0 (`+01:00`), `SOURCE_DATE_EPOCH` retirée et tkn 0.46.2. Arrêt au premier digest différent.
+- **Aucune clé** n'est lue, et rien n'est signé.
+- **Tag** : un seul `TAG`, obligatoire, celui des étapes de mesure qui suivent. `m1b-fermeture.sh rpm` (l. 552) et `m1b-construction.sh` (l. 823) relisent la pipeline à ce tag.
+  - `preparer-rpm`, poussée sous `m4c` en M4c, l'est donc sous ce tag. RE3 mesure que le tag ne change pas le digest.
+  - `m4b`, `m4c` et `essai` sont refusés, comme dans les scripts frères.
+
+**Essai préalable, non archivé**, sur un registre crane local (port 5912, dossier effacé) :
+- le registre local accepte un manifeste déposé par digest sans ses couches ;
+- `crane digest` distingue l'absence (`MANIFEST_UNKNOWN`, `NAME_UNKNOWN`), sur Zot en lecture anonyme comme en local ;
+- les 12 références sont présentes dans Zot aujourd'hui, en manifestes simples.
+
+Le banc remesure ces points (F3, K2, K8, K9).
+
+**Banc** : [`m5b-republier-banc.sh`](m5b-republier-banc.sh) (sha256 `46e07c65a8915eff…`), sur un registre crane local (127.0.0.1:5912, dossier `~/.cache/supply-chain-poc/05/banc-m5b-republier`, journal `m5b-republier-banc.log`).
+- Le script est sourcé avec `CONFIANCE_DIR` dans le dossier du banc. `REG_HOTE` est remplacé par l'adresse locale et contrôlé avant toute lecture. `auth_zot` et `libre_zot` sont remplacées.
+- Les 9 manifestes cités et non poussés par le script sont lus dans Zot (lecture anonyme), puis déposés par lots au fil des cas.
+
+**Prédictions, écrites avant le lancement** :
+- **RB1** (haute) : A1 à A12 et K1 tenus. Le script ne mentionne ni la clé, ni une signature, ni `--ctime`. Un `TAG` refusé ou vide sort en code 2.
+- **RB2** (haute) : les 9 manifestes lus dans Zot ont un sha256 égal à leur digest. Les dépôts locaux rendent 201.
+- **RB3** (moyenne, script jamais exécuté) : les cas refusés échouent en code 1 avec le KO prévu :
+  - K2, K8 et K9 : référence absente ;
+  - K3 : fuseau `+00:00` ;
+  - K4 : `SOURCE_DATE_EPOCH` ;
+  - K5 : sha256 du troisième fichier, après les contrôles complets des deux premiers ;
+  - K6 : tag occupé.
+
+  Aucune poussée, sauf K7 : sous `TZ=UTC` sans la garde d'entrée, une poussée exactement, à un autre digest, puis l'arrêt.
+- **RB4** (haute pour les digests, moyenne pour le déroulé) : N1 à N3 rendent 0, avec les 5 digests de la liste revue au tag `banc`. Ils contrôlent 1, 1, 2, 3 et 6 références. N4, relancée, rend 0 sans déplacer de tag.
+- **RB5** (haute) : la date de création des 5 bundles est `1970-01-01T01:00:00+01:00`, comme au premier passage du banc de 16:27:19Z.
