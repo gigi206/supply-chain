@@ -1125,3 +1125,21 @@ La clôture de la brique 05 reste ta décision.
 **Projection, non mesurée** : sans autre poussée, la base grype seule laisse environ 1,2 Go libres le 28/11. Il faut un `df` à 24 heures d'écart pour le confirmer.
 
 **Rejeu** : M5b recrée les VM ([carte de M5b](m5b-carte.md), l. 7 : le rejeu « viderait Zot »). Le disque de sc-stockage y prend la taille de `vm.sh`, soit 20G.
+
+## Décision du 20/11/2026 et prédictions écrites à 2026-11-20T16:04:17Z UTC, avant tout lancement : agrandissement de sc-stockage, prédictions
+
+**Décision** : « Agrandir maintenant », réponse du propriétaire, contre ma recommandation (surveiller et fixer la taille dans la carte de M5b). Je retiens 30G (+10G). L'hôte a 61G libres sous `/` et le volume qcow2 est fin.
+
+**Script** : [`sc-stockage-agrandir.sh`](sc-stockage-agrandir.sh) (`b7fdf0b2254e850e…`, shellcheck sans remarque).
+- L'étape `avant` est passée en lecture : [`sc-stockage-agrandir-avant.log`](sc-stockage-agrandir-avant.log). Elle donne une capacité de 21 474 836 480 octets, `vda1` en ext4 et 2 823 Mo libres. Les 7 services sont actifs et Zot compte 166 dépôts.
+- L'étape `agrandir` :
+  - `virsh blockresize` à chaud sur `qemu:///system`, sans sudo de l'hôte ;
+  - puis, par le sudo du compte `poc`, `growpart /dev/vda 1` et `resize2fs` en ligne.
+- Rien n'est arrêté. `vm.sh` n'est pas touché, et un rejeu de zéro reprend donc 20G.
+
+**Prédictions** :
+- **AG1** (haute) : `blockresize` rend 0, et la capacité vaut 32 212 254 720 octets.
+- **AG2** (haute) : `growpart` rend 0 (« CHANGED »). `vda1` est la dernière partition, après `vda14` et `vda15`.
+- **AG3** (haute) : `resize2fs` agrandit en ligne et rend 0.
+- **AG4** (haute) : la taille de `/` passe d'environ 19 953 à environ 30 000 Mo, et la place libre gagne environ 10 Go.
+- **AG5** (haute) : les 7 services restent actifs, et Zot compte toujours 166 dépôts en lecture anonyme.
