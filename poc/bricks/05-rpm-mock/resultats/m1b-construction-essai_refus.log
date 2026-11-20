@@ -1,0 +1,113 @@
+# m1b-construction.sh essai_refus, 2026-11-20T13:47:19Z
+OK   entrees.tar de local (taille, sha256), égal au journal de local : 463083520 c5cf750ee6c962daa23c9866b93c5be6c2f6ca2bd393c73d11a90e3263a5dd87
+OK   image_digest altéré : même longueur, différent du verrou : 64 différent
+OK   script d'essai : variables Tekton restantes : 0
+OK   script d'essai : égal au script du gabarit, variables de Tekton exceptées : 3
+OK   script d'essai : égal à celui de l'essai de M4c (sha256) : 0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c
+politiques de builds : NetworkPolicy builder-sans-sortie, NetworkPolicy construction-deb-sans-sortie, NetworkPolicy construction-racine-rpm-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-racine-rpm-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
+OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+relevé : politiques de builds qui sélectionnent preparer-rpm : CiliumNetworkPolicy CiliumNetworkPolicy builds-sans-internet
+OK   pod d'essai : contexte du pas égal à celui du gabarit : {"privileged":true,"allowPrivilegeEscalation":true,"runAsUser":0,"runAsGroup":0,"runAsNonRoot":false}
+OK   pod m1b-construction-refus admis en dry-run serveur
+pod m1b-construction-refus créé à 13:47:20 (image sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae)
+pod prêt sur sc-build, runtimeClassName kata
+OK   copie de entrees.tar dans le pod : 463083520 octets en 7 morceau(x), sha256 conforme
+entrées déballées par uid 65532 : 273 fichiers
+OK   verrou altéré dans le pod (image_digest seul) : verrou altéré : 1 ligne(s) au faux image_digest, 0 au vrai
+OK   copie de construire.sh dans le pod : 8936 octets en 1 morceau(x), sha256 conforme
+## script de construire-rpm dans le pod (13:48:34)
+fin à 13:49:36
+     invité : 6.18.56, 4 vCPU, 7151664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+     témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+     dossier dir: sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 ; image_digest du verrou 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb
+     Source0 sample-app-1.0.0.tar.gz (époque 1793229566) : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6
+     avant mock, capacité de /w : 3575832 kB ; utilisés : 452736 kB
+     mock --hermetic-build : rc 90 en 8 s
+     lignes « Using container image: dir: » : sortie 1 ; root.log 1
+     lignes « Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb » : sortie 1 ; root.log 1
+     lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+     lignes « Expected digest for image » : sortie 1 ; root.log 0
+     lignes « No space left on device » : sortie 0 ; root.log 0
+     lignes http ou https de mock.out : 0
+     lignes http ou https de root.log : 0
+     ----- fin de mock.out -----
+     lignes http ou https de build.log : 0
+     INFO: mock.py version 6.9 starting (python version = 3.9.25, NVR = mock-6.9-1.el9), args: /usr/libexec/mock/mock --hermetic-build /w/verrou.json /w/fermeture/depot --isolation=simple --no-cleanup-after --config-opts=base
+     Start(bootstrap): init plugins
+     INFO: selinux disabled
+     Finish(bootstrap): init plugins
+     Start: init plugins
+     INFO: selinux disabled
+     Finish: init plugins
+     INFO: Signal handler active
+     Start: run
+     Start: scrub ['all']
+     INFO: scrubbing everything for hermetic-build
+     Finish: scrub ['all']
+     INFO: Start(/w/sources/sample-app.spec)  Config(hermetic-build)
+     Start: clean chroot
+     Finish: clean chroot
+     Mock Version: 6.9
+     INFO: Mock Version: 6.9
+     Start(bootstrap): chroot init
+     INFO: calling preinit hooks
+     INFO: enabled package manager cache
+     Start(bootstrap): cleaning package manager metadata
+     Finish(bootstrap): cleaning package manager metadata
+     INFO: Guessed host environment type: unknown
+     INFO: Using container image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     INFO: Tagging container image as mock-bootstrap-c3573a4d-2b59-4163-9d3b-76d78b2adee8
+     INFO: Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb
+     INFO: Calculating mock-bootstrap-c3573a4d-2b59-4163-9d3b-76d78b2adee8 image OCI digest
+     ERROR: Exception(/w/sources/sample-app.spec) Config(hermetic-build) 0 minutes 7 seconds
+     INFO: Results and/or logs in: /w/res
+     ERROR: Expected digest for image dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 is77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb, but
+     ----- fin de root.log -----
+     INFO buildroot.py:704:  Mock Version: 6.9
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build/root
+     DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build/root
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap
+     DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap/root
+     DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap/root
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap/results
+     DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap/results
+     INFO buildroot.py:321:  calling preinit hooks
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock-cache/hermetic-build-bootstrap/yum_cache
+     DEBUG file_util.py:20:  created dir: /w/mock-cache/hermetic-build-bootstrap/yum_cache
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock-cache/hermetic-build-bootstrap/dnf_cache
+     DEBUG file_util.py:20:  created dir: /w/mock-cache/hermetic-build-bootstrap/dnf_cache
+     INFO util.py:1160:  Guessed host environment type: unknown
+     INFO podman.py:113:  Using container image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     INFO podman.py:159:  Tagging container image as mock-bootstrap-c3573a4d-2b59-4163-9d3b-76d78b2adee8
+     INFO buildroot.py:291:  Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb
+     INFO podman.py:29:  Calculating mock-bootstrap-c3573a4d-2b59-4163-9d3b-76d78b2adee8 image OCI digest
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build
+     DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build/root
+     DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build-bootstrap/root
+     ----- fin de build.log -----
+     Mock Version: 6.9
+     mock en échec
+     command terminated with exit code 1
+     (code de l'exec : 1 ; journal complet : resultats/m1b-construction-refus-pod.log)
+pod m1b-construction-refus supprimé
+OK   écriture refusée sur les entrées (ligne du script atteinte) : 1
+relevé : montage des entrées vu dans le pod : virtiofs ro,relatime
+OK   Source0 faite par le tar et le gzip de l'image d'outillage, égale à l'archive de sources.sh : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb
+OK   script de construire-rpm refusé (code de l'exec non nul) : refusé
+OK   dossier dir: et image_digest altéré, lus par le script : 1
+OK   mock --hermetic-build en échec (rc non nul) : 1
+OK   lignes « Expected digest for image » dans la sortie de mock (au moins une) : au moins une
+OK   fin du script : mock en échec, aucun rpm : 1 0
+relevé : lignes « Using container image: dir: » : sortie 1 ; root.log 1 lignes « Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb » : sortie 1 ; root.log 1 lignes « falling back to chroot installation » : sortie 0 ; root.log 0 lignes « Expected digest for image » : sortie 1 ; root.log 0
+relevé : première ligne de mock « Expected digest for image » : Expected digest for image dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 is77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb, but 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca found.
+écarts : 0

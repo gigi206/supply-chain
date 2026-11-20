@@ -1,0 +1,80 @@
+invité : 6.18.56, 4 vCPU, 7151664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+dossier dir: sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 ; image_digest du verrou 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb
+Source0 sample-app-1.0.0.tar.gz (époque 1793229566) : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6
+avant mock, capacité de /w : 3575832 kB ; utilisés : 452736 kB
+mock --hermetic-build : rc 90 en 8 s
+lignes « Using container image: dir: » : sortie 1 ; root.log 1
+lignes « Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb » : sortie 1 ; root.log 1
+lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+lignes « Expected digest for image » : sortie 1 ; root.log 0
+lignes « No space left on device » : sortie 0 ; root.log 0
+lignes http ou https de mock.out : 0
+lignes http ou https de root.log : 0
+----- fin de mock.out -----
+lignes http ou https de build.log : 0
+INFO: mock.py version 6.9 starting (python version = 3.9.25, NVR = mock-6.9-1.el9), args: /usr/libexec/mock/mock --hermetic-build /w/verrou.json /w/fermeture/depot --isolation=simple --no-cleanup-after --config-opts=basedir=/w/mock --config-opts=cache_topdir=/w/mock-cache --resultdir=/w/res --spec /w/sources/sample-app.spec --sources /w/sources
+Start(bootstrap): init plugins
+INFO: selinux disabled
+Finish(bootstrap): init plugins
+Start: init plugins
+INFO: selinux disabled
+Finish: init plugins
+INFO: Signal handler active
+Start: run
+Start: scrub ['all']
+INFO: scrubbing everything for hermetic-build
+Finish: scrub ['all']
+INFO: Start(/w/sources/sample-app.spec)  Config(hermetic-build)
+Start: clean chroot
+Finish: clean chroot
+Mock Version: 6.9
+INFO: Mock Version: 6.9
+Start(bootstrap): chroot init
+INFO: calling preinit hooks
+INFO: enabled package manager cache
+Start(bootstrap): cleaning package manager metadata
+Finish(bootstrap): cleaning package manager metadata
+INFO: Guessed host environment type: unknown
+INFO: Using container image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+INFO: Tagging container image as mock-bootstrap-c3573a4d-2b59-4163-9d3b-76d78b2adee8
+INFO: Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb
+INFO: Calculating mock-bootstrap-c3573a4d-2b59-4163-9d3b-76d78b2adee8 image OCI digest
+ERROR: Exception(/w/sources/sample-app.spec) Config(hermetic-build) 0 minutes 7 seconds
+INFO: Results and/or logs in: /w/res
+ERROR: Expected digest for image dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 is77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb, but 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca found.
+----- fin de root.log -----
+INFO buildroot.py:704:  Mock Version: 6.9
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build/root
+DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build/root
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap
+DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap/root
+DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap/root
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap/results
+DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap/results
+INFO buildroot.py:321:  calling preinit hooks
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock-cache/hermetic-build-bootstrap/yum_cache
+DEBUG file_util.py:20:  created dir: /w/mock-cache/hermetic-build-bootstrap/yum_cache
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock-cache/hermetic-build-bootstrap/dnf_cache
+DEBUG file_util.py:20:  created dir: /w/mock-cache/hermetic-build-bootstrap/dnf_cache
+INFO util.py:1160:  Guessed host environment type: unknown
+INFO podman.py:113:  Using container image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+INFO podman.py:159:  Tagging container image as mock-bootstrap-c3573a4d-2b59-4163-9d3b-76d78b2adee8
+INFO buildroot.py:291:  Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb
+INFO podman.py:29:  Calculating mock-bootstrap-c3573a4d-2b59-4163-9d3b-76d78b2adee8 image OCI digest
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build
+DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build/root
+DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build-bootstrap/root
+----- fin de build.log -----
+Mock Version: 6.9
+mock en échec
+command terminated with exit code 1

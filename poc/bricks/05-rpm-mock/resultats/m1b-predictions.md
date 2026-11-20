@@ -2694,3 +2694,22 @@ La fin de l'essai est remplacée par les assertions du refus (coupe comptée de 
   - la première ligne « Expected digest for image » de mock, qui dira quel digest il a trouvé.
 
 **Portée** : si RF2 tient, la lecture de CO2 et d'ES2 est confirmée : rc 0 sans ligne « Expected digest for image » signifie que mock a trouvé `image_digest` égal au verrou.
+
+### M4c refait : résultat de `essai_refus`, écrit le 20/11/2026 à 2026-11-20T13:50:16Z UTC
+
+`m1b-construction.sh essai_refus` a tourné de 2026-11-20T13:47:19Z à 13:49:36Z, sous l'accord permanent, avec code 0 : [`m1b-construction-essai_refus.log`](m1b-construction-essai_refus.log), 19 OK, 0 KO, 0 écart. Le journal complet du script est [`m1b-construction-refus-pod.log`](m1b-construction-refus-pod.log). Aucune ligne de jeton, rien dans Zot.
+
+- **RF1 tenue** : `entrees.tar` est égal au journal de `local`. Le verrou du pod porte 1 ligne au faux `image_digest` (`…89cb`) et 0 au vrai, et le script lit ce faux digest.
+- **RF2 tenue** : mock refuse.
+  - « mock --hermetic-build : rc 90 en 8 s », puis « mock en échec », sans aucun rpm ; l'exec rend code 1.
+  - « Expected digest for image » apparaît 1 fois dans sa sortie, et aucun repli en chroot n'a lieu (0 et 0).
+  - Ligne de mock, telle quelle : « Expected digest for image dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac… is77cff176…89cb, but 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca found. »
+  - Avant de refuser, mock a écrit « Checking image digest: …89cb » : 1 et 1.
+
+**Ce que cela établit** :
+- mock calcule lui-même le digest de l'image de bootstrap chargée en `dir:`, et ce digest vaut `77cff176…89ca`, la valeur du verrou de M1b ;
+- un `image_digest` faux arrête la construction hermétique en 8 s, sans repli ;
+- la lecture d'ES2 et de CO2 est donc confirmée : rc 0 sans ligne « Expected digest for image » veut dire égalité ;
+- « Checking image digest » imprime la valeur attendue, pas la valeur trouvée. Sa présence seule ne prouve rien.
+
+**Suite** : comparaison et provenance de M4c refait, en lecture seule.

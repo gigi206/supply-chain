@@ -1024,3 +1024,7 @@ Les PipelineRuns de M4c refait publieront dans `builds/sample-app-rpm`, le dép�
 ## Note datée du 20/11/2026, écrite à 2026-11-20T13:44:11Z UTC : artefact republié par M4c refait
 
 De 13:38:48Z à 13:43:25Z, sur ton accord nommé, CO1 à CO4 tiennent. Les deux PipelineRuns `m1b-construction-1` et `-2` publient `builds/sample-app-rpm@07b7bd6f…`, le digest de M4c. mock contrôle `image_digest` `77cff176…` dans les deux. Les enveloppes d'attestation passent de 4 à 8. Suite : refus d'un `image_digest` altéré (pod d'essai), puis comparaison et provenance.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T13:50:16Z UTC : refus d'un image_digest faux observé
+
+De 13:47:19Z à 13:49:36Z, sous l'accord permanent, RF1 et RF2 tiennent. Avec `bootstrap.image_digest` altéré d'un caractère dans le verrou livré au pod, mock s'arrête en 8 s (rc 90), sans repli en chroot. Il écrit « Expected digest for image … is …89cb, but 77cff176…89ca found ». Le digest calculé par mock est donc mesuré, et égal au verrou de M1b. Suite : comparaison et provenance de M4c refait.
