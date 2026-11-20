@@ -2475,3 +2475,69 @@ Si CP1, CP2 et PV1 à PV3 tiennent, **M4b refait est tenu**. Il produit une ferm
 **M4b refait est tenu.** La plateforme produit la fermeture rpm de sample-app avec l'outillage (`70f8c412…`) et le bootstrap (`6de899ac…`) de M1b. Le prefetch, joué dans un pod d'essai, donne l'arbre prédit à sec. La fermeture publiée deux fois a le digest prédit à sec. Tirée de Zot, elle est égale à l'essai, et sa provenance est vérifiée. Elle coexiste avec celle de M4b, par digest, dans le même dépôt.
 
 **Suite de la cascade** : M4c refait, avec `construire-rpm@ca03f189…`, cette fermeture et l'artefact `333b7322…`. `image_digest` (`77cff176…`) y sera mesuré pour la première fois par la construction hermétique.
+
+## Cascade avant M5b, M4c refait : local, essai_preparer et essai, prédictions écrites le 20/11/2026 à 2026-11-20T13:14:31Z UTC, avant tout lancement
+
+**Script** : [`m1b-construction.sh`](../m1b-construction.sh) (sha256 `74065de7b08c11c3…`). C'est un script frère de `m4c.sh`, qui n'est pas touché. Il garde la tâche `preparer-rpm` de M4c (`2f65f390…`) et prend trois entrées neuves :
+- la tâche `construire-rpm@ca03f189…` de la cascade, avec l'outillage `70f8c412…` ;
+- la fermeture `builds/fermetures/sample-app-rpm@09838980…` de M4b refait ;
+- l'artefact `entrees/sample-app/packaging-rpm@333b7322…`, qui porte le verrou `c544599a…` sous le nom `verrou-rpm.json`.
+
+Seize fonctions sont recopiées à l'identique de `m4c.sh`, et deux de `m1b-bundles.sh`. Quatre sont transformées par des remplacements listés et comptés ([`m1b-construction-copies.py`](m1b-construction-copies.py), sha256 `a4714021acf6d88e…`) :
+- `entrees_hote` copie le verrou sous le nom de l'artefact ;
+- `etape_prealables` de M4c devient `local` ;
+- `etape_essai_preparer` vient de M4c ;
+- `etape_essai_construire` des bundles devient `essai`.
+
+Les dossiers sont neufs (rien n'est retiré) et les journaux de pod prennent des noms neufs. Les trois étapes tournent sous l'accord permanent : hôte, puis pods d'essai, rien dans Zot.
+
+**Ajouts** :
+- `local` contrôle les sha256 des gabarits et des tâches signées, et les références de la liste revue. Il vérifie que les tâches rendues sont égales, normalisées, aux tâches signées versionnées. Il vérifie aussi que l'arbre de la fermeture tirée par M4b refait est égal à celui de son essai (`a731fbce…`).
+- `essai` vérifie que `entrees.tar` est égal à la taille et au sha256 journalisés par `local`. Il relève ensuite les lignes de la construction hermétique (fonction `hermetique`), sans arrêter.
+- Les étapes de pipeline ne sont pas écrites : leurs gardes dépendent du digest de l'artefact (voir plus bas).
+
+**Bancs** :
+- [`m1b-construction-banc.log`](m1b-construction-banc.log) : 63 OK, 4 KO. Les quatre erreurs sont dans le banc lui-même : un motif de chemin, `cut -c` qui compte en octets, et une substitution de processus lue plusieurs fois.
+- [`m1b-construction-banc-2.log`](m1b-construction-banc-2.log) : 67 OK, 0 KO (banc `487885888cb47670…`). Il couvre :
+  - les copies (77 contrôles) ;
+  - les constantes confrontées à leurs sources ;
+  - `local` réelle sous un préfixe de banc : 75 OK ;
+  - dix cas altérés, dont les deux essais arrêtés avant tout appel à `kubectl` ;
+  - `hermetique` sur le journal archivé de l'essai des bundles : deux écarts, sur les deux lignes du bootstrap de M4b. Transposé au bootstrap de M1b, ce journal donne 0 écart.
+- **Non couvert** : les pods, Zot, Kata, mock.
+
+- **CL1** (haute), `local` : code 0, 75 OK comme au banc 2.
+  - La confrontation au verrou neuf donne le dossier `dir:` `…@sha256:6de899ac…` et `image_digest` `77cff176…`. Le message est le même qu'en M4c : 222 rpm, repodata à 4 fichiers, dossier `dir:` à 4 fichiers.
+  - `entrees.tar` fait 463 083 520 octets, comme au banc. **Relevé, sans pari** : son sha256. Les dates des copies changent à chaque passage, et `essai` le lit dans le journal de `local`.
+  - **Relevé** : le digest calculé avec le tar de l'hôte, `7b17e7e7…` au banc. C'est celui du 18/11 ; ce n'est pas une référence.
+- **EP1** (haute), `essai_preparer` : le pod runc `m1b-construction-preparer` passe en `Succeeded`. Les pulls réels donnent :
+  - 230 fichiers pour la fermeture `09838980…` ;
+  - 2 fichiers pour l'artefact `333b7322…` ;
+  - 8 fichiers pour la fermeture applicative.
+
+  Les résultats `*_ARTIFACT_INPUTS` citent les deux références neuves. L'arbre `entrees/` du pod est égal à celui de `local` : 273 fichiers, contenu, modes et types.
+- **ES1** (haute), `essai` : le pod Kata `m1b-construction-construire` est prêt. `entrees.tar` est égal au journal de `local`, copié en 7 morceaux, et déballé par l'UID 65532. L'écriture sur les entrées est refusée, et le script rend code 0.
+- **ES2** (moyenne), première construction hermétique avec le bootstrap de M1b. Deux choses n'ont jamais été mesurées :
+  - podman charge en `dir:` une image dont la couche est un tar non compressé ;
+  - mock contrôle `image_digest` `77cff176…`, qui n'a qu'une source, le verrou.
+
+  Lignes attendues du script :
+  - « dossier dir: …6de899ac… ; image_digest du verrou 77cff176… » ;
+  - « Using container image: dir: » : 1 et 1 ;
+  - « Checking image digest: 77cff176… » : 1 et 1 ;
+  - « Expected digest for image » : 0 et 0 ;
+  - mock `--hermetic-build` rc 0 ;
+  - aucun repli en chroot, aucun « No space left on device », aucune ligne http ou https ;
+  - 222 paquets dans le buildroot ;
+  - 4 témoins réseau en échec.
+
+  En M4c, « Checking image digest » valait la valeur du verrou, et le contrôle ne s'imprime en défaut que par la ligne « Expected digest for image ». C'est donc cette dernière ligne à 0, avec rc 0, qui tient le contrôle, et non la seule présence de la valeur. **Si ES2 échoue sur « Expected digest for image »**, la cause est dans le verrou : il faudra un verrou neuf et un artefact de packaging neuf. La fermeture `09838980…` et la tâche signée ne sont pas en cause.
+- **ES3** (haute si ES2 tient) : Source0 `07521c1e…`, src.rpm `c802e60a…` et rpm `864d55f4…`, ceux de M3. 0 écart au verrou `c544599a…` : les 222 rpm sont ceux de M4c, seul le bootstrap change.
+- **ES4** (moyenne haute) : le digest de l'artefact vaut `07b7bd6f…`, celui de l'essai de M4c et de l'essai des bundles. La couche est écrite par le tar de la même image `70f8c412…`, et le rpm est celui de M3.
+- **Relevés, sans pari** :
+  - la durée de mock ;
+  - la place sur `/w` avant et après ;
+  - le montage des entrées ;
+  - la durée des copies. `entrees.tar` passe de 318 842 880 octets (M4c) à 463 083 520, car la couche du bootstrap neuf n'est pas compressée.
+
+**Conséquence, à poser après l'essai** : si ES4 tient, les PipelineRuns de M4c refait publieront dans `builds/sample-app-rpm` le digest déjà publié et attesté par M4c (`07b7bd6f…`). La garde « dépôt absent » de `m4c.sh` serait fausse, et Chains ajouterait des attestations au même sujet. Ce n'est pas le cas de la fermeture, dont le digest changeait. Le choix du dépôt sera une question à part, une fois le digest mesuré.
