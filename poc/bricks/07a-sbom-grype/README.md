@@ -333,3 +333,9 @@ Mesure hors réseau sur l'hôte ([`rpm-distro.sh`](rpm-distro.sh), [prédictions
 - Le journal de Zot ne garde qu'environ 14 h.
 - Le point 3 est révisé : une lecture par balayage (20/11, 24/11, 27/11, 28/11), et H4 révisée (le premier scan du deb serait supprimé le 28/11, marge d'environ 35 min). Le rejeu de M5b attend la lecture du 28/11.
 - Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T19:09:44Z.
+
+**Note du 20/11/2026 (2026-11-20T19:13:11Z UTC), correction de l'additif précédent** : « le rejeu de M5b attend la lecture du 28/11 » est une proposition, pas un fait.
+- Les lignes de Zot seraient aussi dans Loki pendant 720 h, d'après la configuration. Ce n'est pas mesuré.
+- L'absence de redémarrage de Zot depuis le 13/11 n'est pas vérifiée.
+- Inventaire des poussées de scan des 13 et 14/11 : rien de plus que H1, H2 et le scan du deb.
+- Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T19:13:11Z.

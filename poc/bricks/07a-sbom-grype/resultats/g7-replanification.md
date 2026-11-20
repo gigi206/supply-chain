@@ -292,3 +292,33 @@ Elles révisent H1, H2, H4 et H5. H3, H6 et H7 sont inchangées.
 
 - La tâche `supply-chain-g7-premiere-suppression` reste désactivée. Elle sera remplacée par trois tâches ponctuelles, pour B24, B27 et B28. Leurs heures seront fixées après la lecture de B20, qui corrige la projection.
 - La lecture de B20 n'a pas besoin de tâche : le journal la garde jusque vers 07:00 UTC le 21/11 (calcul, profondeur de 14 h).
+
+## Note de 2026-11-20T19:13:11Z : correction de la note de 19:09:44Z (point 3 révisé ; rien n'est réécrit au-dessus)
+
+Le conseiller a relevé quatre trous dans la note de 19:09:44Z. Ses prédictions restent écrites telles quelles. Les trous sont comblés ici, avant toute lecture.
+
+**1. Fenêtres élargies, réinventoriées.** Avec des balayages du soir, deviennent éligibles :
+- à B27, tout ce qui a été poussé le 13/11 avant environ 20:59 UTC ;
+- à B28, tout ce qui a été poussé le 14/11 avant environ 21:36 UTC.
+
+Relu dans les journaux commités des 13 et 14/11 (lignes `PUBLIE|…/builds/scan/…`) :
+- **13/11** : deux scans seulement dans `builds/scan/sample-app`, `9e2c8cf4…` et `043e1382…`, vers 12:45 et 12:47 UTC (`rejeu-s5b-plateforme-ctl.log`, commit `45880b90`). Ce sont les deux de H1.
+- **Témoins de G6** (`builds/scan/essai-scan`) : ils passent par un autre chemin, déjà comptés en H2 (16, vers 12:49 UTC).
+- **14/11** : le scan `256c3190…` dans `builds/scan/sample-app-deb`. C'est un referrer du deb 1.0.0-1 (`039949f9…`). Le job est parti à 20:59:40 UTC et a duré 125 s : poussée vers 21:01:45 UTC, à la seconde près non relue.
+- **Rien d'autre** dans ces fenêtres. Ce relevé ne voit qu'un motif dans les journaux commités : une poussée hors des scripts du dépôt lui échapperait.
+- **Relevé en passant** : `s6a-periodique.log` du 14/11 a été réécrit le 16/11 à 16:06:34 UTC par `lancer`, pour le deb 1.0.0-2 (`60f25f5c…`). Sa première version reste dans git (`31e6e5c1`). C'est un écart à la règle « un journal n'est jamais réécrit ». Les scans du 16/11 visent un autre sujet et deviennent éligibles le 30/11.
+
+**2. Hypothèse manquante : Zot non redémarré depuis le 13/11 à 12:17:25 UTC.** La projection n'est valide que sous cette hypothèse.
+- L'agrandissement de sc-stockage, aujourd'hui vers 16:04 UTC, a relevé « zot active » avant et après. Il n'a relevé ni `ActiveEnterTimestamp` ni `NRestarts` : l'absence de redémarrage n'est **pas vérifiée**.
+- Chaque lecture commence donc par ce contrôle, comme le 15/11. Si Zot a redémarré, la projection ne vaut plus, et B20 le dira.
+- Le même relevé compte 166 dépôts au catalogue, contre 139 balayés le 15/11. Des balayages plus longs décaleraient la projection vers plus tard, sans que je sache de combien.
+- Pour H4, un passage plus tardif sur les dépôts de scan élargirait la marge. Non calculé.
+
+**3. Loki.** D'après la configuration de la 19b :
+- Alloy envoie à Loki tout le journal systemd de chaque VM, sans filtre, étiqueté par unité (`commun/journal.alloy`) ;
+- Loki garde 720 h (`loki.yaml`).
+
+Les lignes de `zot.service` devraient donc y être environ 30 jours. **Ce n'est pas mesuré.** Si c'est confirmé, la limite des 14 h tombe, et les lectures de B24, B27 et B28 peuvent attendre, tant que la plateforme n'est pas recréée.
+- **« Jusque vers 07:00 UTC » était optimiste.** Le début de B20 sortirait du journal de la VM vers 06:26 UTC. La profondeur, mesurée une seule fois, dépend du volume écrit : elle peut être plus courte.
+
+**4. « Le rejeu de M5b ne commence pas avant la lecture de B28 »** n'est pas un fait. C'est une **proposition** au propriétaire : il accepte de tout perdre au rejeu, et l'ordre lui revient.
