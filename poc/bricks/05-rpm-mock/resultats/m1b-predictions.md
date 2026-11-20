@@ -2834,3 +2834,57 @@ Elle le publie deux fois au même digest que M4c (`07b7bd6f…`), et sa provenan
 **Erreur** : le résultat de 14:05:53Z dit que la baisse de la place libre continue « sans écriture de la brique ». Rien ne le mesure. Depuis le relevé du 16/11 à 22:49:55Z, la brique a écrit dans Zot, entre autres, l'amorce, les images d'essai, les images de M1b et la fermeture `09838980…` (environ 462 Mo).
 
 **Ce qui est mesuré** : sous `/` de sc-stockage, la place libre passe de 5 551 Mo (16/11, 22:49:55Z) à 2 842 Mo (20/11, 14:05:09Z), avec la même commande. La baisse n'est pas attribuée. C'est un point à surveiller avant le rejeu du 28/11. QL1 à QL3 ne changent pas.
+
+## Cascade avant M5b, rejeu de R1 à R8, prédictions écrites le 20/11/2026 à 2026-11-20T14:19:01Z UTC, avant tout lancement
+
+**Décision** : « Rejouer les huit » ([carte de M1b](m1b-carte.md), note de 14:10:07Z).
+
+**Script** : [`m1b-r1r8.sh`](../m1b-r1r8.sh) (sha256 `f921d7983c6619f5…`). Il est produit à partir de `m5.sh` (`141c811a022c560a…`), qui n'est pas touché, par 19 remplacements comptés, soit 28 occurrences ([`m1b-r1r8-copies.py`](m1b-r1r8-copies.py), `0ad6115f1e64f0dd…`). Ce qui change :
+- les références de la cascade : pipeline `7d361cb1…`, `construire-rpm@ca03f189…`, outillage `70f8c412…`, fermeture `09838980…`, artefact de packaging `333b7322…`. `preparer-rpm@2f65f390…`, la fermeture de sources, le commit et l'époque ne changent pas ;
+- la source de l'hôte, `m1b-construction.sh local`, d'empreinte `7153c806…` (273 fichiers), et le rootfs de l'outillage de M1b (`crane export` par digest, rpm 4.16.1.3, python 3.9.25) ;
+- la tâche signée lue pour la confrontation et pour les pods de R7 : `construire-rpm.m1b.signee.yaml`. Le script de son pas `construire`, son contexte et ses ressources sont égaux à ceux de M4c (mesuré au banc) ;
+- 8 enveloppes attendues sur `07b7bd6f…` au lieu de 4 ;
+- les PipelineRuns gardés : ceux de M4c et de M4c refait, soit quatre ;
+- le préfixe des journaux suit celui des objets (`m1b-r1r8`). Une garde arrête le script avant toute étape si un journal existe déjà, et certains préfixes de jalons passés sont refusés.
+
+`m5-alterer.py` et `m5-reseau.spec` sont repris tels quels.
+
+**Incident de préparation** : j'avais d'abord nommé ces fichiers `m1b-refus*`. L'écriture du banc a écrasé `resultats/m1b-refus-banc.sh`, le banc commité des cas refusés RZ du 19/11. Le fichier a été remis à son état commité par `git checkout` de ce seul fichier, avant tout commit, et ses journaux n'ont pas été touchés. Les fichiers neufs portent désormais le nom `m1b-r1r8`.
+
+**Bancs** (`d5646eb1a895fa03…`) :
+- [`m1b-r1r8-banc.log`](m1b-r1r8-banc.log) : 42 OK, 4 KO, tous dans le banc. `commun.sh` y était sourcé sans `here`, ce qui a fait échouer deux `listee` et donné une attente fausse de `REG`. Le comptage de shellcheck mêlait aussi les liens du wiki.
+- [`m1b-r1r8-banc-2.log`](m1b-r1r8-banc-2.log) : 45 OK, 0 KO. Il couvre :
+  - les copies ;
+  - shellcheck : seul écart, SC2034 de `m5.sh` (R inutilisé), que la garde des journaux lève ;
+  - les constantes, contre `m1b-construction.sh`, la liste revue, l'arbre de l'hôte, le rootfs et la tâche signée ;
+  - la partie hôte de `prealables`, jouée pour de bon dans une copie arrêtée avant la lecture : 15 OK, comme le banc de M5a ;
+  - `banc_juges` : 5 OK ;
+  - les gardes de préfixe et de journal.
+- **Non couvert** : le cluster, Zot, Kata, mock et Chains. Les étapes du cluster sont le texte de `m5.sh`, mesuré en M5a.
+
+**Lancements** : sous l'accord permanent du 18/11, dans l'ordre de M5a : `prealables`, `banc_juges`, `preparer`, `alterer`, `fermeture`, `sans_kata`, `reseau`, `invariance`, `retirer`. Je compte les KO et les lignes `jeton|token` avant de lire chaque journal. Rien n'est écrit dans Zot.
+
+- **RJ1** (haute), `prealables` :
+  - la partie hôte donne les 15 OK du banc. Les copies sont conformes, et la source reste inchangée. `intacte`, `r4` et `r6` passent la confrontation, et `r1`, `r2`, `r3` et `r5` sont refusées avec leur message. `rpm -i --test` rend 1 sur R4 (« Payload SHA256 ALT digest: BAD »). La sonde ne voit que `lo` ;
+  - en lecture : la pipeline `7d361cb1…` exportée de Zot nomme les trois tâches, avec les bundles attendus, tous les deux dans la liste revue. Les paramètres figés de `preparer` sont les références de la cascade, et `construire` reçoit `epoque=1793229566` ;
+  - `construction-rpm-sans-sortie` est comme en M5a, et aucune politique n'autorise de trafic à `construire-rpm` ;
+  - aucun objet `m1b-r1r8-*` n'existe ; les 13 objets sont admis à blanc ; il y a 8 enveloppes.
+  - **Relevé, sans pari** : les politiques qui sélectionnent un pod sans label de tâche, et le stockage éphémère allouable de sc-build.
+- **RJ2** (haute), `banc_juges` : 5 OK, comme au banc.
+- **RJ3** (haute), `preparer` : il y a 8 enveloppes avant. `m1b-r1r8-preparer` finit en `True|Succeeded`, au label `preparer-rpm`, sans Kata. Les résultats `CHAINS-GIT_*` et les trois `*_ARTIFACT_INPUTS` sont égaux aux références de la cascade.
+- **RJ4** (haute), `alterer` : l'empreinte de `entrees/` sur le PVC vaut `7153c806…`, égale à la source de l'hôte (EP1 a déjà mesuré l'égalité de l'arbre du pod et de celui de `local`). Les 7 copies sont conformes, et la source reste inchangée.
+  - **Risque noté** : R6 écrit un fichier neuf de 241 981 440 octets, contre 97 742 593 en M5a. `m5-alterer.py` le lit en mémoire, avec un pic d'environ deux fois sa taille, sous la limite de 1 Gi du pod.
+  - **Relevé** : la place du PVC.
+- **RJ5** (haute), `fermeture`, témoin : `True|Succeeded`, rpm `864d55f4…` (M3) et `DIGEST_CONSTRUIT` `07b7bd6f…`, comme ES3 et ES4 de M4c refait. Pour chaque cas, l'écriture sur les entrées est refusée, et les 3 témoins TCP comptés par le script sont en échec.
+- **RJ6** (haute) : R1, R2, R3 et R5 sont classées `refus-confrontation`, avec les messages du banc, et mock n'est jamais lancé.
+- **RJ7** (moyenne haute), R4 : `refus-mock`, la barrière étant dnf (« incorrect checksum » contre `primary`), comme en M5a. dnf vient de la nouvelle image, et `repodata/` de la fermeture `09838980…`. **Autres issues, écrites d'avance** : refus par rpm, ou acceptation (constat remonté).
+- **RJ8** (moyenne haute), R6 : `refus-mock`, la barrière étant la vérification du digest du blob par la copie de l'image (« Digest did not match »), sans repli en chroot. La couche est désormais un tar non compressé, chargé en `dir:`, et ce chargement n'a jamais été altéré. **Autres issues** : un refus par le contrôle `image_digest` de mock, ou une acceptation (constat remonté).
+- **RJ9** (haute), `sans_kata` : `False|PodAdmissionFailed`, aucun pod, refus de Pod Security (motifs comptés, jamais affichés).
+- **RJ10** (haute), `reseau`, R7 :
+  - bras a, sans label de tâche : Zot est joint depuis le pod et depuis `%build` ;
+  - bras b, au label `construire-rpm` : la connexion est refusée aux deux endroits ;
+  - mock rc 0 dans les deux bras. Le constat de M5a devrait se répéter : en `--isolation=simple`, mock ne coupe pas le réseau de `%build`, et la NetworkPolicy du pod est la seule barrière.
+- **RJ11** (haute), `invariance` : toujours 8 enveloppes, et les quatre PipelineRuns sont gardés. **Relevé** : les annotations de Chains sur les TaskRuns du jalon.
+- **RJ12** (haute), `retirer` : seuls les objets au label `poc.test/jalon=m1b-r1r8` sont supprimés. Les quatre PipelineRuns sont gardés, et rien n'est retiré de Zot.
+
+**Critère** : comme M5a. Chaque altération est refusée, et chaque témoin est accepté. Une acceptation de R4, de R6 ou du bras b de R7 serait un constat à te remonter, sans modifier de tâche signée.

@@ -1,0 +1,105 @@
+# m1b-r1r8-banc.sh, 2026-11-20T14:16:11Z ; m1b-r1r8.sh f921d7983c6619f53c6191c7ed47c85dea00d1a44a609117cfffe37b3b6abdd2 ; m5.sh 141c811a022c560aad59c60b46bd74a7c24b47cfddd14180b1a4c0c9403bb6f2
+## A : copies
+OK   produit de m5.sh (code, ligne) : 0 OK   m1b-r1r8.sh égal au produit de m5.sh (19 remplacements, 28 occurrences)
+OK   m5.sh égal à celui du commit : 141c811a022c560aad59c60b46bd74a7c24b47cfddd14180b1a4c0c9403bb6f2
+## B : syntaxe et shellcheck
+OK   bash -n : ok
+OK   shellcheck : seul écart, SC2034 de m5.sh (R inutilisé ; m1b-r1r8.sh le lit dans la garde des journaux) : < 1 [SC2034]
+relevé : shellcheck, remarques : [SC2015]×1 [SC2016]×2 [SC2046]×1 [SC2086]×1 [SC2155]×1
+## C : constantes contre leurs sources
+OK   PIPELINE_REF égal à m1b-construction.sh : $REG/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+OK   PREPARER_REF égal à m1b-construction.sh : $REG/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   CONSTRUIRE_REF égal à m1b-construction.sh : $REG/tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+OK   PREFETCH_IMAGE égal à m1b-construction.sh : $REG/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   IMAGE_OUTILLAGE égal à m1b-construction.sh : $REG/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   FERMETURE_RPM égal à m1b-construction.sh : $REG/builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+OK   FERMETURE_SOURCES égal à m1b-construction.sh : $REG/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+OK   PACKAGING égal à m1b-construction.sh : $REG/entrees/sample-app/packaging-rpm@sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   EPOQUE égal à m1b-construction.sh : 1793229566
+OK   COMMIT égal à m1b-construction.sh : 6391fd437f26696847041be3226bbbf633f55a2f
+OK   DEPOT_GIT égal à m1b-construction.sh : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+OK   DIGEST_ESSAI égal à m1b-construction.sh : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+OK   CLE_CHAINS_SHA égal à m1b-construction.sh : 1e7b2a03f9d5d289898e63b57410aeafa4e3680e86474d4f35aaa4e01f0c5e65
+OK   IMAGE (dépôt de l'artefact) égal à m1b-construction.sh : $REG/builds/sample-app-rpm
+OK   PREPARER_REF dans la liste revue (listee, taches.yml du dépôt) : 0
+OK   CONSTRUIRE_REF dans la liste revue (listee, taches.yml du dépôt) : 0
+relevé : REG de commun.sh : sc-stockage.poc.test:5000
+OK   SOURCE_HOTE : $W/m1b-construction-05/local/ws/entrees
+OK   SOURCE_EMPREINTE, recalculée sur l'arbre de l'hôte : 7153c8064cad6aababf65b22369cfe88be892e463e20d5f4722cab9f9abfc43b
+OK   arbre de l'hôte : fichiers : 273
+OK   RACINE : $HOME/.cache/supply-chain-poc/05/m1b-refus-racine/racine
+OK   rootfs : rpm, python3, /mnt : RPM version 4.16.1.3 Python 3.9.25 mnt
+OK   tâche signée de la cascade : sha256, égal aux gabarits de m1b-construction.sh : 90151d43270fc2fa1a77765f4c6acdacdc2ecd2033d9bc0aa8494c5517f0a31b
+OK   pas construire : script égal entre la tâche de M4c et celle de la cascade : égal
+OK   pas construire : contexte et ressources égaux : égal
+OK   fichiers lus par le script : construire-rpm.m1b.signee.yaml (3), construire-rpm.signee.yaml (0) : 3 0
+OK   enveloppes attendues : 8 (trois lignes), 4 (aucune) : 3 0
+OK   PipelineRuns gardés : quatre noms (trois lignes), compte 4 (deux lignes) : 3 2
+OK   gabarit de pod de R7 : image d'outillage de M1b : 1
+## D : partie hôte de prealables, pour de bon (copie arrêtée avant la lecture)
+OK   copie : une ligne changée : 2
+OK   prealables (hôte) : code, journal au préfixe du banc : 0 journal
+OK   prealables (hôte) : lignes OK, KO, arrêt du banc : 15 0 1
+OK   lignes du journal au motif de secret : 0
+     # m1b-r1r8.sh prealables, 2026-11-20T14:16:13Z
+     ## hôte, hors ligne
+     OK   rpm du rootfs de l'image d'outillage de M1b : RPM version 4.16.1.3
+     m5-alterer.py 8bc019dc46a7f28f7f9df2915471e17c9ff31e0cd5260a76e9bb555efd6b26bd ; m5-reseau.spec 1dd1ad3ba811137806d99e93949b6afea343cc3dd7db16295e24311d52652750
+     OK   source locale entrees/ (m4c.sh prealables) : empreinte avant : 7153c8064cad6aababf65b22369cfe88be892e463e20d5f4722cab9f9abfc43b
+          r1 : zlib-1.2.11-40.el9.x86_64.rpm remplacé par le contenu de alternatives-1.24-2.el9.x86_64.rpm
+          r2 : m5-en-trop.rpm ajouté à la racine de depot/
+          r3 : zlib-1.2.11-40.el9.x86_64.rpm retiré
+          r4 : zlib-1.2.11-40.el9.x86_64.rpm, octet 88091 inversé, taille inchangée (92187 octets)
+          r5 : manifest.json du dossier dir: suivi d'un saut de ligne
+          r6 : fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3/b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, octet 120990720 inversé, taille inchangée (241981440 
+          source : 273 fichiers, empreinte 7153c8064cad6aababf65b22369cfe88be892e463e20d5f4722cab9f9abfc43b
+          OK   intacte : 273 fichiers ; écarts à la source : aucun
+          OK   r1 : 273 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (contenu)
+          OK   r2 : 274 fichiers ; écarts à la source : fermeture/depot/m5-en-trop.rpm (en plus)
+          OK   r3 : 272 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (absent)
+          OK   r4 : 273 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (contenu)
+          OK   r5 : 273 fichiers ; écarts à la source : fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3/manifest.json (contenu)
+          OK   r6 : 273 fichiers ; écarts à la source : fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3/b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348 (contenu)
+     OK   copies : chacune ne diffère de la source que par l'objet voulu (code, lignes OK) : 0 7
+     OK   source locale : empreinte après (liens durs rompus à chaque altération) : 7153c8064cad6aababf65b22369cfe88be892e463e20d5f4722cab9f9abfc43b
+     confrontation tirée de construire-rpm signée : 51 lignes, sha256 681477b83b580578027c025a3eedab9979bb38c76279157bc265c7c2d5ee537d
+     OK   confrontation : appel de rpm -qp --qf %{SIGMD5} : 1
+     ## confrontation jouée dans le rootfs, avec le vrai rpm, sur chaque copie
+          intacte : code 0 : fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet sc-stockage.poc.tes
+     OK   confrontation sur intacte : code, ligne attendue : 0 1
+          r1 : code 1 : sigmd5 différent du verrou : zlib-1.2.11-40.el9.x86_64.rpm (5832caf6730301817da8e513d9fca84f) 
+     OK   confrontation sur r1 : code, ligne attendue : 1 1
+          r2 : code 1 : fermeture : 1 objet(s) hors du verrou, de repodata/ et du dossier dir: : ['m5-en-trop.rpm'] 
+     OK   confrontation sur r2 : code, ligne attendue : 1 1
+          r3 : code 1 : fermeture : 1 rpm du verrou absent(s) : ['zlib-1.2.11-40.el9.x86_64.rpm'] 
+     OK   confrontation sur r3 : code, ligne attendue : 1 1
+          r4 : code 0 : fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet sc-stockage.poc.tes
+     OK   confrontation sur r4 : code, ligne attendue : 0 1
+          r5 : code 1 : manifest.json du dossier dir: différent du pull_digest : sha256:f9e4e01438a38bd90d00b1fde311b20697aee03e16bfc2ab785c9508f35168c7 
+     OK   confrontation sur r5 : code, ligne attendue : 1 1
+          r6 : code 0 : fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet sc-stockage.poc.tes
+     OK   confrontation sur r6 : code, ligne attendue : 0 1
+     ## relevé : rpm -i --test (racine vide, --nodeps) sur la cible intacte et sur R4
+          intacte : code 0 : warning: /mnt/alt/intacte/entrees/fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 350d275d: NOKEY 
+          r4 : code 1 : warning: /mnt/alt/r4/entrees/fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 350d275d: NOKEY 	package zlib-1.2.11-40.el9.x86_64 does not verify: Payload SHA256 ALT digest: BAD (Expect
+     ## sonde de m5-reseau.spec (%build) jouée par sh -e sous unshare -rn
+          M5-SONDE début de %build
+          M5-SONDE interfaces : lo 
+          M5-SONDE tcp 192.168.161.13/5000 code 1
+          M5-SONDE fin de %build
+     OK   sonde : code, marqueurs de début et de fin : 0 1 1
+     OK   sonde sans réseau : interfaces vues : lo 
+     OK   sonde sans réseau : connexion refusée (code non nul) : 1
+     ## banc : arrêt avant la lecture
+OK   chrono du banc hors du dépôt : 2
+## E : banc_juges, pour de bon
+OK   banc_juges : code, lignes OK, KO : 0 5 0
+## F : gardes
+OK   PREFIXE=m5 refusé (code, message) : 2 1
+OK   PREFIXE=m4c refusé (code, message) : 2 1
+OK   PREFIXE=m1b-construction refusé (code, message) : 2 1
+OK   PREFIXE=m1bt3 refusé (code, message) : 2 1
+OK   PREFIXE=m1b-refus-x refusé (code, message) : 2 1
+OK   journal présent : arrêt avant toute étape (code, message, journal inchangé) : 2 1 5
+OK   chrono du banc : aucune ligne pour les passages refusés : 2
+# bilan : 45 OK, 0 KO

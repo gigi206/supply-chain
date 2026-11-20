@@ -1066,3 +1066,9 @@ De 13:47:19Z à 13:49:36Z, sous l'accord permanent, RF1 et RF2 tiennent. Avec `b
 
 - **Place libre** : la baisse de 5 551 à 2 842 Mo sous `/` de sc-stockage n'est pas attribuée. Le résultat de 14:05:53Z dans [`m1b-predictions.md`](m1b-predictions.md) l'attribuait à tort à autre chose que la brique ; la correction y est écrite.
 - **ConfigMap `porte`**, lecture du code et non mesure : `listee` (`commun.sh` de la 08) lit `politique/porte/taches.yml` du dépôt, et non la ConfigMap. Les TaskRuns et les pods de R1 à R8 ne passent pas par la porte. La mise à jour de la ConfigMap n'est donc pas un préalable de R1 à R8, contrairement à ce que disaient les notes de 11:16:43Z (M4b refait préparé à sec) et de 13:53:24Z, et mon message du 20/11 après la poussée de `694fab7c`. Elle reste une question à part.
+
+## Décision du 20/11/2026, consignée à 2026-11-20T14:10:07Z UTC : « Rejouer les huit »
+
+Question posée après le point `s1.sh prealables` : « Rejouer R1–R8 sur le nouveau bundle ? ». Le propriétaire a répondu « Rejouer les huit » (réponse lue avant 14:10:07 UTC, heure exacte non relevée). C'était ma recommandation, validée par le conseiller.
+
+**Portée** : les huit refus de M5a sont rejoués sur le bundle de la cascade (`construire-rpm@ca03f189…`, outillage `70f8c412…`), par un script frère de `m5.sh`, qui reste inchangé. L'accord porte sur le rejeu. Chaque étape suit le processus habituel : préparation à sec, banc, prédictions commitées avant le lancement, puis lancement sous l'accord permanent du 18/11. Rien n'est écrit dans Zot.
