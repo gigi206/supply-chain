@@ -299,5 +299,9 @@ verifie "J4 altération : une seule commande sed, du vrai au faux image_digest, 
   "$(sed -n '/^etape_essai_refus() {/,/^}/p' "$F" | grep -c -F "kubectl exec -n builds \"\$p\" -c remplir -- sh -c \"sed -i 's/\$IMAGE_DIGEST_BOOT/\$IMAGE_DIGEST_FAUX/' /e/verrou-rpm.json")" 1
 verifie "J5 essai_refus : aucune lecture d'image.tar ni de digest (fin remplacée)" \
   "$(sed -n '/^etape_essai_refus() {/,/^}/p' "$F" | grep -c 'tar -xf "$x/image.tar"\|DIGEST_ESSAI_M4C\|hermetique ')" 0
+echo "## K comparaison et provenance (ajoutées le 20/11/2026) : arrêt sous le préfixe du banc, lectures réelles seulement"
+altere "K1 comparaison sous le préfixe du banc : journaux de construire absents" "KO   journal archivé de construire absent" 'etape_comparaison'
+altere "K2 provenance sous le préfixe du banc : PipelineRun absent" "KO   IMAGE_DIGEST de bancconstruction-k2-construction-1" 'etape_provenance'
+verifie "K3 comparaison : tirage avec la configuration vide" "$(sed -n '/^etape_comparaison() {/,/^}/p' "$F" | grep -c -F -- '--from-registry-config "$T/vide.json"')" 1
 verifie "resultats/ inchangé par le banc (git status)" "$(etat_resultats)" "$E0"
 echo "# fin $(date -u +%FT%TZ) : $OK OK, $KO KO"

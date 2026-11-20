@@ -140,7 +140,9 @@ def transformer(src, nom, T, compter=False):
 # Ajout du 20/11/2026, après la décision « Même dépôt » : seconde zone, pour les étapes pipeline et construction.
 DEBUT2, FIN2 = '# --- recopié pour la pipeline (m4c.sh, m1b-bundles.sh, m1b-fermeture.sh) ---', '# --- fin des copies pour la pipeline ---'
 HEREDOCS = {'DIFF_FEUILLES': ("DIFF_FEUILLES=$(cat <<'PY'", 'PY')}
-COPIES2 = [('m4c.sh', ['MASQUE=', 'admission', 'libre_zot', 'pr_m4c', 'statut_pr', 'attendre_pr', 'releve_pod', 'lignes']),
+COPIES2 = [('m4c.sh', ['MASQUE=', 'admission', 'libre_zot', 'pr_m4c', 'statut_pr', 'attendre_pr', 'releve_pod', 'lignes',
+                      'COUCHE_ESSAI=', 'COUCHE_TAILLE=', 'CONFIG_ESSAI=', 'RPM_NOM=', 'RPM_TAILLE=', 'confronter_artefact',
+                      'CLE_CHAINS=', 'CLE_CHAINS_SHA=', 'KATA_ATTENDU=', 'lire_prov', 'controler_prov', 'prov_attendue']),
            ('m1b-bundles.sh', ['zot_lire', 'DIFF_FEUILLES', 'diff_feuilles']),
            ('m1b-fermeture.sh', ['lire_manifeste'])]
 T_LIRE_BUNDLE = [('pipeline prefetch-rpm-sample-app', 'pipeline sample-app-rpm', 2)]
@@ -240,8 +242,29 @@ T_REFUS = [
      '  echo "écarts : $ECARTS"\n'
      '  [ "$ECARTS" = 0 ]', 10),
 ]
+# Ajout du 20/11/2026 après essai_refus : comparaison et provenance de m4c.sh (lecture seule), noms des PipelineRuns refaits,
+# dossiers neufs, tirage anonyme explicite ; la provenance compte de plus les enveloppes (celles de M4c et celles de la cascade).
+T_COMPARAISON = [
+    ('  rm -rf -- "${c:?}"; mkdir -p "$c/travail"', '  neuf "$c"; mkdir -p "$c/travail"', 1),
+    ('m4c-pipeline-$i-construire.log', '$N-construction-$i-construire.log', 2),
+    ('m4c-rpm-$i', '$N-construction-$i', 5),
+    ('  oras cp --no-tty --from-ca-file "$P/ca-poc.crt" "${IMAGE/$REG/$REG_HOTE}@$DIGEST_ESSAI"',
+     '  echo \'{}\' > "$T/vide.json"   # configuration vide : lecture anonyme\n'
+     '  oras cp --no-tty --from-ca-file "$P/ca-poc.crt" --from-registry-config "$T/vide.json" "${IMAGE/$REG/$REG_HOTE}@$DIGEST_ESSAI"', 1),
+]
+T_PROVENANCE = [
+    ('m4c-rpm-$i', '$N-construction-$i', 3),
+    ('  rm -rf -- "${c:?}"; mkdir -p "$c"', '  neuf "$c"; mkdir -p "$c"', 1),
+    ('  for pr in m4c-rpm-1 m4c-rpm-2; do', '  for pr in "$N-construction-1" "$N-construction-2"; do', 1),
+    ('    | while read -r i uid; do echo "     $i $uid $(awk -v u="$uid" \'$1 == u {print $2, $3}\' "$c/objets.txt" | grep . || echo "(hors de pipeline)")"; done',
+     '    | while read -r i uid; do echo "     $i $uid $(awk -v u="$uid" \'$1 == u {print $2, $3}\' "$c/objets.txt" | grep . || echo "(hors de pipeline)")"; done\n'
+     '  attendu "enveloppes valides : total, puis celles des objets de M4c refait (deux PipelineRuns, deux TaskRuns de publier)" \\\n'
+     '    "$(grep -c . "$c/enveloppes.json") $(jq -r \'.payload | @base64d | fromjson | .predicate.runDetails.metadata.invocationId // "-"\' "$c/enveloppes.json" \\\n'
+     '      | awk \'NR == FNR {u[$1] = 1; next} $1 in u\' "$c/objets.txt" - | wc -l)" "8 4"', 1),
+]
 TRANSFORMEES2 = [('m1b-fermeture.sh', 'lire_bundle', T_LIRE_BUNDLE), ('m1b-fermeture.sh', 'etape_pipeline', T_PIPELINE),
-                 ('m4c.sh', 'etape_pipeline', T_CONSTRUCTION), ('m1b-bundles.sh', 'etape_essai_construire', T_REFUS)]
+                 ('m4c.sh', 'etape_pipeline', T_CONSTRUCTION), ('m1b-bundles.sh', 'etape_essai_construire', T_REFUS),
+                 ('m4c.sh', 'etape_comparaison', T_COMPARAISON), ('m4c.sh', 'etape_provenance', T_PROVENANCE)]
 
 
 def zone():

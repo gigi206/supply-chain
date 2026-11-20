@@ -2713,3 +2713,29 @@ La fin de l'essai est remplacée par les assertions du refus (coupe comptée de 
 - « Checking image digest » imprime la valeur attendue, pas la valeur trouvée. Sa présence seule ne prouve rien.
 
 **Suite** : comparaison et provenance de M4c refait, en lecture seule.
+
+## Cascade avant M5b, M4c refait : comparaison et provenance, prédictions écrites le 20/11/2026 à 2026-11-20T13:52:09Z UTC, avant tout lancement
+
+**Script** : [`m1b-construction.sh`](../m1b-construction.sh) (sha256 `67ea54d3219e0d82…`). Ce sont `etape_comparaison` et `etape_provenance` de `m4c.sh`, transformées par des remplacements comptés (copies à 133 contrôles), en lecture seule et sous l'accord permanent :
+- les PipelineRuns sont `m1b-construction-1` et `-2` ;
+- les journaux archivés sont `m1b-construction-<n>-construire.log` ;
+- les dossiers sont neufs ;
+- le tirage est anonyme de façon explicite (`--from-registry-config` vide).
+
+Les fonctions `confronter_artefact`, `lire_prov`, `controler_prov` et `prov_attendue` sont recopiées à l'identique. `prov_attendue` cite donc les références de la cascade : pipeline `7d361cb1…`, `construire-rpm@ca03f189…`, image d'outillage `70f8c412…`, fermeture `09838980…` et artefact `333b7322…`. La provenance compte de plus les enveloppes : le total, et celles dont l'invocationId est un objet de M4c refait.
+
+**Banc** : [`m1b-construction-banc-8.log`](m1b-construction-banc-8.log), 143 OK, 0 KO (banc `5929ba01821c33b8…`). La section K couvre l'arrêt des deux étapes sous le préfixe du banc, avec des lectures réelles seulement, et le tirage avec une configuration vide. **Non couvert** : les deux étapes en entier.
+
+- **CM1** (haute), `comparaison` :
+  - `IMAGE_DIGEST` vaut `07b7bd6f…` sur les deux PipelineRuns ;
+  - les journaux archivés de `construire` donnent la couche `ac3e3ef1…`, la configuration `48c5e332…` et le manifeste `07b7bd6f…` ;
+  - les deux buildroots ont 222 paquets et 0 écart au verrou `c544599a…`.
+- **CM2** (haute) : l'artefact tiré a 3 blobs. Le manifeste, la configuration et la couche sont ceux de l'essai, et la couche contient le seul rpm, égal à celui de M3 (sha256 et `cmp`).
+- **PV1** (haute), `provenance` :
+  - la clé de Chains est `1e7b2a03…` ;
+  - `cosign verify-attestation` valide 8 enveloppes : les 4 de M4c et 4 de M4c refait (deux PipelineRuns, deux TaskRuns de `publier`) ;
+  - chaque PipelineRun refait a exactement une enveloppe à son uid, sur le sujet `builds/sample-app-rpm@07b7bd6f…`, avec le buildType attendu et la source git.
+- **PV2** (haute) : pour chaque PipelineRun refait, les `resolvedDependencies` et les paramètres des tâches sont égaux à l'attendu. Kata n'est porté que par `construire-rpm`.
+- **PV3** (haute) : la vérification avec une autre clé est refusée. **Relevé, sans pari** : la signature simplesigning (`.sig`).
+
+Si CM1, CM2 et PV1 à PV3 tiennent, **M4c refait est tenu**, et avec lui le cinquième point de la cascade.

@@ -36,7 +36,14 @@
 #   essai_refus  ajoutée le 20/11/2026 après construction (accord permanent : pod d'essai Kata, rien dans Zot) : etape_essai
 #           (etape_essai_construire de m1b-bundles.sh) avec une seule altération, bootstrap.image_digest du verrou livré au pod,
 #           réécrit par le conteneur remplir ; refus attendu de mock (« Expected digest for image »), code non nul, aucun rpm.
-# Comparaison et provenance viendront ensuite (lecture seule).
+#   comparaison  ajoutée le 20/11/2026 après essai_refus (accord permanent, lecture seule) : etape_comparaison de m4c.sh
+#           transformée : IMAGE_DIGEST des deux PipelineRuns refaits, journaux archivés de construire (couche, configuration,
+#           manifeste ; buildroot contre le verrou neuf) ; artefact tiré par digest (configuration vide, lecture anonyme) dans un
+#           dossier neuf, confronté à l'essai et au rpm de M3.
+#   provenance  ajoutée de même (lecture seule) : etape_provenance de m4c.sh transformée : attestations de l'artefact vérifiées
+#           par cosign (clé de Chains) ; enveloppes comptées (celles de M4c et celles de M4c refait) ; une par PipelineRun refait,
+#           isolée par son uid ; dépendances, paramètres et Kata égaux à l'attendu (références de la cascade) ; refus avec une
+#           autre clé.
 # Un journal existant n'est jamais réécrit : relancer sous un autre PREFIXE.
 # Usage (racine du dépôt) : [PREFIXE=m1b] DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/m1b-construction.sh <étape>…
 #         (journaux : resultats/$PREFIXE-construction-<étape>.log)
@@ -592,6 +599,103 @@ releve_pod() { # pod : nœud, runtimeClassName, label ; conteneurs d'initialisat
       "     ressources \(.name) : demandes \(.resources.requests // {} | tojson) ; limites \(.resources.limits // {} | tojson)")' "$T/pod-$1.json"
 }
 lignes() { grep -c -- "$1" "$2" || true; }   # motif fichier : nombre de lignes
+COUCHE_ESSAI=sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4   # couche du pod d'essai (tar 1.34 de l'image)
+COUCHE_TAILLE=2181120
+CONFIG_ESSAI=sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688b351a53aa0cc4   # configuration du pod d'essai
+RPM_NOM=sample-app-1.0.0-2.el9.x86_64.rpm
+RPM_TAILLE=2173376
+confronter_artefact() { # layout travail : manifeste, configuration, couche et rpm confrontés à l'essai et à M3 ; hors ligne (banc)
+  local L=$1 a=$2 m g l
+  m=$L/blobs/sha256/${DIGEST_ESSAI#sha256:}
+  echo "blobs : $(find "$L/blobs" -type f | wc -l) ; index : $(jq -c '[.manifests[]? | {mediaType, digest}]' "$L/index.json" 2>&1)"
+  [ -f "$m" ] || echec "manifeste $DIGEST_ESSAI absent du layout"
+  echo "manifeste : $(jq -c '{mediaType, config: (.config | {mediaType, digest, size}), layers: [.layers[]? | {mediaType, digest, size}]}' "$m" 2>&1)"
+  attendu "manifeste : sha256 des octets lus" "sha256:$(sha256sum < "$m" | cut -c1-64)" "$DIGEST_ESSAI"
+  attendu "blobs du layout" "$(find "$L/blobs" -type f | wc -l)" 3
+  attendu "manifeste : types, nombre de couches" "$(jq -r '[.mediaType, .config.mediaType, (.layers | length), .layers[0].mediaType] | join(" ")' "$m")" \
+    "application/vnd.oci.image.manifest.v1+json application/vnd.oci.image.config.v1+json 1 application/vnd.oci.image.layer.v1.tar"
+  attendu "manifeste : couche (digest et taille), celle de l'essai" "$(jq -r '.layers[0] | "\(.digest) \(.size)"' "$m")" "$COUCHE_ESSAI $COUCHE_TAILLE"
+  attendu "manifeste : configuration, celle de l'essai" "$(jq -r '.config.digest' "$m")" "$CONFIG_ESSAI"
+  g=$L/blobs/sha256/${CONFIG_ESSAI#sha256:}; l=$L/blobs/sha256/${COUCHE_ESSAI#sha256:}
+  [ -f "$g" ] && [ -f "$l" ] || echec "configuration ou couche absente du layout"
+  echo "configuration : $(jq -c . "$g" 2>&1)"
+  attendu "configuration : sha256 et taille des octets lus" "sha256:$(sha256sum < "$g" | cut -c1-64) $(stat -c %s "$g")" "$CONFIG_ESSAI $(jq -r .config.size "$m")"
+  attendu "configuration : diff_ids, la couche non compressée" "$(jq -c '.rootfs.diff_ids' "$g")" "[\"$COUCHE_ESSAI\"]"
+  attendu "couche : sha256 et taille des octets lus" "sha256:$(sha256sum < "$l" | cut -c1-64) $(stat -c %s "$l")" "$COUCHE_ESSAI $COUCHE_TAILLE"
+  TZ=UTC tar -tvf "$l" > "$a/membres.txt" 2>&1 || true
+  echo "membres de la couche ($(wc -l < "$a/membres.txt")) :"; sed 's/^/     /' "$a/membres.txt"
+  attendu "couche : un membre, le rpm seul (mode, propriétaire, taille, date, nom)" "$(awk '{print $1, $2, $3, $4, $5, $6}' "$a/membres.txt")" \
+    "-rw-r--r-- 0/0 $RPM_TAILLE 1970-01-01 00:00 $RPM_NOM"
+  mkdir -p "$a/rpm"; tar -xf "$l" -C "$a/rpm" || echec "extraction de la couche"
+  echo "rpm tiré : $RPM_NOM, $(stat -c %s "$a/rpm/$RPM_NOM") octets, sha256 $(sha256sum < "$a/rpm/$RPM_NOM" | cut -c1-64)"
+  mesure "rpm tiré égal à celui de M3 (sha256)" "$(sha256sum < "$a/rpm/$RPM_NOM" | cut -c1-64)" "$RPM_M3_SHA"
+  mesure "rpm tiré égal au fichier de M3 (cmp)" "$(cmp -s "$a/rpm/$RPM_NOM" "$RPM_M3" && echo égal || echo différent)" égal
+}
+CLE_CHAINS=$here/resultats/chains-cle-publique.pem
+CLE_CHAINS_SHA=1e7b2a03f9d5d289898e63b57410aeafa4e3680e86474d4f35aaa4e01f0c5e65   # comme m4b.sh (réécrite au rebâti du 13/11)
+KATA_ATTENDU="construire-rpm:kata preparer-rpm:- publier-image:-"   # taskRunSpecs de pr_m4c : Kata pour construire seule
+lire_prov() { # provenance (un objet JSON décodé) travail : resolvedDependencies (« nom uri digest ») dans deps.txt ; paramètres des
+  # pipelineTask (« tâche paramètre valeur ») dans params.txt ; « tâche:runtimeClassName » dans taches.txt ; valeur à saut de ligne :
+  # sha256 après retrait des lignes vides, et nombre de ces lignes ; listes triées ; jamais le contenu des pipelineTask en entier
+  local p=$1 a=$2 t n v
+  jq -r '.predicate.buildDefinition.resolvedDependencies[]
+    | "\(.name // "-") \(.uri // "-") \(.digest // {} | to_entries | map(.key + ":" + .value) | join(","))"' "$p" | sort > "$a/deps.txt"
+  jq -r '.predicate.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask") | .content | @base64d | fromjson
+    | ((.spec.taskRef.params // []) | map(select(.name == "name")) | .[0].value // "-") as $t
+    | .spec.params[]? | "\($t) \(.name) \(.value | if type == "string" then . else tojson end | @base64)"' "$p" \
+    | while read -r t n v; do
+        if [ "$(base64 -d <<< "$v" | wc -l)" -gt 0 ]; then
+          echo "$t $n sha256:$(base64 -d <<< "$v" | sed '/^$/d' | sha256sum | cut -c1-64) ($(base64 -d <<< "$v" | sed '/^$/d' | wc -l) lignes non vides)"
+        else
+          echo "$t $n $(base64 -d <<< "$v")"
+        fi
+      done | sort > "$a/params.txt"
+  jq -r '.predicate.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask") | .content | @base64d | fromjson
+    | "\((.spec.taskRef.params // []) | map(select(.name == "name")) | .[0].value // "-"):\(.spec.podTemplate.runtimeClassName // "-")"' "$p" \
+    | sort > "$a/taches.txt"
+}
+controler_prov() { # enveloppes uid sujet deps-attendues params-attendus kata-attendu source-attendue travail : tout imprimé, puis
+  # assertions ; hors ligne (banc)
+  local e=$1 u=$2 a=$8 n
+  jq -c --arg u "$u" '.payload | @base64d | fromjson | select(.predicate.runDetails.metadata.invocationId == $u)' "$e" > "$a/prov.json"
+  n=$(grep -c . "$a/prov.json" || true)
+  : > "$a/deps.txt"; : > "$a/params.txt"; : > "$a/taches.txt"
+  [ "$n" != 1 ] || lire_prov "$a/prov.json" "$a"
+  echo "enveloppes de l'invocation $u : $n"
+  echo "sujet : $(jq -r '.subject | map("\(.name)@sha256:\(.digest.sha256)") | join(",")' "$a/prov.json" | paste -sd' ')"
+  echo "buildType : $(jq -r '.predicate.buildDefinition.buildType' "$a/prov.json" | paste -sd' ') ; builder.id : $(jq -r '.predicate.runDetails.builder.id // "-"' "$a/prov.json" | paste -sd' ') (relevé)"
+  echo "début et fin : $(jq -r '"\(.predicate.runDetails.metadata.startedOn // "-") \(.predicate.runDetails.metadata.finishedOn // "-")"' "$a/prov.json" | paste -sd' ') (relevé)"
+  echo "resolvedDependencies ($(wc -l < "$a/deps.txt")) :"; sed 's/^/     /' "$a/deps.txt"
+  echo "paramètres des tâches ($(wc -l < "$a/params.txt")) :"; cut -c1-200 "$a/params.txt" | sed 's/^/     /'
+  echo "runtimeClassName des tâches (spec signée) : $(paste -sd' ' "$a/taches.txt")"
+  sort "$4" > "$a/deps-attendues-triees.txt"; sort "$5" > "$a/params-attendus-tries.txt"   # copies triées, sous d'autres noms que les entrées
+  echo "écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres"
+  comm -3 "$a/deps.txt" "$a/deps-attendues-triees.txt" | cut -c1-200 | sed 's/^/     /'
+  comm -3 "$a/params.txt" "$a/params-attendus-tries.txt" | cut -c1-200 | sed 's/^/     /'
+  attendu "enveloppes de l'invocation" "$n" 1
+  attendu "sujet" "$(jq -r '.subject | map("\(.name)@sha256:\(.digest.sha256)") | join(",")' "$a/prov.json")" "$3"
+  attendu "buildType" "$(jq -r '.predicate.buildDefinition.buildType' "$a/prov.json")" https://tekton.dev/chains/v2/slsa-tekton
+  attendu "source (dépendance git : uri et commit)" \
+    "$(jq -r '.predicate.buildDefinition.resolvedDependencies[] | select(.uri // "" | startswith("git+")) | "\(.uri) sha1:\(.digest.sha1 // "-")"' "$a/prov.json" | paste -sd' ')" "$7"
+  attendu "resolvedDependencies égales à l'attendu (sha256 des listes triées)" \
+    "$(sha256sum < "$a/deps.txt" | cut -c1-64)" "$(sha256sum < "$a/deps-attendues-triees.txt" | cut -c1-64)"
+  attendu "paramètres des tâches égaux à l'attendu (sha256 des listes triées)" \
+    "$(sha256sum < "$a/params.txt" | cut -c1-64)" "$(sha256sum < "$a/params-attendus-tries.txt" | cut -c1-64)"
+  attendu "runtimeClassName des tâches dans la spec signée" "$(paste -sd' ' "$a/taches.txt")" "$6"
+}
+prov_attendue() { # travail : deps-attendues.txt et params-attendus.txt, tirés des références épinglées de ce fichier
+  local r
+  {
+    echo "pipeline ${PIPELINE_REF%@*} ${PIPELINE_REF#*@}"
+    for r in "$PREPARER_REF" "$CONSTRUIRE_REF" "$PUBLIER_REF"; do echo "pipelineTask ${r%@*} ${r#*@}"; done
+    for r in "$PREFETCH_IMAGE" "$OUTILS_IMAGE" "$IMAGE_OUTILLAGE"; do echo "- oci://${r%@*} ${r#*@}"; done
+    echo "inputs/result git+$DEPOT_GIT sha1:$COMMIT"
+    for r in "$FERMETURE_RPM" "$FERMETURE_SOURCES" "$PACKAGING"; do echo "inputs/result oci://${r%@*} ${r#*@}"; done
+  } > "$1/deps-attendues.txt"
+  printf '%s\n' "preparer-rpm depot $DEPOT_GIT" "preparer-rpm commit $COMMIT" "preparer-rpm fermeture-rpm $FERMETURE_RPM" \
+    "preparer-rpm fermeture-sources $FERMETURE_SOURCES" "preparer-rpm packaging $PACKAGING" "construire-rpm epoque $EPOQUE" \
+    "publier-image image $IMAGE" "publier-image digest $DIGEST_ESSAI" > "$1/params-attendus.txt"
+}
 # Blocs recopiés à l'identique de m1b-bundles.sh :
 zot_lire() { # libellé référence-sans-registre : digest si présent, « absent » sur un « not found » seul, sinon échec
   local d
@@ -896,6 +1000,87 @@ etape_essai_refus() { # pod Kata au label construire-rpm, à la forme que Tekton
   echo "relevé : première ligne de mock « Expected digest for image » : $(grep -v '^lignes « ' "$x/construire.log" | grep -m 1 -o 'Expected digest for image.*' | cut -c1-300)"
   echo "écarts : $ECARTS"
   [ "$ECARTS" = 0 ]
+}
+
+etape_comparaison() { # lecture seule : artefact tiré par digest (lecture anonyme) dans un dossier neuf, confronté à l'essai et à M3
+  local c=$T/comparaison i x n
+  neuf "$c"; mkdir -p "$c/travail"
+  echo "## gardes"
+  attendu "rpm de M3 (build 1)" "$(sha256sum < "$RPM_M3" | cut -c1-64)" "$RPM_M3_SHA"
+  attendu "verrou (sha256)" "$(sha256sum < "$VERROU" | cut -c1-64)" "$VERROU_SHA"
+  for i in 1 2; do
+    x=$R/$N-construction-$i-construire.log
+    [ -s "$x" ] || echec "journal archivé de construire absent : $x"
+    attendu "journal $i de construire : couche, configuration et manifeste" \
+      "$(lignes "^couche $COUCHE_ESSAI ($COUCHE_TAILLE octets) ; configuration $CONFIG_ESSAI ; manifeste $DIGEST_ESSAI$" "$x")" 1
+    attendu "IMAGE_DIGEST de $N-construction-$i (relu dans le cluster)" \
+      "$(kubectl get pipelinerun -n builds "$N-construction-$i" -o json < /dev/null | jq -r '.status.results[]? | select(.name == "IMAGE_DIGEST") | .value')" "$DIGEST_ESSAI"
+  done
+  echo "## buildroot des deux PipelineRuns contre le verrou (journaux archivés de construire)"
+  jq -r '.buildroot.rpms[] | "paquet \(.name) \(.version) \(.release) \(.arch) \(.sigmd5)"' "$VERROU" | sort > "$c/verrou.txt"
+  for i in 1 2; do
+    grep '^paquet ' "$R/$N-construction-$i-construire.log" > "$c/paquets-$i.txt" || true
+    n=$(diff "$c/paquets-$i.txt" "$c/verrou.txt" | grep -c '^[<>]' || true)
+    echo "$N-construction-$i : paquets imprimés $(wc -l < "$c/paquets-$i.txt") ; lignes d'écart au verrou $n ; 5 premières :"
+    diff "$c/paquets-$i.txt" "$c/verrou.txt" | grep '^[<>]' | sed -n '1,5p' | cut -c1-200 | sed 's/^/     /' || true
+    mesure "$N-construction-$i : paquets du buildroot" "$(wc -l < "$c/paquets-$i.txt")" 222
+    mesure "$N-construction-$i : lignes d'écart au verrou (nom, version, release, arch, sigmd5)" "$n" 0
+  done
+  echo "## tirage par digest, lecture anonyme, dossier neuf"
+  echo '{}' > "$T/vide.json"   # configuration vide : lecture anonyme
+  oras cp --no-tty --from-ca-file "$P/ca-poc.crt" --from-registry-config "$T/vide.json" "${IMAGE/$REG/$REG_HOTE}@$DIGEST_ESSAI" --to-oci-layout "$c/layout:a" < /dev/null > "$c/cp.out" 2>&1 \
+    || { sed -n '1,5p' "$c/cp.out" >&2; echec "oras cp de l'artefact"; }
+  echo "tiré : $DIGEST_ESSAI ; du -sb du layout : $(du -sb "$c/layout" | cut -f1) octets (relevé)"
+  echo "## confrontation à l'essai et à M3"
+  confronter_artefact "$c/layout" "$c/travail"
+  echo "dossier tiré laissé : $c"
+  echo "écarts : $ECARTS"
+  [ "$ECARTS" = 0 ]
+}
+
+etape_provenance() { # lecture seule : attestations de l'artefact vérifiées par cosign (clé de Chains), une par PipelineRun ; refus
+  local c=$T/provenance i pr uid s r
+  echo "## gardes"
+  attendu "clé publique de Chains (sha256)" "$(sha256sum < "$CLE_CHAINS" | cut -c1-64)" "$CLE_CHAINS_SHA"
+  for i in 1 2; do
+    attendu "IMAGE_DIGEST de $N-construction-$i (relu dans le cluster)" \
+      "$(kubectl get pipelinerun -n builds "$N-construction-$i" -o json < /dev/null | jq -r '.status.results[]? | select(.name == "IMAGE_DIGEST") | .value')" "$DIGEST_ESSAI"
+  done
+  s=$IMAGE@$DIGEST_ESSAI
+  neuf "$c"; mkdir -p "$c"
+  prov_attendue "$c"
+  echo "attendu : $(wc -l < "$c/deps-attendues.txt") dépendances, $(wc -l < "$c/params-attendus.txt") paramètres ; sujet $s"
+  echo "## cosign verify-attestation (clé de Chains, sans journal de transparence), lecture anonyme"
+  cosign verify-attestation --key "$CLE_CHAINS" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" \
+    "${s/$REG/$REG_HOTE}" < /dev/null > "$c/enveloppes.json" 2> "$c/cosign.err" || { sed -n '1,5p' "$c/cosign.err" >&2; echec "cosign verify-attestation"; }
+  echo "OK   cosign verify-attestation : $(grep -c . "$c/enveloppes.json") enveloppe(s) valide(s) sur $DIGEST_ESSAI"
+  for pr in "$N-construction-1" "$N-construction-2"; do
+    kubectl get pipelinerun -n builds "$pr" -o jsonpath='{.metadata.uid} PipelineRun {.metadata.name}{"\n"}' < /dev/null
+    kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$pr" -o jsonpath='{range .items[*]}{.metadata.uid} TaskRun {.metadata.name}{"\n"}{end}' < /dev/null
+  done > "$c/objets.txt"
+  echo "invocationId des enveloppes (nombre, valeur, objet de pipeline) :"
+  jq -r '.payload | @base64d | fromjson | .predicate.runDetails.metadata.invocationId // "-"' "$c/enveloppes.json" | sort | uniq -c \
+    | while read -r i uid; do echo "     $i $uid $(awk -v u="$uid" '$1 == u {print $2, $3}' "$c/objets.txt" | grep . || echo "(hors de pipeline)")"; done
+  attendu "enveloppes valides : total, puis celles des objets de M4c refait (deux PipelineRuns, deux TaskRuns de publier)" \
+    "$(grep -c . "$c/enveloppes.json") $(jq -r '.payload | @base64d | fromjson | .predicate.runDetails.metadata.invocationId // "-"' "$c/enveloppes.json" \
+      | awk 'NR == FNR {u[$1] = 1; next} $1 in u' "$c/objets.txt" - | wc -l)" "8 4"
+  for i in 1 2; do
+    pr=$N-construction-$i
+    uid=$(kubectl get pipelinerun -n builds "$pr" -o jsonpath='{.metadata.uid}' < /dev/null)
+    echo "## provenance de $pr ($uid)"
+    mkdir -p "$c/$pr"
+    controler_prov "$c/enveloppes.json" "$uid" "$s" "$c/deps-attendues.txt" "$c/params-attendus.txt" "$KATA_ATTENDU" \
+      "git+$DEPOT_GIT sha1:$COMMIT" "$c/$pr"
+  done
+  echo "## signature simplesigning (tag .sig), relevé"
+  r=0; cosign verify --key "$CLE_CHAINS" --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" "${s/$REG/$REG_HOTE}" \
+    < /dev/null > "$c/signatures.json" 2> "$c/verify.err" || r=$?
+  echo "cosign verify : code $r ; $(jq -s 'flatten | length' "$c/signatures.json" 2> /dev/null || echo -) signature(s) valide(s) ; digests signés : $(
+    jq -r -s 'flatten | map(.critical.image["docker-manifest-digest"]) | unique | join(" ")' "$c/signatures.json" 2> /dev/null || echo -) (relevé, non exigé)"
+  echo "## refus"
+  openssl ecparam -genkey -name prime256v1 2> /dev/null | openssl ec -pubout -out "$c/autre.pub" 2> /dev/null
+  refus "provenance vérifiée avec une autre clé" "no matching attestations|invalid signature" \
+    cosign verify-attestation --key "$c/autre.pub" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" "${s/$REG/$REG_HOTE}"
 }
 # --- fin des copies pour la pipeline ---
 
