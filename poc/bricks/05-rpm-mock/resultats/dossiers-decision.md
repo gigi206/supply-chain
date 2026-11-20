@@ -173,3 +173,25 @@ Le conseiller a relu ce fichier avant la poussée. Les dossiers ci-dessus resten
 - (iii) effacer les vieilles bases par l'import.
 
 Je n'ai toujours pas de recommandation : (ii) et (iii) touchent tous deux à des choses mesurées par G7.
+
+## Dossier 3 : correctif préparé à sec, NON APPLIQUÉ (note de 2026-11-20T20:20:55Z ; rien n'est réécrit au-dessus)
+
+Il ne sert que si tu choisis l'option (i).
+
+**Correctif** [`vm-30g.patch`](vm-30g.patch) : une seule ligne de `08-trust-plane/vm.sh`, la ligne 25 (`TAILLE[sc-stockage]` de 20G à 30G), avec un commentaire.
+- `vm.sh` dans le dépôt : sha256 `6268db0da362ad84…`, non modifié.
+- Copie corrigée, hors du dépôt : sha256 `2e725deee5ec0597…`.
+
+**Contrôles à sec** :
+- `bash -n` passe. shellcheck ne relève aucun avertissement (`-S warning -x`), ni sur la copie ni sur le dépôt.
+- La ligne 25 de la copie, évaluée seule avec la règle de la ligne 27, donne :
+  - sous k3s : confiance 15G, build 30G, stockage 30G ;
+  - sous RKE2 : confiance 25G, build 30G, stockage 30G.
+- Rien n'est créé : `vm.sh` n'a pas tourné.
+
+**Place sur l'hôte**, relevée sans sudo dans la même session :
+- `/` : 61 845 Mo libres ;
+- disques des VM, allocation réelle (`virsh vol-info`) : sc-confiance 11,64 GiB, sc-build 20,13 GiB, sc-stockage 17,29 GiB ;
+- capacité totale sous RKE2 avec le correctif : 85G. Les volumes sont fins (qcow2), et un rejeu repart d'images neuves.
+
+Si tu choisis (i), je l'applique avant le rejeu, puis je repasse `bash -n` et shellcheck sur le dépôt.

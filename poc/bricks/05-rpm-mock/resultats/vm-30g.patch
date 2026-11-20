@@ -1,0 +1,11 @@
+--- vm.sh	2026-11-05 21:19:13.552107511 +0100
++++ vm.sh	2026-11-20 21:20:30.925807556 +0100
+@@ -22,7 +22,7 @@
+ POOL_DIR=/var/lib/libvirt/supply-chain-poc
+ NET=supply-chain-poc
+ VMS=(sc-confiance sc-build sc-stockage)
+-declare -A TAILLE=([sc-confiance]=15G [sc-build]=30G [sc-stockage]=20G)
++declare -A TAILLE=([sc-confiance]=15G [sc-build]=30G [sc-stockage]=30G)   # sc-stockage : 30G depuis le 20/11/2026 (« Agrandir maintenant », AG1-AG5), repris au rejeu
+ . "$here/distro.sh"
+ [ "$DISTRO" = k3s ] || TAILLE[sc-confiance]=25G   # D3 a de la 08b, avec 12 Gi ci-dessous
+ declare -A IP=([sc-confiance]=192.168.161.11 [sc-build]=192.168.161.12 [sc-stockage]=192.168.161.13)
