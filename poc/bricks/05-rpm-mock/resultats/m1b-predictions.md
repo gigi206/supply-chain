@@ -2739,3 +2739,28 @@ Les fonctions `confronter_artefact`, `lire_prov`, `controler_prov` et `prov_atte
 - **PV3** (haute) : la vérification avec une autre clé est refusée. **Relevé, sans pari** : la signature simplesigning (`.sig`).
 
 Si CM1, CM2 et PV1 à PV3 tiennent, **M4c refait est tenu**, et avec lui le cinquième point de la cascade.
+
+### M4c refait : résultat de `comparaison` et `provenance`, écrit le 20/11/2026 à 2026-11-20T13:53:24Z UTC ; M4c refait TENU
+
+`m1b-construction.sh comparaison provenance` a tourné le 20/11/2026 à 13:52:20Z, sous l'accord permanent, avec code 0. Les deux étapes sont en lecture seule, et aucune ligne de jeton n'apparaît.
+
+| Étape | OK | KO | Écarts | Journal |
+|---|---|---|---|---|
+| `comparaison` | 21 | 0 | 0 | [`m1b-construction-comparaison.log`](m1b-construction-comparaison.log) |
+| `provenance` | 20 | 0 | - | [`m1b-construction-provenance.log`](m1b-construction-provenance.log) |
+
+- **CM1 tenue** : `IMAGE_DIGEST` vaut `07b7bd6f…` sur `m1b-construction-1` et `-2`. Les deux journaux archivés de `construire` donnent la couche, la configuration et le manifeste de l'essai. Les deux buildroots ont 222 paquets et 0 écart au verrou `c544599a…`.
+- **CM2 tenue** : l'artefact, tiré anonymement dans un dossier neuf, a 3 blobs (2 181 997 octets). La couche ne contient que le rpm, en 0644, propriétaire 0, daté de 1970, et il est égal à celui de M3 (sha256 et `cmp`).
+- **PV1 tenue** : `cosign verify-attestation` valide 8 enveloppes. 4 viennent des objets de M4c refait (deux PipelineRuns, deux TaskRuns de `publier`), les 4 autres de M4c. Chaque PipelineRun refait a exactement une enveloppe à son uid, sur le sujet `builds/sample-app-rpm@07b7bd6f…`, avec le buildType attendu et la source git `6391fd43…`.
+- **PV2 tenue** : pour chaque PipelineRun refait, les 11 dépendances et les 8 paramètres sont égaux à l'attendu, et Kata n'est porté que par `construire-rpm`.
+  - Les dépendances citent la pipeline `7d361cb1…`, `construire-rpm@ca03f189…`, l'outillage `70f8c412…`, la fermeture `09838980…` et l'artefact `333b7322…`.
+  - Elles ne citent aucune référence de M4c (`ca874375…`, `d7f01398…`, `99790c13…`, `2a9e2ea7…`, `41c639b7…`).
+- **PV3 tenue** : la vérification avec une autre clé est refusée (« no matching attestations »). **Relevé** : une signature simplesigning valide sur `07b7bd6f…`.
+
+**M4c refait est tenu.** La plateforme construit sous Kata, sans réseau, l'artefact rpm de sample-app avec les objets de M1b et de la cascade :
+- l'outillage `70f8c412…` ;
+- le bootstrap `6de899ac…`, dont mock contrôle l'`image_digest` (refus observé avec un faux) ;
+- la fermeture `09838980…` ;
+- l'artefact de packaging `333b7322…`.
+
+Elle le publie deux fois au même digest que M4c (`07b7bd6f…`), et sa provenance cite ces références. **La cascade avant M5b est terminée** : verrou, artefact, bundles, M4b refait, M4c refait.

@@ -221,3 +221,11 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
   - la provenance de Chains cite les références de la cascade.
 - **Conséquence pour la règle générique** : changer d'images de builder change l'empreinte de la fermeture des dépendances, et seulement elle : la seule partie qui diffère est l'image de bootstrap qu'elle embarque. Les deux fermetures coexistent par digest dans le même dépôt (décision du propriétaire « Même dépôt, par digest »).
 - **Non mesuré** : la construction hermétique avec cette fermeture (M4c refait), le contrôle de `image_digest` du bootstrap neuf, et le jugement par la porte.
+
+**Additif du 20/11/2026, écrit à 13:53 UTC : M4c refait tenu** ([résultat](../../poc/bricks/05-rpm-mock/resultats/m1b-predictions.md)). Script frère `m1b-construction.sh`, le 20/11/2026 de 13:14 à 13:52 UTC. Décision du propriétaire « Même dépôt » pour l'artefact.
+- **Mesuré** :
+  - avec l'outillage, le bootstrap, le verrou et la fermeture construits par la plateforme, la construction hermétique sous Kata redonne à l'octet le rpm de M3 et l'artefact de M4c (`07b7bd6f…`) : à l'essai, puis dans deux PipelineRuns ;
+  - mock contrôle l'`image_digest` du bootstrap. Avec une valeur fausse d'un caractère, il s'arrête (rc 90) et donne le digest calculé, égal au verrou ;
+  - les provenances des PipelineRuns refaits citent les références de la cascade, et s'ajoutent à celles de M4c sur le même sujet (8 enveloppes).
+- **Conséquence pour la règle générique** : changer d'images de builder change la fermeture des dépendances, pas l'artefact construit. Un même artefact peut donc porter des provenances de chaînes différentes. La porte les juge ensemble, et une vérification qui veut isoler une chaîne doit passer par l'uid de l'invocation.
+- **Non mesuré** : le jugement par la porte (ConfigMap `porte` encore en retard sur `taches.yml`) et le rejeu M5b.

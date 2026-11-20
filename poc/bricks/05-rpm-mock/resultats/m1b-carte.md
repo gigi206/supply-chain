@@ -1028,3 +1028,11 @@ De 13:38:48Z à 13:43:25Z, sur ton accord nommé, CO1 à CO4 tiennent. Les deux 
 ## Note datée du 20/11/2026, écrite à 2026-11-20T13:50:16Z UTC : refus d'un image_digest faux observé
 
 De 13:47:19Z à 13:49:36Z, sous l'accord permanent, RF1 et RF2 tiennent. Avec `bootstrap.image_digest` altéré d'un caractère dans le verrou livré au pod, mock s'arrête en 8 s (rc 90), sans repli en chroot. Il écrit « Expected digest for image … is …89cb, but 77cff176…89ca found ». Le digest calculé par mock est donc mesuré, et égal au verrou de M1b. Suite : comparaison et provenance de M4c refait.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T13:53:24Z UTC : M4c refait tenu, cascade terminée
+
+À 13:52:20Z, CM1, CM2 et PV1 à PV3 tiennent. L'artefact `07b7bd6f…`, tiré de Zot, ne contient que le rpm de M3. Ses 8 enveloppes valides comptent une enveloppe par PipelineRun refait, et ces provenances citent les références de la cascade, aucune de M4c. **M4c refait est tenu, et la cascade avant M5b est terminée.** Restent, hors de la cascade :
+- la mise à jour de la ConfigMap `porte`, à demander avant R1–R8 ;
+- `poc/packaging/verrou-rpm.json`, encore le verrou de M4a ;
+- l'adaptation de `s1.sh prealables` ;
+- le rejeu M5b, pas avant le 28/11.
