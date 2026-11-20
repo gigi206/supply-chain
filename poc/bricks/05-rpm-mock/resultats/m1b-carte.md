@@ -964,3 +964,7 @@ J'ai écrit un script frère de `m4b.sh` et `m4c.sh` : [`m1b-bundles.sh`](../m1b
 ## Note datée du 20/11/2026, écrite à 2026-11-20T10:47:39Z UTC : bundles de la cascade, correction avant lancement
 
 Le conseiller a trouvé un chemin hérité de `m4c.sh` dans l'essai de construction (`$T/entrees.tar`). Il est corrigé avant tout lancement. Le banc est rejoué : 109 OK ([`m1b-bundles-banc-2.log`](m1b-bundles-banc-2.log)). Détail dans la [correction datée](m1b-predictions.md).
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T10:53:19Z UTC : bundles de la cascade, essais passés
+
+`local` et les deux pods d'essai ont tourné de 10:47:55Z à 10:52:37Z. BL1, EP1 à EP3 et EC1 à EC3 tiennent ([résultat](m1b-predictions.md)). Sur l'image `70f8c412`, le prefetch rend l'arbre de `final` et la construction rend le rpm de M3 et l'artefact `07b7bd6f`. `taches` (signature, deux bundles sous `m1b`) attend ton accord nommé.

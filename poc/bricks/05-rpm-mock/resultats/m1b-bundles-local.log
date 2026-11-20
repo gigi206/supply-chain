@@ -1,0 +1,31 @@
+# m1b-bundles.sh local, 2026-11-20T10:47:55Z
+OK   fermeture/prefetch-rpm.yaml (sha256) : 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c
+OK   fermeture/prefetch-rpm-sample-app.yaml (sha256) : ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+OK   construction/construire-rpm.yaml (sha256) : e88f5521ede87f5b03330683939fd3494f5ff58544ded9a9326014e30b8d0f88
+OK   fermeture/prefetch-rpm.signee.yaml (sha256) : 4123539575b1f7986f82f648913ee147348c7198399018f3520c7037eeade199
+OK   construction/construire-rpm.signee.yaml (sha256) : faab95fd9464d437aa0c0a98b63fce8fe0dd6a2e4f5c173fb2bcd632e6e2b70c
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   verrou de M4a et M4b (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   arbre de final (sha256) : fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+OK   liste de l'outillage de M1b, celle du rendu signé de builder-mock-rocky9 (sha256) : c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f
+## témoin de méthode : gabarits rendus avec l'image d'essai, normalisés, contre les tâches signées de M4b et M4c
+OK   témoin : prefetch-rpm rendue avec l'image d'essai, égale à la tâche signée de M4b : égale
+OK   témoin : construire-rpm rendue avec l'image d'essai, égale à la tâche signée de M4c : égale
+OK   essai : script de prefetch-rpm substitué, égal à celui de l'essai de M4b (sha256) : 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+OK   essai : script de construire-rpm substitué, égal à celui de l'essai de M4c (sha256) : 0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c
+## gabarits rendus avec l'image neuve
+     .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771" -> "sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae"
+OK   prefetch-rpm neuve contre celle de M4b : feuilles différentes : .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771" -> "sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae"
+     .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771" -> "sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae"
+OK   construire-rpm neuve contre celle de M4c : feuilles différentes : .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771" -> "sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae"
+OK   pipeline de prefetch rendue : égale à celle du témoin (le bootstrap de M4b, l'image n'y figure pas) : égale
+OK   neuf : script de prefetch-rpm substitué, égal à celui de l'essai de M4b (sha256) : 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+OK   neuf : script de construire-rpm substitué, égal à celui de l'essai de M4c (sha256) : 0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c
+OK   script de prefetch, sh -n (sh du pas de Tekton) : ok
+OK   script de construire, bash -n (lancé par bash, comme à l'essai de M4c) : ok
+## références de M4b et M4c dans la liste revue ; image neuve
+OK   prefetch-rpm de M4b, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+OK   construire-rpm de M4c, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+relevé : lignes de la liste revue qui citent l'image neuve : 0
+## entrées de l'essai de construction (m4c prealables)
+OK   entrees.tar (taille, sha256) : 318842880 b84f68ee0ac565a4b3f7ec7f55c6b11ae4a0e5a709e38daef97b9d7369f5f284

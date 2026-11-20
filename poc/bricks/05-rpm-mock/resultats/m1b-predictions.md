@@ -2285,3 +2285,22 @@ Les tâches signées de M4b et M4c restent en place, avec leurs tags `m4b` et `m
 - **Correction** : un remplacement de plus, compté (`copier_pod … "$ENTREES"`). Le script passe de `e153d64c…` à `3faa018b389361c6…`.
 - **Banc** : section F ajoutée. Elle relève statiquement les chemins de l'hôte lus par les deux essais : tous sont écrits dans l'étape même, aucun ne vient de `m4c prealables`. Le banc est rejoué dans un journal neuf, [`m1b-bundles-banc-2.log`](m1b-bundles-banc-2.log) : 109 OK, 0 KO à 2026-11-20T10:47:10Z (banc `0e02bb64c77f7ac3…`, copies `079ff24c3480617f…`). Le premier journal reste.
 - **Contrôle ajouté à `local`** : le sha256 de [`m1b-listes-outillage.txt`](m1b-listes-outillage.txt) (`c8883d2b…`). C'est la liste du rendu signé de `builder-mock-rocky9` (`pipeline-o.yaml`, `13836c38…`, égalité relevée dans [`m1b-builders-m1bt-20-prealables.log`](m1b-builders-m1bt-20-prealables.log)). Le relevé « mêmes versions d'outils » s'appuie donc sur la liste réellement fixée par la pipeline signée. **BL1** attend désormais 23 OK au lieu de 22. Les autres prédictions ne changent pas.
+
+### Bundles de la cascade : résultat de `local` et des deux essais, écrit le 20/11/2026 à 2026-11-20T10:53:19Z UTC
+
+Les trois étapes ont tourné sous l'accord permanent, avec le script `3faa018b…`. Rien n'a été écrit dans Zot.
+- [`local`](m1b-bundles-local.log) : 2026-11-20T10:47:55Z, code 0, 23 OK, 0 KO.
+- [`essai_prefetch`](m1b-bundles-essai_prefetch.log) : 10:48:02Z à 10:49:55Z, code 0, 22 OK, 0 KO.
+- [`essai_construire`](m1b-bundles-essai_construire.log) : 10:50:01Z à 10:52:37Z, code 0, 18 OK, 0 écart. Journal complet du script : [`m1b-bundles-construire-pod.log`](m1b-bundles-construire-pod.log).
+
+| Prédiction | Tenue | Mesure |
+|---|---|---|
+| BL1 | oui | témoin égal aux tâches signées de M4b et M4c ; tâches neuves : seule `.spec.steps[0].image` diffère ; scripts `572fb78c…` et `0b119024…` ; liste d'outillage `c8883d2b…` ; `entrees.tar` `b84f68ee…` |
+| EP1 | oui | `m1b-bundles-prefetch` admis, prêt sur sc-build, runc (runtimeClassName vide), UID 65532 |
+| EP2 | oui | code 0 en 40 s ; `repomd.xml` V2 `239a5a71…` ; résultat de bootstrap `essais-05/rocky9-bootstrap@f0ccf105…` ; arbre égal à celui de `final` |
+| EP3 | oui | cas refusé : code 1, message attendu, ni dossier `dir:` ni résultat ; pod et PVC retirés, 0 objet restant |
+| EC1 | oui | `m1b-bundles-construire` prêt sur sc-build sous Kata ; 273 fichiers déballés par l'UID 65532 ; entrées en `virtiofs ro`, écriture refusée ; script de 10:50:54 à 10:52:36, code 0 |
+| EC2 | oui | Source0 `07521c1e…`, src.rpm `c802e60a…`, rpm `864d55f4…` (ceux de M3) ; 222 paquets, 0 écart au verrou |
+| EC3 | oui | artefact `07b7bd6f…`, égal à l'essai de M4c |
+
+**Lecture** : sur les entrées de M4b et M4c, l'outillage de M1b rend les mêmes sorties que l'outillage d'essai : même fermeture, même rpm, même artefact. Les deux tâches neuves ne diffèrent des signées que par l'image. Restent à faire : la signature et les deux bundles (`taches`, sur ton accord), puis la revue de `taches.yml`.
