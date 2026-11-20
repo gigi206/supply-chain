@@ -45,7 +45,7 @@ MASQUE='/jeton\|token/I c\[ligne masquée : motif jeton|token]'
 
 attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)" >&2; exit 1; }; }
 echec() { echo "KO   $*" >&2; exit 1; }
-filtre() { sed -E -e 's/<[^>]*@[^>]*>/<adresse retirée>/g' -e "$MASQUE"; }
+filtre() { sed -E 's/<[^>]*@[^>]*>/<adresse retirée>/g' | sed "$MASQUE"; }   # MASQUE est en BRE : hors de sed -E (banc du 19/11)
 
 pod_json() { # nom : pod d'essai Kata, image de l'amorce, contexte et ressources du pas construire de construire-rpm signée,
   # label construire-rpm, tmpfs /w ; sans PVC

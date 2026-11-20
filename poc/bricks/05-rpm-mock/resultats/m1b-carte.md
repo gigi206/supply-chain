@@ -730,3 +730,13 @@ La provenance reste à préparer, sur le modèle de M4c. Sa forme dépend des r�
 `sortie-builds.sh m1b_sortie` est passée à 2026-11-20T00:12:03Z, code 0, 14 OK et 0 KO ([`sortie-m1b_sortie.log`](../../08c-durcissement/resultats/sortie-m1b_sortie.log)). `prefetch-racine-rpm-sortie` est créée et valide pour Cilium. `builds-sans-internet` exclut désormais quatre labels (`prefetch-gomod`, `prefetch-deb`, `prefetch-rpm`, `prefetch-racine-rpm`). Comme prévu, `s1.sh prealables` attend toujours un `NotIn` à trois labels : à adapter avant le rejeu M5b.
 
 **Suite** : dans un tour de jour, le correctif de `filtre`, puis `m1b_sans_sortie` sur son propre accord, puis `m1b_temoins`.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T08:35:16Z UTC : correctif de `filtre` appliqué
+
+[`m1b-filtre.patch`](../m1b-filtre.patch) est appliqué au dépôt par `git apply`, sans conflit. `m1b.sh` passe à `9f8851d6…` et `m1b-builders.sh` à `31e01ae0…`, les mêmes empreintes que les copies corrigées du banc du 19/11. `bash -n` passe sur les deux.
+
+Le banc, rejoué sur les deux scripts du dépôt, a fini à 2026-11-20T08:34:54Z : 22 OK, 0 KO, code 0 ([`m1b-filtre-banc-applique.log`](m1b-filtre-banc-applique.log)). C'est le résultat annoncé à l'écriture du correctif (22 OK). Les témoins sont des mots inventés, comme au 19/11.
+
+**Portée** : les journaux écrits par `m1b.sh` et `m1b-builders.sh` à partir de maintenant passent par le masquage. Ceux de la mesure de cette nuit n'y sont pas passés ; ils ont été comptés avant lecture et contrôlés par `secrets-depot.sh` avant leur commit. Comme prévu, les bancs complets des deux scripts (étape `banc`) ne sont pas rejoués : seule la ligne `filtre()` change.
+
+**Suite** : `m1b_sans_sortie`, sur son propre accord, puis `m1b_temoins`.
