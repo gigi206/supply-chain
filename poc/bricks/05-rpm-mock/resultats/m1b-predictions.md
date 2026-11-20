@@ -2219,3 +2219,7 @@ Les deux étapes ont tourné le 20/11/2026 à 10:06:41Z, avec code 0 : 12 OK et 
 - **Place libre** : 3 021 647 872 octets. Le dernier relevé précédent est de 09:11:45Z, à la fin du journal des PipelineRuns de M1b ([`m1b-pipeline-pipeline.log`](m1b-pipeline-pipeline.log)) : 3 043 340 288 octets. Il y a donc 21 692 416 octets de moins en 55 minutes, sans écriture de la brique dans Zot entre les deux : le verrou et la provenance n'ont fait que lire. Cela s'accorde avec la dérive déjà notée de / de sc-stockage, non attribuée. La fermeture de M4b refaite devra tenir dans cette place.
 
 **Lecture** : l'artefact neuf ne diffère de celui de M4a que par le verrou. Son digest est connu avant toute écriture. Il reste une question : l'écriture dans Zot.
+
+**Correction du relevé de place libre, écrite le 20/11/2026 à 2026-11-20T10:10:33Z UTC** : le résultat ci-dessus dit « sans écriture de la brique dans Zot entre les deux » et « cela s'accorde avec la dérive déjà notée ».
+- La première phrase vaut pour les scripts de la brique seulement : le verrou et la provenance n'ont fait que lire. Je n'ai pas vérifié si Tekton Chains a écrit dans Zot après 09:11:45Z.
+- La seconde est retirée. 21 692 416 octets en 55 minutes font environ 0,57 Go par jour, soit la moitié des 1,19 Go par jour notés le 18/11. Je donne le chiffre sans conclure.
