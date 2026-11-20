@@ -82,3 +82,21 @@ Seuls des comptes seront archivés, jamais de flux bruts.
 | # | Prédiction | Confiance |
 |---|---|---|
 | T9 | Pour chaque pod, `--pod builds/<pod>` rend autant de flux que `--ip`, et chaque flux sortant porte `source.namespace=builds` et `source.pod_name` = le pod. L'endpoint est créé par le plugin CNI de Cilium avec les labels du pod, comme sous runc. **Si `--pod` ne rend rien alors que `--ip` rend des flux, le filtre `source_pod: builds/` de l'export ne verrait rien, et la conception change avant toute pose** | Moyenne : jamais mesuré sous Kata |
+
+## Corrections de j7.sh avant la mesure (note de 2026-11-20T22:24:23Z ; rien n'est réécrit au-dessus)
+
+`j7.sh` passe de `5baffc6f89cbfffc…` à **`6cae4217abe98b9e…`**, après relecture du conseiller. Les manifestes des pods ne changent pas : l'étape `sec` reste valable.
+
+- **Plus d'échec silencieux** :
+  - chaque `hubble observe` relève son code et ses lignes d'erreur, et l'étape s'arrête sur un code non nul. Un « 0 flux » ne peut plus venir d'un exec en échec ;
+  - **T0 est imposé** : sans flux sortant FORWARDED du pod a, l'étape s'arrête avant le pod b ;
+  - le catalogue de Zot doit être lisible et non vide. Essai en lecture anonyme : 166 dépôts.
+- **Comptes plus riches**, car rien de brut n'est gardé :
+  - verdict × sens × `is_reply` × « la source est le pod » ;
+  - protocole × destination ;
+  - horodatages distincts par destination, pour juger T2 ;
+  - lignes sans `flow`, comme `lost_events`.
+  La fonction a tourné sur un banc local (fichier vide ; `lost_events`, DROPPED et FORWARDED). Défaut trouvé et corrigé : `is_reply` à `false` s'affichait « - » (opérateur `//` de jq).
+- **Flux bruts** : les fichiers de `hubble observe` restent dans le dossier de travail hors du dépôt, le temps des comptes. Ils sont effacés en fin d'étape, comme sur arrêt (`trap`), avec les pods du jalon.
+- **Fenêtre** : elle commence à la création du pod (horloge de l'API). L'écart entre l'horloge de l'agent de sc-build et celle de l'hôte est relevé.
+- **Pas de troncature à 20 flux**, lu dans le code du CLI au tag (`hubble/cmd/observe/flows.go`, sha256 `e84789fd9348296e…`). La limite par défaut ne s'applique que sans `--since`, `--until` ni `--first`. Le CLI embarqué dans l'agent n'a pas été comparé à ce code.

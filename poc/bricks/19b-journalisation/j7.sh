@@ -5,7 +5,8 @@
 #   sec     à sec : les deux pods rendus, créés en dry-run serveur (admission comprise) ; rien n'est créé
 #   mesure  cluster : pod a (sans label de tâche, témoin positif T0) puis pod b (label construire-rpm, T1 à T6, T8) ;
 #           témoins de construire-rpm dans le pod ; ACCORD NOMMÉ DU PROPRIÉTAIRE : kubectl exec dans l'agent Cilium de
-#           sc-build (hubble observe) ; pods supprimés ; catalogue de Zot relu en anonyme avant et après
+#           sc-build (hubble observe, date) ; arrêt si le pod a n'a aucun flux autorisé (T0) ; pods supprimés et flux bruts
+#           effacés de $T en fin d'étape comme sur arrêt (trap) ; catalogue de Zot relu en anonyme avant et après
 # Usage (racine du dépôt) : mise exec -- poc/bricks/19b-journalisation/j7.sh <étape>…   (journal : resultats/j7-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
@@ -66,22 +67,46 @@ temoins() { # a|b : script des témoins, codes sur la sortie
 
 agent_build() { kubectl -n kube-system get pods -l k8s-app=cilium --field-selector spec.nodeName=sc-build -o jsonpath='{.items[0].metadata.name}' < /dev/null; }
 
-comptes() { # fichier-json-lignes libellé : comptes seulement (aucun flux brut n'est affiché ni archivé)
-  echo "$2 : $(grep -c . "$1" || true) flux"
-  jq -rs '
+comptes() { # fichier-json-lignes libellé ip-du-pod : comptes seulement (aucun flux brut n'est affiché ni archivé)
+  jq -rs --arg l "$2" --arg ip "$3" '
     def c(f): (map(f // "-" | tostring) | group_by(.) | map("\(.[0])=\(length)") | join(" "));
-    map(.flow) |
+    def dst: (.IP.destination // "-") + ":" + ((.l4.TCP.destination_port // .l4.UDP.destination_port // "-") | tostring);
+    def proto: (.l4 // {} | keys | join(",")) as $k | if $k == "" then "-" else $k end;
+    (map(select(.flow == null)) | length) as $sansflux |
+    map(select(.flow != null) | .flow) |
+    "\($l) : \(length) flux ; lignes sans flow (lost_events, autres) : \($sansflux)",
     "  verdict : \(c(.verdict))",
     "  drop_reason_desc : \(c(.drop_reason_desc))",
-    "  traffic_direction : \(c(.traffic_direction))",
     "  event_type.type : \(c(.event_type.type))",
-    "  destination (adresse:port) : \(c((.IP.destination // "-") + ":" + ((.l4.TCP.destination_port // .l4.UDP.destination_port // "-") | tostring)))",
+    "  verdict × sens × is_reply × source=pod : \(c("\(.verdict)|\(.traffic_direction // "-")|\(if .is_reply == null then "-" else (.is_reply | tostring) end)|\(if .IP.source == $ip then "pod" else "autre" end)"))",
+    "  protocole × destination : \(c("\(proto)|\(dst)"))",
+    "  horodatages distincts par destination : \(group_by(dst) | map("\(.[0] | dst)=\(map(.time) | unique | length)") | join(" "))",
     "  source.namespace/pod_name : \(c((.source.namespace // "∅") + "/" + (.source.pod_name // "∅")))",
     "  destination.namespace/pod_name : \(c((.destination.namespace // "∅") + "/" + (.destination.pod_name // "∅")))",
-    "  sortants non DROPPED : \(map(select(.traffic_direction == "EGRESS" and .verdict != "DROPPED")) | length)"' "$1"
+    "  sortants du pod non DROPPED : \(map(select(.traffic_direction == "EGRESS" and .IP.source == $ip and .verdict != "DROPPED")) | length)",
+    "  sortants du pod FORWARDED vers Zot : \(map(select(.traffic_direction == "EGRESS" and .IP.source == $ip and .verdict == "FORWARDED" and dst == "192.168.161.13:5000")) | length)"' "$1"
 }
 
-catalogue() { mkdir -p "$T/anonyme"; DOCKER_CONFIG=$T/anonyme SSL_CERT_FILE=$P/ca-poc.crt crane catalog "$REG_HOTE" < /dev/null | grep -c . || true; }
+catalogue() { # nombre de dépôts du catalogue de Zot, lecture anonyme ; échec si crane échoue ou si le compte est nul
+  local n
+  mkdir -p "$T/anonyme"
+  n=$(DOCKER_CONFIG=$T/anonyme SSL_CERT_FILE=$P/ca-poc.crt crane catalog "$REG_HOTE" < /dev/null | grep -c .) || echec "catalogue de Zot illisible"
+  [ "$n" -gt 0 ] || echec "catalogue de Zot vide"
+  echo "$n"
+}
+
+observer() { # agent depuis fichier filtre… : hubble observe dans l'agent ; arrêt sur un code non nul (jamais de « 0 flux » par échec)
+  local a=$1 d=$2 f=$3 rc=0; shift 3
+  kubectl -n kube-system exec "$a" -c cilium-agent -- hubble observe --since "$d" -o json "$@" < /dev/null > "$f" 2> "$f.err" || rc=$?
+  echo "hubble observe $* : code $rc, $(grep -c . "$f" || true) ligne(s), $(grep -c . "$f.err" || true) ligne(s) d'erreur"
+  [ "$rc" = 0 ] || { filtre < "$f.err" | head -n 3 | cut -c1-200; echec "hubble observe en échec"; }
+}
+
+nettoyer() { # pods du jalon supprimés et flux bruts effacés, en fin d'étape comme sur arrêt
+  kubectl delete pod -n builds -l "poc.test/jalon=$N" --wait=true < /dev/null > /dev/null 2>&1 || true
+  find "$T" -maxdepth 1 -name 'hubble-*' -delete
+  echo "nettoyage : pods du jalon restants $(kubectl get pod -n builds -l "poc.test/jalon=$N" -o name < /dev/null | wc -l), flux bruts de $T effacés"
+}
 
 etape_sec() { # rien n'est créé : dry-run serveur (admission comprise)
   local p
@@ -95,32 +120,38 @@ etape_sec() { # rien n'est créé : dry-run serveur (admission comprise)
   echo "agent Cilium de sc-build : $(agent_build) (aucun exec à cette étape)"
 }
 
-etape_mesure() { # ACCORD NOMMÉ : kubectl exec dans l'agent Cilium de sc-build (hubble observe, lecture seule, comptes)
-  local c p ip t0 a k0 k1
+etape_mesure() { # ACCORD NOMMÉ : kubectl exec dans l'agent Cilium de sc-build (hubble observe, date ; lecture seule, comptes)
+  local c p ip t0 a k0 k1 n
   rendre
+  for p in "$N-a" "$N-b"; do ! present "$p" || echec "pod $p déjà présent : relancer sous un autre PREFIXE"; done
+  trap nettoyer EXIT
   a=$(agent_build); echo "agent Cilium de sc-build : $a"
+  echo "horloge : agent de sc-build moins hôte = $(( $(kubectl -n kube-system exec "$a" -c cilium-agent -- date -u +%s < /dev/null) - $(date -u +%s) )) s"
   k0=$(catalogue); echo "catalogue de Zot (anonyme), avant : $k0 dépôt(s)"
   for c in a b; do
     p=$N-$c
     echo "## pod $c ($(jq -r '.metadata.labels["tekton.dev/task"] // "sans label de tâche"' "$T/pod-$p.json"))"
-    ! present "$p" || echec "pod $p déjà présent : relancer sous un autre PREFIXE"
-    kubectl create -f "$T/pod-$p.json" < /dev/null > /dev/null; echo "pod $p créé à $(date -u +%H:%M:%S)"
+    kubectl create -f "$T/pod-$p.json" < /dev/null > /dev/null
+    t0=$(kubectl get pod -n builds "$p" -o jsonpath='{.metadata.creationTimestamp}' < /dev/null)
+    echo "pod $p créé à $t0 (horloge de l'API ; début de la fenêtre de Hubble)"
     kubectl wait -n builds "pod/$p" --for=condition=Ready --timeout=300s < /dev/null > /dev/null || echec "pod $p non prêt"
     ip=$(kubectl get pod -n builds "$p" -o jsonpath='{.status.podIP}' < /dev/null)
     echo "pod prêt : $(kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}, runtimeClassName {.spec.runtimeClassName}' < /dev/null), IP $ip"
     temoins "$c" > "$T/temoins-$c.sh"
-    t0=$(date -u +%Y-%m-%dT%H:%M:%SZ); sleep 1
     kubectl exec -i -n builds "$p" -- bash -s < "$T/temoins-$c.sh" 2>&1 | filtre | tee "$T/temoins-$c.out"
     sleep 5
-    kubectl -n kube-system exec "$a" -c cilium-agent -- hubble observe --since "$t0" --pod "builds/$p" -o json < /dev/null > "$T/hubble-pod-$c.json" 2> "$T/hubble-pod-$c.err" || true
-    kubectl -n kube-system exec "$a" -c cilium-agent -- hubble observe --since "$t0" --ip "$ip" -o json < /dev/null > "$T/hubble-ip-$c.json" 2> "$T/hubble-ip-$c.err" || true
-    [ ! -s "$T/hubble-pod-$c.err" ] || { echo "sortie d'erreur de hubble (filtre --pod) :"; filtre < "$T/hubble-pod-$c.err" | head -n 3; }
-    comptes "$T/hubble-ip-$c.json" "Hubble, filtre --ip $ip (comme la 08)"
-    comptes "$T/hubble-pod-$c.json" "Hubble, filtre --pod builds/$p (celui de l'export)"
+    observer "$a" "$t0" "$T/hubble-ip-$c.json" --ip "$ip"
+    observer "$a" "$t0" "$T/hubble-pod-$c.json" --pod "builds/$p"
+    comptes "$T/hubble-ip-$c.json" "Hubble, filtre --ip $ip (comme la 08)" "$ip"
+    comptes "$T/hubble-pod-$c.json" "Hubble, filtre --pod builds/$p (celui de l'export)" "$ip"
     kubectl delete pod -n builds "$p" --wait=true < /dev/null > /dev/null; echo "pod $p supprimé à $(date -u +%H:%M:%S)"
+    if [ "$c" = a ]; then   # témoin positif (T0) : sans lui, « aucun flux autorisé » du pod b ne prouverait rien
+      n=$(jq -s --arg ip "$ip" '[.[] | .flow | select(. != null and .traffic_direction == "EGRESS" and .IP.source == $ip and .verdict == "FORWARDED")] | length' "$T/hubble-ip-$c.json")
+      [ "$n" -ge 1 ] || echec "T0 : aucun flux sortant FORWARDED du pod a dans Hubble ; arrêt avant le pod b"
+      echo "OK   T0 : $n flux sortant(s) FORWARDED du pod a"
+    fi
   done
   k1=$(catalogue); attendu "catalogue de Zot (anonyme), après" "$k1" "$k0"
-  attendu "pods du jalon restants" "$(kubectl get pod -n builds -l "poc.test/jalon=$N" -o name < /dev/null | wc -l)" 0
 }
 
 for e in "$@"; do [ ! -e "$R/$N-$e.log" ] || { echo "journal déjà présent : resultats/$N-$e.log (relancer sous un autre PREFIXE)" >&2; exit 2; }; done
