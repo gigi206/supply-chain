@@ -840,3 +840,34 @@ Décision du propriétaire : « Oui, prépare-la ». Le script est neuf : [`m1b-
   Le banc le recoupe par les objets Tekton.
 
 **Suite** : le lancement de `m1b-provenance.sh provenance`, en lecture seule, puis l'adaptation de `s1.sh prealables` aux quatre labels avant le rejeu M5b.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T09:23:54Z UTC : provenance passée, M1b tenu avec réserves
+
+`m1b-provenance.sh provenance` a tourné de 2026-11-20T09:22:25Z à 2026-11-20T09:22:27Z, en lecture seule, avec code 0 et 43 OK. PV1 à PV7 tiennent ([résultat](m1b-predictions.md)). Les deux images ont chacune une provenance signée par Chains, une par PipelineRun. Elle nomme la pipeline signée, les trois tâches de la liste revue et l'amorce, plus la base `ee90dc0e…` pour le bootstrap.
+
+**Frontière du §5, tout est fait** :
+- les deux tâches neuves ;
+- les pipelines `builders` ;
+- les deux images, chacune passée deux fois au même digest, avec leur provenance ;
+- le banc de reproductibilité (point 1 A, établi sur un nœud et un hôte) ;
+- le relevé des sources (point 1 B, Rocky 9.8 figée).
+
+**M1b tenu, avec réserves** :
+- l'amorce est figée (décision « (a) Figée » : 44 paquets sur 146 en retard sur Rocky 9.8, 54 errata plus récents) ;
+- la reproduction est établie sur un seul nœud et un seul hôte ;
+- le prefetch joint toute adresse publique en 443 (NT2) ;
+- l'outillage ne déclare pas sa base (reliquat du choix 2, mesuré par PN2) ;
+- la porte ne juge pas ces images : elle ne connaît pas `construire-racine-rpm`, et sa ConfigMap est en retard sur `taches.yml` ;
+- `s1.sh prealables` attend toujours un `NotIn` à trois labels.
+
+Additifs écrits dans les ADR 0001 et 0007. La clôture de la brique 05 reste ta décision.
+
+**Après M1b, avant M5b** (§5, rien n'est commencé) :
+- le verrou refait avec le nouveau bootstrap ;
+- l'artefact de M4a republié ;
+- de nouveaux bundles pour `prefetch-rpm` et `construire-rpm`, avec leur revue ;
+- M4b et M4c refaits, avec leurs provenances ;
+- les refus de M5a rejoués sur le nouveau bundle ;
+- l'adaptation de `s1.sh prealables` aux quatre labels.
+
+Le rejeu M5b ne viendra pas avant le 28/11.

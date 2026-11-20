@@ -1,0 +1,305 @@
+# m1b-provenance-banc.sh, 2026-11-20T09:19:13Z ; m1b-provenance.sh dec9d7140fadad51f4ff422b575c1c5827a4a0119a460e49337b10aa4c0f8257
+## A : syntaxe, shellcheck, constantes contre des sources indépendantes
+OK   bash -n : ok
+OK   shellcheck : codes : SC2015
+OK   clé de Chains (sha256) : 1e7b2a03f9d5d289898e63b57410aeafa4e3680e86474d4f35aaa4e01f0c5e65
+OK   PREFETCH_REF = référence de m1b-signature.sh : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+OK   CONSTRUIRE_REF = référence de m1b-signature.sh : sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
+OK   PUBLIER_REF = celle de m1b-pipeline.sh : /tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   builder-mock-rocky9 : PIPELINE = référence de m1b-signature.sh : sc-stockage.poc.test:5000/tekton/pipelines/builder-mock-rocky9@sha256:4b9daf42a74f247223ae27fd5520a41ca396b750b041691babbe4fa7490d2f0c
+OK   builder-mock-rocky9 : SIGNEE = sha256 au journal SG4 : 1
+OK   builder-mock-rocky9 : IMAGE et DIGEST = journal des PipelineRuns (deux exécutions) : 2 2
+OK   builder-rocky9-bootstrap : PIPELINE = référence de m1b-signature.sh : sc-stockage.poc.test:5000/tekton/pipelines/builder-rocky9-bootstrap@sha256:eb57d44c1b65f0fa3fe3ba6be1e663d15a2fffd4f47dbf7174bdb0f853f56615
+OK   builder-rocky9-bootstrap : SIGNEE = sha256 au journal SG4 : 1
+OK   builder-rocky9-bootstrap : IMAGE et DIGEST = journal des PipelineRuns (deux exécutions) : 2 2
+KO   AMORCE = image des pas des deux tâches signées : ---
+sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d (attendu : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d)
+OK   HORODATAGE = image du pas de publier-image signée (08) : sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+OK   BASE_b = base de m1b-pipeline.sh : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+OK   prefetch-racine-rpm@sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251 dans la liste revue : oui
+OK   construire-racine-rpm@sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f dans la liste revue : oui
+OK   publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b dans la liste revue : oui
+OK   SUBST_DIGEST : seule valeur substituée des deux pipelines signées : $(tasks.construire.results.DIGEST_CONSTRUIT)
+## B : vraies attestations, vraies fonctions, quatre PipelineRuns
+OK   builder-mock-rocky9 : cosign verify-attestation (clé de Chains), code et enveloppes : 0 4
+OK   builder-mock-rocky9 : attendu (dépendances, paramètres) : 6 20
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     sujet : sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://supply-chain.example/builders/tekton-chains@v1 (relevé)
+     début et fin : 2026-11-20T09:02:25Z 2026-11-20T09:05:39Z (relevé)
+     resolvedDependencies (6) :
+          - oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/builder-mock-rocky9 sha256:4b9daf42a74f247223ae27fd5520a41ca396b750b041691babbe4fa7490d2f0c
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (20) :
+          construire-racine-rpm annotations {}
+          construire-racine-rpm cles sha256:894f3a545300fdaf63b0b88d40f58fca186c97ee6a8f3a619b8fc82351eee772 (2 lignes non vides)
+          construire-racine-rpm config {"Env":["PATH=/usr/sbin:/usr/bin:/sbin:/bin","HOME=/root"]}
+          construire-racine-rpm couche -
+          construire-racine-rpm depots sha256:26f6c512d5466adadae2cb82adfae24a093b840c8b2322f506ea1af5b87a59f3 (3 lignes non vides)
+          construire-racine-rpm dnf_conf sha256:d554fb1ce168663fbfbfaffa175056f049506a2fa33675acb63dedf2969d03cc (22 lignes non vides)
+          construire-racine-rpm dnf_conf_sha256 d554fb1ce168663fbfbfaffa175056f049506a2fa33675acb63dedf2969d03cc
+          construire-racine-rpm fichiers sha256:2dce93d6f245f34a9feac311355ec363597cc07b60d746fbece5d98c4a87fa3e (41 lignes non vides)
+          construire-racine-rpm langue en_US
+          construire-racine-rpm liste sha256:c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f (200 lignes non vides)
+          construire-racine-rpm noms mock-6.9-1.el9 mock-core-configs-45.2-1.el9 podman-5.8.2-8.el9_8 skopeo-1.22.2-9.el9_8 rocky-release shadow-utils
+          construire-racine-rpm racine 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+          construire-racine-rpm sde 1793914619
+          prefetch-racine-rpm cle_sup sha256:7d19739f7d3610e56298fe15cc2519e28a7923f7d2da79cc03f36b87c4ae3b92 (28 lignes non vides)
+          prefetch-racine-rpm cles sha256:894f3a545300fdaf63b0b88d40f58fca186c97ee6a8f3a619b8fc82351eee772 (2 lignes non vides)
+          prefetch-racine-rpm couche -
+          prefetch-racine-rpm depots sha256:26f6c512d5466adadae2cb82adfae24a093b840c8b2322f506ea1af5b87a59f3 (3 lignes non vides)
+          prefetch-racine-rpm liste sha256:c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f (200 lignes non vides)
+          publier-image digest sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+          publier-image image sc-stockage.poc.test:5000/builds/builders/mock-rocky9
+     runtimeClassName des tâches (spec signée) : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source git (dépendances git+, aucune attendue) : 0
+     OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : 64d93fb0f70b5f8a464bcb65af6617918c8c24985be03bf96b616fcb66e5e8bb
+     OK   paramètres des tâches égaux à ceux de la pipeline signée (sha256 des listes triées) : 3ddbc234eba88545270a2f53ad6b2bc0619e2450a685a9e5d5596183cc96c2ef
+     OK   runtimeClassName des tâches dans la spec signée : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+OK   m1b-o-1 : controler_prov, code, OK, KO : 0 7 0
+     enveloppes de l'invocation a89bc28f-f5f3-4627-a538-3db962adf8a1 : 1
+     sujet : sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://supply-chain.example/builders/tekton-chains@v1 (relevé)
+     début et fin : 2026-11-20T09:05:47Z 2026-11-20T09:08:44Z (relevé)
+     resolvedDependencies (6) :
+          - oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/builder-mock-rocky9 sha256:4b9daf42a74f247223ae27fd5520a41ca396b750b041691babbe4fa7490d2f0c
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (20) :
+          construire-racine-rpm annotations {}
+          construire-racine-rpm cles sha256:894f3a545300fdaf63b0b88d40f58fca186c97ee6a8f3a619b8fc82351eee772 (2 lignes non vides)
+          construire-racine-rpm config {"Env":["PATH=/usr/sbin:/usr/bin:/sbin:/bin","HOME=/root"]}
+          construire-racine-rpm couche -
+          construire-racine-rpm depots sha256:26f6c512d5466adadae2cb82adfae24a093b840c8b2322f506ea1af5b87a59f3 (3 lignes non vides)
+          construire-racine-rpm dnf_conf sha256:d554fb1ce168663fbfbfaffa175056f049506a2fa33675acb63dedf2969d03cc (22 lignes non vides)
+          construire-racine-rpm dnf_conf_sha256 d554fb1ce168663fbfbfaffa175056f049506a2fa33675acb63dedf2969d03cc
+          construire-racine-rpm fichiers sha256:2dce93d6f245f34a9feac311355ec363597cc07b60d746fbece5d98c4a87fa3e (41 lignes non vides)
+          construire-racine-rpm langue en_US
+          construire-racine-rpm liste sha256:c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f (200 lignes non vides)
+          construire-racine-rpm noms mock-6.9-1.el9 mock-core-configs-45.2-1.el9 podman-5.8.2-8.el9_8 skopeo-1.22.2-9.el9_8 rocky-release shadow-utils
+          construire-racine-rpm racine 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+          construire-racine-rpm sde 1793914619
+          prefetch-racine-rpm cle_sup sha256:7d19739f7d3610e56298fe15cc2519e28a7923f7d2da79cc03f36b87c4ae3b92 (28 lignes non vides)
+          prefetch-racine-rpm cles sha256:894f3a545300fdaf63b0b88d40f58fca186c97ee6a8f3a619b8fc82351eee772 (2 lignes non vides)
+          prefetch-racine-rpm couche -
+          prefetch-racine-rpm depots sha256:26f6c512d5466adadae2cb82adfae24a093b840c8b2322f506ea1af5b87a59f3 (3 lignes non vides)
+          prefetch-racine-rpm liste sha256:c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f (200 lignes non vides)
+          publier-image digest sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+          publier-image image sc-stockage.poc.test:5000/builds/builders/mock-rocky9
+     runtimeClassName des tâches (spec signée) : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source git (dépendances git+, aucune attendue) : 0
+     OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : 64d93fb0f70b5f8a464bcb65af6617918c8c24985be03bf96b616fcb66e5e8bb
+     OK   paramètres des tâches égaux à ceux de la pipeline signée (sha256 des listes triées) : 3ddbc234eba88545270a2f53ad6b2bc0619e2450a685a9e5d5596183cc96c2ef
+     OK   runtimeClassName des tâches dans la spec signée : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+OK   m1b-o-2 : controler_prov, code, OK, KO : 0 7 0
+OK   builder-mock-rocky9 : enveloppes d'un objet hors des deux PipelineRuns : 0
+OK   builder-rocky9-bootstrap : cosign verify-attestation (clé de Chains), code et enveloppes : 0 4
+OK   builder-rocky9-bootstrap : attendu (dépendances, paramètres) : 7 20
+     enveloppes de l'invocation e736c35f-5ac2-432c-a6a9-0c0cc5609f51 : 1
+     sujet : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://supply-chain.example/builders/tekton-chains@v1 (relevé)
+     début et fin : 2026-11-20T09:08:50Z 2026-11-20T09:10:12Z (relevé)
+     resolvedDependencies (7) :
+          - oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          inputs/result oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/builder-rocky9-bootstrap sha256:eb57d44c1b65f0fa3fe3ba6be1e663d15a2fffd4f47dbf7174bdb0f853f56615
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (20) :
+          construire-racine-rpm annotations {"org.opencontainers.image.base.name":"sc-stockage.poc.test:5000/amont/rockylinux/rockylinux","org.opencontainers.image.base.digest":"sha256:ee90dc0e23c2f59
+          construire-racine-rpm cles sha256:cbc3f3d4d0bf05ca0d4966d36034f346c699894ef00e8ef2cbdb1c94929fb84e (1 lignes non vides)
+          construire-racine-rpm config {}
+          construire-racine-rpm couche 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+          construire-racine-rpm depots sha256:b8d36c7747b60dd6dfc1eb61309363ebf3555cc518487a80c222200d6f8c7fe7 (1 lignes non vides)
+          construire-racine-rpm dnf_conf sha256:7f49d5d39d0f1b1b232482a2b9e416c235ece7885a6858256bae0a2692e9f5ef (12 lignes non vides)
+          construire-racine-rpm dnf_conf_sha256 7f49d5d39d0f1b1b232482a2b9e416c235ece7885a6858256bae0a2692e9f5ef
+          construire-racine-rpm fichiers sha256:61d1954b9aba0c9aedb8d1338804e817c7262cfc36da94161dab8e3ed7a3a43a (1 lignes non vides)
+          construire-racine-rpm langue all
+          construire-racine-rpm liste sha256:a35120d2e8d2c5512e91549023bab532b6d5e4dfc432ff87007cc1d176fba2bd (10 lignes non vides)
+          construire-racine-rpm noms dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch 
+          construire-racine-rpm racine b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+          construire-racine-rpm sde 1766985142
+          prefetch-racine-rpm cle_sup sha256:61d1954b9aba0c9aedb8d1338804e817c7262cfc36da94161dab8e3ed7a3a43a (1 lignes non vides)
+          prefetch-racine-rpm cles sha256:cbc3f3d4d0bf05ca0d4966d36034f346c699894ef00e8ef2cbdb1c94929fb84e (1 lignes non vides)
+          prefetch-racine-rpm couche amont/rockylinux/rockylinux ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+          prefetch-racine-rpm depots sha256:b8d36c7747b60dd6dfc1eb61309363ebf3555cc518487a80c222200d6f8c7fe7 (1 lignes non vides)
+          prefetch-racine-rpm liste sha256:a35120d2e8d2c5512e91549023bab532b6d5e4dfc432ff87007cc1d176fba2bd (10 lignes non vides)
+          publier-image digest sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+          publier-image image sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap
+     runtimeClassName des tâches (spec signée) : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source git (dépendances git+, aucune attendue) : 0
+     OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : e7d6baebf22094d31c17a95efa9f239f45514a3e9d6516be4fb420f4881e891c
+     OK   paramètres des tâches égaux à ceux de la pipeline signée (sha256 des listes triées) : bc9708231197f440f6f5a7738841490966c7880471e372aaa97915a79d578f54
+     OK   runtimeClassName des tâches dans la spec signée : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+OK   m1b-b-1 : controler_prov, code, OK, KO : 0 7 0
+     enveloppes de l'invocation cb88d48c-19c6-4381-848a-f67008163c9c : 1
+     sujet : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     buildType : https://tekton.dev/chains/v2/slsa-tekton ; builder.id : https://supply-chain.example/builders/tekton-chains@v1 (relevé)
+     début et fin : 2026-11-20T09:10:20Z 2026-11-20T09:11:38Z (relevé)
+     resolvedDependencies (7) :
+          - oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+          - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+          inputs/result oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+          pipeline sc-stockage.poc.test:5000/tekton/pipelines/builder-rocky9-bootstrap sha256:eb57d44c1b65f0fa3fe3ba6be1e663d15a2fffd4f47dbf7174bdb0f853f56615
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+          pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+     paramètres des tâches (20) :
+          construire-racine-rpm annotations {"org.opencontainers.image.base.name":"sc-stockage.poc.test:5000/amont/rockylinux/rockylinux","org.opencontainers.image.base.digest":"sha256:ee90dc0e23c2f59
+          construire-racine-rpm cles sha256:cbc3f3d4d0bf05ca0d4966d36034f346c699894ef00e8ef2cbdb1c94929fb84e (1 lignes non vides)
+          construire-racine-rpm config {}
+          construire-racine-rpm couche 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+          construire-racine-rpm depots sha256:b8d36c7747b60dd6dfc1eb61309363ebf3555cc518487a80c222200d6f8c7fe7 (1 lignes non vides)
+          construire-racine-rpm dnf_conf sha256:7f49d5d39d0f1b1b232482a2b9e416c235ece7885a6858256bae0a2692e9f5ef (12 lignes non vides)
+          construire-racine-rpm dnf_conf_sha256 7f49d5d39d0f1b1b232482a2b9e416c235ece7885a6858256bae0a2692e9f5ef
+          construire-racine-rpm fichiers sha256:61d1954b9aba0c9aedb8d1338804e817c7262cfc36da94161dab8e3ed7a3a43a (1 lignes non vides)
+          construire-racine-rpm langue all
+          construire-racine-rpm liste sha256:a35120d2e8d2c5512e91549023bab532b6d5e4dfc432ff87007cc1d176fba2bd (10 lignes non vides)
+          construire-racine-rpm noms dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch 
+          construire-racine-rpm racine b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+          construire-racine-rpm sde 1766985142
+          prefetch-racine-rpm cle_sup sha256:61d1954b9aba0c9aedb8d1338804e817c7262cfc36da94161dab8e3ed7a3a43a (1 lignes non vides)
+          prefetch-racine-rpm cles sha256:cbc3f3d4d0bf05ca0d4966d36034f346c699894ef00e8ef2cbdb1c94929fb84e (1 lignes non vides)
+          prefetch-racine-rpm couche amont/rockylinux/rockylinux ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+          prefetch-racine-rpm depots sha256:b8d36c7747b60dd6dfc1eb61309363ebf3555cc518487a80c222200d6f8c7fe7 (1 lignes non vides)
+          prefetch-racine-rpm liste sha256:a35120d2e8d2c5512e91549023bab532b6d5e4dfc432ff87007cc1d176fba2bd (10 lignes non vides)
+          publier-image digest sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+          publier-image image sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap
+     runtimeClassName des tâches (spec signée) : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+     écarts (comm -3 ; sans retrait : provenance seule ; avec retrait : attendu seul) : dépendances, puis paramètres
+     OK   enveloppes de l'invocation : 1
+     OK   sujet : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+     OK   source git (dépendances git+, aucune attendue) : 0
+     OK   resolvedDependencies égales à l'attendu (sha256 des listes triées) : e7d6baebf22094d31c17a95efa9f239f45514a3e9d6516be4fb420f4881e891c
+     OK   paramètres des tâches égaux à ceux de la pipeline signée (sha256 des listes triées) : bc9708231197f440f6f5a7738841490966c7880471e372aaa97915a79d578f54
+     OK   runtimeClassName des tâches dans la spec signée : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+OK   m1b-b-2 : controler_prov, code, OK, KO : 0 7 0
+OK   builder-rocky9-bootstrap : enveloppes d'un objet hors des deux PipelineRuns : 0
+## C : attendu contre les objets Tekton (deux dérivations indépendantes)
+OK   m1b-o-1 : dépendances tirées des objets = deps_attendues : 64d93fb0f70b5f8a464bcb65af6617918c8c24985be03bf96b616fcb66e5e8bb
+OK   m1b-o-1 : paramètres des specs des TaskRuns = params_attendus : 3ddbc234eba88545270a2f53ad6b2bc0619e2450a685a9e5d5596183cc96c2ef
+OK   m1b-o-1 : runtimeClassName des specs des TaskRuns : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+OK   m1b-o-2 : dépendances tirées des objets = deps_attendues : 64d93fb0f70b5f8a464bcb65af6617918c8c24985be03bf96b616fcb66e5e8bb
+OK   m1b-o-2 : paramètres des specs des TaskRuns = params_attendus : 3ddbc234eba88545270a2f53ad6b2bc0619e2450a685a9e5d5596183cc96c2ef
+OK   m1b-o-2 : runtimeClassName des specs des TaskRuns : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+OK   m1b-b-1 : dépendances tirées des objets = deps_attendues : e7d6baebf22094d31c17a95efa9f239f45514a3e9d6516be4fb420f4881e891c
+OK   m1b-b-1 : paramètres des specs des TaskRuns = params_attendus : bc9708231197f440f6f5a7738841490966c7880471e372aaa97915a79d578f54
+OK   m1b-b-1 : runtimeClassName des specs des TaskRuns : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+OK   m1b-b-2 : dépendances tirées des objets = deps_attendues : e7d6baebf22094d31c17a95efa9f239f45514a3e9d6516be4fb420f4881e891c
+OK   m1b-b-2 : paramètres des specs des TaskRuns = params_attendus : bc9708231197f440f6f5a7738841490966c7880471e372aaa97915a79d578f54
+OK   m1b-b-2 : runtimeClassName des specs des TaskRuns : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-
+## D : un écart par cas (copies altérées des vraies enveloppes)
+OK   témoin : copie réenveloppée sans changement, code : 0
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 0
+     KO   enveloppes de l'invocation : 0 (attendu : 1)
+OK   aucune : code : 1
+OK   aucune : KO attendu : 1
+OK   aucune : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 2
+     KO   enveloppes de l'invocation : 2 (attendu : 1)
+OK   deux : code : 1
+OK   deux : KO attendu : 1
+OK   deux : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   sujet : sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:0000000000000000000000000000000000000000000000000000000000000000 (attendu : sc-stockage.poc.test:5000/builds/builders/moc
+OK   sujet : code : 1
+OK   sujet : KO attendu : 1
+OK   sujet : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   sujet : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae (attendu : sc-stockage.poc.test:5000/builds/builder
+OK   sujet_autre_image : code : 1
+OK   sujet_autre_image : KO attendu : 1
+OK   sujet_autre_image : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   buildType : https://tekton.dev/chains/v2/slsa (attendu : https://tekton.dev/chains/v2/slsa-tekton)
+OK   buildtype : code : 1
+OK   buildtype : KO attendu : 1
+OK   buildtype : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   source git (dépendances git+, aucune attendue) : 1 (attendu : 0)
+OK   git_ajoutee : code : 1
+OK   git_ajoutee : KO attendu : 1
+OK   git_ajoutee : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   resolvedDependencies égales à l'attendu (sha256 des listes triées) : 95fd73ac0edb9c152c2ad14b6bc128783f66a377742cd1e340803c5792009064 (attendu : 64d93fb0f70b5f8a464bcb65af6617918c8c24985b
+OK   amorce_digest : code : 1
+OK   amorce_digest : KO attendu : 1
+OK   amorce_digest : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   resolvedDependencies égales à l'attendu (sha256 des listes triées) : c7649cd4666ea5b67b2153c0ace7acf551bad19b1492feeb68e8d1acf2683e89 (attendu : 64d93fb0f70b5f8a464bcb65af6617918c8c24985b
+OK   tache_digest : code : 1
+OK   tache_digest : KO attendu : 1
+OK   tache_digest : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   resolvedDependencies égales à l'attendu (sha256 des listes triées) : 40b985736f8a218a0d7e8f138bbd7e28b0a72f4f6f2b08eab651361f38bc6c6a (attendu : 64d93fb0f70b5f8a464bcb65af6617918c8c24985b
+OK   dep_en_trop : code : 1
+OK   dep_en_trop : KO attendu : 1
+OK   dep_en_trop : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation e736c35f-5ac2-432c-a6a9-0c0cc5609f51 : 1
+     KO   resolvedDependencies égales à l'attendu (sha256 des listes triées) : c2d98ed3e7e854bd95497f21302e2887b8b2a0ea21ad69e4f4e7ee2b7f9bca0c (attendu : e7d6baebf22094d31c17a95efa9f239f45514a3e9d
+OK   base_retiree : code : 1
+OK   base_retiree : KO attendu : 1
+OK   base_retiree : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   resolvedDependencies égales à l'attendu (sha256 des listes triées) : c720d6faa470057305e0fabfa3e52496450cd0f10c23c045a1f6ef42ba6d1678 (attendu : 64d93fb0f70b5f8a464bcb65af6617918c8c24985b
+OK   base_en_trop : code : 1
+OK   base_en_trop : KO attendu : 1
+OK   base_en_trop : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   paramètres des tâches égaux à ceux de la pipeline signée (sha256 des listes triées) : 9fd6061f5bfdbcb517c415c2bba7fc44730563e500ffefce946baf522fa14fa1 (attendu : 3ddbc234eba88545270a2f
+OK   racine : code : 1
+OK   racine : KO attendu : 1
+OK   racine : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   paramètres des tâches égaux à ceux de la pipeline signée (sha256 des listes triées) : a81b172e6be85bdff16809bce36a6d840956a84c7439c759ced0b8656a1d41b2 (attendu : 3ddbc234eba88545270a2f
+OK   liste : code : 1
+OK   liste : KO attendu : 1
+OK   liste : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   paramètres des tâches égaux à ceux de la pipeline signée (sha256 des listes triées) : c4f3ce2419b579fe8b40e1659ad38b66c8b59b9a8aeb8e0279aaafe99d55c9eb (attendu : 3ddbc234eba88545270a2f
+OK   digest_publier : code : 1
+OK   digest_publier : KO attendu : 1
+OK   digest_publier : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   paramètres des tâches égaux à ceux de la pipeline signée (sha256 des listes triées) : 31d6e43750462e6e07a337e3b78f0e4e0a26262f4f4a301dcbef9dbbd6afc2b8 (attendu : 3ddbc234eba88545270a2f
+OK   param_retire : code : 1
+OK   param_retire : KO attendu : 1
+OK   param_retire : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   runtimeClassName des tâches dans la spec signée : construire-racine-rpm:- prefetch-racine-rpm:- publier-image:- (attendu : construire-racine-rpm:kata prefetch-racine-rpm:- publier-image:-)
+OK   kata_retire : code : 1
+OK   kata_retire : KO attendu : 1
+OK   kata_retire : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   runtimeClassName des tâches dans la spec signée : construire-racine-rpm:kata prefetch-racine-rpm:kata publier-image:- (attendu : construire-racine-rpm:kata prefetch-racine-rpm:- publier-im
+OK   kata_ailleurs : code : 1
+OK   kata_ailleurs : KO attendu : 1
+OK   kata_ailleurs : écarts imprimés avant le KO : oui
+     enveloppes de l'invocation 97dcc596-9a7f-4bbe-b05c-aadc91dd12e0 : 1
+     KO   paramètres des tâches égaux à ceux de la pipeline signée (sha256 des listes triées) : 3ddbc234eba88545270a2f53ad6b2bc0619e2450a685a9e5d5596183cc96c2ef (attendu : b12294cda216333d352ca7
+OK   attendu_faux : code : 1
+OK   attendu_faux : KO attendu : 1
+OK   attendu_faux : écarts imprimés avant le KO : oui
+# bilan : 95 OK, 1 KO ; fin 2026-11-20T09:19:20Z

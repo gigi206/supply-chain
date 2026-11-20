@@ -176,3 +176,20 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 **Note du 19/11/2026, écrite à 16:00:25 UTC, fraîcheur de l'image d'outils des tâches** ([carte de M1b](../../poc/bricks/05-rpm-mock/resultats/m1b-carte.md), [mesure](../../poc/bricks/05-rpm-mock/resultats/m1b-amorce-fraicheur.log)) : une image d'outils figée par digest garde ses failles connues. L'amorce `rockylinux:9.8` des tâches rpm (D4 a), image du 25/05/2026, a 44 paquets sur 146 en retard sur sa distribution, soit 54 errata de sécurité, dont un « Critical » (`ca-certificates`), et des retards sur openssl, glibc, python et curl. Le contenu construit n'est pas touché, puisqu'il vient du miroir fixé par la pipeline. Le risque porte sur les pods qui exécutent ces outils. Pour tout format, l'image d'outils d'une tâche doit donc avoir une **règle de fraîcheur** : soit un rafraîchissement daté, qui refait les références, soit une réserve mesurée et acceptée. Le choix reste au propriétaire.
 
 **Note du 19/11/2026, écrite à 16:15:18 UTC, décision sur la fraîcheur de l'image d'outils des tâches rpm** ([carte de M1b](../../poc/bricks/05-rpm-mock/resultats/m1b-carte.md)) : décision du propriétaire « (a) Figée ». Pour la première signature, l'amorce `rockylinux:9.8` reste figée par digest, en réserve mesurée et acceptée. La règle de fraîcheur demandée par la note précédente prend donc, pour ce format, la forme d'une réserve. Elle s'appuie sur les gardes mesurées (RZ, PX), sur une construction sans réseau et sur un contenu tiré du miroir fixé. Une exécution de code dans le pod de prefetch n'est pas couverte par ces mesures.
+
+**Additif du 20/11/2026, écrit à 09:23 UTC : M1b de la brique 05 mesuré** (brique 05, [carte](../../poc/bricks/05-rpm-mock/resultats/m1b-carte.md)).
+- **Mesuré** : les deux images d'outillage rpm (`mock-rocky9`, `rocky9-bootstrap`) sont construites par la plateforme, sur le schéma S4a de la 06 (décision « C »).
+  - Le prefetch vérifie tout ce qu'il tire : sha256 fixés dans la pipeline signée, signature de `repomd.xml` par `gpgv`, puis `rpm -K` sur 199 et 10 rpm.
+  - Le constructeur, hors ligne, installe la racine avec une époque fixée et l'archive par un `tar` borné. Il s'arrête si la racine diffère du sha256 fixé, puis écrit un layout OCI sans date.
+  - `publier-image` est reprise sans changement.
+  - Deux PipelineRuns par image donnent le même digest : `70f8c412…` et `6de899ac…`. C'est aussi celui du banc hors ligne et de la mesure d'un autre jour.
+  - La provenance signée par Chains nomme la pipeline, les trois tâches, l'amorce et, pour le bootstrap, sa base.
+- **Conséquence pour la règle générique** : un outillage de construction (image de builder) suit le même chemin qu'un artefact. Il passe par un prefetch vérifié, une construction sans réseau, une publication commune et une provenance. La reproductibilité d'une racine rpm demande une époque fixée et un `tar` borné, la limite de fichiers ouverts (dnf de Rocky dans Kata) et la langue posée par la tâche.
+- **Réserves** :
+  - l'amorce est figée par digest, en retard sur Rocky 9.8 ;
+  - un seul nœud et un seul hôte ;
+  - le prefetch est ouvert à toute adresse publique en 443 ;
+  - l'outillage ne déclare pas sa base.
+- **Non mesuré** :
+  - l'usage de ces images par la construction rpm (la cascade M4a à M4c refaite, avant le rejeu M5b) ;
+  - leur jugement par la porte.

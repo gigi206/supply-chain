@@ -359,3 +359,10 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 **Additif du 19/11/2026, écrit à 15:24:58 UTC : brique 06 close** ([clôture](../../poc/bricks/06-deb-sbuild/README.md)), sur le choix du propriétaire « Clore maintenant ».
 - **Mesuré** : dans les fichiers de la 06, tout usage privilégié est sous Kata ou n'est qu'une lecture (16 lignes classées) ; les pods `construire` tournent sous Kata en S4a, S4d et S4d3 ; hors Kata, Pod Security refuse `construire-deb` (N7) et la porte refuse la provenance (U12).
 - **Conséquence pour cet ADR** : la voie A (pod Kata privilégié, D1 a) tient pour le deb jusqu'au seuil. La clause « 0 pod privilégié sur l'hôte » se lit avec cette décision : le pod est privilégié dans la VM de Kata, pas sur l'hôte.
+
+**Additif du 20/11/2026, écrit à 09:23 UTC : M1b de la brique 05 tenu** ([carte](../../poc/bricks/05-rpm-mock/resultats/m1b-carte.md), [prédictions et résultats](../../poc/bricks/05-rpm-mock/resultats/m1b-predictions.md)). La plateforme construit les deux images d'outillage rpm. Quatre PipelineRuns des pipelines signées `builder-mock-rocky9` et `builder-rocky9-bootstrap` ont tourné le 20/11/2026, de 09:02:23 à 09:11:45 UTC.
+- **`prefetch-racine-rpm`** tourne sous **runc** sans root (uid 65532, capacités retirées). Sa sortie est limitée au DNS, aux adresses publiques en 443 et à Zot (témoin NT2).
+- **`construire-racine-rpm`** est un pas privilégié en root. Il tourne sous **Kata** (`runtimeClassName` `kata`, relevé pod par pod sur sc-build), sans aucune entrée ni sortie réseau : NetworkPolicy `construction-racine-rpm-sans-sortie` (témoin NT3), et la tâche relève elle-même ses trois témoins coupés.
+- **Provenance** : chaque PipelineRun a une provenance signée par Chains. Elle porte Kata pour la seule tâche `construire` dans la spec signée.
+- **Conséquence pour cet ADR** : aucune décision ne change. Comme `construire-deb` et `construire-rpm`, la seule tâche privilégiée de M1b tourne dans la VM de Kata, sans réseau.
+- **Non mesuré** : le refus d'un pod `construire-racine-rpm` hors Kata, et le jugement de ces images par la porte, qui ne connaît pas encore ce nom.

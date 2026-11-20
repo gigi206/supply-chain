@@ -535,3 +535,12 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - 2026-11-19T13:03:47Z : décision « all, comme S1 » (chaque image garde la langue de S1, posée par la tâche). `pod_e` redonne le bootstrap `b063feb3…` au bit près dans Kata, hors réseau (dnf 5 s). Les deux racines de M1b sont reproduites dans Kata, même jour ; reste un autre jour et la tâche ([résultat](resultats/m1b-predictions.md), [carte](resultats/m1b-carte.md)).
 - 2026-11-19T13:56:06Z : tâches neuves de M1b écrites à sec (`builders/` : `prefetch-racine-rpm` en runc sans root, `construire-racine-rpm` en Kata sans sortie, gabarit `builder-rpm`) et éprouvées sans Tekton par `m1b-builders.sh`. Sur un PVC, le constructeur retrouve les deux racines et donne les mêmes digests d'image que le banc de l'hôte (`70f8c412…`, `6de899ac…`). Rien n'est signé ; politiques et deux choix à poser avant signature ([résultat](resultats/m1b-predictions.md), [carte](resultats/m1b-carte.md)).
 - 2026-11-19T14:21:39Z : base du bootstrap vérifiée et déclarée, sur les décisions « Garder l'arrêt » et « Vérifier et déclarer ». Le prefetch lit et contrôle le manifeste `ee90dc0e…` et écrit `BASE_ARTIFACT_INPUTS`. Les essais sont rejoués sous `m1bt3` (BV1 à BV4 tenues), avec les mêmes digests `70f8c412…` et `6de899ac…`.
+- 2026-11-20T09:23:54Z : M1b tenu, avec réserves. Les étapes depuis la ligne précédente sont détaillées dans la [carte de M1b](resultats/m1b-carte.md). Le 20/11 :
+  - la mesure d'un autre jour tient : les deux racines et les deux images se reproduisent dans Kata ;
+  - `m1b_sortie` et `m1b_sans_sortie` sont posées, et `m1b_temoins` passe (NT1 à NT4) ;
+  - le correctif de `filtre` est appliqué ;
+  - les deux tâches puis les deux pipelines sont signées (SG1 à SG4), et la liste revue est acceptée ;
+  - quatre PipelineRuns publient `builds/builders/mock-rocky9@sha256:70f8c412…` et `builds/builders/rocky9-bootstrap@sha256:6de899ac…`, chacune deux fois au même digest (PN1 à PN7) ;
+  - la provenance passe : une attestation signée par Chains par PipelineRun (2026-11-20T09:22:25Z, PV1 à PV7).
+
+  Réserves : amorce figée, un nœud et un hôte, prefetch ouvert en 443, porte ne connaissant pas `construire-racine-rpm`. La cascade avant M5b n'est pas commencée.

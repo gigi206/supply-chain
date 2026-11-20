@@ -2062,3 +2062,18 @@ Le masquage de `m1b.sh` et de `m1b-builders.sh` est inopérant cette nuit (FL3).
 - **PV7** (haute) : la provenance est refusée avec une autre clé (`no matching attestations`), pour les deux images.
 
 **Portée prévue** : si PV1 à PV7 tiennent, chaque image d'outillage rpm a une provenance signée par Chains, cohérente avec la pipeline signée et la liste revue. La porte ne juge pas encore ces images : elle ne connaît pas `construire-racine-rpm`, et sa ConfigMap est en retard. M1b serait alors mesuré de bout en bout, avec ses réserves (amorce figée, un nœud et un hôte, prefetch ouvert en 443).
+
+### Provenance : résultat (note écrite le 20/11/2026 à 2026-11-20T09:23:54Z UTC)
+
+Lancée sous l'accord permanent du 18/11, puisque l'étape est en lecture seule. `m1b-provenance.sh provenance` (`dec9d714…`, celui des prédictions) a tourné de 2026-11-20T09:22:25Z à 2026-11-20T09:22:27Z, avec code 0, 43 OK et 0 KO ([`m1b-provenance-provenance.log`](m1b-provenance-provenance.log)). **PV1 à PV7 tenues.**
+- **PV1** : toutes les gardes passent : la clé de Chains, les deux pipelines signées et leurs références, et `IMAGE_DIGEST` des quatre PipelineRuns.
+- **PV2** : pour chaque image, quatre enveloppes valides. Elles viennent des deux PipelineRuns et des deux TaskRuns `publier`, aucune d'un objet étranger.
+- **PV3** : chaque PipelineRun a une enveloppe. Son sujet est `mock-rocky9@70f8c412…` ou `rocky9-bootstrap@6de899ac…`, son `buildType` est `slsa-tekton`, et elle n'a aucune dépendance git.
+- **PV4** : les dépendances égalent l'attendu, six pour l'outillage et sept pour le bootstrap.
+- **PV5** : les paramètres égalent ceux de la pipeline signée. Kata est demandé pour `construire-racine-rpm` seule.
+- **PV6** : une signature simplesigning valide par image, sur son digest. C'est un relevé, non exigé.
+- **PV7** : les deux provenances sont refusées avec une autre clé (`no matching attestations`).
+
+**Premier passage du banc, gardé** : [`m1b-provenance-banc-1.log`](m1b-provenance-banc-1.log), 95 OK et 1 KO, sur le même `m1b-provenance.sh`. Le KO venait du banc : `yq` lu sur deux fichiers à la fois imprime un séparateur `---`. Seul le banc a changé (une boucle, un fichier à la fois). Le second passage donne 96 OK ; c'est celui cité dans les prédictions.
+
+**Limite** : les paramètres attendus se lisent dans les pipelines signées du cache (`m1b-signature-05`), épinglées par sha256. Une nouvelle signature les changerait, et la garde refuserait alors l'étape au lieu de la passer. Les bundles dans Zot restent la référence.
