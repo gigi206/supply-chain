@@ -2541,3 +2541,39 @@ Les dossiers sont neufs (rien n'est retiré) et les journaux de pod prennent des
   - la durée des copies. `entrees.tar` passe de 318 842 880 octets (M4c) à 463 083 520, car la couche du bootstrap neuf n'est pas compressée.
 
 **Conséquence, à poser après l'essai** : si ES4 tient, les PipelineRuns de M4c refait publieront dans `builds/sample-app-rpm` le digest déjà publié et attesté par M4c (`07b7bd6f…`). La garde « dépôt absent » de `m4c.sh` serait fausse, et Chains ajouterait des attestations au même sujet. Ce n'est pas le cas de la fermeture, dont le digest changeait. Le choix du dépôt sera une question à part, une fois le digest mesuré.
+
+### M4c refait : résultat de `local`, `essai_preparer` et `essai`, écrit le 20/11/2026 à 2026-11-20T13:19:26Z UTC
+
+Les trois étapes ont tourné sous l'accord permanent, avec le script commité en `ef441717`. Toutes rendent code 0, sans ligne de jeton. Rien n'est écrit dans Zot.
+
+| Étape | Heure (UTC) | OK | KO | Écarts | Journal |
+|---|---|---|---|---|---|
+| `local` | 13:14:53 | 75 | 0 | - | [`m1b-construction-local.log`](m1b-construction-local.log) |
+| `essai_preparer` | 13:15:13 à 13:15:26 | 14 | 0 | - | [`m1b-construction-essai_preparer.log`](m1b-construction-essai_preparer.log) |
+| `essai` | 13:15:30 à 13:18:29 | 30 | 0 | 0 | [`m1b-construction-essai.log`](m1b-construction-essai.log) |
+
+Le journal complet du script de construction est [`m1b-construction-construire-pod.log`](m1b-construction-construire-pod.log).
+
+- **CL1 tenue** : 75 OK, comme au banc 2. Les tâches rendues sont égales aux tâches signées versionnées. La confrontation donne le dossier `dir:` `…@sha256:6de899ac…` et `image_digest` `77cff176…`. **Relevés** :
+  - `entrees.tar` fait 463 083 520 octets, sha256 `c5cf750e…` ;
+  - le tar de l'hôte donne le digest `7b17e7e7…`, comme le 18/11.
+- **EP1 tenue** : le pod runc passe en `Succeeded` en 12 s. Les pulls réels donnent 230 fichiers pour la fermeture `09838980…`, 2 pour l'artefact `333b7322…` et 8 pour la fermeture applicative. Le verrou livré est `c544599a…`. Les trois résultats `*_ARTIFACT_INPUTS` citent les références attendues. L'arbre `entrees/` du pod est égal à celui de `local` : 273 fichiers.
+- **ES1 tenue** : le pod Kata est prêt. `entrees.tar` est égal au journal de `local`, copié en 7 morceaux et déballé par l'UID 65532 (273 fichiers). L'écriture sur les entrées est refusée (virtiofs `ro`), et le script rend code 0.
+- **ES2 tenue** : c'est la première construction hermétique avec le bootstrap de M1b. Lignes relevées :
+  - podman charge en `dir:` le dossier `…6de899ac…`, dont la couche n'est pas compressée (« Using container image: dir: » : 1 et 1) ;
+  - mock contrôle `image_digest` `77cff176…` (« Checking image digest » : 1 et 1). Aucune ligne « Expected digest for image » n'apparaît, et mock rend 0 : la valeur du verrou est la bonne ;
+  - aucun repli en chroot, aucun manque de place, aucune ligne http ou https ;
+  - 222 paquets dans le buildroot ;
+  - quatre témoins réseau en échec.
+
+  `image_digest`, qui n'avait que le verrou pour source, est donc mesuré pour la première fois.
+- **ES3 tenue** : Source0 `07521c1e…`, src.rpm `c802e60a…` et rpm `864d55f4…`, ceux de M3. 0 écart au verrou `c544599a…`.
+- **ES4 tenue** : le digest de l'artefact vaut `07b7bd6f…`, celui de l'essai de M4c et de l'essai des bundles.
+- **Relevés** :
+  - mock dure 49 s, comme à l'essai des bundles ;
+  - `/w` passe de 452 736 kB utilisés avant mock à 1 592 652 kB après (311 876 et 1 456 104 kB à l'essai des bundles) ;
+  - la copie des entrées et le déballage prennent environ 70 s, de 13:15:31 (création du pod) à 13:16:45 (début du script).
+
+**Ce que cela établit** : avec l'outillage, le bootstrap, le verrou et la fermeture de M1b, la construction hermétique de sample-app redonne à l'octet le rpm de M3 et l'artefact de M4c. Changer d'images de builder change la fermeture des dépendances (`2a9e2ea7…` devient `09838980…`), mais pas l'artefact construit.
+
+**Question avant la suite** : publier par la plateforme écrira `builds/sample-app-rpm@07b7bd6f…`, un digest que M4c a déjà publié et que Chains a déjà attesté. La garde « dépôt absent » de `m4c.sh` ne tient plus, et les attestations des PipelineRuns refaits s'ajouteraient à celles de M4c sur le même sujet. Les étapes `pipeline`, `construction`, `comparaison` et `provenance` ne seront écrites qu'après ce choix.

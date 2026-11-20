@@ -1005,3 +1005,7 @@ De 12:44:34Z à 12:46:38Z, sur ton accord nommé, RP1 à RP4 tiennent. Les deux 
 ## Note datée du 20/11/2026, écrite à 2026-11-20T12:50:18Z UTC : M4b refait tenu
 
 À 12:49:26Z et 12:49:28Z, CP1, CP2 et PV1 à PV3 tiennent. La fermeture `sample-app-rpm@09838980…`, tirée de Zot, est égale à l'arbre de l'essai, et sa provenance est vérifiée (quatre enveloppes, dépendances et paramètres égaux à l'attendu). **M4b refait est tenu.** Suite : M4c refait, avec `construire-rpm@ca03f189…`, la fermeture `09838980…` et l'artefact `333b7322…`.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T13:19:26Z UTC : essais de M4c refait tenus
+
+De 13:14:53Z à 13:18:29Z, sous l'accord permanent, `local`, `essai_preparer` et `essai` de `m1b-construction.sh` tiennent : CL1, EP1 et ES1 à ES4. La construction hermétique avec le bootstrap de M1b passe le contrôle `image_digest` (`77cff176…`) de mock, mesuré pour la première fois. Elle redonne le rpm de M3 et l'artefact `07b7bd6f…` de M4c. Suite : choix du dépôt de publication, puisque ce digest est déjà publié et attesté par M4c.
