@@ -595,3 +595,18 @@ Les trois notes restent écrites telles quelles. Les trois défauts ont été re
 - **RV8** (haute) : C1, C3 et C4 transmettent `RENDU`, `MESURE` et `M4A_LAYOUT` vers la copie ;
 - **RV9** (haute) : D1 redonne 8 OK et `333b7322…` avec le layout de M4a lu dans la copie ;
 - **RV10** (haute) : F1 tient les trois gardes remises sur le journal réel de la cascade, et F7 s'arrête sur les témoins après une création.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T17:59:45Z UTC : quatrième passage du banc de `m5b-rejeu.sh`, résultat
+
+**Passage** le 20/11/2026 à 17:59:00 UTC, au dépôt `6a8dc980` (script `a01f8dd1…`). Le banc rend 0 avec « bilan : 115 OK, 0 KO » ([`m5b-rejeu-banc-4.log`](m5b-rejeu-banc-4.log)). Le journal compte 114 lignes OK visibles, plus le contrôle F1 masqué par le filtre `jeton|token`.
+
+- **RV1 à RV6 tenues**, comme au troisième passage.
+- **RV7 tenue** :
+  - B1 copie 6 fichiers, égaux aux originaux, et un layout de M4a égal à l'original.
+  - B9 rend 0 en relisant la copie, avec un travail sans entrées.
+  - B10 s'arrête sur `pipeline-o.yaml` altéré. B11 s'arrête sur les entrées absentes, sans créer de copie.
+- **RV8 tenue** : `RENDU` et `MESURE` (C1, C3) et `M4A_LAYOUT` (C4) pointent vers la copie.
+- **RV9 tenue** : avec un travail sans `m4a-05`, D1 redonne 8 OK et `333b7322…`.
+- **RV10 tenue** : F1 tient les trois gardes remises sur le journal réel de la cascade. F7 s'arrête sur les témoins, après une création.
+
+**Portée**, inchangée : pas de Zot, de Tekton, d'admission réelle, de Kyverno, de Kata, de Chains ni de tkn. `signature` et `images` ne sont mesurées que par leur chargement, et le bloc de `rejeu.sh` n'est pas exécuté. La copie réelle `~/.cache/supply-chain-poc/05/rejeu-entrees` n'existe pas encore : `entree` la fera, avant le démontage. Le dossier du banc (4,2 Mio, lu par aucun script) est effacé.

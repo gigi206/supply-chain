@@ -257,3 +257,8 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - Les pipelines rpm sont lues par digest. La fermeture `09838980…` et l'artefact de packaging `333b7322…`, cités par la pipeline signée, sont exigés à leur digest. L'artefact rpm est relevé seulement.
 - Son banc sans cluster passe (103 OK).
 - Le bloc de `rejeu.sh` reste à écrire.
+
+**Précision du 20/11/2026, écrite à 2026-11-20T17:59:45Z UTC** : `vm.sh detruire` efface le dossier de travail de l'hôte.
+- `m5b-rejeu.sh` copie donc avant le démontage les entrées de l'hôte que ses étapes lisent : le rendu des builders, la mesure d'un autre jour et le layout de M4a.
+- Il rejoue aussi trois gardes de sûreté de la construction rpm : témoins réseau, construction hermétique, aucune URL.
+- Le banc passe à 115 OK. Le bloc 05 de `rejeu.sh` est écrit, et pas encore rejoué.

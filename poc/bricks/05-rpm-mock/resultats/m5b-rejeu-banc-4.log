@@ -1,0 +1,251 @@
+# m5b-rejeu-banc.sh, 2026-11-20T17:59:00Z, dépôt 6a8dc980, script a01f8dd11901a871
+dossier du banc : ~/.cache/supply-chain-poc/05/banc-m5b-rejeu-4 ; travail réel lu : ~/.cache/supply-chain-poc/08/travail (m1bt-20-05, m4a-05, m1b-fermeture-05, m1b-construction-05)
+## A lanceur
+OK   A1 bash -n : ok
+OK   A1 shellcheck -x : ok
+OK   A2 TAG=« m1b » refusé (code) : 2
+OK   A2 TAG=« m4a » refusé (code) : 2
+OK   A2 TAG=« m4b » refusé (code) : 2
+OK   A2 TAG=« m4c » refusé (code) : 2
+OK   A2 TAG=« essai » refusé (code) : 2
+OK   A2 TAG=« s1 » refusé (code) : 2
+OK   A2 TAG=«  » refusé (code) : 2
+OK   A2 TAG=« A » refusé (code) : 2
+OK   A2 TAG=« a_b » refusé (code) : 2
+OK   A3 étape inconnue (code) : 2
+OK   A3 aucun journal écrit par A2 et A3 (journaux du banc exceptés) : 0
+OK   A4 scripts de mesure, commun.sh, m5b-republier.sh et rejeu.sh inchangés (git diff HEAD) : inchangés
+OK   A5 rien n'est signé par le script lui-même (tkn … sign, cosign sign) : 0
+OK   A5 clé des tâches : une seule ligne, le test -s : 1 1
+## B entree, vraie fonction, vraies entrées de l'hôte
+   | ## TAG banc-b1 : journaux et dossiers absents
+   | OK   journaux de ce TAG présents (un journal n'est jamais réécrit) : 0
+   | OK   dossiers de ce TAG présents sous $W : 0
+   | ## outils et environnement
+   | OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+   | OK   SOURCE_DATE_EPOCH : absente
+   | OK   tkn (client) : 0.46.2
+   | OK   clé des tâches présente (test -s, jamais lue ici) : présente
+   | ## entrées de l'hôte, gardées hors de $W (vm.sh detruire l'efface)
+   | copie faite : ~/.cache/supply-chain-poc/05/banc-m5b-rejeu-4/entrees (12 fichiers)
+   | OK   copie : rendu de prealables prefetch-racine-rpm.yaml (sha256, RENDUS_SHA de m1b-signature.sh) : b0fdff3895df59897ebc30333689b24f748124ed98e1f610cb4405a170534a05
+   | OK   copie : rendu de prealables construire-racine-rpm.yaml (sha256, RENDUS_SHA de m1b-signature.sh) : de77ba0a70b4cee401448e7f6dc161094c71b2594204425a838d7dc45bf97b08
+   | OK   copie : rendu de prealables pipeline-o.yaml (sha256, RENDUS_SHA de m1b-signature.sh) : 13836c388b47fe701360631db59239f67b8d787568d2af3491707422d78bfda0
+   | OK   copie : rendu de prealables pipeline-b.yaml (sha256, RENDUS_SHA de m1b-signature.sh) : b2443188125b63b71539cb61c73d314dd21f11aaba3a673ab263a644794870f7
+   | OK   rendus contrôlés : 4
+   | ## mesure d'un autre jour : m1bt-20 (~/.cache/supply-chain-poc/05/banc-m5b-rejeu-4/entrees/m1bt-20-05)
+   | OK   o : digest du banc de m1bt-20 égal à celui de m1bt3 : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+   | OK   o : DIGEST_CONSTRUIT de l'essai m1bt-20-co égal au banc : 1
+   | o : image.tar de l'essai m1bt-20-co : 343951360 octets
+   | OK   b : digest du banc de m1bt-20 égal à celui de m1bt3 : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+   | OK   b : DIGEST_CONSTRUIT de l'essai m1bt-20-cb égal au banc : 1
+   | b : image.tar de l'essai m1bt-20-cb : 241991680 octets
+   | OK   copie : layout de M4a, manifeste sha256:41c639b7f0f2… (sha256 du blob) : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+   | ## fichiers du dépôt
+   | OK   arbre de l'essai de la cascade (sha256) : a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014a
+   | OK   arbre de l'essai de la cascade : fichiers : 230
+   | OK   verrou de la cascade (sha256) : c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+   | OK   fermeture/prefetch-rpm.m1b.signee.yaml (sha256, m5b-republier.sh) : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+   | OK   construction/construire-rpm.m1b.signee.yaml (sha256, m5b-republier.sh) : 90151d43270fc2fa1a77765f4c6acdacdc2ecd2033d9bc0aa8494c5517f0a31b
+   | OK   construction/preparer-rpm.signee.yaml (sha256, m5b-republier.sh) : b32d073f75ca03aa48100f7052a23316297b8d5e318e7796ebc8a729b1d7acf9
+   | OK   fermeture/prefetch-rpm-sample-app.m1b.signee.yaml (sha256, m5b-republier.sh) : be99c8f946849d92fa92b7db354138bee1880ee123186406107d012f18215ffd
+   | OK   construction/sample-app-rpm.m1b.signee.yaml (sha256, m5b-republier.sh) : 8b96852f970da6e1bccab3491587705cff16cafdf3649e312f9d6b87208e66e8
+   | OK   fichiers signés contrôlés : 5
+   | entrée : rien n'a été écrit dans Zot ni dans le cluster
+OK   B1 nominal : code : 0
+OK   B1 nominal : KO : 0
+OK   B1 ligne « OK   journaux de ce TAG présents (un journal n'est jamais réécrit) … » : 1
+OK   B1 ligne « OK   dossiers de ce TAG présents sous $W : 0… » : 1
+OK   B1 ligne « OK   rendus contrôlés : 4… » : 1
+OK   B1 ligne « OK   fichiers signés contrôlés : 5… » : 1
+OK   B1 ligne « OK   copie : layout de M4a, manifeste sha256:41c639b7f0f2… (sha256 d… » : 1
+OK   B1 ligne « OK   clé des tâches présente (test -s, jamais lue ici) : présente… » : 1
+OK   B1 ligne « OK   tkn (client) : 0.46.2… » : 1
+OK   B1 ligne « OK   arbre de l'essai de la cascade : fichiers : 230… » : 1
+OK   B1 ligne « entrée : rien n'a été écrit dans Zot ni dans le cluster… » : 1
+OK   B1 mesure d'un autre jour (gardes_mesure de m1b-pipeline.sh) : deux images : 2
+OK   B1 dossiers laissés sous le travail du banc (chargements) : banc-b1-pipeline-05 m5b-republier-banc-b1-05
+OK   B1 aucun dossier auth laissé : 0
+OK   B1 copie faite hors du travail : fichiers (4 rendus, 2 banc-digest, layout de M4a) : 1 6 2c396377318992f8
+OK   B1 copie : rendus et banc-digest égaux aux originaux : 0
+OK   B2 : arrêt sur « fuseau : décalage de l'époque 0 »
+OK   B3 : arrêt sur « SOURCE_DATE_EPOCH »
+OK   B4 : arrêt sur « journaux de ce TAG présents (un journal n'est jamais réécrit) : 1 »
+OK   B5 : arrêt sur « dossiers de ce TAG présents sous $W : 2 »
+OK   B6 : arrêt sur « clé des tâches présente (test -s, jamais lue ici) : absente »
+OK   B7 : arrêt sur « arbre de l'essai de la cascade (sha256) »
+OK   B8 journal de l'étape entree elle-même ignoré : code : 0
+OK   B2 : arrêt avant tout chargement (aucun dossier du TAG) : 0
+OK   B3 : arrêt avant tout chargement (aucun dossier du TAG) : 0
+OK   B4 : arrêt avant tout chargement (aucun dossier du TAG) : 0
+OK   B6 : arrêt avant tout chargement (aucun dossier du TAG) : 0
+OK   B9 copie relue, travail sans entrées (après démontage) : code, message : 0 1
+OK   B10 : arrêt sur « copie : rendu de prealables pipeline-o.yaml »
+OK   B11 : arrêt sur « entrées de l'hôte absentes de $W »
+OK   B11 : aucune copie créée : absente
+## C chargements, copie du script et scripts de mesure factices
+OK   C1 signature : sorties sous $TS, SIGNER retirée, les deux dossiers auth présents pendant l'étape : signature : T=m5b-rejeu-banc-c-signature-05 SIGNER=absente RENDU=m1bt-20-05 T0/auth=présent T/auth=présent
+OK   C1 signature : code : 0
+OK   C1 dossiers auth retirés après ($TS et $W/m1b-signature-05) : 0
+OK   C2 : arrêt sur « déjà présent, jamais réécrit : m5b-rejeu-banc-c-signature-05 »
+OK   C3 images : PREFIXE, SIG et MESURE transmis : images : N=banc-c SIG=m5b-rejeu-banc-c-signature-05 MESURE=m1bt-20-05
+OK   C4 artefact : PREFIXE, TAG et layout de M4a : artefact : N=banc-c TAG=banc-c T=banc-c-artefact-05 M4A=m4a-05/layout-1
+OK   C5 fermeture : PREFIXE et TAG : fermeture : N=banc-c TAG=banc-c
+OK   C6 construction_rpm : PREFIXE et TAG : construction : N=banc-c TAG=banc-c
+OK   C7 journal présent refusé par le lanceur (code, message) : 2 1
+## D artefact : etape_local réelle, layout de M4a lu dans la copie (travail sans m4a-05), publication dans un layout OCI local
+   | ## A1 sources (sha256)
+   | OK   A1 poc/packaging/sample-app.spec : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6
+   | OK   A1 resultats/m1b-verrou.json : c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+   | OK   A1 poc/packaging/verrou-rpm.json (verrou de M4a, inchangé) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+   | ## A2 verrou neuf contre des sources indépendantes
+   | OK   A2 verrou neuf : version 1.1.0, 222 rpm (222 nom.arch distincts), égaux à ceux du verrou de M4a : True, 0 URL hors de vault 9.7, bootstrap_image sc-stockage.poc.te
+   | OK   A2 image_digest, forme seule (prédiction de M4b, non contrôlée ici) : 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca
+   | ## A3 témoin de méthode : verrou de M4a, tag banc-d, zone neuve
+   | OK   zone temoin : fichiers : sample-app.spec f verrou-rpm.json f
+   | OK   zone temoin : copies égales aux sources : égales
+   | OK   A3 digest du témoin égal à celui de M4a : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+   | ## A4 artefact neuf, deux layouts locaux
+   | OK   zone paquet : fichiers : sample-app.spec f verrou-rpm.json f
+   | OK   zone paquet : copies égales aux sources : égales
+   | artefact : sample-app.spec verrou-rpm.json
+   | OK   A4 deux poussées locales, même digest : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+   | ## A5 manifeste neuf contre celui de M4a
+   | OK   A5 manifeste neuf contre celui de M4a : 2 feuille(s) différente(s), prévues : couche 1 (verrou-rpm.json), digest et taille ; titres ['sample-app.spec', 'verrou-rpm
+   | manifeste neuf : 849 octets ; couches : 118762 octets
+   | digest attendu dans Zot : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48 (tag banc-d)
+   | ## publication (etape_publier de m1b-artefact.sh, sans le tag m4a)
+   | OK   digest local égal à l'artefact cité par la pipeline signée : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+   | OK   P0 sources inchangées depuis local : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6 c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c
+   | OK   P0 zone de préparation inchangée : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6 c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c8
+   | OK   artefact attendu, avant la poussée : absent
+   | OK   G1 entrees/sample-app/packaging-rpm:banc-d, lecture anonyme : absent
+   | OK   G3 octets libres sur / de sc-stockage (porte /var/lib/zot) : 3000000000 (seuil 1073741824)
+   | OK   P1 deux poussées dans Zot, même digest : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+   | OK   P1 digest Zot égal au digest local : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+   | OK   P2 fichiers tirés par digest égaux à la zone de préparation : de37a2889bceb32428a62efceddf824369bef139223a5eca8679fc4aeedd6ac3
+   | OK   P3 entrees/sample-app/packaging-rpm:banc-d, lecture anonyme après : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+   | octets libres sur / de sc-stockage après : 3000000000
+OK   D1 nominal : code, KO : 0 0
+OK   D1 nominal : etape_local réelle (A1 à A5 : 3 + 2 + 1 + 1 + 1) : 8
+OK   D1 nominal : digest local égal à 333b7322 : 1
+OK   D1 nominal : deux poussées au tag banc-d : 2 entrees/sample-app/packaging-rpm:banc-d
+OK   D1 nominal : P1, P2, P3 : 4
+OK   D2 reprise : code, poussées : 0 0
+OK   D2 reprise : message : 1
+OK   D3 : arrêt sur « décision du propriétaire ; rien n'est poussé »
+OK   D3 : poussées : 0
+OK   D4 : arrêt sur « G1 entrees/sample-app/packaging-rpm:banc-d »
+OK   D4 : poussées : 0
+OK   D5 : arrêt sur « G3 place libre sur / de sc-stockage »
+OK   D5 : poussées : 0
+## E fermeture : vraie fonction, faux kubectl servant les objets réels de m1b-rpm-1
+OK   E objets transposés (6 fichiers, plus aucun nom m1b-rpm-) : 6 0
+   | ## gardes, avant toute création
+   | OK   PIPELINE_REF de m1b-fermeture.sh : sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182
+   | OK   fermeture attendue, FERMETURE_NEUVE de m1b-fermeture.sh : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+   | OK   pipeline présente dans Zot par digest (lecture anonyme) : sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+   | OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+   | OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+   | OK   arbre de l'essai de la cascade (sha256), égal à l'arbre prédit : a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014a
+   | OK   fermeture attendue, avant le PipelineRun : absent
+   | / de sc-stockage : 3000000000 octets libres à 17:59:02 (garde : 1073741824)
+   | OK   banc-e-rpm-1 : pipeline par digest : sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf1
+   | OK   banc-e-rpm-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+   | ## banc-e-rpm-1
+   | banc-e-rpm-1 créé à 17:59:02 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60
+   | banc-e-rpm-1 : condition Succeeded « True|Succeeded », relevée à 17:59:02
+   | ### TaskRun banc-e-rpm-1-prefetch : True|Succeeded
+   | ### TaskRun banc-e-rpm-1-publier : True|Succeeded
+   | résultat de IMAGE_URL : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+   | résultat de IMAGE_DIGEST : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+   | OK   PipelineRun banc-e-rpm-1 : True|Succeeded
+   | OK   dépôt publié : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+   | OK   fermeture publiée, égale à l'attendue : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+   | OK   manifeste relu dans Zot (lecture anonyme) : couches : 230
+   | OK   PipelineRun banc-e-rpm-1 signé par Chains : true
+   | / de sc-stockage : 3000000000 octets libres à 17:59:02
+OK   E1 nominal : code, KO : 0 0
+OK   E1 nominal : un PipelineRun créé, au préfixe du banc : banc-e-rpm-1
+OK   E1 nominal : pipeline par digest dans le PipelineRun créé : sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+OK   E1 ligne « OK   fermeture publiée, égale à l'attendue : sha256:0983898054a9b96… » : 1
+OK   E1 ligne « OK   manifeste relu dans Zot (lecture anonyme) : couches : 230… » : 1
+OK   E1 ligne « OK   PipelineRun banc-e-rpm-1 signé par Chains : true… » : 1
+OK   E1 ligne « OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/pref… » : 1
+OK   E1 ligne « OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publ… » : 1
+OK   E1 ligne « OK   fermeture attendue, avant le PipelineRun : absent… » : 1
+OK   E1 nominal : deux TaskRuns relus : 2
+OK   E2 reprise : code, appels de kubectl : 0 0
+OK   E2 reprise : message : 1
+OK   E3 : arrêt sur « pipeline présente dans Zot par digest »
+OK   E4 : arrêt sur « banc-e-rpm-1 existe déjà »
+OK   E5 : arrêt sur « espace libre illisible ou sous la garde »
+OK   E6 : arrêt sur « nouvelle signature et revue de la liste, décision du propriétaire »
+OK   E7 : arrêt sur « arbre de l'essai de la cascade (sha256), égal à l'arbre prédit »
+OK   E8 : arrêt sur « absente de la liste revue »
+OK   E9 : arrêt sur « admis en dry-run serveur »
+OK   E3 à E5, E7 à E9 : aucune création ; E6 : une : 0 0 0 0 0 0 1
+## F construction_rpm : vraie fonction, faux kubectl servant les objets réels de m1b-construction-1
+OK   F objets transposés (13 fichiers, plus aucun nom m1b-construction-1) : 13 0
+OK   F état réel : digest publié 07b7bd6f : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+   | ## gardes, avant toute création
+   | OK   PIPELINE_REF de m1b-construction.sh : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd
+   | OK   FERMETURE_RPM et PACKAGING de m1b-construction.sh : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f sha256:333b7322290ab5edd85989908fa2e181a4
+   | OK   pipeline présente dans Zot par digest (lecture anonyme) : sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+   | OK   entrée présente dans Zot par digest : builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f : sha256:0983898054a
+   | OK   entrée présente dans Zot par digest : builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : sha256:50dc73f
+   | OK   entrée présente dans Zot par digest : entrees/sample-app/packaging-rpm@sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48 : sha256:333b7322290
+   | OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+   | OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+   | OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+   | politiques de builds : NetworkPolicy construction-rpm-sans-sortie
+   | OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]
+   | OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+   | relevé : politiques de builds qui sélectionnent preparer-rpm : 
+   | / de sc-stockage : 3000000000 octets libres à 17:59:03 (garde : 1073741824)
+   | OK   banc-f-construction-1 : pipeline par digest : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b
+   | OK   banc-f-construction-1 : podTemplate commun sans env ; Kata pour construire seule : [false,["construire:kata"]]
+   | OK   banc-f-construction-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+   | ## banc-f-construction-1
+   | banc-f-construction-1 créé à 17:59:03 (sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6
+   | banc-f-construction-1 : condition Succeeded « True|Succeeded », relevée à 17:59:03
+   | ### TaskRun banc-f-construction-1-preparer (tâche preparer) : True|Succeeded
+   | ### TaskRun banc-f-construction-1-construire (tâche construire) : True|Succeeded
+   | ### TaskRun banc-f-construction-1-publier (tâche publier) : True|Succeeded
+   | résultat de IMAGE_URL : sc-stockage.poc.test:5000/builds/sample-app-rpm
+   | résultat de IMAGE_DIGEST : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+   | OK   PipelineRun banc-f-construction-1 : True|Succeeded
+   | OK   construire : témoins réseau en échec : 4
+   | OK   construire : mock --hermetic-build rc 0 : 1
+   | OK   construire : aucune ligne http ou https (mock.out, root.log, build.log) : 3
+   | OK   dépôt publié : sc-stockage.poc.test:5000/builds/sample-app-rpm
+   | OK   construire : DIGEST_CONSTRUIT égal au digest publié : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+   | OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 1
+   | relevé : artefact rpm sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 ; celui de la cascade sha25
+   | OK   PipelineRun banc-f-construction-1 signé par Chains : true
+   | / de sc-stockage : 3000000000 octets libres à 17:59:03
+OK   F1 nominal : code, KO : 0 0
+OK   F1 nominal : un PipelineRun créé, au préfixe du banc : banc-f-construction-1
+OK   F1 nominal : pipeline par digest, commit, Kata pour construire : ["sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a","6391fd437f26696847041be3226bbbf633f55a2f","kata"]
+OK   F1 ligne « OK   construire : DIGEST_CONSTRUIT égal au digest publié : sha256:07… » : 1
+OK   F1 ligne « OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur… » : 1
+OK   F1 ligne « relevé : artefact rpm sc-stockage.poc.test:5000/builds/sample-app-rpm… » : 1
+OK   F1 ligne « OK   PipelineRun banc-f-construction-1 signé par Chains : true… » : 1
+OK   F1 ligne « OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entr�… » : 1
+OK   F1 ligne « OK   entrée présente dans Zot par digest : builds/fermetures/sample-… » : 1
+OK   F1 ligne « OK   construire : témoins réseau en échec : 4… » : 1
+OK   F1 ligne « OK   construire : mock --hermetic-build rc 0 : 1… » : 1
+OK   F1 ligne « OK   construire : aucune ligne http ou https (mock.out, root.log, buil… » : 1
+OK   F1 nominal : trois TaskRuns relus : 3
+[ligne masquée : motif jeton|token]
+OK   F2 digest différent : code, relevé : 0 1
+OK   F3 : arrêt sur « construction-rpm-sans-sortie : sélecteur, types »
+OK   F4 : arrêt sur « entrée présente dans Zot par digest : builds/fermetures/sample-app-sources@ »
+OK   F5 : arrêt sur « banc-f-construction-1 existe déjà »
+OK   F6 : arrêt sur « pipeline présente dans Zot par digest »
+OK   F3 à F6 : aucune création : 0 0 0 0
+OK   F7 journal de construire sans les lignes de témoins (banc) : 0
+OK   F7 : arrêt sur « construire : témoins réseau en échec »
+OK   F7 : une création (garde après le PipelineRun) : 1
+## fin : 2026-11-20T17:59:04Z
+bilan : 115 OK, 0 KO
