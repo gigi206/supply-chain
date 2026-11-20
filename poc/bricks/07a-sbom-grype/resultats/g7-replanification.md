@@ -226,3 +226,69 @@ Préparation de la révision 1.0.0-2 de la 06 (lecture seule, aucune lecture de 
   S6a du 14/11 ne juge que le deb (`06-deb-sbuild/resultats/s6a-porte.log` l. 9).
 - Note de 2026-11-14T21:53:55Z (rien n'est réécrit) : portée de la lecture de la note précédente : WebFetch au tag v2.1.22 (résumé et citations
   courtes, pas les octets) et copie du cache sans version relevée (`grep -ci pull` : 0) ; `zot.json` : `builds/scan/**` sans `keepTags`.
+
+## Point 3 révisé d'après le relevé du 15/11 (note de 2026-11-20T19:09:44Z ; « Oui » du propriétaire ; rien n'est réécrit au-dessus)
+
+Le relevé du 15/11 ([`g7-balayage-15-11.log`](g7-balayage-15-11.log)) est commité avec cette note, sur ta décision.
+- Il contient un écart de masquage, noté dans son en-tête : quatre noms de dépôts ont été affichés à l'écran, pas dans le fichier.
+- Il retient la **loi B**. Un balayage commence 24 h et 4,940 s après la fin du précédent. Elle n'est mesurée que sur un intervalle (14/11 → 15/11).
+- Le journal de `zot.service` ne gardait qu'environ 14 h, profondeur mesurée une fois.
+
+**Conséquences pour les prédictions du 14/11** :
+- Les balayages dérivent d'environ 36 min 43 s par jour et tombent le soir. Les heures « vers 12:17 » et « 13:02:25 » ne valent plus.
+- Une lecture unique après le 28/11 ne verrait ni le 24/11 ni le 27/11 : il faut **une lecture par balayage**, dans les 14 h qui suivent sa fin.
+
+### Projection (CALCUL, pas une mesure)
+
+Durée prise égale à celle du 15/11 (2197,806 s) ou du 14/11 (2199,303 s). Le passage sur les dépôts de scan est placé à début + 964,4 s, comme le 15/11. Heures UTC.
+
+| Balayage | Début | Dépôts de scan | Fin |
+|---|---|---|---|
+| 20/11 | 16:26:08 à 16:26:14 | 16:42:12 à 16:42:18 | 17:02:46 à 17:02:53 |
+| 21/11 | 17:02:51 à 17:02:58 | 17:18:55 à 17:19:03 | 17:39:28 à 17:39:37 |
+| 24/11 | 18:52:59 à 18:53:11 | 19:09:03 à 19:09:15 | 19:29:37 à 19:29:50 |
+| 27/11 | 20:43:07 à 20:43:24 | 20:59:12 à 20:59:28 | 21:19:45 à 21:20:03 |
+| 28/11 | 21:19:50 à 21:20:08 | 21:35:54 à 21:36:12 | 21:56:28 à 21:56:47 |
+
+Toute variation de durée (nombre de dépôts, charge) déplace ces heures. L'écart s'accumule d'un jour à l'autre.
+
+### Prédictions par balayage
+
+Elles révisent H1, H2, H4 et H5. H3, H6 et H7 sont inchangées.
+
+**Hypothèses**, non vérifiées :
+- les poussées quotidiennes continuent : base de `vulndb/grype` vers 08:05 UTC, scan de `sample-app` à 09:30, scan du deb à 11:15 ;
+- aucun autre scan n'a été poussé depuis le 15/11 ;
+- `mostRecentlyPushedCount:11` et `retention.delay` 336 h sont inchangés.
+
+| # | Balayage | Prédit | Confiance |
+|---|---|---|---|
+| B20 | 20/11, déjà passé, **non lu** | Début dans la fenêtre projetée, à ± 60 s : la loi B tient sur 5 intervalles. Aucune suppression. 8 décisions `keep` dans `vulndb/grype` (tags du 13/11 au 20/11) | moyenne : un seul intervalle mesuré |
+| B24 | 24/11 | `vulndb/grype` : 12 tags, retrait du tag du 13/11 (H5), 11 `keep`. Aucune autre suppression | moyenne |
+| B27 | 27/11 | `builds/scan/sample-app` : 2 referrers supprimés, les scans du 13/11 (H1). `builds/scan/essai-scan` : 16 (H2). `vulndb/grype` : retrait du tag du 16/11, et la base du 13/11 effacée (sans tag depuis le 24/11, 336 h le 27/11 à 12:42:16) (H5) | moyenne |
+| B28 | 28/11 | `builds/scan/sample-app` : 1 (scan du 14/11 à 09:31) (H1). **`builds/scan/sample-app-deb` : 1, le premier scan du deb, du 14/11 à 21:01** (H4 révisée). `vulndb/grype` : retrait du tag du 17/11, et la base du 14/11 effacée (H5) | faible pour le deb, moyenne pour le reste |
+
+**H4 change** : la prédiction du 14/11 (« absent, ou aucune décision ») supposait un balayage vers 12:17 UTC.
+- Avec la loi B, le balayage du 28/11 passe sur les dépôts de scan vers 21:36 UTC, après la 336e heure du premier scan du deb (poussé le 14/11 vers 21:01, d'après `docs/03` ; seconde non relue).
+- La marge n'est que d'environ 35 min. Si le balayage passait plus tôt, ce scan survivrait jusqu'au 29/11.
+
+### Consigne (révise celle du 14/11 ; chaque lecture sur accord nommé)
+
+- **Une lecture du journal de `zot.service` par balayage** : B20, puis B24, B27 et B28. Chacune entre 1 h et 10 h après la fin projetée, en lecture seule (`sudo journalctl` sur sc-stockage, comme le 15/11).
+- **Relevé par balayage** :
+  - début, fin, durée et nombre de dépôts ;
+  - heures de passage de `builds/scan/**` et de `vulndb/grype` ;
+  - toutes les décisions de rétention, comptées par dépôt et par raison, puis comparées à la ligne de ce balayage ci-dessus.
+- **Après B28 seulement**, les points 1, 3, 4, 5 et 6 de la consigne du 14/11 :
+  - image réelle et deb lisibles ;
+  - aucun blob manquant ;
+  - décisions lisibles dans Grafana (comptes seulement) ;
+  - CronJob ;
+  - place libre.
+- Au premier relevé, je regarde si les lignes de Zot sont dans Loki, en comptes seulement, sans archiver de réponse de Grafana. Si elles y sont, la limite de 14 h ne tient plus.
+- **Contrainte de calendrier** : le rejeu de M5b recrée Zot. Il ne commence donc pas avant la lecture de B28, vers 23:00 UTC le 28/11.
+
+### Point 4, sur accord
+
+- La tâche `supply-chain-g7-premiere-suppression` reste désactivée. Elle sera remplacée par trois tâches ponctuelles, pour B24, B27 et B28. Leurs heures seront fixées après la lecture de B20, qui corrige la projection.
+- La lecture de B20 n'a pas besoin de tâche : le journal la garde jusque vers 07:00 UTC le 21/11 (calcul, profondeur de 14 h).

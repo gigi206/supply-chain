@@ -327,3 +327,9 @@ Mesure hors réseau sur l'hôte ([`rpm-distro.sh`](rpm-distro.sh), [prédictions
 - La `distro` de D14 est le champ du résultat de grype : vide sans `--distro`, `rockylinux 9.7` avec. Les deux branches sont compatibles.
 - Pour `sample-app`, le scan du rpm seul est vide avec ou sans `--distro` : aucun module Go n'est catalogué. Le binaire Go extrait du deb de la 06 donnait 140 correspondances.
 - Détail : [prédictions et résultat](resultats/rpm-distro-predictions.md), correction de 2026-11-20T19:03:57Z.
+
+**Additif du 20/11/2026 (2026-11-20T19:09:44Z UTC), G7** : le relevé du balayage du 15/11 est commité ([`g7-balayage-15-11.log`](resultats/g7-balayage-15-11.log), décision du propriétaire).
+- Loi B retenue sur un intervalle : un balayage commence 24 h et 5 s après la fin du précédent. Les balayages dérivent donc vers le soir.
+- Le journal de Zot ne garde qu'environ 14 h.
+- Le point 3 est révisé : une lecture par balayage (20/11, 24/11, 27/11, 28/11), et H4 révisée (le premier scan du deb serait supprimé le 28/11, marge d'environ 35 min). Le rejeu de M5b attend la lecture du 28/11.
+- Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T19:09:44Z.

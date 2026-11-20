@@ -1,0 +1,111 @@
+# Relevé en lecture seule du journal de zot.service (sc-stockage), 15/11/2026, tâche planifiée supply-chain-g7-balayage-15-11
+# Heures de date -u (hôte et VM) : 14:31:08, 14:31:16 (essai 1, voir Incident), 14:31:25, 14:31:28, 14:31:29, 14:31:48, 14:32:46,
+#   14:34:50 UTC
+# Rien n'est modifié dans Zot ni le cluster ; seule écriture sur la VM : un fichier temporaire /dev/shm/g7x créé puis supprimé
+# (voir Incident). Rien poussé, rien installé, rien commité.
+# Commandes sur la VM (ssh -n poc@192.168.161.13, clé et known_hosts de ~/.cache/supply-chain-poc/08/ssh) :
+#   date -u ; systemctl show zot.service -p ActiveState -p ActiveEnterTimestamp -p NRestarts -p ExecMainStartTimestamp
+#   sudo journalctl -u zot.service --since '2026-11-13 12:00:00' -o cat | grep -iE 'gc|retention|garbage'
+#   sudo journalctl -u zot.service --since '2026-11-14 12:17:00' --until '2026-11-14 12:46:00' -o cat
+#   sudo journalctl -u zot.service --since '2026-11-15 11:00:00' --until '2026-11-15 14:31:00' -o cat
+#   sudo journalctl -u zot.service -o short-iso-precise (première et dernière entrée) ; journalctl (première entrée) ;
+#   journalctl --disk-usage ; journalctl --list-boots ; lecture de /etc/systemd/journald.conf (lignes non commentées)
+#   comptes (grep -c, sans afficher les lignes) des « executing gc » par préfixe de dépôt, 15/11 de 13:22 à 14:00 ;
+#   (via /dev/shm/g7x, supprimé aussitôt) ; présence de horodatage/essais-test8/aucun-* dans /var/lib/zot (sudo ls | grep -c)
+#   à 14:34:50 : sudo journalctl -u zot.service --since '2026-11-15 13:22:00' --until '2026-11-15 14:00:00' -o cat
+#     | grep -c 'executing gc of orphaned blobs' ; sudo ls -l --time-style=full-iso /var/log/journal/*/ ;
+#     ls /etc/systemd/journald.conf.d/ /usr/lib/systemd/journald.conf.d/ ; df -h /var/log
+# Toute ligne contenant « jeton » ou « token » (casse indifférente) est remplacée à la réception par
+# « [ligne masquée : motif jeton|token] ». Lignes brutes hors du dépôt : ~/.cache/supply-chain-poc/08/travail/g7-replanifier/
+#   (zot-gc-15-11.txt, zot-brut-14-11.txt, zot-brut-15-11-large.txt, fen-15-11.txt, depots-14-11.txt, depots-15-11.txt).
+# Résumés par jq et python3 sur l'hôte. Aucune ligne brute entière n'est recopiée ici.
+
+## Incident (sans effet sur Zot)
+Premier essai à 14:31:16 UTC : le premier ssh a lu le reste du script sur son entrée standard (heredoc) ; seule la première
+commande a tourné (code 0), sa sortie a été écrasée par le second essai. Relancé avec ssh -n à 14:31:25 UTC.
+À 14:32:46 UTC, fichier temporaire /dev/shm/g7x écrit sur sc-stockage (lignes « executing gc » du 15/11) puis supprimé dans la
+même commande. Écart à la consigne de masquage : une comparaison de listes de dépôts a affiché à l'écran (pas dans ce journal)
+quatre noms de dépôts contenant le motif masqué, non remplacés par le marqueur ; corrigé à l'affichage suivant.
+
+## 1. État de zot.service (lu à 14:31:08 UTC)
+ActiveState=active ; ActiveEnterTimestamp=ExecMainStartTimestamp=Fri 2026-11-13 12:17:25 UTC ; NRestarts=0.
+Zot actif et non redémarré depuis le 13/11 à 12:17:25 UTC : on continue.
+
+## 2. Balayages relus
+### Profondeur du journal (constat non prévu)
+Le filtre « depuis le 13/11 12:00 » ne rend QUE des lignes du 15/11 : 420 lignes, dont 408 JSON et 12 masquées.
+Première entrée de zot.service encore présente : 2026-11-15T00:17:04.226196Z ; dernière : 2026-11-15T14:31:19.918013Z.
+Le journal système, lui, remonte au 2026-11-13T09:01:49Z (un seul démarrage), 263.1M sur disque ; journald.conf : aucune
+directive active dans /etc/systemd/journald.conf (section [Journal] seule) ;
+/etc/systemd/journald.conf.d/ absent ; /usr/lib/systemd/journald.conf.d/syslog.conf présent, non lu. Zot écrit environ 19 200 lignes par heure (11h : 19191, 12h : 19168, 13h : 19580).
+Conséquence : les lignes de zot.service du 14/11 ne sont plus lisibles ; le balayage du 14/11 n'est connu que par
+g7-balayage-14-11.log (relu le 14/11 à 20:48:36 UTC). Profondeur constatée UNE FOIS : environ 14 h 14 min de journal de Zot à
+14:31 UTC. À 14:34:50 : 7 fichiers archivés de 37019648 octets chacun (fermés de 02:17:05 à 14:18:22, environ toutes les 2 h)
++ system.journal actif ; disque / à 69 %. Mécanisme de purge (taille ou durée) NON vérifié.
+
+### Balayage du 14/11 (rappel de g7-balayage-14-11.log, non relu ce jour)
+début 2026-11-14T12:45:50.453708521Z ; fin 2026-11-14T13:22:29.757088496Z ; durée 2199,303 s (36 min 39 s) ; 138 dépôts.
+
+### Balayage du 15/11 (mesuré)
+- premier message : 2026-11-15T13:22:34.696782816Z (« executing gc of orphaned blobs for /var/lib/zot/amont/kyverno/background-controller »)
+- dernier message : 2026-11-15T13:59:12.502550477Z ; durée 2197,806 s (36 min 38 s)
+- messages : 135 « executing gc of orphaned blobs for <dépôt> », 135 « garbage collected blobs », 135 « gc successfully completed
+  for <dépôt> », 3 « applied policy », plus 12 lignes masquées (toutes entre 13:41:47 et 13:46:01 UTC d'après leurs voisines).
+- dépôts : 139 MESURÉS (grep -c « executing gc of orphaned blobs », 15/11 de 13:22 à 14:00, lu à 14:34:50 UTC), dont 135 lisibles
+  et 4 masqués (12 lignes masquées = 4 dépôts à 3 lignes ; noms au motif masqué, sous essais-j5/ et horodatage/essais-test8/).
+- écart avec le 14/11 : en plus, builds/scan/sample-app-deb et builds/vsa/sample-app-deb ; en moins,
+  horodatage/essais-test8/aucun-20261113t121249z (0 ligne le 15/11, absent de /var/lib/zot/horodatage/essais-test8/).
+  Les 4 dépôts masqués sont lisibles le 14/11 et masqués le 15/11 (même nom). Comptes de « executing gc » le 15/11 :
+  essais-j5/ 4, essais-test8/ 10, aucun-2026 0.
+- passage des dépôts suivis (début de « executing gc » ; « gc successfully completed » moins de 0,01 s après) :
+  builds/scan/essai-07a    2026-11-15T13:38:39.097673728Z (début + 964,4 s)
+  builds/scan/essai-scan   2026-11-15T13:38:40.948159712Z
+  builds/scan/sample-app   2026-11-15T13:38:55.347791075Z
+  vulndb/grype             2026-11-15T13:58:51.899132505Z
+- décisions de rétention : 3, toutes keep, toutes dans vulndb/grype, dry-run false, aucune dans builds/scan/** :
+  time 13:58:51.899450629Z, tag 2026-11-15, digest sha256:82a5c316bc3df4d347235cb26a6b8e5b2932c1a20de60503528082f568e4a5d3,
+    reason « retained by mostRecentlyPushedCount:11 policy », pushTimestamp 2026-11-15 08:05:21.332826095 UTC,
+    lastPullTimestamp 2026-11-15 13:48:03.990126959 UTC
+  time 13:58:51.899510098Z, tag 2026-11-14, digest sha256:2c0390b3896c07a471151b2cfd3ae21df3a3c51f6ae6f176e18c36b20398a922,
+    même reason, pushTimestamp 2026-11-14 08:11:52.691534816 UTC, lastPullTimestamp 2026-11-15 08:03:00.764030246 UTC
+  time 13:58:51.899546432Z, tag 2026-11-13, digest sha256:c35d469a442164d1d4688fd6cae6f4e5cf377bfe11928d7af8e64452ada151ec,
+    même reason, pushTimestamp 2026-11-13 12:42:16.694528811 UTC, lastPullTimestamp 2026-11-14 08:02:47.365410768 UTC (inchangé)
+
+## 3. Lignes non filtrées avant les balayages
+### 14/11, 12:17:00 à 12:46:00 UTC : IMPOSSIBLE
+journalctl rend 0 ligne : la fenêtre est sortie du journal (première entrée de Zot : 15/11 00:17:04 UTC). Ces lignes n'avaient
+pas été rapatriées le 14/11 (seulement le filtre gc). Les 28 min 25 s (1705,454 s) entre démarrage + 24 h et le début du
+balayage du 14/11 ne peuvent plus être lues. Hypothèse NON vérifiable, compatible avec la loi B : un balayage au démarrage, du
+13/11 12:17:25 à vers 12:45:45, suivi de 24 h + environ 5 s, donnerait 12:45:50 le 14/11.
+Réserve : avec une profondeur d'environ 14 h, la lecture du 14/11 à 20:48:36 UTC ne remontait sans doute pas au 13/11 à 12:17 ;
+« aucun balayage au démarrage » (g7-balayage-14-11.log et note de 2026-11-14T20:52:18Z, non réécrits) reposait sur un journal
+de profondeur inconnue et n'est plus un fait établi.
+### 15/11, 12:22:34 à 13:22:35 UTC (heure qui précède le début)
+19 170 lignes JSON (les 12 lignes masquées du fichier sont toutes après 13:41, hors fenêtre). Par champ message :
+  18016 HTTP API
+   1028 getting manifest
+    120 user profile successfully set
+      3 failed to copy data into http response
+      3 lignes gc, toutes à 13:22:34 (le début du balayage lui-même, module gc)
+Aucune ligne de tâche, de scheduler, de rétention ni de gc avant 13:22:34.696 (recherche de task|sched|gc|garbage|retention|
+generator|dedupe|scrub hors « HTTP API »). Le journal n'annonce donc pas le démarrage du balayage.
+
+## 4. Verdict
+- A (début 15/11 = début 14/11 + 24 h = 12:45:50.454) : écart +2204,243 s (36 min 44 s). Réfutée.
+- B (début 15/11 = fin 14/11 + 24 h = 13:22:29.757) : écart +4,940 s. RETENUE : le début suit la fin du balayage précédent
+  de 24 h et environ 5 s. Un seul intervalle mesuré (14/11 -> 15/11) ; l'écart de 5 s n'est pas expliqué.
+- Démarrage + 24 h : décalage de 1705,454 s au 14/11 ; avec B, cela situerait la fin d'un balayage de démarrage vers le 13/11 à
+  12:45:45 UTC, non vérifiable (journal perdu) : hypothèse, pas une mesure (voir section 3).
+
+## Projection (CALCUL, PAS UNE MESURE) avec la loi B
+Début(n+1) = fin(n) + 24 h + 4,940 s ; durée prise égale à celle du 15/11 (2197,806 s) ou du 14/11 (2199,303 s) ; dérive
+d'environ 36 min 43 s par jour. Toute variation de durée (nombre de dépôts, charge) déplace le résultat ; non vérifié.
+  27/11 : début 2026-11-27 20:43:07,6 à 20:43:24,1 UTC ; fin 21:19:45,4 à 21:20:03,4 UTC
+          (dépôts de scan vers début + 16 min, soit vers 20:59 ; vulndb/grype vers début + 36 min)
+  28/11 : début 2026-11-28 21:19:50,4 à 21:20:08,4 UTC ; fin 21:56:28,2 à 21:56:47,7 UTC
+À ce rythme, ces balayages tombent le soir et non vers 12:45 ou 13:22 : le fireAt de supply-chain-g7-premiere-suppression est à
+reprendre (point 4, décision du propriétaire).
+Conséquence (CALCUL, si la profondeur reste d'environ 14 h) : le balayage du 27/11 finit vers 21:20 UTC et celui du 28/11
+commence environ 24 h plus tard ; une lecture unique après le 28/11 ne verrait ni le 27/11 (premier balayage utile pour H1 et H2)
+ni le 24/11. Compter les décisions des 24/11, 27/11 et 28/11 séparément demande une lecture (ou un rapatriement) par balayage,
+dans les 14 h qui suivent chacun. Loki n'a pas été consulté (consigne) : présence des lignes de Zot dans Loki non vérifiée.
