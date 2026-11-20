@@ -987,3 +987,9 @@ Script frère [`m1b-fermeture.sh`](../m1b-fermeture.sh), étapes `local` et `ess
 ## Note datée du 20/11/2026, écrite à 2026-11-20T11:19:50Z UTC : M4b refait, local et essai passés
 
 `local` et `essai` ont tourné de 11:17:08Z à 11:19:09Z. FL1 et FE1 à FE3 tiennent ([résultat](m1b-predictions.md)). Dans un pod de la plateforme, la tâche signée de la cascade rend exactement l'arbre prédit : 230 fichiers, 462 194 425 octets. Rien n'est écrit dans Zot. Suite : décision sur le dépôt de la fermeture, puis la pipeline et les deux PipelineRuns, chacun sur accord nommé.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T11:56:01Z UTC : décision « Même dépôt, par digest », pipeline et PipelineRuns préparés à sec
+
+**Décision du propriétaire** : « Même dépôt, par digest ». La fermeture neuve ira dans `builds/fermetures/sample-app-rpm`, à côté de celle de M4b.
+
+Les étapes `pipeline` et `rpm` sont ajoutées à [`m1b-fermeture.sh`](../m1b-fermeture.sh). Le banc 2 donne 68 OK ([`m1b-fermeture-banc-2.log`](m1b-fermeture-banc-2.log)). Il a trouvé un défaut avant tout lancement : la relecture de la signature dans le bundle en JSON. Prédictions PS1, PS2 et RP1 à RP4 ([prédictions](m1b-predictions.md)). Chaque étape attend ton accord nommé ; entre les deux, `PIPELINE_REF` sera épinglée par correction datée.

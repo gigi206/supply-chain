@@ -2371,3 +2371,33 @@ C'est un script frère de `m4b.sh`, qui n'est pas touché : sa pipeline (tag `m4
 **Ce que cela établit** : la tâche signée de la cascade, avec les paramètres que la pipeline neuve lui donnera, produit dans un pod de la plateforme exactement l'arbre prédit. Le digest prédit (`09838980…`) suit de cet arbre si `publier-fermeture` se comporte comme en M4b.
 
 **Suite** : la pipeline (signature, bundle sous `m1b`) et les deux PipelineRuns. Le dépôt de la fermeture est figé dans la pipeline signée, donc il est à décider avant. M4b refait n'est pas tenu.
+
+## Cascade avant M5b, M4b refait : pipeline et PipelineRuns, prédictions écrites le 20/11/2026 à 2026-11-20T11:56:01Z UTC, avant tout lancement
+
+**Décision du propriétaire** (réponse lue avant cette note) : « Même dépôt, par digest ». La fermeture neuve ira dans `builds/fermetures/sample-app-rpm`, à côté de celle de M4b (`2a9e2ea7…`). `publier-fermeture` n'y écrit que par digest, sans tag.
+
+**Script** : [`m1b-fermeture.sh`](../m1b-fermeture.sh), passé de `ff5d28f8…` (celui de `local` et `essai`) à `30d60e5143b0890e…`. Deux étapes ajoutées :
+- **`pipeline`** (`SIGNER=1` seulement) : gardes, rendu admis en dry-run serveur, trois feuilles de différence avec M4b, script substitué égal à celui de l'essai. Puis signature par tkn, relecture, version sous `fermeture/prefetch-rpm-sample-app.m1b.signee.yaml`, bundle sous `tekton/pipelines/prefetch-rpm-sample-app:m1b`, relecture anonyme du bundle. Les pipelines de M4b n'étaient pas versionnées ; celle-ci l'est, comme les tâches de la cascade.
+- **`rpm`** : `etape_rpm` de `m4b.sh`, transformée par dix remplacements comptés. Le premier PipelineRun exige désormais la fermeture de M4b présente et la fermeture prédite absente, au lieu d'un dépôt absent. Le nombre de couches attendu vient de l'arbre de l'essai (230), et le digest relevé est comparé au digest prédit, sans en dépendre. `rpm` refuse de tourner tant que `PIPELINE_REF` est vide : elle sera épinglée après `pipeline`, par une correction datée, et le banc sera rejoué.
+- **Lectures de Zot** : celles que `rpm` ajoute passent par `zot_lire`, avec une configuration vide, donc anonymement. `m4b.sh` lisait sans `--registry-config`.
+
+**Banc** : [`m1b-fermeture-banc-2.log`](m1b-fermeture-banc-2.log), 68 OK, 0 KO, passé à 2026-11-20T11:55:06Z (banc `7dc741a1fa46c3c3…`, copies `84b5784ec0f90566…`, 41 contrôles). Le premier journal reste.
+- **E**, `pipeline`, avec le vrai tkn et une clé jetable : cas nominal à 28 OK. La version est vérifiée par tkn avec la clé du banc, et refusée avec une autre. Une seule poussée sous `m1b`, aucun appel de kubectl hors dry-run, `$T/auth` retiré. Huit refus, sans poussée ni version : sans `SIGNER`, clé absente, version présente, tag `m1b` présent, tag `m4b` déplacé, place basse, refus à l'admission, `publier-fermeture` hors de la liste revue.
+- **F**, `rpm` : huit gardes refusées avant toute création. Le cas nominal s'arrête sur la première création réelle, interceptée par le banc. Le PipelineRun relu s'appelle `m1b-rpm-1`, cite le bundle de la pipeline, a un workspace de 1 Gi et pas de `runtimeClassName`.
+
+**Corrections trouvées par le banc, avant tout lancement** :
+- **Signature relue** : le bundle relu dans Zot est du JSON, et `yq` y rend la signature entre guillemets. La comparaison avec la version YAML aurait échoué après la poussée, sur un bundle pourtant correct. La sortie YAML est forcée des deux côtés.
+- **Banc** : un premier passage s'est bloqué dans F9 et a été arrêté. Le sous-shell de chaque cas était appelé dans un `|| r=$?`, et bash y coupe `set -e` : la création interceptée ne terminait pas l'étape, qui attendait le PipelineRun. Les cas des sections C et D tournaient aussi sous cette forme. Leurs arrêts venaient tous de sorties explicites (`attendu`, `echec`), donc leurs résultats restent valables. Les trois appels sont corrigés.
+
+**Accords** : `pipeline` signe et écrit un bundle dans Zot ; elle attend ton accord nommé. `rpm` crée deux PipelineRuns et écrit la fermeture dans Zot ; elle attend un autre accord nommé, après l'épinglage de `PIPELINE_REF`.
+
+- **PS1** (haute), `pipeline` : les gardes passent (tag `m1b` absent, `m4b` sur `9b89b029…`, deux références de la liste revue, plus de 1 Gio libre). Le rendu est admis par le vrai dry-run serveur. Trois feuilles, script `4d8bfe82…`.
+- **PS2** (haute) : la pipeline signée est égale au rendu, signature exceptée. Une version est écrite, puis un bundle sous `m1b`, relu anonymement : égal à la version, même signature. `m4b` n'a pas bougé.
+- **Relevé, sans pari** : le digest du bundle. La signature ECDSA n'est pas déterministe.
+- **RP1** (haute), `rpm` : les gardes passent. Les deux PipelineRuns `m1b-rpm-1` et `m1b-rpm-2` finissent en `True|Succeeded`. Les deux bundles des tâches et celui de la pipeline sont acceptés par les Trusted Resources de Tekton, sous la même clé qu'en M4b.
+- **RP2** (haute) : dans chaque PipelineRun, le prefetch rend `rpm -K` à 222 OK sur 222 et `repomd.xml` V2 à `239a5a71…`. Il désigne `builds/builders/rocky9-bootstrap@6de899ac…`.
+- **RP3** (haute) : `publier` journalise 230 couches. Le manifeste relu anonymement en a 230. Le dépôt est `builds/fermetures/sample-app-rpm`.
+- **RP4** (haute) : les deux PipelineRuns publient le même digest, égal au digest prédit `sha256:09838980…`. Chains signe les deux PipelineRuns. La fermeture de M4b reste présente.
+- **Relevés, sans pari** : la place libre sur sc-stockage et sur sc-build ; la longueur de l'argument de `place-scripts`, non reconstruite ici (59 848 octets en M4b).
+
+**M4b refait** ne sera tenu qu'après la comparaison de la fermeture tirée et la provenance. Ces deux étapes restent à préparer, en lecture seule.
