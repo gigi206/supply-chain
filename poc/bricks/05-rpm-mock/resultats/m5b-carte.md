@@ -610,3 +610,19 @@ Les trois notes restent écrites telles quelles. Les trois défauts ont été re
 - **RV10 tenue** : F1 tient les trois gardes remises sur le journal réel de la cascade. F7 s'arrête sur les témoins, après une création.
 
 **Portée**, inchangée : pas de Zot, de Tekton, d'admission réelle, de Kyverno, de Kata, de Chains ni de tkn. `signature` et `images` ne sont mesurées que par leur chargement, et le bloc de `rejeu.sh` n'est pas exécuté. La copie réelle `~/.cache/supply-chain-poc/05/rejeu-entrees` n'existe pas encore : `entree` la fera, avant le démontage. Le dossier du banc (4,2 Mio, lu par aucun script) est effacé.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T18:55:52Z UTC : audit de `s1.sh` et de `m5b-republier.sh` face à `vm.sh detruire`, aucun défaut
+
+**Pourquoi** : la note de 17:58:49Z n'a vérifié les lectures de `$W` d'avant le démontage que pour `signature`, `images`, `artefact`, `fermeture` et `construction_rpm`. Le bloc 05 de `rejeu.sh` appelle aussi `s1.sh amorce m3_reseau` et les trois étapes de `m5b-republier.sh`. Relevé statique, assertions dans la même commande que cette note.
+- **`vm.sh detruire`** efface `$W` (l. 152) et le kubeconfig (l. 153). Les quatre autres `rm` de `vm.sh` (l. 56, 64, 95, 100) visent des graines et des disques temporaires sous `$W`. Aucun `rm` ne vise `$S` ni `$P`, mais `creer` réécrit `$S/known_hosts` (l. 51) : ces deux étapes ne le lisent pas.
+- **`s1.sh`** (sha256 `b6cbf661a140c57a…`) :
+  - `$W` n'y apparaît qu'une fois, dans `T=$W/s1-05` (l. 194). Le dossier est recréé par le script.
+  - `amorce` écrit `$T/zot.json` (`auth_zot`), puis le copie dans `$T/docker`. Elle copie l'amorce et le bootstrap depuis quay.io vers Zot, par digest épinglé.
+  - `m3_reseau` lit `politiques/construction-rpm-sans-sortie.yaml`, dans le dépôt, et le cluster.
+  - Les journaux vont dans `resultats/<PREFIXE>-<étape>.log` (`lancer` de `commun.sh`). Sous `PREFIXE=$TAG_05`, ils sont neufs.
+- **`m5b-republier.sh`** (sha256 `885f5c53da860c44…`) :
+  - `$W` n'y apparaît que dans `T=$W/m5b-republier-$TAG-05`, son propre dossier.
+  - Il lit les fichiers signés de la brique et la liste revue (`taches.yml`) dans le dépôt, la CA sous `$P`, et Zot.
+  - Il ne lit ni `RENDU`, ni `MESURE`, ni un layout.
+- **Conclusion** : aucune de ces quatre étapes ne lit `$W` d'avant le démontage. Il n'y a pas de correction à faire.
+- **Non mesuré** : l'exécution. Ce relevé ne voit pas une lecture indirecte par un programme externe (`crane`, `tkn`, `kubectl`), hors de leur configuration lue dans `$T` ou `$P`.
