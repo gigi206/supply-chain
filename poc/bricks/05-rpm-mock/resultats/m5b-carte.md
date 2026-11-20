@@ -255,3 +255,17 @@ Le rejeu reste exclu avant la mesure de G7 du 28/11.
 - Elle fixe `TZ=Europe/Paris` pour `tkn bundle push`, et `SOURCE_DATE_EPOCH` absente.
 - Elle s'arrête au premier digest hors liste.
 - Le reste de la plateforme pousse ses bundles par la même fonction, sans `TZ` : cette condition vaut pour toutes les briques, et la 06 en S5b l'a remplie sans le savoir, depuis le même hôte. `commun.sh` n'est pas modifié ici ; c'est une proposition, à te soumettre.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:31:38Z UTC : corrections et prédiction RE7
+
+**Corrections des notes de 16:28:06Z et 16:28:59Z** (elles restent écrites telles quelles) :
+- « pas d'heure d'été en 1970 » n'était établi par aucune commande. `TZ=Europe/Paris date -d @0 +%:z` donne `+01:00`, et la même commande pour le 1er juillet 1970 à 12:00 UTC donne `+01:00`. L'indépendance à la saison est **déduite** : tkn écrit l'époque 0, dont le décalage ne dépend pas du jour du passage.
+- « Le reste de la plateforme pousse ses bundles par la même fonction » ne s'appuyait que sur la 05. Recherche élargie à `poc/`, `tools/` et `mise.toml` :
+  - `tkn bundle push` n'apparaît dans aucun script hors de `commun.sh` (les autres occurrences sont dans des journaux, des notes et un README) ;
+  - `$(bundle ` est appelé 41 fois dans 15 scripts, des briques 01, 03, 05, 06, 08 ;
+  - aucun de ces appels n'est précédé d'un `TZ=`.
+- Le remède « `TZ=Europe/Paris` » n'est pas encore mesuré. Seuls `TZ` absente (premier passage) et `TZ=UTC` l'ont été. Il est prédit ci-dessous.
+- Les dossiers `banc-m5b-republication` et `banc-m5b-republication-utc` ont été effacés après les passages (108 Kio chacun, lus par aucun script). Les journaux archivés restent.
+
+**Prédiction, écrite avant le lancement** : le même banc, inchangé, sous `TZ=Europe/Paris` posée explicitement. Il utilise un dossier neuf (`banc-m5b-republication-paris`), le port 5911 et le journal `m5b-republication-banc-paris.log`.
+- **RE7** (haute) : même bilan que le premier passage, « 36 OK, 9 KO ». Les 9 C1 et les 9 C2 sont égaux aux attendus, et les 9 KO sont des C3 à `1970-01-01T01:00:00+01:00`.
