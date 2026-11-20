@@ -510,3 +510,24 @@ Les contenus prédits N1 à N9 de la note de 19:28:08Z sont inchangés. Seules l
 | E6 | Blob `{}` en 200 dans les trois dépôts | haute |
 | E7 | VSA : au moins un referrer dans `builds/vsa/sample-app` et `builds/vsa/sample-app-deb` | moyenne. Le nombre exact n'est pas prédit |
 | E8 | Les dates annotées (`org.opencontainers.image.created`) des scans du 13/11 tombent vers 12:45 et 12:47 UTC, celle du premier scan du deb vers 21:01 UTC le 14/11 | moyenne : rien ne garantit que le scanner annote la date de création |
+
+## Résultat de l'état avant, E1 à E8 (note de 2026-11-20T19:58:59Z ; rien n'est réécrit au-dessus)
+
+**Lecture** le 20/11 de 19:58:22 à 19:58:23 UTC, au dépôt `d33bc4ef`, script `40406b2f…`, code 0 ([journal](g7-etat-avant.log)). Aucune ligne masquée, aucun 404.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| E1 | 3 manifestes, 3 `.sig` et 3 `.att` en 200 | tenue |
+| E2 | 9 referrers, créés le 13/11 à 12:45:07 et 12:47:15, puis chaque jour du 14 au 20/11 entre 09:31:51 et 09:32:04 UTC | tenue |
+| E3 | **8 referrers**, et non 7 : 3 pour le deb 1.0.0-1 (14/11 21:01:35, 15/11 11:16:51, **16/11 11:16:51**) et 5 pour le deb 1.0.0-2 (16/11 16:08:29, puis du 17 au 20/11 vers 11:17) | **non tenue pour le compte** : le CronJob du 16/11 à 11:15 visait encore le deb 1.0.0-1, et le scan de 16:08 (`s6a-periodique`) s'y est ajouté. Tenue pour le premier scan du deb, de sujet `039949f9…` |
+| E4 | 16 referrers sur 14 images ; `absent` sans scan ; `illisible`, `recent-kev` et `recent-propre` en ont 2 ; tous créés le 13/11 entre 12:49:10 et 12:49:54 UTC | tenue |
+| E5 | 8 tags, du 2026-11-13 au 2026-11-20, 8 digests distincts | tenue |
+| E6 | Blob `{}` en 200 dans les trois dépôts | tenue |
+| E7 | 1 VSA pour l'image, 1 pour chaque deb | tenue (compte non prédit) |
+| E8 | 13/11 à 12:45:07 et 12:47:15 ; premier scan du deb le 14/11 à **21:01:35** UTC | tenue |
+
+**Conséquences pour N8 et N9** (calcul ; Zot décide sur l'heure de poussée, pas sur l'annotation, qui la précède de quelques secondes) :
+- Le premier scan du deb devient éligible le **28/11 à 21:01:35 UTC**, après le n°8 (28/11, de 01:37 à 02:52) et avant le n°9 (29/11, de 02:16 à 03:36). La marge de 5,5 h de N9 tient.
+- Les deux autres scans du deb 1.0.0-1 (15/11 et 16/11 à 11:16:51) deviennent éligibles après le n°9 : ils iront aux n°10 (30/11) et n°11 (1/12). **Le deb 1.0.0-1 garde donc des scans jusqu'au 1/12.** Ce n'était pas prédit en H4 ni en N9, qui ne parlaient que du premier.
+- Le scan de `sample-app` du 14/11 (09:31:51) devient éligible le 28/11 à 09:31:51 UTC, après le n°8 : il ira au n°9, comme N9 le prévoit.
+- Les 16 témoins (13/11, 12:49:10 à 12:49:54) et les deux scans du 13/11 sont éligibles le 27/11 avant 12:50 UTC : n°8, comme N8.
