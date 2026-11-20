@@ -104,3 +104,24 @@ trusted_tasks:
   # nom (ni construction_kata, ni appariement à preparer-rpm)
   oci://sc-stockage.poc.test:5000/tekton/tasks/construire-rpm:
     - ref: sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+  # Brique 05, M1b (signées le 20/11/2026 à 08:57:02 UTC, m1b-signature-taches.log ; accord du propriétaire « Oui, signe ») :
+  # 05-rpm-mock/builders/prefetch-racine-rpm.signee.yaml, pod runc restreint (UID 65532, runAsNonRoot, capacités retirées, sans
+  # élévation) sans secret, image de l'amorce amont/rockylinux/rockylinux@ed654c69 figée (décision « (a) Figée » du 19/11,
+  # réserve mesurée : 44 paquets sur 146 en retard sur Rocky 9.8) ; sortie limitée par la CiliumNetworkPolicy
+  # prefetch-racine-rpm-sortie de la 08c (DNS, adresses publiques en 443, Zot ; témoins NT2). Tire en HTTPS seul les dépôts
+  # fixés par la pipeline (vault Rocky 9.8 et 9.7, archive EPEL 9.8) : clés et repomd.xml contrôlés par sha256 fixé, signature
+  # de repomd.xml vérifiée par gpgv, métadonnées et rpm de la liste contrôlés par sha256 ; lit dans Zot le manifeste de base du
+  # bootstrap (ee90dc0e) et sa couche, et les déclare dans BASE_ARTIFACT_INPUTS (déclaré, non écrit pour l'outillage). Jouée
+  # dans un pod d'essai avant signature (m1bt3), cas refusés PX1-PX5 ; rendu signé égal à celui validé par Tekton (TD1)
+  oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm:
+    - ref: sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+  # Brique 05, M1b : 05-rpm-mock/builders/construire-racine-rpm.signee.yaml, pas privilégié en root (Kata posé par le
+  # PipelineRun, taskRunSpecs), même image d'amorce figée ; sans aucune entrée ni sortie réseau (NetworkPolicy
+  # construction-racine-rpm-sans-sortie, posée le 20/11 ; témoins NT3 ; la tâche relève elle-même DNS et TCP coupés). Revérifie
+  # les entrées du prefetch, installe la racine par dnf-3 --installroot hors ligne (dnf.conf contrôlé par sha256), archive par
+  # tar bornée à SOURCE_DATE_EPOCH et s'arrête si le sha256 de la racine diffère de celui fixé par la pipeline (« Garder
+  # l'arrêt » : 7c07083c outillage, b063feb3 bootstrap) ; artefact en layout OCI que publier-image pousse. Racines et digests
+  # d'image (70f8c412, 6de899ac) reproduits dans Kata les 19 et 20/11 (un nœud, un hôte), cas refusés RZ1-RZ8. Tâche
+  # privilégiée : la porte ne connaît pas encore son nom
+  oci://sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm:
+    - ref: sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
