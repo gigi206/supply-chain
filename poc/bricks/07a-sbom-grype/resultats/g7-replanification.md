@@ -696,3 +696,11 @@ Question posée : « Pour lire les balayages n°2 à n°9, je planifie une tâch
 **N1 tenue.**
 
 **Conséquence pour la suite** (calcul, loi B) : le n°2 doit commencer entre le 21/11 21:46:03 et le 21/11 21:46:20 UTC, soit 24 h et 2 à 19 s après la dernière ligne du n°1. La tâche du 29/11 le relira dans sa fenêtre du 21/11 12:00 au 22/11 12:00.
+
+## Application de la v3 de `g7-balayage.sh` (note de 2026-11-20T22:00:29Z ; rien n'est réécrit au-dessus)
+
+N1 est lue en v2 (note ci-dessus). La copie préparée à 20:17:04Z est copiée dans le dépôt, sans changement :
+- avant : v2, sha256 `d68c726a4991e68cafd92fb478fa6abcb0dfd95034fec40c570fddb0b6ada20f` ;
+- après : v3, sha256 `b13a1375ca6f4ed4dac242c0a0701fab8b5e37903c90628cf9939c4bd34511c7`, l'empreinte attendue par la tâche du 29/11.
+
+Le mode du fichier n'est pas changé par la copie. `bash -n` et shellcheck sont repassés sur le dépôt avant le commit. L'essai V1 à V3 suit, avec les prédictions de la note de 20:17:04Z.

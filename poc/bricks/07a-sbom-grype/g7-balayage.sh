@@ -7,11 +7,15 @@
 # Rien de Grafana n'est archivé hors des comptes et des heures (ni ligne, ni réponse brute).
 # Usage (racine du dépôt) : JOUR=2026-11-20 DE=15:00 A=19:00 mise exec -- poc/bricks/07a-sbom-grype/g7-balayage.sh
 #   (heures UTC de la fenêtre ; journal resultats/g7-balayage-<JJ>-<MM>.log, refusé s'il existe)
+# v3 (20/11/2026, point 4 de G7) : JOUR_A=AAAA-MM-JJ, jour de fin de la fenêtre (JOUR par défaut), pour un balayage qui passe
+#   minuit ; fenêtre vide ou inversée refusée ; nombre de passages par dépôt suivi (plus de 1 : plusieurs balayages mêlés).
 set -euo pipefail
 export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/../08-trust-plane/commun.sh"   # sur, S, P
-JOUR=${JOUR:?JOUR=AAAA-MM-JJ}; DE=${DE:?DE=HH:MM}; A=${A:?A=HH:MM}
+JOUR=${JOUR:?JOUR=AAAA-MM-JJ}; DE=${DE:?DE=HH:MM}; A=${A:?A=HH:MM}; JOUR_A=${JOUR_A:-$JOUR}
+de=$(date -u -d "$JOUR $DE:00Z" +%s); a=$(date -u -d "$JOUR_A $A:00Z" +%s)
+[ "$a" -gt "$de" ] || { echo "fenêtre vide ou inversée : $JOUR $DE à $JOUR_A $A UTC" >&2; exit 2; }
 SUFFIXE=${SUFFIXE:-}            # relance ou seconde lecture du même jour : journal neuf (ex. SUFFIXE=-loki)
 SANS_JOURNAL=${SANS_JOURNAL:-}  # 1 : pas de journalctl (fenêtre hors de la profondeur du journal de la VM) ; Loki seul
 LOG=$here/resultats/g7-balayage-${JOUR:8:2}-${JOUR:5:2}$SUFFIXE.log
@@ -24,7 +28,7 @@ import json, sys, collections
 gc, dec, autres, masq, nonjson = [], [], collections.Counter(), 0, 0
 TIRET, ABSENT = "-", "absent"
 suivis = ("builds/scan/essai-07a", "builds/scan/essai-scan", "builds/scan/sample-app", "builds/scan/sample-app-deb", "vulndb/grype")
-passage = {}
+passage, npass = {}, collections.Counter()
 for l in sys.stdin:
     l = l.rstrip("\n")
     if l.startswith("[ligne masquée"): masq += 1; continue
@@ -34,7 +38,7 @@ for l in sys.stdin:
     if m.startswith("executing gc of orphaned blobs for "):
         r = m.rsplit("/var/lib/zot/", 1)[-1]
         gc.append((t, r))
-        if r in suivis: passage[r] = t
+        if r in suivis: passage[r] = t; npass[r] += 1
     elif "decision" in d:
         dec.append(d)
     else:
@@ -44,7 +48,7 @@ print(f"lignes : {sum(autres.values()) + len(gc) + len(dec)} JSON lues, {masq} m
 print(f"« executing gc of orphaned blobs » : {len(gc)} ; premier {ts[0] if ts else TIRET} ; dernier {ts[-1] if ts else TIRET}")
 for k, v in sorted(autres.items()): print(f"  autre message : {v} × « {k} »")
 print("passage des dépôts suivis (début de « executing gc ») :")
-for r in suivis: print(f"  {r:28} {passage.get(r, ABSENT)}")
+for r in suivis: print(f"  {r:28} {passage.get(r, ABSENT)} ({npass[r]} passage(s))")
 print(f"décisions de rétention : {len(dec)}")
 c = collections.Counter((d.get("repository"), d.get("decision"), d.get("reason")) for d in dec)
 for (r, de, re_), n in sorted(c.items(), key=lambda x: str(x)): print(f"  {n} × {r} | {de} | {re_}")
@@ -56,20 +60,20 @@ for d in dec:
 
 {
   echo "# g7-balayage.sh, $(date -u +%Y-%m-%dT%H:%M:%SZ), dépôt $(git -C "$here" rev-parse --short=8 HEAD), script $(sha256sum < "$0" | cut -c1-16)"
-  echo "# fenêtre : $JOUR $DE à $A UTC ; lecture seule (ssh -n, sudo journalctl, systemctl show ; Grafana : lignes résumées, jamais archivées)"
+  echo "# fenêtre : $JOUR $DE à $JOUR_A $A UTC ; lecture seule (ssh -n, sudo journalctl, systemctl show ; Grafana : lignes résumées, jamais archivées)"
   echo "## 1. zot.service"
   sur sc-stockage 'date -u +%Y-%m-%dT%H:%M:%SZ; systemctl show zot.service -p ActiveState -p ActiveEnterTimestamp -p ExecMainStartTimestamp -p NRestarts' < /dev/null
   if [ -z "$SANS_JOURNAL" ]; then
     echo "## 2. profondeur du journal de zot.service"
     sur sc-stockage 'sudo journalctl -u zot.service -o short-iso-precise --no-pager | head -n 1 | cut -c1-32; sudo journalctl --disk-usage' < /dev/null
-    echo "## 3. balayage dans le journal ($JOUR $DE à $A UTC ; lignes gc, garbage, retention, decision)"
-    sur sc-stockage "sudo journalctl -u zot.service --since '$JOUR $DE:00 UTC' --until '$JOUR $A:00 UTC' -o cat --no-pager | grep -iE 'gc|garbage|retention|decision' || true" < /dev/null \
+    echo "## 3. balayage dans le journal ($JOUR $DE à $JOUR_A $A UTC ; lignes gc, garbage, retention, decision)"
+    sur sc-stockage "sudo journalctl -u zot.service --since '$JOUR $DE:00 UTC' --until '$JOUR_A $A:00 UTC' -o cat --no-pager | grep -iE 'gc|garbage|retention|decision' || true" < /dev/null \
       | sed "$MASQUE" | resume
   else
     echo "## 2 et 3. journal de la VM non lu (SANS_JOURNAL=1)"
   fi
   echo "## 4. mêmes lignes dans Loki, à travers Grafana (auditeur) : lignes masquées puis résumées comme le journal, jamais archivées"
-  de=$(date -u -d "$JOUR $DE:00Z" +%s)000; a=$(date -u -d "$JOUR $A:00Z" +%s)000
+  de=${de}000; a=${a}000
   e='{noeud="sc-stockage", source="journal", unite="zot.service"} |~ "executing gc of orphaned blobs|\"decision\":"'
   q=$(jq -nc --arg e "$e" --arg de "$de" --arg a "$a" \
     '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 5000, direction: "forward"}], from: $de, to: $a}')
