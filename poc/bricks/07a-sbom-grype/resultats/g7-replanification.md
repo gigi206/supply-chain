@@ -632,3 +632,12 @@ C'est l'état « avant » de référence pour la lecture après le n°9 : `AVANT
 | V3 | `JOUR=2026-11-19 DE=20:00 A=23:59 SUFFIXE=-v3-jour SANS_JOURNAL=1`, sans `JOUR_A` | Mêmes comptes que `g7-balayage-19-11.log` (172 lignes, 4 masquées, 161 gc, 7 `keep`), et 1 passage par dépôt suivi | haute |
 
 Les fenêtres de V1 et V3 ne contiennent pas le balayage n°1 de ce soir.
+
+## Note de 2026-11-20T20:18:43Z : critère d'âge de Zot lu dans le code (correction ; rien n'est réécrit au-dessus)
+
+La note de 19:58:59Z écrivait : « Zot décide sur l'heure de poussée, pas sur l'annotation ». Le code de `v2.1.22` (`pkg/storage/gc/gc.go`, `isBlobOlderThan`) précise ce point :
+- l'âge d'un referrer ou d'un manifeste non tagué est la **date de modification du fichier du manifeste** (`StatBlob`), comparée au délai de 336 h ;
+- pour un manifeste unique, comme un scan ou un témoin, cette date est celle de la poussée, ce qui ne change rien aux prédictions N5 à N9 ;
+- un fichier dont la date serait réécrite verrait son âge remis à zéro. Le relevé du 14/11 l'a vu pour le blob partagé `{}`, après une poussée du même blob ailleurs. Ce blob n'est pas un manifeste : le délai de 336 h ne s'applique pas à lui.
+
+Détail et conséquence pour la rétention grype : [dossiers de décision de la 05](../../05-rpm-mock/resultats/dossiers-decision.md), dossier 2.

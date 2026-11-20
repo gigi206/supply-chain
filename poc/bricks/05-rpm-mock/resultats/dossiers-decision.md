@@ -145,3 +145,31 @@ Le conseiller a relu ce fichier avant la poussée. Les dossiers ci-dessus resten
 - **Dossier 2** : pas de recommandation. Ce que Zot permet par dépôt n'est pas relu.
 - **Dossier 6** : pas de recommandation. C'est ta décision, et elle dépend de la date du rejeu.
 - **Dossier 7** : pas de recommandation, puisque le scan du rpm n'est pas dans la plateforme.
+
+## Dossier 2 : rétention de Zot lue dans le code (note de 2026-11-20T20:18:43Z ; rien n'est réécrit au-dessus)
+
+**Lecture** du code de Zot au tag `v2.1.22`, la version épinglée par `stockage.sh`, par l'API publique de GitHub, sans rien télécharger dans le dépôt :
+- `pkg/api/config/config.go`, structures `ImageRetention`, `RetentionPolicy`, `KeepTagsPolicy` et `KeepUntaggedPolicy` ;
+- `pkg/storage/gc/gc.go` (sha256 `4205b7bc4aa3654a…`), fonctions `removeUntaggedManifests`, `removeManifestIfOlderThan` et `isBlobOlderThan` ;
+- `pkg/retention/retention.go`.
+
+**Ce que le code dit** :
+- **Le délai est global.** `ImageRetention.Delay`, commenté « applied for referrers and untagged », n'existe qu'une fois, pour toutes les politiques. Il n'y a **pas de délai propre à un dépôt** en v2.1.22.
+- Une politique de dépôt ne règle que les points suivants :
+  - `deleteReferrers` et `deleteUntagged` ;
+  - `keepTags` : motifs, `mostRecentlyPushedCount`, `mostRecentlyPulledCount`, `pushedWithin`, `pulledWithin` ;
+  - `keepUntagged`, avec les mêmes critères. Ce réglage ne peut que garder davantage.
+- **Un manifeste non tagué n'est effacé que si son fichier a plus que ce délai.** Le critère est la date de modification du blob du manifeste (`StatBlob`, `modtime + delay`). Ce n'est ni le `pushTimestamp` de la base de métadonnées ni une annotation.
+- Les blobs devenus orphelins sont effacés ensuite, au délai `gcDelay` (1 h).
+
+**Conséquence pour le dossier 2** (calcul, à partir du code) :
+- Baisser `mostRecentlyPushedCount` sous 14 **ne libère rien**. Une base détaguée plus tôt reste jusqu'à ses 336 h. L'équilibre reste d'environ 14 bases, soit 2,8 à 3 Go.
+- Seule une baisse du délai global libère de la place. Mais elle raccourcit aussi la vie des scans de `builds/scan/**`, que lit la porte et que G7 mesure.
+- Une autre voie existe hors de la configuration : effacer explicitement les vieilles bases par l'API, depuis l'import quotidien. C'est une écriture dans Zot, et donc ton accord. Elle n'est pas évaluée ici.
+
+**Options révisées** :
+- (i) garder la rétention ;
+- (ii) baisser le délai global, ce qui change aussi la vie des scans ;
+- (iii) effacer les vieilles bases par l'import.
+
+Je n'ai toujours pas de recommandation : (ii) et (iii) touchent tous deux à des choses mesurées par G7.
