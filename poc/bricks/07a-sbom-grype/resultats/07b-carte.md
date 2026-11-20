@@ -94,3 +94,18 @@ La demande est plus étroite que la 07b des documents. Trois tranches, chacune u
 ## Estimation (neuve)
 
 10 h : 3 h pour la tranche 1, 3 h pour la tranche 2, 4 h pour la tranche 3. Décision avec le propriétaire à 20 h.
+
+## Correction : la tranche 1 ne dépend que du choix 6 (note de 2026-11-20T22:18:38Z ; rien n'est réécrit au-dessus)
+
+La carte bloquait à tort les trois tranches sur les six choix.
+- **La tranche 1 ne dépend que du choix 6.**
+- **Les choix 1 à 5 viennent après la tranche 2**, dont la mesure les éclaire. Ils ne sont pas posés avant.
+
+**Choix 6, recommandation (conseiller) : les deux.**
+- Les comptes vont dans Prometheus, par le motif de `fraicheur-scan`.
+- La liste par CVE va dans Loki, jamais en labels Prometheus.
+
+**Lectures faites depuis** :
+- **Taille** : le prédicat archivé de G4 (`resultats/g4-scan-predicat.json`) a 6 vulnérabilités en 1422 octets de JSON compact (calcul). Le couplage de la liste avec le disque de sc-stockage serait de l'ordre de quelques Ko par scan. C'est à mesurer sur un prédicat réel récent ; le scan du binaire Go de la 06 avait 140 correspondances.
+- **G7** : `zot.json` du dépôt n'a aucune règle de rétention par tirage. Un GET anonyme sur `builds/scan/*` ne change donc rien à ce que G7 mesure. Seuls `deleteReferrers` et `deleteUntagged` comptent.
+- **Signature** : aucun script du dépôt n'installe cosign sur sc-stockage. Le seul `install … cosign` du dépôt vise la VM du rejeu indépendant (`10-independent-replay/replay.sh`). Sans installation, le panneau serait étiqueté « signature non vérifiée ici, la porte fait foi ». Ce n'est pas vérifié sur la VM.

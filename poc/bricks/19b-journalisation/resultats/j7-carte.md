@@ -126,3 +126,22 @@ Changements à la carte, après relecture du conseiller :
 - **Format des lignes lu dans le code au tag** (`ExportEvent` en protojson, noms du proto) : `hubble.alloy` lit les bonnes clés. Ce point n'est plus dans les « non vérifié » de l'étape 1, mais reste à constater sur le fichier.
 - **Placement confirmé** : la politique Kyverno `zone-build` (Deny) impose `zone=build` à tout pod de `builds`. « Alloy sur sc-build seul » tient.
 - **Accords** : l'étape 6 est un lancement prévu, mais la lecture du fichier sur sc-build (`sudo` ou `kubectl exec`) demande un accord nommé.
+
+## Étape 2 recadrée et forme de pose recommandée (note de 2026-11-20T22:18:38Z ; rien n'est réécrit au-dessus)
+
+**L'étape 2, telle qu'écrite, ne mesurerait presque plus rien.**
+- Le filtre n'est plus par label, et le format des lignes est lu dans le code.
+- Hors construction, le tampon de Hubble de sc-build n'a sans doute aucun flux de `builds`. Sa taille n'est pas posée dans `cilium-config` ; la valeur commentée du chart est 4095, et le défaut de l'agent n'est pas lu.
+
+**Recadrage.** L'étape 2 lance les deux pods Kata de T0 et T1 ([prédictions](j7-predictions.md)) et lit aussitôt `hubble observe` dans l'agent de sc-build, en comptes seulement.
+- T0 à T6 se vérifient ainsi **sans toucher aux valeurs de Cilium**. E1 à E6 et T7 restent pour l'étape 4a.
+- **Point décisif, jamais mesuré** : les flux d'un pod Kata portent-ils `source.namespace` et `source.pod_name` ? La mesure de la 08 filtrait par adresse (`hubble_refus` de `08-trust-plane/commun.sh` : `--from-ip`, sortie en adresses). Sans ces champs, le filtre `source_pod: builds/` n'exporterait rien, et la conception change avant toute pose.
+- Ordre : préparation à sec (manifestes, dry-run serveur, script de comptes), puis accord nommé du `kubectl exec` dans l'agent, puis pods et lecture immédiate.
+
+**Forme de pose de 4a : recommandation, (a) le fichier combiné**, fichier de la 08c puis export, en `VALEURS_08C`.
+- Pour un essai, (a) est réversible et ne touche aucun fichier de la 08.
+- Commande de retour, celle de `etape_h5_cilium` de la 08c : `VALEURS_08C=$C/valeurs-cilium.yaml cilium.sh appliquer`.
+- Le rejeu de zéro passe par `durcissement.sh h4_bloque` (`rejeu.sh`), qui repose le seul fichier de la 08c : **l'export (a) disparaît au rejeu**.
+- (b), l'export sous `hubble:` de `cilium/valeurs.yaml`, est gardé pour le cas où J7 est retenu après 4b. Ce serait un changement de la 08, avec son coût de rejeu (D9).
+
+**Correction de lecture** : « après redémarrage » dans `kata-reseau-cilium-apres-redemarrage.log` de la 08 suit un redémarrage des VM (README de la 08, « Redémarrage des VM sous Cilium », 30/10/2026), pas un redémarrage des agents seuls. Le comportement des politiques pendant le redémarrage des agents reste non mesuré.
