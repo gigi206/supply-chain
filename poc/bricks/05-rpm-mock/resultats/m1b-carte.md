@@ -1001,3 +1001,7 @@ Les étapes `pipeline` et `rpm` sont ajoutées à [`m1b-fermeture.sh`](../m1b-fe
 ## Note datée du 20/11/2026, écrite à 2026-11-20T12:47:18Z UTC : fermeture neuve publiée
 
 De 12:44:34Z à 12:46:38Z, sur ton accord nommé, RP1 à RP4 tiennent. Les deux PipelineRuns publient `builds/fermetures/sample-app-rpm@09838980…`, le digest prédit à sec, et Chains les signe. La fermeture de M4b reste dans le même dépôt. Suite : comparaison et provenance, en lecture seule, puis M4c refait.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T12:50:18Z UTC : M4b refait tenu
+
+À 12:49:26Z et 12:49:28Z, CP1, CP2 et PV1 à PV3 tiennent. La fermeture `sample-app-rpm@09838980…`, tirée de Zot, est égale à l'arbre de l'essai, et sa provenance est vérifiée (quatre enveloppes, dépendances et paramètres égaux à l'attendu). **M4b refait est tenu.** Suite : M4c refait, avec `construire-rpm@ca03f189…`, la fermeture `09838980…` et l'artefact `333b7322…`.

@@ -2460,3 +2460,18 @@ C'est un script frère de `m4b.sh`, qui n'est pas touché : sa pipeline (tag `m4
 - **PV3** (haute) : la vérification avec une autre clé est refusée. **Relevé, sans pari** : la signature simplesigning (`.sig`).
 
 Si CP1, CP2 et PV1 à PV3 tiennent, **M4b refait est tenu**. Il produit une fermeture rpm de la plateforme avec l'outillage et le bootstrap de M1b, puis vérifie qu'elle est égale à l'essai et attestée.
+
+### M4b refait : résultat de `comparaison` et `provenance`, écrit le 20/11/2026 à 2026-11-20T12:50:18Z UTC ; M4b refait TENU
+
+`m1b-fermeture.sh comparaison provenance` a tourné à 2026-11-20T12:49:26Z et 12:49:28Z, sous l'accord permanent, avec code 0 : [`m1b-fermeture-comparaison.log`](m1b-fermeture-comparaison.log) (18 OK, 0 KO) et [`m1b-fermeture-provenance.log`](m1b-fermeture-provenance.log) (15 OK, 0 KO). Aucune ligne de jeton. Rien n'est écrit.
+
+- **CP1 tenue** : `IMAGE_DIGEST` vaut `09838980…` sur les deux PipelineRuns. Les 230 couches du manifeste sont égales à l'arbre de l'essai. La fermeture, tirée anonymement en 1 s, est égale à cet arbre préfixé : 230 fichiers, 462 194 425 octets, 0 écart.
+- **CP2 tenue** : 222 rpm égaux à la liste, `repomd.xml` `239a5a71…`. Un seul dossier de bootstrap, avec `manifest.json` `6de899ac…` et deux blobs (`b063feb3…`, `ff96017c…`) nommés par leur sha256.
+- **PV1 tenue** : `cosign verify-attestation` valide quatre enveloppes : les deux PipelineRuns et les deux TaskRuns de `publier`, comme en M4b. Chaque PipelineRun a exactement une enveloppe à son uid, sur le sujet `sample-app-rpm@09838980…`, avec le buildType attendu.
+- **PV2 tenue** : pour chaque PipelineRun, les dépendances et les paramètres sont égaux à l'attendu, tiré des références épinglées de la cascade.
+- **PV3 tenue** : refus avec une autre clé (« no matching attestations »). **Relevé** : une signature simplesigning valide, sur `09838980…`.
+- **Laissé** : la fermeture tirée, sous `$W/m1b-fermeture-05/comparaison/tiree` (462 Mo), comme en M4b.
+
+**M4b refait est tenu.** La plateforme produit la fermeture rpm de sample-app avec l'outillage (`70f8c412…`) et le bootstrap (`6de899ac…`) de M1b. Le prefetch, joué dans un pod d'essai, donne l'arbre prédit à sec. La fermeture publiée deux fois a le digest prédit à sec. Tirée de Zot, elle est égale à l'essai, et sa provenance est vérifiée. Elle coexiste avec celle de M4b, par digest, dans le même dépôt.
+
+**Suite de la cascade** : M4c refait, avec `construire-rpm@ca03f189…`, cette fermeture et l'artefact `333b7322…`. `image_digest` (`77cff176…`) y sera mesuré pour la première fois par la construction hermétique.

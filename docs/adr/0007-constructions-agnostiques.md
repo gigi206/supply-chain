@@ -212,3 +212,12 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
   - le tag de M4a reste en place.
 - **Conséquence pour la règle générique** : changer d'image de builder change un artefact d'entrée versionné (le verrou), jamais la recette. Les consommateurs le citent par digest. L'ancien et le nouveau coexistent dans le registre.
 - **Non mesuré** : les bundles de tâches qui citent l'outillage neuf, et la construction hermétique avec cet artefact (M4b et M4c refaits).
+
+**Additif du 20/11/2026, écrit à 12:50 UTC : M4b refait tenu** ([résultat](../../poc/bricks/05-rpm-mock/resultats/m1b-predictions.md)). La fermeture rpm de sample-app est reproduite par la plateforme avec l'outillage et le bootstrap construits par la plateforme (M1b). Script frère `m1b-fermeture.sh`, le 20/11/2026 de 11:17 à 12:49 UTC.
+- **Mesuré** :
+  - la pipeline signée ne diffère de celle de M4b que par la référence de la tâche de prefetch et par celle du bootstrap ;
+  - deux PipelineRuns publient la même fermeture, `09838980…`. Ce digest avait été calculé à sec depuis le manifeste de M4b, avant tout lancement ;
+  - la fermeture tirée est égale à l'arbre d'un pod d'essai : les mêmes 222 rpm et le même `repomd.xml` qu'en M4b, avec un autre dossier de bootstrap ;
+  - la provenance de Chains cite les références de la cascade.
+- **Conséquence pour la règle générique** : changer d'images de builder change l'empreinte de la fermeture des dépendances, et seulement elle : la seule partie qui diffère est l'image de bootstrap qu'elle embarque. Les deux fermetures coexistent par digest dans le même dépôt (décision du propriétaire « Même dépôt, par digest »).
+- **Non mesuré** : la construction hermétique avec cette fermeture (M4c refait), le contrôle de `image_digest` du bootstrap neuf, et le jugement par la porte.
