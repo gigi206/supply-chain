@@ -368,3 +368,19 @@ Le banc remesure ces points (F3, K2, K8, K9).
 **Ce qui reste pour M5b sous C, rien n'est écrit** :
 - le chemin du rejeu pour les gardes tournées vers M4b, M4c et les images d'essai (note de 16:18:58Z) ;
 - le bloc 05 de `rejeu.sh`, dans l'ordre de la note de 16:46:56Z.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:53:29Z UTC : corrections des notes de 16:48:01Z et 16:49:06Z
+
+Les deux notes restent écrites telles quelles.
+- **16:48:01Z** : « K5, K6, N1 à N6 échouent tous sur la référence absente `mock-rocky9` » est inexact.
+  - K5, K6, N1 et N4 s'arrêtent sur `mock-rocky9`.
+  - N2 s'arrête sur `rocky9-bootstrap`, et N3 sur la fermeture `09838980…`.
+  - N5 et N6 échouent parce que rien n'a été poussé au tag `banc`.
+
+  La cause commune est la même : aucun dépôt local.
+- **16:49:06Z, ADR 0007** : « les 5 digests de la liste revue » est trop large. 3 viennent de la liste revue (les tâches), et 2 des lignes `PIPELINE_REF` (les pipelines). La note de la carte le disait déjà. Une précision est ajoutée à l'ADR.
+- **Portée du banc, complément** : le script y est sourcé, donc sa partie principale n'a pas tourné. Le trap qui retire `$T/auth`, le refus d'un journal déjà présent et l'appel à `lancer` ne sont pas mesurés. K1 sort avant eux.
+
+**Pour le bloc 05 de `rejeu.sh`, relevés à sec** :
+- `publier-fermeture@7fa92ad3…`, citée par `prefetch-rpm-sample-app`, n'est pas poussée par la 05. Le rejeu S5b l'a retrouvée dans la liste revue (`rejeu-s5b-plateforme-reprise.log`, l. 143). La 05 en dépend donc, comme de la fermeture de sources de la 06.
+- Le refus d'un journal déjà présent consomme le `TAG` à chaque tentative. Une étape échouée, même sur une lecture non concluante ou un `df`, ne peut pas être reprise sous le même `TAG`. Le choix du `TAG` par tentative est à fixer dans le bloc 05. Les étapes de mesure en aval acceptent `TAG` à part de `PREFIXE`.
