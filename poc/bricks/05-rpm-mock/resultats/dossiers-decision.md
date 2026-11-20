@@ -205,3 +205,37 @@ Question posée : « Quand se fait le rejeu de M5b ? », avec deux choix : « Ap
 - Si Zot redémarrait quand même, la lecture du n°9 se ferait à la nouvelle heure, que la loi B permet de recalculer depuis le redémarrage.
 - La décision rend possible l'option (b) du point 4 de G7 : une tâche le 29/11 à 05:40 UTC. Le choix entre (a), (b) et (c) reste à toi.
 - Le dossier 6 (clôture) n'est pas tranché. Clore après M5b voudrait dire clore au plus tôt le 29/11.
+
+## Dossier 2, option (iii) : effacer les vieilles bases, lu dans le code (note de 2026-11-20T20:42:13Z ; rien n'est réécrit au-dessus)
+
+La note de 20:18:43Z laissait l'option (iii) non évaluée. Lecture du code de Zot au tag `v2.1.22`, par l'API publique de GitHub, comme pour `gc.go` :
+- `pkg/api/routes.go` (sha256 `7b7b3443b3df4cd5…`) ;
+- `pkg/api/authz.go` (`46d3b41ffbdffb3a…`) ;
+- `pkg/storage/imagestore/imagestore.go` (`2819ca7ba2904b75…`) ;
+- `pkg/storage/common/common.go` (`db848f6ceb693e9f…`).
+
+**Ce que le code dit** :
+- **Effacer un manifeste demande le droit `delete`** : une requête `DELETE` prend l'action `DeletePermission` (`authz.go`, `DistSpecAuthzHandler`). Dans `zot.json`, `poc-vulndb` n'a que `read` et `create` sur `vulndb/**`. Le commentaire de `fetch-db.sh` le rappelle : « poc-vulndb n'a que le droit de créer ».
+- **Par tag, rien n'est libéré.** `RemoveManifestDescByReference` ne retire que le tag ; le manifeste reste, non tagué, et attend la rétention, donc ses 336 h.
+- **Par digest, le manifeste part tout de suite** (`deleteImageManifest` efface son blob). Ses couches deviennent orphelines. D'après le code, elles partent au balayage suivant (`gcInterval` 24 h), puisqu'elles ont plus que `gcDelay` (1 h) (`deleteUnreferencedBlobs`). Ce n'est pas mesuré.
+- La porte ne relit pas la base : elle juge `scanner.db.built` dans le prédicat du scan (`scan.rego`). Le scanneur prend la base la plus récente.
+
+**Ce que (iii) demanderait** (relevé, rien n'est fait) :
+- un compte qui a le droit `delete` sur `vulndb/**`, dans `zot.json`. Deux variantes, aucune essayée :
+  - donner `delete` à `poc-vulndb` lui-même ;
+  - un compte distinct, avec `read` et `delete` seulement, pour l'effacement.
+- Dans les deux cas, c'est un changement de politique de Zot, donc un passage de `stockage.sh zot` et un redémarrage : après le n°9, ou seulement dans le dépôt avant le rejeu ;
+- un effacement par digest dans `base-grype.sh` ou `fetch-db.sh`, déployé sur sc-stockage ;
+- une écriture quotidienne dans Zot par un service.
+
+**Ce que (iii) ferait perdre** :
+- **avec la première variante, la garantie « création seulement » de G1.** Aujourd'hui, `poc-vulndb` ne peut pas remplacer un tag (`plateforme.sh`, essai « même tag repoussé » refusé). Avec `delete`, il pourrait effacer une base puis repousser un autre contenu sous le même tag. C'est déduit de `authz.go`, pas mesuré. Le compte distinct garde cette garantie à `poc-vulndb`, mais il ajoute un secret ;
+- dans les deux variantes, les bases citées par digest dans les scans encore gardés (`.scanner.db.ref`), si elles partent avant ces scans (336 h). Un scan ne pourrait plus être rejoué avec sa base.
+
+**Place, en calcul** (bases de 200,7 à 205,2 Mo de couches, relevé du 20/11 ; aucune autre écriture comptée) :
+- (i), rétention gardée : environ 14 bases, soit 2,8 à 3 Go à l'équilibre, comme au dossier 2 ;
+- (ii), délai global seul baissé sous 11 jours : `mostRecentlyPushedCount: 11` garde quand même 11 bases, soit 2,2 à 2,3 Go. Le gain est d'environ 0,6 Go, et les scans vivent moins longtemps. En baissant **le délai et le compte ensemble**, on garde à peu près max(compte, délai en jours) bases, sans droit `delete`. Les scans ne vivent alors que ce délai ;
+- (iii), garder K bases : K × 0,2 Go environ. Ni la porte ni le scanneur n'imposent de plancher à K : le scanneur prend la plus récente, et la porte ne juge que `scanner.db.built`. Par exemple, K = 4 donne environ 0,8 Go.
+- Mesure de comparaison : 12 491 Mo libres sur sc-stockage après l'agrandissement à 30G du 20/11 (AG1 à AG5). Le passage de `vm.sh` à 30G est le dossier 3.
+
+Les options restent (i), (ii) et (iii). Ce fichier n'en tranche aucune.
