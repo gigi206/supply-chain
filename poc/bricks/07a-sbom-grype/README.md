@@ -372,3 +372,19 @@ Projection, calculée : premières suppressions réelles le 28/11 entre 01:37 et
 - La tâche `supply-chain-g7-premiere-suppression` lira, en lecture seule, les balayages n°2 à n°9 et l'état après les suppressions, le 29/11 à 05:40 UTC.
 - Elle n'exécute que `g7-balayage.sh` v3 et `g7-etat.sh` v2, contrôlés par sha256.
 - Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T20:24:27Z.
+
+**Additif du 20/11/2026 (2026-11-20T21:28:28Z UTC) : Konflux et TPA comparés à cette brique, et demande du propriétaire sur les CVE et le VEX.** Question : « compare ce que konflux fait pour le tpa qu'il envoie le sbom à redhat vs ce qu'on fait avec grype ». Puis, verbatim : « Il faudrait faire mieux, les cve trouvées et les failles réelles (VEX) ».
+
+**Lu chez Konflux** (API publique de GitHub) :
+- tâche buildah 0.14.2 (`f18fef21…`) : mobster fusionne les SBOM syft de l'image et de la source, et celui de Hermeto (`--from-hermeto`) ;
+- `konflux-test-tasks` au commit `8c78a751`, `clair-scan` 0.4 (`aa51ccc3…`) : Clair, avec une image `clair-in-ci:v1` à tag flottant, mise à jour chaque jour ; rapport attaché à l'image ;
+- `conforma/policy` au commit `5369b1df`, `release/cve` (`bc699a18…`) : règles bloquantes ou non selon la gravité, avec un délai de grâce ;
+- `release-service-catalog` au commit `785d4c2d`, `rh-advisories` (`95d7a1f6…`) et `collect-tpa-params` (`f09d4854…`), puis mobster (`augment-component-sboms-ta` 0.3, `11fbda77…`) : à la release, les SBOM sont enrichis et envoyés à Atlas et à S3. Le serveur vient de la configuration (`atlas.server` « stage » ou « production », ou une ConfigMap du cluster) ;
+- README de `guacsec/trustify` (`b75b5af8…`) : SBOM, avis (Red Hat, GHSA, NVD, OSV) et VEX dans un même système. Que TPA soit Trustify est déduit, pas lu. Trustify est « n/d » dans `docs/04`.
+
+**Chez nous** :
+- le SBOM fusionné est **effacé après le scan** (`politique/scanner.sh`, `rm … sbom.json`). Seul le prédicat de scan signé est publié. La publication du `bom.json` de Hermeto par la fermeture n'a pas été cherchée ;
+- la porte bloque les KEV sans VEX, les paquets malveillants, et un scan ou une base trop vieux. Elle n'a **aucun seuil de gravité** ;
+- **aucun VEX** : « KEV sans VEX » veut dire « aucune KEV » (cf. plus haut).
+
+**Demande du propriétaire** : voir les CVE trouvées, et celles qui restent réelles après VEX. `docs/02` prévoit les SBOM et les VEX comme attestations, une projection Dependency-Track en phase 2c, et l'ADR 0004 (VEX) en phase 3. **Aucune décision** : une carte de la 07b, préparée à sec, dira son périmètre, son estimation et ses couplages avec G7. Le contenu de la 07b n'est pas encore relu.

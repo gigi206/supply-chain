@@ -302,3 +302,20 @@ Question posée : (i) une barrière, avec les limites de la note précédente en
 Deux lignes de la réserve écrite à la décision affirment plus que ce qui est établi :
 - « aucun contrôle continu de la politique n'existe » : lire **aucun trouvé**. La recherche n'a porté que sur `sortie-builds.sh` et `invariants`, dans les `.timer`, `.service` et `.yaml` du dépôt, plus les rôles et les règles Kyverno de la 08c.
 - « les témoins font échouer la construction, fermée, au démarrage » : c'est **lu dans les tâches signées, pas provoqué**. La moitié en est mesurée : le bras a de R7 de M5a a joint Zot sans le label, ce qui ferait réussir le témoin Zot et arrêter la tâche. L'arrêt de la tâche signée elle-même dans ce cas n'a pas été mesuré.
+
+## Lecture de Konflux en mode hermétique, et demande de journaux réseau (note de 2026-11-20T21:28:28Z ; rien n'est réécrit au-dessus ; décision (i) inchangée)
+
+Question du propriétaire : « Comment Konflux fonctionne lui en hermetic à true ? ». Lu par l'API publique de GitHub, sans rien télécharger dans le dépôt :
+- `konflux-ci/rpmbuild-pipeline` au commit `27d94051`, `task/rpmbuild.yaml` (sha256 `6b58d680…`) et `docs/architecture.md` (`897c7dc1…`) ;
+- `konflux-ci/konflux-build-cli` au commit `58526622`, `pkg/commands/build.go` (`3f2f9c4e…`), appelé par la tâche buildah 0.14.2 de `konflux-ci/container-build-catalog` au commit `774bb868` (`f18fef21…`).
+
+**Ce que le code dit** :
+- Images : en hermétique, `konflux-build-cli` lance `buildah build` sous `unshare --net`, un espace de noms réseau sans sortie. Le commentaire du code dit que `--network=none` de buildah ne couvre pas `ADD`.
+- rpm : `calculate-deps` n'est pas hermétique ; il écrit un verrou, et les rpm listés sont téléchargés dans un dépôt local. `rpmbuild` tourne sur une **VM dédiée** par architecture, pilotée par ssh depuis le pod (contrôleur multi-plateforme), avec `podman run --network=none --privileged -u mockbuilder … mock --hermetic-build`.
+- La coupure est donc dans le conteneur de mock, sur une machine hors du cluster. Le filtrage réseau de ces VM n'est pas lu.
+
+**Chez nous** (rappel) : podman imbriqué fonctionne dans le pod Kata (P8, essais du 17/11, `pull` et `image mount`). `podman run --network=none` autour de mock n'a jamais été essayé : ce serait l'option (ii), qui change la tâche signée.
+
+**Décision du propriétaire** : « Gardons ce qu'on fait ». (i) reste la décision.
+
+**Demande du propriétaire, même message** : « avoir également les logs réseau du container pour voir ceux bloqués (normalement tous) et ceux autorisés (normalement aucun) ». C'est le J7 de la 19b (flux Hubble), resté optionnel. Il répond en partie à la limite « aucun contrôle continu trouvé » de ce dossier. Détail : [README de la 19b](../../19b-journalisation/README.md), note de 2026-11-20T21:28:28Z.
