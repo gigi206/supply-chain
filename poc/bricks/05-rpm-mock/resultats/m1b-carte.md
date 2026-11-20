@@ -997,3 +997,7 @@ Les étapes `pipeline` et `rpm` sont ajoutées à [`m1b-fermeture.sh`](../m1b-fe
 ## Note datée du 20/11/2026, écrite à 2026-11-20T12:28:23Z UTC : pipeline de M4b refait signée et poussée
 
 À 12:25:52Z, sur ton accord nommé (« Oui, signe et pousse »), PS1 et PS2 tiennent. La pipeline est sous `m1b` : `prefetch-rpm-sample-app@sha256:61814acd…`, versionnée sous `fermeture/prefetch-rpm-sample-app.m1b.signee.yaml`. `PIPELINE_REF` est épinglée, et le banc 3 donne 77 OK, dont `rpm` jouée jusqu'au bout sur les objets transposés de M4b. Suite : `rpm`, sur accord nommé.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T12:47:18Z UTC : fermeture neuve publiée
+
+De 12:44:34Z à 12:46:38Z, sur ton accord nommé, RP1 à RP4 tiennent. Les deux PipelineRuns publient `builds/fermetures/sample-app-rpm@09838980…`, le digest prédit à sec, et Chains les signe. La fermeture de M4b reste dans le même dépôt. Suite : comparaison et provenance, en lecture seule, puis M4c refait.

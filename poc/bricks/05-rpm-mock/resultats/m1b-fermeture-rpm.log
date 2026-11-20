@@ -1,0 +1,121 @@
+# m1b-fermeture.sh rpm, 2026-11-20T12:44:34Z
+OK   fermeture/prefetch-rpm.yaml (sha256) : 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c
+OK   fermeture/prefetch-rpm-sample-app.yaml (sha256) : ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+OK   fermeture/prefetch-rpm.signee.yaml (sha256) : 4123539575b1f7986f82f648913ee147348c7198399018f3520c7037eeade199
+OK   fermeture/prefetch-rpm.m1b.signee.yaml (sha256) : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   resultats/m1b-fermeture-digest.py (sha256) : a5d014290f0a6d4ce08e54b2693608f63dd0b18539f183199011b9c138d95f32
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   verrou de la cascade (sha256) : c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   verrou de M4b (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   arbre de final (sha256) : fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+OK   arbre de l'essai archivé (sha256), égal à l'arbre prédit : a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014a
+## gardes, avant toute création
+OK   pipeline relue dans Zot au tag m1b (lecture anonyme) : sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+OK   tag m4b de la pipeline, inchangé : sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+OK   prefetch-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+## m1b-rpm-1
+OK   fermeture de M4b présente dans le même dépôt (« Même dépôt, par digest ») : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+OK   fermeture prédite absente avant le premier PipelineRun : absent
+/ de sc-stockage : 3005587456 octets libres à 12:44:34 (garde : 1073741824)
+/ de sc-build (emptyDir du layout de publier) : 10701484032 octets libres (relevé)
+OK   m1b-rpm-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+m1b-rpm-1 créé à 12:44:35 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c)
+m1b-rpm-1 : condition Succeeded « True|Succeeded », relevée à 12:45:32
+     début 2026-11-20T12:44:35Z ; fin 2026-11-20T12:45:30Z
+### TaskRun m1b-rpm-1-prefetch : True|Succeeded ; début 2026-11-20T12:44:35Z ; fin 2026-11-20T12:45:18Z
+     résultat BOOTSTRAP_ARTIFACT_INPUTS : {"digest":"sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3","uri":"oci://sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap"}
+     pod m1b-rpm-1-prefetch-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task prefetch-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-prefetch : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-prefetch : demandes {"cpu":"2","memory":"2Gi"} ; limites {"cpu":"2","memory":"2Gi"}
+     place-scripts : commande ["sh"], 2 argument(s), dernier argument 59877 octets (reconstruit à sec : non refait ici (59848 en M4b))
+     journal de step-prefetch : 34 lignes, dont 28 de repomd.xml imprimé (non répétées)
+       téléchargés et contrôlés (sha256, taille) : 222
+       clé de Rocky de l'image : empreinte conforme (gpg)
+       rpm -K : rc 0, 222 OK sur 222
+       repodata V2 : repomd.xml 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164 ; fichiers 4 ; en 0 s
+       skopeo copy --preserve-digests : en 1 s ; manifeste sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+       fermeture : 230 fichiers, 462223097 octets
+### TaskRun m1b-rpm-1-publier : True|Succeeded ; début 2026-11-20T12:45:19Z ; fin 2026-11-20T12:45:30Z
+     résultat IMAGE_DIGEST : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+     résultat IMAGE_URL : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+     pod m1b-rpm-1-publier-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-publier : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-publier : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     place-scripts : commande ["sh"], 2 argument(s), dernier argument 1893 octets (reconstruit à sec : non refait ici (59848 en M4b))
+     journal de step-publier : 2 lignes, dont 0 de repomd.xml imprimé (non répétées)
+       /tekton/scripts/script-0-v2qqw: line 17: can't open bom.json: no such file
+       publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f (230 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 
+résultat de IMAGE_URL : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+résultat de IMAGE_DIGEST : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+OK   PipelineRun m1b-rpm-1 : True|Succeeded
+OK   prefetch : rpm -K : 1
+OK   prefetch : repomd.xml V2 : 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+OK   prefetch : résultat BOOTSTRAP_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3","uri":"oci://sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap"}
+digest relevé sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f ; prédit à sec sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f : égaux (relevé, non exigé)
+OK   dépôt publié : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+OK   publier : 230 couches dans le journal : 1
+OK   manifeste relu dans Zot (lecture anonyme) : couches : 230
+OK   PipelineRun m1b-rpm-1 signé par Chains : true
+/ de sc-stockage : 3000684544 octets libres à 12:45:37
+## m1b-rpm-2
+OK   fermeture de M4b présente dans le même dépôt (« Même dépôt, par digest ») : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+/ de sc-stockage : 3000684544 octets libres à 12:45:37 (garde : 1073741824)
+/ de sc-build (emptyDir du layout de publier) : 10237612032 octets libres (relevé)
+OK   m1b-rpm-2 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+m1b-rpm-2 créé à 12:45:38 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c)
+m1b-rpm-2 : condition Succeeded « True|Succeeded », relevée à 12:46:33
+     début 2026-11-20T12:45:38Z ; fin 2026-11-20T12:46:32Z
+### TaskRun m1b-rpm-2-prefetch : True|Succeeded ; début 2026-11-20T12:45:38Z ; fin 2026-11-20T12:46:21Z
+     résultat BOOTSTRAP_ARTIFACT_INPUTS : {"digest":"sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3","uri":"oci://sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap"}
+     pod m1b-rpm-2-prefetch-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task prefetch-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-prefetch : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-prefetch : demandes {"cpu":"2","memory":"2Gi"} ; limites {"cpu":"2","memory":"2Gi"}
+     place-scripts : commande ["sh"], 2 argument(s), dernier argument 59877 octets (reconstruit à sec : non refait ici (59848 en M4b))
+     journal de step-prefetch : 34 lignes, dont 28 de repomd.xml imprimé (non répétées)
+       téléchargés et contrôlés (sha256, taille) : 222
+       clé de Rocky de l'image : empreinte conforme (gpg)
+       rpm -K : rc 0, 222 OK sur 222
+       repodata V2 : repomd.xml 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164 ; fichiers 4 ; en 1 s
+       skopeo copy --preserve-digests : en 1 s ; manifeste sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+       fermeture : 230 fichiers, 462223097 octets
+### TaskRun m1b-rpm-2-publier : True|Succeeded ; début 2026-11-20T12:46:21Z ; fin 2026-11-20T12:46:32Z
+     résultat IMAGE_DIGEST : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+     résultat IMAGE_URL : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+     pod m1b-rpm-2-publier-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-publier : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-publier : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     place-scripts : commande ["sh"], 2 argument(s), dernier argument 1893 octets (reconstruit à sec : non refait ici (59848 en M4b))
+     journal de step-publier : 2 lignes, dont 0 de repomd.xml imprimé (non répétées)
+       /tekton/scripts/script-0-7zznn: line 17: can't open bom.json: no such file
+       publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f (230 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 
+résultat de IMAGE_URL : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+résultat de IMAGE_DIGEST : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+OK   PipelineRun m1b-rpm-2 : True|Succeeded
+OK   prefetch : rpm -K : 1
+OK   prefetch : repomd.xml V2 : 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+OK   prefetch : résultat BOOTSTRAP_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3","uri":"oci://sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap"}
+digest relevé sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f ; prédit à sec sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f : égaux (relevé, non exigé)
+OK   dépôt publié : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm
+OK   publier : 230 couches dans le journal : 1
+OK   manifeste relu dans Zot (lecture anonyme) : couches : 230
+OK   PipelineRun m1b-rpm-2 signé par Chains : true
+/ de sc-stockage : 3007320064 octets libres à 12:46:38
+OK   deux exécutions, même fermeture : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+OK   fermeture de M4b toujours présente après : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+fermeture neuve : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f ; prédite à sec : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f

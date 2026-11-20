@@ -2421,3 +2421,18 @@ C'est un script frère de `m4b.sh`, qui n'est pas touché : sa pipeline (tag `m4
 **Banc 3, avant `rpm`** : [`m1b-fermeture-banc-3.log`](m1b-fermeture-banc-3.log), 77 OK, 0 KO (banc `45f9b579b32baf78…`). La correction de 11:59 prévoyait un cas qui va jusqu'au bout ; c'est la section G ajoutée. Un faux kubectl y sert les objets réels des deux PipelineRuns de M4b (TaskRuns, pods, journaux des pas). Leurs valeurs sont remplacées par celles de la cascade, et un contrôle vérifie qu'il n'en reste aucune de M4b. L'étape va jusqu'au bout : code 0, 36 OK, deux PipelineRuns, 230 couches, même digest, fermeture de M4b présente après. La partie transformée de `etape_rpm` a donc tourné sur les formats réels de Tekton. Le cas F1 force `PIPELINE_REF` vide, puisqu'elle est épinglée. Deux erreurs du banc lui-même ont été corrigées en route : la position des arguments du faux kubectl et le compte des OK de G.
 
 **Suite** : `rpm`, deux PipelineRuns et la fermeture dans Zot, sur ton accord nommé. Prédictions RP1 à RP4, RP3 en moyenne haute (correction de 11:59).
+
+### M4b refait : résultat de `rpm`, écrit le 20/11/2026 à 2026-11-20T12:47:18Z UTC
+
+`m1b-fermeture.sh rpm` a tourné de 2026-11-20T12:44:34Z à 12:46:38Z, sur ton accord nommé (« Oui, lance rpm »), avec code 0 : [`m1b-fermeture-rpm.log`](m1b-fermeture-rpm.log), 36 OK, 0 KO, aucune ligne de jeton.
+
+- **RP1 tenue** : les gardes passent. `m1b-rpm-1` (12:44:35 à 12:45:30) et `m1b-rpm-2` (12:45:38 à 12:46:32) finissent en `True|Succeeded`, sur sc-build, en runc. Le résolveur a accepté les bundles signés de la pipeline et des deux tâches.
+- **RP2 tenue** : dans chaque prefetch, `rpm -K` donne 222 OK sur 222, `repomd.xml` V2 vaut `239a5a71…` et le bootstrap désigné est `6de899ac…`.
+- **RP3 tenue** (moyenne haute) : `publier` journalise 230 couches, et le manifeste relu anonymement en a 230. Le risque des 512Mi ne s'est pas réalisé : le pas `publier` dure 11 s dans chaque PipelineRun, avec code 0.
+- **RP4 tenue** : les deux PipelineRuns publient **`builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f`**, égal au digest prédit à sec par [`m1b-fermeture-digest.py`](m1b-fermeture-digest.py). Chains signe les deux. La fermeture de M4b (`2a9e2ea7…`) reste présente dans le même dépôt.
+- **Relevés** :
+  - **sc-stockage** : 3 005 587 456 octets libres avant, 3 000 684 544 après le premier PipelineRun, 3 007 320 064 après le second. La baisse de 4,9 Mo est bien en dessous des 242 Mo de la couche du bootstrap. La fermeture neuve n'a donc pas ajouté cette couche une seconde fois ; Zot la partageait probablement déjà avec `builds/builders/rocky9-bootstrap`, mais ce n'est pas mesuré ici. La place libre varie aussi sans écriture de la brique (dérive notée le 18/11).
+  - **sc-build** : 10 701 484 032 octets libres avant le premier, 10 237 612 032 avant le second.
+  - **`place-scripts` du prefetch** : le dernier argument fait 59 877 octets, contre 59 869 en M4b.
+
+**Ce que cela établit** : la pipeline de la plateforme, avec l'outillage et le bootstrap de M1b, publie deux fois la même fermeture, et elle est égale à l'octet au calcul fait à sec. **M4b refait n'est pas encore tenu** : restent la comparaison de la fermeture tirée et la provenance, toutes deux en lecture seule.
