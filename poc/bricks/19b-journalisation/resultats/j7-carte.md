@@ -100,3 +100,18 @@ Rien n'est posé. Journal : [`j7-etape1.log`](j7-etape1.log). Fichiers proposés
 - la rotation réelle.
 
 **Étape 2** (`hubble observe` dans l'agent de sc-build, `kubectl exec`) : elle attend un accord nommé. Elle n'est pas demandée ce soir.
+
+## Compléments à l'étape 1, après relecture du conseiller (note de 2026-11-20T21:51:28Z ; rien n'est réécrit au-dessus)
+
+**1. Commande de pose (étape 4a) : `cilium.sh appliquer` lancé seul retirerait le pare-feu d'hôte.**
+- `etape_installer` passe `--reset-values`. Seuls `cilium/valeurs.yaml` rendu, le fichier de la 08b et **un** fichier `VALEURS_08C` sont appliqués.
+- Le pare-feu d'hôte (clés de tête `hostFirewall`, `policyAuditMode` et `tls` du fichier de la 08c) a été posé par `durcissement.sh` avec `VALEURS_08C=$C/valeurs-cilium.yaml`.
+- `cilium/valeurs.yaml` de la 08 a déjà une clé `hubble:` ; le fichier de la 08c n'en a pas.
+- Deux formes possibles, **à choisir avant de demander l'accord 4a** :
+  - (a) un fichier combiné, fichier de la 08c puis export, passé en `VALEURS_08C` (même motif que `valeurs_h6` de la 08c, clés de tête distinctes) ;
+  - (b) l'export ajouté sous `hubble:` dans `cilium/valeurs.yaml` de la 08 : le rejeu le relirait.
+- Dans les deux cas, un passage ultérieur de `durcissement.sh` avec son seul fichier retirerait l'export sans le dire. C'est à écrire dans la carte de pose.
+
+**2. `fieldMask` : non vérifié.** `helm template` ne valide pas les chemins des champs. La réaction de l'agent à un chemin refusé n'est pas lue (refus de tout l'exportateur, champ ignoré ou erreur au journal). Ajouté aux points à lire en 4a.
+
+**3. Scripts de l'étape 1** versés dans [`j7-a-sec/`](j7-a-sec/) : `j7-etape1.sh` (sha256 `4d6528a5b36e1d45…`) et `j7-compare.py` (`2841cf518b67897a…`), tels qu'ils ont tourné. Leur dossier de travail est le scratchpad de la session (variable `S`). Pour les rejouer, il faut changer `S`, sans rien d'autre.
