@@ -643,3 +643,5 @@ Revue menée sur « continue », sans validation du propriétaire, rien lu dans 
   - le volume ;
   - un éventuel redémarrage des agents à l'activation.
 - **Pose** : elle change les valeurs Helm de Cilium, que le rejeu relit. C'est l'accord du propriétaire, après une préparation à sec. Elle doit se faire hors de 08:00 à 11:30 UTC (import de la base grype, scans).
+
+**Additif du 20/11/2026 (2026-11-20T21:35:06Z UTC) : carte de J7 préparée à sec**, [j7-carte.md](resultats/j7-carte.md) : export dynamique de Hubble filtré sur `builds`, Alloy sur sc-build, alertes (flux sortant autorisé, construction sans refus), six étapes dont deux poses sur accord, estimation 0,5 j, décision à 1 j. Rien n'est posé.
