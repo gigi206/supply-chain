@@ -68,6 +68,8 @@ LISTE_REVUE=$here/politique/porte/taches.yml
 # Entrées des essais : celles de M4b et M4c, à l'identique ; seule l'image change
 LISTE=$R/m4b-liste.txt
 LISTE_SHA=95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910   # m4b.sh
+LISTE_OUTILLAGE=$R/m1b-listes-outillage.txt   # liste du rendu signé de builder-mock-rocky9 (m1b-builders.sh prealables, l. 170)
+LISTE_OUTILLAGE_SHA=c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f   # c740d944
 VERROU_SRC=$R/s1-verrou_derivee.json
 VERROU_SHA=b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f   # m4b.sh, m4c.sh
 VERROU_ESSAI=$VERROU_SRC
@@ -297,6 +299,7 @@ une_feuille() { # libellé json-avant json-après : une seule feuille différent
 etape_local() { # hôte seul, hors ligne
   local n
   sources
+  attendu "liste de l'outillage de M1b, celle du rendu signé de builder-mock-rocky9 (sha256)" "$(sha "$LISTE_OUTILLAGE")" "$LISTE_OUTILLAGE_SHA"
   neuf "$T/local"; mkdir "$T/local"
   echo "## témoin de méthode : gabarits rendus avec l'image d'essai, normalisés, contre les tâches signées de M4b et M4c"
   rendre "$T/local/essai" "$IMAGE_ESSAI"
@@ -413,7 +416,7 @@ etape_essai_construire() { # pod Kata au label construire-rpm, à la forme que T
   kubectl wait -n builds "pod/$p" --for=condition=Ready --timeout=300s < /dev/null > /dev/null \
     || { pod_retirer "$p"; echo "KO   pod $p non prêt" >&2; exit 1; }
   echo "pod prêt sur $(kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}, runtimeClassName {.spec.runtimeClassName}' < /dev/null)"
-  copier_pod "$p" remplir "$T/entrees.tar" /e/entrees.tar
+  copier_pod "$p" remplir "$ENTREES" /e/entrees.tar
   kubectl exec -n builds "$p" -c remplir -- sh -c 'tar --no-same-owner -xf /e/entrees.tar -C /e && rm /e/entrees.tar && echo "entrées déballées par uid $(id -u) : $(find /e -type f | wc -l) fichiers"' < /dev/null \
     || { pod_retirer "$p"; echo "KO   déballage des entrées" >&2; exit 1; }
   # Le script est un fichier dans le pod, comme sous Tekton, et rien n'arrive sur son entrée standard (s4d.sh)

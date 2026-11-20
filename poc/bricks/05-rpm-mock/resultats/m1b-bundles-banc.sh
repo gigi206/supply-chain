@@ -13,6 +13,8 @@
 #      Cas : nominal ; sans SIGNER ; clé absente ; signature versionnée déjà présente ; tag neuf déjà présent ; tag m4c déplacé ;
 #      place basse ; tâche refusée à l'admission ; gabarit altéré (mémoire du pas). Dans chaque cas : poussées, signatures
 #      versionnées, $T/auth et appels de kubectl relus.
+#   F  (ajoutée le 20/11/2026, après la revue du conseiller) chemins de l'hôte lus par les deux essais, relevés statiquement : tous
+#      écrits dans l'étape même ; aucun chemin de prealables de M4c sous $T ; entrees.tar lu par $ENTREES seulement.
 # Non couvert : les pods d'essai (cluster), Zot, le vrai dry-run serveur, Tekton (bundles, Trusted Resources), la clé réelle.
 # Usage (racine du dépôt) : mise exec -- bash poc/bricks/05-rpm-mock/resultats/m1b-bundles-banc.sh <dossier-neuf>
 set -uo pipefail
@@ -62,6 +64,18 @@ done
 egal "B entrees.tar = m4c-prealables.log" "$(val m1b-bundles.sh ENTREES_TAILLE) $(val m1b-bundles.sh ENTREES_SHA)" \
   "$(sed -n 's/^entrees.tar : \([0-9]*\) octets, sha256 \([0-9a-f]\{64\}\)$/\1 \2/p' "$D05/resultats/m4c-prealables.log")"
 egal "B arbre de final cité par m4b-final.log" "$(grep -c "$(val m1b-bundles.sh ARBRE_REF_SHA)" "$D05/resultats/m4b-final.log")" 2
+egal "B liste de l'outillage au commit c740d944 = LISTE_OUTILLAGE_SHA" "$(gs c740d944 resultats/m1b-listes-outillage.txt)" "$(val m1b-bundles.sh LISTE_OUTILLAGE_SHA)"
+egal "B liste rendue de builder-mock-rocky9 = m1b-listes-outillage.txt (m1b-builders-m1bt-20-prealables.log)" \
+  "$(grep -c '^OK   pipeline o : liste rendue = m1b-listes-outillage.txt : égale$' "$D05/resultats/m1b-builders-m1bt-20-prealables.log")" 1
+
+echo "## F chemins de l'hôte lus par les deux essais (statique) : tous écrits dans l'étape même"
+chemins() { awk -v f="$1" '$0 ~ "^" f "\\(\\) \\{" {b = 1} b; b && /^}$/ {exit}' "$SCRIPT" | grep -o '"\$[Tx]/[^"]*"' | sort -u | paste -sd' '; }
+egal "F essai_prefetch" "$(chemins etape_essai_prefetch)" \
+  '"$T/$POD.json" "$T/admis-$POD.out" "$T/prefetch-essai-arbre.err" "$T/prefetch-essai-arbre.txt" "$T/prefetch-essai-objets.txt" "$T/prefetch-essai-refus.log" "$T/prefetch-essai.log" "$T/prefetch-rpm-sample-app.yaml" "$T/prefetch-rpm.yaml" "$T/script-essai.sh" "$T/script-refus.sh"'
+egal "F essai_construire" "$(chemins etape_essai_construire)" \
+  "\"\$T/construire-rpm.yaml\" \"\$x/construire.log\" \"\$x/construire.sh\" \"\$x/image.tar\" \"\$x/lu\" \"\$x/lu/blobs/sha256/\$(jq -r '.layers[0].digest' \" \"\$x/lu/index.json\" \"\$x/pod.json\""
+egal "F aucun chemin de prealables de M4c dans le script (entrees.tar, digest-attendu sous \$T)" "$(grep -c -e '"$T/entrees.tar"' -e '$T/digest-attendu' "$SCRIPT")" 0
+egal "F entrees.tar lu par \$ENTREES (lignes : local, garde de l'essai, copie dans le pod)" "$(grep -c '"$ENTREES"' "$SCRIPT")" 3
 
 echo "## C étape local (vraie fonction, forme de lancer)"
 mkdir -p "$B/O/secrets" "$B/C"
@@ -71,7 +85,7 @@ mkdir -p "$B/O/secrets" "$B/C"
   { echo "# etape_local (banc)"; etape_local; } 2>&1 | sed -u "s#$HOME#~#g" > "$T/../sortie.txt"' _ "$SCRIPT"); rc=$?
 grep -v '^     ' "$B/C/sortie.txt" | cut -c1-160
 egal "C local : code" "$rc" 0
-egal "C local : OK" "$(grep -c '^OK' "$B/C/sortie.txt")" 22
+egal "C local : OK" "$(grep -c '^OK' "$B/C/sortie.txt")" 23
 egal "C local : KO" "$(grep -c '^KO' "$B/C/sortie.txt")" 0
 egal "C travail/ du banc : seul le dossier de travail du script, vide (T redirigé)" "$(find "$B/O/travail" -mindepth 1 | sed "s#^$B/O/travail/##" | paste -sd' ')" m1b-bundles-05
 

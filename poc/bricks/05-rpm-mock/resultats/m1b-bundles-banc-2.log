@@ -1,0 +1,214 @@
+# m1b-bundles-banc.sh, 2026-11-20T10:47:10Z ; m1b-bundles.sh 3faa018b389361c6e586bd79410b05aa368fd9bf784ac5697b9c67f696026a22
+# tkn 0.46.2 ; yq v4.54.3
+## A copies
+OK   A copie de m4c.sh : attendu (1 ligne(s)), égale à l'original
+OK   A copie de m4c.sh : ref_revue (7 ligne(s)), égale à l'original
+OK   A copie de m4c.sh : script_etape (1 ligne(s)), égale à l'original
+OK   A copie de m4c.sh : mesure (1 ligne(s)), égale à l'original
+OK   A copie de m4c.sh : pod_retirer (1 ligne(s)), égale à l'original
+OK   A copie de m4c.sh : copier_pod (16 ligne(s)), égale à l'original
+OK   A copie de m4c.sh : politique_relue (14 ligne(s)), égale à l'original
+OK   A copie de m4c.sh : echec (1 ligne(s)), égale à l'original
+OK   A copie de m4c.sh : admission (5 ligne(s)), égale à l'original
+OK   A copie de m4c.sh : libre_zot (1 ligne(s)), égale à l'original
+OK   A copie de m4c.sh : normaliser (6 ligne(s)), égale à l'original
+OK   A copie de m4b.sh : remplacer (17 ligne(s)), égale à l'original
+OK   A copie de m4b.sh : rendre_taches (6 ligne(s)), égale à l'original
+OK   A copie de m4b.sh : substituer (17 ligne(s)), égale à l'original
+OK   A copie de m4b.sh : pod_spec (15 ligne(s)), égale à l'original
+OK   A copie de m4b.sh : dans (7 ligne(s)), égale à l'original
+OK   A copie de m4b.sh : ARBRE (6 ligne(s)), égale à l'original
+OK   A copie de m1b-artefact.sh : neuf (1 ligne(s)), égale à l'original
+OK   A copie de m1b-artefact.sh : sha (1 ligne(s)), égale à l'original
+OK   A copie de m1b-artefact.sh : zot_lire (11 ligne(s)), égale à l'original
+OK   A m4b.sh : etape_essai_tache, 5 remplacement(s), chacun au compte attendu
+OK   A etape_essai_prefetch égale à etape_essai_tache de m4b.sh après les remplacements
+OK   A m4c.sh : etape_essai, 12 remplacement(s), chacun au compte attendu
+OK   A etape_essai_construire égale à etape_essai de m4c.sh après les remplacements
+OK   A copies : code : 0
+OK   A copies : contrôles OK : 24
+## B constantes
+OK   B image neuve = DIGEST_OUTILLAGE de m1b-verrou.sh : $REG/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   B image d'essai = IMAGE de m4b.sh : $REG/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+OK   B image d'essai = IMAGE_OUTILLAGE de m4c.sh : $REG/essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771
+OK   B prefetch-rpm de M4b = PREFETCH_REF de m4b.sh : $REG/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+OK   B construire-rpm de M4c = CONSTRUIRE_REF de m4c.sh : $REG/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+OK   B LISTE_SHA = celle de m4b.sh : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   B VERROU_SHA = celle de m4b.sh : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   B FP_ROCKY = celle de m4b.sh : 21CB256AE16FC54C6E652949702D426D350D275D
+OK   B REPOMD_V2 = celle de m4b.sh : 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+OK   B DEPOT_FERMETURE = celle de m4b.sh : $REG/builds/fermetures/sample-app-rpm
+OK   B LABEL = celle de m4b.sh : prefetch-rpm
+OK   B VOLUME = celle de m4b.sh : 4Gi
+OK   B LIMITES = celle de m4b.sh (ligne) : 1 1
+OK   B SCRIPT_PREFETCH_SHA = SCRIPT_ESSAI_SHA de m4b.sh : 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+OK   B VERROU_SHA = celle de m4c.sh : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   B EPOQUE = celle de m4c.sh : 1793229566
+OK   B ARCHIVE_SHA = celle de m4c.sh : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb
+OK   B RPM_M3_SHA = celle de m4c.sh : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+OK   B SRPM_M3_SHA = celle de m4c.sh : c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128
+OK   B MORCEAU_MIO = celle de m4c.sh : 64
+OK   B LABEL_PREPARER = celle de m4c.sh : preparer-rpm
+OK   B LABEL_CONSTRUIRE = celle de m4c.sh : construire-rpm
+OK   B LIBRE_MIN = celle de m4c.sh : 1073741824
+OK   B DIGEST_ESSAI_M4C = DIGEST_ESSAI de m4c.sh : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+OK   B SCRIPT_CONSTRUIRE_SHA = construire-rpm-construire de m4c.sh : 0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c
+OK   B gabarit construire-rpm = GABARITS_SHA de m4c.sh : 1 1
+OK   B fermeture/prefetch-rpm.yaml au commit de signature 19837c20 = GABARITS_SHA : 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c
+OK   B fermeture/prefetch-rpm-sample-app.yaml au commit de signature 19837c20 = GABARITS_SHA : ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+OK   B fermeture/prefetch-rpm.signee.yaml au commit de signature 19837c20 = GABARITS_SHA : 4123539575b1f7986f82f648913ee147348c7198399018f3520c7037eeade199
+OK   B construction/construire-rpm.yaml au commit de signature 75ed22a8 = GABARITS_SHA : e88f5521ede87f5b03330683939fd3494f5ff58544ded9a9326014e30b8d0f88
+OK   B construction/construire-rpm.signee.yaml au commit de signature 75ed22a8 = GABARITS_SHA : faab95fd9464d437aa0c0a98b63fce8fe0dd6a2e4f5c173fb2bcd632e6e2b70c
+OK   B entrees.tar = m4c-prealables.log : 318842880 b84f68ee0ac565a4b3f7ec7f55c6b11ae4a0e5a709e38daef97b9d7369f5f284
+OK   B arbre de final cité par m4b-final.log : 2
+OK   B liste de l'outillage au commit c740d944 = LISTE_OUTILLAGE_SHA : c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f
+OK   B liste rendue de builder-mock-rocky9 = m1b-listes-outillage.txt (m1b-builders-m1bt-20-prealables.log) : 1
+## F chemins de l'hôte lus par les deux essais (statique) : tous écrits dans l'étape même
+OK   F essai_prefetch : "$T/$POD.json" "$T/admis-$POD.out" "$T/prefetch-essai-arbre.err" "$T/prefetch-essai-arbre.txt" "$T/prefetch-essai-objets.txt" "$T/prefetch-essai-refus.log" "$T/prefetch-essai.log" "$T/prefetch-rpm-sample-app.yaml" "$T/prefetch-rpm.yaml" "$T/script-essai.sh" "$T/script-refus.sh"
+OK   F essai_construire : "$T/construire-rpm.yaml" "$x/construire.log" "$x/construire.sh" "$x/image.tar" "$x/lu" "$x/lu/blobs/sha256/$(jq -r '.layers[0].digest' " "$x/lu/index.json" "$x/pod.json"
+OK   F aucun chemin de prealables de M4c dans le script (entrees.tar, digest-attendu sous $T) : 0
+OK   F entrees.tar lu par $ENTREES (lignes : local, garde de l'essai, copie dans le pod) : 3
+## C étape local (vraie fonction, forme de lancer)
+# etape_local (banc)
+OK   fermeture/prefetch-rpm.yaml (sha256) : 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c
+OK   fermeture/prefetch-rpm-sample-app.yaml (sha256) : ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+OK   construction/construire-rpm.yaml (sha256) : e88f5521ede87f5b03330683939fd3494f5ff58544ded9a9326014e30b8d0f88
+OK   fermeture/prefetch-rpm.signee.yaml (sha256) : 4123539575b1f7986f82f648913ee147348c7198399018f3520c7037eeade199
+OK   construction/construire-rpm.signee.yaml (sha256) : faab95fd9464d437aa0c0a98b63fce8fe0dd6a2e4f5c173fb2bcd632e6e2b70c
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   verrou de M4a et M4b (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   arbre de final (sha256) : fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+OK   liste de l'outillage de M1b, celle du rendu signé de builder-mock-rocky9 (sha256) : c8883d2b643fc9b94d2edff44027092e72b0322f9c276dd0bcd42ff3bfa1021f
+## témoin de méthode : gabarits rendus avec l'image d'essai, normalisés, contre les tâches signées de M4b et M4c
+OK   témoin : prefetch-rpm rendue avec l'image d'essai, égale à la tâche signée de M4b : égale
+OK   témoin : construire-rpm rendue avec l'image d'essai, égale à la tâche signée de M4c : égale
+OK   essai : script de prefetch-rpm substitué, égal à celui de l'essai de M4b (sha256) : 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+OK   essai : script de construire-rpm substitué, égal à celui de l'essai de M4c (sha256) : 0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c
+## gabarits rendus avec l'image neuve
+OK   prefetch-rpm neuve contre celle de M4b : feuilles différentes : .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c13673
+OK   construire-rpm neuve contre celle de M4c : feuilles différentes : .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c136
+OK   pipeline de prefetch rendue : égale à celle du témoin (le bootstrap de M4b, l'image n'y figure pas) : égale
+OK   neuf : script de prefetch-rpm substitué, égal à celui de l'essai de M4b (sha256) : 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+OK   neuf : script de construire-rpm substitué, égal à celui de l'essai de M4c (sha256) : 0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c
+OK   script de prefetch, sh -n (sh du pas de Tekton) : ok
+OK   script de construire, bash -n (lancé par bash, comme à l'essai de M4c) : ok
+## références de M4b et M4c dans la liste revue ; image neuve
+OK   prefetch-rpm de M4b, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff
+OK   construire-rpm de M4c, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2d
+relevé : lignes de la liste revue qui citent l'image neuve : 0
+## entrées de l'essai de construction (m4c prealables)
+OK   entrees.tar (taille, sha256) : 318842880 b84f68ee0ac565a4b3f7ec7f55c6b11ae4a0e5a709e38daef97b9d7369f5f284
+OK   C local : code : 0
+OK   C local : OK : 23
+OK   C local : KO : 0
+OK   C travail/ du banc : seul le dossier de travail du script, vide (T redirigé) : m1b-bundles-05
+## D une_feuille sur des tâches altérées
+OK   D prefetch-rpm neuve telle quelle : OK
+OK   D construire-rpm neuve telle quelle : OK
+OK   D image d'un autre digest : KO
+OK   D annotation ajoutée : KO
+OK   D script changé d'un caractère : KO
+OK   D paramètre retiré : KO
+OK   D mémoire du pas changée : KO
+OK   D contexte de sécurité retiré : KO
+OK   D image d'essai remise (aucune feuille différente) : KO
+## E gardes du lanceur
+OK   E TAG=m4b refusé : 2
+OK   E TAG=m4c refusé : 2
+OK   E TAG=essai refusé : 2
+OK   E TAG invalide refusé : 2
+OK   E PREFIXE invalide refusé : 2
+OK   E aucun journal neuf (PREFIXE et TAG refusés) : 0
+OK   E boucle du lanceur présente telle quelle : 1
+## E étape taches (vraie fonction, faux kubectl, zot_lire, bundle, auth_zot, sur ; vrai tkn, clé jetable)
+OK   E clé jetable du banc (P-256) : 1
+   | # etape_taches (banc), 2026-11-20T10:47:11Z
+   | OK   fermeture/prefetch-rpm.yaml (sha256) : 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c
+   | OK   fermeture/prefetch-rpm-sample-app.yaml (sha256) : ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+   | OK   construction/construire-rpm.yaml (sha256) : e88f5521ede87f5b03330683939fd3494f5ff58544ded9a9326014e30b8d0f88
+   | OK   fermeture/prefetch-rpm.signee.yaml (sha256) : 4123539575b1f7986f82f648913ee147348c7198399018f3520c7037eeade199
+   | OK   construction/construire-rpm.signee.yaml (sha256) : faab95fd9464d437aa0c0a98b63fce8fe0dd6a2e4f5c173fb2bcd632e6e2b70c
+   | OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+   | OK   verrou de M4a et M4b (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+   | OK   arbre de final (sha256) : fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+   | ## gabarits rendus avec l'image neuve ; admission en dry-run serveur, rien n'est créé
+   | OK   taches : script de prefetch-rpm substitué, égal à celui de l'essai de M4b (sha256) : 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+   | OK   taches : script de construire-rpm substitué, égal à celui de l'essai de M4c (sha256) : 0b119024e9aa29dd21b486efd9f4951ee6e15b004ed816dbbc089e97d24aac3c
+   | OK   prefetch-rpm rendue admise (code de kubectl) : 0
+   | OK   construire-rpm rendue admise (code de kubectl) : 0
+   | OK   témoin refusé : champ inconnu (message mesuré le 18/11 en M4b) : 1
+   | ## signatures (tkn 0.46.2) ; les deux tâches relues avant tout versionnement et toute poussée
+   | *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+   | *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+   | OK   prefetch-rpm signée : annotation de signature : true
+   | OK   prefetch-rpm signée : égale à la tâche rendue, signature exceptée (normalisées) : égale
+   | OK   construire-rpm signée : annotation de signature : true
+   | OK   construire-rpm signée : égale à la tâche rendue, signature exceptée (normalisées) : égale
+   | OK   prefetch-rpm signée contre celle de M4b : feuilles différentes : .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c136
+   | OK   construire-rpm signée contre celle de M4c : feuilles différentes : .spec.steps[0].image : "sc-stockage.poc.test:5000/essais-05/mock-rocky9@sha256:99790c1
+   | ## gardes avant toute écriture
+   | OK   G1 tekton/tasks/prefetch-rpm:m1b, lecture anonyme (avant) : absent
+   | OK   G1 tekton/tasks/construire-rpm:m1b, lecture anonyme (avant) : absent
+   | OK   G2 tekton/tasks/prefetch-rpm:m4b, lecture anonyme (avant) : sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+   | OK   G2 tekton/tasks/construire-rpm:m4c, lecture anonyme (avant) : sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+   | OK   G3 octets libres sur / de sc-stockage (porte /var/lib/zot), avant : 3978911744 (seuil 1073741824)
+   | signatures versionnées : fermeture/prefetch-rpm.m1b.signee.yaml (sha256 98cbe510fa340b7a1f41fdab118cd2d9f4c34fd7832c344ae82ae3d3bad891a3), construction/constru
+   | ## bundles, tag m1b (écritures définitives)
+   | prefetch-rpm : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:98cbe510fa340b7a1f41fdab118cd2d9f4c34fd7832c344ae82ae3d3bad891a3
+   | construire-rpm : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:11c42a7dd8e2bee33ee36d7e552acb3856701f4ea5f2b3b513ab2dc170baaa49
+   | ## relecture anonyme après
+   | OK   P1 tekton/tasks/prefetch-rpm:m1b, lecture anonyme après : sha256:98cbe510fa340b7a1f41fdab118cd2d9f4c34fd7832c344ae82ae3d3bad891a3
+   | OK   P1 tekton/tasks/construire-rpm:m1b, lecture anonyme après : sha256:11c42a7dd8e2bee33ee36d7e552acb3856701f4ea5f2b3b513ab2dc170baaa49
+   | OK   P2 tekton/tasks/prefetch-rpm:m4b, lecture anonyme après : sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+   | OK   P2 tekton/tasks/construire-rpm:m4c, lecture anonyme après : sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+   | octets libres sur / de sc-stockage après : 3978911744
+   | SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:98cbe510fa340b
+   | SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:11c42a7dd8e2
+OK   E1 nominal : code : 0
+OK   E1 nominal : KO : 0
+OK   E1 nominal : poussées (dépôt:tag) : tekton/tasks/prefetch-rpm:m1b tekton/tasks/construire-rpm:m1b
+OK   E1 nominal : signatures versionnées sous des noms neufs : 2
+OK   E1 nominal : anciennes tâches signées inchangées : inchangées
+OK   E1 nominal : prefetch-rpm versionnée, vérifiée par tkn (clé publique du banc) : vérifiée
+OK   E1 nominal : prefetch-rpm poussée = versionnée : 1
+OK   E1 nominal : construire-rpm versionnée, vérifiée par tkn (clé publique du banc) : vérifiée
+OK   E1 nominal : construire-rpm poussée = versionnée : 1
+OK   E1 nominal : refus de tkn avec une autre clé : refusée
+OK   E1 nominal : feuilles relues (prefetch, construire ; signées) : 2
+OK   E1 nominal : relectures après (P1 et P2) : 4
+OK   E1 nominal : références à ajouter à la liste revue : 2
+OK   E2 sans SIGNER : refus (code non nul) : refus
+OK   E2 sans SIGNER : motif : 1
+OK   E2 sans SIGNER : aucune poussée : 0
+OK   E2 sans SIGNER : aucune signature versionnée neuve : 0
+OK   E2 sans SIGNER : aucun appel de kubectl : 0
+OK   E3 clé absente : refus (code non nul) : refus
+OK   E3 clé absente : motif : 1
+OK   E3 clé absente : aucune poussée : 0
+OK   E3 clé absente : aucune signature versionnée neuve : 0
+OK   E4 signature versionnée déjà présente : refus (code non nul) : refus
+OK   E4 signature versionnée déjà présente : motif : 1
+OK   E4 signature versionnée déjà présente : aucune poussée : 0
+OK   E4 signature versionnée déjà présente : aucune signature versionnée neuve : 0
+OK   E5 tag m1b déjà présent : refus (code non nul) : refus
+OK   E5 tag m1b déjà présent : motif : 1
+OK   E5 tag m1b déjà présent : aucune poussée : 0
+OK   E5 tag m1b déjà présent : aucune signature versionnée neuve : 0
+OK   E6 tag m4c déplacé : refus (code non nul) : refus
+OK   E6 tag m4c déplacé : motif : 1
+OK   E6 tag m4c déplacé : aucune poussée : 0
+OK   E6 tag m4c déplacé : aucune signature versionnée neuve : 0
+OK   E7 place basse : refus (code non nul) : refus
+OK   E7 place basse : motif : 1
+OK   E7 place basse : aucune poussée : 0
+OK   E7 place basse : aucune signature versionnée neuve : 0
+OK   E8 construire-rpm refusée à l'admission : refus (code non nul) : refus
+OK   E8 construire-rpm refusée à l'admission : motif : 1
+OK   E8 construire-rpm refusée à l'admission : aucune poussée : 0
+OK   E8 construire-rpm refusée à l'admission : aucune signature versionnée neuve : 0
+OK   E8 : aucune signature (pas de -signee dans le travail) : 0
+OK   E9 gabarit altéré (mémoire du pas) : refus (code non nul) : refus
+OK   E9 gabarit altéré (mémoire du pas) : motif : 1
+OK   E9 gabarit altéré (mémoire du pas) : aucune poussée : 0
+OK   E9 gabarit altéré (mémoire du pas) : aucune signature versionnée neuve : 0
+bilan : 109 OK, 0 KO

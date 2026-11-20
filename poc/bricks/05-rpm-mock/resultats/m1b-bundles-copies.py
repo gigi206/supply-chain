@@ -37,6 +37,7 @@ TRANSFORMATIONS = {
         ('mesure "digest de l\'artefact" "$d" "$(cat "$T/digest-attendu")"',
          'mesure "digest de l\'artefact, égal à celui de l\'essai de M4c" "$d" "$DIGEST_ESSAI_M4C"', 1),
         ('"$VERROU" | sort)', '"$VERROU_ESSAI" | sort)', 1),
+        ('copier_pod "$p" remplir "$T/entrees.tar" /e/entrees.tar', 'copier_pod "$p" remplir "$ENTREES" /e/entrees.tar', 1),
     ],
 }
 

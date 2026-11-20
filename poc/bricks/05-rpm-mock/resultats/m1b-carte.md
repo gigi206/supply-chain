@@ -960,3 +960,7 @@ J'ai écrit un script frère de `m4b.sh` et `m4c.sh` : [`m1b-bundles.sh`](../m1b
 - **Avant la signature**, deux pods d'essai jouent les deux scripts sur l'image neuve, avec les entrées de M4b et M4c. `local` et les essais tournent sous l'accord permanent.
 - **`taches`** (signature et deux bundles sous `m1b`) attend ton accord nommé. La revue de `taches.yml` viendra ensuite.
 - **Les pipelines** viendront avec M4b et M4c refaits : `prefetch-rpm-sample-app` avec le bootstrap neuf, `sample-app-rpm` avec la fermeture neuve et l'artefact `333b7322`.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T10:47:39Z UTC : bundles de la cascade, correction avant lancement
+
+Le conseiller a trouvé un chemin hérité de `m4c.sh` dans l'essai de construction (`$T/entrees.tar`). Il est corrigé avant tout lancement. Le banc est rejoué : 109 OK ([`m1b-bundles-banc-2.log`](m1b-bundles-banc-2.log)). Détail dans la [correction datée](m1b-predictions.md).
