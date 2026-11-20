@@ -927,3 +927,13 @@ Je pose la question du tag avant toute écriture.
 - **Tag de l'artefact** : un tag neuf dans le même dépôt `entrees/sample-app/packaging-rpm` (par exemple `m1b`). Le tag `m4a` reste alors sur son manifeste. L'artefact est consommé par digest. La question à poser est l'écriture dans Zot elle-même, une fois le digest calculé à sec par deux layouts locaux.
 - **Place libre dans Zot** : elle ne limite pas l'artefact de M4a (le verrou fait 111 567 octets), mais elle limite la fermeture de M4b. Je la relirai avant la question d'écriture, pour que le chiffre y figure.
 - **Le rejeu de R1 à R8** reste une vraie question, à poser quand la cascade y arrivera.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T10:06:20Z UTC : artefact de la cascade préparé à sec
+
+La forme retenue est un script frère, [`m1b-artefact.sh`](../m1b-artefact.sh), et une zone de préparation neuve. `m4a.sh` et `poc/packaging/verrou-rpm.json` ne changent pas. Le tag neuf est `m1b`, dans le même dépôt.
+
+Le banc donne 46 OK, et les prédictions AR1 à AR6 et AP1 à AP3 sont écrites ([prédictions](m1b-predictions.md)). Ensuite :
+- `local` et `releve` tournent sous l'accord permanent ;
+- `publier` attend ton accord nommé.
+
+**Reste ouvert** : `poc/packaging/verrou-rpm.json` n'est plus la source de l'artefact neuf. Celle-ci est [`m1b-verrou.json`](m1b-verrou.json), sous `resultats/`. Le fichier de `poc/packaging` sera à remplacer quand le banc de `fe1b72cc` et `m4a.sh` ne le liront plus.

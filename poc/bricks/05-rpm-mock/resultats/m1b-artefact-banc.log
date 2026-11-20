@@ -1,0 +1,53 @@
+# m1b-artefact-banc.sh, 2026-11-20T10:05:18Z ; m1b-artefact.sh eb9a12de34c8429e3dc2a509481ff3ed33c49ea04762ff273b13aa6a6d8ea987
+## A : syntaxe, shellcheck, copies de m4a.sh
+OK   bash -n : ok
+OK   shellcheck : codes : SC2015 SC2154
+OK   attendu : ligne égale à m4a.sh, définie une fois : 317a9a605d31ae03 1
+OK   fichiers : ligne égale à m4a.sh, définie une fois : b9c22ddd5bd86d8f 1
+OK   ligne DEPOT égale à m4a.sh, définie une fois : b10c447700c26df1 1
+OK   ligne TYPE égale à m4a.sh, définie une fois : d3e6bb8d8a8f6596 1
+OK   ligne CREE égale à m4a.sh, définie une fois : 81b9c77967867b09 1
+OK   pousser : corps de m4a.sh au dossier près (dossier en premier argument, cd dans ce dossier) : c04a8cbd07fd51d0
+OK   aucun rm dans le script : 0
+OK   aucune écriture vers poc/packaging ni vers m4a-05 (cp, mkdir, >) : 0
+## B : constantes contre des sources indépendantes
+OK   SPEC_SHA = sample-app.spec au journal de l'étape verrou de M4a : 1
+OK   VERROU_NEUF_SHA = verrou écrit au journal du verrou de la cascade : 1
+OK   VERROU_M4A_SHA = VERROU_SHA de m4a.sh : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   M4A_DIGEST = PACKAGING_RPM du journal de publier (M4a) et PACKAGING de m4c.sh : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8 sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   BOOTSTRAP = C3 du journal du verrou de la cascade : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   ID_BOOTSTRAP = G2 et C4 du journal du verrou de la cascade : 2
+OK   LIBRE_MIN = celui de m1b-signature.sh : 1073741824
+OK   layout de M4a : index sur M4A_DIGEST, tag m4a : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8 m4a
+OK   manifeste de M4a : blob relu, sha256 : contrôlé
+OK   chemins des sources : poc/packaging/sample-app.spec poc/bricks/05-rpm-mock/resultats/m1b-verrou.json poc/packaging/verrou-rpm.json
+OK   T par défaut et tag par défaut sous PREFIXE=banc : banc-artefact-05 banc
+## C : témoin de méthode, verrou de M4a sous deux tags autres que m4a
+OK   preparer, tag banc : code et OK : 0 2
+OK   témoin sous le tag banc : digest de M4a : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   preparer, tag m1b : code et OK : 0 2
+OK   témoin sous le tag m1b : digest de M4a : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   oras : 1.3.6
+## D : comparateur de manifestes
+OK   changement prévu (digest et taille du verrou) : code, ligne A5 : 0 1
+OK   aucun changement : code, ligne A5 : 1 1
+OK   digest seul : code, ligne A5 : 1 1
+OK   mauvais digest de verrou : code, ligne A5 : 1 1
+OK   spec changé en plus : code, ligne A5 : 1 1
+OK   annotation de date changée en plus : code, ligne A5 : 1 1
+OK   configuration changée en plus : code, ligne A5 : 1 1
+OK   type d'artefact changé en plus : code, ligne A5 : 1 1
+OK   couche ajoutée : code, ligne A5 : 1 1
+OK   couches inversées : code, ligne A5 : 1 1
+OK   titre du verrou changé : code, ligne A5 : 1 1
+## E : gardes sans réseau, sur une copie du script
+OK   PREFIXE invalide refusé : 2 1
+OK   TAG m4a refusé : 2 1
+OK   TAG invalide refusé : 2 1
+OK   journal existant refusé, laissé vide : 2 1 0
+OK   dossier de travail de bancp absent avant : absent
+OK   publier sans digest local : refus : 1 1
+OK   publier sans digest local : rien d'autre au journal, aucune lecture de Zot : 0
+OK   dossier de travail de bancp absent après : absent
+OK   zone de préparation existante refusée : 1 1
+## bilan : 46 OK, 0 KO

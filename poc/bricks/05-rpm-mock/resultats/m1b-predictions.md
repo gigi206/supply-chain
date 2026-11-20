@@ -2140,3 +2140,62 @@ Lancée sous l'accord permanent du 18/11, puisque l'étape est en lecture seule.
 - la résolution du buildroot ne change pas. Le verrou neuf ne remplace que la référence du bootstrap.
 
 **Non mesuré ici** : la construction hermétique avec ce verrou (M4b et M4c, plus loin dans la cascade). Le tirage anonyme de `builds/` par podman depuis un pod est désormais mesuré une fois.
+
+## Cascade avant M5b, artefact de packaging de la cascade : prédictions écrites le 20/11/2026 à 2026-11-20T10:06:20Z UTC, avant tout lancement
+
+**Script** : [`m1b-artefact.sh`](../m1b-artefact.sh) (sha256 `eb9a12de34c8429e…`), étapes `local`, `releve` et `publier`. Journaux à venir : `m1b-artefact-<étape>.log`.
+
+C'est un script frère de `m4a.sh`, qui n'est pas touché. `poc/packaging/verrou-rpm.json` reste le verrou de M4a (`b6d0f8f1`).
+
+L'artefact est assemblé dans une zone neuve sous le dossier de travail, avec les deux noms que lit `preparer-rpm` :
+- `sample-app.spec` : celui de M4a, `918a83f5…` ;
+- `verrou-rpm.json` : copie de [`m1b-verrou.json`](m1b-verrou.json), `c544599a…`.
+
+Il sera publié dans le même dépôt, `entrees/sample-app/packaging-rpm`, sous le tag neuf `m1b`. Le tag `m4a` reste sur `41c639b7`.
+
+Accords :
+- `local` est hors ligne ;
+- `releve` lit seulement (Zot en anonyme, `df` sur sc-stockage) : ces deux étapes tournent sous l'accord permanent ;
+- `publier` écrit dans Zot : elle attend ton accord nommé.
+
+**Banc** : [`m1b-artefact-banc.log`](m1b-artefact-banc.log), 46 OK, 0 KO, passé à 2026-11-20T10:05:18Z sur ce même sha256 (banc [`m1b-artefact-banc.sh`](m1b-artefact-banc.sh), sha256 `c2618208a808389a…`). Rien n'y est écrit dans Zot, dans le cluster, dans `resultats/` ni dans le dossier de travail de la 08.
+- **A** : `attendu`, `fichiers`, `DEPOT`, `TYPE` et `CREE` sont égaux à `m4a.sh`. `pousser` est égal au dossier poussé près. Le script n'a aucun `rm` et n'écrit ni vers `poc/packaging` ni vers `m4a-05`.
+- **B** : les constantes sont confrontées aux journaux de M4a et du verrou de la cascade, à `m4a.sh`, `m4c.sh`, `m1b-signature.sh` et au layout local de M4a.
+- **C, témoin de méthode** : la même préparation avec le verrou de M4a, sous les tags `banc` puis `m1b`, redonne `41c639b7`. Ni le dossier, ni le tag, ni oras 1.3.6 ne changent donc le digest par rapport à M4a.
+- **D** : le comparateur de manifestes laisse passer le seul changement prévu. Dix altérations donnent chacune code 1.
+- **E** : les gardes sont jouées sans réseau sur une copie du script :
+  - `PREFIXE` invalide, tag `m4a` et tag invalide sont refusés ;
+  - un journal existant est refusé et laissé intact ;
+  - `publier` sans digest local est refusée avant toute lecture de Zot ;
+  - une zone de préparation existante est refusée.
+- **Non couvert** : le digest neuf lui-même. Seule l'étape `local` le calcule.
+
+- **AR1** (haute) : les trois sources ont les sha256 prévus : spec `918a83f5…`, verrou neuf `c544599a…`, verrou de M4a `b6d0f8f1…`.
+- **AR2** (haute) : le verrou neuf est en version 1.1.0, avec 222 rpm égaux à ceux du verrou de M4a et aucune URL hors de vault 9.7. Son bootstrap :
+  - `bootstrap_image` = `builds/builders/rocky9-bootstrap@6de899ac…` ;
+  - `pull_digest` = `6de899ac…` ;
+  - `id` = `ff96017c…` ;
+  - prêt, amd64.
+
+  `image_digest` n'est contrôlé que dans sa forme : c'est une prédiction de M4b.
+- **AR3** (haute) : le témoin redonne `41c639b7`, comme au banc.
+- **AR4** (haute) : deux poussées dans deux layouts locaux donnent le même digest, différent de `41c639b7`.
+- **AR5** (haute) : le manifeste neuf ne diffère de celui de M4a que par deux feuilles :
+  - `.layers[1].digest` : `b6d0f8f1…` → `c544599a…` ;
+  - `.layers[1].size` : 111 561 → 111 567.
+
+  Le manifeste garde donc sa taille, 849 octets (même nombre de chiffres), et les couches font 118 762 octets.
+- **AR6** (haute), étape `releve` :
+  - le tag `m1b` est absent de Zot (un « not found » seul) ;
+  - le tag `m4a` est sur `41c639b7` ;
+  - / de sc-stockage a plus de 1 Gio libre.
+- **Relevé, sans pari** : le digest neuf (il devient la prédiction de `publier`) et les octets libres sur sc-stockage.
+
+**Prédictions de `publier`**, écrites dès maintenant mais pour une étape lancée seulement sur ton accord :
+- **AP1** : les gardes de `releve` repassent, et deux poussées donnent le digest de `local`.
+- **AP2** : l'artefact tiré par digest dans un dossier neuf a les deux fichiers de la zone de préparation.
+- **AP3** : après la poussée, `m1b` est sur le digest neuf et `m4a` toujours sur `41c639b7`.
+
+  Zot ne reçoit que deux blobs neufs, le verrou (111 567 octets) et le manifeste. La spécification et la configuration vide sont déjà dans le dépôt.
+
+**Portée prévue** : si AR1 à AR6 tiennent, le digest de l'artefact neuf est connu avant toute écriture. Il ne dépend que du verrou, et l'écriture se pose en une question. Les points suivants (bundles neufs de `prefetch-rpm` et `construire-rpm`, M4b et M4c refaits) citeront ce digest.
