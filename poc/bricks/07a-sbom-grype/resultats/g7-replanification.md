@@ -665,3 +665,34 @@ Question posée : « Pour lire les balayages n°2 à n°9, je planifie une tâch
 - Si l'essai demande une correction, une note datée donnera la nouvelle empreinte, et la consigne dit de prendre celle de la note la plus récente. Sinon, la tâche s'arrêtera à l'étape 1 au lieu de lire avec un script non essayé.
 
 **Ce que la tâche ne fait pas** : le relevé de place de sc-stockage, ni les notes, le README et docs/03, qui seront écrits ensuite en session sur ton accord.
+
+## Lecture de N1, balayage n°1 du 20/11 (note de 2026-11-20T22:00:16Z ; rien n'est réécrit au-dessus)
+
+**Commande**, en v2 comme prévu (script `d68c726a4991e68c…`), Loki seul : `JOUR=2026-11-20 DE=20:00 A=23:59 SUFFIXE=-soir SANS_JOURNAL=1`. Journal : [`g7-balayage-20-11-soir.log`](g7-balayage-20-11-soir.log). Le journal `g7-balayage-20-11.log`, lu plus tôt dans la journée, n'est pas touché.
+
+**Mesures** (résumés du journal, aucune ligne brute) :
+- statut 200, 174 lignes, dont 4 masquées ;
+- « executing gc of orphaned blobs » : 162 lignes, du 2026-11-20T21:04:02.67884562Z au 2026-11-20T21:46:01.631960307Z ;
+- passage des dépôts suivis :
+  - `builds/scan/essai-07a` : 2026-11-20T21:21:08.529463236Z
+  - `builds/scan/essai-scan` : 2026-11-20T21:21:15.979656153Z
+  - `builds/scan/sample-app` : 2026-11-20T21:21:20.429686197Z
+  - `builds/scan/sample-app-deb` : 2026-11-20T21:21:40.729392161Z
+  - `vulndb/grype` : 2026-11-20T21:45:51.232089885Z
+- décisions de rétention : 8
+  - 8 × `vulndb/grype` | `keep` | retained by mostRecentlyPushedCount:11 policy
+- `zot.service` : `ActiveEnterTimestamp=Thu 2026-11-19 20:24:46 UTC`, `NRestarts=0`.
+
+**Confrontation à N1** (notes de 19:28:08Z et 19:31:21Z) :
+- tenu : statut 200
+- tenu : début dans la plage de la loi B (21:03:49 à 21:04:06)
+- tenu : début à 21:03:52 ± 120 s (note de 19:28:08Z)
+- tenu : fin avant 21:47
+- tenu : 8 décisions, toutes keep de vulndb/grype par mostRecentlyPushedCount:11
+- tenu : aucune suppression
+- tenu : passage de vulndb/grype présent
+- tenu : Zot non redémarré (ActiveEnterTimestamp 19/11 20:24:46, NRestarts=0)
+
+**N1 tenue.**
+
+**Conséquence pour la suite** (calcul, loi B) : le n°2 doit commencer entre le 21/11 21:46:03 et le 21/11 21:46:20 UTC, soit 24 h et 2 à 19 s après la dernière ligne du n°1. La tâche du 29/11 le relira dans sa fenêtre du 21/11 12:00 au 22/11 12:00.

@@ -395,3 +395,5 @@ Projection, calculée : premières suppressions réelles le 28/11 entre 01:37 et
 - Trois tranches proposées : CVE trouvées dans Grafana depuis les prédicats signés ; VEX à blanc sur un Zot et une clé jetables ; prédicat et porte (accord).
 - Six choix à faire par le propriétaire, sans recommandation à ce stade. Estimation neuve : 10 h, décision à 20 h.
 - Incohérence signalée : d'après `docs/00`, Dependency-Track, la projection prévue, ne lit ni OpenVEX ni CSAF, les deux formats de l'ADR 0004.
+
+**Additif du 20/11/2026 (2026-11-20T22:00:16Z UTC), G7 : balayage n°1 lu.** **N1 tenue.** Début 2026-11-20T21:04:02.67884562Z, 8 décisions de rétention, Zot non redémarré : oui. Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T22:00:16Z.
