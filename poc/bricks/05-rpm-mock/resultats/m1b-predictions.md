@@ -2077,3 +2077,42 @@ Lancée sous l'accord permanent du 18/11, puisque l'étape est en lecture seule.
 **Premier passage du banc, gardé** : [`m1b-provenance-banc-1.log`](m1b-provenance-banc-1.log), 95 OK et 1 KO, sur le même `m1b-provenance.sh`. Le KO venait du banc : `yq` lu sur deux fichiers à la fois imprime un séparateur `---`. Seul le banc a changé (une boucle, un fichier à la fois). Le second passage donne 96 OK ; c'est celui cité dans les prédictions.
 
 **Limite** : les paramètres attendus se lisent dans les pipelines signées du cache (`m1b-signature-05`), épinglées par sha256. Une nouvelle signature les changerait, et la garde refuserait alors l'étape au lieu de la passer. Les bundles dans Zot restent la référence.
+
+## Cascade avant M5b, verrou refait avec le bootstrap de M1b : prédictions écrites le 20/11/2026 à 2026-11-20T09:42:17Z UTC, avant tout lancement
+
+**Script** : [`m1b-verrou.sh`](../m1b-verrou.sh) (sha256 `d38551fa51aefdc3…`), étape `verrou`. Journal à venir : `m1b-verrou-verrou.log`. Verrou à venir : `m1b-verrou.json`. C'est un script neuf, sur le modèle de l'étape `verrou_derivee` de `s1.sh`, passée le 17/11 (verrou `b6d0f8f1`). `s1.sh`, `m4a.sh` et `poc/packaging/verrou-rpm.json` ne sont pas touchés. L'étape lit le cluster et Zot, crée un pod d'essai dans `builds` puis le retire. Elle n'écrit rien dans Zot et tourne donc sous l'accord permanent.
+- **Premier usage des deux images de M1b** : M1b a mesuré leur construction, leur digest et leur provenance, pas leur exécution.
+- **Seuls changent** :
+  - l'image du pod : `builds/builders/mock-rocky9@70f8c412…` ;
+  - le bootstrap de la configuration dérivée : `builds/builders/rocky9-bootstrap@6de899ac…` ;
+  - la référence de comparaison : le verrou de `verrou_derivee`, celui de M4a ;
+  - les noms des sorties. Le verrou de sortie n'est jamais écrasé.
+- **Configuration** : la racine garde son nom (`poc-rocky-9.7-derivee-x86_64`). La configuration neuve (`3c1dd63d…`) ne diffère de celle du 17/11 que par `bootstrap_image`.
+
+**Banc** : [`m1b-verrou-banc.log`](m1b-verrou-banc.log), 64 OK, 0 KO, fini à 2026-11-20T09:40:13Z sur ce même sha256 (banc [`m1b-verrou-banc.sh`](m1b-verrou-banc.sh), sha256 `772b9e4f768b46e8…`). Le premier passage est gardé : [`m1b-verrou-banc-1.log`](m1b-verrou-banc-1.log), 53 OK et 11 KO, tous venus du banc. Un `exit 1` de `attendu` quittait le sous-shell avant la ligne « code ».
+- **A** : les huit blocs recopiés de `s1.sh` (fonctions de pod, `MOCK_CFG`, quatre sondes) sont égaux aux originaux, extraits indépendamment du générateur. Les lignes de constantes sont égales à celles de `s1.sh`.
+- **B** : les constantes sont comparées à `m1b-provenance.sh`, au journal des PipelineRuns, à `m4a.sh`, au journal de `verrou_derivee` et à `builders/outillage-fichiers.txt`. Ce dernier fichier montre que l'outillage porte la même configuration de base que `MOCK_CFG`.
+- **C** : les gardes sont jouées pour de vrai, en lecture seule, avec 14 OK :
+  - les deux manifestes sont relus anonymement dans Zot ;
+  - seule `prefetch-rpm-sortie` sélectionne le label `prefetch-rpm` ;
+  - le pod est admis en dry-run serveur.
+
+  Elles refusent si le verrou de sortie existe déjà.
+- **D** : `controles_cfg` et `controles_journaux` sont rejoués sur les journaux du pod du 17/11, reconstitués. Neuf altérations donnent chacune code 1, avec le KO attendu.
+- **E** : le comparateur donne 7 OK sur le verrou attendu. Quatorze altérations donnent chacune code 1, avec le KO attendu.
+- **Non couvert** : ce qui se passe dans le pod (démarrage de l'outillage, tirage du bootstrap, mock). Seul le lancement le mesure.
+
+- **VR1** (haute) : les gardes G0 à G6 passent, et le pod démarre sur l'outillage de M1b, sous Kata.
+- **VR2** (haute) : la configuration de base du pod est égale à `MOCK_CFG` (`a8e5f2bc…`), la configuration neuve est livrée (`3c1dd63d…`), et `mock --debug-config` rend 0. `rpm -q` relève `mock-6.9-1.el9`, `mock-core-configs-45.2-1.el9` et `podman-5.8.2-8.el9_8`.
+- **VR3** (moyenne) : le pod tire anonymement `builds/builders/rocky9-bootstrap@6de899ac…` (rc 0), et `inspect` donne ce digest. Un tirage de `builds/` par podman depuis un pod n'a jamais été mesuré.
+- **VR4** (moyenne) : `mock --buildsrpm` rend 0, et le src.rpm a pour sha256 `c802e60a…`, comme le 17/11 et en M4c.
+- **VR5** (haute) : `mock --calculate-build-dependencies` rend 0. `root.log` dit « Not updating bootstrap chroot » à chaque appel, et aucune ligne de repli n'apparaît dans les trois fichiers.
+- **VR6** (moyenne) : le bootstrap de mock est égal à l'image tirée : 153 lignes communes, aucune propre à l'un ou à l'autre. Le chiffre 153 vient du 17/11, avec `f0ccf105`. L'image neuve a la même base et les dix mêmes NEVRA, mais une autre couche (`b063feb3`, langues « all »).
+- **VR7** (haute) : le verrou ne diffère de `b6d0f8f1` que par quatre feuilles : `bootstrap.id`, `bootstrap.image_digest`, `bootstrap.pull_digest` et `config.bootstrap_image`.
+  - Les 222 rpm sont égaux champ par champ.
+  - `pull_digest` vaut `6de899ac…`.
+  - `id` vaut `ff96017c…` (configuration du manifeste, relue dans Zot) ; le 17/11, `id` valait bien la configuration de `f0ccf105`.
+  - `image_digest` est présent.
+- **Relevé, sans pari** : la valeur de `bootstrap.image_digest` (`18d64b03…` le 17/11, celle qu'épingle `IMAGE_DIGEST` de `m4a.sh`) et la durée.
+
+**Portée prévue** : si VR1 à VR7 tiennent, le verrou neuf ne diffère de celui de M4a que par le bootstrap, et le buildroot résolu est le même. Le point suivant de la cascade, l'artefact de M4a, demande une écriture dans Zot. Je la poserai en question, avec un tag neuf.

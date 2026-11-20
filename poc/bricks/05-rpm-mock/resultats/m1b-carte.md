@@ -871,3 +871,18 @@ Additifs écrits dans les ADR 0001 et 0007. La clôture de la brique 05 reste ta
 - l'adaptation de `s1.sh prealables` aux quatre labels.
 
 Le rejeu M5b ne viendra pas avant le 28/11.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T09:42:17Z UTC : verrou de la cascade préparé à sec
+
+Premier point de la cascade avant M5b (§5) : le verrou refait hors de la plateforme (décision « Hors plateforme »), avec le bootstrap de M1b. Script neuf : [`m1b-verrou.sh`](../m1b-verrou.sh). Banc : 64 OK, 0 KO ([`m1b-verrou-banc.log`](m1b-verrou-banc.log)). Prédictions VR1 à VR7 dans [`m1b-predictions.md`](m1b-predictions.md), commitées avant le lancement.
+
+**Effort**, relevé à 2026-11-20T09:40:47Z avec la méthode de [`temps-05-1211.log`](temps-05-1211.log) :
+- **Brique 05** : 336 commits, 37,44 h à `636f6b83`. Contrôle : 185 commits et 24,89 h à `c2c5809`, égal au relevé archivé.
+- **M1b et sa cascade**, depuis la carte (`1e25df14`) : 137 commits ; 11,00 h en écarts d'au plus 1 h ; 37,76 h de bout en bout, du 18/11 au soir au 20/11.
+- **Estimation** : 3 jours, décision à 6. Je ne convertis pas les heures en jours.
+
+**Suite** :
+- le lancement de `m1b-verrou.sh verrou` (pod d'essai, accord permanent) ;
+- puis l'artefact de M4a, qui demande une écriture dans Zot avec un tag neuf : question à poser ;
+- les bundles neufs de `prefetch-rpm` et de `construire-rpm` ne dépendent que de l'outillage, et peuvent se préparer à sec en parallèle. Leur signature et la revue de `taches.yml` restent à demander ;
+- le rejeu de R1 à R8 sur le nouveau bundle n'a jamais été posé en question. Il le sera à son tour.

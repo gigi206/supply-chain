@@ -36,3 +36,7 @@ premier commit : 196ee34 ; dernier : c2c5809
 185 commits, 24.89 h
 # M4c seule, même méthode : de 4b0816a (carte de M4c) à c2c5809 : 18 commits, 2.3 h (écarts <= 1 h), 4.29 h de bout en bout
 # S5a de la 06, dates d auteur : d516ad2 (préparation, 2026-11-11T21:24:41Z) à afa9bfe (résultat, 2026-11-11T21:51:32Z) : 0.45 h, préparation antérieure non comptée
+# nouveau relevé, même méthode (date d auteur, écarts <= 1 h), 2026-11-20T09:40:47Z à HEAD 636f6b83, avant la préparation du verrou de la cascade ; contrôle de la méthode : 185 commits, 24.89 h à c2c5809, égal au relevé ci-dessus ; les relevés ci-dessus ne sont pas réécrits
+premier commit : 196ee34 ; dernier : 636f6b8
+336 commits, 37.44 h
+# M1b et sa cascade, même méthode : de 1e25df1 (carte de M1b, 2026-11-18T19:38:40Z) à 636f6b8 : 137 commits, 11.00 h (écarts <= 1 h), 37.76 h de bout en bout

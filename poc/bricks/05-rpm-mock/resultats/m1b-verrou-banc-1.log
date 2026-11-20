@@ -1,0 +1,116 @@
+# m1b-verrou-banc.sh, 2026-11-20T09:39:48Z ; m1b-verrou.sh d38551fa51aefdc3f9e4ce77b8a8d6ab3b00d84fd4021f369717871a03df1542
+## A : syntaxe, shellcheck, copies de s1.sh
+OK   bash -n : ok
+OK   shellcheck : codes : SC2015 SC2016 SC2154
+OK   attendu : copie égale à s1.sh (1 ligne(s)), définie une fois : 317a9a605d31ae031ccfa843cb3d822cf9c465ed25c8db80f097b606d589469d 1
+OK   champ : copie égale à s1.sh (1 ligne(s)), définie une fois : 497375d162175b951b459182014cd40b2138a046919362151d3b868351b0e9dc 1
+OK   pod_spec : copie égale à s1.sh (33 ligne(s)), définie une fois : f21f4ea3d260d74ab0785d11deb54a80a5573461ce97a7be85865096e2cc93db 1
+OK   MOCK_CFG : copie égale à s1.sh (18 ligne(s)), définie une fois : 5c8b2f65037f9ba8487c69bb5401d9e790d2b1d747ed128425b15d8e46355f63 1
+OK   SONDE_VERROU : copie égale à s1.sh (31 ligne(s)), définie une fois : a899eb202a34c756cb4fa9e68291c9b642e6e62cce8f8c497678e5b35b1afebb 1
+OK   SONDE_BOOT : copie égale à s1.sh (35 ligne(s)), définie une fois : 1b46aaeb2a4fd0a5ee6963f9a37f3fc0cdcb2969e3989291701f5717768758b2 1
+OK   SONDE_CFG_DERIVEE : copie égale à s1.sh (11 ligne(s)), définie une fois : 1d6d2daae556d19fb2a6299a8c42e7170f58136fbb8f893396c2a268af4fdc00 1
+OK   SONDE_REPLI : copie égale à s1.sh (4 ligne(s)), définie une fois : b46ee09e4ef4a5e5f2cac0c3163f8e19b8cf5c9ae1dad9dfb12731033dd35f12 1
+OK   ligne VAULT97 égale à s1.sh : baf28ba0a0d5306b 1
+OK   ligne BOOT_DIGEST égale à s1.sh : 87ca08ffb0a508e0 1
+OK   ligne DEPOT_AMONT égale à s1.sh : 4ffbb8a490eb41b3 1
+OK   ligne BOOT égale à s1.sh : 1f22f2ace1f2750a 1
+OK   ligne LABEL égale à s1.sh : 56a64ad5ee2e9237 1
+OK   ligne LIMITES égale à s1.sh : 88d50d18f96d334d 1
+OK   ligne TMPFS égale à s1.sh : a00f8618ccb93a4d 1
+OK   ligne PRIVILEGIE égale à s1.sh : ee18d9563e7d5253 1
+OK   ligne CFG égale à s1.sh : 396de1471fdc8790 1
+OK   ligne CFG_DERIVE égale à s1.sh : 7d1d0a826fbf5ac0 1
+OK   PKG = valeur par défaut de PACKAGING_DIR dans s1.sh : 1 1
+OK   ISOLATION = valeur par défaut de s1.sh : 1 1
+## B : constantes contre des sources indépendantes
+OK   outillage = IMAGE_o et DIGEST_o de m1b-provenance.sh : sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   bootstrap = IMAGE_b et DIGEST_b de m1b-provenance.sh : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   deux digests au journal des PipelineRuns (deux exécutions chacun) : 4
+OK   VERROU_REF_SHA = VERROU_SHA de m4a.sh = VERROU_DERIVEE_SHA de s1.sh : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   verrou de référence au journal de verrou_derivee : 1
+OK   DIGEST_DERIVE_S1 = PULL_DIGEST de m4a.sh : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+OK   MOCK_CFG_SHA = configuration de base relue dans le pod le 17/11 : 1
+OK   CFG_DERIVE_S1_SHA = configuration dérivée du 17/11 : 1
+OK   MOCK_CFG = etc/mock/poc-rocky-9.7-x86_64.cfg de builders/outillage-fichiers.txt (couche de configuration de l'outillage) : a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31
+OK   sources de sample-app : spec du cache égale au dépôt : égal
+## C : gardes, pour de vrai (lecture seule : Zot anonyme, politiques, dry-run serveur)
+     ## gardes, en lecture seule
+     OK   G0 sorties absentes : resultats/sortie.json, resultats/sortie-mock.log
+     OK   G1 verrou de référence de verrou_derivee, sha256 : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+     OK   Zot, builds/builders/mock-rocky9, sha256 du manifeste lu anonymement : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+     OK   Zot, builds/builders/rocky9-bootstrap, sha256 du manifeste lu anonymement : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     G2 configuration de l'image de bootstrap (id attendu dans le verrou) : sha256:ff96017c3f06a35a11d06a454930ec797002708cd0187ac46d7febe0891444a2
+     OK   G3 MOCK_CFG recopiée, égale à la configuration de base relue dans le pod de verrou_derivee : a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31
+     OK   G3 configuration dérivée de verrou_derivee, recalculée : 78645df78c3d47b90fd9617844058105b752146402e5a5288aa0abc66e73d2d8
+     OK   G3 configuration neuve contre MOCK_CFG : racine, bootstrap_image et bootstrap_image_ready : 6
+     OK   G3 configuration neuve contre celle de verrou_derivee : bootstrap_image seul : 2
+     écart prévu : < config_opts['bootstrap_image'] = 'sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6'
+     écart prévu : > config_opts['bootstrap_image'] = 'sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3'
+     configuration neuve : sha256 3c1dd63dc911d32ac0bbd6024b5d2b6e11aea0b65fce54ebbe81e2591b5ad760
+     OK   G4 spec de sample-app : cache de s1.sh égal au dépôt : égal
+     OK   G4 sources de sample-app contrôlées par SHA256SUMS : sample-app-1.0.0.tar.gz: OK sample-app.spec: OK
+     OK   G5 politiques de builds qui sélectionnent prefetch-rpm : CiliumNetworkPolicy prefetch-rpm-sortie
+     OK   G5 politiques de builds qui sélectionnent prefetch-rpm et autorisent du trafic : CiliumNetworkPolicy prefetch-rpm-sortie
+     OK   G6 pod banc-05-verrou absent du cluster : 
+     OK   G6 pod admis en dry-run serveur : pod/banc-05-verrou
+     code 0
+OK   gardes : code : code 0
+OK   gardes : lignes OK, aucune KO : 14 0
+OK   écarts de configuration imprimés : ancien et nouveau bootstrap : 1 1
+OK   id attendu = configuration du manifeste de 6de899ac : sha256:ff96017c3f06a35a11d06a454930ec797002708cd0187ac46d7febe0891444a2
+KO   gardes, verrou de sortie déjà présent : code, libellé : KO   verrou ou journal de mock déjà écrit, jamais écrasé : resultats/sortie.json (relancer sous un autre PREFIXE) 1 (attendu : code 1 1)
+## D : contrôles du pod rejoués sur les journaux du 17/11
+journaux reconstitués : verrou-derivee-cfg (8 lignes), verrou-derivee (21 lignes), verrou-derivee-repli (3 lignes), verrou-derivee-boot (7 lignes)
+OK   controles_cfg, journal du 17/11 et valeurs du 17/11 : code, OK : code 0 4
+KO   controles_cfg, journal du 17/11 et configuration neuve : code, KO V1 : KO   V1 configuration dérivée livrée dans le pod : sha256 78645df78c3d47b90fd9617844058105b752146402e5a5288aa0abc66e73d2d8 (attendu : sha256 3c1dd63dc911d32ac0bbd6024b5d2b6e11aea0b65fce54ebbe81e2591b5ad760) 1 (attendu : code 1 1)
+     OK   V3 mock --buildsrpm : rc 0
+     OK   V3 mock --calculate-build-dependencies : rc 0
+     OK   V3 root.log : bootstrap non mis à jour, car prêt : 2
+     OK   V4 repli sans image : trois fichiers lus, zéro ligne chacun : 3
+     OK   V5 bootstrap de mock contre image tirée : lignes propres à l'un ou à l'autre : 0
+     OK   V5 bootstrap de mock et image lus (rpm -qa rc 0) : 2
+     V5 lignes communes : 153
+     OK   V6 verrou copié égal à celui du pod (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+     OK   V6 lignes du verrou au motif jeton|token : 0
+     code 0
+OK   controles_journaux, journaux du 17/11 : code, OK : code 0 8
+KO   D srpm_rc : code, KO attendu : KO   V3 mock --buildsrpm : rc 1 (attendu : rc 0) 1 (attendu : code 1 1)
+KO   D calc_rc : code, KO attendu : KO   V3 mock --calculate-build-dependencies : rc 1 (attendu : rc 0) 1 (attendu : code 1 1)
+KO   D bootstrap_mis_a_jour : code, KO attendu : KO   V3 root.log : bootstrap non mis à jour, car prêt : 0 (attendu : 2) 1 (attendu : code 1 1)
+KO   D repli : code, KO attendu : KO   V4 repli sans image : trois fichiers lus, zéro ligne chacun : 2 (attendu : 3) 1 (attendu : code 1 1)
+KO   D boot_ecart : code, KO attendu : KO   V5 bootstrap de mock contre image tirée : lignes propres à l'un ou à l'autre : 1 (attendu : 0) 1 (attendu : code 1 1)
+KO   D boot_illisible : code, KO attendu : KO   V5 bootstrap de mock et image lus (rpm -qa rc 0) : 1 (attendu : 2) 1 (attendu : code 1 1)
+KO   D verrou_absent : code, KO attendu : KO   V6 aucun verrou produit 1 (attendu : code 1 1)
+KO   D verrou_altere : code, KO attendu : KO   V6 verrou copié égal à celui du pod (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f (attendu : 3a1dfd708a06d66083b1650b94eb80363a8c01ab48fb516ac432cdd7aab3bb8b) 1 (attendu : code 1 1)
+KO   D verrou_jeton : code, KO attendu : KO   V6 lignes du verrou au motif jeton|token : 1 (attendu : 0) 1 (attendu : code 1 1)
+## E : comparer_verrou
+copies écrites
+     OK   C1 feuilles qui diffèrent de verrou_derivee : .bootstrap.id, .bootstrap.image_digest, .bootstrap.pull_digest, .config.bootstrap_image (prévues : .bootstrap.id, .bootstrap.image_digest, .bootstrap.pull_digest, .config.bootstrap_image)
+          .bootstrap.id : 7bf628be885bd8d1f02d62fe280703e185e2f6b6e049e6c5361d832f67b72698 -> ff96017c3f06a35a11d06a454930ec797002708cd0187ac46d7febe0891444a2
+          .bootstrap.image_digest : 18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af -> eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+          .bootstrap.pull_digest : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 -> sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+          .config.bootstrap_image : sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6 -> sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     OK   C2 rpm du buildroot, tous les champs : ici 222, verrou_derivee 222 ; seulement ici 0 ; seulement dans verrou_derivee 0
+     OK   C3 bootstrap.pull_digest égal au digest de l'image de M1b : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     OK   C3 config.bootstrap_image égal à l'image de M1b : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     OK   C3 config.bootstrap_image_ready : True
+     OK   C4 bootstrap.id égal au digest de la configuration de l'image, relu dans Zot : ff96017c3f06a35a11d06a454930ec797002708cd0187ac46d7febe0891444a2
+     OK   C5 bootstrap.image_digest présent, 64 caractères hexadécimaux : eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee (verrou_derivee : 18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af)
+     bilan de la comparaison : 0 KO
+     code 0
+OK   E attendu : code, OK, KO : code 0 7 0
+OK   E identique : code, KO attendu : code 1 1
+OK   E url : code, KO attendu : code 1 1
+OK   E rpm_retire : code, KO attendu : code 1 1
+OK   E rpm_double : code, KO attendu : code 1 1
+OK   E signature : code, KO attendu : code 1 1
+OK   E option_en_plus : code, KO attendu : code 1 1
+OK   E pas_prete : code, KO attendu : code 1 1
+OK   E pull_faux : code, KO attendu : code 1 1
+OK   E id_faux : code, KO attendu : code 1 1
+OK   E version : code, KO attendu : code 1 1
+OK   E autre_image : code, KO attendu : code 1 1
+OK   E macro : code, KO attendu : code 1 1
+OK   E image_digest_absent : code, KO attendu : code 1 1
+OK   E image_digest_inchange : code, KO attendu : code 1 1
+# bilan : 53 OK, 11 KO ; fin 2026-11-20T09:39:49Z
