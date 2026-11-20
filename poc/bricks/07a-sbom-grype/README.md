@@ -314,3 +314,11 @@ dans tous les dépôts (mécanisme non vérifié). Détail : [`resultats/g7-repl
 Points 3 et 4 (prédiction, consigne et tâche replanifiée) : à faire, chacun sur accord.
 
 **Note du 14/11/2026 (2026-11-14T20:52:18Z), rien n'est réécrit :** l'heure « tâche proposée le 28/11/2026 à 13:02:25 UTC » de l'additif précédent ne vaut plus. Le balayage du 14/11 a commencé à 12:45:50 UTC et fini à 13:22:29 UTC (journal de Zot, [résumé](resultats/g7-balayage-14-11.log)) : le modèle « démarrage + k × 24 h » est réfuté, et les premières suppressions de scans sont attendues dès le balayage du 27/11. Heure de la tâche à fixer après un second balayage (15/11). Détail : [`resultats/g7-replanification.md`](resultats/g7-replanification.md).
+
+## Additif du 20/11/2026 (2026-11-20T18:58:47Z UTC) : rpm de la 05 et `distro=`, réponse pour le rpm
+
+Mesure hors réseau sur l'hôte ([`rpm-distro.sh`](rpm-distro.sh), [prédictions et résultat](resultats/rpm-distro-predictions.md), RD1 à RD8 tenues). Les entrées sont le rpm `sample-app` de la 05 (cascade M1b, `864d55f4…`) et trois rpm Rocky de la fermeture tirée de Zot, tous contrôlés par sha256.
+- **Syft 1.38.0 n'émet pas `distro=` sur un `.rpm` isolé**, comme sur le `.deb` isolé de la 06. Le PURL porte `epoch` et `upstream`, mais ni espace de noms ni `distro`.
+- Sans `--distro`, grype 0.104.1 ne trouve aucune correspondance, avec un code 0 et rien sur la sortie d'erreur. Avec `--distro rocky:9.7`, il en trouve sur les données de Red Hat 9 : `openssl-libs` 49 (CVE-2026-9076 comprise), `zlib` 1, `glibc` 19. Pour `sample-app`, il n'en trouve aucune, avec ou sans `--distro`.
+- **La question des 10 et 12/11 est close pour le rpm isolé** : réponse non. **D14 reste à trancher** par le propriétaire : la mesure montre que la branche « refuser » refuserait tous ces SBOM, et que la branche « `--distro` » suffit à les juger.
+- Non mesuré : le binaire Go du rpm, un SBOM fait sur la racine de construction, et un scan de rpm dans la plateforme.

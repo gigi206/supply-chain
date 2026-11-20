@@ -1,0 +1,76 @@
+# rpm-distro.sh, 2026-11-20T18:57:55Z, dépôt 8a7f1d76, script 6f1ae4353d9da2d0
+syft 1.38.0, grype 0.104.1, base Built: 2026-11-04T06:20:59Z
+## entrées (copiées, sha256 contrôlé)
+OK   sample-app-1.0.0-2.el9.x86_64.rpm : sha256 864d55f486f423ce… = archivé
+OK   openssl-libs-3.5.1-7.el9_7.x86_64.rpm : sha256 bdb6ae06f1c7ea72… = archivé
+OK   zlib-1.2.11-40.el9.x86_64.rpm : sha256 fcd8ca717c72aeb3… = archivé
+OK   glibc-2.34-231.el9_7.10.x86_64.rpm : sha256 5e16d9eabca98c26… = archivé
+## sample-app-1.0.0-2.el9.x86_64.rpm : syft dir: sur un dossier qui ne contient que lui
+syft : code 0 ; sortie d'erreur : 0 ligne(s)
+### grype sans --distro (-q, comme politique/scanner.sh)
+grype : code 0 ; sortie d'erreur : 0 ligne(s)
+composants : 2
+   library | pkg:rpm/sample-app@1.0.0-2.el9?arch=x86_64&epoch=0&upstream=sample-app-1.0.0-2.el9.src.rpm | distro= : non
+   file |  | distro= : non
+correspondances : 0 ; distro vue par grype : {"name": "", "version": "", "idLike": null}
+espaces : []
+identifiants (0) : 
+CVE-2026-9076 : absente
+### grype --distro rocky:9.7
+grype : code 0 ; sortie d'erreur : 0 ligne(s)
+correspondances : 0 ; distro vue par grype : {"name": "rockylinux", "version": "9.7", "idLike": ["rockylinux"]}
+espaces : []
+identifiants (0) : 
+CVE-2026-9076 : absente
+## openssl-libs-3.5.1-7.el9_7.x86_64.rpm : syft dir: sur un dossier qui ne contient que lui
+syft : code 0 ; sortie d'erreur : 0 ligne(s)
+### grype sans --distro (-q, comme politique/scanner.sh)
+grype : code 0 ; sortie d'erreur : 0 ligne(s)
+composants : 2
+   library | pkg:rpm/openssl-libs@3.5.1-7.el9_7?arch=x86_64&epoch=1&upstream=openssl-3.5.1-7.el9_7.src.rpm | distro= : non
+   file |  | distro= : non
+correspondances : 0 ; distro vue par grype : {"name": "", "version": "", "idLike": null}
+espaces : []
+identifiants (0) : 
+CVE-2026-9076 : absente
+### grype --distro rocky:9.7
+grype : code 0 ; sortie d'erreur : 0 ligne(s)
+correspondances : 49 ; distro vue par grype : {"name": "rockylinux", "version": "9.7", "idLike": ["rockylinux"]}
+espaces : ['redhat:distro:redhat:9']
+identifiants (49) : CVE-2024-13176 CVE-2024-41996 CVE-2025-9232 CVE-2026-14456 CVE-2026-14457 CVE-2026-18798 CVE-2026-2673 CVE-2026-28387 CVE-2026-28388 CVE-2026-28389 CVE-2026-28390 CVE-2026-31789 …
+CVE-2026-9076 : présente
+## zlib-1.2.11-40.el9.x86_64.rpm : syft dir: sur un dossier qui ne contient que lui
+syft : code 0 ; sortie d'erreur : 0 ligne(s)
+### grype sans --distro (-q, comme politique/scanner.sh)
+grype : code 0 ; sortie d'erreur : 0 ligne(s)
+composants : 2
+   library | pkg:rpm/zlib@1.2.11-40.el9?arch=x86_64&epoch=0&upstream=zlib-1.2.11-40.el9.src.rpm | distro= : non
+   file |  | distro= : non
+correspondances : 0 ; distro vue par grype : {"name": "", "version": "", "idLike": null}
+espaces : []
+identifiants (0) : 
+CVE-2026-9076 : absente
+### grype --distro rocky:9.7
+grype : code 0 ; sortie d'erreur : 0 ligne(s)
+correspondances : 1 ; distro vue par grype : {"name": "rockylinux", "version": "9.7", "idLike": ["rockylinux"]}
+espaces : ['redhat:distro:redhat:9']
+identifiants (1) : CVE-2026-27171
+CVE-2026-9076 : absente
+## glibc-2.34-231.el9_7.10.x86_64.rpm : syft dir: sur un dossier qui ne contient que lui
+syft : code 0 ; sortie d'erreur : 0 ligne(s)
+### grype sans --distro (-q, comme politique/scanner.sh)
+grype : code 0 ; sortie d'erreur : 0 ligne(s)
+composants : 2
+   library | pkg:rpm/glibc@2.34-231.el9_7.10?arch=x86_64&epoch=0&upstream=glibc-2.34-231.el9_7.10.src.rpm | distro= : non
+   file |  | distro= : non
+correspondances : 0 ; distro vue par grype : {"name": "", "version": "", "idLike": null}
+espaces : []
+identifiants (0) : 
+CVE-2026-9076 : absente
+### grype --distro rocky:9.7
+grype : code 0 ; sortie d'erreur : 0 ligne(s)
+correspondances : 19 ; distro vue par grype : {"name": "rockylinux", "version": "9.7", "idLike": ["rockylinux"]}
+espaces : ['redhat:distro:redhat:9']
+identifiants (19) : CVE-2026-18374 CVE-2026-19542 CVE-2026-4046 CVE-2026-4437 CVE-2026-4438 CVE-2026-5435 CVE-2026-5450 CVE-2026-5928 CVE-2026-6238 CVE-2026-6368 CVE-2026-6791 CVE-2026-77117 …
+CVE-2026-9076 : absente
+## fin, 2026-11-20T18:58:05Z

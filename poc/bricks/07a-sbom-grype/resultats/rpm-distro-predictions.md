@@ -25,3 +25,25 @@
 | RD8 | Tous | grype rend 0 dans les 8 appels | haute |
 
 Si RD2 tient, la porte ne peut pas compter sur syft pour `distro=` dans un SBOM de rpm isolé. Il faut donc que D14 soit tranchée avant de scanner les rpm de la 05 dans la plateforme.
+
+## Résultat (écrit le 20/11/2026 à 2026-11-20T18:58:47Z UTC)
+
+Le script a tourné le 20/11/2026 de 18:57:55 à 18:58:05 UTC, au dépôt `8a7f1d76`, code 0. **RD1 à RD8 sont tenues.** Journal : [`rpm-distro.log`](rpm-distro.log).
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| RD1 | 4 sha256 égaux aux valeurs archivées ; syft rend 0 quatre fois, sans sortie d'erreur | tenue |
+| RD2 | Un composant `library` de type rpm par fichier, sans `distro=`. syft ajoute un composant `file` sans PURL (le fichier rpm lui-même) | tenue (le composant `file` n'était pas prédit) |
+| RD3 | `pkg:rpm/<nom>@<version>-<release>?arch=…&epoch=…&upstream=<src.rpm>`, sans espace de noms | tenue |
+| RD4 | 0 correspondance pour les 3 rpm Rocky, code 0, aucune ligne sur la sortie d'erreur | tenue |
+| RD5 | `openssl-libs` : 49 correspondances, toutes dans `redhat:distro:redhat:9`, CVE-2026-9076 présente. Le passage par le rpm source n'est pas relevé (le résumé ne lit pas `matchDetails`) | tenue, mécanisme non mesuré |
+| RD6 | `zlib` : 1 (CVE-2026-27171) ; `glibc` : 19 ; même espace | tenue |
+| RD7 | `sample-app` : 0 avec et sans `--distro` | tenue |
+| RD8 | grype rend 0 dans les 8 appels | tenue |
+
+**Lecture**
+- Syft n'émet pas `distro=` sur un rpm isolé, pas plus que sur le deb isolé de la 06. **Sans `--distro`, grype ne trouve rien, en silence (code 0, `-q`), sur de vrais paquets Rocky** : l'échec silencieux de R5 (PURL synthétique) se retrouve sur de vrais paquets.
+- Avec `--distro rocky:9.7`, les mêmes SBOM sont jugés sur les données de Red Hat 9, comme en R1.
+- **Pour D14** : un SBOM de rpm produit par syft sur le fichier seul n'a jamais `distro=`. La première branche de D14 (la porte refuse un SBOM de paquet sans `distro`) refuserait donc tous les SBOM de rpm faits ainsi ; la seconde (le job passe `--distro`) suffit à les juger. D14 reste ta décision.
+- **Non mesuré** : le binaire Go de `sample-app` dans le rpm (rien pour extraire le rpm sur l'hôte) ; un SBOM fait sur la racine de construction, qui a un `/etc/os-release` ; le scan d'un rpm dans la plateforme.
+- Le dossier de travail (6,9 Mio : copies des quatre rpm, SBOM et sorties de grype, lus par aucun script) est effacé après ce résultat.
