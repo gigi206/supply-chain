@@ -339,3 +339,10 @@ Mesure hors réseau sur l'hôte ([`rpm-distro.sh`](rpm-distro.sh), [prédictions
 - L'absence de redémarrage de Zot depuis le 13/11 n'est pas vérifiée.
 - Inventaire des poussées de scan des 13 et 14/11 : rien de plus que H1, H2 et le scan du deb.
 - Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T19:13:11Z.
+
+**Additif du 20/11/2026 (2026-11-20T19:26:42Z UTC), G7, lecture de B20** : la prédiction n'est pas tenue.
+- Zot a redémarré le 19/11 à 20:24:46 UTC, au passage de `stockage.sh zot` qui a posé le compte `poc-lien` de la 09. La rétention n'a pas changé.
+- La projection depuis le 13/11 ne vaut plus : aucun balayage entre 11:00 et 19:30 UTC le 20/11.
+- Les lignes de `zot.service` sont dans Loki.
+- Le script passe en v2, pour lire Loki seul, et la lecture du 19/11 est prédite (BD1 à BD4).
+- Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T19:26:42Z.

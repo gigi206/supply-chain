@@ -322,3 +322,29 @@ Les lignes de `zot.service` devraient donc y être environ 30 jours. **Ce n'est 
 - **« Jusque vers 07:00 UTC » était optimiste.** Le début de B20 sortirait du journal de la VM vers 06:26 UTC. La profondeur, mesurée une seule fois, dépend du volume écrit : elle peut être plus courte.
 
 **4. « Le rejeu de M5b ne commence pas avant la lecture de B28 »** n'est pas un fait. C'est une **proposition** au propriétaire : il accepte de tout perdre au rejeu, et l'ordre lui revient.
+
+## Lecture de B20 : prédiction non tenue, Zot redémarré le 19/11 (note de 2026-11-20T19:26:42Z ; « Oui » du propriétaire ; rien n'est réécrit au-dessus)
+
+**Lecture** du 20/11 de 19:24:33 à 19:24:36 UTC, au dépôt `963daa36` ([`g7-balayage.sh`](../g7-balayage.sh), script `7abe1bc3…`, [journal](g7-balayage-20-11.log)). Fenêtre de 11:00 à 19:30 UTC, élargie pour voir un balayage même si la loi B était fausse.
+- **`zot.service` a démarré le 19/11 à 20:24:46 UTC** (`ActiveEnterTimestamp`), avec `NRestarts=0` : c'est un redémarrage commandé, pas un redémarrage automatique.
+  - Cause, relue dans le dépôt : le passage de `stockage.sh zot` qui a posé le compte `poc-lien` de la brique 09 (commit `4fe5e8a3` de la 08, accord « Maintenant » du 19/11). Il y a eu deux passages, à 20:24:09 et à 20:24:42 UTC (`stockage-zot-1.log`, `stockage-zot.log`). Le second n'était pas voulu, comme le dit le commit.
+  - La rétention et le gc ne changent pas : le diff de `zot.json` n'ajoute que l'entrée d'accès `signes/**`.
+- **L'hypothèse « Zot non redémarré depuis le 13/11 » de la note de 19:13:11Z est réfutée.** La projection de la note de 19:09:44Z ne vaut plus, à partir du 19/11. Les prédictions B20, B24, B27 et B28 restent écrites, mais leurs heures sont caduques.
+- **B20 non tenue** : aucune ligne « executing gc of orphaned blobs » ni décision de rétention entre 11:00 et 19:30 UTC. Le journal de la VM remonte au 20/11 à 07:18:03 UTC (287,1 Mio). Dans la fenêtre, les 3040 lignes retenues par le filtre sont toutes des « HTTP API ».
+- **Loki** : 0 ligne de gc dans la même fenêtre, ce qui concorde avec le journal. Le filtre `|= "decision"` était trop large : il rend 2000 lignes de `zot.service`, au plafond, de 11:00 à 16:31 UTC. Ce compte est inexploitable, mais il montre que **les lignes de `zot.service` sont dans Loki**. La note de 19:13:11Z le prévoyait d'après la configuration. Les 14 h de profondeur du journal de la VM ne sont donc plus la seule limite.
+
+**Script v2** (`g7-balayage.sh`, sha256 `d68c726a4991e68c…`) :
+- `SANS_JOURNAL=1` lit Loki seul, sans sudo ;
+- `SUFFIXE` donne un journal neuf ;
+- Loki filtre « executing gc of orphaned blobs » ou `"decision":`, jusqu'à 5000 lignes. Elles sont masquées, puis résumées comme celles du journal, sans être archivées.
+
+**Prédictions de la lecture du 19/11** (Loki seul, fenêtre de 20:00 à 23:59 UTC, journal `g7-balayage-19-11.log`), écrites avant le lancement :
+
+| # | Prédit | Confiance |
+|---|---|---|
+| BD1 | Un balayage part au démarrage : premières lignes de gc moins de 5 min après 20:24:46 UTC | faible : hypothèse du 15/11, jamais vérifiée (journal perdu) |
+| BD2 | S'il existe : entre 140 et 170 dépôts, durée de 25 à 45 min | faible |
+| BD3 | Aucune décision autre que `keep`. Rien n'a 336 h, et `vulndb/grype` n'a que 7 tags (13/11 au 19/11), sous le seuil de 11 | moyenne |
+| BD4 | Lignes de Loki sans masquage, et sous le plafond de 5000 | moyenne |
+
+**Conséquence pour ce soir.** Avec BD1, le prochain balayage commencerait 24 h et environ 5 s après la fin de celui du démarrage, soit vers 20:50–21:10 UTC le 20/11. Sans balayage au démarrage, il commencerait vers 20:53 UTC, si l'écart de 28 min 25 s du 13/11 se répète. Ce sont des calculs, pas des mesures.

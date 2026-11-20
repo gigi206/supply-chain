@@ -12,7 +12,9 @@ export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/../08-trust-plane/commun.sh"   # sur, S, P
 JOUR=${JOUR:?JOUR=AAAA-MM-JJ}; DE=${DE:?DE=HH:MM}; A=${A:?A=HH:MM}
-LOG=$here/resultats/g7-balayage-${JOUR:8:2}-${JOUR:5:2}.log
+SUFFIXE=${SUFFIXE:-}            # relance ou seconde lecture du même jour : journal neuf (ex. SUFFIXE=-loki)
+SANS_JOURNAL=${SANS_JOURNAL:-}  # 1 : pas de journalctl (fenêtre hors de la profondeur du journal de la VM) ; Loki seul
+LOG=$here/resultats/g7-balayage-${JOUR:8:2}-${JOUR:5:2}$SUFFIXE.log
 [ ! -e "$LOG" ] || { echo "journal présent, jamais réécrit : $LOG" >&2; exit 2; }
 MASQUE='/jeton\|token/I c\[ligne masquée : motif jeton|token]'
 
@@ -54,33 +56,39 @@ for d in dec:
 
 {
   echo "# g7-balayage.sh, $(date -u +%Y-%m-%dT%H:%M:%SZ), dépôt $(git -C "$here" rev-parse --short=8 HEAD), script $(sha256sum < "$0" | cut -c1-16)"
-  echo "# fenêtre : $JOUR $DE à $A UTC ; lecture seule (ssh -n, sudo journalctl, systemctl show ; Grafana en comptes)"
+  echo "# fenêtre : $JOUR $DE à $A UTC ; lecture seule (ssh -n, sudo journalctl, systemctl show ; Grafana : lignes résumées, jamais archivées)"
   echo "## 1. zot.service"
   sur sc-stockage 'date -u +%Y-%m-%dT%H:%M:%SZ; systemctl show zot.service -p ActiveState -p ActiveEnterTimestamp -p ExecMainStartTimestamp -p NRestarts' < /dev/null
-  echo "## 2. profondeur du journal de zot.service"
-  sur sc-stockage 'sudo journalctl -u zot.service -o short-iso-precise --no-pager | head -n 1 | cut -c1-32; sudo journalctl --disk-usage' < /dev/null
-  echo "## 3. balayage dans le journal ($JOUR $DE à $A UTC ; lignes gc, garbage, retention, decision)"
-  sur sc-stockage "sudo journalctl -u zot.service --since '$JOUR $DE:00 UTC' --until '$JOUR $A:00 UTC' -o cat --no-pager | grep -iE 'gc|garbage|retention|decision' || true" < /dev/null \
-    | sed "$MASQUE" | resume
-  echo "## 4. mêmes lignes dans Loki, à travers Grafana (auditeur ; comptes et heures seulement)"
+  if [ -z "$SANS_JOURNAL" ]; then
+    echo "## 2. profondeur du journal de zot.service"
+    sur sc-stockage 'sudo journalctl -u zot.service -o short-iso-precise --no-pager | head -n 1 | cut -c1-32; sudo journalctl --disk-usage' < /dev/null
+    echo "## 3. balayage dans le journal ($JOUR $DE à $A UTC ; lignes gc, garbage, retention, decision)"
+    sur sc-stockage "sudo journalctl -u zot.service --since '$JOUR $DE:00 UTC' --until '$JOUR $A:00 UTC' -o cat --no-pager | grep -iE 'gc|garbage|retention|decision' || true" < /dev/null \
+      | sed "$MASQUE" | resume
+  else
+    echo "## 2 et 3. journal de la VM non lu (SANS_JOURNAL=1)"
+  fi
+  echo "## 4. mêmes lignes dans Loki, à travers Grafana (auditeur) : lignes masquées puis résumées comme le journal, jamais archivées"
   de=$(date -u -d "$JOUR $DE:00Z" +%s)000; a=$(date -u -d "$JOUR $A:00Z" +%s)000
-  for e in '{noeud="sc-stockage", source="journal", unite="zot.service"} |= "executing gc of orphaned blobs"' \
-           '{noeud="sc-stockage", source="journal", unite="zot.service"} |= "decision"'; do
-    q=$(jq -nc --arg e "$e" --arg de "$de" --arg a "$a" \
-      '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 2000, direction: "forward"}], from: $de, to: $a}')
-    printf 'user = "auditeur:%s"\n' "$(cat "$S/grafana-auditeur.password")" \
-      | curl -sS -K - --cacert "$P/ca-poc.crt" -X POST -H 'Content-Type: application/json' "https://192.168.161.13:3001/api/ds/query" -d "$q" \
-      | python3 -I -c '
+  e='{noeud="sc-stockage", source="journal", unite="zot.service"} |~ "executing gc of orphaned blobs|\"decision\":"'
+  q=$(jq -nc --arg e "$e" --arg de "$de" --arg a "$a" \
+    '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 5000, direction: "forward"}], from: $de, to: $a}')
+  echo "requête : $e"
+  printf 'user = "auditeur:%s"\n' "$(cat "$S/grafana-auditeur.password")" \
+    | curl -sS -K - --cacert "$P/ca-poc.crt" -X POST -H 'Content-Type: application/json' "https://192.168.161.13:3001/api/ds/query" -d "$q" \
+    | python3 -I -c '
 import json, sys
 d = json.load(sys.stdin)
-st = d.get("results", {}).get("A", {}).get("status")
-fr = d.get("results", {}).get("A", {}).get("frames", []) or []
-ts = sorted(v for f in fr for v in (f.get("data", {}).get("values", [[], []])[1] or []))
-import datetime
-h = lambda v: datetime.datetime.fromtimestamp(v / 1000, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
-print(f"  {sys.argv[1]} : statut {st}, {len(ts)} ligne(s)" + (f", première {h(ts[0])}, dernière {h(ts[-1])}" if ts else ""))
-' "$(printf '%s' "$e" | sed 's/.*|= //')"
-  done
+a = d.get("results", {}).get("A", {})
+fr = a.get("frames", []) or []
+n = 0
+for f in fr:
+    v = f.get("data", {}).get("values", [])
+    for l in (v[2] if len(v) > 2 else []) or []:
+        print(l); n += 1
+st, cap = a.get("status"), (" (plafond de 5000 atteint)" if n >= 5000 else "")
+print(f"statut {st}, {n} ligne(s){cap}", file=sys.stderr)
+' | sed "$MASQUE" | resume
   echo "## fin, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 } 2>&1 | sed -u "s#$HOME#~#g" | sed -u "$MASQUE" | tee "$LOG"
 exit "${PIPESTATUS[0]}"

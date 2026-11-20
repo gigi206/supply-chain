@@ -1,0 +1,26 @@
+# g7-balayage.sh, 2026-11-20T19:24:33Z, dépôt 963daa36, script 7abe1bc3c3369bbb
+# fenêtre : 2026-11-20 11:00 à 19:30 UTC ; lecture seule (ssh -n, sudo journalctl, systemctl show ; Grafana en comptes)
+## 1. zot.service
+2026-11-20T19:24:33Z
+NRestarts=0
+ExecMainStartTimestamp=Thu 2026-11-19 20:24:46 UTC
+ActiveState=active
+ActiveEnterTimestamp=Thu 2026-11-19 20:24:46 UTC
+## 2. profondeur du journal de zot.service
+2026-11-20T07:18:03.741911+00:00
+Archived and active journals take up 287.1M in the file system.
+## 3. balayage dans le journal (2026-11-20 11:00 à 19:30 UTC ; lignes gc, garbage, retention, decision)
+lignes : 3040 JSON lues, 0 masquée(s), 0 non JSON
+« executing gc of orphaned blobs » : 0 ; premier - ; dernier -
+  autre message : 3040 × « HTTP API »
+passage des dépôts suivis (début de « executing gc ») :
+  builds/scan/essai-07a        absent
+  builds/scan/essai-scan       absent
+  builds/scan/sample-app       absent
+  builds/scan/sample-app-deb   absent
+  vulndb/grype                 absent
+décisions de rétention : 0
+## 4. mêmes lignes dans Loki, à travers Grafana (auditeur ; comptes et heures seulement)
+  "executing gc of orphaned blobs" : statut 200, 0 ligne(s)
+  "decision" : statut 200, 2000 ligne(s), première 2026-11-20T11:00:03.674Z, dernière 2026-11-20T16:31:03.312Z
+## fin, 2026-11-20T19:24:36Z
