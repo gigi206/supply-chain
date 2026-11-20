@@ -23,7 +23,7 @@ ko() { echo "KO   $*"; KO=$((KO + 1)); }
 verifie() { if [ "$2" = "$3" ]; then ok "$1 : $2"; else ko "$1 : $2 (attendu : $3)"; fi; }
 B=bancconstruction   # préfixe fixe : ses dossiers sous $W sont retirés à la main, par chemin littéral, après archivage du journal
 W0=$(bash -c 'here=poc/bricks/08-trust-plane; . "$here/commun.sh"; echo "$W"')
-for d in "$W0/$B-construction-05" "$W0"/$B-*-construction-05 "$W0/$B-r" "$W0/$B-r2" "$W0/$B-a.txt" "$W0/$B-local.log" "$W0/$B-liste.yml" "$W0/$B-transpose.log"; do
+for d in "$W0/$B-construction-05" "$W0"/$B-*-construction-05 "$W0/$B-ef" "$W0/$B-r" "$W0/$B-r2" "$W0/$B-a.txt" "$W0/$B-local.log" "$W0/$B-liste.yml" "$W0/$B-transpose.log"; do
   [ ! -e "$d" ] || { echo "KO   reste d'un banc précédent : ${d#"$W0"/}" >&2; exit 2; }
 done
 etat_resultats() { git status --porcelain --untracked-files=all -- "$D5/resultats" | sha256sum | cut -c1-64; }
@@ -40,8 +40,9 @@ r=0; PREFIXE='x y' bash "$F" local > /dev/null 2>&1 || r=$?
 verifie "PREFIXE invalide refusé (code)" "$r" 2
 r=0; PREFIXE=m4c bash "$F" local > /dev/null 2>&1 || r=$?
 verifie "PREFIXE m4c refusé (code)" "$r" 2
-r=0; PREFIXE=$B-b bash "$F" pipeline > /dev/null 2>&1 || r=$?   # lancer refuse l'étape inconnue avant tout journal
-verifie "étape inconnue (pipeline, pas encore écrite) refusée (code non nul)" "$([ "$r" != 0 ] && echo oui)" oui
+r=0; PREFIXE=$B-b bash "$F" inconnue > /dev/null 2>&1 || r=$?   # lancer refuse l'étape inconnue avant tout journal
+verifie "étape inconnue refusée (code non nul)" "$([ "$r" != 0 ] && echo oui)" oui
+for t in m4b m4c essai A; do r=0; TAG=$t bash "$F" local > /dev/null 2>&1 || r=$?; verifie "TAG=$t refusé (code)" "$r" 2; done
 
 echo "## C constantes confrontées à leurs sources"
 rhs() { sed -n "s/^$2=\([^ ]*\).*/\1/p" "$1"; }   # fichier variable : membre droit (premier mot) de l'affectation
@@ -122,6 +123,166 @@ sed -e 's/f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/6de89
 s=$( ( PREFIXE=$B; . "$F"; hermetique "$W0/$B-transpose.log"; echo "écarts : $ECARTS" ) 2>&1 )
 verifie "F2 transposé au bootstrap de M1b : écarts" "$(sed -n 's/^écarts : //p' <<< "$s")" 0
 verifie "F2 : OK" "$(grep -c '^OK' <<< "$s")" 12
+
+echo "## G étape pipeline (vraie fonction, vrai tkn, clé P-256 jetable ; doublures : kubectl, zot_lire, bundle, auth_zot, sur, lire_bundle du bundle neuf)"
+EF=$W0/$B-ef
+mkdir -p "$EF/cle"
+(umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$EF/cle/taches.key" 2> /dev/null)
+openssl pkey -in "$EF/cle/taches.key" -pubout -out "$EF/cle/taches.pub" 2> /dev/null
+openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 2> /dev/null | openssl pkey -pubout -out "$EF/cle/autre.pub" 2> /dev/null
+verifie "G clé jetable du banc (P-256)" "$(openssl pkey -in "$EF/cle/taches.pub" -pubin -noout -text 2> /dev/null | grep -c 'NIST CURVE: P-256')" 1
+CA=$(dirname "$W0")/pki/ca-poc.crt   # certificat public de la CA du PoC (lectures anonymes réelles : bundle de M4c, artefact, .att)
+FAUSSE=sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa   # digest de pipeline du banc
+ZOT_BASE="tekton/pipelines/sample-app-rpm:m4c sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be
+builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119"
+doublures() { # après chargement du script, dans le sous-shell du cas
+  eval "lire_bundle_reel() $(declare -f lire_bundle | tail -n +2)"
+  kubectl() {
+    echo "kubectl $*" >> "$BW/appels"
+    case "$*" in
+      "create --dry-run=server -n builds -f "*)
+        if [ -n "${BANC_REFUSEE:-}" ] && [ "$(yq .metadata.name "${*: -1}")" = "$BANC_REFUSEE" ]; then echo "refus du banc" >&2; return 1; fi
+        return 0 ;;
+      "get pipelinerun -n builds "*" -o name") if [ -n "${BANC_PR_EXISTE:-}" ]; then return 0; else echo "NotFound (banc)" >&2; return 1; fi ;;
+      "get networkpolicy -n builds -o json"|"get ciliumnetworkpolicy -n builds -o json") command kubectl "$@"; return ;;   # lecture réelle
+      "create -f "*) cp "${*: -1}" "$BW/cree.json"; echo "création interceptée par le banc" >&2; return 7 ;;
+    esac
+    echo "faux kubectl : appel inattendu : $*" >&2; return 3
+  }
+  zot_lire() { local d; d=$(awk -v r="$2" '$1 == r {x = $2} END {print x}' "$BW/zot.txt"); echo "${d:-absent}"; }
+  bundle() { local d; d=sha256:$(sha256sum < "$1" | cut -c1-64); echo "$2:$3 $d" >> "$BW/poussees"; echo "$2:$3 $d" >> "$BW/zot.txt"; echo "$d"; }
+  auth_zot() { printf '{"faux":1}\n' > "$1"; }
+  sur() { echo " ${BANC_LIBRE-3000000000}"; }
+  lire_bundle() { if [ "$1" = "$PIPELINE_M4C" ]; then lire_bundle_reel "$@"; else yq -o=json "$C/sample-app-rpm.$TAG.signee.yaml" > "$2"; fi; }
+  oras() { # tag de la pipeline du banc : lu dans zot.txt ; tout le reste, le vrai oras (lectures anonymes)
+    case "$*" in *"sample-app-rpm:$TAG"*) echo "{\"digest\":\"$(zot_lire t "tekton/pipelines/sample-app-rpm:$TAG")\"}" ;; *) command oras "$@" ;; esac
+  }
+}
+ef() { # nom code-bash [sans-clé] : un cas dans un sous-shell (CONFIANCE_DIR, construction/ et resultats/ du banc, état de Zot) ; code
+  local w=$EF/$1 r=0
+  mkdir -p "$w/O/pki" "$w/O/secrets" "$w/construction" "$w/r"; chmod 700 "$w/O/secrets"
+  cp "$CA" "$w/O/pki/ca-poc.crt"
+  cp "$D5/construction/sample-app-rpm.yaml" "$D5/construction/preparer-rpm.yaml" "$D5/construction/construire-rpm.yaml" "$w/construction/"
+  cp "$D5/resultats/m1b-construction-essai.log" "$w/r/$B-${1,,}-construction-essai.log"
+  [ -n "${3:-}" ] || (umask 077 && cp "$EF/cle/taches.key" "$w/O/secrets/taches.key")
+  printf '%s\n' "$ZOT_BASE" > "$w/zot.txt"; : > "$w/appels"; : > "$w/poussees"
+  ( export CONFIANCE_DIR=$w/O BW=$w PREFIXE=$B-${1,,}; . "$F"; C=$w/construction; R=$w/r; TIREE=$W0/m1b-fermeture-05/comparaison/tiree
+    doublures; eval "$2" ) > "$w/sortie.txt" 2>&1; r=$?   # hors d'un || : set -e actif
+  echo "$r"
+}
+cas() { mkdir -p "$EF/$1"; ef "$@" > "$EF/$1.code"; mv "$EF/$1.code" "$EF/$1/code"; }
+attendu_ko() { # cas motif : arrêt en KO sur le motif, sans poussée ni signature versionnée ni création
+  local w=$EF/$1
+  if [ "$(cat "$w/code")" != 0 ] && grep -q -F -- "$2" "$w/sortie.txt"; then ok "$1 : arrêt sur « $2 »"
+  else ko "$1 : code $(cat "$w/code"), dernier message : $(grep '^KO' "$w/sortie.txt" | tail -n 1 | cut -c1-200)"; fi
+  verifie "$1 : ni poussée, ni signature versionnée, ni création" \
+    "$(wc -l < "$w/poussees") $(find "$w/construction" -name '*.signee.yaml' -size +0 | wc -l) $([ -e "$w/cree.json" ] && echo 1 || echo 0)" "0 0 0"
+}
+cas G1 'SIGNER=1; etape_pipeline'
+grep -v '^     ' "$EF/G1/sortie.txt" | cut -c1-170 | sed 's/^/   | /'
+v=$EF/G1/construction/sample-app-rpm.$B-g1.signee.yaml
+verifie "G1 nominal : code" "$(cat "$EF/G1/code")" 0
+verifie "G1 nominal : KO" "$(grep -c '^KO' "$EF/G1/sortie.txt")" 0
+echo "relevé : G1 nominal : $(grep -c '^OK' "$EF/G1/sortie.txt") OK"
+verifie "G1 nominal : poussée unique (dépôt:tag digest)" "$(cat "$EF/G1/poussees")" "tekton/pipelines/sample-app-rpm:$B-g1 sha256:$(sha256sum < "$v" | cut -c1-64)"
+verifie "G1 nominal : signature versionnée vérifiée par tkn (clé publique du banc)" "$(tkn pipeline verify "$v" -K "$EF/cle/taches.pub" > /dev/null 2>&1 && echo vérifiée || echo refusée)" vérifiée
+verifie "G1 nominal : refus de tkn avec une autre clé" "$(tkn pipeline verify "$v" -K "$EF/cle/autre.pub" > /dev/null 2>&1 && echo vérifiée || echo refusée)" refusée
+verifie "G1 nominal : références de la version (preparer-rpm, construire-rpm, publier-image)" \
+  "$(yq '[.spec.tasks[].taskRef.params[] | select(.name == "bundle") | .value] | join(" ")' "$v")" \
+  "sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5 sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b"
+verifie "G1 nominal : entrées de preparer et dépôt de publication dans la version" \
+  "$(yq '[.spec.tasks[0].params[2].value, .spec.tasks[0].params[4].value, (.spec.tasks[2].params[] | select(.name == "image") | .value)] | join(" ")' "$v")" \
+  "sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48 sc-stockage.poc.test:5000/builds/sample-app-rpm"
+verifie "G1 nominal : feuilles relevées (trois)" "$(grep -c '^OK   rendue : feuilles différentes de la pipeline de M4c : .spec.tasks\[0\].params\[2\].value .spec.tasks\[0\].params\[4\].value .spec.tasks\[1\].taskRef.params\[0\].value$' "$EF/G1/sortie.txt")" 1
+verifie "G1 nominal : \$T/auth absent à la fin" "$([ -e "$EF/G1/O/travail/$B-g1-construction-05/auth" ] && echo présent || echo absent)" absent
+verifie "G1 nominal : appels de kubectl, dry-run serveur seulement" "$(grep -v -c '^kubectl create --dry-run=server -n builds -f ' "$EF/G1/appels")" 0
+cas G2 'etape_pipeline'; attendu_ko G2 "KO   étape pipeline : SIGNER=1 seulement"
+cas G3 'SIGNER=1; etape_pipeline' sans-cle; attendu_ko G3 "KO   clé des tâches absente"
+mkdir -p "$EF/G4/construction"; : > "$EF/G4/construction/sample-app-rpm.$B-g4.signee.yaml"
+cas G4 'SIGNER=1; etape_pipeline'
+if [ "$(cat "$EF/G4/code")" != 0 ] && grep -q -F "KO   déjà présent" "$EF/G4/sortie.txt" && [ ! -s "$EF/G4/poussees" ]; then ok "G4 version déjà présente : arrêt, sans poussée"; else ko "G4 version déjà présente"; fi
+cas G5 'SIGNER=1; echo "tekton/pipelines/sample-app-rpm:$TAG $FAUSSE" >> "$BW/zot.txt"; etape_pipeline'; attendu_ko G5 "de la pipeline, absent"
+cas G6 "SIGNER=1; echo \"tekton/pipelines/sample-app-rpm:m4c $FAUSSE\" >> \"\$BW/zot.txt\"; etape_pipeline"; attendu_ko G6 "KO   tag m4c de la pipeline, sur celle de M4c"
+cas G7 'SIGNER=1; BANC_LIBRE=1000; etape_pipeline'; attendu_ko G7 "sous 1073741824"
+cas G8 'SIGNER=1; BANC_REFUSEE=sample-app-rpm; etape_pipeline'; attendu_ko G8 "KO   pipeline rendue admise"
+cas G9 'SIGNER=1; PUBLIER_REF=${PUBLIER_REF/d21931f3/00000000}; etape_pipeline'; attendu_ko G9 "KO   publier-image, lue dans la liste revue"
+cas G10 'SIGNER=1; sed -i "s/^écarts : 0$/écarts : 1/" "$R/$N-construction-essai.log"; etape_pipeline'; attendu_ko G10 "KO   essai archivé"
+cas G11 'SIGNER=1; FERMETURE_RPM=${FERMETURE_RPM%@*}@sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c; etape_pipeline'; attendu_ko G11 "KO   rendue : feuilles différentes de la pipeline de M4c"   # fermeture de M4b : deux feuilles seulement
+
+echo "## H étape construction, gardes (vraie fonction, mêmes doublures ; la première création réelle est interceptée)"
+PR_OK="PIPELINE_REF=\$REG/tekton/pipelines/sample-app-rpm@$FAUSSE; mkdir -p \"\$T/pipeline\"; echo \"\$PIPELINE_REF\" > \"\$T/pipeline/pipeline.ref\"; echo \"tekton/pipelines/sample-app-rpm:\$TAG $FAUSSE\" >> \"\$BW/zot.txt\""
+cas H1 'PIPELINE_REF=; etape_construction'; attendu_ko H1 "KO   PIPELINE_REF non épinglée"
+verifie "H1 : aucun appel de kubectl" "$(wc -l < "$EF/H1/appels")" 0
+cas H2 "PIPELINE_REF=\$REG/tekton/pipelines/sample-app-rpm@$FAUSSE; etape_construction"; attendu_ko H2 "KO   référence de la pipeline absente"
+cas H3 "$PR_OK; echo \"tekton/pipelines/sample-app-rpm:m4c $FAUSSE\" >> \"\$BW/zot.txt\"; etape_construction"; attendu_ko H3 "KO   tag m4c de la pipeline, inchangé"
+cas H4 "$PR_OK; : > \"\$R/\$N-construction-2-construire.log\"; etape_construction"; attendu_ko H4 "KO   déjà présent"
+cas H5 "$PR_OK; sed -i '\$d' \"\$BW/zot.txt\"; etape_construction"; attendu_ko H5 "KO   pipeline relue dans Zot au tag"
+cas H6 "$PR_OK; CONSTRUIRE_REF=\${CONSTRUIRE_REF/ca03f189/00000000}; etape_construction"; attendu_ko H6 "absente de la liste revue"
+cas H7 "$PR_OK; sed -i '/^builds/d' \"\$BW/zot.txt\"; etape_construction"; attendu_ko H7 "KO   artefact de M4c présent avant le premier PipelineRun"
+cas H8 "$PR_OK; BANC_PR_EXISTE=1; etape_construction"; attendu_ko H8 "$B-h8-construction-1 existe déjà"
+cas H9 "$PR_OK; BANC_LIBRE=1000; etape_construction"; attendu_ko H9 "KO   espace libre illisible ou sous la garde"
+cas H10 "$PR_OK; etape_construction"
+grep -v '^     ' "$EF/H10/sortie.txt" | cut -c1-170 | sed 's/^/   | /'
+verifie "H10 nominal jusqu'à la création : arrêt sur la création interceptée (code)" "$(cat "$EF/H10/code")" 7
+verifie "H10 : KO avant la création" "$(grep -c '^KO' "$EF/H10/sortie.txt")" 0
+verifie "H10 : enveloppes relevées avant (lecture anonyme réelle)" "$(grep -c "^relevé : enveloppes d'attestation de l'artefact (avant) : [0-9]* " "$EF/H10/sortie.txt")" 1
+verifie "H10 : PipelineRun créé (nom, bundle, nom, PVC, Kata pour construire seule)" \
+  "$(jq -c '[.metadata.name, .spec.pipelineRef.params[0].value, .spec.pipelineRef.params[1].value, .spec.workspaces[0].volumeClaimTemplate.spec.resources.requests.storage, [.spec.taskRunSpecs[] | .pipelineTaskName + ":" + .podTemplate.runtimeClassName]]' "$EF/H10/cree.json")" \
+  "[\"$B-h10-construction-1\",\"sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@$FAUSSE\",\"sample-app-rpm\",\"2Gi\",[\"construire:kata\"]]"
+
+echo "## I étape construction jusqu'au bout : faux kubectl servant les objets réels des PipelineRuns de M4c (TaskRuns, pods, journaux,"
+echo "##   gardés sous \$W/m4c-05), valeurs de M4c remplacées par celles de la cascade ; lectures anonymes réelles de l'artefact et du .att"
+M4C=$W0/m4c-05
+G=$EF/I-objets
+mkdir -p "$G"
+for i in 1 2; do
+  for f in "pr-m4c-rpm-$i-etat.json" "tr-m4c-rpm-$i-preparer.json" "tr-m4c-rpm-$i-construire.json" "tr-m4c-rpm-$i-publier.json" \
+           "pod-m4c-rpm-$i-preparer-pod.json" "pod-m4c-rpm-$i-construire-pod.json" "pod-m4c-rpm-$i-publier-pod.json" \
+           "m4c-rpm-$i-preparer-step-sources.log" "m4c-rpm-$i-preparer-step-entrees.log" "m4c-rpm-$i-preparer-step-assemblage.log" \
+           "m4c-rpm-$i-construire-step-construire.log" "m4c-rpm-$i-publier-step-publier.log"; do
+    sed -e "s/m4c-rpm-/$B-i-construction-/g" \
+      -e 's/d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164/ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5/g' \
+      -e "s/ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be/${FAUSSE#sha256:}/g" \
+      -e 's/2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c/0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f/g' \
+      -e 's/41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8/333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48/g' \
+      -e 's/f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3/g' \
+      -e 's/18d64b0330fe240fff58475e43a3f003e5dcfade898c4caa1d1165e8304be1af/77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca/g' \
+      -e 's#essais-05/mock-rocky9@sha256:99790c13673de2e4b87e72207b4b29eff7ef95dc436d79d25c08e627027f6771#builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae#g' \
+      -e 's#essais-05/rocky9-bootstrap#builds/builders/rocky9-bootstrap#g' \
+      "$M4C/$f" > "$G/${f//m4c-rpm-/$B-i-construction-}"
+  done
+done
+verifie "I objets de M4c transposés (24 fichiers, plus aucune valeur de M4c)" \
+  "$(ls "$G" | wc -l) $(cat "$G"/* | grep -c 'm4c-rpm-\|d7f01398\|ca874375\|2a9e2ea7\|41c639b7\|f0ccf105\|18d64b03\|99790c13\|essais-05')" "24 0"
+complet() { # doublures du cas I, après doublures
+  kubectl() {
+    echo "kubectl $*" >> "$BW/appels"
+    case "$*" in
+      "create --dry-run=server -n builds -f "*) return 0 ;;
+      "get pipelinerun -n builds "*" -o name") grep -qx "$5" "$BW/crees" 2> /dev/null ;;   # $5 : nom de l'objet
+      "create -f "*) jq -r .metadata.name "${*: -1}" >> "$BW/crees"; cp "${*: -1}" "$BW/cree-$(jq -r .metadata.name "${*: -1}").json" ;;
+      "get pipelinerun -n builds "*" -o json") cat "$BANC_G/pr-$5-etat.json" ;;
+      "get pipelinerun -n builds "*" -o jsonpath="*) echo true ;;   # annotation de Chains (signe)
+      "get taskrun -n builds -l tekton.dev/pipelineRun="*) echo "${6#*=}-preparer ${6#*=}-construire ${6#*=}-publier" ;;
+      "get taskrun -n builds "*" -o json") cat "$BANC_G/tr-$5.json" ;;
+      "get pod -n builds "*" -o json") cat "$BANC_G/pod-$5.json" ;;
+      "logs -n builds "*" -c "*) cat "$BANC_G/${4%-pod}-$6.log" ;;
+      "get networkpolicy -n builds -o json"|"get ciliumnetworkpolicy -n builds -o json") command kubectl "$@" ;;   # lecture réelle
+      *) echo "faux kubectl : appel inattendu : $*" >&2; return 3 ;;
+    esac
+  }
+}
+cas I "BANC_G=$G; complet; $PR_OK; etape_construction"
+grep -v '^     \|^       ' "$EF/I/sortie.txt" | cut -c1-170 | sed 's/^/   | /'
+verifie "I : code" "$(cat "$EF/I/code")" 0
+verifie "I : KO et ÉCART" "$(grep -c '^KO\|^ÉCART' "$EF/I/sortie.txt")" 0
+echo "relevé : I : $(grep -c '^OK' "$EF/I/sortie.txt") OK"
+verifie "I : deux PipelineRuns créés, dans l'ordre" "$(paste -sd' ' "$EF/I/crees")" "$B-i-construction-1 $B-i-construction-2"
+verifie "I : lignes hermétiques relevées par PipelineRun (11 lignes et les témoins, deux fois)" "$(grep -c '^OK   ligne du script « \|^OK   témoins réseau en échec' "$EF/I/sortie.txt")" 24
+verifie "I : enveloppes relevées avant et après" "$(grep -c "^relevé : enveloppes d'attestation de l'artefact (\(avant\|après\)) : [0-9]* " "$EF/I/sortie.txt")" 2
+verifie "I : journaux de construire archivés dans le resultats/ du banc" "$(ls "$EF/I/r" | grep -c "^$B-i-construction-[12]-construire.log$")" 2
+verifie "I : lignes finales (même artefact, tag m4c inchangé après)" \
+  "$(grep -c '^OK   deux exécutions, même artefact\|^OK   tag m4c de la pipeline, inchangé après' "$EF/I/sortie.txt")" 2
 
 verifie "resultats/ inchangé par le banc (git status)" "$(etat_resultats)" "$E0"
 echo "# fin $(date -u +%FT%TZ) : $OK OK, $KO KO"

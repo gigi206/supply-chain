@@ -32,6 +32,17 @@ def lignes(f):
 
 
 def bloc(L, nom):
+    if nom in HEREDOCS:   # affectation par heredoc : de la ligne d'ouverture à la parenthèse fermante
+        o, f = HEREDOCS[nom]
+        assert L.count(o) == 1, (nom, L.count(o))
+        i = L.index(o)
+        j = L.index(f, i)
+        assert L[j + 1] == ')', (nom, L[j + 1])
+        return L[i:j + 2]
+    if nom.endswith('='):   # affectation d'une ligne (copiée sans être imprimée)
+        deb = [k for k, l in enumerate(L) if l.startswith(nom)]
+        assert len(deb) == 1, (nom, deb)
+        return [L[deb[0]]]
     deb = [k for k, l in enumerate(L) if l.startswith(nom + '() {')]
     assert len(deb) == 1, (nom, deb)
     i = deb[0]
@@ -113,6 +124,79 @@ def transformer(src, nom, T, compter=False):
     return t
 
 
+# Ajout du 20/11/2026, après la décision « Même dépôt » : seconde zone, pour les étapes pipeline et construction.
+DEBUT2, FIN2 = '# --- recopié pour la pipeline (m4c.sh, m1b-bundles.sh, m1b-fermeture.sh) ---', '# --- fin des copies pour la pipeline ---'
+HEREDOCS = {'DIFF_FEUILLES': ("DIFF_FEUILLES=$(cat <<'PY'", 'PY')}
+COPIES2 = [('m4c.sh', ['MASQUE=', 'admission', 'libre_zot', 'pr_m4c', 'statut_pr', 'attendre_pr', 'releve_pod', 'lignes']),
+           ('m1b-bundles.sh', ['zot_lire', 'DIFF_FEUILLES', 'diff_feuilles']),
+           ('m1b-fermeture.sh', ['lire_manifeste'])]
+T_LIRE_BUNDLE = [('pipeline prefetch-rpm-sample-app', 'pipeline sample-app-rpm', 2)]
+T_PIPELINE = [
+    ('  local x=$T/pipeline v=$TACHES/prefetch-rpm-sample-app.$TAG.signee.yaml src dos p libre',
+     '  local x=$T/pipeline v=$C/sample-app-rpm.$TAG.signee.yaml p libre', 1),
+    ('  sources\n  attendu "arbre de l\'essai archivé (sha256), égal à l\'arbre prédit" "$(sha "$ARBRE_ESSAI")" "$ARBRE_PREDIT_SHA"',
+     '  sources_cascade\n'
+     '  attendu "essai archivé (resultats/$N-construction-essai.log) : digest de l\'artefact, sans écart" \\\n'
+     '    "$(sed -n \'s/^OK   digest de l.artefact, égal à celui de l.essai de M4c : //p\' "$R/$N-construction-essai.log") $(grep -c \'^écarts : 0$\' "$R/$N-construction-essai.log")" "$DIGEST_ESSAI 1"', 1),
+    ('tekton/pipelines/prefetch-rpm-sample-app:$TAG', 'tekton/pipelines/sample-app-rpm:$TAG', 2),
+    ('"tag m4b de la pipeline, sur celle de M4b"', '"tag m4c de la pipeline, sur celle de M4c"', 1),
+    ('"tag m4b de la pipeline, inchangé"', '"tag m4c de la pipeline, inchangé"', 1),
+    ('"tag m4b"', '"tag m4c"', 2),
+    ('tekton/pipelines/prefetch-rpm-sample-app:m4b', 'tekton/pipelines/sample-app-rpm:m4c', 2),
+    ('"${PIPELINE_M4B##*@}"', '"${PIPELINE_M4C##*@}"', 2),
+    ('  attendu "prefetch-rpm de la cascade, lue dans la liste revue" "$(ref_revue prefetch-rpm b9bbeba3)" "$PREFETCH_REF"\n'
+     '  attendu "publier-fermeture, lue dans la liste revue" "$(ref_revue publier-fermeture 7fa92ad3)" "$PUBLIER_REF"',
+     '  attendu "preparer-rpm de M4c, lue dans la liste revue" "$(ref_revue preparer-rpm 2f65f390)" "$PREPARER_REF"\n'
+     '  attendu "construire-rpm de la cascade, lue dans la liste revue" "$(ref_revue construire-rpm ca03f189)" "$CONSTRUIRE_REF"\n'
+     '  attendu "publier-image, lue dans la liste revue" "$(ref_revue publier-image d21931f3)" "$PUBLIER_REF"', 1),
+    ('(références de la liste revue, bootstrap de M1b)', '(références de la liste revue, fermeture et artefact de la cascade)', 1),
+    ('  read -r src dos < <(source_dossier "$VERROU_SRC")\n  (T=$x; rendre_taches "$PREFETCH_REF" "$PUBLIER_REF" "$src" "$dos")',
+     '  (T=$x; rendre_pipeline "$PREPARER_REF" "$CONSTRUIRE_REF" "$PUBLIER_REF")', 1),
+    ('  substituer "$SIGNEE" "$x/prefetch-rpm-sample-app.yaml" /workspace/sortie /tmp/resultat-bootstrap.json "$x/script.sh"\n'
+     '  attendu "script de la tâche substitué avec la pipeline rendue, celui de l\'essai (sha256)" "$(sha "$x/script.sh")" "$SCRIPT_NEUF_SHA"',
+     '  attendu "pipeline rendue : références des tâches (bundles)" \\\n'
+     '    "$(yq \'[.spec.tasks[].taskRef.params[] | select(.name == "bundle") | .value] | join(" ")\' "$x/sample-app-rpm.yaml")" "$PREPARER_REF $CONSTRUIRE_REF $PUBLIER_REF"', 1),
+    ('$x/prefetch-rpm-sample-app.yaml', '$x/sample-app-rpm.yaml', 3),
+    ('bundle-m4b', 'bundle-m4c', 4),
+    ('lire_bundle "$PIPELINE_M4B"', 'lire_bundle "$PIPELINE_M4C"', 1),
+    ('"rendue : feuilles différentes de la pipeline de M4b"', '"rendue : feuilles différentes de la pipeline de M4c"', 1),
+    ('signature versionnée : fermeture/${v##*/}', 'signature versionnée : construction/${v##*/}', 1),
+    ('tekton/pipelines/prefetch-rpm-sample-app', 'tekton/pipelines/sample-app-rpm', 2),
+    ("avant l'étape rpm : $p", "avant l'étape construction : $p", 1),
+]
+T_CONSTRUCTION = [
+    ("etape_pipeline() { # deux PipelineRuns de sample-app-rpm (m4c-rpm-1, puis m4c-rpm-2) ; rien n'est purgé ; artefact comparé à l'essai",
+     "etape_construction() { # deux PipelineRuns de sample-app-rpm ($N-construction-1, puis -2) ; rien n'est purgé ; artefact comparé à\n"
+     "  # l'essai ; etape_pipeline de m4c.sh, transformée", 1),
+    ('  [ -s "$T/sample-app-rpm.ref" ] || echec "référence de la pipeline absente (étape taches)"\n'
+     '  attendu "pipeline écrite par l\'étape taches" "$(cat "$T/sample-app-rpm.ref")" "$PIPELINE_REF"',
+     '  [ -n "$PIPELINE_REF" ] || echec "PIPELINE_REF non épinglée : étape pipeline, puis correction datée"\n'
+     '  [ -s "$T/pipeline/pipeline.ref" ] || echec "référence de la pipeline absente (étape pipeline)"\n'
+     '  attendu "pipeline écrite par l\'étape pipeline" "$(cat "$T/pipeline/pipeline.ref")" "$PIPELINE_REF"\n'
+     '  echo \'{}\' > "$T/vide.json"\n'
+     '  attendu "tag m4c de la pipeline, inchangé" "$(zot_lire "tag m4c" tekton/pipelines/sample-app-rpm:m4c)" "${PIPELINE_M4C##*@}"\n'
+     '  for i in 1 2; do neuf "$R/$N-construction-$i-construire.log"; done', 1),
+    ('"pipeline relue dans Zot au tag m4c (lecture anonyme)"', '"pipeline relue dans Zot au tag $TAG (lecture anonyme)"', 1),
+    ('sample-app-rpm:m4c" < /dev/null', 'sample-app-rpm:$TAG" < /dev/null', 1),
+    ('    pr=m4c-rpm-$i', '    pr=$N-construction-$i', 1),
+    ('      r=$(oras repo tags --ca-file "$P/ca-poc.crt" "${IMAGE/$REG/$REG_HOTE}" < /dev/null 2>&1 || true)\n'
+     '      attendu "dépôt $IMAGE absent avant le premier PipelineRun" "$(grep -c \'name unknown\' <<< "$r")" 1',
+     '      attendu "artefact de M4c présent avant le premier PipelineRun (décision « Même dépôt »)" \\\n'
+     '        "$(zot_lire "artefact de M4c" "${IMAGE#"$REG"/}@$DIGEST_ESSAI")" "$DIGEST_ESSAI"\n'
+     '      enveloppes_att avant', 1),
+    ('    [ ! -f "$x" ] || cp "$x" "$R/m4c-pipeline-$i-construire.log"', '    [ ! -f "$x" ] || cp "$x" "$R/$N-construction-$i-construire.log"', 1),
+    ('    attendu "construire : aucune ligne http ou https (mock.out, root.log, build.log)" "$(lignes \'^lignes http ou https de [a-z.]* : 0$\' "$x")" 3',
+     '    attendu "construire : aucune ligne http ou https (mock.out, root.log, build.log)" "$(lignes \'^lignes http ou https de [a-z.]* : 0$\' "$x")" 3\n'
+     '    hermetique "$x"', 1),
+    ('  mesure "deux exécutions, même artefact" "$(cat "$T/rpm-2.digest")" "$(cat "$T/rpm-1.digest")"',
+     '  mesure "deux exécutions, même artefact" "$(cat "$T/rpm-2.digest")" "$(cat "$T/rpm-1.digest")"\n'
+     '  enveloppes_att après\n'
+     '  attendu "tag m4c de la pipeline, inchangé après" "$(zot_lire "tag m4c" tekton/pipelines/sample-app-rpm:m4c)" "${PIPELINE_M4C##*@}"', 1),
+]
+TRANSFORMEES2 = [('m1b-fermeture.sh', 'lire_bundle', T_LIRE_BUNDLE), ('m1b-fermeture.sh', 'etape_pipeline', T_PIPELINE),
+                 ('m4c.sh', 'etape_pipeline', T_CONSTRUCTION)]
+
+
 def zone():
     L4, LB = lignes('m4c.sh'), lignes('m1b-bundles.sh')
     z = ['# Blocs recopiés à l\'identique de m4c.sh :']
@@ -128,32 +212,51 @@ def zone():
     return z[:-1]
 
 
+def zone2():
+    z = []
+    for src, noms in COPIES2:
+        z.append(f'# Blocs recopiés à l\'identique de {src} :')
+        L = lignes(src)
+        for nom in noms:
+            z += bloc(L, nom)
+    z.append('# Blocs transformés (remplacements listés et comptés par resultats/m1b-construction-copies.py) :')
+    for src, nom, T in TRANSFORMEES2:
+        z += transformer(src, nom, T).split('\n')
+        z.append('')
+    return z[:-1]
+
+
 if mode == 'compter':
-    for src, nom, T in TRANSFORMEES:
+    for src, nom, T in TRANSFORMEES + TRANSFORMEES2:
         transformer(src, nom, T, compter=True)
     sys.exit(0)
 
-C = lignes(CIBLE)
-assert C.count(DEBUT) == 1 and C.count(FIN) == 1
-i, j = C.index(DEBUT), C.index(FIN)
-Z = zone()
-if mode == 'assembler':
-    assert j == i + 1, 'zone déjà remplie : assembler n\'écrit que dans une zone vide'
-    open(f'{d}/{CIBLE}', 'w', encoding='utf-8').write('\n'.join(C[:i + 1] + Z + C[j:]))
-    C = lignes(CIBLE)
-    i, j = C.index(DEBUT), C.index(FIN)
-    print('zone écrite :', len(Z), 'lignes')
 assert mode in ('assembler', 'verifier'), mode
+for deb, fin, fz in ((DEBUT, FIN, zone), (DEBUT2, FIN2, zone2)):
+    C = lignes(CIBLE)
+    assert C.count(deb) == 1 and C.count(fin) == 1, deb
+    i, j = C.index(deb), C.index(fin)
+    if mode == 'assembler' and j == i + 1:   # n'écrit que dans une zone vide
+        Z = fz()
+        open(f'{d}/{CIBLE}', 'w', encoding='utf-8').write('\n'.join(C[:i + 1] + Z + C[j:]))
+        print('zone écrite :', deb, len(Z), 'lignes')
 OK = 0
-Z = zone()   # recompte les remplacements
-assert C[i + 1:j] == Z, 'zone différente des sources transformées'
-ok(f'zone égale aux sources transformées : {len(Z)} lignes')
-for nom in COPIES_M4C + COPIES_BUNDLES:
-    src = lignes('m4c.sh' if nom in COPIES_M4C else 'm1b-bundles.sh')
-    assert bloc(src, nom) == bloc(C, nom), nom
-    ok(f'{nom} identique à sa source')
-z = '\n'.join(Z)
-for motif in ('m4c-essai', 'prealables/', '$ENTREES', 'IMAGE_NEUVE', 'VERROU_ESSAI', 'bundles-construire', 'rm -rf "$x"', '${x:?}'):
+C = lignes(CIBLE)
+toutes = []
+for deb, fin, fz in ((DEBUT, FIN, zone), (DEBUT2, FIN2, zone2)):
+    i, j = C.index(deb), C.index(fin)
+    Z = fz()   # recompte les remplacements
+    assert C[i + 1:j] == Z, f'zone différente des sources transformées : {deb}'
+    ok(f'zone égale aux sources transformées : {len(Z)} lignes ({deb})')
+    toutes += Z
+for src, noms in [('m4c.sh', COPIES_M4C), ('m1b-bundles.sh', COPIES_BUNDLES)] + COPIES2:
+    for nom in noms:
+        assert bloc(lignes(src), nom) == bloc(C, nom), nom
+        ok(f'{nom} identique à sa source ({src})')
+z = '\n'.join(toutes)
+for motif in ('m4c-essai', 'prealables/', '$ENTREES', 'IMAGE_NEUVE', 'VERROU_ESSAI', 'bundles-construire', 'rm -rf "$x"', '${x:?}',
+              'm4c-rpm', 'm4c-pipeline', 'prefetch-rpm-sample-app', 'PIPELINE_M4B', 'ARBRE_ESSAI', 'SCRIPT_NEUF', 'VERROU_SRC', '$TACHES',
+              'sample-app-rpm.ref', 'name unknown'):
     assert motif not in z, motif
-    ok(f'motif absent de la zone : {motif}')
+    ok(f'motif absent des zones : {motif}')
 print(f'bilan : {OK} OK')

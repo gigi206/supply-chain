@@ -22,8 +22,18 @@
 #           égaux au journal de local), script de construire-rpm tel que signé ; première construction hermétique avec le
 #           bootstrap de M1b : lignes du script relevées (dossier dir:, « Checking image digest », « Expected digest for image »,
 #           repli, réseau) ; rpm et src.rpm comparés à M3, digest de l'artefact comparé à celui de l'essai de M4c, sans arrêter.
-# Les étapes de pipeline (signature, PipelineRuns, comparaison, provenance) viendront après l'essai : la décision sur le dépôt de
-# l'artefact en dépend (voir resultats/m1b-predictions.md).
+#   pipeline  ajoutée le 20/11/2026 après la décision du propriétaire « Même dépôt » ; SIGNER=1 seulement, sur accord nommé
+#           (signature, écriture dans Zot) : etape_pipeline de m1b-fermeture.sh transformée (remplacements comptés) : gardes (essai
+#           archivé sans écart, tag neuf absent, tag m4c sur ca874375, trois tâches de la liste revue, place libre) ; pipeline
+#           sample-app-rpm rendue admise, trois feuilles de différence avec celle de M4c relue dans son bundle ; signée par tkn
+#           (clé des tâches, jamais lue ici), relue, versionnée sous construction/sample-app-rpm.$TAG.signee.yaml ; bundle
+#           tekton/pipelines/sample-app-rpm:$TAG ; relue anonymement, tag m4c inchangé. Digest épinglé ensuite dans PIPELINE_REF.
+#   construction  ajoutée de même, sur accord nommé (cluster, écritures dans Zot) : etape_pipeline de m4c.sh transformée : deux
+#           PipelineRuns $PREFIXE-construction-1 et -2 ; gardes (PIPELINE_REF épinglée et relue au tag, tag m4c inchangé, artefact
+#           de M4c présent, journaux neufs) ; lignes de la construction hermétique relevées (hermetique) ; enveloppes d'attestation
+#           de l'artefact relevées avant et après. Écritures dans Zot : le même digest, republié par publier-image, et les
+#           attestations de Chains, ajoutées à celles de M4c.
+# Comparaison et provenance viendront après construction (lecture seule).
 # Un journal existant n'est jamais réécrit : relancer sous un autre PREFIXE.
 # Usage (racine du dépôt) : [PREFIXE=m1b] DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/m1b-construction.sh <étape>…
 #         (journaux : resultats/$PREFIXE-construction-<étape>.log)
@@ -37,6 +47,8 @@ R=$h05/resultats   # journaux de lancer (commun.sh)
 export R
 N=${PREFIXE:-m1b}
 case $N in ''|*[!a-z0-9-]*) echo "PREFIXE invalide : $N" >&2; exit 2 ;; m4c) echo "préfixe refusé : m4c appartient à M4c" >&2; exit 2 ;; esac
+TAG=${TAG:-$N}   # tag du bundle de la pipeline (étape pipeline, ajoutée le 20/11/2026)
+case $TAG in m4b|m4c|essai) echo "tag refusé : $TAG appartient à M4b, M4c ou aux essais" >&2; exit 2 ;; ''|*[!a-z0-9-]*) echo "TAG invalide : $TAG" >&2; exit 2 ;; esac
 C=$h05/construction
 T=$W/$N-construction-05
 mkdir -p "$T"
@@ -86,6 +98,16 @@ LABEL_CONSTRUIRE=construire-rpm
 MORCEAU_MIO=64
 ECARTS=0
 FACTICE=sha256:$(printf '0%.0s' {1..64})
+# Pipeline et PipelineRuns (ajouté le 20/11/2026 après la décision du propriétaire « Même dépôt ») : l'artefact est publié dans
+# builds/sample-app-rpm, où M4c a déjà publié et attesté le même digest ; la publication s'observe par les enveloppes d'attestation.
+PIPELINE_M4C=tekton/pipelines/sample-app-rpm@sha256:ca87437546266359925ff5cf2895f6c9ddeca7114a5634680ebbb0bb325f06be   # m4c.sh (PIPELINE_REF)
+FEUILLES_ATTENDUES=".spec.tasks[0].params[2].value
+.spec.tasks[0].params[4].value
+.spec.tasks[1].taskRef.params[0].value"   # fermeture rpm, artefact de packaging, bundle de construire-rpm (calcul à sec du 20/11)
+PIPELINE_REF=   # vide jusqu'à l'étape pipeline, puis épinglée par correction datée et banc rejoué ; construction refuse de tourner si vide
+DIGEST_ESSAI=sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119   # essai du 20/11 (m1b-construction-essai.log), égal à M4c
+PVC_TAILLE=2Gi   # m4c.sh
+LIBRE_MIN=1073741824   # m4c.sh
 
 # --- recopié de m4c.sh et m1b-bundles.sh ---
 # Blocs recopiés à l'identique de m4c.sh :
@@ -524,6 +546,270 @@ etape_essai() { # pod Kata au label construire-rpm, à la forme que Tekton produ
   [ "$ECARTS" = 0 ]
 }
 # --- fin des copies ---
+# --- recopié pour la pipeline (m4c.sh, m1b-bundles.sh, m1b-fermeture.sh) ---
+# Blocs recopiés à l'identique de m4c.sh :
+MASQUE='/jeton\|token/I c\[ligne masquée : motif jeton|token]'
+admission() { # fichier : kubectl create --dry-run=server dans builds (rien n'est créé) ; code de kubectl, sortie dans $T/admission.out (m4b.sh)
+  local rc=0
+  kubectl create --dry-run=server -n builds -f "$1" < /dev/null > "$T/admission.out" 2>&1 || rc=$?
+  echo "$rc"
+}
+libre_zot() { sur sc-stockage 'df -B1 --output=avail / | tail -n 1' < /dev/null | tr -d ' '; }   # m4b.sh
+pr_m4c() { # nom : PipelineRun de sample-app-rpm ; podTemplate de M4b (nodeSelector, tolérance, contexte de sécurité ; ni env) ;
+  # Kata pour la seule tâche construire (taskRunSpecs) ; workspace sortie sur un PVC de $PVC_TAILLE
+  jq -n --arg n "$1" --arg b "$PIPELINE_REF" --arg c "$COMMIT" --arg u "$DEPOT_GIT" --arg t "$PVC_TAILLE" '
+    {nodeSelector: {zone: "build"}, tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
+      securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: "RuntimeDefault"}}} as $z
+    | {apiVersion: "tekton.dev/v1", kind: "PipelineRun", metadata: {name: $n, namespace: "builds"},
+      spec: {pipelineRef: {resolver: "bundles", params: [{name: "bundle", value: $b}, {name: "name", value: "sample-app-rpm"},
+          {name: "kind", value: "pipeline"}]},
+        params: [{name: "commit", value: $c}, {name: "depot", value: $u}],
+        workspaces: [{name: "sortie", volumeClaimTemplate: {spec: {accessModes: ["ReadWriteOnce"], resources: {requests: {storage: $t}}}}}],
+        taskRunTemplate: {serviceAccountName: "build", podTemplate: $z},
+        taskRunSpecs: [{pipelineTaskName: "construire", podTemplate: ($z + {runtimeClassName: "kata"})}]}}' > "$T/pr-$1.json"
+}
+statut_pr() { # nom : « statut|raison » de la condition Succeeded (jamais le message) ; m4b.sh
+  kubectl get pipelinerun -n builds "$1" -o json < /dev/null | jq -r '[.status.conditions[]? | select(.type == "Succeeded")][0] // {} | "\(.status // "")|\(.reason // "")"'
+}
+attendre_pr() { # nom : attend la fin (3600 s au plus) ; « statut|raison » ; m4b.sh
+  local st=""
+  for _ in $(seq 1800); do
+    st=$(statut_pr "$1"); case $st in True\|*|False\|*) break ;; esac; sleep 2
+  done
+  echo "$st"
+}
+releve_pod() { # pod : nœud, runtimeClassName, label ; conteneurs d'initialisation et de pas (état, code, raison) ; ressources.
+  # Jamais de message ni de variable d'environnement (m4b.sh, sans le relevé de place-scripts).
+  kubectl get pod -n builds "$1" -o json < /dev/null > "$T/pod-$1.json" || { echo "     pod $1 illisible"; return 0; }
+  jq -r '"     pod \(.metadata.name) : nœud \(.spec.nodeName // "-"), runtimeClassName « \(.spec.runtimeClassName // "") », tekton.dev/task \(.metadata.labels["tekton.dev/task"] // "-"), phase \(.status.phase // "-")",
+    ((.status.initContainerStatuses // []) + (.status.containerStatuses // []) | .[] |
+      "     conteneur \(.name) : \(.state | to_entries[0] | "\(.key) code \(.value.exitCode // "-") raison \(.value.reason // "-")")"),
+    ((.spec.initContainers // []) + .spec.containers | .[] |
+      "     ressources \(.name) : demandes \(.resources.requests // {} | tojson) ; limites \(.resources.limits // {} | tojson)")' "$T/pod-$1.json"
+}
+lignes() { grep -c -- "$1" "$2" || true; }   # motif fichier : nombre de lignes
+# Blocs recopiés à l'identique de m1b-bundles.sh :
+zot_lire() { # libellé référence-sans-registre : digest si présent, « absent » sur un « not found » seul, sinon échec
+  local d
+  if d=$(oras manifest fetch --descriptor --ca-file "$P/ca-poc.crt" --registry-config "$T/vide.json" \
+      "$REG_HOTE/$2" < /dev/null 2> "$T/oras.err" | jq -r .digest); then
+    echo "$d"
+  elif grep -q -i -E 'not found|MANIFEST_UNKNOWN|NAME_UNKNOWN' "$T/oras.err"; then
+    echo absent
+  else
+    echec "$1 : NON CONCLUANT, $(head -c 160 "$T/oras.err" | tr '\n' ' ')"
+  fi
+}
+DIFF_FEUILLES=$(cat <<'PY'
+import json, sys
+def feuilles(o, p=''):
+    if isinstance(o, dict):
+        if not o:
+            yield p, '{}'
+        for k in o:
+            yield from feuilles(o[k], f'{p}.{k}')
+    elif isinstance(o, list):
+        if not o:
+            yield p, '[]'
+        for i, v in enumerate(o):
+            yield from feuilles(v, f'{p}[{i}]')
+    else:
+        yield p, json.dumps(o, ensure_ascii=False)
+a = dict(feuilles(json.load(open(sys.argv[1], encoding='utf-8'))))
+b = dict(feuilles(json.load(open(sys.argv[2], encoding='utf-8'))))
+for k in sorted(set(a) | set(b)):
+    if a.get(k) != b.get(k):
+        print(f'{k} : {a.get(k, "<absent>")} -> {b.get(k, "<absent>")}')
+PY
+)
+diff_feuilles() { python3 -I -c "$DIFF_FEUILLES" "$1" "$2"; }   # json-avant json-après
+# Blocs recopiés à l'identique de m1b-fermeture.sh :
+lire_manifeste() { # libellé référence-sans-registre sortie : octets du manifeste, lecture anonyme ; sha256 contrôlé par l'appelant
+  oras manifest fetch --ca-file "$P/ca-poc.crt" --registry-config "$T/vide.json" --output "$3" "$REG_HOTE/$2" < /dev/null 2> "$T/oras.err" \
+    || echec "$1 : manifeste illisible, $(head -c 160 "$T/oras.err" | tr '\n' ' ')"
+}
+# Blocs transformés (remplacements listés et comptés par resultats/m1b-construction-copies.py) :
+lire_bundle() { # référence-sans-registre sortie : objet d'un bundle Tekton (une couche, tar gzip d'un seul fichier), lecture anonyme
+  local x=$T/bundle.json c
+  lire_manifeste "bundle ${1%@*}" "$1" "$x"
+  attendu "bundle ${1##*/} : manifeste relu (sha256)" "sha256:$(sha "$x")" "${1##*@}"
+  attendu "bundle : une couche, pipeline sample-app-rpm" \
+    "$(jq -r '[(.layers | length), .layers[0].annotations["dev.tekton.image.kind"], .layers[0].annotations["dev.tekton.image.name"]] | join(" ")' "$x")" \
+    "1 pipeline sample-app-rpm"
+  c=$(jq -r '.layers[0].digest' "$x")
+  oras blob fetch --ca-file "$P/ca-poc.crt" --registry-config "$T/vide.json" --output "$T/couche.tgz" "$REG_HOTE/${1%@*}@$c" < /dev/null
+  attendu "bundle : couche relue (sha256)" "sha256:$(sha "$T/couche.tgz")" "$c"
+  attendu "bundle : un seul fichier dans la couche" "$(tar -tzf "$T/couche.tgz" | wc -l)" 1
+  tar -xzOf "$T/couche.tgz" > "$2"
+}
+
+etape_pipeline() { # SIGNER=1 seulement : pipeline signée, relue, versionnée sous un nom neuf, bundle au tag neuf
+  [ -n "${SIGNER:-}" ] || echec "étape pipeline : SIGNER=1 seulement, sur accord nommé du propriétaire"
+  [ -s "$S/taches.key" ] || echec "clé des tâches absente"
+  local x=$T/pipeline v=$C/sample-app-rpm.$TAG.signee.yaml p libre
+  neuf "$v"
+  sources_cascade
+  attendu "essai archivé (resultats/$N-construction-essai.log) : digest de l'artefact, sans écart" \
+    "$(sed -n 's/^OK   digest de l.artefact, égal à celui de l.essai de M4c : //p' "$R/$N-construction-essai.log") $(grep -c '^écarts : 0$' "$R/$N-construction-essai.log")" "$DIGEST_ESSAI 1"
+  neuf "$x"; mkdir "$x"
+  echo '{}' > "$T/vide.json"
+  echo "## gardes avant toute écriture (lecture anonyme)"
+  attendu "tag $TAG de la pipeline, absent" "$(zot_lire "tag $TAG" "tekton/pipelines/sample-app-rpm:$TAG")" absent
+  attendu "tag m4c de la pipeline, sur celle de M4c" "$(zot_lire "tag m4c" tekton/pipelines/sample-app-rpm:m4c)" "${PIPELINE_M4C##*@}"
+  attendu "preparer-rpm de M4c, lue dans la liste revue" "$(ref_revue preparer-rpm 2f65f390)" "$PREPARER_REF"
+  attendu "construire-rpm de la cascade, lue dans la liste revue" "$(ref_revue construire-rpm ca03f189)" "$CONSTRUIRE_REF"
+  attendu "publier-image, lue dans la liste revue" "$(ref_revue publier-image d21931f3)" "$PUBLIER_REF"
+  libre=$(libre_zot)
+  case $libre in ''|*[!0-9]*) echec "place libre illisible : $libre" ;; esac
+  [ "$libre" -ge "$LIBRE_MIN" ] || echec "place libre sur / de sc-stockage : $libre octets, sous $LIBRE_MIN"
+  echo "OK   octets libres sur / de sc-stockage (porte /var/lib/zot) : $libre (seuil $LIBRE_MIN)"
+  echo "## pipeline rendue (références de la liste revue, fermeture et artefact de la cascade) ; admission en dry-run serveur, rien n'est créé"
+  (T=$x; rendre_pipeline "$PREPARER_REF" "$CONSTRUIRE_REF" "$PUBLIER_REF")
+  attendu "pipeline rendue admise (code de kubectl)" "$(admission "$x/sample-app-rpm.yaml")" 0
+  lire_bundle "$PIPELINE_M4C" "$x/bundle-m4c.json"
+  normaliser "$x/bundle-m4c.json" > "$x/bundle-m4c.n.json"
+  normaliser "$x/sample-app-rpm.yaml" > "$x/rendue.n.json"
+  diff_feuilles "$x/bundle-m4c.n.json" "$x/rendue.n.json" > "$x/feuilles.txt"
+  attendu "rendue : feuilles différentes de la pipeline de M4c" "$(cut -d' ' -f1 "$x/feuilles.txt" | paste -sd' ')" "$(paste -sd' ' <<< "$FEUILLES_ATTENDUES")"
+  attendu "pipeline rendue : références des tâches (bundles)" \
+    "$(yq '[.spec.tasks[].taskRef.params[] | select(.name == "bundle") | .value] | join(" ")' "$x/sample-app-rpm.yaml")" "$PREPARER_REF $CONSTRUIRE_REF $PUBLIER_REF"
+  echo "## signature (tkn $(tkn version --component client)), relue avant tout versionnement et toute poussée"
+  tkn pipeline sign "$x/sample-app-rpm.yaml" -K "$S/taches.key" -f "$x/signee.yaml" > /dev/null
+  attendu "pipeline signée : annotation de signature" "$(yq '.metadata.annotations["tekton.dev/signature"] | length > 0' "$x/signee.yaml")" true
+  normaliser "$x/signee.yaml" > "$x/signee.n.json"
+  attendu "pipeline signée : égale à la rendue, signature exceptée (normalisées)" \
+    "$(cmp -s "$x/signee.n.json" "$x/rendue.n.json" && echo égale || echo différente)" égale
+  cp "$x/signee.yaml" "$v"
+  echo "signature versionnée : construction/${v##*/} (sha256 $(sha "$v"))"
+  (umask 077 && mkdir -p "$T/auth")
+  trap 'find "$T/auth" -depth -delete 2> /dev/null || true' EXIT   # copie du secret de Zot, retirée même en cas d'échec (sans rm)
+  mkdir -p "$T/auth/docker" && auth_zot "$T/auth/docker/config.json"   # bundle (commun.sh), compte poc-ecriture
+  echo "## bundle, tag $TAG (écriture définitive)"
+  p=$REG/tekton/pipelines/sample-app-rpm@$(bundle "$v" tekton/pipelines/sample-app-rpm "$TAG")
+  find "$T/auth" -depth -delete
+  echo "$p" | tee "$x/pipeline.ref"
+  echo "## relecture anonyme après"
+  attendu "tag $TAG de la pipeline, sur le bundle poussé" "$(zot_lire "tag $TAG" "tekton/pipelines/sample-app-rpm:$TAG")" "${p##*@}"
+  lire_bundle "${p#"$REG"/}" "$x/bundle-neuf.json"
+  normaliser "$x/bundle-neuf.json" > "$x/bundle-neuf.n.json"
+  attendu "bundle relu : égal à la pipeline signée (normalisés)" \
+    "$(cmp -s "$x/bundle-neuf.n.json" "$x/signee.n.json" && echo égal || echo différent)" égal
+  attendu "bundle relu : signature égale à celle de la version" \
+    "$(yq -o=yaml '.metadata.annotations["tekton.dev/signature"]' "$x/bundle-neuf.json")" "$(yq -o=yaml '.metadata.annotations["tekton.dev/signature"]' "$v")"   # le bundle est du JSON : sortie YAML forcée des deux côtés
+  attendu "tag m4c de la pipeline, inchangé" "$(zot_lire "tag m4c" tekton/pipelines/sample-app-rpm:m4c)" "${PIPELINE_M4C##*@}"
+  echo "octets libres sur / de sc-stockage après : $(libre_zot)"
+  echo "PIPELINE_REF à épingler (correction datée, banc rejoué) avant l'étape construction : $p"
+}
+
+etape_construction() { # deux PipelineRuns de sample-app-rpm ($N-construction-1, puis -2) ; rien n'est purgé ; artefact comparé à
+  # l'essai ; etape_pipeline de m4c.sh, transformée
+  local i pr r t p d u c k l x j g
+  echo "## gardes, avant toute création"
+  [ -n "$PIPELINE_REF" ] || echec "PIPELINE_REF non épinglée : étape pipeline, puis correction datée"
+  [ -s "$T/pipeline/pipeline.ref" ] || echec "référence de la pipeline absente (étape pipeline)"
+  attendu "pipeline écrite par l'étape pipeline" "$(cat "$T/pipeline/pipeline.ref")" "$PIPELINE_REF"
+  echo '{}' > "$T/vide.json"
+  attendu "tag m4c de la pipeline, inchangé" "$(zot_lire "tag m4c" tekton/pipelines/sample-app-rpm:m4c)" "${PIPELINE_M4C##*@}"
+  for i in 1 2; do neuf "$R/$N-construction-$i-construire.log"; done
+  attendu "pipeline relue dans Zot au tag $TAG (lecture anonyme)" \
+    "$REG/tekton/pipelines/sample-app-rpm@$(oras manifest fetch --descriptor --ca-file "$P/ca-poc.crt" "$REG_HOTE/tekton/pipelines/sample-app-rpm:$TAG" < /dev/null | jq -r .digest)" \
+    "$PIPELINE_REF"
+  for r in "$PREPARER_REF" "$CONSTRUIRE_REF" "$PUBLIER_REF"; do
+    if listee "$r"; then echo "OK   dans la liste revue : $r"; else echec "absente de la liste revue : $r"; fi
+  done
+  politique_relue
+  for i in 1 2; do
+    pr=$N-construction-$i
+    echo "## $pr"
+    if [ "$i" = 1 ]; then
+      attendu "artefact de M4c présent avant le premier PipelineRun (décision « Même dépôt »)" \
+        "$(zot_lire "artefact de M4c" "${IMAGE#"$REG"/}@$DIGEST_ESSAI")" "$DIGEST_ESSAI"
+      enveloppes_att avant
+    fi
+    r=0; kubectl get pipelinerun -n builds "$pr" -o name < /dev/null > /dev/null 2>&1 || r=$?
+    [ "$r" != 0 ] || echec "$pr existe déjà : rien n'est purgé, décision avant toute relance"
+    l=$(libre_zot)
+    echo "/ de sc-stockage : $l octets libres à $(date -u +%H:%M:%S) (garde : $LIBRE_MIN)"
+    if ! [[ $l =~ ^[0-9]+$ ]] || [ "$l" -lt "$LIBRE_MIN" ]; then echec "espace libre illisible ou sous la garde sur sc-stockage"; fi
+    pr_m4c "$pr"
+    attendu "$pr : podTemplate commun sans env ; Kata pour construire seule" \
+      "$(jq -c '[(.spec.taskRunTemplate.podTemplate | has("env")), [.spec.taskRunSpecs[] | .pipelineTaskName + ":" + (.podTemplate.runtimeClassName // "")]]' "$T/pr-$pr.json")" \
+      '[false,["construire:kata"]]'
+    attendu "$pr admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl" "$(admission "$T/pr-$pr.json")" 0
+    kubectl create -f "$T/pr-$pr.json" < /dev/null > /dev/null
+    echo "$pr créé à $(date -u +%H:%M:%S) ($PIPELINE_REF)"
+    r=$(attendre_pr "$pr")
+    echo "$pr : condition Succeeded « $r », relevée à $(date -u +%H:%M:%S)"
+    kubectl get pipelinerun -n builds "$pr" -o json < /dev/null > "$T/pr-$pr-etat.json"
+    jq -r '"     début \(.status.startTime // "-") ; fin \(.status.completionTime // "-")"' "$T/pr-$pr-etat.json"
+    for t in $(kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$pr" -o jsonpath='{.items[*].metadata.name}' < /dev/null); do
+      kubectl get taskrun -n builds "$t" -o json < /dev/null > "$T/tr-$t.json"
+      k=$(jq -r '.metadata.labels["tekton.dev/pipelineTask"] // "-"' "$T/tr-$t.json")
+      p=$(jq -r '.status.podName // ""' "$T/tr-$t.json")
+      echo "### TaskRun $t (tâche $k) : $(jq -r '[.status.conditions[]? | select(.type == "Succeeded")][0] // {} | "\(.status // "-")|\(.reason // "-")"' "$T/tr-$t.json") ; début $(jq -r '.status.startTime // "-"' "$T/tr-$t.json") ; fin $(jq -r '.status.completionTime // "-"' "$T/tr-$t.json")"
+      jq -r '.status.results[]? | "     résultat \(.name) : \(.value | if type == "string" then . else tojson end)"' "$T/tr-$t.json"
+      cp "$T/tr-$t.json" "$T/$pr-$k.tr.json"
+      [ -n "$p" ] || { echo "     aucun pod"; continue; }
+      echo "$p" > "$T/$pr-$k.pod"
+      releve_pod "$p"
+      for c in $(jq -r '.spec.containers[].name' "$T/pod-$p.json"); do
+        kubectl logs -n builds "$p" -c "$c" < /dev/null 2>&1 | sed "$MASQUE" > "$T/$pr-$k-$c.log" || true
+        echo "     journal de $c : $(wc -l < "$T/$pr-$k-$c.log") lignes, dont $(lignes '^paquet ' "$T/$pr-$k-$c.log") « paquet » (non répétées)"
+        grep -v '^paquet \|^\s*$' "$T/$pr-$k-$c.log" | cut -c1-240 | sed 's/^/       /'
+      done
+    done
+    jq -r '.status.results[]? | "résultat de \(.name) : \(.value)"' "$T/pr-$pr-etat.json"
+    x=$T/$pr-construire-step-construire.log
+    [ ! -f "$x" ] || cp "$x" "$R/$N-construction-$i-construire.log"
+    attendu "PipelineRun $pr" "$r" "True|Succeeded"
+    for j in preparer:preparer-rpm: construire:construire-rpm:kata publier:publier-image:; do
+      IFS=: read -r k g c <<< "$j"
+      attendu "$pr, $k : tekton.dev/task|runtimeClassName|nœud" \
+        "$(jq -r '"\(.metadata.labels["tekton.dev/task"] // "")|\(.spec.runtimeClassName // "")|\(.spec.nodeName // "")"' "$T/pod-$(cat "$T/$pr-$k.pod").json")" "$g|$c|sc-build"
+    done
+    attendu "preparer : CHAINS-GIT_URL et CHAINS-GIT_COMMIT" \
+      "$(jq -r '[.status.results[] | select(.name | startswith("CHAINS-GIT_")) | .name + "=" + .value] | sort | join(" ")' "$T/$pr-preparer.tr.json")" \
+      "CHAINS-GIT_COMMIT=$COMMIT CHAINS-GIT_URL=$DEPOT_GIT"
+    for j in "FERMETURE_RPM $FERMETURE_RPM" "FERMETURE_SOURCES $FERMETURE_SOURCES" "PACKAGING $PACKAGING"; do
+      read -r k g <<< "$j"
+      attendu "preparer : ${k}_ARTIFACT_INPUTS (clés triées)" \
+        "$(jq -cS --arg n "${k}_ARTIFACT_INPUTS" '.status.results[] | select(.name == $n) | .value' "$T/$pr-preparer.tr.json")" \
+        "$(jq -cnS --arg s "$g" '{uri: ("oci://" + ($s | sub("@.*$"; ""))), digest: ($s | sub("^.*@"; ""))}')"
+    done
+    attendu "construire : écriture refusée sur les entrées (ligne du script atteinte)" "$(lignes '^invité : .*, écriture refusée$' "$x")" 1
+    attendu "construire : témoins réseau en échec" "$(lignes '^témoin .* : échec, code [0-9]* (attendu)$' "$x")" 4
+    attendu "construire : fermeture confrontée au verrou (222 rpm)" "$(lignes '^fermeture confrontée au verrou : 222 rpm (noms et sigmd5)' "$x")" 1
+    attendu "construire : mock --hermetic-build rc 0" "$(lignes '^mock --hermetic-build : rc 0 en [0-9]* s$' "$x")" 1
+    attendu "construire : aucun repli en chroot" "$(lignes '^lignes « falling back to chroot installation » : sortie 0 ; root.log 0$' "$x")" 1
+    attendu "construire : aucune ligne http ou https (mock.out, root.log, build.log)" "$(lignes '^lignes http ou https de [a-z.]* : 0$' "$x")" 3
+    hermetique "$x"
+    attendu "construire : dernière ligne du script atteinte (image.tar)" "$(lignes '^image.tar : [0-9]* octets$' "$x")" 1
+    mesure "construire : Source0 égale à l'archive de sources.sh" \
+      "$(sed -n 's/^Source0 sample-app-1.0.0.tar.gz (époque [0-9]*) : \([0-9a-f]\{64\}\) ;.*/\1/p' "$x")" "$ARCHIVE_SHA"
+    mesure "construire : src.rpm égal à celui de M3" "$(sed -n 's/^rpm : [^ ]*\.src\.rpm sha256 \([0-9a-f]\{64\}\) .*/\1/p' "$x")" "$SRPM_M3_SHA"
+    mesure "construire : rpm égal à celui de M3" "$(sed -n 's/^rpm : [^ ]*\.x86_64\.rpm sha256 \([0-9a-f]\{64\}\) .*/\1/p' "$x")" "$RPM_M3_SHA"
+    echo "relevé : paquets du buildroot imprimés : $(lignes '^paquet ' "$x") ; écarts au verrou (nom, version, release, arch, sigmd5) : $(diff <(grep '^paquet ' "$x") <(jq -r '.buildroot.rpms[] | "paquet \(.name) \(.version) \(.release) \(.arch) \(.sigmd5)"' "$VERROU" | sort) | grep -c '^[<>]' || true)"
+    u=$(jq -r '.status.results[] | select(.name == "IMAGE_URL") | .value' "$T/pr-$pr-etat.json")
+    d=$(jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value' "$T/pr-$pr-etat.json")
+    echo "$d" > "$T/rpm-$i.digest"
+    attendu "dépôt publié" "$u" "$IMAGE"
+    attendu "construire : DIGEST_CONSTRUIT égal au digest publié" \
+      "$(jq -r '.status.results[] | select(.name == "DIGEST_CONSTRUIT") | .value' "$T/$pr-construire.tr.json")" "$d"
+    attendu "publier : ligne de publication" "$(lignes "^publiée : $IMAGE@$d (relue en lecture anonyme)$" "$T/$pr-publier-step-publier.log")" 1
+    attendu "manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches" \
+      "$(oras manifest fetch --descriptor --ca-file "$P/ca-poc.crt" "${IMAGE/$REG/$REG_HOTE}@$d" < /dev/null | jq -r .digest) $(
+        oras manifest fetch --ca-file "$P/ca-poc.crt" "${IMAGE/$REG/$REG_HOTE}@$d" < /dev/null | jq '.layers | length')" "$d 1"
+    mesure "digest de l'artefact égal à celui du pod d'essai" "$d" "$DIGEST_ESSAI"
+    attendu "PipelineRun $pr signé par Chains" "$(signe pipelinerun "$pr")" true
+    echo "/ de sc-stockage : $(libre_zot) octets libres à $(date -u +%H:%M:%S)"
+  done
+  mesure "deux exécutions, même artefact" "$(cat "$T/rpm-2.digest")" "$(cat "$T/rpm-1.digest")"
+  enveloppes_att après
+  attendu "tag m4c de la pipeline, inchangé après" "$(zot_lire "tag m4c" tekton/pipelines/sample-app-rpm:m4c)" "${PIPELINE_M4C##*@}"
+  echo "écarts : $ECARTS"
+  [ "$ECARTS" = 0 ]
+}
+# --- fin des copies pour la pipeline ---
 
 sources_cascade() { # sha256 des gabarits et des tâches signées ; références de la liste revue ; bootstrap du verrou neuf
   local e
@@ -561,6 +847,15 @@ hermetique() { # journal du script : lignes de la construction hermétique relev
   mesure "ligne du script « mock --hermetic-build : rc 0 en … s »" "$(grep -c '^mock --hermetic-build : rc 0 en [0-9]* s$' "$j" || true)" 1
   mesure "témoins réseau en échec" "$(grep -c '^témoin .* : échec, code [0-9]* (attendu)$' "$j" || true)" 4
   echo "relevé : $(grep '^mock --hermetic-build : ' "$j" || echo 'aucune ligne mock --hermetic-build') ; $(grep '^avant mock, capacité de /w' "$j" || echo '-') ; $(grep '^après mock' "$j" || echo '-')"
+}
+enveloppes_att() { # moment : relevé, sans pari, du nombre de couches du manifeste .att de l'artefact (une par enveloppe d'attestation),
+  # lecture anonyme ; la publication d'un digest déjà présent s'observe par là (décision « Même dépôt »)
+  local r=${IMAGE#"$REG"/}:sha256-${DIGEST_ESSAI#sha256:}.att
+  if oras manifest fetch --ca-file "$P/ca-poc.crt" --registry-config "$T/vide.json" --output "$T/att-$1.json" "$REG_HOTE/$r" < /dev/null 2> "$T/oras.err"; then
+    echo "relevé : enveloppes d'attestation de l'artefact ($1) : $(jq '.layers | length' "$T/att-$1.json") (manifeste .att sha256:$(sha "$T/att-$1.json"))"
+  else
+    echo "relevé : manifeste .att de l'artefact illisible ($1) : $(head -c 160 "$T/oras.err" | tr '\n' ' ')"
+  fi
 }
 
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then

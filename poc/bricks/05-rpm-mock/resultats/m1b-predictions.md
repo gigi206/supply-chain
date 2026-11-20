@@ -2577,3 +2577,51 @@ Le journal complet du script de construction est [`m1b-construction-construire-p
 **Ce que cela établit** : avec l'outillage, le bootstrap, le verrou et la fermeture de M1b, la construction hermétique de sample-app redonne à l'octet le rpm de M3 et l'artefact de M4c. Changer d'images de builder change la fermeture des dépendances (`2a9e2ea7…` devient `09838980…`), mais pas l'artefact construit.
 
 **Question avant la suite** : publier par la plateforme écrira `builds/sample-app-rpm@07b7bd6f…`, un digest que M4c a déjà publié et que Chains a déjà attesté. La garde « dépôt absent » de `m4c.sh` ne tient plus, et les attestations des PipelineRuns refaits s'ajouteraient à celles de M4c sur le même sujet. Les étapes `pipeline`, `construction`, `comparaison` et `provenance` ne seront écrites qu'après ce choix.
+
+### Décision du propriétaire, lue le 20/11/2026 avant 2026-11-20T13:23:17Z UTC : « Même dépôt » pour l'artefact de M4c refait
+
+Les PipelineRuns de M4c refait publieront dans `builds/sample-app-rpm`, le dépôt de M4c, dont `m5.sh` et la brique 09 (`o5-signes.py`) citent le nom. Le digest attendu, `07b7bd6f…`, y est déjà publié et attesté par M4c (4 enveloppes au 18/11). Trois conséquences :
+- la publication ne sera pas observable comme une apparition. Elle le sera par le nombre d'enveloppes d'attestation, relevé avant et après ;
+- Chains écrira sur des objets de M4c (`.att`, `.sig` de ce digest). L'accord nommé de lancement couvrira cette écriture ;
+- la porte jugera ensemble les attestations de M4c et celles de la cascade. Les étapes de vérification isolent les PipelineRuns refaits par leur uid.
+
+## Cascade avant M5b, M4c refait : pipeline et construction, prédictions écrites le 20/11/2026 à 2026-11-20T13:32:19Z UTC, avant tout lancement
+
+**Script** : [`m1b-construction.sh`](../m1b-construction.sh) (sha256 `07e851f2f1f1f498…`). Deux étapes sont ajoutées après la décision « Même dépôt ». Elles sont produites par des remplacements comptés ([`m1b-construction-copies.py`](m1b-construction-copies.py), `4639c3e4dbb3e2e8…`, 104 contrôles) :
+- `pipeline` est l'`etape_pipeline` de `m1b-fermeture.sh`, transposée à `sample-app-rpm`. Elle n'accepte que `SIGNER=1`.
+- `construction` est l'`etape_pipeline` de `m4c.sh`. Elle crée deux PipelineRuns, `m1b-construction-1` et `-2`.
+
+La garde « dépôt absent » de `m4c.sh` devient « artefact de M4c présent ». Les lignes de la construction hermétique sont relevées par `hermetique`. Les enveloppes d'attestation de l'artefact sont relevées avant et après. Le tag `m4c` de la pipeline de M4c est contrôlé avant et après. Sont recopiés à l'identique : sept fonctions de `m4c.sh` et sa ligne `MASQUE`, trois blocs de `m1b-bundles.sh` et `lire_manifeste` de `m1b-fermeture.sh`. `lire_bundle` de `m1b-fermeture.sh` est transformée : seul le nom de la pipeline change.
+
+**Bancs** :
+- [`m1b-construction-banc-3.log`](m1b-construction-banc-3.log) : 124 OK, 8 KO, tous dans le banc. Une branche de la doublure de `kubectl` retombait sur « appel inattendu », et le cas G11 ne remplaçait que 8 caractères du digest.
+- [`m1b-construction-banc-4.log`](m1b-construction-banc-4.log) : 130 OK, 0 KO, mais un commentaire mal placé y masquait le contrôle du cas G11. Le cas tournait sans être vérifié.
+- [`m1b-construction-banc-5.log`](m1b-construction-banc-5.log) : 132 OK, 0 KO (banc `d082715aeb07ca41…`), G11 compris. Il couvre trois sections :
+  - **G**, `pipeline` : jouée avec le vrai tkn et une clé P-256 jetable. Le cas nominal donne 34 OK, une poussée, une signature vérifiée par tkn et refusée avec une autre clé, les trois feuilles et aucun reste de `$T/auth`. Dix cas sont refusés sans poussée ni signature : sans `SIGNER`, clé absente, version présente, tag neuf présent, tag `m4c` déplacé, place basse, refus à l'admission, `publier-image` hors liste, essai avec écart, fermeture de M4b remise.
+  - **H**, gardes de `construction` : neuf cas refusés avant toute création. Le cas nominal s'arrête sur la création interceptée, après une lecture réelle de 4 enveloppes.
+  - **I**, `construction` jusqu'au bout : un faux `kubectl` sert les objets réels des PipelineRuns de M4c, transposés aux valeurs de la cascade. Les lectures anonymes de l'artefact et de son `.att` sont réelles. Résultat : 87 OK, 0 KO ni écart, 24 lignes hermétiques, enveloppes relevées avant et après.
+- **Non couvert** : Tekton, le résolveur, Chains, Kata, la vraie clé, l'écriture dans Zot.
+
+- **PS1** (haute), `pipeline`, sur ton accord nommé seulement :
+  - Les gardes passent : l'essai archivé est sans écart et donne `07b7bd6f…`, le tag `m1b` est absent, le tag `m4c` est sur `ca874375…`, les trois tâches sont dans la liste revue et la place libre suffit.
+  - La pipeline rendue est admise. Elle ne diffère de celle de M4c, relue dans son bundle, que par trois feuilles : la fermeture, l'artefact de packaging et le bundle de `construire-rpm`.
+  - Elle est signée, relue, puis versionnée sous `construction/sample-app-rpm.m1b.signee.yaml`, et poussée sous le tag `m1b`.
+  - La relecture anonyme est égale à la version, et le tag `m4c` n'a pas bougé.
+  - Résultat attendu : 38 OK, soit les 34 du banc plus les quatre contrôles de `lire_bundle` sur le bundle neuf, réels hors du banc.
+- **Relevé, sans pari** : le digest de la pipeline, car la signature ECDSA n'est pas déterministe. Il sera épinglé dans `PIPELINE_REF` par une correction datée, avec le banc rejoué, avant `construction`.
+- **CO1** (haute), `construction`, sur ton accord nommé seulement :
+  - Les gardes passent : `PIPELINE_REF` épinglée et relue au tag, tag `m4c` inchangé, trois tâches dans la liste revue, politiques de `builds`, artefact de M4c présent, journaux neufs.
+  - `m1b-construction-1` puis `-2` finissent en `True|Succeeded`. `preparer` et `publier` tournent en runc, et `construire` sous Kata, tous sur sc-build.
+  - Le résolveur accepte la pipeline et les trois tâches signées.
+- **CO2** (haute) : `construire` reproduit l'essai, avec les mêmes lignes de la construction hermétique :
+  - `image_digest` `77cff176…` contrôlé, aucune ligne « Expected digest for image », aucun repli, aucune ligne http ;
+  - 222 paquets, 4 témoins réseau en échec ;
+  - Source0, src.rpm et rpm de M3, 0 écart au verrou `c544599a…`.
+- **CO3** (haute) : les deux PipelineRuns publient `builds/sample-app-rpm@07b7bd6f…`, égal à l'essai, et Chains signe les deux. Il y a un précédent : en M4c, `m4c-rpm-2` avait republié ce même digest sans erreur ([`m4c-pipeline.log`](m4c-pipeline.log)).
+- **CO4** (moyenne haute) : les enveloppes d'attestation de l'artefact passent de 4 à 8. Chains ajoute une enveloppe par PipelineRun et une par TaskRun de `publier`, comme en M4c. **Relevés** :
+  - le digest du manifeste `.att` avant et après ;
+  - la place libre sur sc-stockage ;
+  - les durées.
+- **Risque noté** : le PVC de 2 Gi reçoit `entrees/` (environ 463 Mo, contre 319 Mo en M4c) et `image.tar`. La marge reste large.
+
+Si PS1 et CO1 à CO3 tiennent, il restera la comparaison et la provenance, en lecture seule, pour tenir M4c refait. La provenance devra isoler les deux PipelineRuns refaits par leur uid, parmi les enveloppes de M4c.

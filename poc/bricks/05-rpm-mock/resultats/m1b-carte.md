@@ -1009,3 +1009,10 @@ De 12:44:34Z à 12:46:38Z, sur ton accord nommé, RP1 à RP4 tiennent. Les deux 
 ## Note datée du 20/11/2026, écrite à 2026-11-20T13:19:26Z UTC : essais de M4c refait tenus
 
 De 13:14:53Z à 13:18:29Z, sous l'accord permanent, `local`, `essai_preparer` et `essai` de `m1b-construction.sh` tiennent : CL1, EP1 et ES1 à ES4. La construction hermétique avec le bootstrap de M1b passe le contrôle `image_digest` (`77cff176…`) de mock, mesuré pour la première fois. Elle redonne le rpm de M3 et l'artefact `07b7bd6f…` de M4c. Suite : choix du dépôt de publication, puisque ce digest est déjà publié et attesté par M4c.
+
+## Décision du propriétaire, lue le 20/11/2026 avant 2026-11-20T13:23:17Z UTC : « Même dépôt » pour l'artefact de M4c refait
+
+Les PipelineRuns de M4c refait publieront dans `builds/sample-app-rpm`, le dépôt de M4c, dont `m5.sh` et la brique 09 (`o5-signes.py`) citent le nom. Le digest attendu, `07b7bd6f…`, y est déjà publié et attesté par M4c (4 enveloppes au 18/11). Trois conséquences :
+- la publication ne sera pas observable comme une apparition. Elle le sera par le nombre d'enveloppes d'attestation, relevé avant et après ;
+- Chains écrira sur des objets de M4c (`.att`, `.sig` de ce digest). L'accord nommé de lancement couvrira cette écriture ;
+- la porte jugera ensemble les attestations de M4c et celles de la cascade. Les étapes de vérification isolent les PipelineRuns refaits par leur uid.
