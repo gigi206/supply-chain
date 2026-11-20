@@ -85,7 +85,7 @@ ARBRE_PREDIT_SHA=a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014
 DIGEST_PREDIT=sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f # calcul à sec du 20/11 ; relevé à rpm, jamais exigé
 ARBRE_ESSAI=$R/$N-fermeture-essai-arbre.txt   # étape essai (bf35d748 pour m1b)
 # Pipeline et PipelineRuns
-PIPELINE_REF=   # vide jusqu'à l'étape pipeline : épinglée ensuite par correction datée, banc rejoué ; rpm refuse de tourner sans
+PIPELINE_REF=$REG/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c   # étape pipeline du 20/11 (m1b-fermeture-pipeline.log) ; rpm refuse de tourner si vide
 LIBRE_MIN=1073741824   # garde : octets libres sur / de sc-stockage (porte /var/lib/zot), comme m4b.sh
 ARGS_RECONSTRUIT='non refait ici (59848 en M4b)'   # lu par releve_pod (copie de m4b.sh) ; relevé, jamais exigé
 # Pod d'essai (valeurs de m4b.sh)

@@ -148,7 +148,7 @@ cas E9 'SIGNER=1; PUBLIER_REF=${PUBLIER_REF/7fa92ad3/00000000}; etape_pipeline';
 
 echo "## F étape rpm, gardes (vraie fonction, mêmes doublures ; la première création réelle est interceptée)"
 PR_OK="PIPELINE_REF=\$REG/tekton/pipelines/prefetch-rpm-sample-app@$FAUSSE; echo \"tekton/pipelines/prefetch-rpm-sample-app:m1b $FAUSSE\" >> \"\$BW/zot.txt\""
-cas F1 'etape_rpm'; attendu_ko F1 "KO   PIPELINE_REF non épinglée"
+cas F1 'PIPELINE_REF=; etape_rpm'; attendu_ko F1 "KO   PIPELINE_REF non épinglée"
 verifie "F1 : aucun appel de kubectl" "$(wc -l < "$EF/F1/appels")" 0
 cas F2 "PIPELINE_REF=\$REG/tekton/pipelines/prefetch-rpm-sample-app@$FAUSSE; etape_rpm"; attendu_ko F2 "KO   pipeline relue dans Zot au tag m1b"
 cas F3 "$PR_OK; echo \"tekton/pipelines/prefetch-rpm-sample-app:m4b $FAUSSE\" >> \"\$BW/zot.txt\"; etape_rpm"; attendu_ko F3 "KO   tag m4b de la pipeline, inchangé"
@@ -166,6 +166,58 @@ verifie "F9 : PipelineRun créé (nom, bundle de la pipeline, nom, workspace, sa
   "$(jq -c '[.metadata.name, .spec.pipelineRef.params[0].value, .spec.pipelineRef.params[1].value, .spec.workspaces[0].volumeClaimTemplate.spec.resources.requests.storage, (.spec.taskRunTemplate.podTemplate.runtimeClassName // "aucun")]' "$EF/F9/cree.json")" \
   "[\"m1b-rpm-1\",\"sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@$FAUSSE\",\"prefetch-rpm-sample-app\",\"1Gi\",\"aucun\"]"
 verifie "F9 : couches attendues tirées de l'arbre de l'essai" "$(grep -c '^OK   arbre de l.essai archivé (sha256), égal à l.arbre prédit' "$EF/F9/sortie.txt")" 1
+
+echo "## G étape rpm jusqu'au bout (ajoutée le 20/11/2026 après la signature de la pipeline) : faux kubectl servant les objets"
+echo "##   réels des PipelineRuns de M4b (TaskRuns, pods, journaux des pas, gardés sous \$W/m4b-05), valeurs de M4b remplacées par"
+echo "##   celles de la cascade (noms m1b-rpm-*, bootstrap neuf, digest prédit) ; faux oras pour le manifeste neuf seulement"
+M4B=$W0/m4b-05
+G=$EF/G-objets
+mkdir -p "$G"
+for i in 1 2; do
+  for f in "tr-m4b-rpm-$i-prefetch.json" "tr-m4b-rpm-$i-publier.json" "pod-m4b-rpm-$i-prefetch-pod.json" "pod-m4b-rpm-$i-publier-pod.json" \
+           "m4b-rpm-$i-prefetch-step-prefetch.log" "m4b-rpm-$i-publier-step-publier.log"; do
+    sed -e 's/m4b-rpm-/m1b-rpm-/g' -e 's#essais-05/rocky9-bootstrap#builds/builders/rocky9-bootstrap#g' \
+      -e 's/f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6/6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3/g' \
+      -e 's/2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c/0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f/g' \
+      "$M4B/$f" > "$G/${f//m4b-rpm-/m1b-rpm-}"
+  done
+done
+verifie "G objets de M4b transposés (12 fichiers, plus aucune valeur de M4b)" \
+  "$(ls "$G" | wc -l) $(cat "$G"/* | grep -c 'm4b-rpm-\|f0ccf105\|2a9e2ea7\|essais-05/rocky9-bootstrap')" "12 0"
+complet() { # doublures du cas G, après doublures
+  kubectl() {
+    echo "kubectl $*" >> "$BW/appels"
+    case "$*" in
+      "create --dry-run=server -n builds -f "*) return 0 ;;
+      "get pipelinerun -n builds "*" -o name") grep -qx "$5" "$BW/crees" 2> /dev/null ;;   # $5 : nom de l'objet
+      "create -f "*) jq -r .metadata.name "${*: -1}" >> "$BW/crees"; cp "${*: -1}" "$BW/cree-$(jq -r .metadata.name "${*: -1}").json" ;;
+      "get pipelinerun -n builds "*" -o json")
+        jq -n --arg u "$DEPOT_FERMETURE" --arg d "$DIGEST_PREDIT" '{status: {conditions: [{type: "Succeeded", status: "True", reason: "Succeeded"}],
+          startTime: "2026-11-20T00:00:00Z", completionTime: "2026-11-20T00:03:00Z", results: [{name: "IMAGE_URL", value: $u}, {name: "IMAGE_DIGEST", value: $d}]}}' ;;
+      "get pipelinerun -n builds "*" -o jsonpath="*) echo true ;;   # annotation de Chains (signe)
+      "get taskrun -n builds -l tekton.dev/pipelineRun="*) echo "${6#*=}-prefetch ${6#*=}-publier" ;;
+      "get taskrun -n builds "*" -o json") cat "$BANC_G/tr-$5.json" ;;
+      "get pod -n builds "*" -o json") cat "$BANC_G/pod-$5.json" ;;
+      "logs -n builds "*" -c "*) cat "$BANC_G/${4%-pod}-$6.log" ;;
+      *) echo "faux kubectl : appel inattendu : $*" >&2; return 3 ;;
+    esac
+  }
+  oras() { # manifeste de la fermeture prédite : 230 couches ; tout le reste, le vrai oras
+    case "$*" in *"@$DIGEST_PREDIT"*) jq -n '{layers: [range(230) | {}]}' ;; *) command oras "$@" ;; esac
+  }
+}
+cas G "BANC_G=$G; complet; echo \"tekton/pipelines/prefetch-rpm-sample-app:m1b \${PIPELINE_REF##*@}\" >> \"\$BW/zot.txt\"; etape_rpm"
+grep -v '^     \|^       ' "$EF/G/sortie.txt" | cut -c1-170 | sed 's/^/   | /'
+verifie "G : code" "$(cat "$EF/G/code")" 0
+verifie "G : KO" "$(grep -c '^KO' "$EF/G/sortie.txt")" 0
+verifie "G : OK" "$(grep -c '^OK' "$EF/G/sortie.txt")" 36
+verifie "G : deux PipelineRuns créés, dans l'ordre" "$(paste -sd' ' "$EF/G/crees")" "m1b-rpm-1 m1b-rpm-2"
+verifie "G : PipelineRun créé, bundle de la pipeline épinglée" "$(jq -r '.spec.pipelineRef.params[0].value' "$EF/G/cree-m1b-rpm-2.json")" \
+  "sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c"
+verifie "G : lignes finales (même fermeture, M4b présente après, fermeture neuve)" \
+  "$(grep -c '^OK   deux exécutions, même fermeture\|^OK   fermeture de M4b toujours présente après\|^fermeture neuve : sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm@sha256:0983898054a9' "$EF/G/sortie.txt")" 3
+verifie "G : couches attendues = 230 (journal de publier et manifeste)" "$(grep -c '^OK   \(publier : 230 couches dans le journal\|manifeste relu dans Zot (lecture anonyme) : couches : 230\)' "$EF/G/sortie.txt")" 4
+verifie "G : digest relevé égal au prédit (relevé)" "$(grep -c 'calculé\|prédit à sec sha256:0983898054a9[0-9a-f]* : égaux' "$EF/G/sortie.txt")" 2
 
 echo "     dossiers du banc laissés sous \$W : $B-fermeture-05, $B-b-fermeture-05, $B-d1…d9-fermeture-05, $B-r, $B-a.txt, $B-local.log, $B-ef"
 echo "# fin $(date -u +%FT%TZ) : $OK OK, $KO KO"

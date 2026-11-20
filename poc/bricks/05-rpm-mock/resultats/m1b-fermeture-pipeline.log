@@ -1,0 +1,43 @@
+# m1b-fermeture.sh pipeline, 2026-11-20T12:25:52Z
+OK   fermeture/prefetch-rpm.yaml (sha256) : 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c
+OK   fermeture/prefetch-rpm-sample-app.yaml (sha256) : ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+OK   fermeture/prefetch-rpm.signee.yaml (sha256) : 4123539575b1f7986f82f648913ee147348c7198399018f3520c7037eeade199
+OK   fermeture/prefetch-rpm.m1b.signee.yaml (sha256) : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   resultats/m1b-fermeture-digest.py (sha256) : a5d014290f0a6d4ce08e54b2693608f63dd0b18539f183199011b9c138d95f32
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   verrou de la cascade (sha256) : c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   verrou de M4b (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   arbre de final (sha256) : fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+OK   arbre de l'essai archivé (sha256), égal à l'arbre prédit : a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014a
+## gardes avant toute écriture (lecture anonyme)
+OK   tag m1b de la pipeline, absent : absent
+OK   tag m4b de la pipeline, sur celle de M4b : sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+OK   prefetch-rpm de la cascade, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+OK   publier-fermeture, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+OK   octets libres sur / de sc-stockage (porte /var/lib/zot) : 3016204288 (seuil 1073741824)
+## pipeline rendue (références de la liste revue, bootstrap de M1b) ; admission en dry-run serveur, rien n'est créé
+OK   pipeline rendue admise (code de kubectl) : 0
+OK   bundle prefetch-rpm-sample-app@sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db : manifeste relu (sha256) : sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+OK   bundle : une couche, pipeline prefetch-rpm-sample-app : 1 pipeline prefetch-rpm-sample-app
+OK   bundle : couche relue (sha256) : sha256:558f8914c8e1cd4ae5171a6d4aaf20655688520121164bdf18f4fc5a2477beec
+OK   bundle : un seul fichier dans la couche : 1
+OK   rendue : feuilles différentes de la pipeline de M4b : .spec.tasks[0].params[1].value .spec.tasks[0].params[2].value .spec.tasks[0].taskRef.params[0].value
+OK   script de la tâche substitué avec la pipeline rendue, celui de l'essai (sha256) : 4d8bfe827d718b275b056f1c52ecd0a519b2736529f93e0fc56d18aa01b02d0c
+## signature (tkn 0.46.2), relue avant tout versionnement et toute poussée
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   pipeline signée : annotation de signature : true
+OK   pipeline signée : égale à la rendue, signature exceptée (normalisées) : égale
+signature versionnée : fermeture/prefetch-rpm-sample-app.m1b.signee.yaml (sha256 be99c8f946849d92fa92b7db354138bee1880ee123186406107d012f18215ffd)
+## bundle, tag m1b (écriture définitive)
+sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+## relecture anonyme après
+OK   tag m1b de la pipeline, sur le bundle poussé : sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+OK   bundle prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c : manifeste relu (sha256) : sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+OK   bundle : une couche, pipeline prefetch-rpm-sample-app : 1 pipeline prefetch-rpm-sample-app
+OK   bundle : couche relue (sha256) : sha256:6ff746aba12297eb7bbb5067493b8a17776db2deb75b58fd4722b2d068f58330
+OK   bundle : un seul fichier dans la couche : 1
+OK   bundle relu : égal à la pipeline signée (normalisés) : égal
+OK   bundle relu : signature égale à celle de la version : MEQCIC2q3lNl620lnnbu+jy3OOCegmhOvK+nQtlx8961z2xEAiAi9iKqKM+HjNVqLUv4nMkkPCR+a46Xrnfcsu6I6kKjww==
+OK   tag m4b de la pipeline, inchangé : sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+octets libres sur / de sc-stockage après : 3016122368
+PIPELINE_REF à épingler (correction datée, banc rejoué) avant l'étape rpm : sc-stockage.poc.test:5000/tekton/pipelines/prefetch-rpm-sample-app@sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c

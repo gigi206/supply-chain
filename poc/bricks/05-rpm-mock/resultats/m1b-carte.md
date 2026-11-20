@@ -993,3 +993,7 @@ Script frère [`m1b-fermeture.sh`](../m1b-fermeture.sh), étapes `local` et `ess
 **Décision du propriétaire** : « Même dépôt, par digest ». La fermeture neuve ira dans `builds/fermetures/sample-app-rpm`, à côté de celle de M4b.
 
 Les étapes `pipeline` et `rpm` sont ajoutées à [`m1b-fermeture.sh`](../m1b-fermeture.sh). Le banc 2 donne 68 OK ([`m1b-fermeture-banc-2.log`](m1b-fermeture-banc-2.log)). Il a trouvé un défaut avant tout lancement : la relecture de la signature dans le bundle en JSON. Prédictions PS1, PS2 et RP1 à RP4 ([prédictions](m1b-predictions.md)). Chaque étape attend ton accord nommé ; entre les deux, `PIPELINE_REF` sera épinglée par correction datée.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T12:28:23Z UTC : pipeline de M4b refait signée et poussée
+
+À 12:25:52Z, sur ton accord nommé (« Oui, signe et pousse »), PS1 et PS2 tiennent. La pipeline est sous `m1b` : `prefetch-rpm-sample-app@sha256:61814acd…`, versionnée sous `fermeture/prefetch-rpm-sample-app.m1b.signee.yaml`. `PIPELINE_REF` est épinglée, et le banc 3 donne 77 OK, dont `rpm` jouée jusqu'au bout sur les objets transposés de M4b. Suite : `rpm`, sur accord nommé.
