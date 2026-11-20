@@ -71,3 +71,14 @@ Seuls des comptes seront archivés, jamais de flux bruts.
 - **Le volume d'une construction complète**, prefetch compris. Les pods de prefetch ont des sorties permises : leurs flux FORWARDED sont attendus et ne contredisent pas T5. Ce volume sera mesuré en 4a.
 - **Le comportement des politiques pendant le redémarrage des agents** à la pose.
 - **La réaction de l'agent à un chemin de `fieldMask` refusé.**
+
+## Étape 2 recadrée : script et prédiction T9 (note de 2026-11-20T22:20:24Z ; rien n'est réécrit au-dessus)
+
+**Script** : [`j7.sh`](../j7.sh) (sha256 `5baffc6f89cbfffc…`).
+- **Étape `sec`, passée** ([journal](j7-sec.log)) : les deux pods sont admis à blanc par dry-run serveur, admission comprise. Ce sont deux pods Kata en zone `build`, avec l'image d'outillage de M1b et le contexte du pas `construire` signé ; le pod b porte le label `construire-rpm`. Rien n'est créé.
+- **Étape `mesure`, en attente de l'accord nommé** du `kubectl exec` dans l'agent Cilium de sc-build. Elle crée le pod a puis le pod b et lance leurs témoins. Elle lit ensuite `hubble observe` deux fois par pod, avec `--ip` (comme la 08) puis avec `--pod builds/<pod>` (le filtre de l'export), en comptes seulement. Les pods sont ensuite supprimés, et le catalogue de Zot est relu en anonyme.
+- T0 à T6 et T8 s'y vérifient. E1 à E6 et T7 restent pour l'étape 4a.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| T9 | Pour chaque pod, `--pod builds/<pod>` rend autant de flux que `--ip`, et chaque flux sortant porte `source.namespace=builds` et `source.pod_name` = le pod. L'endpoint est créé par le plugin CNI de Cilium avec les labels du pod, comme sous runc. **Si `--pod` ne rend rien alors que `--ip` rend des flux, le filtre `source_pod: builds/` de l'export ne verrait rien, et la conception change avant toute pose** | Moyenne : jamais mesuré sous Kata |

@@ -1,0 +1,6 @@
+# j7.sh sec, 2026-11-20T22:20:05Z
+OK   labels de tâche (a, b) : - construire-rpm
+OK   contexte du conteneur, celui du pas signé : {"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0}
+OK   j7-a admis à blanc : kata ; build ; sans label de tâche ; 8f6d797a41ebaf472ae
+OK   j7-b admis à blanc : kata ; build ; construire-rpm ; 8f6d797a41ebaf472ae
+agent Cilium de sc-build : cilium-jpzfl (aucun exec à cette étape)
