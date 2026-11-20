@@ -283,3 +283,16 @@ Question posée : (iii) laisser `TZ` à l'hôte pour ce rejeu, ou (i) `TZ=Europe
 - L'utilisateur sous lequel mock lance `%build` n'a pas été relevé.
 
 Les options restent (i) et (ii). Une piste de contrôle hors de la tâche signée, qui ne rouvrirait ni la signature ni la cascade, serait un relevé périodique des politiques de `builds`. Elle n'est ni écrite ni essayée.
+
+## Décision du propriétaire sur le dossier 5 : une barrière, en réserve écrite (note de 2026-11-20T21:05:43Z ; rien n'est réécrit au-dessus)
+
+Question posée : (i) une barrière, avec les limites de la note précédente en réserve écrite, ou un relevé périodique des politiques de `builds` en plus. **Réponse : « Ok i ».**
+
+- Rien n'est modifié : ni `construire-rpm`, ni `construire-racine-rpm`, ni leurs politiques. Pas de nouvelle signature, et la cascade de M1b reste valable.
+- **Réserve de la 05**, à reprendre à la clôture :
+  - une seule politique réseau coupe la voie rpm pendant `%build`, parce que mock en `--isolation=simple` ne crée pas d'espace de noms réseau ;
+  - les témoins des tâches signées font échouer la construction, fermée, au démarrage seulement ;
+  - aucun contrôle continu de la politique n'existe ;
+  - les deux politiques vers Internet passent par le même moteur ;
+  - le contenu du rpm reste une voie de sortie que la barrière réseau ne couvre pas.
+- Le relevé périodique des politiques reste une piste, ni écrite ni essayée.
