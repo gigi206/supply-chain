@@ -724,3 +724,9 @@ La provenance reste à préparer, sur le modèle de M4c. Sa forme dépend des r�
 **Portée, celle prévue à 15:33:13 UTC le 19/11** : les deux racines et les deux images se reproduisent dans Kata sur deux jours (19 et 20/11), sur un seul nœud et un seul hôte. Le point 1 A est établi dans ce cadre, pas au-delà : ni pour un autre nœud, ni après une mise à jour du noyau ou de Kata.
 
 **Suite** : `m1b_sortie` (accord déjà donné pour après la mesure). Ensuite, dans un tour de jour, le correctif de `filtre`, puis `m1b_sans_sortie` sur son propre accord.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T00:12:41Z UTC : `m1b_sortie` posée
+
+`sortie-builds.sh m1b_sortie` est passée à 2026-11-20T00:12:03Z, code 0, 14 OK et 0 KO ([`sortie-m1b_sortie.log`](../../08c-durcissement/resultats/sortie-m1b_sortie.log)). `prefetch-racine-rpm-sortie` est créée et valide pour Cilium. `builds-sans-internet` exclut désormais quatre labels (`prefetch-gomod`, `prefetch-deb`, `prefetch-rpm`, `prefetch-racine-rpm`). Comme prévu, `s1.sh prealables` attend toujours un `NotIn` à trois labels : à adapter avant le rejeu M5b.
+
+**Suite** : dans un tour de jour, le correctif de `filtre`, puis `m1b_sans_sortie` sur son propre accord, puis `m1b_temoins`.
