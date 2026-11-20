@@ -379,3 +379,10 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
   - les témoins des tâches signées arrêteraient la construction si la politique manquait au démarrage. C'est lu, pas provoqué ;
   - aucun contrôle continu de la politique n'a été trouvé ;
   - les deux politiques vers Internet passent par le même moteur, Cilium.
+
+**Additif du 20/11/2026 (2026-11-20T22:52:08Z UTC) : flux Hubble des pods de construction mesurés (J7 de la 19b).** Un export dynamique de Hubble, filtré sur `builds/`, est posé depuis le 20/11 à 22:46 UTC. Ce qu'il voit :
+- **Pod d'essai au label `construire-rpm`** : 46 flux refusés et aucun autorisé.
+- **Pod Kata** : ses flux portent l'espace de noms et le nom du pod, comme sous runc.
+- **Invité Kata** : `tcp_syn_linear_timeouts=4`, d'où 7 SYN en 10 s par connexion refusée.
+
+Mesuré sur des pods d'essai, pas sur une construction. Détail : [résultats](../../poc/bricks/19b-journalisation/resultats/j7-predictions.md).

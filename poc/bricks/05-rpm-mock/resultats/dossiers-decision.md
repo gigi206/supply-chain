@@ -340,3 +340,14 @@ Question posée : « On clôt la 05 maintenant avec M5b en réserve, ou après M
 - Les décisions des dossiers 2 à 5 valent pour ce rejeu : rétention grype gardée, `vm.sh` à 30G, `TZ` laissé à l'hôte, une barrière réseau en réserve.
 - Le dossier 7 (D14) n'est pas lié à la clôture : il se tranchera quand le scan du rpm entrera dans la plateforme.
 - Effort au 20/11 : 46,78 h de commits (note de 20:07:45Z), pour une estimation de 2,5 pw avec décision à 5 pw. Je ne convertis pas les heures ; l'effort sera relevé de nouveau à la clôture.
+
+## Renvoi : J7 de la 19b, mesure du contrôle de la barrière (note de 2026-11-20T22:52:08Z ; rien n'est réécrit au-dessus)
+
+La réserve du dossier 5 disait « aucun contrôle continu » de la NetworkPolicy pendant `%build`. J7 de la 19b a posé, le 20/11 à 22:46 UTC, un export des flux Hubble des pods de `builds` vers un fichier de sc-build (accord du propriétaire, [résultats](../../19b-journalisation/resultats/j7-predictions.md)).
+
+Il a été mesuré avec **un pod Kata d'essai au label `construire-rpm`, pas avec une construction** :
+- les quatre témoins de la tâche ont été refusés ;
+- 46 flux refusés, aucun flux autorisé en sortie ;
+- le fichier filtré sur `builds/` les contient tous.
+
+Les flux ne vont pas encore dans Grafana : c'est 4b, sur un second accord. La réserve tient tant qu'une construction réelle n'a pas été lue ainsi.

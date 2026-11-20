@@ -215,3 +215,11 @@ Accord du propriétaire : « Oui il faut mettre rke2 ». La demande nommait la p
 - **Journal** : la ligne « command terminated with exit code 1 » vient du `grep -c` sans correspondance du compte des fichiers tournés. Elle est sans effet (0 fichier tourné).
 
 **État laissé : l'export est posé** sur les trois agents. Il borne le fichier à 60 Mo par nœud, sous `/var/run` (sans doute un tmpfs, non lu). Le retour est un accord à part : `DISTRO=rke2 mise exec -- poc/bricks/19b-journalisation/j7.sh retour`.
+
+## Relevés après la pose (note de 2026-11-20T22:52:08Z ; rien n'est réécrit au-dessus)
+
+- **Rattrapage** : `pose` a suspendu le CronJob `rattrapage`, puis l'a remis à `suspend: false` sans avoir relevé sa valeur de départ. Celle-ci est établie après coup. Dans Loki, par Grafana (auditeur, comptes seulement), 15 pods `rattrapage` ont tourné entre 22:30 et 22:45 UTC, un par minute : le CronJob était actif avant la pose, et la reprise a rétabli son état. Au relevé : `suspend=false`, dernier passage à 22:50:00 UTC. **Avant `retour`, `j7.sh` doit relever cette valeur et la restaurer.**
+- **`rattrapage-deb`** : 15 pods de ce second CronJob ont tourné sur la même plage. Il n'est pas suspendu par la pose, pas plus que par `etape_h5_cilium` de la 08c. Le contrôle « aucun PipelineRun actif » couvre le moment de la pose, pas la durée du redémarrage.
+- **`/var/run` de sc-build** : c'est un tmpfs de 995 Mo (`findmnt` par ssh, sans sudo), sur une VM de 9 950 Mo de mémoire. Le fichier d'export, borné à 60 Mo par la rotation, est en mémoire.
+- **Volume d'une vraie construction** : l'export est posé, donc tout PipelineRun à venir remplira le fichier. Derniers PipelineRuns de `builds` : le 20/11 à 13:41:07 UTC. La mesure passive consiste à relire la taille du fichier après le prochain passage, sans rien écrire dans Zot. Cette relecture est un `kubectl exec`, à nommer dans la demande.
+- **`DISTRO`** : le défaut de `distro.sh` reste `k3s`. Le changer serait une modification de configuration pour tous les scripts de la 08, et n'est pas fait.
