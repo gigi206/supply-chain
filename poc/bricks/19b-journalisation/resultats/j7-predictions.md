@@ -183,3 +183,35 @@ Accord du propriétaire : « Oui », à la demande nommant les deux pods Kata pr
    Sur un banc local avec une ligne coupée : 1 ligne non JSON, et les 4 valides gardées.
 
 Commande de chaque étape, depuis la racine : `DISTRO=rke2 mise exec -- poc/bricks/19b-journalisation/j7.sh <pose|export|retour>`.
+
+## Résultats de 4a : pose et export (note de 2026-11-20T22:49:25Z ; rien n'est réécrit au-dessus)
+
+Accord du propriétaire : « Oui il faut mettre rke2 ». La demande nommait la pose des valeurs Helm de Cilium (redémarrage des agents des trois nœuds, réécriture de `cilium-appliquer.log` de la 08), les deux pods Kata privilégiés, et les `kubectl exec` dans les agents des trois nœuds. Les deux étapes ont tourné avec `DISTRO=rke2` et `j7.sh` `edbc4fdbf9b1dfdb…`, chacune en code 0.
+
+**`pose`**, de 22:45:30 à 22:46:23 UTC ([journal](j7-pose.log), et [`cilium-appliquer.log`](../../08-trust-plane/resultats/cilium-appliquer.log) de la 08, révision 3 de la release).
+- **P1 tenue** :
+  - trois agents recréés (de 22:45:57 à 22:46:10), avec l'état OK et Hubble Ok ;
+  - API prête, Zot joignable (HTTP 200) ;
+  - certificats de Cilium et de Hubble inchangés (versions d'objet 426 et 427) ;
+  - 17 redémarrages hors Cilium, avant comme après, et 0 pour les pods de Cilium recréés ;
+  - pare-feu d'hôte posé.
+- **E1 et E2 tenues** : 164 clés, et un seul exportateur, `builds`. Relu juste après : les 163 autres clés sont égales à celles d'avant la pose (sha256 du JSON trié `2cf9627a73576d91…` des deux côtés), et `kube-proxy-replacement=true`.
+- **E3 tenue** : fichier absent sur sc-build tant qu'aucun flux de `builds` n'a passé.
+
+**`export`**, de 22:47:07 à 22:48:11 UTC ([journal](j7-export.log)). Pods supprimés, copies effacées.
+
+| # | Résultat |
+|---|---|
+| X1 (réserve de T9) | **Tenue.** Le fichier de sc-build, filtré par le préfixe `builds/`, contient autant de flux que `hubble observe --ip` : 7 = 7 pour le pod a, 46 = 46 pour le pod b |
+| X2 | **Tenue, et cette fois mesurée.** POLICY_DENY = 14 sur 199.232.170.132:80 ; POLICY_DENIED sur le DNS (4) et sur Zot et Forgejo (14 et 14) |
+| X3 | **Tenue.** 42 flux SYN pour le pod b, 14 par témoin TCP, soit 7 paquets SYN par témoin à deux événements chacun. L'invité Kata (noyau 6.18.56) a `tcp_syn_retries=6` et **`tcp_syn_linear_timeouts=4`** : quatre reprises à intervalle fixe avant le doublement. Cela explique T2 |
+| X4 (E4, E5) | **Tenue.** 53 lignes, toutes avec `flow`, `node_name` et `time`. Le verdict est écrit en nom. Aucun champ hors du masque. Aucune ligne hors de `builds`. Aucune ligne non JSON |
+| X5 (T7) | **Tenue.** 53 lignes et 67 604 octets pour les deux pods (environ 1,3 Ko par ligne). Aucun fichier tourné |
+| E6 | **Non tenue pour sc-stockage.** Le fichier de sc-stockage existe, avec une ligne (1 201 octets) : un verdict de politique FORWARDED **en entrée**, de `builds/j7-a` vers Zot (192.168.161.13:5000). Le pare-feu d'hôte du nœud de destination voit les connexions autorisées des pods de `builds`. Les connexions refusées, elles, sont jetées à la source. Ce comptage a été lu après l'étape, dans l'agent de sc-stockage, puis la copie a été effacée. sc-confiance : absent |
+
+**Constats pour la suite** :
+- **Alloy sur sc-build seul** voit tout ce qui est refusé, et les sorties autorisées vues à la source. Les nœuds de destination ajoutent les entrées autorisées vers leurs services (Zot et Forgejo sur sc-stockage). Ce sont des doublons utiles, à décider en 4b.
+- **Volume** : environ 1,3 Ko par flux. Une construction rpm sans autre trafic en donnerait environ 46 pour ses témoins. Une vraie construction, prefetch compris, n'est pas mesurée.
+- **Journal** : la ligne « command terminated with exit code 1 » vient du `grep -c` sans correspondance du compte des fichiers tournés. Elle est sans effet (0 fichier tourné).
+
+**État laissé : l'export est posé** sur les trois agents. Il borne le fichier à 60 Mo par nœud, sous `/var/run` (sans doute un tmpfs, non lu). Le retour est un accord à part : `DISTRO=rke2 mise exec -- poc/bricks/19b-journalisation/j7.sh retour`.

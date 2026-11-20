@@ -155,3 +155,7 @@ Résultat dans les [prédictions](j7-predictions.md) ; [journal](j7-mesure.log).
 Forme (a), le fichier combiné. Les étapes `pose`, `export` et `retour` de [`j7.sh`](../j7.sh) sont prêtes, avec les prédictions P1 à P3 et X1 à X5 ([prédictions](j7-predictions.md)). `pose_sec` est tenue. Rien n'est posé.
 
 Ordre recommandé (conseiller) : `pose` et `export` sur un accord ; `retour` sur un accord à part. Le retour viendrait après la mesure du volume d'une vraie construction, qui est l'objet de 4a. Cette mesure n'est pas préparée : une construction réelle écrirait dans Zot, ce qui est à peser contre G7.
+
+## 4a : export posé et mesuré (note de 2026-11-20T22:49:25Z ; rien n'est réécrit au-dessus)
+
+**L'export est posé depuis 22:46:23 UTC le 20/11** (forme (a)). Le passage s'est fait sans incident : P1, E1 à E3 et X1 à X5 sont tenues. E6 ne l'est pas pour sc-stockage : son pare-feu d'hôte voit les entrées autorisées des pods de `builds`. Détail dans les [prédictions](j7-predictions.md). Le retour attend un accord à part. 4b (envoi vers Loki) n'est pas commencé.

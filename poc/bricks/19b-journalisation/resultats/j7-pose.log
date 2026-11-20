@@ -1,0 +1,43 @@
+# j7.sh pose, 2026-11-20T22:45:30Z
+OK   DISTRO=rke2
+OK   fenêtre : 2026-11-20T22:45:30Z, hors de 08:00 à 11:30 UTC et hors des balayages n°2 et n°3
+en cas de KO après cilium.sh : l'export peut rester posé ; retour : DISTRO=rke2 [FORCER_RETOUR=1] j7.sh retour
+OK   clés de tête du fichier combiné : hostFirewall policyAuditMode tls hubble
+OK   export absent avant la pose : false
+OK   rattrapage suspendu, aucun PipelineRun actif
+pose 22:45:30 UTC
+# cilium.sh appliquer, 2026-11-20T22:45:30Z
+## valeurs (cilium/valeurs.yaml, digests amd64)
+OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
+## release cilium (helm v4.3.1+gc0d08d0, depuis l'hôte)
+Release "cilium" has been upgraded. Happy Helming!
+NAME: cilium
+LAST DEPLOYED: Fri Nov 20 23:45:31 2026
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 3
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+OK   release cilium : statut et version : deployed cilium-1.20.4
+cilium-config : policy-cidr-match-mode=nodes
+OK   DaemonSet cilium prêt : 3/3
+agents recréés après 2026-11-13T12:54:05Z : sc-confiance=2026-11-20T22:45:57Z sc-stockage=2026-11-20T22:46:00Z sc-build=2026-11-20T22:46:10Z 
+OK   policy-cidr-match-mode lu par l'agent de sc-confiance : [nodes]
+agents prêts 22:46:23 UTC
+OK   API : ok
+OK   Zot joignable depuis l'hôte : HTTP 200
+OK   certificats de Cilium et de Hubble (versions d'objet) : cilium-ca 426 hubble-server-certs 427
+OK   cilium-m7md2, état : OK
+OK   cilium-m7md2, Hubble : Ok
+OK   cilium-pb28b, état : OK
+OK   cilium-pb28b, Hubble : Ok
+OK   cilium-xk5zh, état : OK
+OK   cilium-xk5zh, Hubble : Ok
+OK   redémarrages de conteneurs du cluster, hors pods de Cilium : 17
+OK   redémarrages des pods de Cilium recréés : 0
+OK   enable-host-firewall : true
+OK   E1 : clés de cilium-config, hubble-flowlogs-config-path : 164 /flowlog-config/flowlogs.yaml
+OK   E2 : exportateurs de cilium-flowlog-config : builds
+E3 : sc-build : 0 absent
+E6 : sc-confiance : 0 absent ; sc-stockage : 0 absent
+rattrapage repris

@@ -1,0 +1,87 @@
+# j7.sh export, 2026-11-20T22:47:07Z
+OK   export posé : /flowlog-config/flowlogs.yaml
+OK   labels de tâche (a, b) : - construire-rpm
+OK   contexte du conteneur, celui du pas signé : {"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0}
+agent Cilium de sc-build : cilium-xk5zh
+fichier d'export avant : sc-build 0 absent
+## pod a (sans label de tâche)
+pod j7-a créé à 2026-11-20T22:47:07Z
+pod prêt : sc-build, runtimeClassName kata, IP 10.42.1.34
+invité Kata : tcp_syn_retries=6 tcp_syn_linear_timeouts=4 6.18.56
+J7-POD tcp 192.168.161.13/5000 code 0
+hubble observe --ip 10.42.1.34 : code 0, 7 ligne(s), 0 ligne(s) d'erreur
+Hubble, filtre --ip 10.42.1.34 : 7 flux ; lignes sans flow (lost_events, autres) : 0
+  verdict : FORWARDED=7
+  drop_reason_desc : -=7
+  event_type.type : 4=6 5=1
+  verdict × sens × is_reply × source=pod : FORWARDED|EGRESS|false|pod=5 FORWARDED|EGRESS|true|autre=2
+  protocole × destination : TCP|10.42.1.34:38966=2 TCP|192.168.161.13:5000=5
+  horodatages distincts par destination : 10.42.1.34:38966=2 192.168.161.13:5000=5
+  source.namespace/pod_name : builds/j7-a=5 ∅/∅=2
+  destination.namespace/pod_name : builds/j7-a=2 ∅/∅=5
+  sortants du pod non DROPPED : 5
+  sortants du pod FORWARDED vers Zot : 5
+  drapeaux TCP des flux du pod : ACK=2 ACK,FIN=1 SYN=2
+  motif × destination : -|10.42.1.34:38966=2 -|192.168.161.13:5000=5
+fichier d'export de sc-build : 7 ligne(s), dont non JSON : 0
+fichier d'export de sc-build depuis 2026-11-20T22:47:07Z (préfixe builds/) : 7 flux ; lignes sans flow (lost_events, autres) : 0
+  verdict : FORWARDED=7
+  drop_reason_desc : -=7
+  event_type.type : 4=6 5=1
+  verdict × sens × is_reply × source=pod : FORWARDED|EGRESS|false|pod=5 FORWARDED|EGRESS|true|autre=2
+  protocole × destination : TCP|10.42.1.34:38966=2 TCP|192.168.161.13:5000=5
+  horodatages distincts par destination : 10.42.1.34:38966=2 192.168.161.13:5000=5
+  source.namespace/pod_name : builds/j7-a=5 ∅/∅=2
+  destination.namespace/pod_name : builds/j7-a=2 ∅/∅=5
+  sortants du pod non DROPPED : 5
+  sortants du pod FORWARDED vers Zot : 5
+  T9 (préfixe) : flux du pod dans le fichier 7 ; dans hubble observe --ip 7
+pod j7-a supprimé à 22:47:19
+## pod b (construire-rpm)
+pod j7-b créé à 2026-11-20T22:47:19Z
+pod prêt : sc-build, runtimeClassName kata, IP 10.42.1.249
+invité Kata : tcp_syn_retries=6 tcp_syn_linear_timeouts=4 6.18.56
+J7-POD dns dl.rockylinux.org code 124
+J7-POD tcp 192.168.161.13/5000 code 124
+J7-POD tcp 192.168.161.13/3000 code 124
+J7-POD tcp 199.232.170.132/80 code 124
+hubble observe --ip 10.42.1.249 : code 0, 46 ligne(s), 0 ligne(s) d'erreur
+Hubble, filtre --ip 10.42.1.249 : 46 flux ; lignes sans flow (lost_events, autres) : 0
+  verdict : DROPPED=46
+  drop_reason_desc : POLICY_DENIED=32 POLICY_DENY=14
+  event_type.type : 1=23 5=23
+  verdict × sens × is_reply × source=pod : DROPPED|EGRESS|-|pod=46
+  protocole × destination : TCP|192.168.161.13:3000=14 TCP|192.168.161.13:5000=14 TCP|199.232.170.132:80=14 UDP|10.42.2.203:53=4
+  horodatages distincts par destination : 10.42.2.203:53=4 192.168.161.13:3000=14 192.168.161.13:5000=14 199.232.170.132:80=14
+  source.namespace/pod_name : builds/j7-b=46
+  destination.namespace/pod_name : kube-system/rke2-coredns-rke2-coredns-746f455775-lgbkn=4 ∅/∅=42
+  sortants du pod non DROPPED : 0
+  sortants du pod FORWARDED vers Zot : 0
+  drapeaux TCP des flux du pod : =4 SYN=42
+  motif × destination : POLICY_DENIED|10.42.2.203:53=4 POLICY_DENIED|192.168.161.13:3000=14 POLICY_DENIED|192.168.161.13:5000=14 POLICY_DENY|199.232.170.132:80=14
+fichier d'export de sc-build : 53 ligne(s), dont non JSON : 0
+fichier d'export de sc-build depuis 2026-11-20T22:47:19Z (préfixe builds/) : 46 flux ; lignes sans flow (lost_events, autres) : 0
+  verdict : DROPPED=46
+  drop_reason_desc : POLICY_DENIED=32 POLICY_DENY=14
+  event_type.type : 1=23 5=23
+  verdict × sens × is_reply × source=pod : DROPPED|EGRESS|-|pod=46
+  protocole × destination : TCP|192.168.161.13:3000=14 TCP|192.168.161.13:5000=14 TCP|199.232.170.132:80=14 UDP|10.42.2.203:53=4
+  horodatages distincts par destination : 10.42.2.203:53=4 192.168.161.13:3000=14 192.168.161.13:5000=14 199.232.170.132:80=14
+  source.namespace/pod_name : builds/j7-b=46
+  destination.namespace/pod_name : kube-system/rke2-coredns-rke2-coredns-746f455775-lgbkn=4 ∅/∅=42
+  sortants du pod non DROPPED : 0
+  sortants du pod FORWARDED vers Zot : 0
+  T9 (préfixe) : flux du pod dans le fichier 46 ; dans hubble observe --ip 46
+pod j7-b supprimé à 22:48:11
+fichier d'export de sc-build : 53 ligne(s), dont non JSON : 0
+## E4, E5 : fichier de sc-build depuis 2026-11-20T22:47:07Z
+lignes : 53 ; octets : 67604
+clés de tête : flow,node_name,time=53
+champs de flow : IP=53 destination=53 drop_reason_desc=46 egress_allowed_by=1 egress_denied_by=7 event_type=53 is_reply=7 l4=53 node_name=53 source=53 time=53 traffic_direction=53 verdict=53
+verdict au format nom : DROPPED FORWARDED
+sources hors de builds : 0
+## fichier entier et rotation
+command terminated with exit code 1
+sc-build : 1 67604 ; fichiers tournés : 0
+E6 : sc-confiance : 0 absent ; sc-stockage : 1 1201
+nettoyage : pods du jalon restants 0, flux bruts de ~/.cache/supply-chain-poc/08/travail/j7-19b effacés
