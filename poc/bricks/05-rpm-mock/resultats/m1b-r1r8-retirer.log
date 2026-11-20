@@ -1,0 +1,4 @@
+# m1b-r1r8.sh retirer, 2026-11-20T14:38:41Z
+à retirer : 18 objet(s) : taskrun.tekton.dev/m1b-r1r8-intacte taskrun.tekton.dev/m1b-r1r8-preparer taskrun.tekton.dev/m1b-r1r8-r1 taskrun.tekton.dev/m1b-r1r8-r2 taskrun.tekton.dev/m1b-r1r8-r3 taskrun.tekton.dev/m1b-r1r8-r4 taskrun.tekton.dev/m1b-r1r8-r5 taskrun.tekton.dev/m1b-r1r8-r6 taskrun.tekton.dev/m1b-r1r8-sans-kata pod/m1b-r1r8-intacte-pod pod/m1b-r1r8-preparer-pod pod/m1b-r1r8-r1-pod pod/m1b-r1r8-r2-pod pod/m1b-r1r8-r3-pod pod/m1b-r1r8-r4-pod pod/m1b-r1r8-r5-pod pod/m1b-r1r8-r6-pod persistentvolumeclaim/m1b-r1r8-entrees
+OK   objets du jalon restants : 0
+OK   PipelineRuns de M4c et de M4c refait gardés : 4

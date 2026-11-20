@@ -1,0 +1,4 @@
+# m1b-r1r8.sh invariance, 2026-11-20T14:38:13Z
+OK   enveloppes valides sur l'artefact de M4c (après) : 8
+relevé : TaskRuns du jalon, annotation chains.tekton.dev/signed : m1b-r1r8-intacte=true m1b-r1r8-preparer=true m1b-r1r8-r1=true m1b-r1r8-r2=true m1b-r1r8-r3=true m1b-r1r8-r4=true m1b-r1r8-r5=true m1b-r1r8-r6=true m1b-r1r8-sans-kata=failed
+OK   PipelineRuns de M4c et de M4c refait gardés : 4

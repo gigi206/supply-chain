@@ -1072,3 +1072,25 @@ De 13:47:19Z à 13:49:36Z, sous l'accord permanent, RF1 et RF2 tiennent. Avec `b
 Question posée après le point `s1.sh prealables` : « Rejouer R1–R8 sur le nouveau bundle ? ». Le propriétaire a répondu « Rejouer les huit » (réponse lue avant 14:10:07 UTC, heure exacte non relevée). C'était ma recommandation, validée par le conseiller.
 
 **Portée** : les huit refus de M5a sont rejoués sur le bundle de la cascade (`construire-rpm@ca03f189…`, outillage `70f8c412…`), par un script frère de `m5.sh`, qui reste inchangé. L'accord porte sur le rejeu. Chaque étape suit le processus habituel : préparation à sec, banc, prédictions commitées avant le lancement, puis lancement sous l'accord permanent du 18/11. Rien n'est écrit dans Zot.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T14:40:14Z UTC : refus de M5a rejoués, cascade terminée
+
+De 14:23:25Z à 14:38:42Z, sous l'accord permanent, `m1b-r1r8.sh` a rejoué R1 à R8 sur le bundle de la cascade. RJ1 à RJ12 tiennent : chaque altération est refusée par la même barrière qu'en M5a, et le témoin redonne le rpm de M3 et l'artefact `07b7bd6f…` ([résultat](m1b-predictions.md)).
+
+**Vérification contre la liste du §5 et la correction de 13:56:10Z** : les six points de la cascade sont faits.
+- Verrou `c544599a…` ;
+- artefact de packaging `333b7322…` ;
+- bundles et revue ;
+- M4b refait ;
+- M4c refait ;
+- refus de M5a rejoués (cette note), et `s1.sh prealables` à quatre labels (note de 14:05Z).
+
+**La cascade avant M5b est terminée.**
+
+**Restent, hors de la cascade** :
+- la ConfigMap `porte` en retard sur `taches.yml`, qui n'est pas un préalable de R1 à R8 ;
+- `poc/packaging/verrou-rpm.json`, encore le verrou de M4a ;
+- la place libre de sc-stockage, 2 842 Mo, en baisse non attribuée ;
+- le rejeu M5b, pas avant le 28/11.
+
+La clôture de la brique 05 reste ta décision.

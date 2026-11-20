@@ -1,0 +1,22 @@
+# m1b-r1r8.sh alterer, 2026-11-20T14:24:57Z
+pod m1b-r1r8-alterer créé à 14:24:57
+OK   m5-alterer.py dans le pod (sha256) : 8bc019dc46a7f28f7f9df2915471e17c9ff31e0cd5260a76e9bb555efd6b26bd
+OK   entrees/ du PVC (preparer-rpm) : empreinte, égale à la source locale : 7153c8064cad6aababf65b22369cfe88be892e463e20d5f4722cab9f9abfc43b
+     r1 : zlib-1.2.11-40.el9.x86_64.rpm remplacé par le contenu de alternatives-1.24-2.el9.x86_64.rpm
+     r2 : m5-en-trop.rpm ajouté à la racine de depot/
+     r3 : zlib-1.2.11-40.el9.x86_64.rpm retiré
+     r4 : zlib-1.2.11-40.el9.x86_64.rpm, octet 88091 inversé, taille inchangée (92187 octets)
+     r5 : manifest.json du dossier dir: suivi d'un saut de ligne
+     r6 : fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3/b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, octet 120990720 inversé, taille inchangée (241981440 octet
+     source : 273 fichiers, empreinte 7153c8064cad6aababf65b22369cfe88be892e463e20d5f4722cab9f9abfc43b
+     OK   intacte : 273 fichiers ; écarts à la source : aucun
+     OK   r1 : 273 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (contenu)
+     OK   r2 : 274 fichiers ; écarts à la source : fermeture/depot/m5-en-trop.rpm (en plus)
+     OK   r3 : 272 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (absent)
+     OK   r4 : 273 fichiers ; écarts à la source : fermeture/depot/zlib-1.2.11-40.el9.x86_64.rpm (contenu)
+     OK   r5 : 273 fichiers ; écarts à la source : fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3/manifest.json (contenu)
+     OK   r6 : 273 fichiers ; écarts à la source : fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3/b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348 (contenu)
+OK   copies : chacune ne diffère de la source que par l'objet voulu (code, lignes OK) : 0 7
+OK   entrees/ du PVC : empreinte après : 7153c8064cad6aababf65b22369cfe88be892e463e20d5f4722cab9f9abfc43b
+relevé : PVC : 21513452 kB utilisés sur 30753032
+pod m1b-r1r8-alterer supprimé

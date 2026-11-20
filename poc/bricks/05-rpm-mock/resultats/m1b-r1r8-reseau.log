@@ -1,0 +1,31 @@
+# m1b-r1r8.sh reseau, 2026-11-20T14:36:29Z
+## bras a (sans label de tâche)
+pod m1b-r1r8-reseau-a créé à 14:36:29
+pod prêt sur sc-build, runtimeClassName kata
+OK   m1b-r1r8-reseau-a : spec et script copiés (sha256) : 1dd1ad3ba811137806d99e93949b6afea343cc3dd7db16295e24311d52652750 5160760dabfa92af1aac137d7312620c5b4178d60a4737f1547cfc67539e93f0
+     M5-POD uid 0 ; interfaces : lo eth0 
+     M5-POD tcp 192.168.161.13/5000 code 0
+     M5-POD mock rc 0 en 31 s
+     M5-SONDE début de %build
+     M5-SONDE interfaces : lo eth0 
+     M5-SONDE tcp 192.168.161.13/5000 code 0
+     M5-SONDE fin de %build
+     M5-POD produit : /w/res/m5-reseau-1.0-1.noarch.rpm
+     M5-POD produit : /w/res/m5-reseau-1.0-1.src.rpm
+pod m1b-r1r8-reseau-a supprimé (code de l'exec : 0)
+relevé : bras a : pod tcp 0 ; %build : début 1, fin 1, tcp 0, interfaces « lo eth0  »
+## bras b (construire-rpm)
+pod m1b-r1r8-reseau-b créé à 14:37:11
+pod prêt sur sc-build, runtimeClassName kata
+OK   m1b-r1r8-reseau-b : spec et script copiés (sha256) : 1dd1ad3ba811137806d99e93949b6afea343cc3dd7db16295e24311d52652750 5160760dabfa92af1aac137d7312620c5b4178d60a4737f1547cfc67539e93f0
+     M5-POD uid 0 ; interfaces : lo eth0 
+     M5-POD tcp 192.168.161.13/5000 code 124
+     M5-POD mock rc 0 en 40 s
+     M5-SONDE début de %build
+     M5-SONDE interfaces : lo eth0 
+     M5-SONDE tcp 192.168.161.13/5000 code 124
+     M5-SONDE fin de %build
+     M5-POD produit : /w/res/m5-reseau-1.0-1.noarch.rpm
+     M5-POD produit : /w/res/m5-reseau-1.0-1.src.rpm
+pod m1b-r1r8-reseau-b supprimé (code de l'exec : 0)
+relevé : bras b : pod tcp 124 ; %build : début 1, fin 1, tcp 124, interfaces « lo eth0  »

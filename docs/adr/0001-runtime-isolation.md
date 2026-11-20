@@ -366,3 +366,9 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
 - **Provenance** : chaque PipelineRun a une provenance signée par Chains. Elle porte Kata pour la seule tâche `construire` dans la spec signée.
 - **Conséquence pour cet ADR** : aucune décision ne change. Comme `construire-deb` et `construire-rpm`, la seule tâche privilégiée de M1b tourne dans la VM de Kata, sans réseau.
 - **Non mesuré** : le refus d'un pod `construire-racine-rpm` hors Kata, et le jugement de ces images par la porte, qui ne connaît pas encore ce nom.
+
+**Additif du 20/11/2026, écrit à 2026-11-20T14:40:14Z UTC : R1 à R8 rejoués sur le bundle de la cascade de M1b** ([détail](../../poc/bricks/05-rpm-mock/resultats/m1b-predictions.md)).
+- **Mesuré**, avec l'image d'outillage `70f8c412…` construite par la plateforme :
+  - un TaskRun de `construire-rpm@ca03f189…` sans `runtimeClassName` est refusé par Pod Security (`PodAdmissionFailed`, aucun pod) ;
+  - dans le pod Kata privilégié, `mock --isolation=simple` laisse encore `eth0` et la connexion à Zot à `%build` (bras a). Sous le label `construire-rpm`, la connexion est refusée (bras b).
+- **Conséquence pour cet ADR** : aucune décision ne change. Le constat réseau de M5a vaut aussi pour l'outillage de M1b, et une seconde barrière pour la voie rpm reste à décider avec le propriétaire.

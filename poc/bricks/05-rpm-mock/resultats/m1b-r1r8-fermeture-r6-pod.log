@@ -1,0 +1,156 @@
+2026/11/20 14:33:20 Decoded script /tekton/scripts/script-0-h2nsw
+invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+dossier dir: sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 ; image_digest du verrou 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca
+Source0 sample-app-1.0.0.tar.gz (époque 1793229566) : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6
+avant mock, capacité de /w : 3059832 kB ; utilisés : 452724 kB
+mock --hermetic-build : rc 1 en 126 s
+lignes « Using container image: dir: » : sortie 1 ; root.log 1
+lignes « Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca » : sortie 0 ; root.log 0
+lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+lignes « Expected digest for image » : sortie 0 ; root.log 0
+lignes « No space left on device » : sortie 0 ; root.log 0
+lignes http ou https de mock.out : 0
+lignes http ou https de root.log : 0
+lignes http ou https de build.log : 0
+----- fin de mock.out -----
+INFO: Guessed host environment type: unknown
+INFO: Using container image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR: b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage2116114221/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR: b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage4095624073/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR: b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage2770647648/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR: b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage1974442475/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR: b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage2007411142/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR: b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage3876231986/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR: b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage2421369382/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR: b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage3570667101/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR: b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage2566164690/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO: Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR: b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage984843591/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+ERROR: Exception(/w/sources/sample-app.spec) Config(hermetic-build) 2 minutes 4 seconds
+INFO: Results and/or logs in: /w/res
+ERROR: tuple index out of range
+Traceback (most recent call last):
+  File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 266, in _fallback
+    yield
+  File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 281, in _load_from_container_image
+    podman.retry_image_pull(self.image_keep_getting,
+  File "/usr/lib/python3.9/site-packages/mockbuild/podman.py", line 170, in retry_image_pull
+    _keep_trying()
+  File "/usr/lib/python3.9/site-packages/backoff/_sync.py", line 55, in retry
+    _call_handlers(on_giveup, **details, value=ret)
+  File "/usr/lib/python3.9/site-packages/backoff/_sync.py", line 20, in _call_handlers
+    hdlr(details)
+  File "/usr/lib/python3.9/site-packages/mockbuild/podman.py", line 98, in pull_fail_handler
+    raise PodmanError("Image pull failed")
+mockbuild.podman.PodmanError: Image pull failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/libexec/mock/mock", line 1140, in <module>
+    exitStatus = main()
+  File "/usr/libexec/mock/mock", line 892, in main
+    result = run_command(options, args, config_opts, commands, buildroot)
+  File "/usr/libexec/mock/mock", line 995, in run_command
+    srpm = mockbuild.rebuild.do_buildsrpm(config_opts, commands, buildroot, options, args)
+  File "/usr/lib/python3.9/site-packages/mockbuild/rebuild.py", line 102, in do_buildsrpm
+    return rebuild_generic([options.spec], commands, buildroot, config_opts,
+  File "/usr/lib/python3.9/site-packages/mockbuild/rebuild.py", line 24, in rebuild_generic
+    commands.init(prebuild=not config_opts.get('short_circuit'))
+  File "/usr/lib/python3.9/site-packages/mockbuild/backend.py", line 146, in init
+    self.bootstrap_buildroot.initialize(**kwargs)
+  File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 207, in initialize
+    self._init(prebuild=prebuild)
+  File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 325, in _init
+    self._load_from_container_image()
+  File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 304, in _load_from_container_image
+    file_util.unlink_if_exists(os.path.join(self.make_chroot_path(),
+  File "/usr/lib64/python3.9/contextlib.py", line 137, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 270, in _fallback
+    raise err from exc
+  File "/usr/lib/python3.9/site-packages/mockbuild/exception.py", line 219, in __init__
+    super().__init__(*args)
+  File "/usr/lib/python3.9/site-packages/mockbuild/exception.py", line 23, in __init__
+    self.msg = args[0]
+IndexError: tuple index out of range
+----- fin de root.log -----
+INFO buildroot.py:704:  Mock Version: 6.9
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build/root
+DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build/root
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap
+DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap/root
+DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap/root
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap/results
+DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap/results
+INFO buildroot.py:321:  calling preinit hooks
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock-cache/hermetic-build-bootstrap/yum_cache
+DEBUG file_util.py:20:  created dir: /w/mock-cache/hermetic-build-bootstrap/yum_cache
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock-cache/hermetic-build-bootstrap/dnf_cache
+DEBUG file_util.py:20:  created dir: /w/mock-cache/hermetic-build-bootstrap/dnf_cache
+INFO util.py:1160:  Guessed host environment type: unknown
+INFO podman.py:113:  Using container image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR podman.py:138:  b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage2116114221/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR podman.py:138:  b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage4095624073/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR podman.py:138:  b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage2770647648/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR podman.py:138:  b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage1974442475/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR podman.py:138:  b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage2007411142/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR podman.py:138:  b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage3876231986/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR podman.py:138:  b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage2421369382/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR podman.py:138:  b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage3570667101/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR podman.py:138:  b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage2566164690/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+INFO podman.py:119:  Pulling image: dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+ERROR podman.py:138:  b''
+b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3: writing blob: storing blob to file "/var/tmp/container_images_storage984843591/1": happened during read: Digest did not match, expected sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348, got sha256:b216895a97d55458eb55792de30d4f972f74bbdb497eca6f83d75998f6102aed\n'
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build
+DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build/root
+DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build-bootstrap/root
+----- fin de build.log -----
+Mock Version: 6.9
+mock en échec
+2026/11/20 14:33:19 Entrypoint initialization

@@ -1,0 +1,6 @@
+# m1b-r1r8.sh sans_kata, 2026-11-20T14:36:26Z
+taskrun m1b-r1r8-sans-kata créé à 14:36:26
+TaskRun m1b-r1r8-sans-kata terminé à 14:36:29
+statut False|PodAdmissionFailed ; pod :  ; motifs du message : PodSecurity 1, privileged 1, ValidatingAdmissionPolicy 0, kyverno 0, runtimeClassName 0
+OK   R8 : TaskRun refusé à la création du pod : False|PodAdmissionFailed
+OK   R8 : aucun pod : 0

@@ -2909,3 +2909,43 @@ RJ1 à RJ12 ne changent pas.
 - `fermeture` et `reseau` en arrière-plan, car leur durée dépasse 10 minutes.
 - Si `alterer` s'arrête, pas de relance sous le même préfixe.
 - Les classes de R4 et R6, les codes TCP de R7 et les motifs de R8 sont des relevés du script, et non des assertions. Le script de résultat les assertera, et les journaux de pod de R4 et de R6 seront archivés avant `retirer`.
+
+### Cascade avant M5b, rejeu de R1 à R8, résultat, écrit le 20/11/2026 à 2026-11-20T14:40:14Z UTC
+
+Toutes les étapes ont tourné sous l'accord permanent, avec le script commité en `4a8d4f0c`. Toutes rendent code 0, avec 0 KO, aucune ligne de jeton et aucun « CONSTAT ». Rien n'est écrit dans Zot.
+
+| Étape | Heure (UTC) | OK | Journal |
+|---|---|---|---|
+| `prealables` | 14:23:25 à 14:24:31 | 45 | [`m1b-r1r8-prealables.log`](m1b-r1r8-prealables.log) |
+| `banc_juges`, `preparer`, `alterer` | 14:24:42 à 14:25:41 | 5, 8, 4 | [`banc_juges`](m1b-r1r8-banc_juges.log), [`preparer`](m1b-r1r8-preparer.log), [`alterer`](m1b-r1r8-alterer.log) |
+| `fermeture` | 14:25:51 à 14:36:26 | 21 | [`m1b-r1r8-fermeture.log`](m1b-r1r8-fermeture.log) ; pods de R4 et de R6 : [`r4`](m1b-r1r8-fermeture-r4-pod.log), [`r6`](m1b-r1r8-fermeture-r6-pod.log) |
+| `sans_kata`, `reseau`, `invariance` | 14:36:26 à 14:38:13 | 2, 2, 2 | [`sans_kata`](m1b-r1r8-sans_kata.log), [`reseau`](m1b-r1r8-reseau.log), [`invariance`](m1b-r1r8-invariance.log) |
+| `retirer` | 14:38:41 à 14:38:42 | 2 | [`m1b-r1r8-retirer.log`](m1b-r1r8-retirer.log) |
+
+- **RJ1 tenue** :
+  - la partie hôte est celle du banc ;
+  - la pipeline `7d361cb1…` porte les bundles et les paramètres de la cascade, dans la liste revue ;
+  - aucune politique n'autorise de trafic à `construire-rpm` ;
+  - les 13 objets sont admis à blanc ;
+  - il y a 8 enveloppes.
+- **RJ2, RJ3, RJ4 tenues** :
+  - `preparer` passe en `True|Succeeded` en 15 s, et ses résultats citent les références de la cascade ;
+  - l'empreinte de `entrees/` sur le PVC vaut `7153c806…`, et les 7 copies sont conformes ;
+  - R6 a écrit son blob de 241 981 440 octets sans incident ;
+  - **relevé** : le disque du nœud montre 21 513 452 kB utilisés sur 30 753 032.
+- **RJ5 tenue** : le témoin finit en `True|Succeeded`, mock rc 0 en 48 s. Il donne le rpm `864d55f4…` (M3) et `DIGEST_CONSTRUIT` `07b7bd6f…` (M4c). Dans les sept cas, l'écriture sur les entrées est refusée, et les témoins réseau échouent (code 124).
+- **RJ6 tenue** : R1, R2, R3 et R5 sont refusées par la confrontation, avec les messages du banc, et mock n'est jamais lancé.
+- **RJ7 tenue, branche principale** : R4 passe la confrontation. mock rend rc 30 en 13 s, et la barrière est dnf : « Package "zlib-1.2.11-40.el9.x86_64" from local repository "offline" has incorrect checksum ». C'est la même barrière qu'en M5a, ici avec le dnf de l'image `70f8c412…`.
+- **RJ8 tenue, branche principale** : R6 passe la confrontation. mock rend rc 1 en 126 s. podman copie le dossier `dir:` et écrit « Digest did not match, expected sha256:b063feb3… » (20 lignes), puis « Image pull failed ». Il n'y a aucun repli en chroot, et aucune ligne « Expected digest for image ».
+  - La couche non compressée du bootstrap de M1b est donc vérifiée par son digest à la copie, comme la couche compressée de M5a.
+  - Le contrôle `image_digest` de mock n'est pas atteint.
+- **RJ9 tenue** : R8 donne `False|PodAdmissionFailed`, sans pod. Motifs comptés : PodSecurity 1, privileged 1, ValidatingAdmissionPolicy 0, kyverno 0.
+- **RJ10 tenue** : mock rend rc 0 dans les deux bras (31 s et 40 s). Mesures de la connexion :
+  - bras a, sans label de tâche : Zot est joint depuis le pod et depuis `%build` (code 0), avec les interfaces `lo eth0` ;
+  - bras b, au label `construire-rpm` : la connexion est refusée aux deux endroits (code 124).
+
+  **Le constat de M5a se répète avec l'outillage de M1b** : mock, en `--isolation=simple`, ne coupe pas le réseau de `%build`. La NetworkPolicy du pod reste la seule barrière.
+- **RJ11 tenue** : il y a toujours 8 enveloppes. Chains a signé les huit TaskRuns qui ont eu un pod, et `sans-kata` porte `failed`. Les quatre PipelineRuns sont gardés.
+- **RJ12 tenue** : 18 objets au label `poc.test/jalon=m1b-r1r8` sont supprimés, et plus aucun ne reste. Les quatre PipelineRuns sont gardés, et rien n'est retiré de Zot.
+
+**Bilan** : sur le bundle de la cascade (`construire-rpm@ca03f189…`, outillage `70f8c412…`, bootstrap de M1b), chaque altération est refusée par la même barrière qu'en M5a, et chaque témoin est accepté. **Le rejeu de R1 à R8 est tenu.** Les réserves de M5a demeurent (R4 dépend de `repodata/` ; R7 repose sur la seule politique du pod).

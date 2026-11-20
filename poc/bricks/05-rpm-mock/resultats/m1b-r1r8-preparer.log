@@ -1,0 +1,24 @@
+# m1b-r1r8.sh preparer, 2026-11-20T14:24:42Z
+OK   enveloppes valides sur l'artefact de M4c (avant) : 8
+pvc m1b-r1r8-entrees créé à 14:24:42
+taskrun m1b-r1r8-preparer créé à 14:24:42
+TaskRun m1b-r1r8-preparer terminé à 14:24:57
+pod : preparer-rpm|sc-build|- ; journal : 10 lignes
+     2026/11/20 14:24:47 Entrypoint initialization
+     2026/11/20 14:24:47 Decoded script /tekton/scripts/script-0-cf68r
+     2026/11/20 14:24:48 Decoded script /tekton/scripts/script-1-bdbkx
+     2026/11/20 14:24:48 Decoded script /tekton/scripts/script-2-2zpxw
+     git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     fermeture rpm : 230 fichiers ; fermeture applicative : 8 fichiers ; packaging : 2 fichiers
+     all modules verified
+     go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+     entrées prêtes : src (41 fichiers), fermeture rpm (230 fichiers), spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6, verrou c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   TaskRun m1b-r1r8-preparer : True|Succeeded
+OK   pod de m1b-r1r8-preparer : label de tâche, runtimeClassName : preparer-rpm|-
+OK   résultat CHAINS-GIT_URL : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+OK   résultat CHAINS-GIT_COMMIT : 6391fd437f26696847041be3226bbbf633f55a2f
+OK   résultat FERMETURE_RPM_ARTIFACT_INPUTS (JSON trié) : {"digest":"sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f","uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm"}
+OK   résultat FERMETURE_SOURCES_ARTIFACT_INPUTS (JSON trié) : {"digest":"sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21","uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources"}
+OK   résultat PACKAGING_ARTIFACT_INPUTS (JSON trié) : {"digest":"sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48","uri":"oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm"}
+relevé : annotation de Chains sur m1b-r1r8-preparer : true

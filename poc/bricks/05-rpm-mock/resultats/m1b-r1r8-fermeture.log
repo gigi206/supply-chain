@@ -1,0 +1,204 @@
+# m1b-r1r8.sh fermeture, 2026-11-20T14:25:51Z
+## intacte
+taskrun m1b-r1r8-intacte créé à 14:25:51
+TaskRun m1b-r1r8-intacte terminé à 14:27:46
+pod : construire-rpm|sc-build|kata ; statut True|Succeeded
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+     témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+     avant mock, capacité de /w : 3059832 kB ; utilisés : 452724 kB
+     mock --hermetic-build : rc 0 en 48 s
+     lignes http ou https de mock.out : 0
+     après mock (buildroot gardé), capacité de /w : 3059832 kB ; utilisés : 1592640 kB
+     rpm : sample-app-1.0.0-2.el9.src.rpm sha256 c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128 (151068 octets) ; NEVRA sample-app-1.0.0-2.el9.x86_64 ; BUILDHOST reproducible ; BUILDTIME 1794787200
+     rpm : sample-app-1.0.0-2.el9.x86_64.rpm sha256 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f (2173376 octets) ; NEVRA sample-app-1.0.0-2.el9.x86_64 ; BUILDHOST reproducible ; BUILDTIME 1794787200
+     couche sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4 (2181120 octets) ; configuration sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688b351a53aa0cc4 ; manifeste sha256:07b7bd6feb489bff1
+juge : True|Succeeded|1|0|0|864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f|sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 ; classe : accepte
+OK   pod de m1b-r1r8-intacte : label de tâche, runtimeClassName : construire-rpm|kata
+OK   m1b-r1r8-intacte : écriture refusée sur les entrées, témoins TCP atteints : 1 3
+OK   témoin : TaskRun, classe : True|Succeeded accepte
+OK   témoin : rpm égal à celui de M3 : 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f
+OK   témoin : DIGEST_CONSTRUIT égal à l'artefact de M4c : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+## r1
+taskrun m1b-r1r8-r1 créé à 14:27:46
+TaskRun m1b-r1r8-r1 terminé à 14:28:52
+pod : construire-rpm|sc-build|kata ; statut False|StepFailed
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+     témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     sigmd5 différent du verrou : zlib-1.2.11-40.el9.x86_64.rpm (5832caf6730301817da8e513d9fca84f)
+juge : False|StepFailed|0|1|-|-|- ; classe : refus-confrontation
+OK   pod de m1b-r1r8-r1 : label de tâche, runtimeClassName : construire-rpm|kata
+OK   m1b-r1r8-r1 : écriture refusée sur les entrées, témoins TCP atteints : 1 3
+OK   r1 : classe (refus par la confrontation, mock jamais lancé) : refus-confrontation
+## r2
+taskrun m1b-r1r8-r2 créé à 14:28:52
+TaskRun m1b-r1r8-r2 terminé à 14:29:50
+pod : construire-rpm|sc-build|kata ; statut False|StepFailed
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+     témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     fermeture : 1 objet(s) hors du verrou, de repodata/ et du dossier dir: : ['m5-en-trop.rpm']
+juge : False|StepFailed|0|1|-|-|- ; classe : refus-confrontation
+OK   pod de m1b-r1r8-r2 : label de tâche, runtimeClassName : construire-rpm|kata
+OK   m1b-r1r8-r2 : écriture refusée sur les entrées, témoins TCP atteints : 1 3
+OK   r2 : classe (refus par la confrontation, mock jamais lancé) : refus-confrontation
+## r3
+taskrun m1b-r1r8-r3 créé à 14:29:50
+TaskRun m1b-r1r8-r3 terminé à 14:30:47
+pod : construire-rpm|sc-build|kata ; statut False|StepFailed
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+     témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     fermeture : 1 rpm du verrou absent(s) : ['zlib-1.2.11-40.el9.x86_64.rpm']
+juge : False|StepFailed|0|1|-|-|- ; classe : refus-confrontation
+OK   pod de m1b-r1r8-r3 : label de tâche, runtimeClassName : construire-rpm|kata
+OK   m1b-r1r8-r3 : écriture refusée sur les entrées, témoins TCP atteints : 1 3
+OK   r3 : classe (refus par la confrontation, mock jamais lancé) : refus-confrontation
+## r4
+taskrun m1b-r1r8-r4 créé à 14:30:47
+TaskRun m1b-r1r8-r4 terminé à 14:32:08
+pod : construire-rpm|sc-build|kata ; statut False|StepFailed
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+     témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+     avant mock, capacité de /w : 3059832 kB ; utilisés : 452724 kB
+     mock --hermetic-build : rc 30 en 13 s
+     lignes http ou https de mock.out : 0
+     ----- fin de mock.out -----
+     DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build-bootstrap/root/w/mock/hermetic-build/root
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build-bootstrap/root/w/mock/hermetic-build/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build-bootstrap/root/w/mock/hermetic-build/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock
+     DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build/root
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/hermetic-build/root/var/cache/dnf'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/us
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/hermetic-build/root/var/cache/yum'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/us
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build/root/dev/pts'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/us
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build/root/dev/shm'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/us
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sb
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sb
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/s
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/s
+     DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build-bootstrap/root
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/hermetic-build-bootstrap/root/w/fermeture/depot'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/us
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/hermetic-build-bootstrap/root/var/cache/dnf'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bi
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/hermetic-build-bootstrap/root/var/cache/yum'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bi
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build-bootstrap/root/dev/pts'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bi
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build-bootstrap/root/dev/shm'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bi
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build-bootstrap/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/b
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build-bootstrap/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/b
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build-bootstrap/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/
+     DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/hermetic-build-bootstrap/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/
+     mock en échec
+juge : False|StepFailed|1|0|30|-|- ; classe : refus-mock
+OK   pod de m1b-r1r8-r4 : label de tâche, runtimeClassName : construire-rpm|kata
+OK   m1b-r1r8-r4 : écriture refusée sur les entrées, témoins TCP atteints : 1 3
+relevé : r4, classe : refus-mock (refus-mock, accepte ou non-mesure ; prédictions écrites avant le lancement)
+lignes qui nomment une barrière :
+     fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+     dossier dir: sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 ; image_digest du verrou 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca
+     lignes « Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca » : sortie 1 ; root.log 1
+     lignes « Expected digest for image » : sortie 0 ; root.log 0
+     Package "zlib-1.2.11-40.el9.x86_64" from local repository "offline" has incorrect checksum
+     Error: Some packages from local repository have incorrect checksum
+## r5
+taskrun m1b-r1r8-r5 créé à 14:32:08
+TaskRun m1b-r1r8-r5 terminé à 14:33:13
+pod : construire-rpm|sc-build|kata ; statut False|StepFailed
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+     témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     manifest.json du dossier dir: différent du pull_digest : sha256:f9e4e01438a38bd90d00b1fde311b20697aee03e16bfc2ab785c9508f35168c7
+juge : False|StepFailed|0|1|-|-|- ; classe : refus-confrontation
+OK   pod de m1b-r1r8-r5 : label de tâche, runtimeClassName : construire-rpm|kata
+OK   m1b-r1r8-r5 : écriture refusée sur les entrées, témoins TCP atteints : 1 3
+OK   r5 : classe (refus par la confrontation, mock jamais lancé) : refus-confrontation
+## r6
+taskrun m1b-r1r8-r6 créé à 14:33:13
+TaskRun m1b-r1r8-r6 terminé à 14:36:26
+pod : construire-rpm|sc-build|kata ; statut False|StepFailed
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+     témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+     avant mock, capacité de /w : 3059832 kB ; utilisés : 452724 kB
+     mock --hermetic-build : rc 1 en 126 s
+     lignes http ou https de mock.out : 0
+     ----- fin de mock.out -----
+       File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 266, in _fallback
+       File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 281, in _load_from_container_image
+       File "/usr/lib/python3.9/site-packages/mockbuild/podman.py", line 170, in retry_image_pull
+       File "/usr/lib/python3.9/site-packages/mockbuild/podman.py", line 98, in pull_fail_handler
+     mockbuild.podman.PodmanError: Image pull failed
+       File "/usr/libexec/mock/mock", line 1140, in <module>
+       File "/usr/libexec/mock/mock", line 892, in main
+       File "/usr/libexec/mock/mock", line 995, in run_command
+         srpm = mockbuild.rebuild.do_buildsrpm(config_opts, commands, buildroot, options, args)
+       File "/usr/lib/python3.9/site-packages/mockbuild/rebuild.py", line 102, in do_buildsrpm
+       File "/usr/lib/python3.9/site-packages/mockbuild/rebuild.py", line 24, in rebuild_generic
+       File "/usr/lib/python3.9/site-packages/mockbuild/backend.py", line 146, in init
+       File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 207, in initialize
+       File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 325, in _init
+       File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 304, in _load_from_container_image
+       File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 270, in _fallback
+       File "/usr/lib/python3.9/site-packages/mockbuild/exception.py", line 219, in __init__
+       File "/usr/lib/python3.9/site-packages/mockbuild/exception.py", line 23, in __init__
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build/root
+     DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build/root
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap
+     DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap/root
+     DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap/root
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build-bootstrap/results
+     DEBUG file_util.py:20:  created dir: /w/mock/hermetic-build-bootstrap/results
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock-cache/hermetic-build-bootstrap/yum_cache
+     DEBUG file_util.py:20:  created dir: /w/mock-cache/hermetic-build-bootstrap/yum_cache
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock-cache/hermetic-build-bootstrap/dnf_cache
+     DEBUG file_util.py:20:  created dir: /w/mock-cache/hermetic-build-bootstrap/dnf_cache
+     DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/hermetic-build
+     DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build/root
+     DEBUG util.py:200:  kill orphans in chroot /w/mock/hermetic-build-bootstrap/root
+     mock en échec
+juge : False|StepFailed|1|0|1|-|- ; classe : refus-mock
+OK   pod de m1b-r1r8-r6 : label de tâche, runtimeClassName : construire-rpm|kata
+OK   m1b-r1r8-r6 : écriture refusée sur les entrées, témoins TCP atteints : 1 3
+relevé : r6, classe : refus-mock (refus-mock, accepte ou non-mesure ; prédictions écrites avant le lancement)
+lignes qui nomment une barrière :
+     fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+     dossier dir: sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 ; image_digest du verrou 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca
+     lignes « Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca » : sortie 0 ; root.log 0
+     lignes « Expected digest for image » : sortie 0 ; root.log 0
+     b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5d
+     b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5d
+     b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5d
+     b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5d
+     b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5d
+     b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5d
+     b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5d
+     b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5d
+     b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5d
+     b'Getting image source signatures\nCopying blob sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348\nError: unable to perform copy: unable to copy from source dir:/w/fermeture/depot/sc-stockage.poc.test@sha256:6de899ac5d
+       File "/usr/lib/python3.9/site-packages/mockbuild/buildroot.py", line 266, in _fallback

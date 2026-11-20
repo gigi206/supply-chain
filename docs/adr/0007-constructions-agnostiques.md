@@ -229,3 +229,12 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
   - les provenances des PipelineRuns refaits citent les références de la cascade, et s'ajoutent à celles de M4c sur le même sujet (8 enveloppes).
 - **Conséquence pour la règle générique** : changer d'images de builder change la fermeture des dépendances, pas l'artefact construit. Un même artefact peut donc porter des provenances de chaînes différentes. D'après une lecture de `porte.rego`, non mesurée, la porte les juge ensemble (`some task in lib.tasks_from_pipelinerun`, sur toutes les provenances de PipelineRun du sujet). Une vérification qui veut isoler une chaîne doit passer par l'uid de l'invocation.
 - **Non mesuré** : le jugement par la porte (ConfigMap `porte` encore en retard sur `taches.yml`) et le rejeu M5b.
+
+**Additif du 20/11/2026, écrit à 2026-11-20T14:40:14Z UTC : R1 à R8 rejoués sur le bundle de la cascade de M1b** ([détail](../../poc/bricks/05-rpm-mock/resultats/m1b-predictions.md)).
+- **Mesuré** : avec `construire-rpm@ca03f189…`, les entrées de la pipeline `sample-app-rpm@7d361cb1…` et le bootstrap de M1b, les altérations de M5a sont refusées par les mêmes barrières :
+  - R1, R2, R3 et R5 par la confrontation au verrou ;
+  - R4 par dnf ;
+  - R6 par podman, qui vérifie à la copie le digest de la couche, désormais non compressée.
+
+  Le témoin redonne le rpm de M3 et l'artefact `07b7bd6f…`.
+- **Conséquence pour la règle générique** : changer d'images de builder ne change ni l'artefact ni les barrières mesurées. La cascade avant M5b est terminée.

@@ -1,0 +1,6 @@
+# m1b-r1r8.sh banc_juges, 2026-11-20T14:24:42Z
+OK   juge sur banc-refus (motif « sigmd5 différent du verrou : zlib-1.2.1 ») : False|Failed|0|1|-|-|-|refus-confrontation
+OK   juge sur banc-succes (motif « - ») : True|Succeeded|1|0|0|864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f|sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119|accepte
+OK   juge sur banc-mock (motif « - ») : False|Failed|1|0|30|-|-|refus-mock
+OK   juge sur banc-avant (motif « - ») : False|Failed|0|0|-|-|-|non-mesure
+OK   juge sur banc-refus (motif « - ») : False|Failed|0|0|-|-|-|non-mesure
