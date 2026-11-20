@@ -261,3 +261,25 @@ Question posée : (iii) laisser `TZ` à l'hôte pour ce rejeu, ou (i) `TZ=Europe
 - `08-trust-plane/commun.sh` n'est pas modifié. `bundle` reste sans `TZ=`, et les digests des bundles dépendent toujours du fuseau de l'hôte.
 - Pour la 05, `m5b-republier.sh` pose déjà `TZ=Europe/Paris` (relu à l'instant dans le dépôt). D'après RE1 à RE7, mesurés sur cet hôte, `TZ=Europe/Paris` redonne les 9 digests de la liste revue. Sur un autre hôte, c'est déduit, pas mesuré.
 - **Réserve** : les bundles des autres briques (01, 03, 06, 08) ne sont reproductibles que depuis un hôte réglé sur le même fuseau. La décision pour toute la plateforme reste ouverte, après le rejeu.
+
+## Dossier 5 : la barrière unique relue (note de 2026-11-20T21:03:02Z ; question du propriétaire « La network policy est-elle réellement suffisante ? » ; rien n'est réécrit au-dessus ; AUCUNE DÉCISION)
+
+**Mesuré** :
+- RE3 de M5a : sous le label `construire-rpm`, la connexion est refusée depuis le pod comme depuis `%build`.
+- `construction-rpm-sans-sortie` n'a aucune règle : tout est refusé, en entrée comme en sortie, DNS et API du cluster compris.
+- Sous Cilium, depuis un pod Kata privilégié (`kata-reseau-cilium-apres-redemarrage.log` de la 08) : aucune fenêtre au démarrage en 3 essais, et usurpation d'adresse source refusée (`INVALID_SOURCE_IP`).
+
+**Lu dans les tâches signées, et non mesuré comme mode de panne** :
+- Le premier pas de `construire-rpm` (`construire-rpm.m1b.signee.yaml`) lance des témoins **avant mock** : DNS de `dl.rockylinux.org`, TCP vers Zot (5000), Forgejo (3000) et une adresse publique (80). **Il s'arrête en échec si l'un d'eux réussit.** `construire-racine-rpm` a les mêmes témoins, sans l'adresse publique.
+- Si la politique manquait, ou si le label ne correspondait plus, `builds-sans-internet` laisserait encore Zot joignable (son en-tête : elle ne ferme ni sc-stockage, ni le DNS, ni l'API). Le témoin Zot réussirait, et la construction s'arrêterait avant mock. **La barrière échoue donc fermée au démarrage.** C'est déduit de la lecture ; ce cas n'a pas été provoqué.
+- Le label vient du contrôleur de Tekton, qui le réécrit depuis le nom de la tâche résolue. C'est lu dans le code de Tekton (en-tête de la politique de la 08), pas mesuré ici.
+
+**Limites** :
+- Les témoins ne regardent qu'au démarrage. Une politique retirée pendant la construction (46 s pour le témoin de M5a) ne serait pas vue.
+- Vers Internet, deux politiques ferment la sortie (`construction-rpm-sans-sortie` et `builds-sans-internet`). Mais elles passent par le même moteur, Cilium : elles sont deux en nombre, pas indépendantes. Vers Zot, le DNS et l'API, il n'y en a qu'une.
+- Aucun contrôle continu de la présence de la politique n'a été trouvé hors des tâches. Elle n'est vérifiée qu'à la pose, par les invariants de `sortie-builds.sh`.
+- Ce que pourrait faire le code de `%build` contre la politique depuis l'invité Kata : seule l'usurpation a été mesurée. « Il faudrait sortir de la VM » est une déduction.
+- La barrière réseau ne couvre pas l'autre voie de sortie : le contenu du rpm lui-même. Un `%build` hostile et déterministe passerait la confrontation bit-identique.
+- L'utilisateur sous lequel mock lance `%build` n'a pas été relevé.
+
+Les options restent (i) et (ii). Une piste de contrôle hors de la tâche signée, qui ne rouvrirait ni la signature ni la cascade, serait un relevé périodique des politiques de `builds`. Elle n'est ni écrite ni essayée.
