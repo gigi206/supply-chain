@@ -388,3 +388,10 @@ Projection, calculée : premières suppressions réelles le 28/11 entre 01:37 et
 - **aucun VEX** : « KEV sans VEX » veut dire « aucune KEV » (cf. plus haut).
 
 **Demande du propriétaire** : voir les CVE trouvées, et celles qui restent réelles après VEX. `docs/02` prévoit les SBOM et les VEX comme attestations, une projection Dependency-Track en phase 2c, et l'ADR 0004 (VEX) en phase 3. **Aucune décision** : une carte de la 07b, préparée à sec, dira son périmètre, son estimation et ses couplages avec G7. Le contenu de la 07b n'est pas encore relu.
+
+**Additif du 20/11/2026 (2026-11-20T21:53:35Z UTC) : carte de la 07b préparée à sec, rien n'est posé** ([carte](resultats/07b-carte.md)), en réponse à « Il faudrait faire mieux, les cve trouvées et les failles réelles (VEX) ».
+- Le prédicat de scan signé garde déjà les CVE trouvées (gravité, EPSS, KEV, correctif), mais aucune n'est visible dans Grafana. Aucun prédicat réel n'écrit `vex`, et le champ `malicious` est toujours vide.
+- grype 0.104.1 lit les VEX OpenVEX et CSAF (`--vex`) et range les correspondances écartées dans `ignoredMatches`. C'est lu dans le code au tag, pas essayé.
+- Trois tranches proposées : CVE trouvées dans Grafana depuis les prédicats signés ; VEX à blanc sur un Zot et une clé jetables ; prédicat et porte (accord).
+- Six choix à faire par le propriétaire, sans recommandation à ce stade. Estimation neuve : 10 h, décision à 20 h.
+- Incohérence signalée : d'après `docs/00`, Dependency-Track, la projection prévue, ne lit ni OpenVEX ni CSAF, les deux formats de l'ADR 0004.
