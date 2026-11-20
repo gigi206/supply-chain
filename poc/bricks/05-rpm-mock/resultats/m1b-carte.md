@@ -983,3 +983,7 @@ Script frère [`m1b-fermeture.sh`](../m1b-fermeture.sh), étapes `local` et `ess
 - **Fermeture prédite à sec** : 230 fichiers, 462 194 425 octets, digest `09838980…`. Le bootstrap neuf a une couche non compressée de 242 Mo.
 - **Dépôt de la fermeture : décision à prendre avant la pipeline**. Le dépôt figure dans la pipeline signée. `builds/fermetures/sample-app-rpm` contient déjà la fermeture de M4b (`2a9e2ea7`). `publier-fermeture` n'écrit que par digest, sans tag : une seconde fermeture dans le même dépôt ne touche pas la première. `m4c.sh` et `m5.sh` épinglent `2a9e2ea7` par digest. La note du 19/11 réserve cette décision au propriétaire.
 - **ConfigMap `porte`** : elle ne joue pas pour les PipelineRuns. Elle sera à demander avant R1 à R8.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T11:19:50Z UTC : M4b refait, local et essai passés
+
+`local` et `essai` ont tourné de 11:17:08Z à 11:19:09Z. FL1 et FE1 à FE3 tiennent ([résultat](m1b-predictions.md)). Dans un pod de la plateforme, la tâche signée de la cascade rend exactement l'arbre prédit : 230 fichiers, 462 194 425 octets. Rien n'est écrit dans Zot. Suite : décision sur le dépôt de la fermeture, puis la pipeline et les deux PipelineRuns, chacun sur accord nommé.

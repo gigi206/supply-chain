@@ -1,0 +1,100 @@
+# m1b-fermeture.sh essai, 2026-11-20T11:17:09Z
+OK   fermeture/prefetch-rpm.yaml (sha256) : 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c
+OK   fermeture/prefetch-rpm-sample-app.yaml (sha256) : ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+OK   fermeture/prefetch-rpm.signee.yaml (sha256) : 4123539575b1f7986f82f648913ee147348c7198399018f3520c7037eeade199
+OK   fermeture/prefetch-rpm.m1b.signee.yaml (sha256) : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   resultats/m1b-fermeture-digest.py (sha256) : a5d014290f0a6d4ce08e54b2693608f63dd0b18539f183199011b9c138d95f32
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   verrou de la cascade (sha256) : c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   verrou de M4b (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   arbre de final (sha256) : fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+OK   arbre prédit de local (sha256) : a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014a
+OK   scripts : nominal et refusé, seuls écarts le workspace, le résultat et repomd : 3
+OK   script substitué, égal au script neuf de local (sha256) : 4d8bfe827d718b275b056f1c52ecd0a519b2736529f93e0fc56d18aa01b02d0c
+OK   m1b-fermeture-prefetch admis en dry-run serveur
+### m1b-fermeture-prefetch (runc, uid 65532, label tekton.dev/task=prefetch-rpm) : prêt sur sc-build, runtimeClassName «  »
+## script de la tâche, nominal
+     téléchargés et contrôlés (sha256, taille) : 222
+     clé de Rocky de l'image : empreinte conforme (gpg)
+     rpm -K : rc 0, 222 OK sur 222
+     repodata V2 : repomd.xml 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164 ; fichiers 4 ; en 1 s
+     repomd.xml V2 : <?xml version="1.0" encoding="UTF-8"?>
+     repomd.xml V2 : <repomd xmlns="http://linux.duke.edu/metadata/repo" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
+     repomd.xml V2 :   <revision>0</revision>
+     repomd.xml V2 :   <data type="primary">
+     repomd.xml V2 :     <checksum type="sha256">82ecf122061ff6969c76ee80363011022d54941e70d22f4b81268832dea2181d</checksum>
+     repomd.xml V2 :     <open-checksum type="sha256">eaf5c5e0ec44769f7c586b702f3ab2c23bc81839aa839a580a3cae93ccaaf32a</open-checksum>
+     repomd.xml V2 :     <location href="repodata/82ecf122061ff6969c76ee80363011022d54941e70d22f4b81268832dea2181d-primary.xml.gz"/>
+     repomd.xml V2 :     <timestamp>0</timestamp>
+     repomd.xml V2 :     <size>88633</size>
+     repomd.xml V2 :     <open-size>586215</open-size>
+     repomd.xml V2 :   </data>
+     repomd.xml V2 :   <data type="filelists">
+     repomd.xml V2 :     <checksum type="sha256">152feb18d71a8880aff41cce804bf2a6949dba4955aa62014d9a8e446345ddd7</checksum>
+     repomd.xml V2 :     <open-checksum type="sha256">66a37e5bb965c274a4fb417e5dbc5af59cc84c111f486998963767eb9342bc7c</open-checksum>
+     repomd.xml V2 :     <location href="repodata/152feb18d71a8880aff41cce804bf2a6949dba4955aa62014d9a8e446345ddd7-filelists.xml.gz"/>
+     repomd.xml V2 :     <timestamp>0</timestamp>
+     repomd.xml V2 :     <size>231414</size>
+     repomd.xml V2 :     <open-size>2477413</open-size>
+     repomd.xml V2 :   </data>
+     repomd.xml V2 :   <data type="other">
+     repomd.xml V2 :     <checksum type="sha256">8d40856db0aeb2f1ee4aaa49b2ef7342279da1473825c08bb45f8014975b376e</checksum>
+     repomd.xml V2 :     <open-checksum type="sha256">08e2ddaa8d916689cbce411ec75c7e14b5e2bfc374c741e23ae2119e443ebb0c</open-checksum>
+     repomd.xml V2 :     <location href="repodata/8d40856db0aeb2f1ee4aaa49b2ef7342279da1473825c08bb45f8014975b376e-other.xml.gz"/>
+     repomd.xml V2 :     <timestamp>0</timestamp>
+     repomd.xml V2 :     <size>347241</size>
+     repomd.xml V2 :     <open-size>1777383</open-size>
+     repomd.xml V2 :   </data>
+     repomd.xml V2 : </repomd>
+     skopeo copy --preserve-digests : en 1 s ; manifeste sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     fermeture : 230 fichiers, 462223097 octets
+     durée du pas : 43 s
+     (code de l'exec : 0)
+OK   repomd.xml V2 : 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164
+OK   résultat BOOTSTRAP_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap","digest":"sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3"}
+OK   arbre relevé (code de l'exec) : 0
+arbre archivé : resultats/m1b-fermeture-essai-arbre.txt (230 fichiers, sha256 a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014a)
+OK   arbre égal à l'arbre prédit : égal
+## même script, repomd.xml attendu faux, workspace neuf (refus attendu avant la copie de l'image)
+     téléchargés et contrôlés (sha256, taille) : 222
+     clé de Rocky de l'image : empreinte conforme (gpg)
+     rpm -K : rc 0, 222 OK sur 222
+     repodata V2 : repomd.xml 239a5a71c887d4370228ffdff016517282086f19de93418ee740482c089be164 ; fichiers 4 ; en 1 s
+     repomd.xml V2 : <?xml version="1.0" encoding="UTF-8"?>
+     repomd.xml V2 : <repomd xmlns="http://linux.duke.edu/metadata/repo" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
+     repomd.xml V2 :   <revision>0</revision>
+     repomd.xml V2 :   <data type="primary">
+     repomd.xml V2 :     <checksum type="sha256">82ecf122061ff6969c76ee80363011022d54941e70d22f4b81268832dea2181d</checksum>
+     repomd.xml V2 :     <open-checksum type="sha256">eaf5c5e0ec44769f7c586b702f3ab2c23bc81839aa839a580a3cae93ccaaf32a</open-checksum>
+     repomd.xml V2 :     <location href="repodata/82ecf122061ff6969c76ee80363011022d54941e70d22f4b81268832dea2181d-primary.xml.gz"/>
+     repomd.xml V2 :     <timestamp>0</timestamp>
+     repomd.xml V2 :     <size>88633</size>
+     repomd.xml V2 :     <open-size>586215</open-size>
+     repomd.xml V2 :   </data>
+     repomd.xml V2 :   <data type="filelists">
+     repomd.xml V2 :     <checksum type="sha256">152feb18d71a8880aff41cce804bf2a6949dba4955aa62014d9a8e446345ddd7</checksum>
+     repomd.xml V2 :     <open-checksum type="sha256">66a37e5bb965c274a4fb417e5dbc5af59cc84c111f486998963767eb9342bc7c</open-checksum>
+     repomd.xml V2 :     <location href="repodata/152feb18d71a8880aff41cce804bf2a6949dba4955aa62014d9a8e446345ddd7-filelists.xml.gz"/>
+     repomd.xml V2 :     <timestamp>0</timestamp>
+     repomd.xml V2 :     <size>231414</size>
+     repomd.xml V2 :     <open-size>2477413</open-size>
+     repomd.xml V2 :   </data>
+     repomd.xml V2 :   <data type="other">
+     repomd.xml V2 :     <checksum type="sha256">8d40856db0aeb2f1ee4aaa49b2ef7342279da1473825c08bb45f8014975b376e</checksum>
+     repomd.xml V2 :     <open-checksum type="sha256">08e2ddaa8d916689cbce411ec75c7e14b5e2bfc374c741e23ae2119e443ebb0c</open-checksum>
+     repomd.xml V2 :     <location href="repodata/8d40856db0aeb2f1ee4aaa49b2ef7342279da1473825c08bb45f8014975b376e-other.xml.gz"/>
+     repomd.xml V2 :     <timestamp>0</timestamp>
+     repomd.xml V2 :     <size>347241</size>
+     repomd.xml V2 :     <open-size>1777383</open-size>
+     repomd.xml V2 :   </data>
+     repomd.xml V2 : </repomd>
+     KO   repomd.xml différent de l'attendu (fixé par la pipeline)
+     command terminated with exit code 1
+     (code de l'exec : 1)
+OK   cas refusé : code : 1
+OK   cas refusé : message : 1
+OK   cas refusé : ni dossier dir:, ni résultat : 0 0
+OK   retrait du pod (code de kubectl) : 0
+OK   PVC m1b-fermeture-prefetch-w retirée (code de kubectl wait) : 0
+OK   objets de builds relus (code de kubectl) : 0
+OK   pods et PVC restants au nom de m1b-fermeture-prefetch : 0

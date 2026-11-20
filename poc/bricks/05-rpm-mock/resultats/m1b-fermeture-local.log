@@ -1,0 +1,62 @@
+# m1b-fermeture.sh local, 2026-11-20T11:17:08Z
+OK   fermeture/prefetch-rpm.yaml (sha256) : 96b9d6bd056224eeed144fc1d1b093820a32b2fa26e46f2217f797782837968c
+OK   fermeture/prefetch-rpm-sample-app.yaml (sha256) : ee74c25874a43d14051c6f2d11aa53b264ac688bebfec970036a50c42192b534
+OK   fermeture/prefetch-rpm.signee.yaml (sha256) : 4123539575b1f7986f82f648913ee147348c7198399018f3520c7037eeade199
+OK   fermeture/prefetch-rpm.m1b.signee.yaml (sha256) : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   resultats/m1b-fermeture-digest.py (sha256) : a5d014290f0a6d4ce08e54b2693608f63dd0b18539f183199011b9c138d95f32
+OK   liste des rpm (sha256) : 95541ee86a3c8891d231df6896558a78f73a607037b2a7035312337ab80b8910
+OK   verrou de la cascade (sha256) : c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   verrou de M4b (sha256) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+OK   arbre de final (sha256) : fc556539d9fe7255a7e65fa25278d37c7f85fd728ee97f08c8d8ea2c9f35e880
+## témoin de méthode : pipeline signée de M4b, relue dans son bundle, contre le gabarit rendu avec les entrées de M4b
+OK   bundle prefetch-rpm-sample-app@sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db : manifeste relu (sha256) : sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+OK   bundle : une couche, pipeline prefetch-rpm-sample-app : 1 pipeline prefetch-rpm-sample-app
+OK   bundle : couche relue (sha256) : sha256:558f8914c8e1cd4ae5171a6d4aaf20655688520121164bdf18f4fc5a2477beec
+OK   bundle : un seul fichier dans la couche : 1
+OK   témoin : pipeline rendue avec les entrées de M4b, égale à son bundle (normalisées) : égale
+OK   témoin : script de la tâche de M4b substitué avec son bundle (sha256) : 572fb78cf6b3104dbbbe2c834d236d313f1eb49e0da9b4171d03fc299fc42145
+## rendu neuf : prefetch-rpm de la cascade, bootstrap de M1b
+source sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 ; dossier sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     .spec.tasks[0].params[1].value : "sc-stockage.poc.test:5000/essais-05/rocky9-bootstrap@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6" -> "sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5d
+     .spec.tasks[0].params[2].value : "sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6" -> "sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3"
+     .spec.tasks[0].taskRef.params[0].value : "sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a" -> "sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8
+OK   feuilles différentes de la pipeline de M4b : .spec.tasks[0].params[1].value .spec.tasks[0].params[2].value .spec.tasks[0].taskRef.params[0].value
+OK   nouvelles valeurs : source, dossier, prefetch-rpm de la cascade : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+OK   script neuf : tâche signée de la cascade substituée avec la pipeline neuve (sha256) : 4d8bfe827d718b275b056f1c52ecd0a519b2736529f93e0fc56d18aa01b02d0c
+OK   script neuf contre celui de M4b : lignes différentes (SOURCE et DOSSIER) : < SOURCE < DOSSIER > SOURCE > DOSSIER
+OK   script neuf, sh -n (sh du pas de Tekton) : ok
+## liste revue
+OK   prefetch-rpm de la cascade, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+OK   publier-fermeture, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+## bootstrap neuf, arbre et digest prédits (resultats/m1b-fermeture-digest.py)
+OK   manifeste du bootstrap neuf (sha256) = pull_digest du verrou : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   configuration du bootstrap neuf = bootstrap.id du verrou : sha256:ff96017c3f06a35a11d06a454930ec797002708cd0187ac46d7febe0891444a2
+OK   manifeste du bootstrap de M4b (sha256) = pull_digest du verrou de M4b : sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     témoin : bootstrap neuf : 1 couche(s), configuration sha256:7bf628be885bd8d1f02d62fe280703e185e2f6b6e049e6c5361d832f67b72698 (243 octets)
+     témoin :   couche sha256:22495746e2884528c0c9417f0ac9c22943d3391226abfb98008fb8f74cb3ea99 : 97742593 octets, application/vnd.oci.image.layer.v1.tar+gzip
+     témoin : dossier dir: de M4b : sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     témoin : dossier dir: neuf : sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     témoin : arbre prédit : 230 fichiers, 317955662 octets
+     témoin : couches : 230, octets des fichiers : 317955662
+     témoin : manifeste prédit : 59923 octets
+     témoin : digest prédit : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+OK   témoin du calcul : arbre prédit avec le bootstrap de M4b, égal à celui de final : égal
+OK   témoin du calcul : digest prédit avec le bootstrap de M4b : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+     bootstrap neuf : 1 couche(s), configuration sha256:ff96017c3f06a35a11d06a454930ec797002708cd0187ac46d7febe0891444a2 (163 octets)
+       couche sha256:b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348 : 241981440 octets, application/vnd.oci.image.layer.v1.tar
+     dossier dir: de M4b : sc-stockage.poc.test@sha256:f0ccf10541c724f3ec87aa55bd6b0941391516f8eecf21d82f7367f73c20efb6
+     dossier dir: neuf : sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     arbre prédit : 230 fichiers, 462194425 octets
+     couches : 230, octets des fichiers : 462194425
+     manifeste prédit : 59924 octets
+     digest prédit : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+OK   arbre prédit (sha256) : a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014a
+OK   digest prédit : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+OK   arbre prédit : lignes hors du dossier du bootstrap, égales à celles de final : égales (226)
+## gardes de Zot (lecture anonyme)
+OK   tag m1b de la pipeline, absent : absent
+OK   tag m4b de la pipeline, sur celle de M4b : sha256:9b89b0299353cd66f37c02484628d5d177f27043624f3f05b8f1a642738eb9db
+OK   tag m1b de prefetch-rpm (bundles de la cascade), sur celle de la cascade : sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+OK   fermeture de M4b présente : sha256:2a9e2ea738e7e1b51ae441960502d3c1598bbd04bc7a66fa90423c7512169f0c
+OK   fermeture prédite absente : absent
+/ de sc-stockage : 3028594688 octets libres à 11:17:09 ; fichiers de la fermeture prédite : 462194425 octets

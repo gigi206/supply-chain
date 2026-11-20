@@ -2357,3 +2357,17 @@ C'est un script frère de `m4b.sh`, qui n'est pas touché : sa pipeline (tag `m4
 - **Relevé, sans pari** : la durée du pas, comparée aux 40 s de l'essai des bundles. La couche est 2,5 fois plus grosse.
 
 **Ce que ces deux étapes ne tiennent pas** : M4b refait n'est pas tenu avant la pipeline signée, les deux PipelineRuns, la comparaison de la fermeture tirée et la provenance. `image_digest` du bootstrap neuf (`77cff176…`) n'est pas contrôlé ici : `skopeo copy` en `dir:` ne le produit pas. Il reste une prédiction de M4c refait, lue dans la construction hermétique.
+
+### M4b refait : résultat de `local` et `essai`, écrit le 20/11/2026 à 2026-11-20T11:19:50Z UTC
+
+`m1b-fermeture.sh local essai` a tourné de 2026-11-20T11:17:08Z à 2026-11-20T11:19:09Z, avec code 0 : [`m1b-fermeture-local.log`](m1b-fermeture-local.log) (35 OK, 0 KO) et [`m1b-fermeture-essai.log`](m1b-fermeture-essai.log) (24 OK, 0 KO). Aucune ligne de jeton dans les deux journaux. Rien n'est écrit dans Zot.
+
+- **FL1 tenue** : témoin égal à la pipeline de M4b relue dans son bundle, trois feuilles différentes, script neuf `4d8bfe82…`. Le témoin du calcul redonne `final` et `2a9e2ea7…`. Arbre prédit `a731fbce…`, digest prédit `09838980…`. Toutes les gardes de Zot passent. Place libre sur / de sc-stockage : 3 028 594 688 octets à 11:17:09.
+- **FE1 tenue** : le pod `m1b-fermeture-prefetch` est admis et prêt sur sc-build, en runc.
+- **FE2 tenue** : code 0, `rpm -K` à 222 OK sur 222, `repomd.xml` V2 à `239a5a71…`. Le résultat de bootstrap désigne `builds/builders/rocky9-bootstrap@6de899ac…`. L'arbre relevé est égal à l'arbre prédit : 230 fichiers, archivés sous [`m1b-fermeture-essai-arbre.txt`](m1b-fermeture-essai-arbre.txt) (`a731fbce…`). Le risque connu ne s'est pas réalisé : `skopeo copy --preserve-digests` garde la couche non compressée sous son nom.
+- **FE3 tenue** : le cas refusé rend code 1 avec le message attendu, sans dossier `dir:` ni résultat. Le pod et sa PVC sont retirés.
+- **Relevés** : le pas dure 43 s, contre 40 s à l'essai des bundles. `skopeo copy` prend 1 s. `du -sb` compte 462 223 097 octets, dossiers compris ; les fichiers seuls font 462 194 425 octets, comme prédit.
+
+**Ce que cela établit** : la tâche signée de la cascade, avec les paramètres que la pipeline neuve lui donnera, produit dans un pod de la plateforme exactement l'arbre prédit. Le digest prédit (`09838980…`) suit de cet arbre si `publier-fermeture` se comporte comme en M4b.
+
+**Suite** : la pipeline (signature, bundle sous `m1b`) et les deux PipelineRuns. Le dépôt de la fermeture est figé dans la pipeline signée, donc il est à décider avant. M4b refait n'est pas tenu.
