@@ -115,3 +115,14 @@ Rien n'est posé. Journal : [`j7-etape1.log`](j7-etape1.log). Fichiers proposés
 **2. `fieldMask` : non vérifié.** `helm template` ne valide pas les chemins des champs. La réaction de l'agent à un chemin refusé n'est pas lue (refus de tout l'exportateur, champ ignoré ou erreur au journal). Ajouté aux points à lire en 4a.
 
 **3. Scripts de l'étape 1** versés dans [`j7-a-sec/`](j7-a-sec/) : `j7-etape1.sh` (sha256 `4d6528a5b36e1d45…`) et `j7-compare.py` (`2841cf518b67897a…`), tels qu'ils ont tourné. Leur dossier de travail est le scratchpad de la session (variable `S`). Pour les rejouer, il faut changer `S`, sans rien d'autre.
+
+## Étape 3 : prédictions écrites (note de 2026-11-20T22:14:17Z ; rien n'est réécrit au-dessus)
+
+[`j7-predictions.md`](j7-predictions.md) : E1 à E6 pour l'étape 4a, T0 à T8 pour l'étape 6. Rien n'est posé.
+
+Changements à la carte, après relecture du conseiller :
+- **L'étape 6 compte deux pods d'essai Kata.** Le second, sans label de tâche comme le bras a de R7, est un **témoin positif** : il doit produire au moins un flux autorisé exporté. Sans lui, « aucun flux autorisé » ne prouverait pas que l'export fonctionne.
+- **« Aucun autorisé » porte sur tous les verdicts** de `flow.proto`, pas seulement sur FORWARDED. Les requêtes et le panneau devront faire de même.
+- **Format des lignes lu dans le code au tag** (`ExportEvent` en protojson, noms du proto) : `hubble.alloy` lit les bonnes clés. Ce point n'est plus dans les « non vérifié » de l'étape 1, mais reste à constater sur le fichier.
+- **Placement confirmé** : la politique Kyverno `zone-build` (Deny) impose `zone=build` à tout pod de `builds`. « Alloy sur sc-build seul » tient.
+- **Accords** : l'étape 6 est un lancement prévu, mais la lecture du fichier sur sc-build (`sudo` ou `kubectl exec`) demande un accord nommé.
