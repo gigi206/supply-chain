@@ -7,6 +7,13 @@
 #           témoins de construire-rpm dans le pod ; ACCORD NOMMÉ DU PROPRIÉTAIRE : kubectl exec dans l'agent Cilium de
 #           sc-build (hubble observe, date) ; arrêt si le pod a n'a aucun flux autorisé (T0) ; pods supprimés et flux bruts
 #           effacés de $T en fin d'étape comme sur arrêt (trap) ; catalogue de Zot relu en anonyme avant et après
+# Étape 4a (forme (a) : fichier combiné, valeurs de la 08c puis export, en VALEURS_08C ; disparaît au rejeu de zéro) :
+#   pose_sec  à sec : fichier combiné, rendu hors ligne comparé au rendu de l'étape 1 (fichiers séparés) ; rien n'est posé
+#   pose      ACCORD : cilium.sh appliquer avec le fichier combiné (redémarre les agents des trois nœuds), hors de 08:00 à
+#             11:30 UTC et hors des balayages n°2 et n°3 de Zot ; rattrapage suspendu, aucun PipelineRun actif ; E1, E2, E3, E6
+#   export    ACCORD : pods a et b comme « mesure », plus les relevés de l'invité Kata ; fichier d'export lu dans les
+#             agents (kubectl exec), comptes seulement, copie effacée ; E4, E5, T7, réserve de T9 (préfixe)
+#   retour    ACCORD : cilium.sh appliquer avec le seul fichier de la 08c (commande de etape_h5_cilium) ; export retiré
 # Usage (racine du dépôt) : mise exec -- poc/bricks/19b-journalisation/j7.sh <étape>…   (journal : resultats/j7-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
@@ -28,6 +35,10 @@ ZOT_CIBLE=192.168.161.13/5000
 ZONE='{"nodeSelector": {"zone": "build"}, "tolerations": [{"key": "zone", "operator": "Equal", "value": "build", "effect": "NoSchedule"}],
   "securityContext": {"runAsNonRoot": true, "runAsUser": 65532, "seccompProfile": {"type": "RuntimeDefault"}}}'   # m1b-r1r8.sh
 MASQUE='/jeton\|token/I c\[ligne masquée : motif jeton|token]'
+V08C=$h19b/../08c-durcissement/config/valeurs-cilium.yaml   # fichier de la 08c, posé par etape_h5_cilium
+EXPORT=$R/j7-a-sec/valeurs-export.yaml                       # export proposé à l'étape 1
+FICHIER=/var/run/cilium/hubble/builds.log                   # filePath de l'exportateur builds (hostPath cilium-run)
+TGZ=$O/telechargements/cilium/cilium-1.20.4.tgz
 
 attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)" >&2; exit 1; }; }
 echec() { echo "KO   $*" >&2; exit 1; }
@@ -152,6 +163,167 @@ etape_mesure() { # ACCORD NOMMÉ : kubectl exec dans l'agent Cilium de sc-build 
     fi
   done
   k1=$(catalogue); attendu "catalogue de Zot (anonyme), après" "$k1" "$k0"
+}
+
+# --- étape 4a ------------------------------------------------------------------------------------------------------------
+valeurs_j7() { # fichier combiné : 08c puis export ; clés de tête distinctes (même motif que valeurs_h6 de la 08c)
+  cat "$V08C" "$EXPORT" > "$T/valeurs-j7.yaml"
+  attendu "clés de tête du fichier combiné" "$(yq -r 'keys | join(" ")' "$T/valeurs-j7.yaml")" "hostFirewall policyAuditMode tls hubble"
+}
+
+rendu() { # sortie fichiers-de-valeurs… : helm template hors ligne, valeurs de cilium.sh (08, 08b) puis les fichiers donnés
+  local o=$1; shift
+  sed -e "s#@CILIUM_AMD64@#sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54#" \
+      -e "s#@OPERATOR_AMD64@#sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1#" \
+      "$here/cilium/valeurs.yaml" | grep -v '^#' > "$T/valeurs-08.yaml"
+  local f=(-f "$T/valeurs-08.yaml" -f "$h19b/../08b-rke2/config/valeurs-cilium.yaml") v
+  for v in "$@"; do f+=(-f "$v"); done
+  helm template cilium "$TGZ" --namespace kube-system "${f[@]}" | yq -o=json -I=0 '.' \
+    | jq -c 'select(. != null and .kind != "Secret")' | jq -sc 'sort_by(.kind, .metadata.name)' > "$o"
+}
+
+garde_fenetre() { # pose et retour redémarrent les agents des trois nœuds : hors des scans de G7 et des balayages de Zot
+  local j m
+  j=$(date -u +%Y-%m-%d); m=$(( 10#$(date -u +%H) * 60 + 10#$(date -u +%M) ))
+  [ "$m" -lt 480 ] || [ "$m" -gt 690 ] || echec "fenêtre refusée : entre 08:00 et 11:30 UTC (import de la base grype, scans de G7)"
+  case $j in
+    2026-11-21) [ "$m" -lt 1290 ] || [ "$m" -gt 1365 ] || echec "fenêtre refusée : balayage n°2 de Zot (21/11, 21:30 à 22:45 UTC)" ;;
+    2026-11-22) [ "$m" -lt 1335 ] || [ "$m" -gt 1410 ] || echec "fenêtre refusée : balayage n°3 de Zot (22/11, 22:15 à 23:30 UTC)" ;;
+    2026-11-2[0-2]) ;;
+    *) echec "fenêtre non calculée pour $j : recalculer les balayages de Zot avant de poser" ;;
+  esac
+  echo "OK   fenêtre : $(date -u +%Y-%m-%dT%H:%M:%SZ), hors de 08:00 à 11:30 UTC et hors des balayages n°2 et n°3"
+}
+
+reprendre_rattrapage() { kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":false}}' < /dev/null > /dev/null; echo "rattrapage repris"; }
+suspendre_rattrapage() { # comme etape_h5_cilium (08c) : aucun passage ni PipelineRun actif pendant les redémarrages
+  local n
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' < /dev/null > /dev/null
+  trap reprendre_rattrapage EXIT
+  for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}' < /dev/null)" ] && break; sleep 2; done
+  n=$(kubectl get pipelineruns -n builds -o json < /dev/null | jq '[.items[] | select(.status.completionTime == null)] | length')
+  [ "$n" = 0 ] || echec "$n PipelineRun(s) actif(s) : pose reportée"
+  echo "OK   rattrapage suspendu, aucun PipelineRun actif"
+}
+
+versions_certs() { kubectl get secret -n kube-system cilium-ca hubble-server-certs --no-headers -o custom-columns=N:.metadata.name,V:.metadata.resourceVersion < /dev/null | tr -s ' ' | paste -sd' ' -; }   # 08c ; aucune valeur affichée
+redemarrages() { kubectl get pods -A -o json < /dev/null | jq '[.items[].status.containerStatuses[]?.restartCount] | add'; }
+agent_de() { kubectl get pods -n kube-system -l k8s-app=cilium --field-selector "spec.nodeName=$1" -o jsonpath='{.items[0].metadata.name}' < /dev/null; }
+cfg() { kubectl -n kube-system get cm cilium-config -o json < /dev/null; }
+fichier_export() { # nœud : état du fichier d'export dans l'agent du nœud (ls ; absent si aucun)
+  kubectl -n kube-system exec "$(agent_de "$1")" -c cilium-agent -- sh -c "ls -l --time-style=+%H:%M:%S $(dirname "$FICHIER") 2>/dev/null | grep -c 'builds' ; wc -c 2>/dev/null < $FICHIER || echo absent" < /dev/null | paste -sd' ' -
+}
+
+apres_pose() { # contrôles communs à pose et retour : nœuds, API, Zot, agents, Hubble, certificats, redémarrages
+  local c0=$1 r0=$2 p v
+  kubectl wait --for=condition=Ready node --all --timeout=120s < /dev/null > /dev/null
+  attendu "API" "$(kubectl get --raw /readyz < /dev/null || true)" ok
+  v=$(curl -k -s -o /dev/null --max-time 8 -w '%{http_code}' "https://$REG_HOTE/v2/" < /dev/null || true)
+  [ "${v:-000}" != 000 ] && echo "OK   Zot joignable depuis l'hôte : HTTP $v" || echec "Zot injoignable depuis l'hôte"
+  attendu "certificats de Cilium et de Hubble (versions d'objet)" "$(versions_certs)" "$c0"
+  sleep 30
+  while read -r p; do
+    attendu "$p, état" "$(kubectl exec -n kube-system "$p" -c cilium-agent -- cilium-dbg status --brief < /dev/null 2>&1 | tail -1)" OK
+    attendu "$p, Hubble" "$(kubectl exec -n kube-system "$p" -c cilium-agent -- cilium-dbg status < /dev/null 2> /dev/null | awk '$1 == "Hubble:" {print $2}')" Ok
+  done < <(kubectl get pods -n kube-system -l k8s-app=cilium -o json < /dev/null | jq -r '.items[].metadata.name')
+  attendu "redémarrages de conteneurs du cluster" "$(redemarrages)" "$r0"
+  attendu "enable-host-firewall" "$(cfg | jq -r '.data["enable-host-firewall"]')" true
+}
+
+etape_pose_sec() { # rien n'est posé
+  valeurs_j7
+  rendu "$T/rendu-combine.json" "$T/valeurs-j7.yaml"
+  rendu "$T/rendu-separe.json" "$V08C" "$EXPORT"
+  rendu "$T/rendu-actuel.json" "$V08C"
+  attendu "rendu du fichier combiné = rendu de l'étape 1 (fichiers séparés), hors Secrets" "$(sha256sum < "$T/rendu-combine.json" | cut -c1-16)" "$(sha256sum < "$T/rendu-separe.json" | cut -c1-16)"
+  attendu "objets ajoutés par l'export" "$(jq -r --slurpfile a "$T/rendu-actuel.json" '[.[] | "\(.kind)/\(.metadata.name)"] - [$a[0][] | "\(.kind)/\(.metadata.name)"] | join(" ")' "$T/rendu-combine.json")" "ConfigMap/cilium-flowlog-config"
+  attendu "cilium-config rendu actuel = cilium-config vivant (clés et valeurs)" \
+    "$(jq -cS '.[] | select(.kind == "ConfigMap" and .metadata.name == "cilium-config") | .data' "$T/rendu-actuel.json" | sha256sum | cut -c1-16)" "$(cfg | jq -cS '.data' | sha256sum | cut -c1-16)"
+  attendu "clés de cilium-config : vivant, puis après la pose" "$(cfg | jq '.data | length') $(jq '.[] | select(.kind == "ConfigMap" and .metadata.name == "cilium-config") | .data | length' "$T/rendu-combine.json")" "163 164"
+  echo "commande de pose   : VALEURS_08C=$T/valeurs-j7.yaml $here/cilium.sh appliquer" | sed "s#$HOME#~#g"
+  echo "commande de retour : VALEURS_08C=$V08C $here/cilium.sh appliquer   (celle de etape_h5_cilium)" | sed "s#$HOME#~#g"
+  ( garde_fenetre ) || echo "information : la fenêtre actuelle serait refusée"
+}
+
+etape_pose() { # ACCORD NOMMÉ : valeurs de Cilium (export), redémarrage des agents des trois nœuds
+  local c0 r0
+  garde_fenetre
+  valeurs_j7
+  attendu "export absent avant la pose" "$(cfg | jq -r '.data | has("hubble-flowlogs-config-path")')" false
+  c0=$(versions_certs); r0=$(redemarrages)
+  suspendre_rattrapage
+  date -u '+pose %H:%M:%S UTC'
+  VALEURS_08C=$T/valeurs-j7.yaml "$here/cilium.sh" appliquer < /dev/null
+  date -u '+agents prêts %H:%M:%S UTC'
+  apres_pose "$c0" "$r0"
+  attendu "E1 : clés de cilium-config, hubble-flowlogs-config-path" "$(cfg | jq -r '"\(.data | length) \(.data["hubble-flowlogs-config-path"])"')" "164 /flowlog-config/flowlogs.yaml"
+  attendu "E2 : exportateurs de cilium-flowlog-config" "$(kubectl -n kube-system get cm cilium-flowlog-config -o jsonpath='{.data.flowlogs\.yaml}' < /dev/null | yq -r '[.flowLogs[].name] | join(" ")')" builds
+  echo "E3 : sc-build : $(fichier_export sc-build)"
+  echo "E6 : sc-confiance : $(fichier_export sc-confiance) ; sc-stockage : $(fichier_export sc-stockage)"
+}
+
+lire_export() { # nœud depuis : copie du fichier d'export du nœud dans $T (effacée par nettoyer), lignes depuis l'heure donnée
+  kubectl -n kube-system exec "$(agent_de "$1")" -c cilium-agent -- cat "$FICHIER" < /dev/null > "$T/hubble-export-$1.json" 2> /dev/null || : > "$T/hubble-export-$1.json"
+  jq -c --arg d "$2" 'select(.time[:19] >= $d[:19])' "$T/hubble-export-$1.json" > "$T/hubble-export-$1-depuis.json"
+}
+
+etape_export() { # ACCORD NOMMÉ : pods d'essai, kubectl exec dans les agents (hubble observe, lecture du fichier d'export)
+  local c p ip t0 tp a n
+  attendu "export posé" "$(cfg | jq -r '.data["hubble-flowlogs-config-path"]')" /flowlog-config/flowlogs.yaml
+  rendre
+  for p in "$N-a" "$N-b"; do ! present "$p" || echec "pod $p déjà présent : relancer sous un autre PREFIXE"; done
+  trap nettoyer EXIT
+  a=$(agent_build); echo "agent Cilium de sc-build : $a"
+  echo "fichier d'export avant : sc-build $(fichier_export sc-build)"
+  tp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  for c in a b; do
+    p=$N-$c
+    echo "## pod $c ($(jq -r '.metadata.labels["tekton.dev/task"] // "sans label de tâche"' "$T/pod-$p.json"))"
+    kubectl create -f "$T/pod-$p.json" < /dev/null > /dev/null
+    t0=$(kubectl get pod -n builds "$p" -o jsonpath='{.metadata.creationTimestamp}' < /dev/null)
+    echo "pod $p créé à $t0"
+    kubectl wait -n builds "pod/$p" --for=condition=Ready --timeout=300s < /dev/null > /dev/null || echec "pod $p non prêt"
+    ip=$(kubectl get pod -n builds "$p" -o jsonpath='{.status.podIP}' < /dev/null)
+    echo "pod prêt : $(kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}, runtimeClassName {.spec.runtimeClassName}' < /dev/null), IP $ip"
+    echo "invité Kata : $(kubectl exec -n builds "$p" -- sh -c 'for k in tcp_syn_retries tcp_syn_linear_timeouts; do printf "%s=%s " $k "$(cat /proc/sys/net/ipv4/$k 2>/dev/null || echo absent)"; done; uname -r' < /dev/null)"
+    temoins "$c" > "$T/temoins-$c.sh"
+    kubectl exec -i -n builds "$p" -- bash -s < "$T/temoins-$c.sh" 2>&1 | filtre | tee "$T/temoins-$c.out"
+    sleep 5
+    observer "$a" "$t0" "$T/hubble-ip-$c.json" --ip "$ip"
+    comptes "$T/hubble-ip-$c.json" "Hubble, filtre --ip $ip" "$ip"
+    echo "  drapeaux TCP des flux du pod : $(jq -rs --arg ip "$ip" '[.[] | .flow | select(. != null and .IP.source == $ip) | (.l4.TCP.flags // {} | keys | join(","))] | group_by(.) | map("\(.[0])=\(length)") | join(" ")' "$T/hubble-ip-$c.json")"
+    echo "  motif × destination : $(jq -rs '[.[] | .flow | select(. != null) | "\(.drop_reason_desc // "-")|\(.IP.destination):\(.l4.TCP.destination_port // .l4.UDP.destination_port // "-")"] | group_by(.) | map("\(.[0])=\(length)") | join(" ")' "$T/hubble-ip-$c.json")"
+    lire_export sc-build "$t0"
+    n=$(jq -s --arg ip "$ip" '[.[] | .flow | select(. != null and (.IP.source == $ip or .IP.destination == $ip))] | length' "$T/hubble-export-sc-build-depuis.json")
+    comptes "$T/hubble-export-sc-build-depuis.json" "fichier d'export de sc-build depuis $t0 (préfixe builds/)" "$ip"
+    echo "  T9 (préfixe) : flux du pod dans le fichier $n ; dans hubble observe --ip $(grep -c . "$T/hubble-ip-$c.json" || true)"
+    kubectl delete pod -n builds "$p" --wait=true < /dev/null > /dev/null; echo "pod $p supprimé à $(date -u +%H:%M:%S)"
+  done
+  sleep 5
+  lire_export sc-build "$tp"
+  echo "## E4, E5 : fichier de sc-build depuis $tp"
+  echo "lignes : $(grep -c . "$T/hubble-export-sc-build-depuis.json" || true) ; octets : $(wc -c < "$T/hubble-export-sc-build-depuis.json")"
+  echo "clés de tête : $(jq -r 'keys | join(",")' "$T/hubble-export-sc-build-depuis.json" | sort | uniq -c | awk '{print $2 "=" $1}' | paste -sd' ' -)"
+  echo "champs de flow : $(jq -r '.flow // {} | keys[]' "$T/hubble-export-sc-build-depuis.json" | sort | uniq -c | awk '{print $2 "=" $1}' | paste -sd' ' -)"
+  echo "verdict au format nom : $(jq -r '.flow.verdict // empty' "$T/hubble-export-sc-build-depuis.json" | sort -u | paste -sd' ' -)"
+  echo "sources hors de builds : $(jq -r 'select(.flow != null) | .flow | select((.source.namespace // "") != "builds" and (.destination.namespace // "") != "builds") | 1' "$T/hubble-export-sc-build-depuis.json" | grep -c . || true)"
+  echo "## fichier entier et rotation"
+  echo "sc-build : $(fichier_export sc-build) ; fichiers tournés : $(kubectl -n kube-system exec "$a" -c cilium-agent -- sh -c "ls $(dirname "$FICHIER") | grep -c '^builds-'" < /dev/null || true)"
+  echo "E6 : sc-confiance : $(fichier_export sc-confiance) ; sc-stockage : $(fichier_export sc-stockage)"
+}
+
+etape_retour() { # ACCORD NOMMÉ : valeurs de la 08c seules (commande de etape_h5_cilium), redémarrage des agents
+  local c0 r0
+  garde_fenetre
+  c0=$(versions_certs); r0=$(redemarrages)
+  suspendre_rattrapage
+  date -u '+retour %H:%M:%S UTC'
+  VALEURS_08C=$V08C "$here/cilium.sh" appliquer < /dev/null
+  date -u '+agents prêts %H:%M:%S UTC'
+  apres_pose "$c0" "$r0"
+  attendu "clés de cilium-config, export retiré" "$(cfg | jq -r '"\(.data | length) \(.data | has("hubble-flowlogs-config-path"))"')" "163 false"
+  attendu "ConfigMap cilium-flowlog-config" "$(kubectl -n kube-system get cm cilium-flowlog-config --ignore-not-found -o name < /dev/null)" ""
+  echo "fichier d'export laissé sur sc-build (tmpfs /run probable, non lu) : $(fichier_export sc-build)"
 }
 
 for e in "$@"; do [ ! -e "$R/$N-$e.log" ] || { echo "journal déjà présent : resultats/$N-$e.log (relancer sous un autre PREFIXE)" >&2; exit 2; }; done

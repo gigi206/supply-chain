@@ -1,0 +1,9 @@
+# j7.sh pose_sec, 2026-11-20T22:41:56Z
+OK   clés de tête du fichier combiné : hostFirewall policyAuditMode tls hubble
+OK   rendu du fichier combiné = rendu de l'étape 1 (fichiers séparés), hors Secrets : 062962a7e13943d5
+OK   objets ajoutés par l'export : ConfigMap/cilium-flowlog-config
+OK   cilium-config rendu actuel = cilium-config vivant (clés et valeurs) : 2cf9627a73576d91
+OK   clés de cilium-config : vivant, puis après la pose : 163 164
+commande de pose   : VALEURS_08C=~/.cache/supply-chain-poc/08/travail/j7-19b/valeurs-j7.yaml ~/Documents/git/github/gigi206/supply-chain/poc/bricks/19b-journalisation/../08-trust-plane/cilium.sh appliquer
+commande de retour : VALEURS_08C=~/Documents/git/github/gigi206/supply-chain/poc/bricks/19b-journalisation/../08c-durcissement/config/valeurs-cilium.yaml ~/Documents/git/github/gigi206/supply-chain/poc/bricks/19b-journalisation/../08-trust-plane/cilium.sh appliquer   (celle de etape_h5_cilium)
+OK   fenêtre : 2026-11-20T22:41:57Z, hors de 08:00 à 11:30 UTC et hors des balayages n°2 et n°3

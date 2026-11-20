@@ -138,3 +138,31 @@ Accord du propriétaire : « Oui », à la demande nommant les deux pods Kata pr
 - croiser le motif avec la destination.
 
 **T9 : réserve.** La mesure a filtré sur le nom complet (`--pod builds/<pod>`). L'export filtrera sur le préfixe `builds/`. Le sens du préfixe est lu dans `flow.proto`, pas mesuré : c'est un point de 4a.
+
+## Étape 4a préparée : pose, export, retour (note de 2026-11-20T22:42:28Z ; rien n'est réécrit au-dessus)
+
+`j7.sh` passe à **`5f753a08acd74e9f…`**. Ajouts : `pose_sec`, `pose`, `export` et `retour`. La forme retenue est (a), le fichier combiné (valeurs de la 08c, puis export) passé en `VALEURS_08C`. Il disparaît au rejeu de zéro.
+
+- **`pose_sec`, passée** ([journal](j7-pose_sec.log)) : rien n'est posé.
+  - Le rendu du fichier combiné est égal, hors Secrets, au rendu de l'étape 1 fait avec des fichiers séparés.
+  - Il ajoute la seule ConfigMap `cilium-flowlog-config`.
+  - Le rendu actuel est égal au `cilium-config` du cluster (clés et valeurs).
+  - Clés de `cilium-config` : 163 aujourd'hui, 164 après la pose.
+- **Commandes** :
+  - pose : `VALEURS_08C=<fichier combiné> cilium.sh appliquer` ;
+  - retour : `VALEURS_08C=08c-durcissement/config/valeurs-cilium.yaml cilium.sh appliquer`, la commande de `etape_h5_cilium`.
+- **Précautions reprises de la 08c** : le rattrapage est suspendu, et la pose est refusée si un PipelineRun est actif. Les certificats de Cilium et de Hubble (versions d'objet), le nombre de redémarrages et le pare-feu d'hôte sont contrôlés après coup.
+- **Fenêtre gardée par le script** : jamais de 08:00 à 11:30 UTC. Le 21/11, jamais de 21:30 à 22:45 UTC (balayage n°2) ; le 22/11, jamais de 22:15 à 23:30 UTC (n°3). Au-delà du 22/11, la pose est refusée tant que les balayages ne sont pas recalculés.
+- **Journal de la 08** : `cilium.sh appliquer` réécrit `08-trust-plane/resultats/cilium-appliquer.log`, comme chaque passage de la 08c (h4, h5_cilium, h6, h6_retrait). L'historique reste dans git.
+- **Fichier d'export** : il est sous `/var/run` du nœud, sans doute un tmpfs, donc en mémoire (60 Mo au plus avec la rotation). Ce n'est pas lu sur la VM.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| P1 | `pose` : agents prêts (3/3), état OK et Hubble Ok sur les trois. API prête, Zot joignable depuis l'hôte. Certificats de Cilium et de Hubble inchangés, nombre de redémarrages inchangé, pare-feu d'hôte toujours posé | Haute : même chemin que h5_cilium et h6 |
+| P2 | E1 et E2 (164 clés, un exportateur `builds`), E3 et E6 comme écrites plus haut | Haute |
+| X1 | `export`, réserve de T9 : le fichier de sc-build contient, pour chaque pod, autant de flux que `hubble observe --ip`. Le préfixe `builds/` filtre comme le nom complet | Moyenne : préfixe lu, pas mesuré |
+| X2 | Motif × destination, pod b : POLICY_DENY = 14 sur 199.232.170.132:80 ; POLICY_DENIED sur les trois autres destinations | Haute : politique lue |
+| X3 | Drapeaux SYN : 7 par témoin TCP, d'après les 14 flux de la mesure. `tcp_syn_linear_timeouts` est relevé dans l'invité, sans pari | Moyenne |
+| X4 | E4 et E5 dans le fichier : clés de tête `flow`, `node_name` et `time`, verdict en nom, aucun champ hors du masque, aucune ligne hors de `builds` | Haute : code au tag |
+| X5 | T7 : moins de 150 lignes et moins de 300 Ko pour les deux pods. Aucun fichier tourné | Moyenne |
+| P3 | `retour` : 163 clés, `cilium-flowlog-config` absente, mêmes contrôles que P1. Le fichier reste sur sc-build jusqu'au redémarrage de la VM | Haute |
