@@ -2321,3 +2321,7 @@ Tu as donné l'accord nommé : « Oui, signe et pousse ». `taches` a tourné av
 - place libre sur / de sc-stockage : 3 022 004 224 octets avant, 3 021 639 680 après.
 
 **Suite** : ces deux références ne sont pas encore dans la liste revue (`taches.yml` de la 08). Tekton ne les acceptera qu'après ta revue.
+
+**Revue de la liste, note écrite le 20/11/2026 à 2026-11-20T10:59:46Z UTC** : tu as accepté la revue avec « Oui, garde les deux ». Les deux références `m1b` sont ajoutées à `taches.yml` (08), sous `prefetch-rpm` et `construire-rpm`, chacune avec un commentaire. Les références de M4b (`9afe09db…`) et de M4c (`d7f01398…`) restent listées, donc les preuves de M4b, M4c et M5a restent revérifiables par la porte. La fonction `listee` de `commun.sh` trouve les quatre références. Les tests de la porte (`porte_test.rego`) ont leurs propres digests et ne sont pas touchés.
+
+**Non fait** : la ConfigMap `porte` du cluster porte toujours une liste antérieure. La mettre à jour change une politique dans le cluster ; ce sera une question à part.

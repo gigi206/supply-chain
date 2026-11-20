@@ -84,6 +84,12 @@ trusted_tasks:
   # script substitué égal à celui joué dans le pod d'essai (sha256 572fb78c)
   oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm:
     - ref: sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+    # Brique 05, cascade de M1b (signée le 20/11/2026 à 10:54:10 UTC, m1b-bundles-taches.log ; accord du propriétaire « Oui, signe
+    # et pousse ») : 05-rpm-mock/fermeture/prefetch-rpm.m1b.signee.yaml ; même gabarit que la version de M4b, seule l'image du
+    # pas change : outillage de M1b construit par la plateforme (builds/builders/mock-rocky9@70f8c412). Jouée dans un pod d'essai
+    # avant signature (10:48:02 UTC) : repomd.xml et arbre égaux à ceux de final (M4b). La version de M4b reste listée (revue du
+    # 20/11/2026 : « Oui, garde les deux »)
+    - ref: sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
   # Brique 05, M4c (signées le 18/11/2026 entre 14:52:19 et 14:52:23 UTC, chrono.tsv ; accord permanent du 18/11) :
   # 05-rpm-mock/construction/preparer-rpm.signee.yaml, pod runc restreint (UID 65532, runAsNonRoot, capacités retirées, sans
   # élévation) sans secret, images d'outils plateforme/outils-prefetch@68e0ae70 et plateforme/outils-horodatage@c7bebae2 ;
@@ -104,6 +110,11 @@ trusted_tasks:
   # nom (ni construction_kata, ni appariement à preparer-rpm)
   oci://sc-stockage.poc.test:5000/tekton/tasks/construire-rpm:
     - ref: sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+    # Brique 05, cascade de M1b (signée le 20/11/2026 à 10:54:10 UTC, m1b-bundles-taches.log ; même accord) :
+    # 05-rpm-mock/construction/construire-rpm.m1b.signee.yaml ; même gabarit que la version de M4c, seule l'image du pas change
+    # (mock-rocky9@70f8c412 de M1b). Jouée dans un pod d'essai Kata avant signature (10:50:01 UTC) : rpm de M3 et artefact
+    # 07b7bd6f, ceux de l'essai de M4c. La version de M4c reste listée (« Oui, garde les deux »)
+    - ref: sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
   # Brique 05, M1b (signées le 20/11/2026 à 08:57:02 UTC, m1b-signature-taches.log ; accord du propriétaire « Oui, signe ») :
   # 05-rpm-mock/builders/prefetch-racine-rpm.signee.yaml, pod runc restreint (UID 65532, runAsNonRoot, capacités retirées, sans
   # élévation) sans secret, image de l'amorce amont/rockylinux/rockylinux@ed654c69 figée (décision « (a) Figée » du 19/11,

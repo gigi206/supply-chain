@@ -972,3 +972,7 @@ Le conseiller a trouvé un chemin hérité de `m4c.sh` dans l'essai de construct
 ## Note datée du 20/11/2026, écrite à 2026-11-20T10:54:47Z UTC : bundles de la cascade signés et poussés
 
 `taches` a tourné à 10:54:10Z, sur ton accord nommé (« Oui, signe et pousse »), et TB1 à TB3 tiennent ([résultat](m1b-predictions.md)). Bundles sous `m1b` : `prefetch-rpm@b9bbeba3…` et `construire-rpm@ca03f189…`. Les tags `m4b` et `m4c` n'ont pas bougé. Reste la revue de `taches.yml`.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T10:59:46Z UTC : liste revue complétée
+
+Revue acceptée (« Oui, garde les deux ») : `taches.yml` liste les références de M4b, de M4c et de la cascade. Suite : M4b refait sous un préfixe (pipeline `prefetch-rpm-sample-app` avec le bootstrap neuf, puis fermeture), puis M4c refait avec l'artefact `333b7322`. La ConfigMap `porte` reste à mettre à jour, sur question à part.
