@@ -937,3 +937,10 @@ Le banc donne 46 OK, et les prédictions AR1 à AR6 et AP1 à AP3 sont écrites 
 - `publier` attend ton accord nommé.
 
 **Reste ouvert** : `poc/packaging/verrou-rpm.json` n'est plus la source de l'artefact neuf. Celle-ci est [`m1b-verrou.json`](m1b-verrou.json), sous `resultats/`. Le fichier de `poc/packaging` sera à remplacer quand le banc de `fe1b72cc` et `m4a.sh` ne le liront plus.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T10:07:46Z UTC : artefact de la cascade calculé hors ligne
+
+`local` et `releve` ont tourné à 10:06:41Z, et AR1 à AR6 tiennent ([résultat](m1b-predictions.md)).
+- Le digest neuf est `sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48`, sous le tag `m1b`, à pousser dans `entrees/sample-app/packaging-rpm`.
+- Zot n'a reçu aucune écriture.
+- `publier` attend ton accord nommé.

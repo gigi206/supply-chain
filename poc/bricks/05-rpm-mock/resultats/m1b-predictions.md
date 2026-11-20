@@ -2199,3 +2199,23 @@ Accords :
   Zot ne reçoit que deux blobs neufs, le verrou (111 567 octets) et le manifeste. La spécification et la configuration vide sont déjà dans le dépôt.
 
 **Portée prévue** : si AR1 à AR6 tiennent, le digest de l'artefact neuf est connu avant toute écriture. Il ne dépend que du verrou, et l'écriture se pose en une question. Les points suivants (bundles neufs de `prefetch-rpm` et `construire-rpm`, M4b et M4c refaits) citeront ce digest.
+
+### Artefact de la cascade : résultat de `local` et `releve`, écrit le 20/11/2026 à 2026-11-20T10:07:46Z UTC
+
+Les deux étapes ont tourné le 20/11/2026 à 10:06:41Z, avec code 0 : 12 OK et 0 KO pour `local`, 3 OK et 0 KO pour `releve` ([`local`](m1b-artefact-local.log), [`releve`](m1b-artefact-releve.log)). Rien n'a été écrit dans Zot.
+
+| Prédiction | Tenue | Mesure |
+|---|---|---|
+| AR1 | oui | spec `918a83f5…`, verrou neuf `c544599a…`, verrou de M4a `b6d0f8f1…` |
+| AR2 | oui | version 1.1.0, 222 rpm égaux à ceux de M4a, 0 URL hors de vault 9.7, bootstrap `builds/builders/rocky9-bootstrap@6de899ac…`, `id` `ff96017c…`, prêt, amd64 |
+| AR3 | oui | témoin sous le tag `m1b` : `41c639b7…` |
+| AR4 | oui | deux layouts : `sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48` |
+| AR5 | oui | deux feuilles : `.layers[1].digest` (`b6d0f8f1…` → `c544599a…`) et `.layers[1].size` (111 561 → 111 567) ; manifeste de 849 octets, couches de 118 762 octets |
+| AR6 | oui | `m1b` absent (« not found »), `m4a` sur `41c639b7…`, 3 021 647 872 octets libres sur / de sc-stockage |
+
+**Relevé, sans pari** :
+- **Digest de l'artefact neuf** : `sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48`. C'est désormais la prédiction de `publier` (AP1).
+- **`image_digest`** : `77cff176…`, sous contrôle de forme seulement.
+- **Place libre** : 3 021 647 872 octets. Le dernier relevé précédent est de 09:11:45Z, à la fin du journal des PipelineRuns de M1b ([`m1b-pipeline-pipeline.log`](m1b-pipeline-pipeline.log)) : 3 043 340 288 octets. Il y a donc 21 692 416 octets de moins en 55 minutes, sans écriture de la brique dans Zot entre les deux : le verrou et la provenance n'ont fait que lire. Cela s'accorde avec la dérive déjà notée de / de sc-stockage, non attribuée. La fermeture de M4b refaite devra tenir dans cette place.
+
+**Lecture** : l'artefact neuf ne diffère de celui de M4a que par le verrou. Son digest est connu avant toute écriture. Il reste une question : l'écriture dans Zot.

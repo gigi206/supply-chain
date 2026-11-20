@@ -1,0 +1,5 @@
+# m1b-artefact.sh releve, 2026-11-20T10:06:41Z
+digest local (étape local) : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   G1 entrees/sample-app/packaging-rpm:m1b, lecture anonyme (relevé) : absent
+OK   G2 entrees/sample-app/packaging-rpm:m4a, lecture anonyme (relevé) : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   G3 octets libres sur / de sc-stockage (porte /var/lib/zot), relevé : 3021647872 (seuil 1073741824)
