@@ -107,6 +107,8 @@ Sources :
 
 Sources : [gestion des clés cosign](https://docs.sigstore.dev/cosign/key_management/overview/), [Rekor v2 GA](https://blog.sigstore.dev/rekor-v2-ga/), [charts Helm Sigstore](https://github.com/sigstore/helm-charts), [timestamp-authority](https://github.com/sigstore/timestamp-authority), [RSTUF](https://github.com/repository-service-tuf/repository-service-tuf).
 
+*Correction datée du 19/11/2026 (brique 09, [page de manuel de debsign de trixie](../poc/bricks/09-openpgp-signing/resultats/releve-complements.log), §A)* : dans la ligne « Signature OpenPGP », « `rpmsign`/`debsign` modifient l'artefact » n'est exact que pour `rpmsign`. `debsign` signe le `.dsc`, le `.buildinfo` et le `.changes`, pas le `.deb` ; le deb reste bit-identique et sa signature passe par le dépôt (`Release.gpg`, `InRelease`). Une signature intégrée au `.deb` demanderait `debsigs`, qui remplit à la lettre « Risqué » (doc 04). L'attestation de lien reste nécessaire pour le rpm signé ; pour le deb, le lien est une identité d'empreinte.
+
 ## 5. Politique, vérification, stockage des attestations
 
 | Option | Pour | Contre | Verdict |

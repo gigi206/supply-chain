@@ -30,7 +30,7 @@ Plateforme de **supply-chain logicielle** auto-hébergée. Elle vise à :
 >   - M1 non réévalué : les images d'outillage ont été construites hors de la plateforme ;
 >   - M1b en cours, pour que la plateforme les construise sans réseau ;
 >   - rejeu M5b pas avant le 28/11.
-> - **Licences (13a)** : volet deb fait le 14/11, volet rpm pas lancé. **Signature OpenPGP (09)** : non commencée.
+> - **Licences (13a)** : volet deb fait le 14/11, volet rpm pas lancé. **Signature OpenPGP (09)** : **seuil atteint le 19/11**, avec réserves : rpm, deb (par le dépôt apt) et dépôts rpm et apt signés sur l'hôte, publiés dans Zot avec une attestation de lien vérifiée par cosign et par un contrôle indépendant ; la porte ne juge pas le lien, et la clé OpenPGP est un fichier sur l'hôte, pour le PoC seulement ([clôture](poc/bricks/09-openpgp-signing/README.md)).
 > - **Décisions du 18/11** :
 >   - Tekton Triggers est gardé : Pipelines as Code n'est pas retenu ([`poc/benchmarks/pac`](poc/benchmarks/pac/README.md)) ;
 >   - la plateforme reste déployée par ses scripts : Argo CD, Flux et helmfile ne sont pas retenus ([`poc/benchmarks/deploiement`](poc/benchmarks/deploiement/README.md)).
