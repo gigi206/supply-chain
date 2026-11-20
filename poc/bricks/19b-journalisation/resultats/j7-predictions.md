@@ -100,3 +100,24 @@ Seuls des comptes seront archivés, jamais de flux bruts.
 - **Flux bruts** : les fichiers de `hubble observe` restent dans le dossier de travail hors du dépôt, le temps des comptes. Ils sont effacés en fin d'étape, comme sur arrêt (`trap`), avec les pods du jalon.
 - **Fenêtre** : elle commence à la création du pod (horloge de l'API). L'écart entre l'horloge de l'agent de sc-build et celle de l'hôte est relevé.
 - **Pas de troncature à 20 flux**, lu dans le code du CLI au tag (`hubble/cmd/observe/flows.go`, sha256 `e84789fd9348296e…`). La limite par défaut ne s'applique que sans `--since`, `--until` ni `--first`. Le CLI embarqué dans l'agent n'a pas été comparé à ce code.
+
+## Résultat de la mesure de l'étape 2 (note de 2026-11-20T22:34:12Z ; rien n'est réécrit au-dessus)
+
+Accord du propriétaire : « Oui », à la demande nommant les deux pods Kata privilégiés, le `kubectl exec` dans l'agent Cilium de sc-build (`hubble observe`, `date`), des comptes seulement, et rien de posé. `j7.sh` (`6cae4217…`), étape `mesure` : de 22:32:09 à 22:33:12 UTC, code 0 ([journal](j7-mesure.log)). Les valeurs de Cilium ne sont pas touchées. Les pods sont supprimés et les flux bruts effacés. L'horloge de l'agent de sc-build est à 0 s de celle de l'hôte.
+
+| # | Résultat |
+|---|---|
+| T0 | **Tenue.** Pod a : TCP vers Zot, code 0 ; 5 flux sortants FORWARDED vers 192.168.161.13:5000, plus 2 réponses (`is_reply` vrai) vers le pod |
+| T1 | **Tenue.** Pod b : les quatre témoins échouent en code 124, le DNS compris |
+| T2 | **Non tenue.** 14 flux refusés par témoin TCP, 42 en tout, contre un pari de 8 et une plage de 2 à 8. Les 14 horodatages sont tous distincts. Sur les 46 flux du pod b : 23 de type 1 (perte) et 23 de type 5 (verdict de politique). Lecture déduite, non mesurée (drapeaux TCP non comptés) : deux événements par paquet refusé, donc environ 7 SYN par témoin en 10 s. Les « deux flux par horodatage » de la 08 étaient lus à la milliseconde |
+| T3 | **En partie.** Tous les flux sont DROPPED et EGRESS, vers les destinations des témoins. Mais deux motifs : POLICY_DENIED (32) et **POLICY_DENY (14), non prédit**. Le compte de 14 est celui d'un seul témoin TCP. Son attribution à 199.232.170.132:80 est déduite, pas mesurée : le croisement motif × destination n'a pas été compté. Ce serait un refus explicite d'une politique Cilium (`builds-sans-internet` refuse les adresses publiques) |
+| T4 | **Tenue.** 4 flux UDP refusés vers le port 53. La destination vue est le pod CoreDNS (10.42.2.203, `kube-system/rke2-coredns-…`), pas le service : la traduction précède la politique |
+| T5 | **Tenue.** Aucun flux sortant du pod b avec un verdict autre que DROPPED |
+| T6 | **Tenue sur la fenêtre.** Aucun flux entrant vers le pod b : les 46 flux sont EGRESS, source le pod |
+| T8 | **Tenue.** Catalogue de Zot : 166 dépôts avant et après |
+| T9 | **Tenue, point décisif.** Pour chaque pod, `--pod builds/<pod>` rend exactement les flux de `--ip` (7 = 7, 46 = 46). Chaque flux sortant porte `source.namespace=builds` et le nom du pod. **Le filtre `source_pod: builds/` de l'export verrait donc les pods Kata.** La conception tient |
+
+**Conséquences pour la suite** :
+- **Requêtes et panneau** : les réponses aux pods de `builds` (`is_reply` vrai, destination le pod) apparaissent en FORWARDED avec le sens EGRESS. « Aucun autorisé » doit se lire sur les flux dont la source est un pod de construction, réponses exclues, et sur tous les verdicts autres que DROPPED.
+- **Volume** : le pod b donne 46 flux pour ses quatre témoins. C'est l'ordre de grandeur d'une construction rpm sans autre trafic ; il est à mesurer en 4a.
+- **Comptes de 4a** : il faudra croiser le motif avec la destination, pour mesurer l'attribution de POLICY_DENY.

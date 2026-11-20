@@ -145,3 +145,7 @@ Changements à la carte, après relecture du conseiller :
 - (b), l'export sous `hubble:` de `cilium/valeurs.yaml`, est gardé pour le cas où J7 est retenu après 4b. Ce serait un changement de la 08, avec son coût de rejeu (D9).
 
 **Correction de lecture** : « après redémarrage » dans `kata-reseau-cilium-apres-redemarrage.log` de la 08 suit un redémarrage des VM (README de la 08, « Redémarrage des VM sous Cilium », 30/10/2026), pas un redémarrage des agents seuls. Le comportement des politiques pendant le redémarrage des agents reste non mesuré.
+
+## Étape 2 recadrée : mesure faite (note de 2026-11-20T22:34:12Z ; rien n'est réécrit au-dessus)
+
+Résultat dans les [prédictions](j7-predictions.md) ; [journal](j7-mesure.log). **T9 tenue** : les flux des pods Kata portent l'espace de noms et le nom du pod, donc l'export filtré sur `builds/` les verrait. T0, T1, T4, T5, T6 et T8 sont tenues. **T2 n'est pas tenue** : 14 flux par témoin TCP. **T3 l'est en partie** : un motif POLICY_DENY non prédit, sur 14 flux. Rien n'est posé. Prochaine étape : 4a (export vers le fichier, forme (a) recommandée), sur accord.

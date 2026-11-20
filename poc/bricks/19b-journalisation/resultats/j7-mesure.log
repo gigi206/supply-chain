@@ -1,0 +1,70 @@
+# j7.sh mesure, 2026-11-20T22:32:09Z
+OK   labels de tâche (a, b) : - construire-rpm
+OK   contexte du conteneur, celui du pas signé : {"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0}
+agent Cilium de sc-build : cilium-jpzfl
+horloge : agent de sc-build moins hôte = 0 s
+catalogue de Zot (anonyme), avant : 166 dépôt(s)
+## pod a (sans label de tâche)
+pod j7-a créé à 2026-11-20T22:32:09Z (horloge de l'API ; début de la fenêtre de Hubble)
+pod prêt : sc-build, runtimeClassName kata, IP 10.42.1.134
+J7-POD tcp 192.168.161.13/5000 code 0
+hubble observe --ip 10.42.1.134 : code 0, 7 ligne(s), 0 ligne(s) d'erreur
+hubble observe --pod builds/j7-a : code 0, 7 ligne(s), 0 ligne(s) d'erreur
+Hubble, filtre --ip 10.42.1.134 (comme la 08) : 7 flux ; lignes sans flow (lost_events, autres) : 0
+  verdict : FORWARDED=7
+  drop_reason_desc : -=7
+  event_type.type : 4=6 5=1
+  verdict × sens × is_reply × source=pod : FORWARDED|EGRESS|false|pod=5 FORWARDED|EGRESS|true|autre=2
+  protocole × destination : TCP|10.42.1.134:44286=2 TCP|192.168.161.13:5000=5
+  horodatages distincts par destination : 10.42.1.134:44286=2 192.168.161.13:5000=5
+  source.namespace/pod_name : builds/j7-a=5 ∅/∅=2
+  destination.namespace/pod_name : builds/j7-a=2 ∅/∅=5
+  sortants du pod non DROPPED : 5
+  sortants du pod FORWARDED vers Zot : 5
+Hubble, filtre --pod builds/j7-a (celui de l'export) : 7 flux ; lignes sans flow (lost_events, autres) : 0
+  verdict : FORWARDED=7
+  drop_reason_desc : -=7
+  event_type.type : 4=6 5=1
+  verdict × sens × is_reply × source=pod : FORWARDED|EGRESS|false|pod=5 FORWARDED|EGRESS|true|autre=2
+  protocole × destination : TCP|10.42.1.134:44286=2 TCP|192.168.161.13:5000=5
+  horodatages distincts par destination : 10.42.1.134:44286=2 192.168.161.13:5000=5
+  source.namespace/pod_name : builds/j7-a=5 ∅/∅=2
+  destination.namespace/pod_name : builds/j7-a=2 ∅/∅=5
+  sortants du pod non DROPPED : 5
+  sortants du pod FORWARDED vers Zot : 5
+pod j7-a supprimé à 22:32:21
+OK   T0 : 5 flux sortant(s) FORWARDED du pod a
+## pod b (construire-rpm)
+pod j7-b créé à 2026-11-20T22:32:21Z (horloge de l'API ; début de la fenêtre de Hubble)
+pod prêt : sc-build, runtimeClassName kata, IP 10.42.1.110
+J7-POD dns dl.rockylinux.org code 124
+J7-POD tcp 192.168.161.13/5000 code 124
+J7-POD tcp 192.168.161.13/3000 code 124
+J7-POD tcp 199.232.170.132/80 code 124
+hubble observe --ip 10.42.1.110 : code 0, 46 ligne(s), 0 ligne(s) d'erreur
+hubble observe --pod builds/j7-b : code 0, 46 ligne(s), 0 ligne(s) d'erreur
+Hubble, filtre --ip 10.42.1.110 (comme la 08) : 46 flux ; lignes sans flow (lost_events, autres) : 0
+  verdict : DROPPED=46
+  drop_reason_desc : POLICY_DENIED=32 POLICY_DENY=14
+  event_type.type : 1=23 5=23
+  verdict × sens × is_reply × source=pod : DROPPED|EGRESS|-|pod=46
+  protocole × destination : TCP|192.168.161.13:3000=14 TCP|192.168.161.13:5000=14 TCP|199.232.170.132:80=14 UDP|10.42.2.203:53=4
+  horodatages distincts par destination : 10.42.2.203:53=4 192.168.161.13:3000=14 192.168.161.13:5000=14 199.232.170.132:80=14
+  source.namespace/pod_name : builds/j7-b=46
+  destination.namespace/pod_name : kube-system/rke2-coredns-rke2-coredns-746f455775-lgbkn=4 ∅/∅=42
+  sortants du pod non DROPPED : 0
+  sortants du pod FORWARDED vers Zot : 0
+Hubble, filtre --pod builds/j7-b (celui de l'export) : 46 flux ; lignes sans flow (lost_events, autres) : 0
+  verdict : DROPPED=46
+  drop_reason_desc : POLICY_DENIED=32 POLICY_DENY=14
+  event_type.type : 1=23 5=23
+  verdict × sens × is_reply × source=pod : DROPPED|EGRESS|-|pod=46
+  protocole × destination : TCP|192.168.161.13:3000=14 TCP|192.168.161.13:5000=14 TCP|199.232.170.132:80=14 UDP|10.42.2.203:53=4
+  horodatages distincts par destination : 10.42.2.203:53=4 192.168.161.13:3000=14 192.168.161.13:5000=14 199.232.170.132:80=14
+  source.namespace/pod_name : builds/j7-b=46
+  destination.namespace/pod_name : kube-system/rke2-coredns-rke2-coredns-746f455775-lgbkn=4 ∅/∅=42
+  sortants du pod non DROPPED : 0
+  sortants du pod FORWARDED vers Zot : 0
+pod j7-b supprimé à 22:33:12
+OK   catalogue de Zot (anonyme), après : 166
+nettoyage : pods du jalon restants 0, flux bruts de ~/.cache/supply-chain-poc/08/travail/j7-19b effacés
