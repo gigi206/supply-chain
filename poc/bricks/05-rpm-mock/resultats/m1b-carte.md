@@ -953,3 +953,10 @@ Le banc donne 46 OK, et les prédictions AR1 à AR6 et AP1 à AP3 sont écrites 
 - `m4a` reste sur `41c639b7`.
 
 **Suite de la cascade** : les bundles neufs de `prefetch-rpm` et `construire-rpm`, qui citent l'outillage `70f8c412`. Signature et revue de `taches.yml` à demander. Viennent ensuite M4b et M4c refaits, sous un préfixe, avec cet artefact.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T10:43:05Z UTC : bundles de la cascade préparés à sec
+
+J'ai écrit un script frère de `m4b.sh` et `m4c.sh` : [`m1b-bundles.sh`](../m1b-bundles.sh). Les gabarits ne changent pas, seule l'image d'outillage change. Le banc donne 103 OK, et les prédictions BL1, EP1 à EP3, EC1 à EC3 et TB1 à TB3 sont écrites ([prédictions](m1b-predictions.md)).
+- **Avant la signature**, deux pods d'essai jouent les deux scripts sur l'image neuve, avec les entrées de M4b et M4c. `local` et les essais tournent sous l'accord permanent.
+- **`taches`** (signature et deux bundles sous `m1b`) attend ton accord nommé. La revue de `taches.yml` viendra ensuite.
+- **Les pipelines** viendront avec M4b et M4c refaits : `prefetch-rpm-sample-app` avec le bootstrap neuf, `sample-app-rpm` avec la fermeture neuve et l'artefact `333b7322`.

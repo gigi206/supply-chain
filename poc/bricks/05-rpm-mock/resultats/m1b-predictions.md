@@ -2237,3 +2237,45 @@ Tu as donné l'accord nommé : « Oui, publie en m1b ». `publier` a tourné de 
 **Relevé, sans pari** : la place libre sur / de sc-stockage passe de 3 011 768 320 à 3 011 391 488 octets, soit 376 832 octets de moins. Le relevé « après » ne dit pas comment Zot range les blobs ; je n'attribue pas l'écart.
 
 **Référence à citer dans la suite de la cascade** : `PACKAGING_RPM=sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48`.
+
+## Cascade avant M5b, bundles de la cascade : prédictions écrites le 20/11/2026 à 2026-11-20T10:43:05Z UTC, avant tout lancement
+
+**Script** : [`m1b-bundles.sh`](../m1b-bundles.sh) (sha256 `e153d64c26a5ce0e…`), étapes `local`, `essai_prefetch`, `essai_construire` et `taches`. Journaux à venir : `m1b-bundles-<étape>.log`.
+
+C'est un script frère de `m4b.sh` et `m4c.sh`, qui ne sont pas touchés. Leurs gabarits sont rendus sans changement. Seule l'image du pas change : l'outillage de M1b, `builds/builders/mock-rocky9@70f8c412…`, remplace l'outillage d'essai `essais-05/mock-rocky9@99790c13…` (« Option 1 »).
+
+Les tâches signées de M4b et M4c restent en place, avec leurs tags `m4b` et `m4c`. Les tâches neuves seront versionnées sous des noms neufs : `fermeture/prefetch-rpm.m1b.signee.yaml` et `construction/construire-rpm.m1b.signee.yaml`. Leurs bundles iront sous le tag neuf `m1b`. Aucune pipeline n'est signée ici : `prefetch-rpm-sample-app` (bootstrap du verrou neuf) et `sample-app-rpm` (fermeture et artefact neufs) changeront avec M4b et M4c refaits.
+
+**Pourquoi des pods d'essai avant la signature** : aucun des deux scripts n'a tourné dans `70f8c412`. `m1b-verrou.sh` n'y a joué que mock, pour le verrou, sous Kata. Le prefetch (`rpm -K`, `createrepo_c`, `skopeo`, en runc et sans root) et la construction hermétique n'y ont jamais tourné. Les essais gardent les entrées de M4b et M4c à l'identique (verrou `b6d0f8f1`, bootstrap d'essai, `entrees.tar` de `m4c prealables`) : seule l'image change, et chaque sortie a une référence archivée.
+
+**Accords** :
+- `local` (hôte, hors ligne) et les deux essais (pods d'essai, rien dans Zot) tournent sous l'accord permanent ;
+- `taches` signe les deux tâches et écrit deux bundles dans Zot : elle n'accepte que `SIGNER=1` et attend ton accord nommé ;
+- la revue de `taches.yml` viendra ensuite, avec une question : garder ou non les références de M4b et M4c à côté des neuves.
+
+**Banc** : [`m1b-bundles-banc.log`](m1b-bundles-banc.log), 103 OK, 0 KO, passé à 2026-11-20T10:41:30Z sur ce même sha256 (banc [`m1b-bundles-banc.sh`](m1b-bundles-banc.sh), sha256 `24c42337689b8c4a…` ; copies contrôlées par [`m1b-bundles-copies.py`](m1b-bundles-copies.py), sha256 `4ff1f179f2a8a53a…`). Rien n'y est écrit dans Zot, dans le cluster, dans `resultats/` ni dans le dossier de travail de la 08.
+- **A** : vingt fonctions recopiées sont égales à leurs originaux (`m4b.sh`, `m4c.sh`, `m1b-artefact.sh`). Les deux essais sont refaits depuis `essai_tache` de M4b et `essai` de M4c, par des remplacements listés et comptés.
+- **B** : chaque constante est confrontée à sa source. Les gabarits et les tâches signées sont égaux à ceux des commits de signature (`19837c20` pour M4b, `75ed22a8` pour M4c).
+- **C** : l'étape `local` réelle donne 22 OK.
+- **D** : la comparaison par feuilles ne laisse passer que l'image d'outillage. Sept altérations sont refusées : autre digest, annotation, script, paramètre, mémoire, contexte de sécurité, image d'essai remise.
+- **E** :
+  - les gardes du lanceur tiennent : `PREFIXE` invalide, tags `m4b`, `m4c`, `essai` ou invalide, journal existant ;
+  - `taches` est jouée avec le vrai tkn et une clé jetable, sur des copies des gabarits. Le cas nominal donne deux poussées sous `m1b`, deux signatures versionnées vérifiées par tkn, un refus avec une autre clé et les anciennes tâches inchangées ;
+  - huit cas sont refusés sans poussée ni signature versionnée : sans `SIGNER`, clé absente, version déjà présente, tag `m1b` déjà présent, tag `m4c` déplacé, place basse, refus à l'admission, gabarit altéré.
+- **Non couvert** : les pods d'essai, Zot, le vrai dry-run serveur, Tekton et la clé réelle.
+
+**Relevé, sans pari** : la liste de l'outillage de M1b ([`m1b-listes-outillage.txt`](m1b-listes-outillage.txt)) a été tirée de la base rpm de la racine de S1, celle de `99790c13`. Les outils des deux scripts y ont donc les mêmes versions : mock 6.9-1, createrepo_c 0.20.1-4, skopeo 1.22.2-9.el9_8, rpm 4.16.1.3-40, gnupg2 2.3.3-5.el9_7, curl 7.76.1-40.el9_8.9, tar 1.34-13.el9_8. Les écarts connus entre les deux racines sont ceux de M1b : `machine-id` absent, mode de la racine fixé, dates bornées.
+
+- **BL1** (haute), `local` : code 0, 22 OK, comme au banc. Le témoin rendu avec l'image d'essai est égal aux tâches signées de M4b et M4c. Rendue avec l'image neuve, chaque tâche ne diffère de la signée que par `.spec.steps[0].image`. Scripts substitués : `572fb78c…` (prefetch) et `0b119024…` (construction). `entrees.tar` : 318 842 880 octets, `b84f68ee…`.
+- **EP1** (haute), `essai_prefetch` : le pod runc `m1b-bundles-prefetch` (UID 65532, label `prefetch-rpm`) est admis et prêt sur l'image neuve. La sortie est permise par `prefetch-rpm-sortie`, comme en M4b.
+- **EP2** (haute) : le script de la tâche rend code 0. `repomd.xml` V2 vaut `239a5a71…`. Le résultat de bootstrap désigne `essais-05/rocky9-bootstrap@f0ccf105…`. L'arbre du workspace est égal à celui de `final` (`m4b-final-arbre.txt`, `fc556539…`). Risques connus : la clé de Rocky lue dans l'image, la configuration de `containers` de l'image.
+- **EP3** (haute) : le cas refusé (`repomd.xml` faux) rend code 1 avec le message attendu, sans dossier `dir:` ni résultat. Le pod et sa PVC sont retirés.
+- **EC1** (haute), `essai_construire` : le pod Kata `m1b-bundles-construire` est admis et prêt. Les entrées sont copiées par morceaux, déballées par l'UID 65532 et montées en lecture seule (écriture refusée). Le script rend code 0.
+- **EC2** (haute) : Source0 `07521c1e…`, src.rpm `c802e60a…` et rpm `864d55f4…`, ceux de M3. 222 paquets du buildroot, 0 écart au verrou.
+- **EC3** (moyenne) : le digest de l'artefact vaut `07b7bd6f…`, celui de l'essai de M4c. La couche est écrite par le tar de l'image, de même version. Le 18/11, le tar de l'hôte avait donné un autre digest (`7b17e7e7…`, noté ÉCART à l'essai de M4c).
+- **TB1** (haute), `taches`, sur ton accord seulement : les deux rendus sont admis, et le témoin `computeResources` est refusé. Les deux tâches sont signées et relues : chacune est égale au rendu, et ne diffère de celle de M4b ou M4c que par l'image.
+- **TB2** (haute) : les gardes passent. `m1b` est absent des deux dépôts, `m4b` est sur `9afe09db…`, `m4c` sur `d7f01398…`, et / de sc-stockage a plus de 1 Gio libre.
+- **TB3** (haute) : deux bundles sont poussés sous `m1b`, puis relus anonymement à leurs digests. `m4b` et `m4c` n'ont pas bougé. Les deux références sont imprimées « à ajouter » à la liste revue.
+- **Relevé, sans pari** : les digests des deux bundles. La signature ECDSA n'est pas déterministe, donc ils ne sont connus qu'après la signature. Le bundle a une date de création fixe (`commun.sh`), donc son digest suit le fichier signé.
+
+**Hors de ce point** : `image_digest` du bootstrap neuf (`77cff176…`) reste une prédiction de M4b refait. Si `construire-rpm` échoue plus tard sur « Checking image digest », la cause sera dans le verrou, pas dans ce bundle.
