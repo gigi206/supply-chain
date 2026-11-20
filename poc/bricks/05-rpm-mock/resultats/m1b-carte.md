@@ -976,3 +976,10 @@ Le conseiller a trouvé un chemin hérité de `m4c.sh` dans l'essai de construct
 ## Note datée du 20/11/2026, écrite à 2026-11-20T10:59:46Z UTC : liste revue complétée
 
 Revue acceptée (« Oui, garde les deux ») : `taches.yml` liste les références de M4b, de M4c et de la cascade. Suite : M4b refait sous un préfixe (pipeline `prefetch-rpm-sample-app` avec le bootstrap neuf, puis fermeture), puis M4c refait avec l'artefact `333b7322`. La ConfigMap `porte` reste à mettre à jour, sur question à part.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T11:16:43Z UTC : M4b refait préparé à sec
+
+Script frère [`m1b-fermeture.sh`](../m1b-fermeture.sh), étapes `local` et `essai`. Le banc donne 20 OK ([`m1b-fermeture-banc.log`](m1b-fermeture-banc.log)), et les prédictions FL1 et FE1 à FE3 sont écrites ([prédictions](m1b-predictions.md)).
+- **Fermeture prédite à sec** : 230 fichiers, 462 194 425 octets, digest `09838980…`. Le bootstrap neuf a une couche non compressée de 242 Mo.
+- **Dépôt de la fermeture : décision à prendre avant la pipeline**. Le dépôt figure dans la pipeline signée. `builds/fermetures/sample-app-rpm` contient déjà la fermeture de M4b (`2a9e2ea7`). `publier-fermeture` n'écrit que par digest, sans tag : une seconde fermeture dans le même dépôt ne touche pas la première. `m4c.sh` et `m5.sh` épinglent `2a9e2ea7` par digest. La note du 19/11 réserve cette décision au propriétaire.
+- **ConfigMap `porte`** : elle ne joue pas pour les PipelineRuns. Elle sera à demander avant R1 à R8.

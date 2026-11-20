@@ -2325,3 +2325,35 @@ Tu as donné l'accord nommé : « Oui, signe et pousse ». `taches` a tourné av
 **Revue de la liste, note écrite le 20/11/2026 à 2026-11-20T10:59:46Z UTC** : tu as accepté la revue avec « Oui, garde les deux ». Les deux références `m1b` sont ajoutées à `taches.yml` (08), sous `prefetch-rpm` et `construire-rpm`, chacune avec un commentaire. Les références de M4b (`9afe09db…`) et de M4c (`d7f01398…`) restent listées, donc les preuves de M4b, M4c et M5a restent revérifiables par la porte. La fonction `listee` de `commun.sh` trouve les quatre références. Les tests de la porte (`porte_test.rego`) ont leurs propres digests et ne sont pas touchés.
 
 **Non fait** : la ConfigMap `porte` du cluster porte toujours une liste antérieure. La mettre à jour change une politique dans le cluster ; ce sera une question à part.
+
+## Cascade avant M5b, M4b refait sous le préfixe `m1b` : prédictions écrites le 20/11/2026 à 2026-11-20T11:16:43Z UTC, avant tout lancement
+
+**Script** : [`m1b-fermeture.sh`](../m1b-fermeture.sh) (sha256 `243bf07f9f995492…`), étapes `local` et `essai`. Journaux à venir : `m1b-fermeture-local.log`, `m1b-fermeture-essai.log`, et l'arbre de l'essai sous `m1b-fermeture-essai-arbre.txt`.
+
+C'est un script frère de `m4b.sh`, qui n'est pas touché : sa pipeline (tag `m4b`, `9b89b029…`), sa fermeture (`2a9e2ea7…`) et ses journaux restent. Le gabarit de la pipeline est rendu sans changement. Seules trois valeurs changent : la référence de `prefetch-rpm` (`b9bbeba3…`, celle de la cascade, dans la liste revue), la source du bootstrap (`builds/builders/rocky9-bootstrap@6de899ac…`, celle du verrou `c544599a…`) et le nom du dossier `dir:` qui en découle.
+
+**Calculé à sec, avant ces prédictions** :
+- la pipeline signée de M4b, relue dans son bundle (lecture anonyme), est égale au gabarit rendu avec les entrées de M4b ; le rendu neuf en diffère par exactement trois feuilles (`.spec.tasks[0].params[1]`, `params[2]`, `taskRef.params[0]`) ;
+- le script de la tâche, substitué comme Tekton le fera, vaut `4d8bfe827d718b27…` ; il ne diffère de celui de M4b (`572fb78c…`) que par les lignes `SOURCE` et `DOSSIER` ;
+- le bootstrap neuf a une seule couche, **non compressée**, de 241 981 440 octets (`b063feb3…`), contre 97 742 593 octets compressés pour celui de M4b. La fermeture neuve pèsera donc 462 194 425 octets au lieu de 317 955 662 ;
+- [`m1b-fermeture-digest.py`](m1b-fermeture-digest.py) (sha256 `a5d014290f0a6d4c…`) prédit l'arbre et le digest. Il part du manifeste réel de la fermeture de M4b (relu dans Zot, sha256 contrôlé) et remplace, octet pour octet, les quatre couches du bootstrap par celles que `skopeo copy --preserve-digests` écrira. **Témoin** : avec le manifeste du bootstrap de M4b, il redonne l'arbre de `final` à l'octet et le digest `2a9e2ea7…`. Avec le bootstrap neuf : arbre `a731fbce…` (230 fichiers, dont les 226 hors du dossier `dir:` égaux à ceux de `final`), digest prédit `sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f`.
+
+**Banc** : [`m1b-fermeture-banc.log`](m1b-fermeture-banc.log), 20 OK, 0 KO, passé à 2026-11-20T11:15:43Z sur ce même sha256 (banc [`m1b-fermeture-banc.sh`](m1b-fermeture-banc.sh), sha256 `687f975280f0e568…` ; copies contrôlées par [`m1b-fermeture-copies.py`](m1b-fermeture-copies.py), sha256 `7e6fa8f5f89369fa…`). Rien n'y est écrit dans Zot, dans le cluster ni dans `resultats/`.
+- **A** : dix-sept blocs recopiés sont égaux, octet pour octet et dans l'ordre, à ceux de `m1b-bundles.sh`. `etape_essai` est `essai_prefetch` de `m1b-bundles.sh`, transformée par cinq remplacements listés et comptés.
+- **B** : les tags `m4b`, `m4c`, `essai` et invalides sont refusés, de même qu'un `PREFIXE` invalide et une étape inconnue.
+- **C** : l'étape `local` réelle, sous un préfixe de banc, donne 35 OK.
+- **D** : neuf altérations s'arrêtent chacune sur le contrôle visé, sans appel au cluster pour les trois de `essai` : script neuf, arbre prédit, verrou de M4b remis (feuilles), `prefetch-rpm` hors de la liste revue, digest prédit, essai sans `local`, arbre déjà archivé, script substitué, gabarit modifié.
+- **Correction pendant la préparation** : le premier passage du banc (non archivé) a trouvé une garde fausse dans `local`. Elle lisait le tag `$TAG` de `prefetch-rpm` au lieu du tag `m1b` des bundles de la cascade, et aurait échoué sous tout autre préfixe. Elle est corrigée avant le banc archivé.
+- **Non couvert** : le pod d'essai, Tekton, la signature et les écritures dans Zot.
+
+**Accords** : `local` (hôte, lectures anonymes de Zot) et `essai` (pod d'essai, rien dans Zot) tournent sous l'accord permanent. La pipeline (signature et bundle sous `m1b`) et les deux PipelineRuns (fermeture dans Zot) ne sont pas encore écrits. Ils attendent ta décision sur le dépôt de la fermeture, puis chacun son accord nommé.
+
+**Correction d'une annonce** : mon message de fin de la revue annonçait une question sur la ConfigMap `porte` « avant ces PipelineRuns ». C'est faux : elle n'est lue que par le Job de jugement de la porte, pas à l'admission des PipelineRuns (note de la carte du 19/11, déjà écrite). Elle sera à demander avant un verdict de la porte, donc avant R1 à R8.
+
+- **FL1** (haute), `local` : code 0, 35 OK, comme au banc. Témoin égal à la pipeline de M4b. Trois feuilles. Script neuf `4d8bfe82…`. Bootstrap neuf `6de899ac…`, configuration `ff96017c…` (= `bootstrap.id` du verrou). Témoin du calcul : arbre de `final`, digest `2a9e2ea7…`. Arbre prédit `a731fbce…`, digest prédit `09838980…`. Gardes de Zot : tag `m1b` de la pipeline absent, `m4b` sur `9b89b029…`, `m1b` de `prefetch-rpm` sur `b9bbeba3…`, fermeture de M4b présente, fermeture prédite absente.
+- **FE1** (haute), `essai` : le pod runc `m1b-fermeture-prefetch` (UID 65532, label `prefetch-rpm`, outillage `70f8c412…`) est admis et prêt. La sortie est permise par `prefetch-rpm-sortie`, comme à l'essai des bundles.
+- **FE2** (haute) : le script de la tâche rend code 0, avec `rpm -K` à 222 OK sur 222 et `repomd.xml` V2 à `239a5a71…`. Le résultat de bootstrap désigne `builds/builders/rocky9-bootstrap@6de899ac…`. L'arbre du workspace est égal à l'arbre prédit `a731fbce…` : 230 fichiers, 462 194 425 octets. Risque connu : `skopeo copy` n'a jamais copié ce bootstrap en `dir:` (le verrou l'a tiré par podman, pour mock). Une couche non compressée doit garder son type et son nom sous `--preserve-digests`.
+- **FE3** (haute) : le cas refusé (`repomd.xml` faux) rend code 1 avec le message attendu, sans dossier `dir:` ni résultat. Le pod et sa PVC sont retirés.
+- **Relevé, sans pari** : la durée du pas, comparée aux 40 s de l'essai des bundles. La couche est 2,5 fois plus grosse.
+
+**Ce que ces deux étapes ne tiennent pas** : M4b refait n'est pas tenu avant la pipeline signée, les deux PipelineRuns, la comparaison de la fermeture tirée et la provenance. `image_digest` du bootstrap neuf (`77cff176…`) n'est pas contrôlé ici : `skopeo copy` en `dir:` ne le produit pas. Il reste une prédiction de M4c refait, lue dans la construction hermétique.
