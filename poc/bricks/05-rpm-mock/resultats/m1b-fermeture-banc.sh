@@ -47,9 +47,11 @@ verifie "étape inconnue refusée (code non nul)" "$([ "$r" != 0 ] && echo oui)"
 echo "## C étape local réelle"
 ( PREFIXE=$B; . "$F"; etape_local ) > "$W0/$B-local.log" 2>&1; r=$?   # jamais dans un || : bash y couperait set -e
 sed 's/^/     /' "$W0/$B-local.log" | cut -c1-250
-verifie "local (code)" "$r" 0
-verifie "local : KO" "$(grep -c '^KO' "$W0/$B-local.log")" 0
-verifie "local : OK" "$(grep -c '^OK' "$W0/$B-local.log")" 35
+# Depuis rpm (20/11/2026, 12:45:30Z), la fermeture prédite est publiée : local, étape d'avant publication, s'arrête sur sa dernière
+# garde (« fermeture prédite absente »), et sur elle seule (banc 4, m1b-fermeture-banc-4.log).
+verifie "local (code), fermeture prédite publiée depuis rpm" "$r" 1
+verifie "local : seul KO, la garde de la fermeture prédite" "$(grep '^KO' "$W0/$B-local.log" | sed 's/sha256:.*/sha256:/')" "KO   fermeture prédite absente : sha256:"
+verifie "local : OK" "$(grep -c '^OK' "$W0/$B-local.log")" 34
 
 echo "## D cas altérés (KO attendu sur le contrôle visé)"
 altere() { # libellé motif-du-KO-attendu code-bash : préfixe $B-<D1…> propre au cas (dossier neuf, rien à vider)

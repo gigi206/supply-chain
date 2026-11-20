@@ -94,8 +94,47 @@ TRANSFORMATIONS_RPM = [
      '  attendu "fermeture de M4b toujours présente après" "$(zot_lire "fermeture de M4b" "${DEPOT_FERMETURE#"$REG"/}@$FERMETURE_M4B")" "$FERMETURE_M4B"\n'
      '  echo "fermeture neuve : $DEPOT_FERMETURE@$(cat "$T/rpm-1.digest") ; prédite à sec : $DIGEST_PREDIT"\n}', 1),
 ]
+# Ajout du 20/11/2026 après rpm (comparaison, provenance) : cinq fonctions de m4b.sh, et deux étapes transformées.
+DEBUT_M4B2, FIN_M4B2 = '# --- recopié de m4b.sh (comparaison, provenance) ---', '# --- fin des copies de m4b.sh (comparaison, provenance) ---'
+COPIES_M4B2 = ['arbre_de', 'confronter', 'lire_prov', 'controler_prov', 'prov_attendue']
+TRANSFORMATIONS_COMPARAISON = [
+    ('  local c=$T/comparaison i d src b t f\n  echo "## gardes"\n'
+     '  attendu "arbre de final (sha256)" "$(sha256sum < "$ARBRE_REF" | cut -c1-64)" "$ARBRE_SHA"\n'
+     '  attendu "arbre de final : fichiers" "$(wc -l < "$ARBRE_REF")" 230\n',
+     '  local c=$T/comparaison i d src b t f\n'
+     '  [ -n "$FERMETURE_NEUVE" ] || echec "FERMETURE_NEUVE non épinglée : étape rpm d\'abord, puis correction datée"\n'
+     '  echo \'{}\' > "$T/vide.json"\n  echo "## gardes"\n'
+     '  attendu "arbre de l\'essai (sha256), égal à l\'arbre prédit" "$(sha "$ARBRE_ESSAI")" "$ARBRE_PREDIT_SHA"\n'
+     '  attendu "arbre de l\'essai : fichiers" "$(wc -l < "$ARBRE_ESSAI")" 230\n', 1),
+    ('"m4b-rpm-$i"', '"$N-rpm-$i"', 1),
+    ('"IMAGE_DIGEST de m4b-rpm-$i"', '"IMAGE_DIGEST de $N-rpm-$i"', 1),
+    ('$FERMETURE_RPM', '$FERMETURE_NEUVE', 4),
+    ('  rm -rf -- "${c:?}"; mkdir -p "$c/tiree"', '  neuf "$c"; mkdir -p "$c/tiree"', 1),
+    ('oras manifest fetch --ca-file "$P/ca-poc.crt" "${DEPOT', 'oras manifest fetch --ca-file "$P/ca-poc.crt" --registry-config "$T/vide.json" "${DEPOT', 1),
+    ('oras pull --no-tty --ca-file "$P/ca-poc.crt" -o', 'oras pull --no-tty --ca-file "$P/ca-poc.crt" --registry-config "$T/vide.json" -o', 1),
+    ('"$(sed \'s|^|depot/|\' "$ARBRE_REF" | sort | sha256sum)"', '"$(sed \'s|^|depot/|\' "$ARBRE_ESSAI" | sort | sha256sum)"', 1),
+    ('  echo "## confrontation à l\'arbre de final"\n  confronter "$c/tiree" "$ARBRE_REF" "$c"\n',
+     '  echo "## confrontation à l\'arbre de l\'essai (libellés de confronter : « final » y désigne cet arbre)"\n  confronter "$c/tiree" "$ARBRE_ESSAI" "$c"\n', 1),
+]
+TRANSFORMATIONS_PROVENANCE = [
+    ('  local c=$T/provenance i pr uid src dos s r\n',
+     '  local c=$T/provenance i pr uid src dos s r\n'
+     '  [ -n "$FERMETURE_NEUVE" ] || echec "FERMETURE_NEUVE non épinglée : étape rpm d\'abord, puis correction datée"\n', 1),
+    ('$FERMETURE_RPM', '$FERMETURE_NEUVE', 2),
+    ('  rm -rf -- "${c:?}"; mkdir -p "$c"', '  neuf "$c"; mkdir -p "$c"', 1),
+    ('  for pr in m4b-rpm-1 m4b-rpm-2; do', '  for pr in $N-rpm-1 $N-rpm-2; do', 1),
+    ('    pr=m4b-rpm-$i\n', '    pr=$N-rpm-$i\n', 1),
+]
 src = lignes('m1b-bundles.sh')
 m4b = lignes('m4b.sh')
+
+
+def transformee(nom, tr):
+    t = '\n'.join(bloc(m4b, nom))
+    for a, b, c in tr:
+        assert t.count(a) == c, (nom, a[:60], t.count(a), c)
+        t = t.replace(a, b)
+    return t
 
 
 def rpm_transformee():
@@ -117,6 +156,14 @@ if mode == 'assembler':
     if '@ETAPE_RPM@' in f:
         k = f.index('@ETAPE_RPM@')
         f = f[:k] + rpm_transformee().split('\n') + f[k + 1:]
+    if DEBUT_M4B2 in f:
+        i, j = f.index(DEBUT_M4B2), f.index(FIN_M4B2)
+        f = f[:i + 1] + [l for n in COPIES_M4B2 for l in bloc(m4b, n)] + f[j:]
+    for ph, nom, tr in [('@ETAPE_COMPARAISON@', 'etape_comparaison', TRANSFORMATIONS_COMPARAISON),
+                        ('@ETAPE_PROVENANCE@', 'etape_provenance', TRANSFORMATIONS_PROVENANCE)]:
+        if ph in f:
+            k = f.index(ph)
+            f = f[:k] + transformee(nom, tr).split('\n') + f[k + 1:]
     open(f'{d}/m1b-fermeture.sh', 'w', encoding='utf-8').write('\n'.join(f))
     print(f'zones des copies écrites : {len(zone)} et {len(zone_m4b)} lignes')
 f = lignes('m1b-fermeture.sh')
@@ -155,3 +202,16 @@ for a, b, c in TRANSFORMATIONS_RPM:
     print(f'OK   remplacement compté dans etape_rpm ({c}) : {a[:70]!r}')
 assert '\n'.join(bloc(f, 'etape_rpm')) == rpm_transformee(), 'etape_rpm différente de celle de m4b.sh transformée'
 print('OK   etape_rpm = etape_rpm de m4b.sh, transformée')
+if DEBUT_M4B2 in f:   # présent depuis l'ajout de comparaison et provenance (20/11/2026, après rpm)
+    i, j = f.index(DEBUT_M4B2), f.index(FIN_M4B2)
+    zone = f[i + 1:j]
+    for n in COPIES_M4B2:
+        assert bloc(zone, n) == bloc(m4b, n), f'copie différente : {n}'
+        print(f'OK   copie identique à m4b.sh : {n} ({len(bloc(m4b, n))} lignes)')
+    assert zone == [l for n in COPIES_M4B2 for l in bloc(m4b, n)], 'zone des copies (comparaison, provenance) : ordre ou lignes en plus'
+    print(f'OK   zone des copies de m4b.sh (comparaison, provenance) : exactement les {len(COPIES_M4B2)} blocs ({len(zone)} lignes)')
+    for nom, tr in [('etape_comparaison', TRANSFORMATIONS_COMPARAISON), ('etape_provenance', TRANSFORMATIONS_PROVENANCE)]:
+        for a, b, c in tr:
+            print(f'OK   remplacement compté dans {nom} ({c}) : {a[:70]!r}')
+        assert '\n'.join(bloc(f, nom)) == transformee(nom, tr), f'{nom} différente de celle de m4b.sh transformée'
+        print(f'OK   {nom} = {nom} de m4b.sh, transformée')

@@ -2436,3 +2436,27 @@ C'est un script frère de `m4b.sh`, qui n'est pas touché : sa pipeline (tag `m4
   - **`place-scripts` du prefetch** : le dernier argument fait 59 877 octets, contre 59 869 en M4b.
 
 **Ce que cela établit** : la pipeline de la plateforme, avec l'outillage et le bootstrap de M1b, publie deux fois la même fermeture, et elle est égale à l'octet au calcul fait à sec. **M4b refait n'est pas encore tenu** : restent la comparaison de la fermeture tirée et la provenance, toutes deux en lecture seule.
+
+## Cascade avant M5b, M4b refait : comparaison et provenance, prédictions écrites le 20/11/2026 à 2026-11-20T12:49:18Z UTC, avant tout lancement
+
+**Script** : [`m1b-fermeture.sh`](../m1b-fermeture.sh) (sha256 `a3c30269f2e96545…`). Deux étapes ajoutées après `rpm`, en lecture seule, sous l'accord permanent. Ce sont `etape_comparaison` et `etape_provenance` de `m4b.sh`, transformées par des remplacements comptés. Cinq fonctions de `m4b.sh` sont recopiées à l'identique : `arbre_de`, `confronter`, `lire_prov`, `controler_prov`, `prov_attendue`. Les transformations visent quatre points :
+- le digest épinglé de la fermeture neuve (`FERMETURE_NEUVE`) ;
+- l'arbre de l'essai comme référence ;
+- les noms `m1b-rpm-*` ;
+- un dossier neuf au lieu d'un `rm -rf`, et des lectures de Zot faites avec une configuration vide, donc anonymes.
+
+**Bancs** : le banc 4 ([`m1b-fermeture-banc-4.log`](m1b-fermeture-banc-4.log), 74 OK, 3 KO) a montré que `local` s'arrête désormais sur sa dernière garde, « fermeture prédite absente ». C'est voulu : `rpm` a publié cette fermeture. Les 34 autres contrôles de `local` passent. La section C attend maintenant cet état. Le banc 5 ([`m1b-fermeture-banc-5.log`](m1b-fermeture-banc-5.log), 76 OK, 1 KO) avait une erreur à lui : `cut -c` compte en octets sous `LC_ALL=C`. Le banc 6 ([`m1b-fermeture-banc-6.log`](m1b-fermeture-banc-6.log)) donne 77 OK, 0 KO (banc `25ce3ad6c6eda191…`). Les copies contrôlées par `m1b-fermeture-copies.py` (`1ab061b78adbae1f…`) passent à 63 contrôles. Non couvert par le banc : les deux nouvelles étapes elles-mêmes. Elles ne lisent que Zot, le cluster et l'hôte.
+
+- **CP1** (haute), `comparaison` : `IMAGE_DIGEST` vaut `09838980…` sur `m1b-rpm-1` et `m1b-rpm-2`. Le manifeste lu a ce sha256, et ses 230 couches sont égales à l'arbre de l'essai (relevé). La fermeture est tirée anonymement, par digest, dans un dossier neuf. Elle est égale à l'arbre de l'essai préfixé par `depot/` : 230 fichiers, 0 écart, rien hors de `depot/`.
+- **CP2** (haute) : les 222 rpm sont égaux à la liste (nom, taille, sha256), et `repomd.xml` vaut `239a5a71…`. Le dossier du bootstrap `…@sha256:6de899ac…` est unique, son `manifest.json` a ce sha256, et ses deux blobs (configuration `ff96017c…`, couche `b063feb3…`) sont nommés par leur sha256.
+- **PV1** (haute), `provenance` : la clé de Chains est égale à `1e7b2a03…`. `cosign verify-attestation` valide les attestations du sujet `sample-app-rpm@09838980…`. Chaque PipelineRun a exactement une enveloppe à son uid, avec le buildType `https://tekton.dev/chains/v2/slsa-tekton`. **Relevé, sans pari** : le nombre total d'enveloppes. M4b en avait quatre : deux PipelineRuns et deux TaskRuns de `publier`.
+- **PV2** (haute) : les `resolvedDependencies` de chaque PipelineRun sont égales à l'attendu :
+  - la pipeline `61814acd…` ;
+  - les tâches `prefetch-rpm@b9bbeba3…` et `publier-fermeture@7fa92ad3…` ;
+  - les images des pas : outillage `70f8c412…` et horodatage `c7bebae2…` ;
+  - le bootstrap `6de899ac…` en `inputs/result`.
+
+  Les paramètres des tâches sont égaux à ceux de la pipeline : liste `95541ee8…` à 222 lignes, source et dossier du bootstrap neuf, empreinte, `repomd.xml`, dépôt.
+- **PV3** (haute) : la vérification avec une autre clé est refusée. **Relevé, sans pari** : la signature simplesigning (`.sig`).
+
+Si CP1, CP2 et PV1 à PV3 tiennent, **M4b refait est tenu**. Il produit une fermeture rpm de la plateforme avec l'outillage et le bootstrap de M1b, puis vérifie qu'elle est égale à l'essai et attestée.
