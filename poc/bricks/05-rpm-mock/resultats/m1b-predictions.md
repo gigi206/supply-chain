@@ -2640,3 +2640,24 @@ Si PS1 et CO1 à CO3 tiennent, il restera la comparaison et la provenance, en le
 **Épinglage** : `PIPELINE_REF` vaut désormais ce digest dans `m1b-construction.sh` (sha256 `e2c6d681af893ba7…`). Les copies passent (104 contrôles), et le banc rejoué donne 132 OK, 0 KO : [`m1b-construction-banc-6.log`](m1b-construction-banc-6.log).
 
 **Suite** : `construction`, sur un accord nommé à part. Elle crée deux PipelineRuns qui republieront `builds/sample-app-rpm@07b7bd6f…`, et Chains ajoutera ses attestations à celles de M4c (4 enveloppes aujourd'hui, 8 prédites). Avant de tenir M4c refait, il faudra aussi un essai Kata avec `image_digest` altéré, car aucun refus de mock n'a encore été observé.
+
+### M4c refait : résultat de `construction`, écrit le 20/11/2026 à 2026-11-20T13:44:11Z UTC
+
+`m1b-construction.sh construction` a tourné de 2026-11-20T13:38:48Z à 13:43:25Z, sur ton accord nommé (« Oui, lance construction »), avec code 0 : [`m1b-construction-construction.log`](m1b-construction-construction.log), 87 OK, 0 KO, 0 écart, comme au banc. Aucune ligne de jeton. Les journaux complets de `construire` sont [`m1b-construction-1-construire.log`](m1b-construction-1-construire.log) et [`m1b-construction-2-construire.log`](m1b-construction-2-construire.log).
+
+- **CO1 tenue** : les gardes passent. `m1b-construction-1` (13:38:48 à 13:40:59) et `-2` (13:41:07 à 13:43:18) finissent en `True|Succeeded`. `preparer` et `publier` tournent en runc, et `construire` sous Kata, tous sur sc-build. Le résolveur a accepté la pipeline `7d361cb1…` et les trois tâches signées.
+- **CO2 tenue** : dans chaque `construire`, les onze lignes de la construction hermétique sont celles de l'essai :
+  - « Checking image digest: 77cff176… », aucune ligne « Expected digest for image » ;
+  - mock rend 0 en 45 et 46 s ;
+  - 4 témoins réseau en échec, 222 paquets, 0 écart au verrou `c544599a…` ;
+  - Source0, src.rpm et rpm de M3.
+- **CO3 tenue** : les deux PipelineRuns publient **`builds/sample-app-rpm@07b7bd6f…`**, égal à l'essai et à M4c. Le manifeste relu a une couche, et Chains signe les deux PipelineRuns.
+- **CO4 tenue** : les enveloppes d'attestation de l'artefact passent de 4 (`.att` `40c19b6f…`) à 8 (`.att` `8dd19c69…`). Le tag `m4c` de la pipeline de M4c est inchangé avant et après.
+- **Relevés** :
+  - sc-stockage : 2 971 598 848 octets libres avant, 2 965 942 272 après ;
+  - `/w` : 452 724 kB utilisés avant mock, 1 592 640 kB après.
+
+**Ce que cela établit** : la plateforme, avec la pipeline et les tâches de la cascade, construit sans réseau l'artefact de M4c à l'octet près. Elle le fait à partir de la fermeture et du bootstrap construits par la plateforme, et des deux PipelineRuns. **M4c refait n'est pas encore tenu.** Restent :
+- l'essai de refus avec un `image_digest` altéré, car aucun refus de mock n'a encore été observé ;
+- la comparaison ;
+- la provenance, qui devra isoler les deux PipelineRuns refaits parmi les huit enveloppes.

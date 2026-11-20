@@ -1020,3 +1020,7 @@ Les PipelineRuns de M4c refait publieront dans `builds/sample-app-rpm`, le dép�
 ## Note datée du 20/11/2026, écrite à 2026-11-20T13:37:10Z UTC : pipeline de M4c refait signée
 
 À 13:36:05Z, sur ton accord nommé, PS1 tient : la pipeline `sample-app-rpm` de la cascade est signée et poussée sous `m1b` (`7d361cb1…`). Elle ne diffère de celle de M4c que par la fermeture, l'artefact et `construire-rpm`. `PIPELINE_REF` est épinglée, et le banc 6 donne 132 OK. Suite : `construction`, sur accord à part, puis le refus d'un `image_digest` altéré, la comparaison et la provenance.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T13:44:11Z UTC : artefact republié par M4c refait
+
+De 13:38:48Z à 13:43:25Z, sur ton accord nommé, CO1 à CO4 tiennent. Les deux PipelineRuns `m1b-construction-1` et `-2` publient `builds/sample-app-rpm@07b7bd6f…`, le digest de M4c. mock contrôle `image_digest` `77cff176…` dans les deux. Les enveloppes d'attestation passent de 4 à 8. Suite : refus d'un `image_digest` altéré (pod d'essai), puis comparaison et provenance.
