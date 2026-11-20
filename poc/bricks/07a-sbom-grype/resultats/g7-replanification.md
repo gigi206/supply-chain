@@ -645,3 +645,23 @@ Détail et conséquence pour la rétention grype : [dossiers de décision de la 
 ## Décision du propriétaire : rejeu de M5b après le n°9 (note de 2026-11-20T20:21:48Z ; rien n'est réécrit au-dessus)
 
 « Après le n°9 » : le rejeu de M5b attend la lecture du balayage n°9. L'option (b) de la note de 20:00:02Z, une tâche le 29/11 à 05:40 UTC, n'est plus en conflit avec le rejeu. Le choix entre (a), (b) et (c) reste au propriétaire. Aucun passage de `stockage.sh zot` d'ici là ([dossiers de décision de la 05](../../05-rpm-mock/resultats/dossiers-decision.md)).
+
+## Pose de la tâche planifiée, option (b) (note de 2026-11-20T20:24:27Z ; « Oui, une tâche » du propriétaire ; rien n'est réécrit au-dessus)
+
+Question posée : « Pour lire les balayages n°2 à n°9, je planifie une tâche le 29/11 à 05:40 UTC ? ». **Réponse : « Oui, une tâche ».**
+
+**Tâche** `supply-chain-g7-premiere-suppression` : la tâche existante est réutilisée, et non recréée. Elle est désactivée depuis le 12/11.
+- Nouveau titre : « G7 : balayages n°2 à n°9 et premières suppressions de Zot ».
+- `fireAt` : **2026-11-29T05:40:00Z**, en une seule fois. La tâche est réactivée ; la relecture de la liste donne `enabled: true` et `nextRunAt` 2026-11-29T05:40:00.000Z.
+- La consigne de la note de 20:00:02Z est remplacée par une consigne exécutable (sha256 du texte `ee49ee6c018468ae…`, relu dans le `SKILL.md` de la tâche). Elle diffère de la note de 20:00:02Z sur trois points :
+  - les empreintes complètes des deux scripts sont écrites dans la consigne ;
+  - l'état de référence est `g7-etat-avant-2.log` (v2, avec les blobs) ;
+  - la tâche contrôle les `BLOB-KO` et le nombre de passages par dépôt.
+- Elle est en lecture seule : Loki à travers Grafana, Zot en anonyme, `systemctl show` par ssh sans sudo, `kubectl get cronjob`. Elle ne commite ni ne pousse rien.
+
+**Empreintes attendues par la tâche** :
+- `g7-etat.sh` v2 : `a12f0653831cb7989b2956641b5cdcec30c1b03655e380c68d63f24124465505`, celle du dépôt ;
+- `g7-balayage.sh` v3 : `b13a1375ca6f4ed4dac242c0a0701fab8b5e37903c90628cf9939c4bd34511c7`. **C'est la copie préparée, pas encore appliquée.** Elle sera appliquée ce soir, après la lecture de N1, puis essayée (V1 à V3).
+- Si l'essai demande une correction, une note datée donnera la nouvelle empreinte, et la consigne dit de prendre celle de la note la plus récente. Sinon, la tâche s'arrêtera à l'étape 1 au lieu de lire avec un script non essayé.
+
+**Ce que la tâche ne fait pas** : le relevé de place de sc-stockage, ni les notes, le README et docs/03, qui seront écrits ensuite en session sur ton accord.

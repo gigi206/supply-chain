@@ -367,3 +367,8 @@ Projection, calculée : premières suppressions réelles le 28/11 entre 01:37 et
   - le deb 1.0.0-1 garde des scans jusqu'au balayage n°11 (1/12), d'après le calcul.
 - Une seule lecture Loki après le n°9 suffit. Il y a trois options de tâche ; leur choix dépend de la date du rejeu de M5b.
 - Détail : [`g7-replanification.md`](resultats/g7-replanification.md), notes de 19:58 à 20:08 UTC.
+
+**Additif du 20/11/2026 (2026-11-20T20:24:27Z UTC), G7, point 4 : tâche posée.** Décisions du propriétaire : « Après le n°9 » pour le rejeu de M5b, et « Oui, une tâche ».
+- La tâche `supply-chain-g7-premiere-suppression` lira, en lecture seule, les balayages n°2 à n°9 et l'état après les suppressions, le 29/11 à 05:40 UTC.
+- Elle n'exécute que `g7-balayage.sh` v3 et `g7-etat.sh` v2, contrôlés par sha256.
+- Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T20:24:27Z.
