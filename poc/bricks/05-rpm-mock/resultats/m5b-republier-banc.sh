@@ -77,13 +77,14 @@ complet() { # préfixe de référence : référence complète lue dans les conte
     | grep -o "sc-stockage.poc.test:5000/$1[0-9a-f]*" | sort -u | sed 's#^sc-stockage.poc.test:5000/##'
 }
 declare -A LOT
+i=0   # compteur explicite : ${#LOT[@]} sur le tableau vide arrêtait la boucle sous set -u (premier passage, 20/11/2026)
 while read -r p l; do
   r=$(complet "$p")
   egal "F1 ${p%@*} : référence complète unique" "$(grep -c . <<< "$r")" 1
-  i=${#LOT[@]}
   DOCKER_CONFIG=$B/f SSL_CERT_FILE=$CA_ZOT crane manifest "$ZOT/$r" > "$B/f/$i.json" 2> "$B/f/$i.err"
   egal "F2 ${r%@*} : sha256 du manifeste lu = digest" "sha256:$(sha256sum < "$B/f/$i.json" | cut -c1-64)" "${r#*@}"
   LOT[$r]="$l $i"
+  i=$((i + 1))
 done <<< "$FIXTURES"
 deposer() { # lot : manifestes du lot déposés par digest dans le registre local
   local r l i c

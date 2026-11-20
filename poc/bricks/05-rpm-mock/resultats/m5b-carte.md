@@ -332,3 +332,20 @@ Le banc remesure ces points (F3, K2, K8, K9).
   Aucune poussée, sauf K7 : sous `TZ=UTC` sans la garde d'entrée, une poussée exactement, à un autre digest, puis l'arrêt.
 - **RB4** (haute pour les digests, moyenne pour le déroulé) : N1 à N3 rendent 0, avec les 5 digests de la liste revue au tag `banc`. Ils contrôlent 1, 1, 2, 3 et 6 références. N4, relancée, rend 0 sans déplacer de tag.
 - **RB5** (haute) : la date de création des 5 bundles est `1970-01-01T01:00:00+01:00`, comme au premier passage du banc de 16:27:19Z.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:48:01Z UTC : premier passage du banc de `m5b-republier.sh`, défaut du banc, prédiction du second passage
+
+**Passage** le 20/11/2026 à 16:47:12 UTC, au dépôt `e48ca6c5`. Le banc rend 1 avec « bilan : 45 OK, 28 KO » ([`m5b-republier-banc.log`](m5b-republier-banc.log)).
+
+**Défaut du banc, pas du script** :
+- `${#LOT[@]}` sur le tableau associatif encore vide échoue sous `set -u`, hérité du script sourcé (« LOT: unbound variable », l. 83). La boucle F s'arrête au premier manifeste.
+- Aucun manifeste n'a donc été lu ni déposé : RB2 n'est pas mesurée. Les cas qui supposent le lot `t` (K5, K6, N1 à N6) échouent tous sur la référence absente `mock-rocky9`.
+
+**Mesures valables de ce passage**, qui ne dépendent pas des dépôts :
+- A1 à A12 et K1 tenus (RB1).
+- K2, K3 et K4 tenus : référence absente, fuseau `+00:00` et `SOURCE_DATE_EPOCH`, chacun en code 1 sans poussée.
+- **K7 tenu** : sous `TZ=UTC`, sans la garde d'entrée, une seule poussée, `prefetch-rpm` à `81fae36a…` au lieu de `b9bbeba3…`, puis l'arrêt. `construire-rpm` n'est pas poussé.
+
+**Correction** : un compteur explicite remplace `${#LOT[@]}` (banc, sha256 `aca585e713fda4ea…`). Le script testé n'est pas modifié.
+
+**Prédiction du second passage, écrite avant le lancement** : RB1 à RB5 inchangées. Le passage utilise un dossier neuf (`banc-m5b-republier-2`), le port 5913 et le journal `m5b-republier-banc-2.log`. Le premier journal reste tel quel.
