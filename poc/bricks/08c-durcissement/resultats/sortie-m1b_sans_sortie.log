@@ -1,0 +1,15 @@
+# sortie-builds.sh m1b_sans_sortie, 2026-11-20T08:41:35Z
+OK   construction-racine-rpm-sans-sortie absente
+OK   construction-racine-rpm-sans-sortie admise en dry-run serveur
+kubectl : networkpolicy.networking.k8s.io/construction-racine-rpm-sans-sortie created
+politiques de builds : NetworkPolicy builder-sans-sortie, NetworkPolicy construction-deb-sans-sortie, NetworkPolicy construction-racine-rpm-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-racine-rpm-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui sélectionnent un pod de prefetch-gomod : CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-image : 
+OK   politiques à sortie CIDR dont les pods seraient aussi sous un refus : 
+OK   labels exclus d'un refus sans politique de sortie dédiée : 
+OK   politiques qui sélectionnent un pod de prefetch-deb : CiliumNetworkPolicy prefetch-deb-sortie
+OK   politiques qui sélectionnent un pod de builds sans label : CiliumNetworkPolicy builds-sans-internet
+OK   politiques qui sélectionnent un pod de prefetch-rpm : CiliumNetworkPolicy prefetch-rpm-sortie
+OK   politiques qui sélectionnent un pod de construire-racine-rpm : CiliumNetworkPolicy builds-sans-internet, NetworkPolicy construction-racine-rpm-sans-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-racine-rpm : 
+OK   types des NetworkPolicy qui sélectionnent un pod de construire-racine-rpm : Egress+Ingress

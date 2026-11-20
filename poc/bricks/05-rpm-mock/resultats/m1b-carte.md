@@ -740,3 +740,13 @@ Le banc, rejoué sur les deux scripts du dépôt, a fini à 2026-11-20T08:34:54Z
 **Portée** : les journaux écrits par `m1b.sh` et `m1b-builders.sh` à partir de maintenant passent par le masquage. Ceux de la mesure de cette nuit n'y sont pas passés ; ils ont été comptés avant lecture et contrôlés par `secrets-depot.sh` avant leur commit. Comme prévu, les bancs complets des deux scripts (étape `banc`) ne sont pas rejoués : seule la ligne `filtre()` change.
 
 **Suite** : `m1b_sans_sortie`, sur son propre accord, puis `m1b_temoins`.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T08:41:58Z UTC : `m1b_sans_sortie` posée
+
+Accord du propriétaire : « Oui, lance-la ». `sortie-builds.sh m1b_sans_sortie` est passée à 2026-11-20T08:41:35Z, code 0, 12 OK et 0 KO ([`sortie-m1b_sans_sortie.log`](../../08c-durcissement/resultats/sortie-m1b_sans_sortie.log)). La politique posée est `construction-racine-rpm-sans-sortie` (sha256 `bddeeedf…`, celui des prédictions). **NC1 tenue** : elle était absente au départ, a été admise en dry-run serveur, puis posée. Les invariants rpm et ceux de la construction de M1b tiennent dans le cluster.
+- **Construction de M1b** : un pod `construire-racine-rpm` est sélectionné par `builds-sans-internet` et par `construction-racine-rpm-sans-sortie`. Aucune politique ne lui autorise de trafic, et la NetworkPolicy porte les types `Egress+Ingress`.
+- **Cluster** : dix politiques dans `builds`, cinq NetworkPolicy et cinq CiliumNetworkPolicy.
+
+**Portée** : seuls des invariants lus sur les objets ont été vérifiés. Le chemin réseau réel n'a pas encore été mesuré ; ce sera le rôle des témoins.
+
+**Suite** : `m1b_temoins` (pods runc d'essai, accord permanent du 18/11), prédictions NT1 à NT4 déjà commitées.
