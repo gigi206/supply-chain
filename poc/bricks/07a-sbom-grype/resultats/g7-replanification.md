@@ -641,3 +641,7 @@ La note de 19:58:59Z écrivait : « Zot décide sur l'heure de poussée, pas sur
 - un fichier dont la date serait réécrite verrait son âge remis à zéro. Le relevé du 14/11 l'a vu pour le blob partagé `{}`, après une poussée du même blob ailleurs. Ce blob n'est pas un manifeste : le délai de 336 h ne s'applique pas à lui.
 
 Détail et conséquence pour la rétention grype : [dossiers de décision de la 05](../../05-rpm-mock/resultats/dossiers-decision.md), dossier 2.
+
+## Décision du propriétaire : rejeu de M5b après le n°9 (note de 2026-11-20T20:21:48Z ; rien n'est réécrit au-dessus)
+
+« Après le n°9 » : le rejeu de M5b attend la lecture du balayage n°9. L'option (b) de la note de 20:00:02Z, une tâche le 29/11 à 05:40 UTC, n'est plus en conflit avec le rejeu. Le choix entre (a), (b) et (c) reste au propriétaire. Aucun passage de `stockage.sh zot` d'ici là ([dossiers de décision de la 05](../../05-rpm-mock/resultats/dossiers-decision.md)).

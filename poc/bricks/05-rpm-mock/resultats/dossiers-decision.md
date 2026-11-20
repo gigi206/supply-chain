@@ -195,3 +195,13 @@ Il ne sert que si tu choisis l'option (i).
 - capacité totale sous RKE2 avec le correctif : 85G. Les volumes sont fins (qcow2), et un rejeu repart d'images neuves.
 
 Si tu choisis (i), je l'applique avant le rejeu, puis je repasse `bash -n` et shellcheck sur le dépôt.
+
+## Décision du propriétaire sur le dossier 1 (note de 2026-11-20T20:21:48Z ; rien n'est réécrit au-dessus)
+
+Question posée : « Quand se fait le rejeu de M5b ? », avec deux choix : « Après le n°9 » et « Le 28/11, après le n°8 ». **Réponse : « Après le n°9 ».**
+
+- Le rejeu de M5b ne commence pas avant la lecture du balayage n°9 de G7. D'après la projection, ce balayage finit au plus tard le 29/11 vers 03:36 UTC, et la lecture se fait au plus tôt vers 05:40 UTC. C'est un calcul.
+- **Contrainte jusque-là** : aucun passage de `stockage.sh zot`, ni aucune recréation de sc-stockage. Un redémarrage de Zot déplacerait les balayages.
+- Si Zot redémarrait quand même, la lecture du n°9 se ferait à la nouvelle heure, que la loi B permet de recalculer depuis le redémarrage.
+- La décision rend possible l'option (b) du point 4 de G7 : une tâche le 29/11 à 05:40 UTC. Le choix entre (a), (b) et (c) reste à toi.
+- Le dossier 6 (clôture) n'est pas tranché. Clore après M5b voudrait dire clore au plus tôt le 29/11.
