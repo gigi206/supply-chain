@@ -331,3 +331,12 @@ Question posée : « On retient (i) pour ce rejeu ? », après la recommandation
   - (iii) n'est pas essayée, et elle coûte la garantie « création seulement » ou un compte de plus ;
   - le disque est à 30G (dossier 3).
 - **À revoir** avec le relevé `df` de sc-stockage du 21/11 vers 16:00 UTC et l'état du 29/11. Deux rythmes de remplissage ne sont pas rapprochés : 1,19 Go par jour le 18/11, et environ 200 Mo par jour attribués à grype. L'équilibre à environ 14 bases est un calcul ; la tâche du 29/11 le lira.
+
+## Décision du propriétaire sur le dossier 6 : clôture après M5b (note de 2026-11-20T21:33:46Z ; rien n'est réécrit au-dessus)
+
+Question posée : « On clôt la 05 maintenant avec M5b en réserve, ou après M5b ? », sans recommandation. **Réponse : « Après ».**
+
+- La 05 reste ouverte jusqu'au rejeu de zéro (M5b). Celui-ci attend la lecture du balayage n°9 de G7, le 29/11 vers 05:40 UTC au plus tôt (calcul ; dossier 1).
+- Les décisions des dossiers 2 à 5 valent pour ce rejeu : rétention grype gardée, `vm.sh` à 30G, `TZ` laissé à l'hôte, une barrière réseau en réserve.
+- Le dossier 7 (D14) n'est pas lié à la clôture : il se tranchera quand le scan du rpm entrera dans la plateforme.
+- Effort au 20/11 : 46,78 h de commits (note de 20:07:45Z), pour une estimation de 2,5 pw avec décision à 5 pw. Je ne convertis pas les heures ; l'effort sera relevé de nouveau à la clôture.
