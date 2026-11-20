@@ -800,3 +800,31 @@ La ConfigMap `porte` du cluster est toujours en retard sur `taches.yml` (note de
 **Portée** : les pipelines signées ne sont pas versionnées dans le dépôt (le script ne le fait pas) ; leur sha256 est au journal SG4, et la référence de vérité est le bundle dans Zot. La ConfigMap `porte` reste en retard sur `taches.yml`.
 
 **Suite** : `m1b-pipeline.sh pipeline`, quatre PipelineRuns (PN1 à PN7), sur ton accord, car `publier-image` écrit dans Zot et ces écritures sont définitives.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T09:12:42Z UTC : quatre PipelineRuns passés, images publiées dans Zot
+
+Accord du propriétaire : « Oui, lance-les ». `m1b-pipeline.sh pipeline` (sha256 `f1982fdd…`, celui des prédictions corrigées) a tourné de 2026-11-20T09:02:23Z à 2026-11-20T09:11:45Z, avec code 0, 113 OK et 0 KO. Journaux : [`m1b-pipeline-pipeline.log`](m1b-pipeline-pipeline.log), plus un journal de pas par PipelineRun et par tâche (`m1b-pipeline-m1b-<o|b>-<1|2>-<prefetch|construire>.log`).
+- **PN1, tenue** :
+  - toutes les gardes d'entrée passent (mesure d'un autre jour, pipelines relues dans Zot au tag `m1b`, liste revue, politiques à quatre labels, noms et dépôts absents, place dans Zot) ;
+  - `m1b-o-1`, `m1b-o-2`, `m1b-b-1` et `m1b-b-2` sont créés dans cet ordre, et chacun finit `True|Succeeded` ;
+  - tous les pods tournent sur sc-build, sous Kata pour `construire` seule.
+- **PN2, tenue** : le prefetch de l'outillage réussit sans écrire `BASE_ARTIFACT_INPUTS`, et le résultat est absent de ses deux TaskRuns. Le reliquat du choix 2 est désormais mesuré, et non plus seulement lu dans le code.
+- **PN3, tenue** :
+  - le prefetch du bootstrap écrit `BASE_ARTIFACT_INPUTS` = `oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux`, digest `sha256:ee90dc0e…` ;
+  - `rpm -K` vérifie 199 rpm sur 199 (outillage) et 10 sur 10 (bootstrap) ;
+  - les listes de sha256 des entrées égalent celles des essais de `m1bt3`.
+- **PN4, tenue** :
+  - `construire` voit ses trois témoins réseau échouer et ses entrées en lecture seule ;
+  - la racine est conforme à la valeur fixée (`7c07083c…`, `b063feb3…`) ;
+  - le manifeste et `DIGEST_CONSTRUIT` égalent les digests de `m1bt3`.
+- **PN5, tenue** : `publier-image` publie chaque image au digest construit. Zot la relit en lecture anonyme, avec deux couches pour l'outillage et une pour le bootstrap. C'est la première poussée d'une image de 344 Mo par cette tâche ; chaque `publier` a duré de 7 à 10 s.
+- **PN6, tenue** : pour chaque image, les deux exécutions donnent le même digest, égal à celui de `m1bt3` et de la mesure d'un autre jour :
+  - `builds/builders/mock-rocky9@sha256:70f8c412…` ;
+  - `builds/builders/rocky9-bootstrap@sha256:6de899ac…`.
+- **PN7, tenue** : Chains signe les quatre PipelineRuns (annotation `true`). Les signatures et attestations des images relèvent de l'étape de provenance, qui reste à préparer.
+
+**Zot** : `/` de sc-stockage passe de 3 610 853 376 octets libres (09:02:24 UTC) à 3 043 340 288 (09:11:45 UTC).
+
+**Portée** : les deux images d'outillage rpm sont construites par la plateforme, sans réseau à la construction, et reproduites deux fois chacune dans Kata, sur un nœud et un hôte. L'amorce reste figée (réserve « (a) Figée »). Le prefetch joint toute adresse publique en 443 (NT2). La porte ne connaît pas encore `construire-racine-rpm`, et sa ConfigMap reste en retard sur `taches.yml`.
+
+**Suite** : préparer l'étape de provenance de M1b (attestations des deux images, sur le modèle de M4b et M4c), puis adapter `s1.sh prealables` aux quatre labels avant le rejeu M5b.
