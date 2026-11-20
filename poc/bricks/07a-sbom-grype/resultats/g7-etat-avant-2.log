@@ -1,0 +1,125 @@
+# g7-etat.sh avant, 2026-11-20T20:06:19Z, dépôt b291601d, script a12f0653831cb798
+# lecture seule, anonyme, API de Zot (https://192.168.161.13:5000/v2) ; ni ssh, ni sudo, ni Grafana
+## 1. image réelle et deb, avec .sig et .att (HEAD, 200 attendu)
+MANIFESTE|builds/sample-app@sha256:3a7ca1b14dbf|200
+TAG|builds/sample-app:sha256-3a7ca1b14dbf….sig|200
+TAG|builds/sample-app:sha256-3a7ca1b14dbf….att|200
+MANIFESTE|builds/sample-app-deb@sha256:039949f947f2|200
+TAG|builds/sample-app-deb:sha256-039949f947f2….sig|200
+TAG|builds/sample-app-deb:sha256-039949f947f2….att|200
+MANIFESTE|builds/sample-app-deb@sha256:60f25f5c3fb5|200
+TAG|builds/sample-app-deb:sha256-60f25f5c3fb5….sig|200
+TAG|builds/sample-app-deb:sha256-60f25f5c3fb5….att|200
+## 2. referrers des sujets réels (scans et VSA)
+REF|builds/scan/sample-app|sha256:9e2c8cf4d020f77ecaafa67cb18f78d5ada38a49d7ecb67ce81c626457ca10ce|2026-11-13T12:45:07Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 3a7ca1b14dbf
+REF|builds/scan/sample-app|sha256:043e13825970e7dcb1f80c9010c34fd455d97c3baad0beb384b17ac7c3716d77|2026-11-13T12:47:15Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 3a7ca1b14dbf
+REF|builds/scan/sample-app|sha256:1e0a4c127a76057b926784eda7aabaf46aead6aee10789f3bd19471f726c6ad9|2026-11-14T09:31:51Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 3a7ca1b14dbf
+REF|builds/scan/sample-app|sha256:dc98d7e5aa4450c34ca8d8e6c7102d22a9877ef8a553befff008610a7e3bba7f|2026-11-15T09:31:53Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 3a7ca1b14dbf
+REF|builds/scan/sample-app|sha256:fc23e125c56b1cf6fc9d42800053038fae44eb131c83ef1f6328497b540718dd|2026-11-16T09:31:52Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 3a7ca1b14dbf
+REF|builds/scan/sample-app|sha256:d7acc7271146c2da7f0055b0659b4beaee40010038740aed062083566b80e27e|2026-11-17T09:31:59Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 3a7ca1b14dbf
+REF|builds/scan/sample-app|sha256:5065f83a5fffcbf6a35723e2fe2a7d98a97ab0e9d2ad492c9203569133b274f6|2026-11-18T09:31:56Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 3a7ca1b14dbf
+REF|builds/scan/sample-app|sha256:8da85063791f80e57041402ae3a3957ff0394bda382d939b9958044946d8fbed|2026-11-19T09:32:04Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 3a7ca1b14dbf
+REF|builds/scan/sample-app|sha256:bd5e47f55d3fff93407d57c2dd5eebd3a30f3d35210c3a3ca701b3e0dad2ddf2|2026-11-20T09:31:59Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 3a7ca1b14dbf
+COMPTE|builds/scan/sample-app|sujet 3a7ca1b14dbf|9
+REF|builds/scan/sample-app-deb|sha256:256c31902a4677cdb24b0629e1a1bac9b932d75357b81577344d050d9f3a573e|2026-11-14T21:01:35Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 039949f947f2
+REF|builds/scan/sample-app-deb|sha256:3ff73022d7c22a35bb0747114174cc5bd808718ca5f00e9c2be8ea7434a7a6a3|2026-11-15T11:16:51Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 039949f947f2
+REF|builds/scan/sample-app-deb|sha256:194c7bca69972534e6da6397db2e609b8a2b5c4a634e04bcf50bfc1c97ce38bb|2026-11-16T11:16:51Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 039949f947f2
+COMPTE|builds/scan/sample-app-deb|sujet 039949f947f2|3
+REF|builds/scan/sample-app-deb|sha256:ca8946f41c7e9a12303be362425e33e9e7359117b6ec171b0331fe307ea5a986|2026-11-16T16:08:29Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 60f25f5c3fb5
+REF|builds/scan/sample-app-deb|sha256:9d3bda275a6dff27e666e88c784e9ea5a7430d03158b86fd68ec2648cdb00bdf|2026-11-17T11:16:54Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 60f25f5c3fb5
+REF|builds/scan/sample-app-deb|sha256:44baed7e5542d28c8793b835b606240522efc4a4dda83ae6709d1534ad342290|2026-11-18T11:16:53Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 60f25f5c3fb5
+REF|builds/scan/sample-app-deb|sha256:81329cd4a6758a0a9948d20ecc05cb35500b35b3317768ce12123666911f625d|2026-11-19T11:16:59Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 60f25f5c3fb5
+REF|builds/scan/sample-app-deb|sha256:b8065ed5eae10dde999a9482ca72e53fb89a95483ad4be8f090da881f2b1afba|2026-11-20T11:17:03Z|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 60f25f5c3fb5
+COMPTE|builds/scan/sample-app-deb|sujet 60f25f5c3fb5|5
+REF|builds/vsa/sample-app|sha256:69a2b10326017d997ace216a789c1d9c4820a4a5f4440aa60f724e95c7682d9b|-|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 3a7ca1b14dbf
+COMPTE|builds/vsa/sample-app|sujet 3a7ca1b14dbf|1
+REF|builds/vsa/sample-app-deb|sha256:bd7c77ec312ed48a9adf8c3e4f4c32b98f71b1980c032b4604a26d37156e004d|-|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 039949f947f2
+COMPTE|builds/vsa/sample-app-deb|sujet 039949f947f2|1
+REF|builds/vsa/sample-app-deb|sha256:97b4100d0f151241a8bedb1e116bd1ebe39165aeeed717e96da7bcf8320b531c|-|application/vnd.dev.sigstore.bundle.v0.3+json|sujet 60f25f5c3fb5
+COMPTE|builds/vsa/sample-app-deb|sujet 60f25f5c3fb5|1
+## 3. témoins de G6 : referrers dans builds/scan/essai-scan, par image de builds/essai-scan
+TEMOIN|absent|sha256:d247cecee236|0
+TEMOIN|autre-digest|sha256:43ad6e32ca46|1
+REF|builds/scan/essai-scan|sha256:6966d6821322175e313116796cdca59125d5558cbc38d5add791afc39cab17b8|2026-11-13T12:49:36Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|base-vieille|sha256:67841d63a5e3|1
+REF|builds/scan/essai-scan|sha256:b80bf1dd9917d583ceb3d9a2867b2897de957965f3e13125be7194065fb22637|2026-11-13T12:49:31Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|futur|sha256:69d0bb2b3e52|1
+REF|builds/scan/essai-scan|sha256:9b12f9d0c4b9721f7df05e7a25d5cba150a89830e0c964b86295805f0af43cc5|2026-11-13T12:49:28Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|illisible|sha256:c026a0e56531|2
+REF|builds/scan/essai-scan|sha256:0542f26678504d412f31d7541714d238c73abae309439b668f353e12e4042611|2026-11-13T12:49:51Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+REF|builds/scan/essai-scan|sha256:718b017c323649723029c857744c71631642cc1c2c5a102df3dec22c18757013|2026-11-13T12:49:54Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|incomplet|sha256:50bceb793574|1
+REF|builds/scan/essai-scan|sha256:3d4c65e6a0a81157e5ecb69930dc38c4a4d8652d539413a7fdf8b5f5d26a1592|2026-11-13T12:49:34Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|kev|sha256:60b190cc93a7|1
+REF|builds/scan/essai-scan|sha256:374dc72dbc77efd26e74281cd203c35b645390a11095a485470f5388362419c2|2026-11-13T12:49:13Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|mal|sha256:15860f9e16ed|1
+REF|builds/scan/essai-scan|sha256:780aca3527957b1539696bd4edebaa4cdb52d7c519bc5e4d00584f519aa524fe|2026-11-13T12:49:16Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|propre|sha256:824e2d81d743|1
+REF|builds/scan/essai-scan|sha256:5b2e299d7b263543e1f81aa8b2f6a7ef8ffff0b259c73d3c31701b2a046bf4b6|2026-11-13T12:49:10Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|recent-kev|sha256:42dfbe1de68b|2
+REF|builds/scan/essai-scan|sha256:797544cf3dd42b998a112b0e5bcfb8a65bf23defa564602fd6e3b8c774364fd2|2026-11-13T12:49:45Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+REF|builds/scan/essai-scan|sha256:fe2e56fe16ea40b161d522572e6f142111fc55964f6f685896de82ee33ce9005|2026-11-13T12:49:48Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|recent-propre|sha256:c4cb26f9575c|2
+REF|builds/scan/essai-scan|sha256:1787bd876da8f0254d2d739de7b8577ad3cf4d0833f7c4b91f79c41df30a0ac8|2026-11-13T12:49:39Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+REF|builds/scan/essai-scan|sha256:842067edf0c4c8797c8ce43582dae84cb7e228b7473620bc02a4c37e4ad52fee|2026-11-13T12:49:42Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|vex-expire|sha256:d13ace75069a|1
+REF|builds/scan/essai-scan|sha256:caffa55ed0021757001632bfafcc74de81de5fc007011be1060bd43b3e1df328|2026-11-13T12:49:19Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|vex-valide|sha256:dd0ccdb0544c|1
+REF|builds/scan/essai-scan|sha256:7817aa4eb6728d7083a35c3c11fe7336f52d94e6207529b153e75a0688005fd8|2026-11-13T12:49:22Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+TEMOIN|vieux|sha256:c3fb5bc9404a|1
+REF|builds/scan/essai-scan|sha256:8ab6da08fce4d16d0c895cbe1349edbd9b60dd5a5e18a7f4ef7365ffc5fb28ae|2026-11-13T12:49:25Z|application/vnd.dev.sigstore.bundle.v0.3+json|témoin
+COMPTE|builds/scan/essai-scan|tous les témoins|16
+## 4. vulndb/grype : tags et digests
+BASE|2026-11-13|sha256:c35d469a442164d1d4688fd6cae6f4e5cf377bfe11928d7af8e64452ada151ec
+BASE|2026-11-14|sha256:2c0390b3896c07a471151b2cfd3ae21df3a3c51f6ae6f176e18c36b20398a922
+BASE|2026-11-15|sha256:82a5c316bc3df4d347235cb26a6b8e5b2932c1a20de60503528082f568e4a5d3
+BASE|2026-11-16|sha256:e6aa5a3ca01055dd90723cbe0ab427632e691c2e3a60bcb58d91f9715c733411
+BASE|2026-11-17|sha256:24af76a835dda3507ecf9d2a70dd458e082d47e6b0b82618a74c515b35ce596b
+BASE|2026-11-18|sha256:9e11a7c93c70c40ea2bf74c9d0bb417267aa577fe28671a1d7618a1e6e0f4680
+BASE|2026-11-19|sha256:78b52ca2e54441a8c5117686fc0183039b7bc8f14c65369749a5d27ac79c0da3
+BASE|2026-11-20|sha256:11da3802f3fa0e0b39839caa076d25a2c09991d5c90ecc038f6510c554cae47c
+COMPTE|vulndb/grype|tags|8
+## 5. blob vide {} (H7, HEAD, 200 attendu)
+BLOB|builds/vsa/sample-app|sha256:44136fa355b3|200
+BLOB|builds/vsa/sample-app-deb|sha256:44136fa355b3|200
+BLOB|builds/scan/sample-app|sha256:44136fa355b3|200
+## 6. blobs des manifestes présents (config et couches ; HEAD dans le même dépôt, 200 attendu)
+BLOBS|builds/scan/sample-app|sha256:9e2c8cf4d020|2|2
+BLOBS|builds/scan/sample-app|sha256:043e13825970|2|2
+BLOBS|builds/scan/sample-app|sha256:1e0a4c127a76|2|2
+BLOBS|builds/scan/sample-app|sha256:dc98d7e5aa44|2|2
+BLOBS|builds/scan/sample-app|sha256:fc23e125c56b|2|2
+BLOBS|builds/scan/sample-app|sha256:d7acc7271146|2|2
+BLOBS|builds/scan/sample-app|sha256:5065f83a5fff|2|2
+BLOBS|builds/scan/sample-app|sha256:8da85063791f|2|2
+BLOBS|builds/scan/sample-app|sha256:bd5e47f55d3f|2|2
+BLOBS|builds/scan/sample-app-deb|sha256:256c31902a46|2|2
+BLOBS|builds/scan/sample-app-deb|sha256:3ff73022d7c2|2|2
+BLOBS|builds/scan/sample-app-deb|sha256:194c7bca6997|2|2
+BLOBS|builds/scan/sample-app-deb|sha256:ca8946f41c7e|2|2
+BLOBS|builds/scan/sample-app-deb|sha256:9d3bda275a6d|2|2
+BLOBS|builds/scan/sample-app-deb|sha256:44baed7e5542|2|2
+BLOBS|builds/scan/sample-app-deb|sha256:81329cd4a675|2|2
+BLOBS|builds/scan/sample-app-deb|sha256:b8065ed5eae1|2|2
+BLOBS|builds/vsa/sample-app|sha256:69a2b1032601|2|2
+BLOBS|builds/vsa/sample-app-deb|sha256:bd7c77ec312e|2|2
+BLOBS|builds/vsa/sample-app-deb|sha256:97b4100d0f15|2|2
+BLOBS|builds/scan/essai-scan|sha256:6966d6821322|2|2
+BLOBS|builds/scan/essai-scan|sha256:b80bf1dd9917|2|2
+BLOBS|builds/scan/essai-scan|sha256:9b12f9d0c4b9|2|2
+BLOBS|builds/scan/essai-scan|sha256:0542f2667850|2|2
+BLOBS|builds/scan/essai-scan|sha256:718b017c3236|2|2
+BLOBS|builds/scan/essai-scan|sha256:3d4c65e6a0a8|2|2
+BLOBS|builds/scan/essai-scan|sha256:374dc72dbc77|2|2
+BLOBS|builds/scan/essai-scan|sha256:780aca352795|2|2
+BLOBS|builds/scan/essai-scan|sha256:5b2e299d7b26|2|2
+BLOBS|builds/scan/essai-scan|sha256:797544cf3dd4|2|2
+BLOBS|builds/scan/essai-scan|sha256:fe2e56fe16ea|2|2
+BLOBS|builds/scan/essai-scan|sha256:1787bd876da8|2|2
+BLOBS|builds/scan/essai-scan|sha256:842067edf0c4|2|2
+BLOBS|builds/scan/essai-scan|sha256:caffa55ed002|2|2
+BLOBS|builds/scan/essai-scan|sha256:7817aa4eb672|2|2
+BLOBS|builds/scan/essai-scan|sha256:8ab6da08fce4|2|2
+BLOBS|vulndb/grype|sha256:11da3802f3fa|3|3
+COMPTE|blobs|37 manifestes|75 blobs|75 en 200
+## fin, 2026-11-20T20:06:21Z

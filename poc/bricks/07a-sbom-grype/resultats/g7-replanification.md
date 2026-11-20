@@ -587,3 +587,15 @@ Les contenus prédits N1 à N9 de la note de 19:28:08Z sont inchangés. Seules l
 | E9 | Sections 1 à 5 identiques au journal v1, en-tête et heures exceptés. Aucun scan ni aucune base ne sont poussés avant le 21/11 vers 08:05 | haute |
 | E10 | 37 manifestes présents : 9 et 8 scans, 3 VSA, 16 témoins, 1 base | haute |
 | E11 | Tous les blobs en 200, aucun `BLOB-KO`. Chaque scan et chaque témoin a 2 blobs (config `{}` et bundle) | haute pour les 200 ; moyenne pour « 2 blobs » ; nombre de blobs de la base non prédit |
+
+## Résultat E9 à E11 (note de 2026-11-20T20:06:44Z ; rien n'est réécrit au-dessus)
+
+**Relance** le 20/11 de 20:06:19 à 20:06:21 UTC, au dépôt `b291601d`, script `a12f0653…`, code 0 ([journal](g7-etat-avant-2.log)). Aucune ligne masquée.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| E9 | Sections 1 à 5 identiques à celles du journal v1, à l'en-tête près (`diff` vide) | tenue |
+| E10 | 37 manifestes présents | tenue |
+| E11 | 75 blobs, tous en 200, aucun `BLOB-KO`. 36 manifestes ont 2 blobs ; la base `vulndb/grype` du 2026-11-20 en a 3 | tenue |
+
+C'est l'état « avant » de référence pour la lecture après le n°9 : `AVANT=resultats/g7-etat-avant-2.log`. Il remplace le journal v1 dans la consigne de la note de 20:00:02Z.
