@@ -384,3 +384,79 @@ Les deux notes restent écrites telles quelles.
 **Pour le bloc 05 de `rejeu.sh`, relevés à sec** :
 - `publier-fermeture@7fa92ad3…`, citée par `prefetch-rpm-sample-app`, n'est pas poussée par la 05. Le rejeu S5b l'a retrouvée dans la liste revue (`rejeu-s5b-plateforme-reprise.log`, l. 143). La 05 en dépend donc, comme de la fermeture de sources de la 06.
 - Le refus d'un journal déjà présent consomme le `TAG` à chaque tentative. Une étape échouée, même sur une lecture non concluante ou un `df`, ne peut pas être reprise sous le même `TAG`. Le choix du `TAG` par tentative est à fixer dans le bloc 05. Les étapes de mesure en aval acceptent `TAG` à part de `PREFIXE`.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T17:47:22Z UTC : chemin du rejeu écrit à sec, banc et prédictions
+
+**Étape écrite, rien n'est lancé contre Zot ni le cluster** : [`m5b-rejeu.sh`](../m5b-rejeu.sh) (sha256 `1245c0e88f079b34…`), script frère. Les scripts de mesure, `m5b-republier.sh`, `commun.sh` et `rejeu.sh` ne sont pas touchés. Le bloc 05 de `rejeu.sh` reste à écrire.
+
+**Lectures faites avant d'écrire** :
+- `m1b-signature.sh taches` et `m1b-pipeline.sh pipeline` acceptent un Zot neuf : leurs gardes portent sur la liste revue, les fichiers de l'hôte et des dépôts absents.
+  - `m1b-signature.sh` **signe à chaque passage**, sans `SIGNER` : les tâches dans son dossier de travail, et les deux pipelines des builders, poussées au tag `m1b`. Le rejeu signe donc ces deux pipelines avec la clé des tâches, lue par tkn seulement. Leurs digests changent, ce que la note de 16:18:58Z prévoyait.
+  - Son journal (`m1b-signature-taches.log`) et son dossier (`$W/m1b-signature-05`) ont des noms fixes, et `lancer` réécrit un journal présent. Sourcer le script, sous un journal et un dossier propres au rejeu, évite les deux.
+- `s1.sh amorce` et `m3_reseau` ne citent aucune image d'essai. Sous `PREFIXE=$TAG`, leurs journaux sont neufs.
+- `m4a.sh publier` réécrirait `m4a-publier.log` : il n'a ni `PREFIXE` ni refus d'un journal présent.
+- **Gardes tournées vers l'histoire** :
+  - `m1b-fermeture.sh rpm` exige le tag `m4b` de la pipeline et la fermeture `2a9e2ea7…`, avant et après, ainsi que l'arbre de l'essai sous `$PREFIXE`.
+  - `m1b-construction.sh construction` exige le tag `m4c` et l'artefact de M4c présent avant le premier PipelineRun. Il lit aussi `pipeline.ref` dans le dossier du préfixe, écrit par son étape `pipeline`, qui signe.
+  - `m1b-artefact.sh publier` exige le tag `m4a` (G2, P3) et `digest-local` dans le dossier du préfixe.
+
+  Les quatre derniers dépendent du préfixe : sous un préfixe neuf, ces étapes ne passent pas telles quelles, même avec un Zot réparé.
+- `07b7bd6f…` n'est épinglé nulle part en aval : un commentaire de `taches.yml`, et une lecture de `o5-zot.sh` (09), qui n'est pas dans `rejeu.sh`. `50dc73f7…` a été redonné par le rejeu S5b (`rejeu-s5b-06-a.log`).
+
+**Le script** :
+- Chaque étape source un script de mesure dans un sous-shell, sous `PREFIXE=$TAG`, et réutilise ses fonctions et ses références épinglées. Aucun bloc n'est recopié.
+- Les gardes de l'histoire ne sont pas rejouées. Les gardes de sûreté le sont : liste revue, politiques, place libre, PipelineRun absent, dry-run d'admission, signature de Chains.
+- Les pipelines rpm sont lues dans Zot **par digest**, et les PipelineRuns les référencent par digest (`pr_rpm`, `pr_m4c`). Le `TAG` de `m5b-republier.sh` n'a donc plus à être celui des étapes suivantes.
+- Les étapes :
+  - `entree` tourne avant le démontage, sans cluster ni Zot. Elle contrôle le `TAG`, l'absence de journaux et de dossiers pour ce `TAG`, les entrées de l'hôte (rendu de `prealables`, mesure d'un autre jour par `gardes_mesure`, layout de M4a), l'arbre et le verrou de la cascade, les 5 fichiers signés, la clé des tâches (`test -s`), le fuseau, `SOURCE_DATE_EPOCH` et tkn.
+  - `signature` : `etape_taches` sans `SIGNER`, sorties sous `$W/m5b-rejeu-$TAG-signature-05`.
+  - `images` : `etape_pipeline` sous `PREFIXE=$TAG`, avec ces sorties.
+  - `artefact` : `etape_local`, puis la publication de `etape_publier` sans la garde du tag `m4a`. Le digest local doit être `333b7322…` avant toute poussée.
+  - `fermeture` : un PipelineRun, et la fermeture `09838980…` exigée.
+  - `construction_rpm` : un PipelineRun, et l'artefact rpm relevé contre `07b7bd6f…` sans l'exiger.
+- Un digest différent de `333b7322…` ou de `09838980…` arrête l'étape, avec renvoi à ta décision : nouvelle signature et revue de la liste. Ces deux objets sont cités par la pipeline signée `sample-app-rpm`.
+- Si la fermeture ou l'artefact est déjà présent à son digest, l'étape ne crée rien (reprise).
+- **Un PipelineRun par pipeline** suffit pour poser l'état. La reproductibilité a été mesurée par la cascade, avec deux PipelineRuns.
+- `TAG` est obligatoire et sans défaut. Sont refusés `m1b`, `m4a`, `m4b`, `m4c`, `essai` et `s1` : `m1b` réutiliserait les dossiers de la cascade, que lit le banc.
+
+**Écart à l'ordre de la note de 16:46:56Z**, qui reste écrite telle quelle :
+- L'artefact de M4a (`41c639b7…`) n'est plus republié. La seule garde qui l'exigeait est G2 de `m1b-artefact.sh`, retirée ici.
+- `m1b-artefact.sh publier` est remplacée par l'étape `artefact`.
+- `m1b-fermeture.sh rpm` et `m1b-construction.sh construction` sont remplacées par `fermeture` et `construction_rpm`.
+
+**Ordre prévu pour le bloc 05** (à écrire) : `s1.sh amorce m3_reseau` (`PREFIXE=$TAG`), `signature`, `images`, `m5b-republier.sh taches`, `artefact`, `m5b-republier.sh pipeline_fermeture`, `fermeture`, `m5b-republier.sh pipeline_construction`, `construction_rpm`. Il vient après la 06, dont viennent `sample-app-sources`, `publier-fermeture` et `publier-image`, et avant `fuites`. `entree` passe avant le démontage.
+
+**Banc** : [`m5b-rejeu-banc.sh`](m5b-rejeu-banc.sh) (sha256 `f355bb330a97537a…`), dossier `~/.cache/supply-chain-poc/05/banc-m5b-rejeu`, journal `m5b-rejeu-banc.log`.
+- Il a son propre `CONFIANCE_DIR`, avec des liens en lecture vers `m1bt-20-05` et `m4a-05`, une clé factice et le certificat public de la CA.
+- Doublures : `kubectl`, `zot_lire`, `oras`, `sur`, `auth_zot`. Le faux `kubectl` sert les objets réels des PipelineRuns de la cascade (`m1b-rpm-1`, `m1b-construction-1`), renommés au préfixe du banc.
+- Rien n'est lu ni écrit dans Zot ou le cluster.
+
+**Prédictions, écrites avant le lancement** :
+- **RV1** (haute) : A tenue.
+  - `bash -n` et shellcheck passent.
+  - Les 9 `TAG` refusés et l'étape inconnue rendent 2, sans journal.
+  - Les scripts de mesure, `commun.sh`, `m5b-republier.sh` et `rejeu.sh` sont inchangés.
+  - Aucune commande de signature n'est dans le script, et la clé n'apparaît qu'au `test -s`.
+- **RV2** (moyenne, jamais exécutée) : B1 rend 0, avec 4 rendus et 5 fichiers signés contrôlés et la mesure d'un autre jour pour les deux images. Il laisse les deux dossiers de chargement, sans dossier `auth`. B2 à B7 s'arrêtent en code 1 sur la garde visée, et B2, B3, B4 et B6 avant tout chargement. B8 rend 0.
+- **RV3** (haute) : C1 à C7 tenus.
+  - En C1, les sorties vont sous `$TS`, `SIGNER` est retirée, et les deux dossiers `auth` sont retirés après.
+  - C2 refuse un `$TS` présent.
+  - C3 transmet `PREFIXE` et `SIG`, et C4 à C6 `PREFIXE` et `TAG`.
+  - C7 : un journal présent est refusé en code 2.
+- **RV4** (haute pour le digest, moyenne pour le déroulé) : D1 rend 0.
+  - `etape_local` réelle donne 8 OK (A1 à A5) et le digest local `333b7322…`.
+  - Deux poussées au tag du banc, puis P1, P2 et P3.
+  - D2 (reprise) rend 0 sans poussée.
+  - D3 (digest local différent), D4 (tag occupé) et D5 (place) s'arrêtent sans poussée.
+- **RV5** (moyenne) : E1 rend 0.
+  - Un PipelineRun `banc-e-rpm-1`, avec la pipeline `61814acd…` par digest.
+  - Fermeture `09838980…`, 230 couches, deux TaskRuns relus.
+  - E2 (reprise) rend 0 sans appel de `kubectl`.
+  - E3 à E5 et E7 à E9 s'arrêtent sans création. E6 (autre digest) s'arrête après une création, sur le renvoi à ta décision.
+- **RV6** (moyenne) : F1 rend 0.
+  - Un PipelineRun `banc-f-construction-1`, avec la pipeline `7d361cb1…`, le commit `6391fd43…` et Kata pour `construire`.
+  - `DIGEST_CONSTRUIT` est égal au digest publié, et le relevé dit « égaux ». Trois TaskRuns sont relus, et aucune ligne `jeton|token` n'est laissée non masquée.
+  - F2 rend 0 avec « différents ».
+  - F3 à F6 s'arrêtent sans création.
+
+**Portée** : ni Zot (TLS, comptes), ni Tekton, ni l'admission réelle, ni Kyverno, Kata, Chains ou tkn. `s1.sh`, `m5b-republier.sh` et `rejeu.sh` ne sont pas exécutés. Les étapes `signature` et `images` ne sont mesurées que par leur chargement (C1, C3). Leur corps est celui, inchangé, des étapes passées de la cascade.
