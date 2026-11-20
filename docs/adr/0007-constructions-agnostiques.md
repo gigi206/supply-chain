@@ -238,3 +238,5 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 
   Le témoin redonne le rpm de M3 et l'artefact `07b7bd6f…`.
 - **Conséquence pour la règle générique** : changer d'images de builder ne change ni l'artefact ni les barrières mesurées. La cascade avant M5b est terminée.
+
+**Précision de portée du 20/11/2026, écrite à 2026-11-20T14:42:23Z UTC** : l'additif précédent généralise un seul changement mesuré, des images d'essai aux images de M1b. Pour ce changement, l'artefact et les barrières mesurées sont restés les mêmes. Ce n'est pas une règle prouvée pour tout changement d'images de builder.

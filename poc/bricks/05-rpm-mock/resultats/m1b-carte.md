@@ -1094,3 +1094,15 @@ De 14:23:25Z à 14:38:42Z, sous l'accord permanent, `m1b-r1r8.sh` a rejoué R1 �
 - le rejeu M5b, pas avant le 28/11.
 
 La clôture de la brique 05 reste ta décision.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T14:42:23Z UTC : traçabilité du rejeu de R1 à R8
+
+- **Recherche élargie** : j'ai cherché dans `m1b-carte.md` et `m5b-carte.md` les mentions « avant M5b », « avant le rejeu », « à adapter », « à refaire » et « à rejouer ». Aucun autre point de la cascade n'en sort.
+  - Les références du bootstrap à refaire, et les étapes à rejouer avant la mesure d'un autre jour, appartiennent à M1b, qui est tenu.
+  - Les « builds de M3 et de M4 à recomparer » de la décision C sont couverts par M4c refait, dont le rpm est égal à celui de M3. C'est la formulation du §5.
+  - L'entrée des étapes durables dans `rejeu.sh` relève de M5b.
+- **Rootfs de l'outillage** : `m1b-r1r8.sh` lit `~/.cache/supply-chain-poc/05/m1b-refus-racine/racine`, extrait à la main le 20/11 avant le banc. Aucun script commité ne journalise cette extraction, à la différence de `m5-sigmd5.sh` pour M5a. Voici la commande, exécutée depuis la racine du dépôt après `commun.sh` :
+  - `crane digest` de `$REG_HOTE/builds/builders/mock-rocky9@sha256:70f8c412…` a rendu `sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae` ;
+  - puis `crane export` de la même référence par digest, avec la CA du PoC et une lecture anonyme, envoyé dans `unshare -r tar -x --no-same-owner --exclude='dev/*'` ;
+  - les deux commandes ont rendu 0, pour 345 Mo extraits. Le rootfs donne `RPM version 4.16.1.3` et `Python 3.9.25`, versions relevées par les bancs 2 et 3.
+- **Portée de l'additif de l'ADR 0007** : « changer d'images de builder ne change ni l'artefact ni les barrières » vaut pour le seul changement mesuré, des images d'essai (`99790c13…`, `f0ccf105…`) aux images de M1b (`70f8c412…`, bootstrap `6de899ac…`). La précision est ajoutée à l'ADR.
