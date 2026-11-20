@@ -33,7 +33,10 @@
 #           de M4c présent, journaux neufs) ; lignes de la construction hermétique relevées (hermetique) ; enveloppes d'attestation
 #           de l'artefact relevées avant et après. Écritures dans Zot : le même digest, republié par publier-image, et les
 #           attestations de Chains, ajoutées à celles de M4c.
-# Comparaison et provenance viendront après construction (lecture seule).
+#   essai_refus  ajoutée le 20/11/2026 après construction (accord permanent : pod d'essai Kata, rien dans Zot) : etape_essai
+#           (etape_essai_construire de m1b-bundles.sh) avec une seule altération, bootstrap.image_digest du verrou livré au pod,
+#           réécrit par le conteneur remplir ; refus attendu de mock (« Expected digest for image »), code non nul, aucun rpm.
+# Comparaison et provenance viendront ensuite (lecture seule).
 # Un journal existant n'est jamais réécrit : relancer sous un autre PREFIXE.
 # Usage (racine du dépôt) : [PREFIXE=m1b] DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/m1b-construction.sh <étape>…
 #         (journaux : resultats/$PREFIXE-construction-<étape>.log)
@@ -72,6 +75,7 @@ VERROU=$R/m1b-verrou.json   # verrou de la cascade, livré sous le nom verrou-rp
 VERROU_SHA=c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83   # m1b-verrou.sh verrou (6da4e4a1)
 BOOT_DOSSIER=sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3   # dossier dir: du bootstrap (CP2 de M4b refait)
 IMAGE_DIGEST_BOOT=77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca   # bootstrap.image_digest du verrou, jamais mesuré par mock
+IMAGE_DIGEST_FAUX=77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89cb   # essai_refus : dernier caractère changé, rien d'autre
 SPEC=$repo/poc/packaging/sample-app.spec
 SPEC_SHA=918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6     # m4c.sh
 TIREE=$W/m1b-fermeture-05/comparaison/tiree   # fermeture 09838980 tirée par digest par la comparaison de M4b refait (égale à l'essai)
@@ -806,6 +810,90 @@ etape_construction() { # deux PipelineRuns de sample-app-rpm ($N-construction-1,
   mesure "deux exécutions, même artefact" "$(cat "$T/rpm-2.digest")" "$(cat "$T/rpm-1.digest")"
   enveloppes_att après
   attendu "tag m4c de la pipeline, inchangé après" "$(zot_lire "tag m4c" tekton/pipelines/sample-app-rpm:m4c)" "${PIPELINE_M4C##*@}"
+  echo "écarts : $ECARTS"
+  [ "$ECARTS" = 0 ]
+}
+
+etape_essai_refus() { # pod Kata au label construire-rpm, à la forme que Tekton produira : contexte du podTemplate au niveau du pod (UID
+  # 65532, runAsNonRoot), pas root privilégié au niveau du conteneur ; entrées sur un volume à part, remplies par un second
+  # conteneur en UID 65532 et montées en lecture seule dans le conteneur de mock ; script de construire-rpm tiré du gabarit rendu,
+  # variables de Tekton seules substituées ; image.tar rapatrié ; écarts à M3 relevés sans arrêter ; pod supprimé
+  local p=$N-construction-refus x=$T/essai-refus rc=0 d s j=$R/$N-construction-local.log
+  [ -s "$j" ] && [ -s "$T/entrees.tar" ] || echec "lancer d'abord local (journal resultats/${j##*/} et entrees.tar)"
+  attendu "entrees.tar de local (taille, sha256), égal au journal de local" "$(stat -c %s "$T/entrees.tar") $(sha "$T/entrees.tar")" \
+    "$(sed -n 's/^entrees.tar : \([0-9]*\) octets, sha256 \([0-9a-f]\{64\}\)$/\1 \2/p' "$j")"
+  attendu "image_digest altéré : même longueur, différent du verrou" "${#IMAGE_DIGEST_FAUX} $([ "$IMAGE_DIGEST_FAUX" != "$IMAGE_DIGEST_BOOT" ] && echo différent)" "64 différent"
+  neuf "$R/$N-construction-refus-pod.log"
+  neuf "$x"; mkdir -p "$x"
+  rendre_taches
+  script_etape "$T/construire-rpm.yaml" construire \
+    | sed -e 's#\$(workspaces.entrees.path)#/e#g' -e 's#\$(workspaces.sortie.path)#/o#g' -e 's#\$(results.DIGEST_CONSTRUIT.path)#/w/digest#g' > "$x/construire.sh"
+  attendu "script d'essai : variables Tekton restantes" "$(grep -c '\$(\(params\|workspaces\|results\)\.' "$x/construire.sh" || true)" 0
+  attendu "script d'essai : égal au script du gabarit, variables de Tekton exceptées" \
+    "$(diff <(script_etape "$T/construire-rpm.yaml" construire) "$x/construire.sh" | grep -c '^>' || true)" 3
+  attendu "script d'essai : égal à celui de l'essai de M4c (sha256)" "$(sha "$x/construire.sh")" "$SCRIPT_CONSTRUIRE_SHA"
+  politique_relue
+  jq -n --arg n "$p" --arg lb "$LABEL_CONSTRUIRE" --arg i "$IMAGE_OUTILLAGE" --arg ep "$EPOQUE" \
+    --argjson sc "$(yq -o=json -I=0 '.spec.steps[0].securityContext' "$T/construire-rpm.yaml")" \
+    --argjson res "$(yq -o=json -I=0 '.spec.steps[0].resources' "$T/construire-rpm.yaml")" '{
+    apiVersion: "v1", kind: "Pod", metadata: {name: $n, namespace: "builds", labels: {"tekton.dev/task": $lb}},
+    spec: {restartPolicy: "Never", serviceAccountName: "build", automountServiceAccountToken: false, nodeSelector: {zone: "build"},
+      runtimeClassName: "kata",
+      tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
+      securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: "RuntimeDefault"}},
+      volumes: [{name: "w", emptyDir: {medium: "Memory", sizeLimit: "4Gi"}}, {name: "e", emptyDir: {}}, {name: "o", emptyDir: {}}],
+      containers: [
+        {name: "essai", image: $i, command: ["sleep", "7200"], securityContext: $sc, resources: $res, env: [{name: "EPOQUE", value: $ep}],
+          volumeMounts: [{name: "w", mountPath: "/w"}, {name: "e", mountPath: "/e", readOnly: true}, {name: "o", mountPath: "/o"}]},
+        {name: "remplir", image: $i, command: ["sleep", "7200"],
+          securityContext: {runAsUser: 65532, runAsNonRoot: true, allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}},
+          resources: {requests: {cpu: "100m", memory: "256Mi"}, limits: {cpu: "1", memory: "1Gi"}},
+          volumeMounts: [{name: "e", mountPath: "/e"}]}]}}' > "$x/pod.json"
+  attendu "pod d'essai : contexte du pas égal à celui du gabarit" "$(jq -c '.spec.containers[0].securityContext' "$x/pod.json")" \
+    '{"privileged":true,"allowPrivilegeEscalation":true,"runAsUser":0,"runAsGroup":0,"runAsNonRoot":false}'
+  kubectl delete pod -n builds "$p" --ignore-not-found --wait=true < /dev/null > /dev/null
+  trap "kubectl delete pod -n builds $p --ignore-not-found --wait=false < /dev/null > /dev/null 2>&1 || true" EXIT
+  kubectl create --dry-run=server -f "$x/pod.json" < /dev/null > /dev/null || { echo "KO   pod $p refusé en dry-run serveur" >&2; exit 1; }
+  echo "OK   pod $p admis en dry-run serveur"
+  kubectl create -f "$x/pod.json" < /dev/null > /dev/null
+  echo "pod $p créé à $(date -u +%H:%M:%S) (image $IMAGE_OUTILLAGE)"
+  kubectl wait -n builds "pod/$p" --for=condition=Ready --timeout=300s < /dev/null > /dev/null \
+    || { pod_retirer "$p"; echo "KO   pod $p non prêt" >&2; exit 1; }
+  echo "pod prêt sur $(kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}, runtimeClassName {.spec.runtimeClassName}' < /dev/null)"
+  copier_pod "$p" remplir "$T/entrees.tar" /e/entrees.tar
+  kubectl exec -n builds "$p" -c remplir -- sh -c 'tar --no-same-owner -xf /e/entrees.tar -C /e && rm /e/entrees.tar && echo "entrées déballées par uid $(id -u) : $(find /e -type f | wc -l) fichiers"' < /dev/null \
+    || { pod_retirer "$p"; echo "KO   déballage des entrées" >&2; exit 1; }
+  # Seule altération de l'essai : bootstrap.image_digest du verrou livré, réécrit par le conteneur remplir (UID 65532)
+  kubectl exec -n builds "$p" -c remplir -- sh -c "sed -i 's/$IMAGE_DIGEST_BOOT/$IMAGE_DIGEST_FAUX/' /e/verrou-rpm.json && echo \"verrou altéré : \$(grep -c $IMAGE_DIGEST_FAUX /e/verrou-rpm.json) ligne(s) au faux image_digest, \$(grep -c $IMAGE_DIGEST_BOOT /e/verrou-rpm.json) au vrai\"" < /dev/null > "$x/alteration.txt" \
+    || { pod_retirer "$p"; echo "KO   altération du verrou dans le pod" >&2; exit 1; }
+  attendu "verrou altéré dans le pod (image_digest seul)" "$(cat "$x/alteration.txt")" "verrou altéré : 1 ligne(s) au faux image_digest, 0 au vrai"
+  # Le script est un fichier dans le pod, comme sous Tekton, et rien n'arrive sur son entrée standard (s4d.sh)
+  copier_pod "$p" essai "$x/construire.sh" /w/construire.sh
+  echo "## script de construire-rpm dans le pod ($(date -u +%H:%M:%S))"
+  timeout 1800 kubectl exec -n builds "$p" -c essai -- bash /w/construire.sh < /dev/null > "$x/construire.log" 2>&1 || rc=$?
+  echo "fin à $(date -u +%H:%M:%S)"
+  sed '/jeton\|token/I c\[ligne masquée : motif jeton|token]' "$x/construire.log" > "$R/$N-construction-refus-pod.log"
+  grep -v '^paquet ' "$R/$N-construction-refus-pod.log" | cut -c1-220 | sed 's/^/     /'
+  echo "     (code de l'exec : $rc ; journal complet : resultats/$N-construction-refus-pod.log)"
+  if [ $rc = 0 ]; then
+    kubectl exec -n builds "$p" -c essai -- cat /o/image.tar < /dev/null > "$x/image.tar"
+    attendu "image.tar rapatrié (sha256 dans le pod)" "$(sha256sum < "$x/image.tar" | cut -c1-64)" "$(kubectl exec -n builds "$p" -c essai -- sha256sum /o/image.tar < /dev/null | cut -c1-64)"
+    d=$(kubectl exec -n builds "$p" -c essai -- cat /w/digest < /dev/null)
+  fi
+  pod_retirer "$p"
+  attendu "écriture refusée sur les entrées (ligne du script atteinte)" "$(grep -c '^invité : .*, écriture refusée$' "$x/construire.log" || true)" 1
+  echo "relevé : montage des entrées vu dans le pod : $(sed -n 's/^invité : .* entrees : \(.*\), écriture refusée$/\1/p' "$x/construire.log")"
+  s=$(sed -n 's/^Source0 sample-app-1.0.0.tar.gz (époque [0-9]*) : \([0-9a-f]\{64\}\) ;.*/\1/p' "$x/construire.log")
+  mesure "Source0 faite par le tar et le gzip de l'image d'outillage, égale à l'archive de sources.sh" "$s" "$ARCHIVE_SHA"
+  attendu "script de construire-rpm refusé (code de l'exec non nul)" "$([ "$rc" != 0 ] && echo refusé || echo "accepté, code $rc")" refusé
+  attendu "dossier dir: et image_digest altéré, lus par le script" \
+    "$(grep -c -x -F "dossier dir: $BOOT_DOSSIER ; image_digest du verrou $IMAGE_DIGEST_FAUX" "$x/construire.log" || true)" 1
+  attendu "mock --hermetic-build en échec (rc non nul)" "$(grep -c '^mock --hermetic-build : rc [1-9][0-9]* en [0-9]* s$' "$x/construire.log" || true)" 1
+  attendu "lignes « Expected digest for image » dans la sortie de mock (au moins une)" \
+    "$(sed -n 's/^lignes « Expected digest for image » : sortie \([0-9]*\) ; root.log [0-9]*$/\1/p' "$x/construire.log" | sed 's/^[1-9][0-9]*$/au moins une/')" "au moins une"
+  attendu "fin du script : mock en échec, aucun rpm" "$(grep -c '^mock en échec$' "$x/construire.log" || true) $(grep -c '^rpm : ' "$x/construire.log" || true)" "1 0"
+  echo "relevé : $(grep '^lignes « \(Using\|Checking\|Expected\|falling\)' "$x/construire.log" | paste -sd' ' -)"
+  echo "relevé : première ligne de mock « Expected digest for image » : $(grep -v '^lignes « ' "$x/construire.log" | grep -m 1 -o 'Expected digest for image.*' | cut -c1-300)"
   echo "écarts : $ECARTS"
   [ "$ECARTS" = 0 ]
 }

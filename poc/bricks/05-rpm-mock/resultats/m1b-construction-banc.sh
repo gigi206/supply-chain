@@ -23,7 +23,7 @@ ko() { echo "KO   $*"; KO=$((KO + 1)); }
 verifie() { if [ "$2" = "$3" ]; then ok "$1 : $2"; else ko "$1 : $2 (attendu : $3)"; fi; }
 B=bancconstruction   # préfixe fixe : ses dossiers sous $W sont retirés à la main, par chemin littéral, après archivage du journal
 W0=$(bash -c 'here=poc/bricks/08-trust-plane; . "$here/commun.sh"; echo "$W"')
-for d in "$W0/$B-construction-05" "$W0"/$B-*-construction-05 "$W0/$B-ef" "$W0/$B-r" "$W0/$B-r2" "$W0/$B-a.txt" "$W0/$B-local.log" "$W0/$B-liste.yml" "$W0/$B-transpose.log"; do
+for d in "$W0/$B-construction-05" "$W0"/$B-*-construction-05 "$W0/$B-ef" "$W0/$B-r3" "$W0/$B-r" "$W0/$B-r2" "$W0/$B-a.txt" "$W0/$B-local.log" "$W0/$B-liste.yml" "$W0/$B-transpose.log"; do
   [ ! -e "$d" ] || { echo "KO   reste d'un banc précédent : ${d#"$W0"/}" >&2; exit 2; }
 done
 etat_resultats() { git status --porcelain --untracked-files=all -- "$D5/resultats" | sha256sum | cut -c1-64; }
@@ -284,5 +284,20 @@ verifie "I : journaux de construire archivés dans le resultats/ du banc" "$(ls 
 verifie "I : lignes finales (même artefact, tag m4c inchangé après)" \
   "$(grep -c '^OK   deux exécutions, même artefact\|^OK   tag m4c de la pipeline, inchangé après' "$EF/I/sortie.txt")" 2
 
+echo "## J essai_refus (ajouté le 20/11/2026 après construction) : gardes et chemin jusqu'au premier appel à kubectl (doublure)"
+verifie "J0 IMAGE_DIGEST_FAUX : 64 caractères, seul le dernier diffère d'IMAGE_DIGEST_BOOT" \
+  "$(rhs "$F" IMAGE_DIGEST_FAUX | wc -c) $(rhs "$F" IMAGE_DIGEST_FAUX | cut -c1-63) $(rhs "$F" IMAGE_DIGEST_FAUX | cut -c64)" \
+  "65 $(rhs "$F" IMAGE_DIGEST_BOOT | cut -c1-63) b"
+verifie "J0 IMAGE_DIGEST_BOOT : dernier caractère" "$(rhs "$F" IMAGE_DIGEST_BOOT | cut -c64)" a
+altere "J1 essai_refus sans local" "KO   lancer d'abord local" "$FK; etape_essai_refus"
+mkdir -p "$W0/$B-r3"; cp "$W0/$B-r/$B-construction-local.log" "$W0/$B-r3/"; : > "$W0/$B-r3/$B-construction-refus-pod.log"
+altere "J2 essai_refus : journal de pod déjà présent" "KO   déjà présent" "R=$W0/$B-r3; T=$W0/$B-construction-05; N=$B; $FK; etape_essai_refus"
+altere "J3 essai_refus : nominal jusqu'au premier appel à kubectl" "KO   kubectl appelé : get networkpolicy" \
+  "R=$W0/$B-r; T=$W0/$B-construction-05; N=$B; $FK; etape_essai_refus"
+verifie "J3 : journal de pod non créé" "$(ls -A "$W0/$B-r" | paste -sd' ')" "$B-construction-local.log"
+verifie "J4 altération : une seule commande sed, du vrai au faux image_digest, dans le conteneur remplir" \
+  "$(sed -n '/^etape_essai_refus() {/,/^}/p' "$F" | grep -c -F "kubectl exec -n builds \"\$p\" -c remplir -- sh -c \"sed -i 's/\$IMAGE_DIGEST_BOOT/\$IMAGE_DIGEST_FAUX/' /e/verrou-rpm.json")" 1
+verifie "J5 essai_refus : aucune lecture d'image.tar ni de digest (fin remplacée)" \
+  "$(sed -n '/^etape_essai_refus() {/,/^}/p' "$F" | grep -c 'tar -xf "$x/image.tar"\|DIGEST_ESSAI_M4C\|hermetique ')" 0
 verifie "resultats/ inchangé par le banc (git status)" "$(etat_resultats)" "$E0"
 echo "# fin $(date -u +%FT%TZ) : $OK OK, $KO KO"

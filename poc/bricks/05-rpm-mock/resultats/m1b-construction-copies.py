@@ -113,7 +113,20 @@ TRANSFORMEES = [('m4c.sh', 'entrees_hote', T_ENTREES), ('m4c.sh', 'etape_prealab
 
 def transformer(src, nom, T, compter=False):
     t = '\n'.join(bloc(lignes(src), nom))
-    for a, b, n in T:
+    for e in T:
+        if len(e) == 4:   # coupe : de la ligne exacte a à la ligne exacte f, comprises, remplacées par b ; n lignes retirées
+            a, f, b, n = e
+            L = t.split('\n')
+            assert L.count(a) == 1 and L.count(f) == 1, (nom, a[:50])
+            i, j = L.index(a), L.index(f)
+            if compter:
+                print(f'{src} {nom} : coupe de {j - i + 1} ligne(s), attendue(s) {n}')
+            else:
+                assert j - i + 1 == n, (nom, j - i + 1, n)
+                ok(f'{nom} : coupe comptée ({n} lignes) : {a[:60]}')
+            t = '\n'.join(L[:i] + b.split('\n') + L[j + 1:])
+            continue
+        a, b, n = e
         c = t.count(a)
         if compter:
             print(f'{src} {nom} : {c} occurrence(s) attendue(s) {n}')
@@ -193,8 +206,42 @@ T_CONSTRUCTION = [
      '  enveloppes_att après\n'
      '  attendu "tag m4c de la pipeline, inchangé après" "$(zot_lire "tag m4c" tekton/pipelines/sample-app-rpm:m4c)" "${PIPELINE_M4C##*@}"', 1),
 ]
+# Ajout du 20/11/2026 après construction : essai de refus, etape_essai_construire de m1b-bundles.sh, verrou livré au pod altéré sur
+# bootstrap.image_digest seul ; fin de l'essai remplacée par les assertions du refus (coupe comptée).
+T_REFUS = [
+    ('etape_essai_construire() {', 'etape_essai_refus() {', 1),
+    ('  local p=$N-bundles-construire x=$T/essai-construire rc=0 d s', '  local p=$N-construction-refus x=$T/essai-refus rc=0 d s j=$R/$N-construction-local.log', 1),
+    ('  attendu "entrees.tar de m4c prealables (taille, sha256)" "$(stat -c %s "$ENTREES") $(sha "$ENTREES")" "$ENTREES_TAILLE $ENTREES_SHA"',
+     '  [ -s "$j" ] && [ -s "$T/entrees.tar" ] || echec "lancer d\'abord local (journal resultats/${j##*/} et entrees.tar)"\n'
+     '  attendu "entrees.tar de local (taille, sha256), égal au journal de local" "$(stat -c %s "$T/entrees.tar") $(sha "$T/entrees.tar")" \\\n'
+     '    "$(sed -n \'s/^entrees.tar : \\([0-9]*\\) octets, sha256 \\([0-9a-f]\\{64\\}\\)$/\\1 \\2/p\' "$j")"\n'
+     '  attendu "image_digest altéré : même longueur, différent du verrou" "${#IMAGE_DIGEST_FAUX} $([ "$IMAGE_DIGEST_FAUX" != "$IMAGE_DIGEST_BOOT" ] && echo différent)" "64 différent"\n'
+     '  neuf "$R/$N-construction-refus-pod.log"', 1),
+    ('  rendre "$T" "$IMAGE_NEUVE"', '  rendre_taches', 1),
+    ('$IMAGE_NEUVE', '$IMAGE_OUTILLAGE', 2),
+    ('"$ENTREES"', '"$T/entrees.tar"', 1),
+    ('$N-bundles-construire-pod.log', '$N-construction-refus-pod.log', 3),
+    ('    || { pod_retirer "$p"; echo "KO   déballage des entrées" >&2; exit 1; }',
+     '    || { pod_retirer "$p"; echo "KO   déballage des entrées" >&2; exit 1; }\n'
+     '  # Seule altération de l\'essai : bootstrap.image_digest du verrou livré, réécrit par le conteneur remplir (UID 65532)\n'
+     '  kubectl exec -n builds "$p" -c remplir -- sh -c "sed -i \'s/$IMAGE_DIGEST_BOOT/$IMAGE_DIGEST_FAUX/\' /e/verrou-rpm.json && echo \\"verrou altéré : \\$(grep -c $IMAGE_DIGEST_FAUX /e/verrou-rpm.json) ligne(s) au faux image_digest, \\$(grep -c $IMAGE_DIGEST_BOOT /e/verrou-rpm.json) au vrai\\"" < /dev/null > "$x/alteration.txt" \\\n'
+     '    || { pod_retirer "$p"; echo "KO   altération du verrou dans le pod" >&2; exit 1; }\n'
+     '  attendu "verrou altéré dans le pod (image_digest seul)" "$(cat "$x/alteration.txt")" "verrou altéré : 1 ligne(s) au faux image_digest, 0 au vrai"', 1),
+    ('  [ $rc = 0 ] || { echo "KO   script de construire-rpm : code $rc" >&2; exit 1; }', '  [ "$ECARTS" = 0 ]',
+     '  attendu "script de construire-rpm refusé (code de l\'exec non nul)" "$([ "$rc" != 0 ] && echo refusé || echo "accepté, code $rc")" refusé\n'
+     '  attendu "dossier dir: et image_digest altéré, lus par le script" \\\n'
+     '    "$(grep -c -x -F "dossier dir: $BOOT_DOSSIER ; image_digest du verrou $IMAGE_DIGEST_FAUX" "$x/construire.log" || true)" 1\n'
+     '  attendu "mock --hermetic-build en échec (rc non nul)" "$(grep -c \'^mock --hermetic-build : rc [1-9][0-9]* en [0-9]* s$\' "$x/construire.log" || true)" 1\n'
+     '  attendu "lignes « Expected digest for image » dans la sortie de mock (au moins une)" \\\n'
+     '    "$(sed -n \'s/^lignes « Expected digest for image » : sortie \\([0-9]*\\) ; root.log [0-9]*$/\\1/p\' "$x/construire.log" | sed \'s/^[1-9][0-9]*$/au moins une/\')" "au moins une"\n'
+     '  attendu "fin du script : mock en échec, aucun rpm" "$(grep -c \'^mock en échec$\' "$x/construire.log" || true) $(grep -c \'^rpm : \' "$x/construire.log" || true)" "1 0"\n'
+     '  echo "relevé : $(grep \'^lignes « \\(Using\\|Checking\\|Expected\\|falling\\)\' "$x/construire.log" | paste -sd\' \' -)"\n'
+     '  echo "relevé : première ligne de mock « Expected digest for image » : $(grep -v \'^lignes « \' "$x/construire.log" | grep -m 1 -o \'Expected digest for image.*\' | cut -c1-300)"\n'
+     '  echo "écarts : $ECARTS"\n'
+     '  [ "$ECARTS" = 0 ]', 10),
+]
 TRANSFORMEES2 = [('m1b-fermeture.sh', 'lire_bundle', T_LIRE_BUNDLE), ('m1b-fermeture.sh', 'etape_pipeline', T_PIPELINE),
-                 ('m4c.sh', 'etape_pipeline', T_CONSTRUCTION)]
+                 ('m4c.sh', 'etape_pipeline', T_CONSTRUCTION), ('m1b-bundles.sh', 'etape_essai_construire', T_REFUS)]
 
 
 def zone():

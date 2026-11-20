@@ -2661,3 +2661,36 @@ Si PS1 et CO1 à CO3 tiennent, il restera la comparaison et la provenance, en le
 - l'essai de refus avec un `image_digest` altéré, car aucun refus de mock n'a encore été observé ;
 - la comparaison ;
 - la provenance, qui devra isoler les deux PipelineRuns refaits parmi les huit enveloppes.
+
+## Cascade avant M5b, M4c refait : essai_refus, prédictions écrites le 20/11/2026 à 2026-11-20T13:47:06Z UTC, avant tout lancement
+
+**Pourquoi** : jusqu'ici, « aucune ligne « Expected digest for image » et rc 0 » a été lu comme « mock a comparé `image_digest` et l'a trouvé égal ». Aucun journal archivé ne montre pourtant mock refuser un digest faux. Cet essai observe le refus.
+
+**Étape** : `essai_refus` de [`m1b-construction.sh`](../m1b-construction.sh) (sha256 `8445fc684cd04586…`). C'est `etape_essai_construire` de `m1b-bundles.sh`, transformée comme `essai`, avec une seule altération :
+- le conteneur `remplir` (UID 65532) réécrit `bootstrap.image_digest` dans le verrou livré au pod ;
+- `77cff176…89ca` devient `77cff176…89cb` (dernier caractère changé) ;
+- rien d'autre ne change : entrées de `local`, image `70f8c412…`, script de la tâche signée.
+
+La fin de l'essai est remplacée par les assertions du refus (coupe comptée de 10 lignes). Le pod s'appelle `m1b-construction-refus`, et son journal `m1b-construction-refus-pod.log`. Rien n'est écrit dans Zot. L'étape tourne sous l'accord permanent.
+
+**Banc** : [`m1b-construction-banc-7.log`](m1b-construction-banc-7.log), 140 OK, 0 KO (banc `be261d1690dd8436…`, copies à 113 contrôles). La section J couvre :
+- la valeur altérée : seul le 64e caractère diffère ;
+- l'arrêt sans `local` et l'arrêt si le journal de pod existe déjà ;
+- le chemin nominal jusqu'au premier appel à `kubectl` ;
+- la présence d'une seule commande d'altération ;
+- l'absence de toute lecture d'`image.tar` dans la fin remplacée.
+
+**Non couvert** : les assertions du refus elles-mêmes, et mock.
+
+- **RF1** (haute) : le pod Kata est prêt. `entrees.tar` est égal au journal de `local`, et le verrou du pod porte 1 ligne au faux `image_digest` et 0 au vrai. Le script lit « dossier dir: …6de899ac… ; image_digest du verrou 77cff176…89cb ».
+- **RF2** (moyenne) : mock refuse :
+  - « mock --hermetic-build : rc » non nul ;
+  - au moins une ligne « Expected digest for image » dans sa sortie ;
+  - « mock en échec », aucun rpm, code de l'exec non nul.
+
+  **Autre issue possible** : mock pourrait se replier sur une installation en chroot depuis le dépôt local de la fermeture (« falling back to chroot installation »), et construire quand même. L'étape s'arrêterait alors en KO sur « refusé ». Ce serait une découverte : le contrôle d'`image_digest` ne bloquerait pas la construction hermétique.
+- **Relevés, sans pari** :
+  - les compteurs « Using container image », « Checking image digest: …89cb » et « falling back » ;
+  - la première ligne « Expected digest for image » de mock, qui dira quel digest il a trouvé.
+
+**Portée** : si RF2 tient, la lecture de CO2 et d'ES2 est confirmée : rc 0 sans ligne « Expected digest for image » signifie que mock a trouvé `image_digest` égal au verrou.
