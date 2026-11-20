@@ -1061,3 +1061,8 @@ De 13:47:19Z à 13:49:36Z, sous l'accord permanent, RF1 et RF2 tiennent. Avec `b
 **Relevé** : il reste 2 842 Mo libres sous `/` de sc-stockage (5 551 Mo le 16/11).
 
 **Reste dans la cascade** : le rejeu de R1 à R8 sur le nouveau bundle. Il n'a jamais été décidé, et `m5.sh` ne peut pas le jouer tel quel (4 enveloppes attendues, 8 présentes).
+
+## Correction datée du 20/11/2026, écrite à 2026-11-20T14:09:05Z UTC : place libre non attribuée ; ConfigMap `porte` hors des préalables de R1 à R8
+
+- **Place libre** : la baisse de 5 551 à 2 842 Mo sous `/` de sc-stockage n'est pas attribuée. Le résultat de 14:05:53Z dans [`m1b-predictions.md`](m1b-predictions.md) l'attribuait à tort à autre chose que la brique ; la correction y est écrite.
+- **ConfigMap `porte`**, lecture du code et non mesure : `listee` (`commun.sh` de la 08) lit `politique/porte/taches.yml` du dépôt, et non la ConfigMap. Les TaskRuns et les pods de R1 à R8 ne passent pas par la porte. La mise à jour de la ConfigMap n'est donc pas un préalable de R1 à R8, contrairement à ce que disaient les notes de 11:16:43Z (M4b refait préparé à sec) et de 13:53:24Z, et mon message du 20/11 après la poussée de `694fab7c`. Elle reste une question à part.

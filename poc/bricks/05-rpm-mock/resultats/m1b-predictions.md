@@ -2828,3 +2828,9 @@ Elle le publie deux fois au même digest que M4c (`07b7bd6f…`), et sa provenan
   - **place libre sous `/` de sc-stockage : 2 842 Mo**, contre 5 551 Mo le 16/11 avec la même commande. La baisse continue sans écriture de la brique ; son attribution reste confiée au propriétaire (`sudo du`).
 
 **Ce que cela établit** : `s1.sh prealables` attend désormais la politique de sortie posée dans le cluster et dans le dépôt. Ce point de la cascade est fait. Il reste un point : le rejeu des refus de M5a (R1 à R8), qui n'a jamais été décidé.
+
+### Correction datée du 20/11/2026, écrite à 2026-11-20T14:09:05Z UTC : place libre non attribuée
+
+**Erreur** : le résultat de 14:05:53Z dit que la baisse de la place libre continue « sans écriture de la brique ». Rien ne le mesure. Depuis le relevé du 16/11 à 22:49:55Z, la brique a écrit dans Zot, entre autres, l'amorce, les images d'essai, les images de M1b et la fermeture `09838980…` (environ 462 Mo).
+
+**Ce qui est mesuré** : sous `/` de sc-stockage, la place libre passe de 5 551 Mo (16/11, 22:49:55Z) à 2 842 Mo (20/11, 14:05:09Z), avec la même commande. La baisse n'est pas attribuée. C'est un point à surveiller avant le rejeu du 28/11. QL1 à QL3 ne changent pas.
