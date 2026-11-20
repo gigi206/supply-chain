@@ -613,3 +613,22 @@ C'est l'état « avant » de référence pour la lecture après le n°9 : `AVANT
 À partir du n°5, il y a 12 tags : 11 `keep` et 1 retrait par balayage (N5 à N9).
 
 **Dépendance** : l'option (b) du point 4 (une tâche le 29/11 à 05:40 UTC) suppose que le rejeu de M5b n'a pas lieu avant. Si le rejeu passait le 28/11 après le n°8, il effacerait Loki, et il faudrait lire le n°8 avant de le lancer. **La date du rejeu se tranche donc en premier** ([dossiers de décision de la 05](../../05-rpm-mock/resultats/dossiers-decision.md), dossier 1 et ses corrections).
+
+## Note de 2026-11-20T20:17:04Z : v3 de `g7-balayage.sh` préparée, prédictions V1 à V3 de son essai (rien n'est réécrit au-dessus ; NON APPLIQUÉE)
+
+**v3**, préparée hors du dépôt (copie sha256 `b13a1375ca6f4ed4…`, à partir de la v2 `d68c726a4991e68c…`) :
+- `JOUR_A=AAAA-MM-JJ` donne le jour de fin de la fenêtre (`JOUR` par défaut), pour un balayage qui passe minuit ;
+- une fenêtre vide ou inversée est refusée avec le code 2, avant toute lecture et sans journal ;
+- le résumé compte les passages par dépôt suivi : plus de 1 signale plusieurs balayages mêlés.
+
+`bash -n` passe, et shellcheck ne relève aucun avertissement. Elle sera appliquée **après la lecture de N1**, faite en v2 comme prédit, puis essayée.
+
+**Essai, prédictions** (Loki seul, sur des fenêtres déjà lues ; journaux neufs) :
+
+| # | Commande | Prédit | Confiance |
+|---|---|---|---|
+| V1 | `JOUR=2026-11-19 DE=12:00 JOUR_A=2026-11-20 A=12:00 SUFFIXE=-v3-essai SANS_JOURNAL=1` (première requête de 24 h) | Somme des deux lectures du 19/11 : statut 200, **331 lignes** (159 + 172), sous le plafond ; 8 masquées ; 309 « executing gc » ; premier 2026-11-19T15:48:21.396899617Z, dernier 2026-11-19T21:03:47.081968486Z ; 14 `keep` dans `vulndb/grype` ; **2 passages** pour chaque dépôt suivi (balayage de 15:48 et balayage complet après le redémarrage ; le balayage interrompu de 20:24:14 n'a pas atteint les dépôts de scan, qui passent environ 1000 s après le début) | haute pour les comptes ; moyenne pour les 2 passages |
+| V2 | `JOUR=2026-11-20 DE=12:00 JOUR_A=2026-11-19 A=12:00 SUFFIXE=-v3-inverse` | Code 2, message « fenêtre vide ou inversée », aucun journal écrit | haute |
+| V3 | `JOUR=2026-11-19 DE=20:00 A=23:59 SUFFIXE=-v3-jour SANS_JOURNAL=1`, sans `JOUR_A` | Mêmes comptes que `g7-balayage-19-11.log` (172 lignes, 4 masquées, 161 gc, 7 `keep`), et 1 passage par dépôt suivi | haute |
+
+Les fenêtres de V1 et V3 ne contiennent pas le balayage n°1 de ce soir.
