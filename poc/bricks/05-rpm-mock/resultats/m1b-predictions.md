@@ -2223,3 +2223,17 @@ Les deux étapes ont tourné le 20/11/2026 à 10:06:41Z, avec code 0 : 12 OK et 
 **Correction du relevé de place libre, écrite le 20/11/2026 à 2026-11-20T10:10:33Z UTC** : le résultat ci-dessus dit « sans écriture de la brique dans Zot entre les deux » et « cela s'accorde avec la dérive déjà notée ».
 - La première phrase vaut pour les scripts de la brique seulement : le verrou et la provenance n'ont fait que lire. Je n'ai pas vérifié si Tekton Chains a écrit dans Zot après 09:11:45Z.
 - La seconde est retirée. 21 692 416 octets en 55 minutes font environ 0,57 Go par jour, soit la moitié des 1,19 Go par jour notés le 18/11. Je donne le chiffre sans conclure.
+
+### Artefact de la cascade : résultat de `publier`, écrit le 20/11/2026 à 2026-11-20T10:12:24Z UTC
+
+Tu as donné l'accord nommé : « Oui, publie en m1b ». `publier` a tourné de 2026-11-20T10:11:50Z à 10:11:53Z, avec code 0, 10 OK et 0 KO ([journal](m1b-artefact-publier.log)). Le dossier d'authentification a été retiré à la sortie.
+
+| Prédiction | Tenue | Mesure |
+|---|---|---|
+| AP1 | oui | gardes G1 à G3 repassées (`m1b` absent, `m4a` sur `41c639b7…`, 3 011 768 320 octets libres) ; deux poussées : `333b7322…`, égal au digest local |
+| AP2 | oui | artefact tiré par digest dans un dossier neuf, deux fichiers égaux à la zone de préparation |
+| AP3 | oui | après : `m1b` sur `333b7322…`, `m4a` toujours sur `41c639b7…` |
+
+**Relevé, sans pari** : la place libre sur / de sc-stockage passe de 3 011 768 320 à 3 011 391 488 octets, soit 376 832 octets de moins. Le relevé « après » ne dit pas comment Zot range les blobs ; je n'attribue pas l'écart.
+
+**Référence à citer dans la suite de la cascade** : `PACKAGING_RPM=sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48`.

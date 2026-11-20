@@ -1,0 +1,13 @@
+# m1b-artefact.sh publier, 2026-11-20T10:11:50Z
+OK   P0 sources inchangées depuis l'étape local : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6 c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   P0 zone de préparation inchangée : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6 c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   G1 entrees/sample-app/packaging-rpm:m1b, lecture anonyme (avant) : absent
+OK   G2 entrees/sample-app/packaging-rpm:m4a, lecture anonyme (avant) : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+OK   G3 octets libres sur / de sc-stockage (porte /var/lib/zot), avant : 3011768320 (seuil 1073741824)
+OK   P1 deux poussées dans Zot, même digest : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   P1 digest Zot égal au digest local : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   P2 fichiers tirés par digest égaux à la zone de préparation : de37a2889bceb32428a62efceddf824369bef139223a5eca8679fc4aeedd6ac3
+OK   P3 entrees/sample-app/packaging-rpm:m1b, lecture anonyme après : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   P3 entrees/sample-app/packaging-rpm:m4a, lecture anonyme après : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+octets libres sur / de sc-stockage après : 3011391488
+PACKAGING_RPM=sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm@sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48

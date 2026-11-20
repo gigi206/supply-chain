@@ -944,3 +944,12 @@ Le banc donne 46 OK, et les prédictions AR1 à AR6 et AP1 à AP3 sont écrites 
 - Le digest neuf est `sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48`, sous le tag `m1b`, à pousser dans `entrees/sample-app/packaging-rpm`.
 - Zot n'a reçu aucune écriture.
 - `publier` attend ton accord nommé.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T10:12:24Z UTC : artefact de la cascade publié
+
+`publier` a tourné à 10:11:50Z, sur ton accord nommé (« Oui, publie en m1b »), et AP1 à AP3 tiennent. L'artefact est dans Zot :
+- dépôt `entrees/sample-app/packaging-rpm`, tag `m1b` ;
+- digest `sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48` ;
+- `m4a` reste sur `41c639b7`.
+
+**Suite de la cascade** : les bundles neufs de `prefetch-rpm` et `construire-rpm`, qui citent l'outillage `70f8c412`. Signature et revue de `taches.yml` à demander. Viennent ensuite M4b et M4c refaits, sous un préfixe, avec cet artefact.

@@ -204,3 +204,11 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
   Seule la référence du bootstrap change dans le verrou : image, digest du manifeste, configuration et `image_digest`.
 - **Conséquence pour la règle générique** : remplacer l'image de builder par celle de la plateforme ne change pas les entrées résolues de la construction. Elle change la référence du bootstrap, que le verrou porte et que la construction hermétique contrôle.
 - **Non mesuré** : la construction hermétique avec ce verrou (M4b et M4c refaits) et le jugement par la porte.
+
+**Additif du 20/11/2026, écrit à 10:12 UTC : artefact de packaging republié** ([résultat](../../poc/bricks/05-rpm-mock/resultats/m1b-predictions.md)). L'artefact qui porte la spec et le verrou a été republié avec le verrou neuf, sous un tag neuf du même dépôt (`m1b-artefact.sh`, le 20/11/2026 à 10:11:50 UTC).
+- **Mesuré** :
+  - le manifeste ne diffère de l'ancien que par le digest et la taille de la couche du verrou ;
+  - le digest est calculé hors ligne puis retrouvé dans Zot (`333b7322…`) ;
+  - le tag de M4a reste en place.
+- **Conséquence pour la règle générique** : changer d'image de builder change un artefact d'entrée versionné (le verrou), jamais la recette. Les consommateurs le citent par digest. L'ancien et le nouveau coexistent dans le registre.
+- **Non mesuré** : les bundles de tâches qui citent l'outillage neuf, et la construction hermétique avec cet artefact (M4b et M4c refaits).
