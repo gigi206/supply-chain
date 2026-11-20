@@ -2017,3 +2017,48 @@ Le masquage de `m1b.sh` et de `m1b-builders.sh` est inopérant cette nuit (FL3).
 **Règle d'arrêt, fixée avant la mesure** : si un fichier compte une ligne ou plus, je ne lis pas ce fichier, je ne montre pas la sortie de `jk-verif.py`, je ne commite rien et je ne lance pas `m1b_sortie`. Je rapporte les seuls comptes et j'attends ta décision.
 
 **NU2, portée du contrôle des secrets** : `tools/secrets-depot.sh` cherche les valeurs littérales des secrets des briques 08 et 10 dans les fichiers modifiés ou nouveaux. Il ne trouve pas un jeton qu'il ne connaît pas (par exemple un jeton de compte de service du cluster), ni les secrets de la brique 09. Pour un jeton inconnu, le comptage est le seul garde-fou de cette nuit.
+
+## Provenance des deux images : prédictions écrites le 20/11/2026 à 2026-11-20T09:20:30Z UTC, avant tout lancement de l'étape
+
+**Script** : [`m1b-provenance.sh`](../m1b-provenance.sh) (sha256 `dec9d7140fadad51…`), étape `provenance`, journal à venir `m1b-provenance-provenance.log`. C'est un script neuf, sur le modèle de l'étape `provenance` de `m4c.sh`. `m1b-pipeline.sh`, `m1b-signature.sh` et `m1b-builders.sh` ne sont pas touchés. L'étape est en **lecture seule** : elle lit le cluster et lit Zot anonymement, sans rien créer ni supprimer. Elle tourne donc sous l'accord permanent du 18/11.
+- **Gardes** :
+  - la clé publique de Chains (`1e7b2a03…`) ;
+  - les deux pipelines signées de `m1b-signature.sh`, par sha256 épinglé (`d31c8718…`, `15123e7f…`) et par leur référence au tag `m1b` ;
+  - le résultat `IMAGE_DIGEST` des quatre PipelineRuns, relu dans le cluster.
+- **Pour chaque image** :
+  - `cosign verify-attestation` avec la clé de Chains, sans journal de transparence ;
+  - aucune enveloppe d'un objet étranger aux deux PipelineRuns de l'image ;
+  - par PipelineRun : une enveloppe, le sujet, le `buildType` et aucune dépendance `git+` (les builders n'ont pas de dépôt) ;
+  - les `resolvedDependencies` égales à l'attendu tiré des références épinglées : la pipeline, les trois tâches et les images des pas (amorce `ed654c69…`, `outils-horodatage` `c7bebae2…`) ; pour le bootstrap seul, la base `ee90dc0e…` en entrée ;
+  - les paramètres des trois tâches égaux à ceux de la pipeline signée, où le digest donné à `publier` est remplacé par celui de l'image ;
+  - Kata pour `construire` seule dans la spec signée ;
+  - la signature simplesigning relevée (non exigée), et un refus avec une autre clé.
+
+**Banc** : [`m1b-provenance-banc.log`](m1b-provenance-banc.log), 96 OK, 0 KO, fini à 2026-11-20T09:19:36Z sur ce même sha256 (banc [`m1b-provenance-banc.sh`](m1b-provenance-banc.sh), sha256 `4650b6825e88d8a3…`). Rien n'y est écrit dans Zot ni dans le cluster.
+- **A** : les constantes du script sont comparées à des sources indépendantes : références écrites par la signature, journal SG4, journal des PipelineRuns, images des pas des tâches signées, base de `m1b-pipeline.sh`, liste revue et seule valeur substituée des pipelines.
+- **B** : les vraies fonctions sont jouées sur les **vraies attestations** des deux images, vérifiées par cosign : quatre enveloppes par image, et les quatre PipelineRuns passent avec 7 OK chacun.
+- **C** : l'attendu est recoupé par une seconde dérivation, tirée des objets Tekton (`refSource`, images des pas, `*_ARTIFACT_INPUTS`, paramètres et `runtimeClassName` des specs des TaskRuns). Les deux dérivations sont égales aux quatre exécutions.
+- **D** : dix-huit écarts, chacun sur une copie altérée d'une vraie enveloppe. Tous donnent code 1 avec le libellé attendu, les écarts étant imprimés avant le KO :
+  - enveloppe absente, ou en double ;
+  - sujet faux, ou d'une autre image ;
+  - `buildType` changé, ou une source git ajoutée ;
+  - digest de l'amorce ou d'une tâche changé ;
+  - dépendance en trop, base retirée, ou base en trop ;
+  - `racine` changée, ligne ajoutée à `liste`, digest de `publier` changé, ou paramètre retiré ;
+  - Kata retiré, ou Kata ailleurs ;
+  - attendu tiré d'un faux digest.
+- **Non couvert** :
+  - l'enchaînement de l'étape elle-même : gardes, boucle, relevé simplesigning et refus ;
+  - ce que la provenance ne dit pas : elle décrit ce que Tekton a exécuté, pas le contenu des entrées téléchargées, que les gardes du prefetch contrôlent.
+
+**Lecture préalable** : B fait déjà tourner les fonctions de contrôle sur les vraies attestations. PV3 à PV5 sont donc presque acquises ; le lancement ajoute l'enchaînement, le relevé et le refus.
+
+- **PV1** (haute) : l'étape finit en code 0, et toutes les gardes passent.
+- **PV2** (haute) : pour chaque image, cosign vérifie quatre enveloppes : les deux PipelineRuns et les deux TaskRuns `publier`, comme en M4c. Aucune ne vient d'un objet étranger.
+- **PV3** (haute) : pour chacun des quatre PipelineRuns, il y a une enveloppe. Son sujet est l'image à son digest (`mock-rocky9@70f8c412…`, `rocky9-bootstrap@6de899ac…`), son `buildType` est `https://tekton.dev/chains/v2/slsa-tekton`, et elle n'a aucune dépendance git.
+- **PV4** (haute) : les `resolvedDependencies` égalent l'attendu : six pour l'outillage, sept pour le bootstrap (la base `ee90dc0e…` en `inputs/result`).
+- **PV5** (haute) : les vingt paramètres des trois tâches égalent ceux de la pipeline signée. La spec signée porte Kata pour `construire-racine-rpm` seule.
+- **PV6** (moyenne) : la signature simplesigning de chaque image se vérifie par la clé de Chains, sur son digest. C'est un relevé, non exigé. En M4c, une signature était valide.
+- **PV7** (haute) : la provenance est refusée avec une autre clé (`no matching attestations`), pour les deux images.
+
+**Portée prévue** : si PV1 à PV7 tiennent, chaque image d'outillage rpm a une provenance signée par Chains, cohérente avec la pipeline signée et la liste revue. La porte ne juge pas encore ces images : elle ne connaît pas `construire-racine-rpm`, et sa ConfigMap est en retard. M1b serait alors mesuré de bout en bout, avec ses réserves (amorce figée, un nœud et un hôte, prefetch ouvert en 443).

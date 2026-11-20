@@ -828,3 +828,15 @@ Accord du propriétaire : « Oui, lance-les ». `m1b-pipeline.sh pipeline` (sha2
 **Portée** : les deux images d'outillage rpm sont construites par la plateforme, sans réseau à la construction, et reproduites deux fois chacune dans Kata, sur un nœud et un hôte. L'amorce reste figée (réserve « (a) Figée »). Le prefetch joint toute adresse publique en 443 (NT2). La porte ne connaît pas encore `construire-racine-rpm`, et sa ConfigMap reste en retard sur `taches.yml`.
 
 **Suite** : préparer l'étape de provenance de M1b (attestations des deux images, sur le modèle de M4b et M4c), puis adapter `s1.sh prealables` aux quatre labels avant le rejeu M5b.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T09:20:30Z UTC : provenance préparée à sec
+
+Décision du propriétaire : « Oui, prépare-la ». Le script est neuf : [`m1b-provenance.sh`](../m1b-provenance.sh), en lecture seule. Banc : 96 OK, 0 KO ([`m1b-provenance-banc.log`](m1b-provenance-banc.log)). Prédictions PV1 à PV7 dans [`m1b-predictions.md`](m1b-predictions.md), commitées avant le lancement.
+- **Relevé fait pour écrire le script** : les attestations des deux images se vérifient déjà par cosign avec la clé de Chains (quatre enveloppes chacune). Leur forme a été lue (dépendances et noms de paramètres, valeurs à saut de ligne réduites à leur nombre de lignes) avant d'écrire l'attendu.
+- **L'attendu** se tire de deux sources :
+  - les références épinglées, pour les dépendances ;
+  - les pipelines signées, pour les paramètres.
+
+  Le banc le recoupe par les objets Tekton.
+
+**Suite** : le lancement de `m1b-provenance.sh provenance`, en lecture seule, puis l'adaptation de `s1.sh prealables` aux quatre labels avant le rejeu M5b.
