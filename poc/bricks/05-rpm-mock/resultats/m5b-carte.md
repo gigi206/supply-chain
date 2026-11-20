@@ -534,3 +534,64 @@ Les deux notes restent écrites telles quelles.
 - le `df` de `/` sur sc-stockage vers 16:00Z le 21/11 ;
 - le rejeu lui-même, pas avant le 28/11, sur ton accord ;
 - tes décisions ouvertes (taille du disque dans `vm.sh`, rétention grype, seconde barrière réseau, `TZ` dans `bundle`).
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T17:58:49Z UTC : corrections des notes de 16:18:58Z, 17:47:22Z et 17:52:19Z ; prédictions du quatrième passage
+
+Les trois notes restent écrites telles quelles. Les trois défauts ont été relevés par le conseiller, à la relecture d'avant poussée.
+
+**1. `$W` ne survit pas au rejeu** (note de 16:18:58Z, « entrées lues hors du dépôt […] qui survivent à la recréation des VM ») : c'est faux.
+- `vm.sh detruire`, première étape du rejeu, efface `$W` (`rm -rf -- "$W"`, l. 152). C'est déjà écrit dans le README de la 08, à l'additif du 13/11 sur S5b, qui y a perdu les entrées du bloc 06.
+- Trois étapes auraient échoué des heures après une `entree` passée :
+  - `signature`, qui lit `RENDU`, soit `$W/m1bt-20-05` ;
+  - `images`, qui lit `MESURE` (même dossier) ;
+  - `artefact`, qui lit `M4A_LAYOUT`, soit `$W/m4a-05/layout-1`.
+- **Remède** (`m5b-rejeu.sh`, sha256 `a01f8dd11901a871…`) : `entree` copie ces entrées hors de `$W`, sous `~/.cache/supply-chain-poc/05/rejeu-entrees`.
+  - La copie comprend les quatre rendus, `banc-digest-o` et `-b`, et le layout de M4a.
+  - Elle n'est faite que si elle est absente, et jamais réécrite.
+  - Elle est contrôlée : `RENDUS_SHA`, `gardes_mesure` et sha256 du manifeste `41c639b7…`.
+  - Les étapes la lisent par les variables des scripts de mesure : `RENDU`, `MESURE` et `M4A_LAYOUT`. Aucun script de mesure n'est modifié.
+  - Sans copie et sans entrées dans `$W`, `entree` s'arrête en KO.
+- **Autres lectures vérifiées** :
+  - `fermeture` et `construction_rpm` ne lisent rien dans `$W` d'avant le démontage. `TIREE`, `RPM_M3` et `S4B` de `m1b-construction.sh` ne servent pas à `rejeu_construction`.
+  - La clé des tâches, sous `$S`, survit : `vm.sh` n'efface que `$W`, et `politique.sh` garde une clé existante (l. 370).
+
+**2. « Aucun bloc n'est recopié »** (note de 17:47:22Z) est inexact.
+- Le relevé des TaskRuns de `fermeture` et de `construction_rpm` est une copie transformée de celui de `etape_rpm` et de `etape_construction`.
+- La publication de `artefact` est une copie transformée de `etape_publier`.
+- **Retiré pour `fermeture`** :
+  - les gardes de M4b et le second PipelineRun ;
+  - les contrôles du journal de prefetch (`rpm -K`, `repomd.xml`, `BOOTSTRAP_ARTIFACT_INPUTS`) et la ligne du journal de publier.
+
+  La fermeture exigée à `09838980…` couvre son contenu.
+- **Retiré pour `construction_rpm`** :
+  - les gardes de M4c, `pipeline.ref` et le second PipelineRun ;
+  - les labels, Kata et le nœud de chaque pod ;
+  - les résultats de preparer (`CHAINS-GIT_*`, `*_ARTIFACT_INPUTS`) ;
+  - les lignes « écriture refusée », « confrontée au verrou », « aucun repli » et « dernière ligne » ;
+  - le relevé hermétique, les comparaisons à M3 et les enveloppes d'attestation.
+- **Remis** : trois gardes de sûreté du journal de `construire`.
+  - témoins réseau en échec : 4 ;
+  - `mock --hermetic-build` rc 0 ;
+  - aucune ligne http ou https dans `mock.out`, `root.log` et `build.log`.
+
+  Sans elles, un digest différent de `07b7bd6f…` passait au vert sans preuve que la construction était coupée du réseau.
+
+**3. La reprise** (note de 17:52:19Z, et additifs de `rejeu.sh` et du README de la 08) : « un `TAG_05` neuf par tentative, reprise par `DEPUIS=` comprise » est faux pour `05 (images)`.
+- Les sorties de `signature` sont sous le `TAG` (`$TS`). Sous un `TAG_05` neuf, `images` ne les trouverait pas.
+- Une reprise à `images` repart donc de `05 (signature)`, qui republie les tâches au même digest et signe à nouveau les deux pipelines des builders.
+- L'en-tête de `rejeu.sh` et le README de la 08 reçoivent une correction datée.
+
+**Banc** ([`m5b-rejeu-banc.sh`](m5b-rejeu-banc.sh), sha256 `3c2ba53a420edf49…`) :
+- B1 contrôle la copie : 6 fichiers, et le layout égal à l'original.
+- Cas ajoutés :
+  - B9 : copie relue, avec un travail sans entrées, comme après le démontage ;
+  - B10 : copie altérée ;
+  - B11 : entrées absentes partout, sans copie créée ;
+  - F7 : journal de construire sans les lignes de témoins.
+- C1, C3 et C4 contrôlent `RENDU`, `MESURE` et `M4A_LAYOUT`. D tourne avec un travail sans `m4a-05` : `etape_local` lit donc le layout de M4a dans la copie.
+
+**Prédictions du quatrième passage, écrites avant le lancement** : dossier `banc-m5b-rejeu-4`, journal `m5b-rejeu-banc-4.log`. Bilan à 0 KO, avec RV1 à RV6 tenues comme au troisième passage, et :
+- **RV7** (haute) : B1 fait la copie (6 fichiers, layout égal), B9 rend 0 en la relisant, B10 et B11 s'arrêtent sur la garde visée, et B11 ne crée rien ;
+- **RV8** (haute) : C1, C3 et C4 transmettent `RENDU`, `MESURE` et `M4A_LAYOUT` vers la copie ;
+- **RV9** (haute) : D1 redonne 8 OK et `333b7322…` avec le layout de M4a lu dans la copie ;
+- **RV10** (haute) : F1 tient les trois gardes remises sur le journal réel de la cascade, et F7 s'arrête sur les témoins après une création.

@@ -55,6 +55,9 @@
 # republication sans signature des tâches rpm, artefact de packaging, pipeline de fermeture, fermeture, pipeline de construction,
 # construction rpm. Les gardes de M4a, M4b et M4c ne sont pas rejouées (m5b-rejeu.sh). Un journal n'est jamais réécrit : un
 # TAG_05 neuf par tentative, reprise par DEPUIS= comprise (entree le refuse sinon). Sans TAG_05, le bloc est sauté.
+# Correction du 20/11/2026 (carte de M5b, note de 2026-11-20T17:58:49Z) : les sorties de signature sont sous le TAG, donc une reprise
+# à « 05 (images) » sous un TAG_05 neuf repart de « 05 (signature) » ; vm.sh detruire efface $W (l. 152) : entree copie avant
+# le démontage les entrées de l'hôte que lisent signature, images et artefact (m5b-rejeu.sh, E05).
 #
 # Usage (racine du dépôt) : [POUSSER_VSA=1] [TAG_05=<tag>] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail

@@ -7,19 +7,21 @@
 # oras, sur, auth_zot ; les objets des PipelineRuns sont ceux, réels, de la cascade (gardés sous $W/m1b-fermeture-05 et
 # $W/m1b-construction-05, lus seulement), renommés au préfixe du banc.
 #   A  lanceur : bash -n, shellcheck, TAG refusés (code 2), étape inconnue ; scripts de mesure inchangés ; rien n'est signé ici
-#   B  entree, la vraie fonction sur les vraies entrées de l'hôte : nominal ; fuseau, SOURCE_DATE_EPOCH, journal et dossier du
-#      TAG présents, clé absente, arbre altéré refusés ; journal de l'étape elle-même ignoré
+#   B  entree, la vraie fonction sur les vraies entrées de l'hôte : nominal (copie hors de $W faite) ; fuseau,
+#      SOURCE_DATE_EPOCH, journal et dossier du TAG présents, clé absente, arbre altéré refusés ; journal de l'étape elle-même
+#      ignoré ; (ajouté le 20/11 après la note de 17:52:19Z) copie relue sans $W, copie altérée, entrées absentes partout
 #   C  chargements, sur une copie avec des scripts de mesure factices : signature (sorties sous $TS, SIGNER retirée, dossiers
 #      auth retirés, refus d'un $TS présent), images (PREFIXE et SIG), artefact, fermeture, construction_rpm (PREFIXE, TAG) ;
 #      journal présent refusé par le lanceur
-#   D  artefact : etape_local réelle, publication dans un layout OCI local ; reprise, digest local différent, tag occupé, place
+#   D  artefact : etape_local réelle, layout de M4a lu dans la copie (travail sans m4a-05), publication dans un layout OCI
+#      local ; reprise, digest local différent, tag occupé, place
 #   E  fermeture : nominal, reprise, pipeline absente, PipelineRun présent, place, digest différent, arbre altéré, tâche hors
 #      liste, admission refusée
 #   F  construction_rpm : nominal, digest différent (relevé), politique absente, entrée absente, PipelineRun présent, pipeline
-#      absente
+#      absente ; témoins réseau absents du journal de construire
 # Ne couvre pas : Zot (TLS, comptes), Tekton, l'admission réelle, Kyverno, Kata, Chains, tkn, s1.sh, m5b-republier.sh, rejeu.sh.
 # Usage (racine du dépôt) : mise exec -- bash poc/bricks/05-rpm-mock/resultats/m5b-rejeu-banc.sh <dossier-neuf>
-# shellcheck disable=SC1090,SC2012,SC2016,SC2034,SC2154,SC2329  # code des cas évalué dans le script sourcé ; variables de ce script
+# shellcheck disable=SC1090,SC2012,SC2016,SC2030,SC2031,SC2034,SC2154,SC2329  # code des cas évalué dans le script sourcé ; variables de ce script
 set -uo pipefail
 export LC_ALL=C
 cd "$(dirname "$0")/../../../.." || exit 2
@@ -38,14 +40,18 @@ ln -s "$W0/m4a-05" "$B/O/travail/m4a-05"
 cp "$(dirname "$W0")/pki/ca-poc.crt" "$B/O/pki/ca-poc.crt"
 printf 'clé factice du banc\n' > "$B/O/secrets/taches.key"
 export CONFIANCE_DIR=$B/O
+export E05=$B/entrees   # copie des entrées de l'hôte, faite par B1
 W=$B/O/travail
+mkdir -p "$B/O2/travail" "$B/O2/pki" "$B/O2/secrets"; chmod 700 "$B/O2/secrets"   # travail après démontage : ni m1bt-20-05 ni m4a-05
+cp "$B/O/pki/ca-poc.crt" "$B/O2/pki/ca-poc.crt"; cp "$B/O/secrets/taches.key" "$B/O2/secrets/taches.key"
 REG=sc-stockage.poc.test:5000
 echo "# m5b-rejeu-banc.sh, $(date -u +%FT%TZ), dépôt $(git rev-parse --short=8 HEAD), script $(sha256sum < "$F" | cut -c1-16)"
 echo "dossier du banc : ${B/#$HOME/\~} ; travail réel lu : ${W0/#$HOME/\~} (m1bt-20-05, m4a-05, m1b-fermeture-05, m1b-construction-05)"
 
 cas() { # nom tag code [script] : sous-shell, script sourcé sous TAG=tag, R du banc ; sortie et code dans $B/cas-<nom>.*
   local r
-  ( export TAG=$2; . "${4:-$F}"; R=$B/resultats; eval "$3" ) > "$B/cas-$1.out" 2>&1; r=$?   # hors d'un || : set -e actif
+  ( export TAG=$2; [ -z "${CAS_O:-}" ] || export CONFIANCE_DIR=$CAS_O; [ -z "${CAS_E05:-}" ] || export E05=$CAS_E05
+    . "${4:-$F}"; R=$B/resultats; eval "$3" ) > "$B/cas-$1.out" 2>&1; r=$?   # hors d'un || : set -e actif
   echo "$r" > "$B/cas-$1.code"
 }
 code() { cat "$B/cas-$1.code"; }
@@ -79,7 +85,8 @@ montre B1
 verifie "B1 nominal : code" "$(code B1)" 0
 verifie "B1 nominal : KO" "$(grep -c '^KO' "$B/cas-B1.out")" 0
 for m in "OK   journaux de ce TAG présents (un journal n'est jamais réécrit) : 0" "OK   dossiers de ce TAG présents sous \$W : 0" \
-         "OK   rendus contrôlés : 4" "OK   fichiers signés contrôlés : 5" "OK   layout de M4a (étape local de m1b-artefact.sh) : présent" \
+         "OK   rendus contrôlés : 4" "OK   fichiers signés contrôlés : 5" \
+         "OK   copie : layout de M4a, manifeste sha256:41c639b7f0f2… (sha256 du blob) : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8" \
          "OK   clé des tâches présente (test -s, jamais lue ici) : présente" "OK   tkn (client) : 0.46.2" \
          "OK   arbre de l'essai de la cascade : fichiers : 230" "entrée : rien n'a été écrit dans Zot ni dans le cluster"; do
   verifie "B1 ligne « ${m:0:70}… »" "$(lignes B1 "$m")" 1
@@ -87,6 +94,11 @@ done
 verifie "B1 mesure d'un autre jour (gardes_mesure de m1b-pipeline.sh) : deux images" "$(grep -c '^OK   [ob] : digest du banc de m1bt-20 égal à celui de m1bt3' "$B/cas-B1.out")" 2
 verifie "B1 dossiers laissés sous le travail du banc (chargements)" "$(cd "$W" && ls -d banc-b1-pipeline-05 m5b-republier-banc-b1-05 2> /dev/null | paste -sd' ')" "banc-b1-pipeline-05 m5b-republier-banc-b1-05"
 verifie "B1 aucun dossier auth laissé" "$(find "$W" -name auth | wc -l)" 0
+verifie "B1 copie faite hors du travail : fichiers (4 rendus, 2 banc-digest, layout de M4a)" \
+  "$(lignes B1 'copie faite : ') $(find "$E05/m1bt-20-05" -type f | wc -l) $(cd "$E05/m4a-05/layout-1" && find . -type f | sort | xargs sha256sum | sha256sum | cut -c1-16)" \
+  "1 6 $(cd "$W0/m4a-05/layout-1" && find . -type f | sort | xargs sha256sum | sha256sum | cut -c1-16)"
+verifie "B1 copie : rendus et banc-digest égaux aux originaux" \
+  "$(cd "$E05/m1bt-20-05" && for f in *; do cmp -s "$f" "$W0/m1bt-20-05/$f" || echo "$f"; done | wc -l)" 0
 cas B2 banc-b2 'export TZ=UTC; rejeu_entree'; refus B2 "fuseau : décalage de l'époque 0"
 cas B3 banc-b3 'export SOURCE_DATE_EPOCH=0; rejeu_entree'; refus B3 "SOURCE_DATE_EPOCH"
 : > "$B/resultats/m5b-republier-banc-b4-taches.log"
@@ -99,6 +111,13 @@ cas B7 banc-b7 'ARBRE_CASCADE=$B/arbre-altere.txt; rejeu_entree'; refus B7 "arbr
 cas B8 banc-b8 'rejeu_entree'
 verifie "B8 journal de l'étape entree elle-même ignoré : code" "$(code B8)" 0
 for c in B2 B3 B4 B6; do verifie "$c : arrêt avant tout chargement (aucun dossier du TAG)" "$(find "$W" -maxdepth 1 -name "*banc-${c,,}*" | wc -l)" 0; done
+CAS_O=$B/O2 cas B9 banc-b9 'rejeu_entree'
+verifie "B9 copie relue, travail sans entrées (après démontage) : code, message" "$(code B9) $(lignes B9 'copie présente, relue : ')" "0 1"
+mkdir -p "$B/entrees-alt"; cp -r "$E05/m1bt-20-05" "$E05/m4a-05" "$B/entrees-alt/"
+sed -i '1s/^/# altéré par le banc\n/' "$B/entrees-alt/m1bt-20-05/pipeline-o.yaml"
+CAS_O=$B/O2 CAS_E05=$B/entrees-alt cas B10 banc-b10 'rejeu_entree'; refus B10 "copie : rendu de prealables pipeline-o.yaml"
+CAS_O=$B/O2 CAS_E05=$B/entrees-absente cas B11 banc-b11 'rejeu_entree'; refus B11 "entrées de l'hôte absentes de \$W"
+verifie "B11 : aucune copie créée" "$([ -e "$B/entrees-absente" ] && echo créée || echo absente)" absente
 
 echo "## C chargements, copie du script et scripts de mesure factices"
 C=$B/c
@@ -111,12 +130,12 @@ $entete
 T=\$W/m1b-signature-05
 (umask 077 && mkdir -p "\$T/auth")
 trap 'find "\$T/auth" -depth -delete 2> /dev/null || true' EXIT
-etape_taches() { echo "signature : T=\${T#"\$W"/} SIGNER=\${SIGNER-absente} T0/auth=\$([ -d "\$T0/auth" ] && echo présent || echo absent) T/auth=\$([ -d "\$T/auth" ] && echo présent || echo absent)"; mkdir -p "\$T/auth/docker"; echo '{}' > "\$T/auth/docker/config.json"; }
+etape_taches() { echo "signature : T=\${T#"\$W"/} SIGNER=\${SIGNER-absente} RENDU=\${RENDU#"\$E05"/} T0/auth=\$([ -d "\$T0/auth" ] && echo présent || echo absent) T/auth=\$([ -d "\$T/auth" ] && echo présent || echo absent)"; mkdir -p "\$T/auth/docker"; echo '{}' > "\$T/auth/docker/config.json"; }
 EOF
 cat > "$C/05-rpm-mock/m1b-pipeline.sh" <<EOF
 $entete
-N=\${PREFIXE:-m1b}; SIG=\${SIG:-\$W/m1b-signature-05}; T=\$W/\$N-pipeline-05
-etape_pipeline() { echo "images : N=\$N SIG=\${SIG#"\$W"/}"; }
+N=\${PREFIXE:-m1b}; SIG=\${SIG:-\$W/m1b-signature-05}; MESURE=\${MESURE:-\$W/m1bt-20-05}; T=\$W/\$N-pipeline-05
+etape_pipeline() { echo "images : N=\$N SIG=\${SIG#"\$W"/} MESURE=\${MESURE#"\$E05"/}"; }
 EOF
 for s in artefact fermeture construction; do
   printf '%s\nN=${PREFIXE:-m1b}; TAG=${TAG:-$N}; T=$W/$N-%s-05\n' "$entete" "$s" > "$C/05-rpm-mock/m1b-$s.sh"
@@ -124,14 +143,14 @@ done
 FC=$C/05-rpm-mock/m5b-rejeu.sh
 cas C1 banc-c 'export SIGNER=1; etape_signature' "$FC"
 verifie "C1 signature : sorties sous \$TS, SIGNER retirée, les deux dossiers auth présents pendant l'étape" \
-  "$(grep '^signature : ' "$B/cas-C1.out")" "signature : T=m5b-rejeu-banc-c-signature-05 SIGNER=absente T0/auth=présent T/auth=présent"
+  "$(grep '^signature : ' "$B/cas-C1.out")" "signature : T=m5b-rejeu-banc-c-signature-05 SIGNER=absente RENDU=m1bt-20-05 T0/auth=présent T/auth=présent"
 verifie "C1 signature : code" "$(code C1)" 0
 verifie "C1 dossiers auth retirés après (\$TS et \$W/m1b-signature-05)" "$(find "$W/m5b-rejeu-banc-c-signature-05" "$W/m1b-signature-05" -name auth | wc -l)" 0
 cas C2 banc-c 'etape_signature' "$FC"; refus C2 "déjà présent, jamais réécrit : m5b-rejeu-banc-c-signature-05"
 cas C3 banc-c 'etape_images' "$FC"
-verifie "C3 images : PREFIXE et SIG transmis" "$(grep '^images : ' "$B/cas-C3.out")" "images : N=banc-c SIG=m5b-rejeu-banc-c-signature-05"
-cas C4 banc-c 'rejeu_artefact() { echo "artefact : N=$N TAG=$TAG T=${T#"$W"/}"; }; etape_artefact' "$FC"
-verifie "C4 artefact : PREFIXE et TAG" "$(grep '^artefact : ' "$B/cas-C4.out")" "artefact : N=banc-c TAG=banc-c T=banc-c-artefact-05"
+verifie "C3 images : PREFIXE, SIG et MESURE transmis" "$(grep '^images : ' "$B/cas-C3.out")" "images : N=banc-c SIG=m5b-rejeu-banc-c-signature-05 MESURE=m1bt-20-05"
+cas C4 banc-c 'rejeu_artefact() { echo "artefact : N=$N TAG=$TAG T=${T#"$W"/} M4A=${M4A_LAYOUT#"$E05"/}"; }; etape_artefact' "$FC"
+verifie "C4 artefact : PREFIXE, TAG et layout de M4a" "$(grep '^artefact : ' "$B/cas-C4.out")" "artefact : N=banc-c TAG=banc-c T=banc-c-artefact-05 M4A=m4a-05/layout-1"
 cas C5 banc-c 'rejeu_fermeture() { echo "fermeture : N=$N TAG=$TAG"; }; etape_fermeture' "$FC"
 verifie "C5 fermeture : PREFIXE et TAG" "$(grep '^fermeture : ' "$B/cas-C5.out")" "fermeture : N=banc-c TAG=banc-c"
 cas C6 banc-c 'rejeu_construction() { echo "construction : N=$N TAG=$TAG"; }; etape_construction_rpm' "$FC"
@@ -147,7 +166,7 @@ communes() { # doublures communes, dans le sous-shell du cas, après le chargeme
   auth_zot() { printf '{"faux":1}\n' > "$1"; }
 }
 
-echo "## D artefact : etape_local réelle, publication dans un layout OCI local"
+echo "## D artefact : etape_local réelle, layout de M4a lu dans la copie (travail sans m4a-05), publication dans un layout OCI local"
 dbl_artefact() {
   communes
   eval "pousser_vrai() $(declare -f pousser | tail -n +2)"
@@ -168,7 +187,7 @@ dbl_artefact() {
 }
 cas_d() { # nom code [état-de-Zot]
   local w=$B/$1; mkdir -p "$w"; printf '%s' "${3:-}" > "$w/zot.txt"; : > "$w/poussees"
-  cas "$1" banc-d "BW=$w; charger_mesure m1b-artefact.sh; dbl_artefact; $2"
+  CAS_O=$B/O2 cas "$1" banc-d "BW=$w; charger_artefact; dbl_artefact; $2"
 }
 A333=sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
 cas_d D1 'rejeu_artefact'
@@ -304,7 +323,8 @@ verifie "F1 nominal : pipeline par digest, commit, Kata pour construire" \
 for m in "OK   construire : DIGEST_CONSTRUIT égal au digest publié : $D07" "OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : $D07 1" \
          "relevé : artefact rpm $REG/builds/sample-app-rpm@$D07 ; celui de la cascade $D07 : égaux (relevé, non exigé)" \
          "OK   PipelineRun banc-f-construction-1 signé par Chains : true" "OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie" \
-         "OK   entrée présente dans Zot par digest : builds/fermetures/sample-app-sources@"; do
+         "OK   entrée présente dans Zot par digest : builds/fermetures/sample-app-sources@" "OK   construire : témoins réseau en échec : 4" \
+         "OK   construire : mock --hermetic-build rc 0 : 1" "OK   construire : aucune ligne http ou https (mock.out, root.log, build.log) : 3"; do
   verifie "F1 ligne « ${m:0:70}… »" "$(lignes F1 "$m")" 1
 done
 verifie "F1 nominal : trois TaskRuns relus" "$(grep -c '^### TaskRun banc-f-construction-1-' "$B/cas-F1.out")" 3
@@ -316,6 +336,11 @@ cas_f F4 'rejeu_construction' "$(grep -v sample-app-sources <<< "$ZF")"; refus F
 cas_f F5 'BANC_PR_EXISTE=1; rejeu_construction'; refus F5 "banc-f-construction-1 existe déjà"
 cas_f F6 'rejeu_construction' "$(grep -v tekton/pipelines <<< "$ZF")"; refus F6 "pipeline présente dans Zot par digest"
 verifie "F3 à F6 : aucune création" "$(for c in F3 F4 F5 F6; do creations "$c"; done | paste -sd' ')" "0 0 0 0"
+mkdir -p "$B/f-temoins"; cp "$FO"/* "$B/f-temoins/"
+grep -v '^témoin ' "$FO/banc-f-construction-1-construire-step-construire.log" > "$B/f-temoins/banc-f-construction-1-construire-step-construire.log"
+verifie "F7 journal de construire sans les lignes de témoins (banc)" "$(grep -c '^témoin ' "$B/f-temoins/banc-f-construction-1-construire-step-construire.log")" 0
+cas_f F7 'rejeu_construction' "$ZF" "$B/f-temoins"; refus F7 "construire : témoins réseau en échec"
+verifie "F7 : une création (garde après le PipelineRun)" "$(creations F7)" 1
 
 echo "## fin : $(date -u +%FT%TZ)"
 echo "bilan : $OK OK, $KO KO"

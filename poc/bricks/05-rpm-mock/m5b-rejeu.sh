@@ -9,9 +9,12 @@
 # rejouées : un Zot neuf ne les a pas. Les gardes de sûreté le sont : liste revue, politiques, place libre, PipelineRun absent,
 # dry-run d'admission, signature de Chains. Les entrées sont des fichiers du dépôt épinglés par sha256 et des objets de Zot lus
 # par digest.
-#   entree        avant le démontage, sans cluster ni Zot : TAG, journaux et dossiers de ce TAG absents, entrées de l'hôte
-#                 (rendu de prealables, mesure d'un autre jour, layout de M4a, arbre de l'essai et verrou de la cascade),
-#                 fichiers signés, clé des tâches présente (test -s), fuseau, SOURCE_DATE_EPOCH, tkn.
+#   entree        avant le démontage, sans cluster ni Zot : TAG, journaux et dossiers de ce TAG absents, fuseau,
+#                 SOURCE_DATE_EPOCH, tkn, clé des tâches présente (test -s) ; entrées de l'hôte copiées hors de $W, que
+#                 vm.sh detruire efface (l. 152), sous $E05 (si la copie est absente ; jamais réécrite) : les quatre rendus
+#                 de prealables et banc-digest-o, -b ($W/m1bt-20-05), le layout de M4a ($W/m4a-05/layout-1) ; la copie est
+#                 contrôlée (RENDUS_SHA, gardes_mesure, manifeste 41c639b7) ; arbre et verrou de la cascade, fichiers signés.
+#                 Les étapes suivantes lisent cette copie : RENDU et MESURE (signature, images), M4A_LAYOUT (artefact).
 #   signature     etape_taches de m1b-signature.sh, sans SIGNER : les deux tâches des builders republiées depuis builders/
 #                 (tag m1b), les deux pipelines des builders SIGNÉES À NOUVEAU par tkn avec la clé des tâches (lue par tkn
 #                 seulement, jamais ici) et poussées au tag m1b. Leurs digests changent (ECDSA). Sorties sous
@@ -30,7 +33,8 @@
 # construction_rpm. Les pipelines rpm sont relues par digest : le TAG de m5b-republier.sh peut être celui-ci ou un autre.
 # Un digest différent de 333b7322 ou de 09838980 arrête l'étape : il demande une nouvelle signature et une revue de la liste,
 # décision du propriétaire, jamais prise ici.
-# TAG obligatoire, sans défaut : un TAG par tentative, car un journal existant n'est jamais réécrit.
+# TAG obligatoire, sans défaut : un TAG par tentative, car un journal existant n'est jamais réécrit. Les sorties de signature
+# sont sous le TAG : une reprise à images sous un TAG neuf repart de signature.
 # Aucun secret en argument ; l'authentification de Zot est écrite sous un dossier auth (0700) retiré à la sortie, même en échec.
 # Usage (racine du dépôt) : TAG=<tag> DISTRO=rke2 mise exec -- poc/bricks/05-rpm-mock/m5b-rejeu.sh <étape>…
 #         (journaux : resultats/m5b-rejeu-<tag>-<étape>.log)
@@ -52,6 +56,8 @@ case $TAG in
   ''|*[!a-z0-9-]*) echo "TAG absent ou invalide : « $TAG » (un TAG neuf par tentative)" >&2; exit 2 ;;
 esac
 TS=$W/m5b-rejeu-$TAG-signature-05   # sorties de l'étape signature (références, pipelines signées), lues par images (SIG)
+E05=${E05:-$HOME/.cache/supply-chain-poc/05/rejeu-entrees}   # entrées de l'hôte gardées hors de $W (entree)
+M4A_MANIFESTE=sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8   # M4A_DIGEST de m1b-artefact.sh
 TKN_VERSION=0.46.2                   # m5b-republier.sh
 DECALAGE=+01:00                      # m5b-republier.sh
 MASQUE05='/jeton\|token/I c\[ligne masquée : motif jeton|token]'   # BRE : jamais sous sed -E
@@ -68,8 +74,10 @@ echec() { echo "KO   $*" >&2; exit 1; }
 attendu() { if [ "$2" = "$3" ]; then echo "OK   $1 : $2"; else echec "$1 : $2 (attendu : $3)"; fi; }
 
 # --- chargements : chacun dans le sous-shell de son étape ---
-charger_signature() { # m1b-signature.sh ; ses sorties sous $TS, pas sous $W/m1b-signature-05
+charger_signature() { # m1b-signature.sh ; ses sorties sous $TS, pas sous $W/m1b-signature-05 ; rendu lu dans $E05
   unset SIGNER
+  # shellcheck disable=SC2034  # lue par le script sourcé
+  RENDU=$E05/m1bt-20-05
   # shellcheck disable=SC1091
   . "$h05/m1b-signature.sh"   # T=$W/m1b-signature-05 : crée $T/auth et pose son trap
   T0=$T; T=$TS
@@ -82,6 +90,8 @@ charger_images() { # m1b-pipeline.sh sous PREFIXE=$TAG, références des pipelin
   PREFIXE=$TAG   # chargement : une locale serait perdue au retour), dans le sous-shell de l'étape
   # shellcheck disable=SC2034  # lue par le script sourcé
   SIG=$TS
+  # shellcheck disable=SC2034  # lue par le script sourcé
+  MESURE=$E05/m1bt-20-05   # même nom de dossier : gardes_mesure en tire le préfixe m1bt-20
   # shellcheck disable=SC1091
   . "$h05/m1b-pipeline.sh"
 }
@@ -90,6 +100,11 @@ charger_mesure() { # script : m1b-artefact.sh, m1b-fermeture.sh ou m1b-construct
   local PREFIXE=$TAG
   # shellcheck disable=SC1090
   . "$h05/$1"
+}
+charger_artefact() { # m1b-artefact.sh, layout de M4a lu dans $E05
+  charger_mesure m1b-artefact.sh
+  # shellcheck disable=SC2034  # lue par etape_local du script sourcé
+  M4A_LAYOUT=$E05/m4a-05/layout-1
 }
 
 # --- étapes : le corps, une fois le script de mesure chargé ---
@@ -114,16 +129,29 @@ rejeu_entree() {
   attendu "SOURCE_DATE_EPOCH" "${SOURCE_DATE_EPOCH-absente}" absente
   attendu "tkn (client)" "$(tkn version --component client)" "$TKN_VERSION"
   attendu "clé des tâches présente (test -s, jamais lue ici)" "$([ -s "$S/taches.key" ] && echo présente || echo absente)" présente
-  echo "## entrées de l'hôte (hors du dépôt)"
+  echo "## entrées de l'hôte, gardées hors de \$W (vm.sh detruire l'efface)"
+  if [ -e "$E05" ]; then
+    echo "copie présente, relue : ${E05/#$HOME/\~}"
+  else
+    [ -d "$W/m1bt-20-05" ] && [ -d "$W/m4a-05/layout-1" ] || echec "entrées de l'hôte absentes de \$W (m1bt-20-05, m4a-05/layout-1) et de ${E05/#$HOME/\~}"
+    mkdir -p "$E05/m1bt-20-05" "$E05/m4a-05"
+    while IFS=: read -r f e; do
+      [ -z "$f" ] || cp "$W/m1bt-20-05/$f" "$E05/m1bt-20-05/$f"
+    done < <(sed -n '/^RENDUS_SHA="/,/"/{s/^RENDUS_SHA="//;s/".*$//;p}' "$h05/m1b-signature.sh")
+    cp "$W/m1bt-20-05/banc-digest-o" "$W/m1bt-20-05/banc-digest-b" "$E05/m1bt-20-05/"
+    cp -r "$W/m4a-05/layout-1" "$E05/m4a-05/"
+    echo "copie faite : ${E05/#$HOME/\~} ($(find "$E05" -type f | wc -l) fichiers)"
+  fi
   n=0
   while IFS=: read -r f e; do
     [ -n "$f" ] || continue
-    attendu "rendu de prealables : $f (sha256, RENDUS_SHA de m1b-signature.sh)" "$(sha256sum < "$W/m1bt-20-05/$f" 2> /dev/null | cut -c1-64)" "$e"
+    attendu "copie : rendu de prealables $f (sha256, RENDUS_SHA de m1b-signature.sh)" "$(sha256sum < "$E05/m1bt-20-05/$f" 2> /dev/null | cut -c1-64)" "$e"
     n=$((n + 1))
   done < <(sed -n '/^RENDUS_SHA="/,/"/{s/^RENDUS_SHA="//;s/".*$//;p}' "$h05/m1b-signature.sh")
   attendu "rendus contrôlés" "$n" 4
   (charger_images > /dev/null; gardes_mesure)
-  attendu "layout de M4a (étape local de m1b-artefact.sh)" "$([ -s "$W/m4a-05/layout-1/index.json" ] && echo présent || echo absent)" présent
+  attendu "copie : layout de M4a, manifeste ${M4A_MANIFESTE:0:19}… (sha256 du blob)" \
+    "sha256:$(sha256sum < "$E05/m4a-05/layout-1/blobs/sha256/${M4A_MANIFESTE#sha256:}" 2> /dev/null | cut -c1-64)" "$M4A_MANIFESTE"
   echo "## fichiers du dépôt"
   attendu "arbre de l'essai de la cascade (sha256)" "$(sha256sum < "$ARBRE_CASCADE" | cut -c1-64)" a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014a
   attendu "arbre de l'essai de la cascade : fichiers" "$(wc -l < "$ARBRE_CASCADE")" 230
@@ -235,7 +263,7 @@ rejeu_fermeture() { # après charger_mesure m1b-fermeture.sh
 }
 
 rejeu_construction() { # après charger_mesure m1b-construction.sh
-  local pr=$N-construction-1 r d u t p k c l
+  local pr=$N-construction-1 r d u t p k c l x
   echo '{}' > "$T/vide.json"
   echo "## gardes, avant toute création"
   attendu "PIPELINE_REF de m1b-construction.sh" "$PIPELINE_REF" "$REG/$PIPE_CONSTRUCTION"
@@ -283,6 +311,10 @@ rejeu_construction() { # après charger_mesure m1b-construction.sh
   done
   jq -r '.status.results[]? | "résultat de \(.name) : \(.value)"' "$T/pr-$pr-etat.json"
   attendu "PipelineRun $pr" "$r" "True|Succeeded"
+  x=$T/$pr-construire-step-construire.log   # gardes de sûreté de la construction, reprises de etape_construction
+  attendu "construire : témoins réseau en échec" "$(lignes '^témoin .* : échec, code [0-9]* (attendu)$' "$x")" 4
+  attendu "construire : mock --hermetic-build rc 0" "$(lignes '^mock --hermetic-build : rc 0 en [0-9]* s$' "$x")" 1
+  attendu "construire : aucune ligne http ou https (mock.out, root.log, build.log)" "$(lignes '^lignes http ou https de [a-z.]* : 0$' "$x")" 3
   u=$(jq -r '.status.results[] | select(.name == "IMAGE_URL") | .value' "$T/pr-$pr-etat.json")
   d=$(jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value' "$T/pr-$pr-etat.json")
   attendu "dépôt publié" "$u" "$IMAGE"
@@ -299,7 +331,7 @@ rejeu_construction() { # après charger_mesure m1b-construction.sh
 etape_entree() { rejeu_entree; }
 etape_signature() { (charger_signature; etape_taches); }
 etape_images() { (charger_images; etape_pipeline); }
-etape_artefact() { (charger_mesure m1b-artefact.sh; rejeu_artefact); }
+etape_artefact() { (charger_artefact; rejeu_artefact); }
 etape_fermeture() { (charger_mesure m1b-fermeture.sh; rejeu_fermeture); }
 etape_construction_rpm() { (charger_mesure m1b-construction.sh; rejeu_construction); }
 

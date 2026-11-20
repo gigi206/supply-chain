@@ -2660,6 +2660,7 @@ Correctif [`rejeu-s6.patch`](rejeu-s6.patch) : étapes S6a et S6b de la 06 aprè
 - Les neuf étapes passent après la 06 et avant `fuites`, sous RKE2 et Cilium, avec `TAG_05=<tag>` seulement.
 - Il faut un `TAG_05` neuf par tentative, reprise comprise.
 - Détail, relevé statique et ce qui n'est pas mesuré : [carte de M5b](../05-rpm-mock/resultats/m5b-carte.md), note de 2026-11-20T17:52:19Z. Pas de rejeu avant le 28/11/2026.
+- **Correction du 20/11/2026 (2026-11-20T17:58:49Z)** : une reprise à « 05 (images) » sous un `TAG_05` neuf repart de « 05 (signature) ». Les sorties de signature sont sous le `TAG`. `vm.sh detruire` efface `$W` (l. 152) : `entree` copie donc les entrées de l'hôte hors de `$W`. Détail dans la carte de M5b, note de 2026-11-20T17:58:49Z.
 
 ### Additif du 17/11/2026 (note de 2026-11-17T19:11:07Z) : Kyverno v1.20.0 et choix de la provenance (réserve C)
 
