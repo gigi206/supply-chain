@@ -116,3 +116,84 @@ L'état du cluster et de l'hôte aura bougé d'ici le 28/11. Rien de ce qui suit
   L'estimation de 1,5 jour du point 5 ne vaut que pour l'option A. Elle sera refaite dans la carte du jalon des images.
 - **Inchangé** : le rejeu reste exclu avant le 28/11. Les réserves du point 4 restent ouvertes, dont la seconde barrière réseau du build rpm, qui n'est pas tranchée.
 - **Suite** : carte du jalon des images, préparée à sec sous l'accord permanent du 18/11.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:18:58Z UTC : préparation du rejeu sous l'option C (inventaire à sec)
+
+**Portée** : lecture des scripts et des journaux seulement. Rien n'est lancé ni écrit dans Zot, le cluster ou les VM. `rejeu.sh` et `vm.sh` ne sont pas touchés.
+- Pour l'option C, cette note remplace la liste des étapes durables du point 2, le préalable « Disque » du point 3 et l'estimation du point 5. Ces passages restent écrits tels quels.
+- Elle complète les « modifications prévisibles » du point 2, qui restent valables. En particulier, aucun journal n'est réécrit : le rejeu se fait sous un autre `PREFIXE`, que `TAG` suit par défaut. Les gardes « dépôt absent » et les préfixes de tags restent à relire.
+
+**Déjà couvert par le rejeu** :
+- **Quatre labels** : l'étape `rejeu` de `sortie-builds.sh` (l. 350 à 364) pose les deux politiques de M1b et attend le `NotIn` à quatre labels (l. 360). La référence « l. 263 à 272 » du point 2 est périmée.
+- **ConfigMap `porte`** : `cm_porte` (`politique.sh`, l. 1316) la refait depuis le `taches.yml` du dépôt (l. 1322). Son retard sur `taches.yml` disparaît donc avec le rejeu. C'est déduit du code, non mesuré.
+- **Anciennes versions dans `taches.yml`** : les bundles de M4b et M4c (`9afe09db…`, `d7f01398…`) y restent listés et seront absents de Zot après le rejeu. Une recherche par motif dans les scripts ne trouve aucun contrôle qui exige que chaque référence listée existe dans Zot. Non mesuré.
+
+**Étapes durables de la 05 sous l'option C** (à la place des images d'essai) :
+
+| Étape | Ce qu'elle pose | Durée mesurée |
+|---|---|---|
+| `s1.sh amorce` | rockylinux 9.8 `ed654c69…` (amorce des tâches de M1b, `m1b-signature.sh`, l. 33) et 9.7 `ee90dc0e…` (base du bootstrap, `m1b-pipeline.sh`, l. 65) | 12 s |
+| `s1.sh m3_reseau` | `construction-rpm-sans-sortie`, que le rejeu de la 08c ne pose pas ; dépendances aux images d'essai à relire | moins de 1 s |
+| `m1b-signature.sh taches`, sans `SIGNER` | bundles de `prefetch-racine-rpm` et `construire-racine-rpm` poussés depuis `builders/*.signee.yaml` (l. 107) ; pipelines `builder-mock-rocky9` et `builder-rocky9-bootstrap` signées et poussées | non relevée |
+| `m1b-pipeline.sh pipeline` | les deux images, `70f8c412…` et `6de899ac…` (l. 57 et 61), par quatre PipelineRuns | 9 min 15 s (09:02:23 à 09:11:38Z le 20/11) |
+| artefact de M4a, puis `m1b-artefact.sh publier` | `packaging-rpm@41c639b7…`, puis `333b7322…` | 3 s pour M4a ; celle de la cascade non relevée |
+| bundles des tâches rpm | `prefetch-rpm` (`b9bbeba3…`), `construire-rpm` (`ca03f189…`), `preparer-rpm` (`2f65f390…`) | 2 à 4 s par passe en M4b et M4c |
+| pipeline et fermeture (M4b refait) | `prefetch-rpm-sample-app` (`61814acd…`), fermeture `09838980…` | 1 min 58 s (`m1b-fermeture-rpm.log`) |
+| pipeline et rpm (M4c refait) | `sample-app-rpm` (`7d361cb1…`), artefact `07b7bd6f…` | 4 min 29 s (`m1b-construction-construction.log`) |
+
+**Hors du rejeu** :
+- `s1.sh racine`, `image`, `boot_racine` et `boot_image` : images d'essai, écartées par la décision C.
+- `m1b-verrou.sh` : c'est une mesure. `m1b-artefact.sh` lit le verrou `c544599a…` dans le dépôt (`resultats/m1b-verrou.json`, l. 50).
+- `m1b-builders.sh prealables` (hôte, hors ligne, l. 5), les bancs, les pods d'essai et R1 à R8.
+- `comparaison` et `provenance` peuvent servir de témoins après le rejeu.
+
+**Entrées lues hors du dépôt**, sur l'hôte, qui survivent à la recréation des VM mais pas à un nettoyage du cache :
+- `$W/m1bt-20-05` : rendu de `prealables`, lu par `m1b-signature.sh` (`RENDU`, l. 27) et contrôlé par sha256 (`RENDUS_SHA`, l. 37) ;
+- `$W/m1b-signature-05` : sorties de `m1b-signature.sh`, lues par `m1b-pipeline.sh` (`SIG`, l. 41) ;
+- `$W/m4a-05/layout-1` : manifeste de M4a, lu par `m1b-artefact.sh` (`M4A_LAYOUT`, l. 55) ;
+- l'arbre de l'essai archivé, lu par la garde de `m1b-fermeture.sh rpm` (l. 546).
+
+**Ce qui casse si on rejoue les étapes telles quelles** :
+- **Signature à chaque passage** : `m1b-bundles.sh taches`, `m1b-fermeture.sh pipeline` et `m1b-construction.sh pipeline` exigent `SIGNER=1` (l. 473, 486 et 755) et re-signent. ECDSA n'est pas déterministe. Les digests changeraient, et avec eux les `PIPELINE_REF` écrites en dur (`m1b-fermeture.sh`, l. 94 ; `m1b-construction.sh`, l. 118) et la liste revue.
+- **Remède prévu** : `bundle` (`commun.sh`, l. 308) pousse avec une date de création fixe. Un même fichier signé doit donc donner le même digest.
+  - C'est mesuré dans S5b pour les tâches de la 06 : sur un Zot neuf, `rejeu-s5b-06-a.log` à `-c.log` comptent 11 contrôles « dans la liste revue » passés. Ce n'est pas mesuré dans la 05.
+  - Les signatures versionnées existent pour toutes les tâches et pipelines rpm : `builders/*.signee.yaml`, `fermeture/*.m1b.signee.yaml`, `construction/*.m1b.signee.yaml` et `construction/preparer-rpm.signee.yaml`.
+  - Une étape de republication sans signature, comme dans la 06, est à écrire.
+- **Pipelines `builders`** : `m1b-signature.sh` les re-signe à chaque passage (l. 127) et ne les versionne pas (l. 131 : seulement sous `$T`). Leur digest changera donc au rejeu. Rien ne casse pour autant : `m1b-pipeline.sh` lit leur référence dans `$SIG` (l. 157), pas en dur. Les deux tâches `builders` sont, elles, versionnées (l. 76).
+- **Gardes tournées vers M4b, M4c et les images d'essai** : elles échouent sur un Zot vide sans les images d'essai. Elles sont à sauter ou à remplacer dans le chemin du rejeu, sans toucher aux étapes de mesure.
+  - `m1b-bundles.sh` : l. 54, 65 et 66 ;
+  - `m1b-fermeture.sh` : l. 62, 84 et 89 ;
+  - `m1b-construction.sh` : l. 114 ;
+  - `m1b-artefact.sh` : « tag m4a sur 41c639b7 », l. 18 et 22. L'artefact de M4a doit donc être republié avant `m1b-artefact.sh`.
+
+**Préalables du point 3, corrigés** :
+- **Disque** :
+  - Le rythme d'environ 1,19 Go par jour sans cause est remplacé par l'attribution du 20/11 à 16:00:00Z, la base grype quotidienne d'environ 200 Mo par jour. S'y ajoute l'agrandissement à 30G (note de 16:04:46Z de la carte de M1b).
+  - Le rejeu recrée sc-stockage à 20G (`vm.sh`). Les neuf journaux de S5b ne contiennent aucun relevé de place de sc-stockage : « octets libres » y apparaît 0 fois. La place occupée après un rejeu est donc **non mesurée**.
+  - Premier relevé à prendre : un `df` de `/` sur sc-stockage vers 16:00Z le 21/11, à 24 heures de celui de 16:04Z.
+- **Amont** : il faut relire vault 9.8 et l'archive EPEL 9.8 (`m1b-builders.sh`, l. 46), en plus de vault 9.7 (l. 47), et l'amorce par ses deux digests sur quay.io.
+
+**Prédictions, à écrire avant le rejeu** :
+- **Bundles republiés depuis les signatures versionnées** : mêmes digests que la liste revue. Confiance haute (`commun.sh`, l. 308 ; mesuré pour la 06 en S5b).
+- **Pipelines `builders`** : digests neufs, ce qui est certain.
+- **Images `70f8c412…` et `6de899ac…`** : confiance moyenne. Deux passages et une mesure d'un autre jour ont donné le même digest, mais tout dépend des sources 9.8 figées et de l'amorce.
+- **Artefact `333b7322…`** : confiance haute (calcul local, deux layouts, même digest).
+- **Fermeture `09838980…`** : haute si les images retombent sur leurs digests, car la fermeture contient le bootstrap. Sinon, elle change.
+- **rpm `07b7bd6f…`** : confiance moyenne. La réserve du `BUILDTIME` (point 4) n'est pas expliquée.
+
+**Effort mesuré**, même méthode que [`temps-05-1211.log`](temps-05-1211.log) (date d'auteur, écarts d'au plus 1 h). Ce relevé y est ajouté, et la méthode y redonne les valeurs déjà archivées.
+- **M1b et sa cascade**, de `1e25df14` (carte de M1b, 18/11 à 19:38:40Z) à `a4360d3b` : 177 commits, **16,38 h**, et 44,44 h de bout en bout. L'estimation était de 3 jours, avec une décision à 6. Les heures ne sont pas converties.
+- **Brique 05**, de `196ee343` à `a4360d3b` : 376 commits, **42,82 h**.
+
+**Estimation de M5b sous l'option C** : **2 jours**, avec une décision avec toi à 4 jours.
+- **Hypothèse** : la republication depuis les signatures versionnées redonne les digests de la liste revue. Si ce n'est pas le cas, il faut une nouvelle signature et une revue de `taches.yml`, ce qui est ta décision.
+- **1 jour de préparation** : étape de republication sans signature, chemin du rejeu pour les gardes, bloc 05 dans `rejeu.sh`, banc et prédictions. Comparable : la cascade après M1b, 5,38 h de commits de `636f6b83` à `a4360d3b`.
+- **1 jour de rejeu** : comme S5b (environ 7 h le 13/11), plus environ 16 min d'exécution mesurée pour la 05 (somme du tableau), plus l'intégration de S6 et la cascade de la 06, jamais rejouées.
+
+**Décisions ouvertes, chez toi, non posées ici** :
+- la taille du disque de sc-stockage dans `vm.sh`, qui attend le `df` du 21/11 ;
+- la rétention de la base grype dans Zot (07a) ;
+- la seconde barrière réseau du build rpm ;
+- la clôture de la brique 05, après M5b.
+
+Le rejeu reste exclu avant la mesure de G7 du 28/11.

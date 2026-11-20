@@ -40,3 +40,7 @@ premier commit : 196ee34 ; dernier : c2c5809
 premier commit : 196ee34 ; dernier : 636f6b8
 336 commits, 37.44 h
 # M1b et sa cascade, même méthode : de 1e25df1 (carte de M1b, 2026-11-18T19:38:40Z) à 636f6b8 : 137 commits, 11.00 h (écarts <= 1 h), 37.76 h de bout en bout
+# nouveau relevé, même méthode (date d auteur, écarts <= 1 h), 2026-11-20T16:18:58Z à HEAD a4360d3b, pour la note de préparation de M5b sous l option C ; contrôle de la méthode : 336 commits, 37.44 h à 636f6b8, et 137 commits, 11.00 h de 1e25df1 à 636f6b8, égaux aux relevés ci-dessus ; les relevés ci-dessus ne sont pas réécrits
+premier commit : 196ee34 ; dernier : a4360d3b
+376 commits, 42.82 h
+# M1b et sa cascade, même méthode : de 1e25df1 à a4360d3b : 177 commits, 16.38 h (écarts <= 1 h), 44.44 h de bout en bout ; de 636f6b8 à a4360d3b : 41 commits, 5.38 h
