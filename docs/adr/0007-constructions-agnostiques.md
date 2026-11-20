@@ -240,3 +240,8 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Conséquence pour la règle générique** : changer d'images de builder ne change ni l'artefact ni les barrières mesurées. La cascade avant M5b est terminée.
 
 **Précision de portée du 20/11/2026, écrite à 2026-11-20T14:42:23Z UTC** : l'additif précédent généralise un seul changement mesuré, des images d'essai aux images de M1b. Pour ce changement, l'artefact et les barrières mesurées sont restés les mêmes. Ce n'est pas une règle prouvée pour tout changement d'images de builder.
+
+**Additif du 20/11/2026, écrit à 2026-11-20T16:28:59Z UTC : reproductibilité des bundles Tekton** ([détail](../../poc/bricks/05-rpm-mock/resultats/m5b-carte.md)).
+- **Mesuré** sur un registre crane local, sans Zot : les 9 signatures versionnées de la 05, poussées par `bundle` (`commun.sh`), redonnent les digests de la liste revue, quel que soit le tag.
+- **Mesuré** : le digest dépend du fuseau de l'hôte. tkn 0.46.2 écrit la date de création, l'époque 0, en heure locale. Sous `TZ=UTC`, les 9 digests changent.
+- **Conséquence** : un bundle n'est reproductible qu'à fichier signé, version de tkn et fuseau égaux, avec `SOURCE_DATE_EPOCH` absente. Ce n'est mesuré ni dans Zot ni à l'admission.

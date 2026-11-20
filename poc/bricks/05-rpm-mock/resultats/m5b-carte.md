@@ -241,3 +241,17 @@ Le rejeu reste exclu avant la mesure de G7 du 28/11.
 - **RE5** (haute) : la date de création vaut `1970-01-01T00:00:00Z` pour les 9 (9 C3 OK).
 - **RE6** (haute) : les 9 digests diffèrent des attendus, aux deux tags (18 KO en C1 et C2). Le digest dépend donc du fuseau de l'hôte.
 - Si RE5 et RE6 tiennent, l'étape de republication devra fixer `TZ=Europe/Paris` pour `tkn bundle push`. Il faudra aussi le signaler comme une condition de reproductibilité des bundles de toute la plateforme. Ce constat ne touche pas la 06 en S5b, poussée depuis le même hôte.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:28:59Z UTC : banc de republication sous `TZ=UTC`, résultat
+
+**Passage** le 20/11/2026 à 16:28:16 UTC, au dépôt `5b415052`, avec le même script sous `TZ=UTC`. Le banc rend 1 avec « bilan : 27 OK, 18 KO » ([`m5b-republication-banc-utc.log`](m5b-republication-banc-utc.log)). Les 18 KO sont tous des C1 et des C2.
+
+- **RE5 tenue** : la date de création vaut `1970-01-01T00:00:00Z` pour les 9 (9 C3 OK).
+- **RE6 tenue** : les 9 digests diffèrent des attendus. Chaque fichier donne pourtant un même digest aux deux tags. Par exemple, `prefetch-racine-rpm` donne `df6098fb…` au lieu de `16a32993…`.
+
+**Constat** : le digest d'un bundle poussé par `bundle` (`commun.sh`, l. 308) dépend du fuseau de l'hôte, parce que tkn 0.46.2 écrit la date de création en heure locale. Sur cet hôte (Europe/Paris, `TZ` non posée), un même fichier signé redonne le digest de la liste revue, quel que soit le tag.
+
+**Conséquences pour l'étape de republication, à écrire** :
+- Elle fixe `TZ=Europe/Paris` pour `tkn bundle push`, et `SOURCE_DATE_EPOCH` absente.
+- Elle s'arrête au premier digest hors liste.
+- Le reste de la plateforme pousse ses bundles par la même fonction, sans `TZ` : cette condition vaut pour toutes les briques, et la 06 en S5b l'a remplie sans le savoir, depuis le même hôte. `commun.sh` n'est pas modifié ici ; c'est une proposition, à te soumettre.
