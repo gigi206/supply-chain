@@ -121,3 +121,20 @@ Accord du propriétaire : « Oui », à la demande nommant les deux pods Kata pr
 - **Requêtes et panneau** : les réponses aux pods de `builds` (`is_reply` vrai, destination le pod) apparaissent en FORWARDED avec le sens EGRESS. « Aucun autorisé » doit se lire sur les flux dont la source est un pod de construction, réponses exclues, et sur tous les verdicts autres que DROPPED.
 - **Volume** : le pod b donne 46 flux pour ses quatre témoins. C'est l'ordre de grandeur d'une construction rpm sans autre trafic ; il est à mesurer en 4a.
 - **Comptes de 4a** : il faudra croiser le motif avec la destination, pour mesurer l'attribution de POLICY_DENY.
+
+## Lectures après la mesure (note de 2026-11-20T22:35:57Z ; rien n'est réécrit au-dessus)
+
+**T3 : l'attribution de POLICY_DENY est lue, plus seulement déduite** (elle n'est toujours pas mesurée).
+- `builds-sans-internet` (`08c-durcissement/politiques/cilium-sortie/`) porte un `egressDeny` vers `0.0.0.0/0`, sauf les plages privées (10/8, 172.16/12, 192.168/16, 169.254/16, 127/8).
+- Son sélecteur exclut seulement les quatre tâches de prefetch : elle s'applique donc à `construire-rpm`.
+- Sa spec dans le cluster est égale à celle du dépôt (sha256 du JSON trié : `1c6d23c21f6241dd…` des deux côtés).
+- `POLICY_DENY` vaut 181 dans `DropReason` (`flow.proto` au tag), distinct de `POLICY_DENIED` (133).
+- Des quatre destinations du pod b, seule 199.232.170.132 est publique. Ses 14 flux sont donc les POLICY_DENY, et 32 = 14 + 14 + 4 pour les autres : refus implicites de la NetworkPolicy sans règle.
+- Conséquence : l'adresse publique est refusée par deux politiques à la fois, et le refus explicite l'emporte dans le motif.
+
+**T2 : piste, pas un verdict.** Sept paquets en 10 s ne collent pas aux reprises de 0, 1, 3 et 7 s. Ajouté aux comptes de 4a :
+- relever `net.ipv4.tcp_syn_linear_timeouts` dans l'invité Kata ;
+- compter les drapeaux SYN ;
+- croiser le motif avec la destination.
+
+**T9 : réserve.** La mesure a filtré sur le nom complet (`--pod builds/<pod>`). L'export filtrera sur le préfixe `builds/`. Le sens du préfixe est lu dans `flow.proto`, pas mesuré : c'est un point de 4a.
