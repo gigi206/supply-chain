@@ -531,3 +531,45 @@ Les contenus prédits N1 à N9 de la note de 19:28:08Z sont inchangés. Seules l
 - Les deux autres scans du deb 1.0.0-1 (15/11 et 16/11 à 11:16:51) deviennent éligibles après le n°9 : ils iront aux n°10 (30/11) et n°11 (1/12). **Le deb 1.0.0-1 garde donc des scans jusqu'au 1/12.** Ce n'était pas prédit en H4 ni en N9, qui ne parlaient que du premier.
 - Le scan de `sample-app` du 14/11 (09:31:51) devient éligible le 28/11 à 09:31:51 UTC, après le n°8 : il ira au n°9, comme N9 le prévoit.
 - Les 16 témoins (13/11, 12:49:10 à 12:49:54) et les deux scans du 13/11 sont éligibles le 27/11 avant 12:50 UTC : n°8, comme N8.
+
+## Point 4 à sec : lectures et tâche planifiée, choix au propriétaire (note de 2026-11-20T20:00:02Z ; rien n'est réécrit au-dessus ; RIEN N'EST PLANIFIÉ)
+
+**Ce qui change la question.** Loki garde les lignes de `zot.service` 720 h (lu le 20/11). Une seule lecture, après le n°9, relit les n°1 à n°9, comme L13 à L19 l'ont fait pour les balayages passés. Les trois tâches de la note de 19:09:44Z (B24, B27, B28) ne sont plus nécessaires.
+
+**La seule contrainte qui compte** : ni passage de `stockage.sh zot`, ni recréation de sc-stockage, ni rejeu de M5b avant la lecture. Un redémarrage de Zot déplace les balayages, et une recréation efface Loki.
+
+**Options** :
+
+| | Lecture | Ce qu'elle demande | Risque |
+|---|---|---|---|
+| (a) | Aucune tâche : je lis dans une session ouverte, après le 29/11 vers 05:40 UTC | rien à planifier | dépend d'une session ouverte ; aucun, tant que Loki garde les lignes (jusque vers le 20/12 pour le n°1, d’après la configuration ; la lecture n’a été mesurée que sur 7 jours, avec le 13/11) |
+| (b) | **Une tâche ponctuelle**, le 29/11 à 05:40 UTC (fin la plus tardive du n°9, 03:36, plus 2 h) | ton accord pour remplacer la consigne de `supply-chain-g7-premiere-suppression`, fixer `fireAt` et la réactiver | la lecture se fait sans moi ; rien n'est commité ni poussé par la tâche |
+| (c) | Une tâche par balayage (n°5, n°8, n°9) | trois accords | rien de plus que (b), puisque Loki garde tout |
+
+**Fenêtres des lectures** (une par balayage, de 12:00 UTC le jour J à 12:00 UTC le lendemain) :
+- d'après la projection, les balayages n°1 à n°9 commencent entre 20:00 et 04:00 UTC. Chaque fenêtre n'en contient donc qu'un, même s'il passe minuit ;
+- le n°k est dans la fenêtre qui commence le (19 + k)/11 à 12:00 UTC ;
+- `g7-balayage.sh` v2 ne prend qu'un seul jour (`JOUR`, `DE`, `A`). **Une v3 ajoutera `JOUR_A`** (jour de fin, `JOUR` par défaut), après la lecture de N1 pour ne pas la mêler à N1. Elle sera passée au banc avant toute tâche.
+
+**Consigne de la tâche (b), à poser telle quelle sur ton accord.** Elle remplace celle du 14/11, désormais périmée :
+- `sudo journalctl --since 13/11` ne vaut plus, puisque le journal de la VM ne garde qu'environ 14 h : la lecture passe par Loki seul ;
+- Zot a redémarré le 19/11 à 20:24:46 UTC, et les heures, la loi B et la projection ont changé ;
+- les sujets ont changé : le deb scanné chaque jour est le 1.0.0-2 (`60f25f5c…`) ;
+- « comptes seulement » est levé pour les résumés de balayage, mais seulement pour eux ;
+- **la tâche n'exécute que des scripts commités**, contrôlés par sha256, et rien en forme libre. Le relevé du 15/11, en forme libre, avait laissé un écart de masquage.
+
+> Réponds en français. Dépôt : /home/gigi/Documents/git/github/gigi206/supply-chain, branche claude/focused-fermi-ul5y20. Brique 07a, G7, point 4. Lis d'abord poc/bricks/07a-sbom-grype/resultats/g7-replanification.md à partir de « Point 3 révisé » (notes du 20/11), en particulier « Projection refaite », « Résultat de l'état avant » et la note qui suit.
+>
+> TOUT EST EN LECTURE SEULE : ne modifie ni Zot, ni le cluster, ni les VM, ni Loki ; pas de sudo ; ne pousse rien, n'installe rien, ne committe rien. N'écris que les journaux produits par les deux scripts ci-dessous. N'exécute aucune autre commande sur la VM ou dans Grafana que celles de ces scripts. Si quelque chose échoue, dis-le, ne corrige rien, ne relance pas sous un autre nom de journal.
+>
+> 1. Vérifie que `sha256sum poc/bricks/07a-sbom-grype/g7-balayage.sh poc/bricks/07a-sbom-grype/g7-etat.sh` donne les empreintes écrites dans la note de pose de cette tâche. Si l'une diffère, arrête-toi et dis-le.
+> 2. Pour chaque balayage n°2 à n°9 (n°1 déjà lu), lance depuis la racine : `JOUR=2026-11-<J> DE=12:00 JOUR_A=2026-11-<J+1> A=12:00 SANS_JOURNAL=1 mise exec -- poc/bricks/07a-sbom-grype/g7-balayage.sh`, J allant de 21 à 28. Chaque journal est neuf (`g7-balayage-<J>-11.log`).
+> 3. Lance `MOMENT=apres AVANT=resultats/g7-etat-avant.log mise exec -- poc/bricks/07a-sbom-grype/g7-etat.sh`.
+> 4. Relève en lecture seule : `KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml kubectl get cronjob -n scan` (dernier succès de chaque CronJob), sans `describe` ni message d'événement.
+> 5. Compare aux prédictions N5 à N9 et aux conséquences de « Résultat de l'état avant » : pour chaque balayage, début, `ActiveEnterTimestamp` de la section 1 (Zot a-t-il redémarré depuis le 19/11 à 20:24:46 UTC ?), décisions par dépôt et par raison, puis, dans l'état après, les digests passés de 200 à 404.
+>
+> Rapport court au propriétaire : résultat d'abord, écarts aux prédictions nommés, ce qui reste non vérifié. Les notes, le README et docs/03 seront écrits ensuite dans une session ouverte, sur son accord.
+
+**Prédictions** : celles de N5 à N9, inchangées pour le contenu, et les conséquences de « Résultat de l'état avant ». Les heures sont des calculs ; un redémarrage de Zot les déplace sans changer ce qui doit être supprimé, sauf au balayage où tombe le redémarrage.
+
+**Hors de cette tâche** : la place libre sur sc-stockage. Le relevé du 21/11 vers 16:00 UTC est prévu à part, à la main.
