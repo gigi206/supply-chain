@@ -197,3 +197,29 @@ L'état du cluster et de l'hôte aura bougé d'ici le 28/11. Rien de ce qui suit
 - la clôture de la brique 05, après M5b.
 
 Le rejeu reste exclu avant la mesure de G7 du 28/11.
+
+## Prédictions écrites le 20/11/2026 à 2026-11-20T16:27:07Z UTC, avant tout lancement : banc de republication
+
+**But** : mesurer l'hypothèse de l'estimation de M5b sous C (note de 16:18:58Z), avant d'écrire l'étape de republication. Un même fichier signé, poussé par `bundle` (`commun.sh`, l. 308), doit redonner le digest de la liste revue, sans nouvelle signature.
+
+**Banc** : [`m5b-republication-banc.sh`](m5b-republication-banc.sh) (`2ec613ef45b5773e…`, shellcheck sans remarque), journal `m5b-republication-banc.log`, dossier neuf `~/.cache/supply-chain-poc/05/banc-m5b-republication`.
+- Registre crane local en http sur `127.0.0.1:5909`. Rien n'est écrit dans Zot ni dans le cluster. Aucune clé n'est lue, rien n'est signé.
+- `bundle` est extraite par texte de `commun.sh`, qui n'est pas sourcé : son `REG_HOTE` est le vrai Zot. `DOCKER_CONFIG` pointe vers un `{}` du banc.
+- `tkn bundle push` lit `SOURCE_DATE_EPOCH` (aide de tkn 0.46.2, date par défaut 1970-01-01T00:00:00Z). Le banc la retire.
+- Les 9 signatures versionnées sont poussées sous leur chemin de dépôt réel, avec le tag `m1b` puis `banc2`. Les attendus sont lus dans le dépôt : `taches.yml` de la 08 pour les 7 tâches, lignes `PIPELINE_REF` de `m1b-fermeture.sh` (l. 94) et `m1b-construction.sh` (l. 118) pour les 2 pipelines.
+
+**Prédictions** :
+- **RE1** (haute) : tkn 0.46.2 et crane 0.20.6, `SOURCE_DATE_EPOCH` absente, `bundle` extraite telle quelle et sans `--ctime`.
+- **RE2** (haute) : les 9 digests au tag `m1b` sont égaux aux attendus :
+  - tâches : `prefetch-racine-rpm` `16a32993…`, `construire-racine-rpm` `bdde08ed…`, `prefetch-rpm` `9afe09db…` (M4b) et `b9bbeba3…` (M1b), `construire-rpm` `d7f01398…` (M4c) et `ca03f189…` (M1b), `preparer-rpm` `2f65f390…` ;
+  - pipelines : `prefetch-rpm-sample-app` `61814acd…`, `sample-app-rpm` `7d361cb1…`.
+- **RE3** (haute) : le tag `banc2` redonne les 9 mêmes digests. Le digest ne dépend donc pas du tag, que le rejeu change avec le `PREFIXE`.
+- **RE4** (haute) : la date de création de la configuration vaut 1970-01-01T00:00:00Z pour les 9.
+
+**Clé des tâches au rejeu** : `politique.sh` garde une clé existante (l. 370, « clé existante »). C'est mesuré en S5b : `rejeu-s5b-plateforme.log` compte une fois « clé existante ». La clé publique reste donc la même, et les signatures versionnées restent valides pour Trusted Resources. C'est déduit du code et de ce journal ; l'admission elle-même n'est pas couverte par le banc.
+
+**Non couvert** : Zot (TLS, authentification, compte `poc-ecriture`), Tekton, Trusted Resources, Kyverno.
+
+**Suite** :
+- Un écart sur l'un des 9 : arrêt, archivage, et l'hypothèse de l'estimation n'est pas tenue (nouvelle signature et revue de `taches.yml`, ta décision).
+- 9 sur 9 : l'étape de republication sera écrite comme un script frère, sans toucher aux `m1b-*.sh` de mesure. Elle ne prendra ni clé ni `SIGNER` et poussera les tâches avant les pipelines. Elle s'arrêtera au premier digest hors liste. Elle portera sur 5 fichiers (trois tâches rpm, deux pipelines) : `m1b-signature.sh taches` republie déjà les deux tâches `builders`.
