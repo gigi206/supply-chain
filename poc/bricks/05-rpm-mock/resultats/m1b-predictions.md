@@ -2781,3 +2781,35 @@ Elle le publie deux fois au même digest que M4c (`07b7bd6f…`), et sa provenan
 **ADR 0007** : la phrase « la porte les juge ensemble » est une lecture de `porte.rego`, et non une mesure. Le refus y est de la forme `some task in lib.tasks_from_pipelinerun`, sur toutes les provenances de PipelineRun du sujet. L'additif est précisé en ce sens.
 
 **Incident de rédaction** : le script qui a écrit la note de 13:53:24Z a d'abord écrit `m1b-predictions.md`, puis s'est arrêté sur une garde de la carte. Le fichier a été remis à son état commité (`git checkout` de ce seul fichier, 25 lignes ajoutées et aucune retirée), puis le script a été rejoué avec toutes ses gardes avant toute écriture.
+
+## Cascade avant M5b, `s1.sh prealables` à quatre labels, prédictions écrites le 20/11/2026 à 2026-11-20T14:04:31Z UTC, avant toute application et tout lancement
+
+**Correctif** : [`s1-quatre-labels.patch`](../s1-quatre-labels.patch) (sha256 `707deebe9eae1690…`), préparé à sec sous l'accord permanent du 18/11. Il change une seule ligne de code : la valeur attendue du `NotIn` de `builds-sans-internet` passe de trois à quatre labels. Le quatrième, `prefetch-racine-rpm`, a été posé par `sortie-builds.sh m1b_sortie` le 20/11 à 00:12:03Z. Le correctif ajoute aussi trois lignes d'en-tête datées. La copie bancée a le sha256 `9bfb94d5a13c5e9c…`.
+
+**Portée, vérifiée dans le dépôt** :
+- Seul `s1.sh` de la 05 attend le `NotIn` à trois labels (grep sur `poc/` et `tools/`). `sortie-builds.sh rejeu` attend déjà les quatre (`etape_rejeu`), et `rpm_appliquer` y est noté historique.
+- `rejeu.sh` n'a aucune étape de la 05 (carte de M5b, §2). Le bloc de la 05 viendra après celui de la 08c, où `sortie-builds.sh rejeu` pose les quatre labels. La garde à quatre labels ne casse donc pas le rejeu.
+- Lecture du cluster faite ce tour, avant le banc (heure non relevée) : le `NotIn` porte `prefetch-gomod`, `prefetch-deb`, `prefetch-rpm` et `prefetch-racine-rpm`.
+
+**Bancs** (banc `5da53dd4f21ccd78…`, hors cluster, `kubectl`, `ssh` et `kube-apiserver` remplacés par des doublures) :
+- [`s1-quatre-labels-banc.log`](s1-quatre-labels-banc.log) : 16 OK, 1 KO, dans le banc lui-même. Il attendait 24 lignes extraites, et il y en a 23 (`attendu` et les 22 lignes de `etape_prealables`).
+- [`s1-quatre-labels-banc-2.log`](s1-quatre-labels-banc-2.log) : 17 OK, 0 KO. Il couvre :
+  - la forme du diff : une ligne changée, trois lignes d'en-tête ;
+  - `bash -n` et shellcheck, avec les mêmes remarques avant et après ;
+  - la valeur attendue, égale au manifeste du dépôt et à la liste de `sortie-builds.sh rejeu` ;
+  - la vraie `etape_prealables` jouée avec des doublures. La copie passe jusqu'au bout avec quatre labels. Elle s'arrête sur le `NotIn` avec trois labels, ou avec un quatrième label faux. Le `s1.sh` actuel s'arrête avec quatre labels, ce qui montre que le correctif est nécessaire, et passe avec trois labels, ce qui sert de témoin des doublures.
+- [`s1-quatre-labels-banc-n34.log`](s1-quatre-labels-banc-n34.log) : N3 et N4 sur la copie, 35 OK, 0 KO.
+- **Non couvert** : le vrai cluster, `ssh` et `kube-apiserver`. La lecture réelle est l'étape `prealables` elle-même.
+
+- **QL1** (haute), application sous l'accord permanent :
+  - le patch appliqué à `s1.sh` (`362af7ef18e1dcf4…`) donne la copie bancée ;
+  - une ligne datée d'application est ensuite ajoutée à l'en-tête ;
+  - le banc, rejoué contre le `s1.sh` du commit précédent avec quatre lignes d'en-tête, donne 17 OK ;
+  - N3 et N4 donnent 35 OK.
+- **QL2** (haute), `PREFIXE=s1-m1b s1.sh prealables`, en lecture seule et à blanc, sous l'accord permanent. Son journal est neuf (`s1-m1b-prealables.log`, absent avant le lancement), et le `s1-prealables.log` du 16/11 n'est pas touché. Attendus :
+  - code 0 ;
+  - `prefetch-rpm-sortie` présente ;
+  - `NotIn` : `prefetch-deb,prefetch-gomod,prefetch-racine-rpm,prefetch-rpm`.
+- **QL3** (moyenne haute) : `kube-apiserver` lit l'exemption de `kata`, et `s1-05-racine` est admis à blanc. Le dernier passage date du 16/11, et je n'ai pas relu les règles d'admission posées depuis.
+- **Relevés, sans pari** : l'allouable de sc-build, les demandes de mémoire en cours, et la place libre sous `/` de sc-stockage (5 551 Mo le 16/11, 4,49 Go le 18/11).
+- **Avant lecture** : la sortie de l'étape n'est pas filtrée, et elle recopie `admis.out` en cas de refus. Je compte donc les KO et les lignes `jeton|token` avant de lire le journal.
