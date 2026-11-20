@@ -1,0 +1,21 @@
+## apres
+2026-11-20T16:04:23Z
+running
+
+Capacity:       32212254720
+vda     32212254720
+|-vda1  32078020096
+|-vda14     3145728
+`-vda15   130023424
+vda1    32078020096
+ Used Avail 1M-blocks
+16273 12491     30033
+ext4
+zot active
+loki active
+prometheus active
+forgejo active
+grafana active
+alloy active
+rke2-agent active
+dépôts du catalogue de Zot (lecture anonyme) : 166

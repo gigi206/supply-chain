@@ -1,0 +1,13 @@
+## agrandir
+2026-11-20T16:04:22Z
+Block device 'vda' is resized
+blockresize : rc 0
+CHANGED: partition=1 start=262144 old: size=41680863 end=41943006 new: size=62652383 end=62914526
+growpart : rc 0
+resize2fs 1.47.2 (1-Jan-2025)
+Filesystem at /dev/vda1 is mounted on /; on-line resizing required
+old_desc_blocks = 3, new_desc_blocks = 4
+The filesystem on /dev/vda1 is now 7831547 (4k) blocks long.
+
+resize2fs : rc 0
+2026-11-20T16:04:23Z

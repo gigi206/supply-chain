@@ -1143,3 +1143,15 @@ La clôture de la brique 05 reste ta décision.
 - **AG3** (haute) : `resize2fs` agrandit en ligne et rend 0.
 - **AG4** (haute) : la taille de `/` passe d'environ 19 953 à environ 30 000 Mo, et la place libre gagne environ 10 Go.
 - **AG5** (haute) : les 7 services restent actifs, et Zot compte toujours 166 dépôts en lecture anonyme.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:04:46Z UTC : agrandissement de sc-stockage, résultat
+
+**Passage** le 20/11/2026, de 16:04:22 à 16:04:23 UTC. Les étapes `agrandir` et `apres` rendent 0 : [`sc-stockage-agrandir.log`](sc-stockage-agrandir.log), [`sc-stockage-agrandir-apres.log`](sc-stockage-agrandir-apres.log).
+
+- **AG1 tenue** : `blockresize` rend 0, et la capacité vaut 32 212 254 720 octets.
+- **AG2 tenue** : `growpart` rend 0, avec « CHANGED: partition=1 ». `vda1` passe à 32 078 020 096 octets.
+- **AG3 tenue** : `resize2fs` agrandit en ligne (« on-line resizing required ») et rend 0.
+- **AG4 tenue** : `/` passe de 19 953 à 30 033 Mo. La place libre passe de 2 823 à 12 491 Mo, soit 9 668 Mo de plus.
+- **AG5 tenue** : les 7 services restent actifs, et Zot compte toujours 166 dépôts.
+
+`vm.sh` garde 20G pour sc-stockage. Un rejeu de zéro (M5b) recréera donc un disque de 20G, sauf décision contraire dans la carte de M5b.
