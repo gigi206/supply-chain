@@ -414,3 +414,25 @@ Elles remplacent les heures de B24, B27 et B28. Le contenu change de balayage, c
 **Lectures** : Loki garde les lignes de `zot.service` (lu ici). Chaque lecture peut donc se faire sans sudo, après la fin du balayage, tant que la plateforme n'est pas recréée.
 - La lecture de N1 est couverte par ton « Oui » de ce soir. Je la ferai après 22:00 UTC, en Loki seul.
 - Pour voir N8 et N9, le rejeu de M5b, qui recrée Zot et Loki, devrait attendre le 29/11 vers 03:00 UTC. **C'est ta décision** : tu acceptes de tout perdre au rejeu.
+
+## Note de 2026-11-20T19:31:21Z : lectures Loki des balayages passés, prédictions avant lancement ; corrections de la note de 19:28:08Z (rien n'est réécrit au-dessus)
+
+**Pourquoi.** Loki garde 720 h : les balayages passés sont lisibles maintenant, sans sudo. Le conseiller a relevé que la note de 19:28:08Z reposait encore sur un seul intervalle mesuré.
+
+**Corrections de la note de 19:28:08Z**
+- « Elle explique aussi les 28 min 25 s du 14/11 » était affirmé, pas mesuré. La lecture du 13/11 ci-dessous le mesurera.
+- La durée de 2341 s et les décalages de passage (909,7 s et 2315,4 s) viennent de deux balayages mêlés, comptés depuis 20:24:46. Ce sont des bornes, pas des mesures. La projection sera refaite avec la durée du dernier balayage complet d'avant le redémarrage.
+- BD1 : les « 5 s » courent depuis l'en-tête du premier passage de `stockage.sh zot` (20:24:09), pas depuis un démarrage de Zot relevé.
+- **Écart à la consigne** : les journaux du 19/11 et des lectures ci-dessous archivent des heures, les noms des dépôts suivis et les raisons des décisions, tirés de la réponse de Grafana. La consigne du 14/11 et la note de 19:09:44Z disaient « comptes seulement ». Aucune ligne brute n'est archivée. **C'est à toi de trancher**, avant toute poussée.
+
+**Lectures** (`g7-balayage.sh` v2, `SANS_JOURNAL=1`, un journal neuf par lecture) :
+
+| # | Fenêtre (UTC) | Journal | Prédit (loi B depuis le 15/11, durée de 2197,8 à 2199,3 s) | Confiance |
+|---|---|---|---|---|
+| L13 | 13/11, 12:00 à 13:30 | `g7-balayage-13-11.log` | Un balayage au démarrage de Zot (12:17:25) : début moins de 2 min après, fin vers 12:45:45 (déduite du début du 14/11, 24 h + 4,94 s plus tôt) ; aucune décision autre que `keep` | faible : Alloy a pu démarrer après Zot. 0 ligne dirait seulement que la collecte manquait |
+| L16 | 16/11, 12:00 à 18:00 | `g7-balayage-16-11.log` | Début 13:59:17, à ± 120 s ; fin vers 14:35:55 ; 4 `keep` (tags du 13 au 16/11) | moyenne |
+| L17 | 17/11, 12:00 à 18:00 | `g7-balayage-17-11.log` | Début vers 14:36:00, à ± 5 min ; 5 `keep` | moyenne |
+| L18 | 18/11, 13:00 à 19:00 | `g7-balayage-18-11.log` | Début vers 15:12:42, à ± 5 min ; 6 `keep` | moyenne |
+| L19 | 19/11, 14:00 à 20:20 | `g7-balayage-19-11-avant.log` | Début vers 15:49:25, à ± 5 min, fin avant le redémarrage ; 7 `keep` | moyenne |
+
+Pour toutes : aucune suppression, puisque rien n'a 336 h et que `vulndb/grype` reste sous 11 tags. Les durées pourraient s'allonger avec le nombre de dépôts : 139 balayés le 15/11, 166 au catalogue le 20/11. La tolérance de ± 5 min en tient compte, sans calcul.
