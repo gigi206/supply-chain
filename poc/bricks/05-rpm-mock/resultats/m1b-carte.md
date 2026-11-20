@@ -899,3 +899,31 @@ Premier point de la cascade avant M5b (§5) : le verrou refait hors de la platef
 - le remplacement de `poc/packaging/verrou-rpm.json`.
 
 Je pose la question du tag avant toute écriture.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T09:48:29Z UTC : épinglages de la cascade, et correction de la note de 09:44:51
+
+**Correction** : la note de 2026-11-20T09:44:51Z annonçait « de nouvelles constantes dans `m4a.sh` » et « le remplacement de `poc/packaging/verrou-rpm.json` ». Ce plan est retiré, pour trois raisons lues dans le dépôt :
+- **Le banc commité les lit** : la section B de [`m1b-verrou-banc.sh`](m1b-verrou-banc.sh) prend `VERROU_SHA` et `PULL_DIGEST` de `m4a.sh` comme sources des anciennes valeurs. Les changer sur place ferait échouer ce banc au rejeu.
+- **`etape_verrou` de `m4a.sh` ne remplace pas `verrou-rpm.json`** : elle le compare s'il existe.
+- **Les rejeux écraseraient les journaux** : `m4a.sh`, `m4b.sh` et `m4c.sh` écrivent `resultats/m4x-<étape>.log` et `$W/m4x-05` sans `PREFIXE`. Les rejouer réécrirait leurs journaux archivés, comme pour le journal de signature le 20/11 au matin. `m5.sh` a un `PREFIXE`.
+
+**Forme à choisir à la préparation de chaque point** : des constantes choisies par un préfixe, ou un script frère, comme `m1b-verrou.sh`. Dans les deux cas, les anciens journaux et les anciens épinglages restent lisibles, et le banc de `fe1b72cc` reste vert ou est remplacé explicitement.
+
+**Épinglages des anciennes valeurs**, relevés par `grep` hors journaux (`resultats/` exclu) :
+
+| Ancienne valeur | Où elle est épinglée |
+|---|---|
+| `b6d0f8f1…`, verrou de M4a | `m4a.sh`, `m4b.sh`, `m4c.sh`, `s1.sh` (et `s1-m2.patch`), `m1b-verrou.sh` (comme référence), README de la 05 |
+| `f0ccf105…`, bootstrap d'essai | `poc/packaging/verrou-rpm.json`, `m4a.sh`, `m4c.sh`, `m1b-verrou.sh` (référence), README, docs/03, ADR 0001 |
+| `18d64b03…`, `image_digest` du bootstrap d'essai | `poc/packaging/verrou-rpm.json`, `m4a.sh` |
+| `99790c13…`, outillage d'essai | tâches signées `fermeture/prefetch-rpm.signee.yaml` et `construction/construire-rpm.signee.yaml`, liste revue `taches.yml` (08), `m4a.sh`, `m4b.sh`, `m4c.sh`, `m5.sh`, `m1b-builders.sh`, `m1b-verrou.sh`, `A-REPORTER.md` (09), README, docs/03, docs/04, ADR 0007 |
+| `41c639b7…`, artefact de M4a dans Zot | `m4c.sh`, `m5.sh`, README, docs/03 |
+| chemin `verrou-rpm.json` | `preparer-rpm` et `construire-rpm` (sources et signées), `m4a.sh`, `m4c.sh`, `m5.sh`, `m5-alterer.py`, `m1b-verrou.sh`, README, docs/03 |
+
+`rejeu.sh` (08) n'a pas encore de bloc pour la 05.
+
+**Points notés pour la suite** :
+- **`image_digest` (`77cff176…`) n'a qu'une source**, le verrou lui-même. Le 17/11, `IMAGE_DIGEST` venait de la ligne « Checking image digest » de l'étape `hermetique`. Le contrôle de ce champ par M4a serait donc circulaire : la valeur sera une prédiction de M4b, lue dans la construction hermétique.
+- **Tag de l'artefact** : un tag neuf dans le même dépôt `entrees/sample-app/packaging-rpm` (par exemple `m1b`). Le tag `m4a` reste alors sur son manifeste. L'artefact est consommé par digest. La question à poser est l'écriture dans Zot elle-même, une fois le digest calculé à sec par deux layouts locaux.
+- **Place libre dans Zot** : elle ne limite pas l'artefact de M4a (le verrou fait 111 567 octets), mais elle limite la fermeture de M4b. Je la relirai avant la question d'écriture, pour que le chiffre y figure.
+- **Le rejeu de R1 à R8** reste une vraie question, à poser quand la cascade y arrivera.
