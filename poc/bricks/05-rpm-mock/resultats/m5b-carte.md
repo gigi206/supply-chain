@@ -626,3 +626,29 @@ Les trois notes restent écrites telles quelles. Les trois défauts ont été re
   - Il ne lit ni `RENDU`, ni `MESURE`, ni un layout.
 - **Conclusion** : aucune de ces quatre étapes ne lit `$W` d'avant le démontage. Il n'y a pas de correction à faire.
 - **Non mesuré** : l'exécution. Ce relevé ne voit pas une lecture indirecte par un programme externe (`crane`, `tkn`, `kubectl`), hors de leur configuration lue dans `$T` ou `$P`.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T19:03:57Z UTC : correction de la note de 18:55:52Z (audit de `s1.sh` et de `m5b-republier.sh`)
+
+La note de 18:55:52Z reste écrite telle quelle. Sa conclusion tient : aucune des quatre étapes ne lit `$W` d'avant le démontage. Mais elle reposait sur un grep de deux fichiers, et trois points étaient inexacts ou non vérifiés. Le conseiller les a relevés.
+
+**1. `known_hosts`.** La note disait : « `creer` réécrit `$S/known_hosts` (l. 51) : ces deux étapes ne le lisent pas ». C'est faux sur deux points.
+- La ligne 51 est dans `cles()` (l. 43 à 52). Dans `vm.sh`, `S=$O/ssh` (l. 29), pas le `$S=$O/secrets` de `commun.sh`.
+- `sur` (`commun.sh`, l. 22) lit `$O/ssh/id_ed25519` et `$O/ssh/known_hosts` (l. 18). `libre_zot` de `m5b-republier.sh` (l. 57) passe par `sur` : cette étape **lit** donc `known_hosts`.
+- Ce fichier n'est pas sous `$W` : il survit au démontage. `cles()` le réécrit à la création des VM, en gardant les clés d'hôte existantes (l. 48).
+
+**2. Fonctions appelées, lues cette fois** (`commun.sh`, `s1.sh`) :
+- `auth_zot` (l. 48) lit le mot de passe sous `$O/secrets`.
+- `bundle` (l. 308) écrit `$T/tkn.out` et lit `$T/auth/docker`.
+- `politique_m3_relue` écrit `$T/m3-politiques.json` et lit `selecteurs.jq` dans le dépôt (08).
+- `miroir` (l. 54) passe par un cache OCI local, `$O/telechargements/oci/<dépôt>`, hors de `$W`. Il ne lit l'amont que si le cache n'a pas le digest.
+  - Les deux digests de l'amorce (`ed654c69…`, `ee90dc0e…`) sont dans l'`index.json` de ce cache, relu avant cette note.
+  - **Cela corrige aussi la note de 17:52:19Z** : « `s1.sh amorce` lit quay.io : il demande le réseau public » est faux tant que ce cache est intact. Avec lui, `amorce` copie de l'hôte vers Zot. Le rejeu demande quand même le réseau public pour la 06.
+
+**3. Journaux neufs.** `s1.sh` appelle `lancer`, qui ne refuse pas un journal présent. La protection vient d'`entree` :
+- `rejeu.sh` lance `entree` hors de `etape` (l. 96), donc à chaque invocation, reprise par `DEPUIS=` comprise.
+- Sa garde couvre `<TAG>-amorce.log`, `<TAG>-m3_reseau.log`, `m5b-republier-<TAG>-*.log` et `<TAG>-*.log`. `m5b-republier.sh` refuse aussi lui-même un journal présent (l. 140).
+- **Essai** ([`m5b-rejeu-essai-amorce.sh`](m5b-rejeu-essai-amorce.sh), [journal](m5b-rejeu-essai-amorce.log), 19:02:37 UTC), dans un bac à sable hors du dépôt :
+  - X1, témoin sans journal : la garde passe à 0. L'étape s'arrête ensuite sur la clé des tâches, absente du bac.
+  - X2 (`amorce`) et X3 (`m3_reseau`) : arrêt en code 1 sur la garde.
+  - Le compte vaut 2 au lieu de 1, parce que deux motifs couvrent le même fichier. C'est sans effet sur le refus.
+- **Écart à tes règles, dans ma première version de l'essai** (scratchpad, lancée à 19:02:19 UTC) : elle contenait un `rm` dont la cible était une expansion de variable. Il visait seulement le faux journal du bac à sable, et il était inutile, puisque chaque cas a son propre TAG. Il est retiré de la version archivée, relancée avec le même résultat.

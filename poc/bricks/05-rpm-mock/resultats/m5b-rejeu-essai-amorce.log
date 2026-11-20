@@ -1,0 +1,4 @@
+# essai-amorce.sh, 2026-11-20T19:02:37Z, dépôt 91897987, script a01f8dd11901a871
+X1 (TAG essai-x1, présent : -) : code 1 ; garde : OK   journaux de ce TAG présents (un journal n'est jamais réécrit) : 0
+X2 (TAG essai-x2, présent : essai-x2-amorce.log) : code 1 ; garde : KO   journaux de ce TAG présents (un journal n'est jamais réécrit) : 2 (attendu : 0)
+X3 (TAG essai-x3, présent : essai-x3-m3_reseau.log) : code 1 ; garde : KO   journaux de ce TAG présents (un journal n'est jamais réécrit) : 2 (attendu : 0)

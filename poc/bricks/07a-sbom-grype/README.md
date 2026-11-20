@@ -322,3 +322,8 @@ Mesure hors réseau sur l'hôte ([`rpm-distro.sh`](rpm-distro.sh), [prédictions
 - Sans `--distro`, grype 0.104.1 ne trouve aucune correspondance, avec un code 0 et rien sur la sortie d'erreur. Avec `--distro rocky:9.7`, il en trouve sur les données de Red Hat 9 : `openssl-libs` 49 (CVE-2026-9076 comprise), `zlib` 1, `glibc` 19. Pour `sample-app`, il n'en trouve aucune, avec ou sans `--distro`.
 - **La question des 10 et 12/11 est close pour le rpm isolé** : réponse non. **D14 reste à trancher** par le propriétaire : la mesure montre que la branche « refuser » refuserait tous ces SBOM, et que la branche « `--distro` » suffit à les juger.
 - Non mesuré : le binaire Go du rpm, un SBOM fait sur la racine de construction, et un scan de rpm dans la plateforme.
+
+**Note du 20/11/2026 (2026-11-20T19:03:57Z UTC), correction de l'additif de 18:58:47 UTC** (rien n'est réécrit) : la lecture de D14 y était fausse.
+- La `distro` de D14 est le champ du résultat de grype : vide sans `--distro`, `rockylinux 9.7` avec. Les deux branches sont compatibles.
+- Pour `sample-app`, le scan du rpm seul est vide avec ou sans `--distro` : aucun module Go n'est catalogué. Le binaire Go extrait du deb de la 06 donnait 140 correspondances.
+- Détail : [prédictions et résultat](resultats/rpm-distro-predictions.md), correction de 2026-11-20T19:03:57Z.

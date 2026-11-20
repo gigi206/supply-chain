@@ -47,3 +47,14 @@ Le script a tourné le 20/11/2026 de 18:57:55 à 18:58:05 UTC, au dépôt `8a7f1
 - **Pour D14** : un SBOM de rpm produit par syft sur le fichier seul n'a jamais `distro=`. La première branche de D14 (la porte refuse un SBOM de paquet sans `distro`) refuserait donc tous les SBOM de rpm faits ainsi ; la seconde (le job passe `--distro`) suffit à les juger. D14 reste ta décision.
 - **Non mesuré** : le binaire Go de `sample-app` dans le rpm (rien pour extraire le rpm sur l'hôte) ; un SBOM fait sur la racine de construction, qui a un `/etc/os-release` ; le scan d'un rpm dans la plateforme.
 - Le dossier de travail (6,9 Mio : copies des quatre rpm, SBOM et sorties de grype, lus par aucun script) est effacé après ce résultat.
+
+## Correction du 20/11/2026, écrite à 2026-11-20T19:03:57Z UTC (la lecture ci-dessus reste écrite telle quelle)
+
+**La lecture de D14 était fausse.** Le conseiller l'a relevé.
+- D14 dit : « la porte refuse un scan dont la `distro` est vide, ou le job passe `--distro` explicitement ». La `distro` en cause est le champ `distro` du résultat de grype, pas un qualificatif du PURL.
+- Il est vide sans `--distro` (`{"name": ""}`) et vaut `rockylinux 9.7` avec. Les deux branches de D14 sont donc compatibles : un job qui passe `--distro` produit un scan dont la `distro` n'est pas vide.
+- « Refuserait tous les SBOM de rpm » est donc faux.
+- « `--distro` suffit à les juger » est faux pour `sample-app` : 0 correspondance dans les deux cas. Le SBOM n'a que 2 composants, le rpm et le fichier, et aucun module Go.
+  - Un scan du rpm seul serait donc vide pour l'application.
+  - À comparer : le binaire Go extrait du deb de la 06 donnait 140 correspondances (12/11).
+- D14 reste ta décision. Cette mesure ne l'oriente pas.
