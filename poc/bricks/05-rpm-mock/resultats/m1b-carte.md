@@ -784,3 +784,19 @@ Accord du propriétaire pour les écritures dans Zot : « Oui, signe ». `SIGNER
 3. les PipelineRuns, sur leur propre accord.
 
 La ConfigMap `porte` du cluster est toujours en retard sur `taches.yml` (note de 16:51:28 UTC le 19/11). Elle ne joue pas à l'admission des PipelineRuns, seulement pour un verdict de la porte.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T09:01:24Z UTC : liste revue acceptée, second passage de la signature
+
+**Liste revue** : sur ta décision « Oui, ajoute-les », les deux entrées proposées sont ajoutées telles quelles à `08-trust-plane/politique/porte/taches.yml` (commit `54c4dc1c`).
+
+**Second passage** : `m1b-signature.sh taches`, sans `SIGNER`, est parti à 2026-11-20T09:00:43Z, avec code 0, 31 OK et 0 KO ([`m1b-signature-taches-2.log`](m1b-signature-taches-2.log) ; le journal du premier passage reste [`m1b-signature-taches.log`](m1b-signature-taches.log)).
+- **SG2, tenue** : les deux bundles de tâches, repoussés depuis les fichiers versionnés (inchangés : `14e83b3d…` et `9069ad26…`), ont les digests du premier passage (`16a32993…` et `bdde08ed…`). Le script les trouve tous deux dans la liste revue.
+- **SG3, tenue** :
+  - chaque pipeline ne diffère du rendu que par les trois références (`prefetch-racine-rpm`, `construire-racine-rpm`, `publier-image` `d21931f3…`) ;
+  - elles sont admises, signées et relues, puis poussées au tag `m1b` ;
+  - `builder-mock-rocky9@sha256:4b9daf42…` et `builder-rocky9-bootstrap@sha256:eb57d44c…`.
+- **SG4, tenue pour les quatre objets** ([`m1b-signature-sg4.log`](m1b-signature-sg4.log)) : `tkn pipeline verify`, avec la clé publique des tâches, accepte les deux pipelines signées et refuse une copie altérée de chacune (un paramètre de `construire`).
+
+**Portée** : les pipelines signées ne sont pas versionnées dans le dépôt (le script ne le fait pas) ; leur sha256 est au journal SG4, et la référence de vérité est le bundle dans Zot. La ConfigMap `porte` reste en retard sur `taches.yml`.
+
+**Suite** : `m1b-pipeline.sh pipeline`, quatre PipelineRuns (PN1 à PN7), sur ton accord, car `publier-image` écrit dans Zot et ces écritures sont définitives.

@@ -5,3 +5,8 @@ prefetch-racine-rpm altérée (memory) : modifiée ; tkn task verify : refusée
 construire-racine-rpm.signee.yaml : sha256 9069ad2613a8a1270d02f7dec685f48f41e0698a0ad4648eb77dfb4c973ef058 ; tkn task verify : vérifiée
 construire-racine-rpm altérée (memory) : modifiée ; tkn task verify : refusée
 pipelines : non signées à ce stade (second passage après revue)
+# vérification SG4 (pipelines, second passage), 2026-11-20T09:00:57Z
+builder-mock-rocky9-signee.yaml (travail) : sha256 d31c871840301fe50b2fc9ac31e60a70a2f6d0792d80192ff0434b8869a68d3a ; tkn pipeline verify : vérifiée
+builder-mock-rocky9 altérée (paramètre de construire) : modifiée ; tkn pipeline verify : refusée
+builder-rocky9-bootstrap-signee.yaml (travail) : sha256 15123e7fae50e03999e6e582ff9c0974a259c3353bc0aa81215c330aa42bc848 ; tkn pipeline verify : vérifiée
+builder-rocky9-bootstrap altérée (paramètre de construire) : modifiée ; tkn pipeline verify : refusée
