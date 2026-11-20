@@ -1,0 +1,68 @@
+2026-11-20T15:25:49Z
+253	/var/lib/synchro
+264	/var/log/journal
+264	/var/log/journal/6c7a0b3dc13643808cbd0c8c6d39fb43
+267	/var/log
+296	/var/lib/rancher/rke2/data
+358	/opt/grafana-13.3.0/public
+398	/var/lib/zot/plateforme
+442	/var/lib/zot/amont/openbao
+459	/var/lib/zot/essais-06
+459	/var/lib/zot/essais-06/sbuild-debian13
+468	/opt/grafana-13.3.0/bin
+546	/var/lib/zot/amont/tektoncd
+564	/opt/grafana-13.3.0/data
+564	/opt/grafana-13.3.0/data/plugins-bundled
+1005	/var/lib/zot/amont/kyverno
+1266	/var/lib/zot/builds/builders
+1391	/var/lib/loki/chunks/fake
+1394	/var/lib/loki/chunks
+1401	/opt/grafana-13.3.0
+1413	/var/lib/loki
+1420	/opt
+1489	/var/lib/zot/builds
+1546	/var/lib/zot/vulndb
+1546	/var/lib/zot/vulndb/grype
+2417	/var/lib/zot/amont
+2883	/var/lib/rancher/rke2/agent
+3178	/var/lib/rancher
+3178	/var/lib/rancher/rke2
+6774	/var/lib/zot
+12040	/var/lib
+Archived and active journals take up 263.1M in the file system.
+ Used Avail
+16252  2843
+2026-11-20T15:55:52Z
+253	/var/lib/synchro
+272	/var/log/journal
+272	/var/log/journal/6c7a0b3dc13643808cbd0c8c6d39fb43
+275	/var/log
+296	/var/lib/rancher/rke2/data
+358	/opt/grafana-13.3.0/public
+398	/var/lib/zot/plateforme
+442	/var/lib/zot/amont/openbao
+459	/var/lib/zot/essais-06
+459	/var/lib/zot/essais-06/sbuild-debian13
+468	/opt/grafana-13.3.0/bin
+546	/var/lib/zot/amont/tektoncd
+564	/opt/grafana-13.3.0/data
+564	/opt/grafana-13.3.0/data/plugins-bundled
+1005	/var/lib/zot/amont/kyverno
+1266	/var/lib/zot/builds/builders
+1394	/var/lib/loki/chunks/fake
+1397	/var/lib/loki/chunks
+1401	/opt/grafana-13.3.0
+1420	/opt
+1420	/var/lib/loki
+1489	/var/lib/zot/builds
+1546	/var/lib/zot/vulndb
+1546	/var/lib/zot/vulndb/grype
+2417	/var/lib/zot/amont
+2883	/var/lib/rancher/rke2/agent
+3178	/var/lib/rancher
+3178	/var/lib/rancher/rke2
+6774	/var/lib/zot
+12048	/var/lib
+Archived and active journals take up 271.1M in the file system.
+ Used Avail
+16268  2826

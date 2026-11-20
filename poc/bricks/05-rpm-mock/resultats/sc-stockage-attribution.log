@@ -1,0 +1,16 @@
+# attribution de la place de / sur sc-stockage, lecture seule (df sans sudo, lecture anonyme de Zot)
+2026-11-20T15:59:32Z
+ Used Avail 1M-blocks
+16274  2820     19953
+## vulndb/grype : tags et octets des couches (lecture anonyme)
+2026-11-13 200675469
+2026-11-14 201047091
+2026-11-15 201356968
+2026-11-16 201493737
+2026-11-17 203145775
+2026-11-18 203412645
+2026-11-19 203990334
+2026-11-20 205235691
+## taille du disque de sc-stockage dans vm.sh
+25:declare -A TAILLE=([sc-confiance]=15G [sc-build]=30G [sc-stockage]=20G)
+2026-11-20T15:59:32Z

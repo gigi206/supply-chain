@@ -1106,3 +1106,22 @@ La clôture de la brique 05 reste ta décision.
   - puis `crane export` de la même référence par digest, avec la CA du PoC et une lecture anonyme, envoyé dans `unshare -r tar -x --no-same-owner --exclude='dev/*'` ;
   - les deux commandes ont rendu 0, pour 345 Mo extraits. Le rootfs donne `RPM version 4.16.1.3` et `Python 3.9.25`, versions relevées par les bancs 2 et 3.
 - **Portée de l'additif de l'ADR 0007** : « changer d'images de builder ne change ni l'artefact ni les barrières » vaut pour le seul changement mesuré, des images d'essai (`99790c13…`, `f0ccf105…`) aux images de M1b (`70f8c412…`, bootstrap `6de899ac…`). La précision est ajoutée à l'ADR.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:00:00Z UTC : attribution de la place de `/` sur sc-stockage
+
+**Mesures** (lecture seule) :
+- [`sc-stockage-du.log`](sc-stockage-du.log) : `sudo du` lancé par toi, deux relevés à 15:25:49Z et à 15:55:52Z. Au premier, `/var/lib` occupe 12 040 Mo sur 16 252 Mo utilisés : Zot 6 774 Mo, dont `vulndb/grype` 1 546 Mo ; rke2 3 178 Mo ; Loki 1 413 Mo. En 30 minutes, `/var/log/journal` passe de 264 à 272 Mo et Loki de 1 413 à 1 420 Mo ; Zot et rke2 ne bougent pas.
+- [`sc-stockage-attribution.log`](sc-stockage-attribution.log) : en lecture anonyme de Zot, `vulndb/grype` porte 8 tags, un par jour du 13/11 au 20/11, de 200 675 469 à 205 235 691 octets de couches chacun. Zot ne supprime rien. Le `df` sans sudo donne 2 820 Mo libres à 15:59:32Z.
+
+**Attribution** :
+- L'écrivain périodique identifié est la base grype poussée chaque jour (brique 07a, `fraicheur-scan`). Elle ajoute environ 200 Mo par jour.
+- La brique 05 a aussi poussé dans Zot depuis le 16/11 : images d'essai, fermetures, images de M1b. Je n'en ai pas fait la somme mesurée.
+- journald et Loki oscillent. `/var/log/journal` valait 288 Mo à 14:46Z et 264 Mo à 15:25Z, et la place libre est remontée de 2 821 à 2 846 Mo entre 14:45:59Z et 15:24:21Z. Trente minutes ne donnent pas de débit journalier.
+
+**Correction** :
+- « sans écriture de la brique » restait vrai pour la 05, mais la cause était la base grype quotidienne, que les relevés précédents n'attribuaient pas.
+- Le rythme d'environ 740 Mo par jour, et la saturation vers le 24/11 que j'en tirais, venaient de deux fenêtres qui s'accordaient par hasard. Je les retire. Entre 14:05Z (2 842 Mo) et 15:55Z (2 826 Mo), il ne manque que 16 Mo.
+
+**Projection, non mesurée** : sans autre poussée, la base grype seule laisse environ 1,2 Go libres le 28/11. Il faut un `df` à 24 heures d'écart pour le confirmer.
+
+**Rejeu** : M5b recrée les VM ([carte de M5b](m5b-carte.md), l. 7 : le rejeu « viderait Zot »). Le disque de sc-stockage y prend la taille de `vm.sh`, soit 20G.
