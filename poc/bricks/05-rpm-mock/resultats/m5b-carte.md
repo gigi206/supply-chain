@@ -515,3 +515,22 @@ Les deux notes restent écrites telles quelles.
 **Portée**, inchangée : ni Zot, ni Tekton, ni l'admission réelle, ni Kyverno, Kata, Chains ou tkn. Les étapes `signature` et `images` ne sont mesurées que par leur chargement. Le dossier du banc (3,4 Mio, lu par aucun script) est effacé. Les trois journaux restent.
 
 **Ce qui reste pour M5b sous C** : le bloc 05 de `rejeu.sh`, dans l'ordre de la note de 17:47:22Z.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T17:52:19Z UTC : bloc 05 de `rejeu.sh` écrit à sec
+
+**Écrit, rien n'est lancé** : [`rejeu.sh`](../../08-trust-plane/rejeu.sh) (sha256 `c142ebfe1568a3de…`) reçoit le bloc 05, appliqué sous l'accord permanent du 18/11. Son en-tête porte un additif du 20/11/2026, marqué « PAS ENCORE REJOUÉ, pas avant le 28/11/2026 ».
+- **`TAG_05`** déclenche le bloc. Sans lui, le bloc est sauté avec un message, comme `POUSSER_VSA` pour la VSA.
+  - Il faut un `TAG_05` neuf par tentative, reprise par `DEPUIS=` comprise : un journal n'est jamais réécrit, et `entree` refuse un `TAG` déjà utilisé.
+  - `m5b-rejeu.sh` refuse `m1b`, `m4a`, `m4b`, `m4c`, `essai` et `s1`.
+- **`entree`** passe avant le démontage, sous RKE2 et Cilium, hors de `etape`. Un refus arrête donc le rejeu avant qu'il ne détruise quoi que ce soit.
+- **Les neuf étapes**, dans l'ordre de la note de 17:47:22Z, viennent après la dernière étape de la 06 et avant `fuites`. Elles tournent dans la branche RKE2 et Cilium, comme la 08c et la 06.
+- **Relevé statique**, dans la même commande que cette note : `bash -n` passe, et shellcheck aussi, lancé depuis le dossier de la 08. Depuis la racine, il signale SC1091 sur `distro.sh` (info), déjà présente avant le bloc 05 : `rejeu.sh` du commit précédent la donne aussi. Les neuf lignes sont présentes une fois chacune, dans l'ordre et consécutives. `entree` précède le démontage, qui précède la dernière étape de la 06, puis le bloc, puis `fuites`.
+- **Politiques réseau** : la lecture de `sortie-builds.sh rejeu` (l. 354 à 356) confirme qu'il pose `prefetch-rpm-sortie`, `prefetch-racine-rpm-sortie` et `construction-racine-rpm-sans-sortie`. `s1.sh m3_reseau` pose `construction-rpm-sans-sortie`. La NotIn à quatre labels est posée par la 08c (note de 16:18:58Z).
+- **Non mesuré** : aucune exécution du bloc, ni sur banc ni dans le cluster.
+  - La durée attendue reste celle de l'estimation : environ 16 min pour la 05, plus le premier passage de `signature` et `images` sous le rejeu.
+  - `s1.sh amorce` lit quay.io : il demande le réseau public, comme la 06.
+
+**Ce qui reste pour M5b sous C**, en dehors de la préparation :
+- le `df` de `/` sur sc-stockage vers 16:00Z le 21/11 ;
+- le rejeu lui-même, pas avant le 28/11, sur ton accord ;
+- tes décisions ouvertes (taille du disque dans `vm.sh`, rétention grype, seconde barrière réseau, `TZ` dans `bundle`).

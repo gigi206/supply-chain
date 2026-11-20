@@ -47,8 +47,16 @@
 # pousser_vsa et lire_vsa, puis S6a porte. Sans POUSSER_VSA=1, la porte du deb est sautée comme celle de S4d3 : la clé du scanner
 # n'entre dans la ConfigMap porte que par cm_porte des contrôles 6 et 7 (déduit du code, non mesuré). Une étape par appel : s6a.sh
 # et s6b.sh n'acceptent qu'un argument.
+# Additif du 20/11/2026 : M5b de la 05 sous l'option C (décision du propriétaire ; carte 05-rpm-mock/resultats/m5b-carte.md,
+# notes de 17:47:22 et 17:50:11 UTC), à sec, PAS ENCORE REJOUÉ, pas avant le 28/11/2026. Avec TAG_05=<tag> seulement, sous RKE2 et
+# Cilium : m5b-rejeu.sh entree avant le démontage (hôte seul : TAG, journaux et dossiers du TAG absents, entrées de l'hôte, fichiers
+# signés, clé des tâches, fuseau, tkn), puis, après la 06 (sample-app-sources, publier-fermeture et publier-image en viennent) :
+# s1.sh amorce et m3_reseau, signature (les deux pipelines des builders signées à nouveau, clé des tâches lue par tkn), images,
+# republication sans signature des tâches rpm, artefact de packaging, pipeline de fermeture, fermeture, pipeline de construction,
+# construction rpm. Les gardes de M4a, M4b et M4c ne sont pas rejouées (m5b-rejeu.sh). Un journal n'est jamais réécrit : un
+# TAG_05 neuf par tentative, reprise par DEPUIS= comprise (entree le refuse sinon). Sans TAG_05, le bloc est sauté.
 #
-# Usage (racine du dépôt) : [POUSSER_VSA=1] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
+# Usage (racine du dépôt) : [POUSSER_VSA=1] [TAG_05=<tag>] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -80,6 +88,10 @@ etape() { # libellé commande…
   [ "$l" != "$JUSQUA" ] || { echo "## arrêt après $l (JUSQUA), $(( $(date +%s) - t0 )) s"; exit 0; }
 }
 echo "réseau : $RESEAU${DEPUIS:+ ; reprise à $DEPUIS}${JUSQUA:+ ; arrêt après $JUSQUA}"
+b05=$here/../05-rpm-mock
+if [ -n "${TAG_05:-}" ] && [ "$DISTRO" = rke2 ] && [ "$RESEAU" = cilium ]; then   # M5b de la 05 : contrôle avant tout démontage
+  env TAG="$TAG_05" mise exec -- "$b05/m5b-rejeu.sh" entree
+fi
 etape démontage mise run confiance:vm -- detruire
 etape VM mise run confiance:vm -- creer
 if [ "$DISTRO" = k3s ]; then etape k3s mise run confiance:k3s; else etape RKE2 mise exec -- "$here/../08b-rke2/rke2.sh" installer; fi
@@ -214,8 +226,22 @@ if [ "$DISTRO" = rke2 ] && [ "$RESEAU" = cilium ]; then
     echo "## 06 s6b pousser_vsa, lire_vsa et s6a porte : sautées (POUSSER_VSA=1 absent : accord du propriétaire à chaque push de"
     echo "## VSA ; clé du scanner posée dans la ConfigMap porte par les contrôles 6 et 7 seulement)"
   fi
+  # M5b de la 05 (20/11/2026, à sec) : voir l'additif de l'en-tête. Un PipelineRun par pipeline ; 333b7322 et 09838980 exigés.
+  if [ -n "${TAG_05:-}" ]; then
+    etape "05 (S1, amorce et m3_reseau)" env PREFIXE="$TAG_05" mise exec -- "$b05/s1.sh" amorce m3_reseau
+    etape "05 (signature)" env TAG="$TAG_05" mise exec -- "$b05/m5b-rejeu.sh" signature
+    etape "05 (images)" env TAG="$TAG_05" mise exec -- "$b05/m5b-rejeu.sh" images
+    etape "05 (taches)" env TAG="$TAG_05" mise exec -- "$b05/m5b-republier.sh" taches
+    etape "05 (artefact)" env TAG="$TAG_05" mise exec -- "$b05/m5b-rejeu.sh" artefact
+    etape "05 (pipeline_fermeture)" env TAG="$TAG_05" mise exec -- "$b05/m5b-republier.sh" pipeline_fermeture
+    etape "05 (fermeture)" env TAG="$TAG_05" mise exec -- "$b05/m5b-rejeu.sh" fermeture
+    etape "05 (pipeline_construction)" env TAG="$TAG_05" mise exec -- "$b05/m5b-republier.sh" pipeline_construction
+    etape "05 (construction_rpm)" env TAG="$TAG_05" mise exec -- "$b05/m5b-rejeu.sh" construction_rpm
+  else
+    echo "## 05 (M5b) : sautée (TAG_05 absent ; un TAG neuf par tentative)"
+  fi
 else
-  echo "## 08c, J8 (résolveurs) et 06 : sautés (DISTRO=$DISTRO, RESEAU=$RESEAU ; RKE2 et Cilium seulement)"
+  echo "## 08c, J8 (résolveurs), 06 et 05 : sautés (DISTRO=$DISTRO, RESEAU=$RESEAU ; RKE2 et Cilium seulement)"
 fi
 echo "## 08d : rien à rejouer (relevés seuls, rien installé ; cert-manager lié à l'exposition de services, D7)"
 etape fuites mise run confiance:fuites -- "$lib"

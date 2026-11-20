@@ -2653,6 +2653,14 @@ Correctif [`rejeu-s6.patch`](rejeu-s6.patch) : étapes S6a et S6b de la 06 aprè
 
 **Note du 14/11/2026 (2026-11-14T21:19:48Z) :** `rejeu-s6.patch` appliqué à `rejeu.sh` (« Oui, applique-le ») ; pas encore rejoué.
 
+### Additif du 20/11/2026 (note de 2026-11-20T17:52:19Z) : M5b de la 05 intégré à sec, PAS ENCORE REJOUÉ
+
+`rejeu.sh` reçoit le bloc 05 (option C de la 05), appliqué sous l'accord permanent du 18/11.
+- `entree` de `m5b-rejeu.sh` passe avant le démontage.
+- Les neuf étapes passent après la 06 et avant `fuites`, sous RKE2 et Cilium, avec `TAG_05=<tag>` seulement.
+- Il faut un `TAG_05` neuf par tentative, reprise comprise.
+- Détail, relevé statique et ce qui n'est pas mesuré : [carte de M5b](../05-rpm-mock/resultats/m5b-carte.md), note de 2026-11-20T17:52:19Z. Pas de rejeu avant le 28/11/2026.
+
 ### Additif du 17/11/2026 (note de 2026-11-17T19:11:07Z) : Kyverno v1.20.0 et choix de la provenance (réserve C)
 
 Lecture du code de v1.20.0 (publiée le 12/11/2026), **rien mesuré, aucune note modifiée** ([script](kyverno-120-selection.sh), [journal](resultats/kyverno-120-selection.log) ; premier passage, deux défauts du script : [journal](resultats/kyverno-120-selection-passage1.log)). Relevé demandé par le propriétaire le 17/11/2026 (« Je parlais du problème vs conforma », puis « Oui, archive-le »). Lecture publique seulement.
