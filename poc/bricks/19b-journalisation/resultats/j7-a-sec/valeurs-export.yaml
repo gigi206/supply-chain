@@ -1,0 +1,41 @@
+# J7 de la 19b, préparé à sec le 20/11/2026 : export dynamique de Hubble, limité aux pods du namespace builds.
+# Deux filtres (source OU destination) : dans un même filtre, tous les champs doivent correspondre (flow.proto, v1.20.4).
+# Rien n'est posé : ce fichier sert au rendu hors ligne (helm template) et à la carte j7-carte.md.
+hubble:
+  export:
+    dynamic:
+      enabled: true
+      config:
+        configMapName: cilium-flowlog-config
+        createConfigMap: true
+        content:
+          - name: builds
+            fieldMask:
+              - time
+              - node_name
+              - verdict
+              - drop_reason_desc
+              - event_type
+              - traffic_direction
+              - is_reply
+              - IP
+              - l4
+              - source.namespace
+              - source.pod_name
+              - source.labels
+              - destination.namespace
+              - destination.pod_name
+              - destination_names
+              - egress_allowed_by
+              - egress_denied_by
+              - ingress_denied_by
+            fieldAggregate: []
+            aggregationInterval: "0s"
+            includeFilters:
+              - source_pod: ["builds/"]
+              - destination_pod: ["builds/"]
+            excludeFilters: []
+            filePath: /var/run/cilium/hubble/builds.log
+            fileMaxSizeMb: 10
+            fileMaxBackups: 5
+            fileCompress: false

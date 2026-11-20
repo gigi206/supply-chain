@@ -1,0 +1,29 @@
+// Brique 19b, J7 (préparé à sec le 20/11/2026, non posé) : flux Hubble des pods du namespace builds, exportés par l'agent Cilium
+// de sc-build dans /var/run/cilium/hubble/builds.log (export dynamique, ConfigMap cilium-flowlog-config). Une ligne JSON par flux.
+// Étiquettes à faible cardinalité seulement : source="hubble" et verdict ; le pod et la destination restent dans la ligne (| json).
+// Rôle « build » : sc-build seul, où tournent les pods de construction (taint zone=build:NoSchedule).
+local.file_match "hubble" {
+  path_targets = [{"__path__" = "/var/run/cilium/hubble/builds.log", source = "hubble"}]
+}
+
+loki.source.file "hubble" {
+  targets    = local.file_match.hubble.targets
+  forward_to = [loki.process.hubble.receiver]
+}
+
+loki.process "hubble" {
+  stage.json {
+    expressions = {verdict = "flow.verdict", horodatage = "time"}
+  }
+  stage.timestamp {
+    source = "horodatage"
+    format = "RFC3339Nano"
+  }
+  stage.labels {
+    values = {verdict = ""}
+  }
+  stage.label_drop {
+    values = ["filename"]
+  }
+  forward_to = [loki.write.sortie.receiver]
+}

@@ -1,0 +1,56 @@
+# J7 de la 19b, étape 1 à sec (2026-11-20T21:46:17Z) : rien n'est posé
+## archives
+chart : sha256 505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed (CHART_TGZ de cilium.sh : 505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed)
+alloy : sha256 50d23af2d0f98c00beac6ce9a365693e60f87fb76b6cad6fe1d161e80588af6d (ALLOY_SHA de journalisation.sh : 50d23af2d0f98c00beac6ce9a365693e60f87fb76b6cad6fe1d161e80588af6d)
+binaire : alloy, version v1.21.3 (branch: HEAD, revision: f2108cd), extrait hors de /tmp, non installé
+helm : v4.3.1+gc0d08d0
+## fichiers proposés (j7-a-sec/)
+11a3f50e3280e892c7318bf622cb7d8365aa69e0e7845dc44988d7ae0097ca45  valeurs-export.yaml
+b4ec54152bb704eee8946fe528bbecb831e281b366cbe2ccf89fc9f6661b9d5b  hubble.alloy
+## rendu hors ligne (helm template), valeurs de cilium.sh appliquer : cilium/valeurs.yaml rendu, 08b valeurs-cilium.yaml, 08c valeurs-cilium.yaml
+pas de WireGuard posé (clé enable-wireguard absente du cilium-config vivant) : true
+Secrets du rendu (non comparés, non affichés) : 2
+objets ajoutés : ['ConfigMap/cilium-flowlog-config']
+objets retirés : []
+cilium-config rendu actuel contre vivant : clés 163 / 163 ; différentes : []
+== ConfigMap/cilium-config : 2 lignes de diff
+   @@ -88,0 +89 @@
+   +  "hubble-flowlogs-config-path": "/flowlog-config/flowlogs.yaml",
+== DaemonSet/cilium : 14 lignes de diff
+   @@ -273,0 +274,5 @@
+   +       },
+   +       {
+   +        "mountPath": "/flowlog-config",
+   +        "name": "hubble-flowlog-config",
+   +        "readOnly": true
+   @@ -748,0 +754,7 @@
+   +     },
+   +     {
+   +      "configMap": {
+   +       "name": "cilium-flowlog-config",
+   +       "optional": true
+   +      },
+   +      "name": "hubble-flowlog-config"
+== ajouté ConfigMap/cilium-flowlog-config
+   {
+    "apiVersion": "v1",
+    "data": {
+     "flowlogs.yaml": "flowLogs:\n  - aggregationInterval: 0s\n    excludeFilters: []\n    fieldAggregate: []\n    fieldMask:\n    - time\n    - node_name\n    - verdict\n    - drop_reason_desc\n    - event_type\n    - traffic_direction\n    - is_reply\n    - IP\n    - l4\n    - source.namespace\n    - source.pod_name\n    - source.labels\n    - destination.namespace\n    - destination.pod_name\n    - destination_names\n    - egress_allowed_by\n    - egress_denied_by\n    - ingress_denied_by\n    fileCompress: false\n    fileMaxBackups: 5\n    fileMaxSizeMb: 10\n    filePath: /var/run/cilium/hubble/builds.log\n    includeFilters:\n    - source_pod:\n      - builds/\n    - destination_pod:\n      - builds/\n    name: builds\n"
+    },
+    "kind": "ConfigMap",
+    "metadata": {
+     "name": "cilium-flowlog-config",
+     "namespace": "kube-system"
+    }
+   }
+montage cilium-agent /var/run/cilium <- volume cilium-run hostPath /var/run/cilium
+montage cilium-agent /var/run/cilium/netns <- volume cilium-netns hostPath /var/run/netns
+## alloy validate, composition de sc-build (rôles commun noeud, plus journaux-rke2.alloy sous RKE2)
+sans : code 0 ; fichiers : journal.alloy journaux-rke2.alloy pods.alloy sortie.alloy 
+avec : code 0 ; fichiers : hubble.alloy journal.alloy journaux-rke2.alloy pods.alloy sortie.alloy 
+temoin : code 1 ; fichiers : hubble.alloy journal.alloy journaux-rke2.alloy pods.alloy sortie.alloy 
+  refus sur : loki.write.inexistant.receiver
+## alloy fmt (forme seulement)
+hubble.alloy : 37 lignes d'écart avec fmt
+pods.alloy : 33 lignes d'écart avec fmt
+journaux-rke2.alloy : 12 lignes d'écart avec fmt

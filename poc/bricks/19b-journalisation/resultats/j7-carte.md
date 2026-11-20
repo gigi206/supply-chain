@@ -79,3 +79,24 @@ C'est le J7 du [README](../README.md) de la 19b (« Flux réseau refusés (Hubbl
 - que `/var/run/cilium` soit un `hostPath` du DaemonSet de Cilium : le `helm template` de l'étape 1 le dira ;
 - « alerte » : la 19 a un Alertmanager, mais son branchement sur Loki n'a pas été relu. D'ici là, lire « requête et panneau » ;
 - l'étape 2 (`hubble observe`) passe par un `kubectl exec` dans l'agent Cilium privilégié. Ce n'est pas une des lectures sans accord : elle sera **nommée dans la demande d'accord**, et seuls des comptes seront archivés, jamais de flux bruts.
+
+## Étape 1 à sec : résultat (note de 2026-11-20T21:46:56Z ; rien n'est réécrit au-dessus)
+
+Rien n'est posé. Journal : [`j7-etape1.log`](j7-etape1.log). Fichiers proposés dans [`j7-a-sec/`](j7-a-sec/) : `valeurs-export.yaml` (sha256 `11a3f50e3280e892…`) et `hubble.alloy` (`b4ec54152bb704ee…`).
+
+- **Rendu hors ligne.** `helm template` de l'archive du chart (sha256 égal à `CHART_TGZ`), avec les mêmes fichiers que `cilium.sh appliquer` : `cilium/valeurs.yaml` rendu, `valeurs-cilium.yaml` de la 08b et de la 08c. La reconstruction est exacte : les 163 clés de `cilium-config` sont égales à celles du cluster (`kubectl get`, lecture seule). WireGuard n'est pas posé (clé absente).
+- **Ce que l'export change**, Secrets du rendu ni comparés ni affichés :
+  - `cilium-config` : une clé, `hubble-flowlogs-config-path: /flowlog-config/flowlogs.yaml` ;
+  - DaemonSet `cilium` : un volume (ConfigMap `cilium-flowlog-config`, `optional: true`) et son montage `/flowlog-config` dans `cilium-agent` ;
+  - une ConfigMap ajoutée, `cilium-flowlog-config`, avec un exportateur `builds` : deux filtres (`source_pod: builds/`, `destination_pod: builds/`), 18 champs gardés, fichier `/var/run/cilium/hubble/builds.log`, rotation 10 Mo × 5.
+  - Le modèle de pod du DaemonSet change : `helm upgrade` seul relancerait donc les agents. C'est déduit, pas mesuré ; `cilium.sh appliquer` les relance de toute façon.
+- **Point non lu n°1 levé** : `/var/run/cilium` est un `hostPath` du DaemonSet (volume `cilium-run`). Le fichier d'export est donc sur le disque de sc-build.
+- **Alloy** : composition de sc-build (rôles `commun` et `noeud`, plus `journaux-rke2.alloy`), validée par `alloy validate` v1.21.3 (binaire extrait de l'archive vérifiée, non installé) : code 0 sans et avec `hubble.alloy` ; le témoin cassé (récepteur inexistant) est refusé (code 1). `alloy fmt` ne signale que des écarts de forme, comme sur `pods.alloy` et `journaux-rke2.alloy` du dépôt.
+- **À la pose 4b** : un rôle `build` pour sc-build seul, dans `ROLES` de `journalisation.sh`.
+
+**Non vérifié, à lire sur le fichier à l'étape 4a** :
+- le format des lignes : `hubble.alloy` suppose les clés `time` et `flow.verdict` ;
+- les droits du fichier `builds.log` : la lecture par Alloy (`CAP_DAC_READ_SEARCH`) est déduite ;
+- la rotation réelle.
+
+**Étape 2** (`hubble observe` dans l'agent de sc-build, `kubectl exec`) : elle attend un accord nommé. Elle n'est pas demandée ce soir.
