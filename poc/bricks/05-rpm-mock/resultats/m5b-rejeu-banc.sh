@@ -65,7 +65,7 @@ for t in m1b m4a m4b m4c essai s1 '' A a_b; do
 done
 r=0; TAG=banc-a bash "$F" inconnue > /dev/null 2>&1 || r=$?
 verifie "A3 étape inconnue (code)" "$r" 2
-verifie "A3 aucun journal écrit par A2 et A3" "$(find poc/bricks/05-rpm-mock/resultats -name 'm5b-rejeu-*-*.log' | wc -l)" 0
+verifie "A3 aucun journal écrit par A2 et A3 (journaux du banc exceptés)" "$(find poc/bricks/05-rpm-mock/resultats -name 'm5b-rejeu-*-*.log' ! -name 'm5b-rejeu-banc*' | wc -l)" 0
 verifie "A4 scripts de mesure, commun.sh, m5b-republier.sh et rejeu.sh inchangés (git diff HEAD)" \
   "$(git diff --quiet HEAD -- poc/bricks/05-rpm-mock/m1b-signature.sh poc/bricks/05-rpm-mock/m1b-pipeline.sh poc/bricks/05-rpm-mock/m1b-artefact.sh \
     poc/bricks/05-rpm-mock/m1b-fermeture.sh poc/bricks/05-rpm-mock/m1b-construction.sh poc/bricks/05-rpm-mock/m5b-republier.sh \

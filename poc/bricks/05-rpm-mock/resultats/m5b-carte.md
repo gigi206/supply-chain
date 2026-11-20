@@ -478,3 +478,16 @@ Les deux notes restent écrites telles quelles.
 - Le `cut -c1-170` des extraits (lignes `   | `) coupe des caractères multioctets : `grep` traite alors le journal comme binaire. C'est sans effet sur les comptes.
 
 **Prédiction du second passage, écrite avant le lancement** : RV1 à RV6 tenues, « bilan : 103 OK, 0 KO ». Le passage utilise un dossier neuf (`banc-m5b-rejeu-2`) et le journal `m5b-rejeu-banc-2.log`. Le premier journal reste tel quel, et son dossier (3,4 Mio, lu par aucun script) est effacé.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T17:49:27Z UTC : second passage du banc de `m5b-rejeu.sh`, défaut du banc, prédiction du troisième
+
+**Passage** le 20/11/2026 à 17:48:46 UTC, au dépôt `5ae93cb6` (script `1b97d453…`). Le banc rend 1 avec « bilan : 102 OK, 1 KO » ([`m5b-rejeu-banc-2.log`](m5b-rejeu-banc-2.log)).
+- **A1 tenue** : shellcheck passe depuis la racine.
+- **Le KO, défaut du banc** : « A3 aucun journal écrit par A2 et A3 : 1 ». Le motif `m5b-rejeu-*-*.log` attrape le journal du banc lui-même, `m5b-rejeu-banc-2.log`, ouvert par `tee` avant A3. Au premier passage, `m5b-rejeu-banc.log` n'avait pas de second tiret.
+  - Un relevé après le passage ne trouve que ce fichier.
+  - Le prédire faisait partie de mon travail : je ne l'ai pas vu.
+- Les autres contrôles redonnent ceux du premier passage. La prédiction de 17:48:37Z (103 OK) n'est donc pas tenue, à cause du banc.
+
+**Correction** : le motif exclut les journaux du banc (`! -name 'm5b-rejeu-banc*'`). Sha256 du banc : `cc4a2da9b3750d06…`. Le script n'est pas modifié.
+
+**Prédiction du troisième passage, écrite avant le lancement** : « bilan : 103 OK, 0 KO », RV1 à RV6 tenues. Il utilise le dossier `banc-m5b-rejeu-3` et le journal `m5b-rejeu-banc-3.log`. Le dossier du second passage (3,4 Mio, lu par aucun script) est effacé.
