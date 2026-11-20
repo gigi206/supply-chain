@@ -750,3 +750,17 @@ Accord du propriétaire : « Oui, lance-la ». `sortie-builds.sh m1b_sans_sortie
 **Portée** : seuls des invariants lus sur les objets ont été vérifiés. Le chemin réseau réel n'a pas encore été mesuré ; ce sera le rôle des témoins.
 
 **Suite** : `m1b_temoins` (pods runc d'essai, accord permanent du 18/11), prédictions NT1 à NT4 déjà commitées.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T08:54:54Z UTC : `m1b_temoins` passée
+
+`sortie-builds.sh m1b_temoins` a tourné de 2026-11-20T08:42:17Z à 2026-11-20T08:54:16Z sous l'accord permanent du 18/11, avec code 0 et sans KO ([`sortie-m1b_temoins.log`](../../08c-durcissement/resultats/sortie-m1b_temoins.log)). Sept pods témoins runc, retirés par le script. [`m1b-temoins-verif.py`](m1b-temoins-verif.py) compare le journal à celui de `rpm_temoins` du 16/11 ; seules les adresses résolues sont normalisées. Résultat : 17 OK, 0 KO ([`m1b-temoins-verif.log`](m1b-temoins-verif.log)).
+- **NT1, tenue** : les cinq témoins de `rpm_temoins` rendent les mêmes dix lignes que le 16/11, aux adresses près.
+- **NT2, tenue** : le témoin `prefetch-racine-rpm` rend les lignes du témoin `prefetch-rpm`. DNS résolu, 443 public joint (proxy.golang.org et dl.rockylinux.org), 80 refusé, API refusée, Zot joint, Forgejo refusé.
+- **NT3, tenue** : le témoin `construire-racine-rpm` rend les lignes du témoin `construire-image`. DNS en échec et les sept destinations refusées.
+- **NT4, tenue** : le pod runc au label `construire-racine-rpm` est admis.
+
+**Portée** : ce sont des témoins runc ; ils ne disent rien du chemin réseau propre à Kata. NT2 confirme la borne déjà écrite pour la réserve « (a) Figée » : le prefetch de M1b joint toute adresse publique en 443, pas seulement vault et EPEL.
+
+Les trois étapes réseau de M1b (`m1b_sortie`, `m1b_sans_sortie`, `m1b_temoins`) sont faites. `s1.sh prealables` attend toujours un `NotIn` à trois labels : à adapter avant le rejeu M5b.
+
+**Suite** : signature des tâches de M1b (`SIGNER=1`, écriture dans Zot, sur accord), puis revue de la liste `taches.yml`.

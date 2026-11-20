@@ -1,0 +1,18 @@
+OK   cinq témoins le 16/11
+OK   sept témoins le 20/11
+OK   NT1 construire : même label
+OK   NT1 construire : mêmes lignes (10) aux adresses près
+OK   NT1 deb : même label
+OK   NT1 deb : mêmes lignes (10) aux adresses près
+OK   NT1 prefetch : même label
+OK   NT1 prefetch : mêmes lignes (10) aux adresses près
+OK   NT1 rpm : même label
+OK   NT1 rpm : mêmes lignes (10) aux adresses près
+OK   NT1 sans-label : même label
+OK   NT1 sans-label : mêmes lignes (10) aux adresses près
+OK   NT2 label prefetch-racine-rpm
+OK   NT2 racine-p : lignes du témoin rpm
+OK   NT3 label construire-racine-rpm
+OK   NT3 racine-c : lignes du témoin construire
+OK   NT4 racine-c admis (10 lignes rendues)
+# bilan : OK 17 ; KO 0
