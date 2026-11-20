@@ -10,6 +10,10 @@
 #   prealables  cluster et Zot, lecture seule et dry-run : politique de sortie rpm en place (prefetch-rpm-sortie, et prefetch-rpm
 #               dans le NotIn de builds-sans-internet : décision du propriétaire, appliquée hors de ce script) ; exemption Pod
 #               Security de kata ; spec admise en dry-run serveur ; sc-build ; place libre de Zot
+#               Correctif du 20/11/2026 (../s1-quatre-labels.patch, cascade de M1b, préparé à sec sous l'accord permanent du
+#               18/11) : le NotIn attendu porte quatre labels, prefetch-racine-rpm compris (sortie-builds.sh m1b_sortie,
+#               posée le 20/11 à 00:12:03 UTC ; dans le rejeu, sortie-builds.sh rejeu pose les quatre avant le bloc de la 05)
+#               Correctif appliqué au dépôt le 20/11/2026 à 14:04:58 UTC (accord permanent du 18/11) ; le patch donne la copie bancée (9bfb94d5…)
 #   amorce      copie par digest de rockylinux 9.8 (outillage, D4 a) et 9.7 (bootstrap de mock, D2 a), amd64, dans Zot,
 #               amont/rockylinux/rockylinux
 #   racine      pod Kata privilégié, root, label prefetch-rpm, image 9.8 : dnf --installroot des quatre paquets épinglés avec les
@@ -270,7 +274,7 @@ etape_prealables() { # cluster et Zot, en lecture seule et dry-run
     || { echo "KO   prefetch-rpm-sortie absente : proposition dans politiques/prefetch-rpm-sortie.yaml, à décider" >&2; exit 1; }
   attendu "NotIn de builds-sans-internet" \
     "$(kubectl get cnp -n builds builds-sans-internet -o json </dev/null | jq -r '.spec.endpointSelector.matchExpressions[0].values | sort | join(",")')" \
-    "prefetch-deb,prefetch-gomod,prefetch-rpm"
+    "prefetch-deb,prefetch-gomod,prefetch-racine-rpm,prefetch-rpm"
   echo "## exemption Pod Security de la RuntimeClass kata"
   args_apiserver | grep -x -- "--admission-control-config-file=$D_CONF/pod-security.yaml" >/dev/null \
     && echo "OK   kube-apiserver lit $D_CONF/pod-security.yaml" || { echo "KO   exemption de kata absente" >&2; exit 1; }

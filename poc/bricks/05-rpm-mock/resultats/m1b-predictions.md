@@ -2813,3 +2813,18 @@ Elle le publie deux fois au même digest que M4c (`07b7bd6f…`), et sa provenan
 - **QL3** (moyenne haute) : `kube-apiserver` lit l'exemption de `kata`, et `s1-05-racine` est admis à blanc. Le dernier passage date du 16/11, et je n'ai pas relu les règles d'admission posées depuis.
 - **Relevés, sans pari** : l'allouable de sc-build, les demandes de mémoire en cours, et la place libre sous `/` de sc-stockage (5 551 Mo le 16/11, 4,49 Go le 18/11).
 - **Avant lecture** : la sortie de l'étape n'est pas filtrée, et elle recopie `admis.out` en cas de refus. Je compte donc les KO et les lignes `jeton|token` avant de lire le journal.
+
+### `s1.sh prealables` à quatre labels, résultat, écrit le 20/11/2026 à 2026-11-20T14:05:53Z UTC
+
+**Application** : le patch est appliqué à 14:04:58Z sous l'accord permanent du 18/11. Il donne la copie bancée `9bfb94d5…`, puis la ligne datée est ajoutée : `s1.sh` vaut `b6cbf661a140c57a…`.
+
+- **QL1 tenue** :
+  - [`s1-quatre-labels-banc-applique.log`](s1-quatre-labels-banc-applique.log) : 17 OK, 0 KO, contre le `s1.sh` du commit précédent, avec quatre lignes d'en-tête ;
+  - [`s1-quatre-labels-banc-n34-applique.log`](s1-quatre-labels-banc-n34-applique.log) : 35 OK, 0 KO.
+- **QL2 tenue** : `PREFIXE=s1-m1b s1.sh prealables` a tourné de 14:05:09Z à 14:05:10Z, avec code 0, 4 OK, 0 KO et aucune ligne de jeton ([`s1-m1b-prealables.log`](s1-m1b-prealables.log)). `prefetch-rpm-sortie` est présente, et le `NotIn` porte `prefetch-deb,prefetch-gomod,prefetch-racine-rpm,prefetch-rpm`. Le `s1-prealables.log` du 16/11 n'est pas touché.
+- **QL3 tenue** : `kube-apiserver` lit `/etc/rancher/rke2/pod-security.yaml`, et `s1-05-racine` est admis à blanc.
+- **Relevés** :
+  - sc-build : 6 CPU et 10 189 584 Ki allouables, aucune demande de mémoire en cours ;
+  - **place libre sous `/` de sc-stockage : 2 842 Mo**, contre 5 551 Mo le 16/11 avec la même commande. La baisse continue sans écriture de la brique ; son attribution reste confiée au propriétaire (`sudo du`).
+
+**Ce que cela établit** : `s1.sh prealables` attend désormais la politique de sortie posée dans le cluster et dans le dépôt. Ce point de la cascade est fait. Il reste un point : le rejeu des refus de M5a (R1 à R8), qui n'a jamais été décidé.

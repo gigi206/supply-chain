@@ -1053,3 +1053,11 @@ De 13:47:19Z à 13:49:36Z, sous l'accord permanent, RF1 et RF2 tiennent. Avec `b
 **ADR 0007** : la phrase « la porte les juge ensemble » est une lecture de `porte.rego`, et non une mesure. Le refus y est de la forme `some task in lib.tasks_from_pipelinerun`, sur toutes les provenances de PipelineRun du sujet. L'additif est précisé en ce sens.
 
 **Incident de rédaction** : le script qui a écrit la note de 13:53:24Z a d'abord écrit `m1b-predictions.md`, puis s'est arrêté sur une garde de la carte. Le fichier a été remis à son état commité (`git checkout` de ce seul fichier, 25 lignes ajoutées et aucune retirée), puis le script a été rejoué avec toutes ses gardes avant toute écriture.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T14:05:53Z UTC : `s1.sh prealables` adapté aux quatre labels
+
+`s1-quatre-labels.patch` est appliqué à 14:04:58Z, sous l'accord permanent (QL1 : banc à 17 OK, N3/N4 à 35 OK). `PREFIXE=s1-m1b s1.sh prealables` est passée de 14:05:09Z à 14:05:10Z, code 0 : QL2 et QL3 tiennent. Le sixième point de la cascade est fait.
+
+**Relevé** : il reste 2 842 Mo libres sous `/` de sc-stockage (5 551 Mo le 16/11).
+
+**Reste dans la cascade** : le rejeu de R1 à R8 sur le nouveau bundle. Il n'a jamais été décidé, et `m5.sh` ne peut pas le jouer tel quel (4 enveloppes attendues, 8 présentes).

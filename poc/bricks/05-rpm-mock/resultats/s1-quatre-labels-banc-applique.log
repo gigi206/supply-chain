@@ -1,0 +1,26 @@
+# s1-quatre-labels-banc.sh, 2026-11-20T14:04:58Z ; s1.sh avant 362af7ef18e1dcf4d53e68ba366230cdfc716cc9183a5771072b227cbd707f84 ; copie b6cbf661a140c57a5b8e21f9bd4b53896bdf5c4180966025f548295b8ff3090b
+## A : forme du diff
+OK   lignes retirées ou changées : 1
+OK   ligne retirée : la valeur attendue à trois labels :     "prefetch-deb,prefetch-gomod,prefetch-rpm"
+OK   blocs : un ajout (en-tête), un changement (code) : a c
+OK   lignes ajoutées (en-tête 4, code 1) : 5
+OK   lignes d'en-tête ajoutées : commentaires : 4
+relevé : ligne de code ajoutée :     "prefetch-deb,prefetch-gomod,prefetch-racine-rpm,prefetch-rpm"
+## B : syntaxe et shellcheck
+OK   bash -n : ok
+OK   shellcheck : remarques, avant et copie égales : égales
+relevé : shellcheck, remarques de la copie : SC2001×2 SC2013×2 SC2015×6 SC2016×22 SC2086×2
+## C : valeur attendue contre ses sources
+OK   valeur de la copie, contre le manifeste du dépôt (jq sort, join) : prefetch-deb,prefetch-gomod,prefetch-racine-rpm,prefetch-rpm
+OK   valeur de la copie, contre la liste attendue par sortie-builds.sh rejeu : prefetch-deb,prefetch-gomod,prefetch-racine-rpm,prefetch-rpm
+## D : etape_prealables jouée avec des doublures
+OK   fonctions extraites (lignes, avant et copie) : 23 23
+relevé : NotIn servi pour « quatre » (ordre du manifeste) : ["prefetch-gomod","prefetch-deb","prefetch-rpm","prefetch-racine-rpm"]
+OK   copie, quatre labels : code 0, NotIn OK, aucun appel inattendu : 0 1 0 0
+OK   copie, quatre labels : étape jusqu'au bout (lignes OK, place libre) : 4 1
+OK   copie, trois labels : arrêt sur le NotIn : 1 0 1 0
+OK   copie, quatrième label faux : arrêt sur le NotIn : 1 0 1 0
+OK   avant, quatre labels : arrêt sur le NotIn (le correctif est nécessaire) : 1 0 1 0
+OK   avant, trois labels : code 0 (témoin des doublures) : 0 1 0 0
+OK   copie, trois labels : rien après le NotIn : 0
+# bilan : 17 OK, 0 KO

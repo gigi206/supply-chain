@@ -1,0 +1,13 @@
+# s1.sh prealables, 2026-11-20T14:05:09Z
+## politique de sortie rpm (décision du propriétaire, appliquée hors de ce script)
+OK   CiliumNetworkPolicy prefetch-rpm-sortie présente
+OK   NotIn de builds-sans-internet : prefetch-deb,prefetch-gomod,prefetch-racine-rpm,prefetch-rpm
+## exemption Pod Security de la RuntimeClass kata
+OK   kube-apiserver lit /etc/rancher/rke2/pod-security.yaml
+## admission en dry-run serveur (image d'amorce : les règles ne lisent que la forme de la référence)
+OK   s1-05-racine : admis
+## sc-build
+allouable : 6 CPU, 10189584Ki
+demandes de mémoire en cours : 0 conteneur(s) : 
+## place libre pour Zot
+libre sous / : 2842 Mo
