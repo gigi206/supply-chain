@@ -483,3 +483,30 @@ Les contenus prédits N1 à N9 de la note de 19:28:08Z sont inchangés. Seules l
 - Les journaux `g7-balayage-*.log` gardent donc des heures, les noms des dépôts suivis et les raisons des décisions de rétention, en plus des comptes.
 - Aucune ligne brute de Grafana ni de Loki n'est archivée.
 - La consigne « comptes seulement » du 14/11 et de la note de 19:09:44Z est levée pour ces relevés.
+
+## Point 4 à sec : état de Zot avant les premières suppressions, prédictions E1 à E8 (note de 2026-11-20T19:58:13Z ; rien n'est réécrit au-dessus)
+
+**Pourquoi.** Après le balayage n°9, un 404 ne prouve une suppression que si l'objet était présent avant. Le conseiller a demandé de relever cet état maintenant, en lecture seule, et de le commiter.
+
+**Script** [`g7-etat.sh`](../g7-etat.sh) (sha256 `40406b2f1bcc3499…`, neuf) :
+- uniquement des GET et des HEAD anonymes sur l'API de Zot ; ni ssh, ni sudo, ni Grafana, ni cluster ;
+- `MOMENT=avant` : image réelle et deb avec `.sig` et `.att`, referrers des sujets réels (scans et VSA), témoins de G6, tags de `vulndb/grype` avec leurs digests, blob `{}` (H7) ;
+- `MOMENT=apres AVANT=…` : la même chose, puis chaque digest du journal « avant » relu un par un (200 présent, 404 supprimé).
+- `bash -n` passe, et shellcheck ne relève aucun avertissement (`-S warning`).
+
+**Sujets, relus ce soir dans les CronJobs** (`kubectl get cronjob -n scan`, variables des conteneurs d'initialisation) :
+- `scan-sample-app` (09:30 UTC) vise `builds/sample-app@sha256:3a7ca1b1…` ;
+- `scan-sample-app-deb` (11:15 UTC) vise `builds/sample-app-deb@sha256:60f25f5c…`, le deb 1.0.0-2. Le premier scan du deb (`256c3190…`, 14/11) a pour sujet le deb 1.0.0-1, `039949f9…`. Le script lit les deux.
+
+**Prédictions**, avant lancement :
+
+| # | Prédit | Confiance |
+|---|---|---|
+| E1 | Image réelle, deb 1.0.0-1 et deb 1.0.0-2 : manifestes, `.sig` et `.att` en 200 | haute : tags lus ce soir dans `tags/list` |
+| E2 | `builds/scan/sample-app`, referrers de l'image : 9 (2 du 13/11, puis un par jour du 14 au 20/11) | moyenne : un autre scan manuel m'échapperait |
+| E3 | `builds/scan/sample-app-deb` : 7 referrers en tout, sur les deux debs. Le premier, du 14/11, a pour sujet `039949f9…` | moyenne. La répartition entre les deux debs n'est pas prédite : l'heure de création du deb 1.0.0-2, le 16/11, n'est pas relue |
+| E4 | Témoins de G6 : 16 referrers dans `builds/scan/essai-scan`, sur 14 images de `builds/essai-scan` | moyenne : H2. Le cas `absent` n'a pas de scan, et un cas peut en avoir plusieurs |
+| E5 | `vulndb/grype` : 8 tags, du 2026-11-13 au 2026-11-20, chacun avec un digest distinct | haute pour le compte (lu dans `tags/list`) ; moyenne pour « distinct » |
+| E6 | Blob `{}` en 200 dans les trois dépôts | haute |
+| E7 | VSA : au moins un referrer dans `builds/vsa/sample-app` et `builds/vsa/sample-app-deb` | moyenne. Le nombre exact n'est pas prédit |
+| E8 | Les dates annotées (`org.opencontainers.image.created`) des scans du 13/11 tombent vers 12:45 et 12:47 UTC, celle du premier scan du deb vers 21:01 UTC le 14/11 | moyenne : rien ne garantit que le scanner annote la date de création |
