@@ -1,0 +1,23 @@
+# g7-balayage.sh, 2026-11-20T19:31:28Z, dépôt 1790a28a, script d68c726a4991e68c
+# fenêtre : 2026-11-16 12:00 à 18:00 UTC ; lecture seule (ssh -n, sudo journalctl, systemctl show ; Grafana : lignes résumées, jamais archivées)
+## 1. zot.service
+2026-11-20T19:31:28Z
+NRestarts=0
+ExecMainStartTimestamp=Thu 2026-11-19 20:24:46 UTC
+ActiveState=active
+ActiveEnterTimestamp=Thu 2026-11-19 20:24:46 UTC
+## 2 et 3. journal de la VM non lu (SANS_JOURNAL=1)
+## 4. mêmes lignes dans Loki, à travers Grafana (auditeur) : lignes masquées puis résumées comme le journal, jamais archivées
+requête : {noeud="sc-stockage", source="journal", unite="zot.service"} |~ "executing gc of orphaned blobs|\"decision\":"
+statut 200, 143 ligne(s)
+lignes : 139 JSON lues, 4 masquée(s), 0 non JSON
+« executing gc of orphaned blobs » : 135 ; premier 2026-11-16T13:59:30.895884438Z ; dernier 2026-11-16T14:33:17.849917908Z
+passage des dépôts suivis (début de « executing gc ») :
+  builds/scan/essai-07a        2026-11-16T14:13:51.797015994Z
+  builds/scan/essai-scan       2026-11-16T14:14:01.697875531Z
+  builds/scan/sample-app       2026-11-16T14:14:13.847072999Z
+  builds/scan/sample-app-deb   2026-11-16T14:14:21.647421405Z
+  vulndb/grype                 2026-11-16T14:33:05.555615194Z
+décisions de rétention : 4
+  4 × vulndb/grype | keep | retained by mostRecentlyPushedCount:11 policy
+## fin, 2026-11-20T19:31:28Z

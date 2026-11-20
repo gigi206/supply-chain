@@ -351,3 +351,10 @@ Mesure hors réseau sur l'hôte ([`rpm-distro.sh`](rpm-distro.sh), [prédictions
 - Le dernier balayage a fini le 19/11 à 21:03:47 UTC, avec 7 décisions `keep`.
 - Nouvelle projection, calculée : premières suppressions réelles au balayage n°8, le 28/11 vers 01:52 UTC ; premier scan du deb au n°9, le 29/11 vers 02:31 UTC. Tout redémarrage de Zot remet ce calendrier à zéro.
 - Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T19:28:08Z.
+
+**Additif du 20/11/2026 (2026-11-20T19:32:31Z UTC), G7, lectures Loki des balayages passés** (L13 à L19, tenues) :
+- la loi B tient sur six intervalles, à 2 à 19 s près ;
+- le balayage de démarrage du 13/11 explique l'écart du 14/11 ;
+- la durée croît avec le nombre de dépôts (1732 à 2407 s).
+
+Projection, calculée : premières suppressions réelles le 28/11 entre 01:37 et 02:52 UTC, scan du deb le 29/11 entre 02:16 et 03:36 UTC. Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T19:32:31Z.

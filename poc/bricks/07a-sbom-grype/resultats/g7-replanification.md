@@ -436,3 +436,45 @@ Elles remplacent les heures de B24, B27 et B28. Le contenu change de balayage, c
 | L19 | 19/11, 14:00 à 20:20 | `g7-balayage-19-11-avant.log` | Début vers 15:49:25, à ± 5 min, fin avant le redémarrage ; 7 `keep` | moyenne |
 
 Pour toutes : aucune suppression, puisque rien n'a 336 h et que `vulndb/grype` reste sous 11 tags. Les durées pourraient s'allonger avec le nombre de dépôts : 139 balayés le 15/11, 166 au catalogue le 20/11. La tolérance de ± 5 min en tient compte, sans calcul.
+
+## Résultat des lectures L13 à L19 (note de 2026-11-20T19:32:31Z ; rien n'est réécrit au-dessus)
+
+**Lectures** le 20/11 de 19:31:28 à 19:31:29 UTC, au dépôt `1790a28a` : Loki seul, script `d68c726a…`, cinq journaux neufs (`g7-balayage-13-11.log`, `-16-11`, `-17-11`, `-18-11`, `-19-11-avant`). Chacun compte 4 lignes masquées et aucune décision autre que `keep`.
+- Une première boucle, lancée sous zsh, a échoué avant toute lecture : `set -- $c` n'y découpe pas les mots. Aucun journal n'a été écrit. La relance s'est faite sous `bash -c`.
+
+Les heures sont celles des première et dernière lignes « executing gc ». La fin réelle (« gc successfully completed ») suit la dernière ligne de moins de 0,01 s, mesuré le 15/11.
+
+| # | Début mesuré | Prédit | Écart | Dernière ligne | Dépôts | Durée | `keep` | Verdict |
+|---|---|---|---|---|---|---|---|---|
+| L13 | 13/11 12:16:43.3 | moins de 2 min après 12:17:25 | **42 s avant** le démarrage relevé | 12:45:35.5 (prédit vers 12:45:45) | 117 | 1732 s | 1 | **tenue sur le balayage de démarrage et sa fin**, à 10 s ; début antérieur au démarrage relevé, non expliqué |
+| L16 | 16/11 13:59:30.9 | 13:59:17 ± 120 s | +14 s | 14:33:17.8 | 135 | 2027 s | 4 | tenue |
+| L17 | 17/11 14:33:35.4 | 14:36:00 ± 5 min | −145 s | 15:10:27.8 | 139 | 2212 s | 5 | tenue |
+| L18 | 18/11 15:10:29.8 | 15:12:42 ± 5 min | −132 s | 15:48:15.6 | 148 | 2266 s | 6 | tenue |
+| L19 | 19/11 15:48:21.4 | 15:49:25 ± 5 min | −64 s | 16:28:28.7 | 148 | 2407 s | 7 | tenue |
+
+**Loi B mesurée sur six intervalles.** On mesure le début d'un balayage moins la dernière ligne du précédent, moins 24 h.
+- 13→14/11 : +15,0 s, mesuré depuis le balayage de démarrage ;
+- 14→15/11 : +4,9 s ;
+- 15→16/11 : +18,4 s ;
+- 16→17/11 : +17,6 s ;
+- 17→18/11 : +2,0 s ;
+- 18→19/11 : +5,8 s.
+
+Le balayage de démarrage du 13/11 **explique les 28 min 25 s du 14/11** : c'est maintenant mesuré, et non plus seulement déduit. La durée croît avec le nombre de dépôts, de 1732 à 2407 s. Le début du 13/11, 42 s avant `ActiveEnterTimestamp`, laisse penser à un démarrage antérieur, comme les deux passages du 19/11. Ce n'est pas vérifié.
+
+### Projection refaite (CALCUL)
+
+Elle part de la dernière ligne du balayage de redémarrage, le 19/11 à 21:03:47 UTC.
+- Durée : de 2341 à 2600 s.
+- Écart quotidien : de 2 à 19 s.
+- Passages à début + 1057 s pour les dépôts de scan et à début + 2395 s pour `vulndb/grype`, comme le 19/11 avant le redémarrage.
+- Aucun redémarrage de Zot.
+
+| # | Balayage | Plage projetée (UTC) | Contenu prédit | Marge minimale |
+|---|---|---|---|---|
+| N1 | n°1 | début le 20/11 entre 21:03:49 et 21:04:06 | 8 `keep`, aucune suppression | — |
+| N5 | n°5 | `vulndb/grype` le 25/11 entre 00:19 et 00:38 | retrait du tag du 13/11 | environ 16 h |
+| N8 | n°8 | le 28/11, de 01:37 à 02:52 | **premières suppressions réelles** : 2 scans du 13/11, 16 témoins, base du 13/11, tag du 16/11 | 13,1 h |
+| N9 | n°9 | le 29/11, de 02:16 à 03:36 | scan du 14/11, **premier scan du deb**, base du 14/11, tag du 17/11 | 5,5 h (le deb) |
+
+Les contenus prédits N1 à N9 de la note de 19:28:08Z sont inchangés. Seules les plages s'élargissent.
