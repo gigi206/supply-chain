@@ -149,3 +149,9 @@ Changements à la carte, après relecture du conseiller :
 ## Étape 2 recadrée : mesure faite (note de 2026-11-20T22:34:12Z ; rien n'est réécrit au-dessus)
 
 Résultat dans les [prédictions](j7-predictions.md) ; [journal](j7-mesure.log). **T9 tenue** : les flux des pods Kata portent l'espace de noms et le nom du pod, donc l'export filtré sur `builds/` les verrait. T0, T1, T4, T5, T6 et T8 sont tenues. **T2 n'est pas tenue** : 14 flux par témoin TCP. **T3 l'est en partie** : un motif POLICY_DENY non prédit, sur 14 flux. Rien n'est posé. Prochaine étape : 4a (export vers le fichier, forme (a) recommandée), sur accord.
+
+## Étape 4a préparée (note de 2026-11-20T22:45:04Z ; rien n'est réécrit au-dessus)
+
+Forme (a), le fichier combiné. Les étapes `pose`, `export` et `retour` de [`j7.sh`](../j7.sh) sont prêtes, avec les prédictions P1 à P3 et X1 à X5 ([prédictions](j7-predictions.md)). `pose_sec` est tenue. Rien n'est posé.
+
+Ordre recommandé (conseiller) : `pose` et `export` sur un accord ; `retour` sur un accord à part. Le retour viendrait après la mesure du volume d'une vraie construction, qui est l'objet de 4a. Cette mesure n'est pas préparée : une construction réelle écrirait dans Zot, ce qui est à peser contre G7.

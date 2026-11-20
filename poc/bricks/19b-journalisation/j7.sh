@@ -207,7 +207,13 @@ suspendre_rattrapage() { # comme etape_h5_cilium (08c) : aucun passage ni Pipeli
 }
 
 versions_certs() { kubectl get secret -n kube-system cilium-ca hubble-server-certs --no-headers -o custom-columns=N:.metadata.name,V:.metadata.resourceVersion < /dev/null | tr -s ' ' | paste -sd' ' -; }   # 08c ; aucune valeur affichée
-redemarrages() { kubectl get pods -A -o json < /dev/null | jq '[.items[].status.containerStatuses[]?.restartCount] | add'; }
+redemarrages() { # hors pods de Cilium, recréés par cilium.sh appliquer (compteurs remis à zéro)
+  kubectl get pods -A -o json < /dev/null | jq '[.items[] | select((.metadata.labels["k8s-app"] // "") != "cilium" and (.metadata.labels["io.cilium/app"] // "") != "operator") | .status.containerStatuses[]?.restartCount] | add // 0'
+}
+exige_rke2() { # cilium.sh choisit ses fichiers par DISTRO (défaut k3s dans distro.sh) : sans rke2, --reset-values retirerait le fichier de la 08b
+  [ "$DISTRO" = rke2 ] || echec "DISTRO=$DISTRO : lancer avec DISTRO=rke2 (sinon la pose retirerait kubeProxyReplacement de la 08b)"
+  echo "OK   DISTRO=rke2"
+}
 agent_de() { kubectl get pods -n kube-system -l k8s-app=cilium --field-selector "spec.nodeName=$1" -o jsonpath='{.items[0].metadata.name}' < /dev/null; }
 cfg() { kubectl -n kube-system get cm cilium-config -o json < /dev/null; }
 fichier_export() { # nœud : état du fichier d'export dans l'agent du nœud (ls ; absent si aucun)
@@ -226,7 +232,8 @@ apres_pose() { # contrôles communs à pose et retour : nœuds, API, Zot, agents
     attendu "$p, état" "$(kubectl exec -n kube-system "$p" -c cilium-agent -- cilium-dbg status --brief < /dev/null 2>&1 | tail -1)" OK
     attendu "$p, Hubble" "$(kubectl exec -n kube-system "$p" -c cilium-agent -- cilium-dbg status < /dev/null 2> /dev/null | awk '$1 == "Hubble:" {print $2}')" Ok
   done < <(kubectl get pods -n kube-system -l k8s-app=cilium -o json < /dev/null | jq -r '.items[].metadata.name')
-  attendu "redémarrages de conteneurs du cluster" "$(redemarrages)" "$r0"
+  attendu "redémarrages de conteneurs du cluster, hors pods de Cilium" "$(redemarrages)" "$r0"
+  attendu "redémarrages des pods de Cilium recréés" "$(kubectl get pods -n kube-system -l k8s-app=cilium -o json < /dev/null | jq '[.items[].status.containerStatuses[].restartCount] | add')" 0
   attendu "enable-host-firewall" "$(cfg | jq -r '.data["enable-host-firewall"]')" true
 }
 
@@ -243,11 +250,14 @@ etape_pose_sec() { # rien n'est posé
   echo "commande de pose   : VALEURS_08C=$T/valeurs-j7.yaml $here/cilium.sh appliquer" | sed "s#$HOME#~#g"
   echo "commande de retour : VALEURS_08C=$V08C $here/cilium.sh appliquer   (celle de etape_h5_cilium)" | sed "s#$HOME#~#g"
   ( garde_fenetre ) || echo "information : la fenêtre actuelle serait refusée"
+  ( exige_rke2 ) || echo "information : DISTRO=$DISTRO ici ; pose et retour exigent DISTRO=rke2"
 }
 
 etape_pose() { # ACCORD NOMMÉ : valeurs de Cilium (export), redémarrage des agents des trois nœuds
   local c0 r0
+  exige_rke2
   garde_fenetre
+  echo "en cas de KO après cilium.sh : l'export peut rester posé ; retour : DISTRO=rke2 [FORCER_RETOUR=1] j7.sh retour"
   valeurs_j7
   attendu "export absent avant la pose" "$(cfg | jq -r '.data | has("hubble-flowlogs-config-path")')" false
   c0=$(versions_certs); r0=$(redemarrages)
@@ -262,9 +272,13 @@ etape_pose() { # ACCORD NOMMÉ : valeurs de Cilium (export), redémarrage des ag
   echo "E6 : sc-confiance : $(fichier_export sc-confiance) ; sc-stockage : $(fichier_export sc-stockage)"
 }
 
-lire_export() { # nœud depuis : copie du fichier d'export du nœud dans $T (effacée par nettoyer), lignes depuis l'heure donnée
-  kubectl -n kube-system exec "$(agent_de "$1")" -c cilium-agent -- cat "$FICHIER" < /dev/null > "$T/hubble-export-$1.json" 2> /dev/null || : > "$T/hubble-export-$1.json"
-  jq -c --arg d "$2" 'select(.time[:19] >= $d[:19])' "$T/hubble-export-$1.json" > "$T/hubble-export-$1-depuis.json"
+lire_export() { # nœud depuis : copie du fichier d'export du nœud dans $T (effacée par nettoyer), lignes depuis l'heure donnée ;
+  # arrêt si l'exec échoue (jamais de « 0 flux » par échec) ; lignes non JSON (dernière ligne coupée) comptées, pas fatales
+  local rc=0
+  kubectl -n kube-system exec "$(agent_de "$1")" -c cilium-agent -- cat "$FICHIER" < /dev/null > "$T/hubble-export-$1.json" 2> "$T/hubble-export-$1.err" || rc=$?
+  [ "$rc" = 0 ] || { filtre < "$T/hubble-export-$1.err" | head -n 3 | cut -c1-200; echec "lecture du fichier d'export de $1 en échec (code $rc)"; }
+  echo "fichier d'export de $1 : $(grep -c . "$T/hubble-export-$1.json" || true) ligne(s), dont non JSON : $(jq -R 'fromjson? // "NONJSON" | select(. == "NONJSON")' "$T/hubble-export-$1.json" | grep -c . || true)"
+  jq -cR --arg d "$2" 'fromjson? | select(.time[:19] >= $d[:19])' "$T/hubble-export-$1.json" > "$T/hubble-export-$1-depuis.json"
 }
 
 etape_export() { # ACCORD NOMMÉ : pods d'essai, kubectl exec dans les agents (hubble observe, lecture du fichier d'export)
@@ -314,7 +328,8 @@ etape_export() { # ACCORD NOMMÉ : pods d'essai, kubectl exec dans les agents (h
 
 etape_retour() { # ACCORD NOMMÉ : valeurs de la 08c seules (commande de etape_h5_cilium), redémarrage des agents
   local c0 r0
-  garde_fenetre
+  exige_rke2
+  if [ "${FORCER_RETOUR:-0}" = 1 ]; then echo "ATTENTION fenêtre non contrôlée : FORCER_RETOUR=1 ($(date -u +%Y-%m-%dT%H:%M:%SZ))"; else garde_fenetre; fi
   c0=$(versions_certs); r0=$(redemarrages)
   suspendre_rattrapage
   date -u '+retour %H:%M:%S UTC'

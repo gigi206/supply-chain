@@ -166,3 +166,20 @@ Accord du propriétaire : « Oui », à la demande nommant les deux pods Kata pr
 | X4 | E4 et E5 dans le fichier : clés de tête `flow`, `node_name` et `time`, verdict en nom, aucun champ hors du masque, aucune ligne hors de `builds` | Haute : code au tag |
 | X5 | T7 : moins de 150 lignes et moins de 300 Ko pour les deux pods. Aucun fichier tourné | Moyenne |
 | P3 | `retour` : 163 clés, `cilium-flowlog-config` absente, mêmes contrôles que P1. Le fichier reste sur sc-build jusqu'au redémarrage de la VM | Haute |
+
+## Corrections de 4a avant la demande de pose (note de 2026-11-20T22:45:04Z ; rien n'est réécrit au-dessus)
+
+`j7.sh` passe de `5f753a08acd74e9f…` à **`edbc4fdbf9b1dfdb…`**, après relecture du conseiller. Rien n'est posé.
+
+1. **`DISTRO`, le plus grave.** `distro.sh` (08) met `DISTRO=k3s` par défaut, et `cilium.sh` n'ajoute le fichier de la 08b que hors k3s. Une pose lancée sans `DISTRO=rke2` aurait donc retiré `kubeProxyReplacement`, par `--reset-values`. `pose` et `retour` exigent désormais `DISTRO=rke2`.
+   - Relance à sec avec `DISTRO=rke2` ([`j7v2-pose_sec.log`](j7v2-pose_sec.log)) : tout est tenu.
+   - Témoin sans `DISTRO` ([`j7v3-pose_sec.log`](j7v3-pose_sec.log)) : `DISTRO=k3s`, refusé.
+   - Le premier journal `j7-pose_sec.log` n'est pas réécrit. Son rendu fixait la liste des fichiers en dur et ne passait pas par ce chemin.
+2. **Redémarrages** : le compte se fait désormais hors pods de Cilium, que `cilium.sh appliquer` recrée avec des compteurs remis à zéro. S'y ajoute un contrôle à part : zéro redémarrage pour les pods de Cilium recréés. Au relevé : 17 hors Cilium, 0 pour Cilium.
+3. **Retour toujours possible** : `FORCER_RETOUR=1` passe outre la garde de fenêtre, et c'est écrit dans le journal. Si `pose` finit en KO après `cilium.sh`, l'export peut rester posé. Le script affiche alors la commande de retour : `DISTRO=rke2 [FORCER_RETOUR=1] j7.sh retour`.
+4. **`lire_export`** :
+   - l'étape s'arrête si l'exec échoue ;
+   - les lignes non JSON (une dernière ligne coupée) sont comptées, sans arrêter l'étape.
+   Sur un banc local avec une ligne coupée : 1 ligne non JSON, et les 4 valides gardées.
+
+Commande de chaque étape, depuis la racine : `DISTRO=rke2 mise exec -- poc/bricks/19b-journalisation/j7.sh <pose|export|retour>`.
