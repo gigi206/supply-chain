@@ -1,0 +1,53 @@
+OK   lanceur : bilan sans KO
+OK   lanceur : 21 comparaisons OK : 21
+## JK1
+OK   JK1 prealables : m1b-20-prealables.log présent, fini, sans KO
+OK   JK1 prealables_boot : m1b-20-prealables_boot.log présent, fini, sans KO
+## JK2
+OK   JK2 pod_c : m1b-20-pod_c.log présent, fini, sans KO
+OK   JK2 témoins réseau en échec (rc non nul)
+OK   JK2 limite avant dnf 1024 / 1024
+OK   JK2 dnf code 0 en moins de 300 s : 39 s
+OK   JK2 201 paquets dont 2 gpg-pubkey
+OK   JK2 racine en 555
+OK   JK2 archive = 7c07083c… octet pour octet
+## JK3
+OK   JK3 pod_e : m1b-20-pod_e.log présent, fini, sans KO
+OK   JK3 dnf-3 code 0
+OK   JK3 rpm -qa après 1ca7c54b…
+OK   JK3 archive = b063feb3… octet pour octet
+## JT1
+OK   JT1 prealables : m1b-builders-m1bt-20-prealables.log présent, fini, sans KO
+OK   JT1 script-po a93deebb…
+OK   JT1 script-pb 912520ea…
+OK   JT1 script-co 956e39c2…
+OK   JT1 script-cb cad7f550…
+## JT2
+OK   JT2 banc : m1b-builders-m1bt-20-banc.log présent, fini, sans KO
+OK   JT2 banc o : racine 7c07083c…
+OK   JT2 banc o : DIGEST_CONSTRUIT 70f8c412…
+OK   JT2 banc b : racine b063feb3…
+OK   JT2 banc b : DIGEST_CONSTRUIT 6de899ac…
+## JT3, JT4
+OK   JT3 essai_prefetch : m1b-builders-m1bt-20-essai_prefetch.log présent, fini, sans KO
+OK   JT3 repomd.xml de baseos98 abac8b17…
+OK   JT3 repomd.xml de appstream98 a3ca4230…
+OK   JT3 repomd.xml de epel9 e86fdcd8…
+OK   JT3 repomd.xml de baseos97 fa6d5054…
+OK   JT3 arbre po : 224 fichiers, liste 93f2a63e…
+OK   JT3 arbre pb : 20 fichiers, liste 7af63de7…
+OK   JT4 BASE_ARTIFACT_INPUTS absent pour l'outillage
+OK   JT4 BASE_ARTIFACT_INPUTS ee90dc0e… pour le bootstrap
+## JT5
+OK   JT5 essai_construire : m1b-builders-m1bt-20-essai_construire.log présent, fini, sans KO
+OK   JT5 co : DIGEST_CONSTRUIT 70f8c412… = banc
+OK   JT5 co : image.tar 26ce192f… = banc
+OK   JT5 cb : DIGEST_CONSTRUIT 6de899ac… = banc
+OK   JT5 cb : image.tar e574aaa1… = banc
+OK   JT5 PVC retiré, 0 objet restant
+## TD1 sur les rendus du jour
+OK   TD1 m1bt-20 prefetch-racine-rpm.yaml = rendu validé : b0fdff3895df5989
+OK   TD1 m1bt-20 construire-racine-rpm.yaml = rendu validé : de77ba0a70b4cee4
+OK   TD1 m1bt-20 pipeline-o.yaml = rendu validé : 13836c388b47fe70
+OK   TD1 m1bt-20 pipeline-b.yaml = rendu validé : b2443188125b63b7
+# KO 0

@@ -712,3 +712,15 @@ La provenance reste à préparer, sur le modèle de M4c. Sa forme dépend des r�
 **Pas appliqué**. L'application est un rejeu de `git apply` sur le dépôt, suivi du banc sur les scripts du dépôt (attendu : 22 OK). Elle viendra après la mesure de 00:01 UTC et le commit de son résultat ; ces deux scripts ne changent pas avant.
 
 **Bancs complets des deux scripts** (étape `banc` de chacun, podman local) : ils ne sont pas rejoués pour ce correctif. Seule la ligne `filtre()` change, et elle n'agit que sur les journaux.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T00:11:38Z UTC : mesure d'un autre jour, résultat
+
+**Tout tient.** Lanceur [`m1b-jour-kata.sh`](m1b-jour-kata.sh) parti à 2026-11-20T00:01:43Z, fini à 2026-11-20T00:11:15Z, code 0 ; journal [`m1b-jour-kata.log`](m1b-jour-kata.log), bilan sans KO, 21 comparaisons OK sur 21.
+- **NU1, tenue** : avant toute lecture, 0 ligne jeton/token dans chacun des 10 fichiers comptés ([`m1b-nuit-compte.log`](m1b-nuit-compte.log)).
+- **JK1 à JK3, JT1 à JT5 et TD1, tenues** : `jk-verif.py` rend 44 OK, 0 KO ([`m1b-jour-kata-verif.log`](m1b-jour-kata-verif.log)). Préfixes `m1b-20` (ancienne forme) et `m1bt-20` (forme de la tâche).
+- **Durées relues** : dnf de `pod_c` 39 s (40 s le 19/11), dnf-3 de `pod_e` 5 s.
+- **Journaux** : `m1b-20-prealables.log`, `m1b-20-pod_c.log`, `m1b-20-prealables_boot.log`, `m1b-20-pod_e.log`, et les quatre `m1b-builders-m1bt-20-*.log`.
+
+**Portée, celle prévue à 15:33:13 UTC le 19/11** : les deux racines et les deux images se reproduisent dans Kata sur deux jours (19 et 20/11), sur un seul nœud et un seul hôte. Le point 1 A est établi dans ce cadre, pas au-delà : ni pour un autre nœud, ni après une mise à jour du noyau ou de Kata.
+
+**Suite** : `m1b_sortie` (accord déjà donné pour après la mesure). Ensuite, dans un tour de jour, le correctif de `filtre`, puis `m1b_sans_sortie` sur son propre accord.

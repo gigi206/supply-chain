@@ -1,0 +1,35 @@
+# m1b.sh pod_e (PREFIXE m1b-20), début 2026-11-20T00:03:47Z
+OK   admis à blanc : pod-m1b-20-e.json
+pod m1b-20-e prêt : nœud sc-build, runtimeClassName kata, label construire-rpm, image sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+OK   copie de entrees-boot.tar dans le pod : 115660800 octets en 2 morceau(x), sha256 conforme
+OK   copie de entrees-boot.sha256 dans le pod : 2933 octets en 1 morceau(x), sha256 conforme
+     invité : 6.18.56, 3 vCPU ; uid 0 ; umask du conteneur : 0022
+     versions : rpm-4.16.1.3-40.el9.x86_64 python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch 
+     entrées revérifiées dans le pod : rc 0 ; fichiers 22 ; lignes de la liste 22
+     lien /m vers /w/m posé
+     %_install_langs lu par rpm de python, env -i HOME=/root : [en_US]
+     %_install_langs lu par rpm de python, env -i HOME=/m/h : [all]
+     témoin TCP Zot 192.168.161.13:5000 (5 s) : rc 124
+     témoin DNS dl.rockylinux.org (5 s) : rc 124
+     avant installation, /w : capacité 3059832 kB ; utilisés 112968 kB
+     (code de l'exec : 0)
+     extraction par le tar de l amorce : code 0 ; stderr 0 lignes ; racine 755
+     avant : rpm -qa 147 lignes
+     dnf-3, début 2026-11-20T00:04:21Z
+     limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 1073741824 / 1073741824
+     dnf-3 code 0 en 5 s ; 85 lignes de journal ; fin 2026-11-20T00:04:26Z
+     résumé de la transaction : Install  6 Packages
+     résumé de la transaction : Upgrade  4 Packages
+     liste rpm -qa après : 153 lignes, sha256 1ca7c54b467560e67191b2ca557fa04d0ab7e06c7d639d2e00072757bde61699
+     racine passée en 555 ; etc/machine-id : 0 octet(s)
+     tar code 0 ; stderr 0 lignes
+     archive du pod : 241981440 octets, 11472 membres, sha256 b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+     après archive, /w : capacité 3059832 kB ; utilisés 627128 kB
+     (code de l'exec : 0)
+journal de dnf rapatrié (filtré) : 85 lignes, /home/gigi/.cache/supply-chain-poc/08/travail/m1b-20-05/pod-e-dnf.log
+OK   liste rpm -qa après = celle de S1 (sha256)
+OK   archive du pod m1b-20-e rapatriée : b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+pod m1b-20-e supprimé
+OK   archive du pod m1b-20-e = cible du bootstrap b063feb3… octet pour octet
+place libre de /home : 104989188 kB
+# fin pod_e 2026-11-20T00:04:53Z

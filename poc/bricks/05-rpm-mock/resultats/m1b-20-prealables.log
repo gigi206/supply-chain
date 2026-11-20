@@ -1,0 +1,17 @@
+# m1b.sh prealables (PREFIXE m1b-20), début 2026-11-20T00:01:43Z
+## entrées, relues contre le banc de l'amorce du 18/11
+OK   a8.tar du banc : 06c289ad8da33198dd845be6cc899f688ecfb8986e77e4b333629e838876dfa5
+OK   dnf.conf du banc (16 car.) : d554fb1ce168663f
+OK   S = 1793914619 dans m1b-outil-amorce.log
+OK   rpm de la liste épinglée présents dans le miroir au bon sha256 : 199
+rpm dans le miroir : 199 ; fichiers : 222 ; clés : RPM-GPG-KEY-EPEL-9 RPM-GPG-KEY-Rocky-9 
+## archive de transfert (clés, miroir, dnf.conf, aucun/) et liste de sha256
+entrees.tar : 227153920 octets, sha256 ba6f1f8852dfe4ec42bf67a1a65196520c57a64de6bb4fc84622739e9fd2e383 ; liste : 225 fichiers
+## cluster, lecture
+politiques de builds : NetworkPolicy builder-sans-sortie, NetworkPolicy construction-deb-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
+OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+OK   admis à blanc : pod-m1b-20-a.json
+OK   admis à blanc : pod-m1b-20-b.json
+pod : image sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d ; label construire-rpm ; ressources {"cpu":"2","memory":"6Gi"}
+# fin prealables 2026-11-20T00:01:45Z

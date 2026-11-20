@@ -1,0 +1,79 @@
+# m1b-builders.sh prealables (PREFIXE m1bt-20), début 2026-11-20T00:04:53Z
+## valeurs, relues contre les bancs et les journaux archivés
+OK   dnf.conf de l'outillage (16 car.) : d554fb1ce168663f
+OK   dnf97.conf du bootstrap : 7f49d5d39d0f1b1b232482a2b9e416c235ece7885a6858256bae0a2692e9f5ef
+OK   repomd.xml de baseos98 (banc) = valeur de la pipeline : abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+OK   repomd.xml de baseos98 cité par m1b-outil.log
+OK   repomd.xml de appstream98 (banc) = valeur de la pipeline : a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+OK   repomd.xml de appstream98 cité par m1b-outil.log
+OK   repomd.xml de epel9 (banc) = valeur de la pipeline : e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61
+OK   repomd.xml de epel9 cité par m1b-outil.log
+OK   repomd.xml de baseos97 (banc) = valeur de la pipeline : fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+OK   clé de Rocky (banc de l'outillage) : 3a66e521e7a4abac9768d889c7cd60a8250f59512b275cf576c8a10ff34624c1
+OK   clé de Rocky (banc du bootstrap) : 3a66e521e7a4abac9768d889c7cd60a8250f59512b275cf576c8a10ff34624c1
+OK   clé d'EPEL (banc de l'outillage) : fcf0eab4f05a1c0de6363ac4b707600a27a9d774e9b491059e59e6921b255a84
+OK   couche de l'amorce (cache OCI) : 99c753a880cc03bbe9da8bf6e354c8ba2d99f19058e87b8a55b6487ffcf52f8a
+OK   couche de base du bootstrap (cache OCI) : 812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+OK   liste de l'outillage : lignes de rpm : 199
+OK   liste du bootstrap : lignes : 10
+OK   builders/bootstrap-liste.txt = liste tirée de s1-hote97.log : égale
+OK   builders/outillage-dnf.conf = dnf.conf du banc : égal
+OK   builders/bootstrap-dnf.conf = dnf97.conf du banc : égal
+OK   builders/RPM-GPG-KEY-EPEL-9 = clé du banc : égale
+noms de l'outillage : mock-6.9-1.el9 mock-core-configs-45.2-1.el9 podman-5.8.2-8.el9_8 skopeo-1.22.2-9.el9_8 rocky-release shadow-utils ; noms du bootstrap : dbus-libs-1:1.12.20-8.el9.x86_64 python3-dateutil-1:2.9.0.post0-1.el9_7.noarch python3-dbus-1.2.18-2.el9.0.1.x86_64 python3-dnf-plugins-core-4.3.0-24.el9_7.noarch python3-six-1.15.0-9.el9.noarch python3-systemd-234-19.el9.x86_64 dnf-4.14.0-31.el9.rocky.0.1.noarch dnf-data-4.14.0-31.el9.rocky.0.1.noarch python3-dnf-4.14.0-31.el9.rocky.0.1.noarch yum-4.14.0-31.el9.rocky.0.1.noarch
+## fichiers de configuration de l'outillage, tirés de la couche de S1 (fd00cdb1ac39ed07d03836b05bd7c24cf435e68a2b29d63403e5dfc4610ac157)
+OK   configuration de 99790c13 : diff_id de la couche 2 : sha256:f5710d475bc0e83b67701a96b5aa3dbd01fe971d2d68f097358019c72ba52560
+OK   couche de configuration de S1, décompressée : f5710d475bc0e83b67701a96b5aa3dbd01fe971d2d68f097358019c72ba52560
+OK   fichiers de la couche de S1 : etc/containers/storage.conf etc/mock/poc-rocky-9.7-pret-x86_64.cfg etc/mock/poc-rocky-9.7-x86_64.cfg
+paramètre fichiers de l'outillage : 41 lignes, 2290 octets
+OK   builders/outillage-fichiers.txt = fichiers de la couche de S1 : égal
+## gabarits rendus (références de tâches factices)
+OK   pipeline o : yq la relit, nom : builder-mock-rocky9
+OK   pipeline o : aucun marqueur restant
+OK   pipeline b : yq la relit, nom : builder-rocky9-bootstrap
+OK   pipeline b : aucun marqueur restant
+OK   prefetch-racine-rpm : image du pas : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+OK   prefetch-racine-rpm : aucun computeResources, aucune variable d'environnement autre que HOME : [0,["HOME"]]
+OK   construire-racine-rpm : image du pas : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+OK   construire-racine-rpm : aucun computeResources, aucune variable d'environnement autre que HOME : [0,[]]
+OK   prefetch : UID, runAsNonRoot, capacités, élévation : 65532 true ALL false
+OK   construire : contexte du pas = celui du pas construire de construire-rpm signée : {"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsNonRoot":false,"runAsUser":0}
+OK   construire : ressources du pas = celles du pas construire de construire-rpm signée : {"limits":{"cpu":"2","memory":"6Gi"},"requests":{"cpu":"2","memory":"6Gi"}}
+OK   pipeline o : paramètres de prefetch = ceux de la tâche : ["depots","liste","cles","cle_sup","couche"]
+OK   pipeline o : paramètres de construire = ceux de la tâche : ["depots","liste","cles","couche","dnf_conf","dnf_conf_sha256","noms","langue","sde","racine","fichiers","config","annotations"]
+OK   pipeline o : depots, liste et cles identiques entre prefetch et construire (JSON comparés en texte) : identiques
+OK   pipeline o : sous-dossiers des workspaces : ["entrees","entrees","image","image"]
+OK   pipeline b : paramètres de prefetch = ceux de la tâche : ["depots","liste","cles","cle_sup","couche"]
+OK   pipeline b : paramètres de construire = ceux de la tâche : ["depots","liste","cles","couche","dnf_conf","dnf_conf_sha256","noms","langue","sde","racine","fichiers","config","annotations"]
+OK   pipeline b : depots, liste et cles identiques entre prefetch et construire (JSON comparés en texte) : identiques
+OK   pipeline b : sous-dossiers des workspaces : ["entrees","entrees","image","image"]
+OK   pipeline o : dnf_conf_sha256 = sha256 de dnf.conf du banc : d554fb1ce168663fbfbfaffa175056f049506a2fa33675acb63dedf2969d03cc
+OK   pipeline o : annotations et couche de construire = base contrôlée par le prefetch : sans base
+OK   pipeline b : annotations et couche de construire = base contrôlée par le prefetch : base amont/rockylinux/rockylinux@sha256:ee90dc0e23c2, couche 812c44127102 : cohérentes
+OK   pipeline b : dnf_conf_sha256 = sha256 de dnf97.conf du banc : 7f49d5d39d0f1b1b232482a2b9e416c235ece7885a6858256bae0a2692e9f5ef
+OK   pipeline o : liste rendue = m1b-listes-outillage.txt : égale
+OK   pipeline b : liste rendue = liste du bootstrap : égale
+## analyseur du paramètre fichiers (section de la tâche), sur la valeur rendue
+OK   analyseur extrait (lignes) : ok
+     fichier de configuration etc/containers/storage.conf : 87 octets
+     fichier de configuration etc/mock/poc-rocky-9.7-pret-x86_64.cfg : 1047 octets
+     fichier de configuration etc/mock/poc-rocky-9.7-x86_64.cfg : 1043 octets
+OK   fichiers produits = fichiers de la couche de S1, octet pour octet : identiques
+## scripts substitués comme par Tekton
+OK   script-po : bash -n : ok
+OK   script-po : shellcheck sans avertissement
+OK   script-po : 34949 octets, base64 46600 caractères (+ 1 000 de marge sous la borne de 131071) ; sha256 a93deebbd3fbed7d2570c6c25b0087cf294e8583df4433c71fa750b387ecf004
+OK   script-pb : bash -n : ok
+OK   script-pb : shellcheck sans avertissement
+OK   script-pb : 11907 octets, base64 15876 caractères (+ 1 000 de marge sous la borne de 131071) ; sha256 912520eae2810d581fe229a29215bc2c60744a738125364954721ff31aa73c0a
+OK   script-co : bash -n : ok
+OK   script-co : shellcheck sans avertissement
+OK   script-co : 37708 octets, base64 50280 caractères (+ 1 000 de marge sous la borne de 131071) ; sha256 956e39c260a74aac9c9f71639af15ca4acc9986cf6ad52d18dddbac90ec2fee4
+OK   script-cb : bash -n : ok
+OK   script-cb : shellcheck sans avertissement
+OK   script-cb : 14125 octets, base64 18836 caractères (+ 1 000 de marge sous la borne de 131071) ; sha256 cad7f5501dfe61a370baff4a44e56c7c8bb9a3e739e428294a5073b2221b541c
+## entrées attendues du prefetch (bancs du 18/11), liste des sha256
+entrées attendues o : 224 fichiers, liste 93f2a63ef2e49607d2844e07d7dfc7f793537f350be492c4acf82815ec280535
+entrées attendues b : 20 fichiers, liste 7af63de76df231b2c106629aff7ce628282053dd5831d50bc157dafcb6ca2325
+place libre de /home : 104988772 kB
+# fin prealables 2026-11-20T00:04:56Z

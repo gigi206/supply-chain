@@ -1,0 +1,42 @@
+# m1b-jour-kata.sh, début 2026-11-20T00:01:43Z ; HEAD f2ac13073a81
+préfixes : ancienne forme m1b-20, forme de la tâche m1bt-20
+scripts : m1b.sh 373ae33436d298e3 ; m1b-builders.sh 82004de28016ee27
+2026-11-20T00:01:43Z m1b.sh prealables (PREFIXE m1b-20) : journal m1b-20-prealables.log
+2026-11-20T00:01:45Z    code 0
+2026-11-20T00:01:45Z m1b.sh pod_c (PREFIXE m1b-20) : journal m1b-20-pod_c.log
+2026-11-20T00:03:46Z    code 0
+2026-11-20T00:03:46Z m1b.sh prealables_boot (PREFIXE m1b-20) : journal m1b-20-prealables_boot.log
+2026-11-20T00:03:47Z    code 0
+2026-11-20T00:03:47Z m1b.sh pod_e (PREFIXE m1b-20) : journal m1b-20-pod_e.log
+2026-11-20T00:04:53Z    code 0
+2026-11-20T00:04:53Z m1b-builders.sh prealables (PREFIXE m1bt-20) : journal m1b-builders-m1bt-20-prealables.log
+2026-11-20T00:04:56Z    code 0
+2026-11-20T00:04:56Z m1b-builders.sh banc (PREFIXE m1bt-20) : journal m1b-builders-m1bt-20-banc.log
+2026-11-20T00:05:35Z    code 0
+2026-11-20T00:05:35Z m1b-builders.sh essai_prefetch (PREFIXE m1bt-20) : journal m1b-builders-m1bt-20-essai_prefetch.log
+2026-11-20T00:08:10Z    code 0
+2026-11-20T00:08:10Z m1b-builders.sh essai_construire (PREFIXE m1bt-20) : journal m1b-builders-m1bt-20-essai_construire.log
+2026-11-20T00:11:15Z    code 0
+## bilan : valeurs du 20/11 contre celles du 19/11
+OK   pod_c, archive de l'outillage : 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+OK   pod_e, archive du bootstrap : b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+OK   pod_e, liste rpm -qa après : 1ca7c54b467560e67191b2ca557fa04d0ab7e06c7d639d2e00072757bde61699
+OK   script-po rendu : a93deebbd3fbed7d2570c6c25b0087cf294e8583df4433c71fa750b387ecf004
+OK   script-pb rendu : 912520eae2810d581fe229a29215bc2c60744a738125364954721ff31aa73c0a
+OK   script-co rendu : 956e39c260a74aac9c9f71639af15ca4acc9986cf6ad52d18dddbac90ec2fee4
+OK   script-cb rendu : cad7f5501dfe61a370baff4a44e56c7c8bb9a3e739e428294a5073b2221b541c
+OK   banc o, DIGEST_CONSTRUIT : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   banc b, DIGEST_CONSTRUIT : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   banc o, racine : 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+OK   banc b, racine : b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+OK   prefetch, repomd.xml de baseos98 : abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+OK   prefetch, repomd.xml de appstream98 : a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+OK   prefetch, repomd.xml de epel9 : e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61
+OK   prefetch, repomd.xml de baseos97 : fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+OK   prefetch po, liste de l'arbre écrit : 93f2a63ef2e49607d2844e07d7dfc7f793537f350be492c4acf82815ec280535
+OK   prefetch pb, liste de l'arbre écrit : 7af63de76df231b2c106629aff7ce628282053dd5831d50bc157dafcb6ca2325
+OK   construire co, DIGEST_CONSTRUIT : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   construire co, image.tar : 26ce192f90b645aedf3e02ef925d38bbea17a127c3b0707c4aa564764f1dd659
+OK   construire cb, DIGEST_CONSTRUIT : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   construire cb, image.tar : e574aaa17ed8c4a68b58f2580f762e2e5718f43a7e7734fabfffab95fc3b321b
+# fin 2026-11-20T00:11:15Z ; KO 0
