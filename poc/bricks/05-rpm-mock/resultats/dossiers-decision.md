@@ -296,3 +296,9 @@ Question posée : (i) une barrière, avec les limites de la note précédente en
   - les deux politiques vers Internet passent par le même moteur ;
   - le contenu du rpm reste une voie de sortie que la barrière réseau ne couvre pas.
 - Le relevé périodique des politiques reste une piste, ni écrite ni essayée.
+
+## Correction de la réserve du dossier 5 (note de 2026-11-20T21:07:59Z ; relecture du conseiller ; rien n'est réécrit au-dessus)
+
+Deux lignes de la réserve écrite à la décision affirment plus que ce qui est établi :
+- « aucun contrôle continu de la politique n'existe » : lire **aucun trouvé**. La recherche n'a porté que sur `sortie-builds.sh` et `invariants`, dans les `.timer`, `.service` et `.yaml` du dépôt, plus les rôles et les règles Kyverno de la 08c.
+- « les témoins font échouer la construction, fermée, au démarrage » : c'est **lu dans les tâches signées, pas provoqué**. La moitié en est mesurée : le bras a de R7 de M5a a joint Zot sans le label, ce qui ferait réussir le témoin Zot et arrêter la tâche. L'arrêt de la tâche signée elle-même dans ce cas n'a pas été mesuré.

@@ -372,3 +372,10 @@ C'est une vérification de non-régression, sur un passage. Le chemin direct ver
   - un TaskRun de `construire-rpm@ca03f189…` sans `runtimeClassName` est refusé par Pod Security (`PodAdmissionFailed`, aucun pod) ;
   - dans le pod Kata privilégié, `mock --isolation=simple` laisse encore `eth0` et la connexion à Zot à `%build` (bras a). Sous le label `construire-rpm`, la connexion est refusée (bras b).
 - **Conséquence pour cet ADR** : aucune décision ne change. Le constat réseau de M5a vaut aussi pour l'outillage de M1b, et une seconde barrière pour la voie rpm reste à décider avec le propriétaire.
+
+**Additif du 20/11/2026, écrit à 2026-11-20T21:07:59Z UTC : une barrière réseau sur la voie rpm** (décision du propriétaire « Ok i », dossier 5 de la 05, [dossiers](../../poc/bricks/05-rpm-mock/resultats/dossiers-decision.md)).
+- Aucune seconde barrière n'est ajoutée. La NetworkPolicy `construction-rpm-sans-sortie` reste la seule coupure du réseau de `%build` dans le pod Kata. Aucune décision de cet ADR ne change.
+- Réserve écrite de la 05 :
+  - les témoins des tâches signées arrêteraient la construction si la politique manquait au démarrage. C'est lu, pas provoqué ;
+  - aucun contrôle continu de la politique n'a été trouvé ;
+  - les deux politiques vers Internet passent par le même moteur, Cilium.
