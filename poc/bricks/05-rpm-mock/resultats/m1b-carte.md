@@ -886,3 +886,16 @@ Premier point de la cascade avant M5b (§5) : le verrou refait hors de la platef
 - puis l'artefact de M4a, qui demande une écriture dans Zot avec un tag neuf : question à poser ;
 - les bundles neufs de `prefetch-rpm` et de `construire-rpm` ne dépendent que de l'outillage, et peuvent se préparer à sec en parallèle. Leur signature et la revue de `taches.yml` restent à demander ;
 - le rejeu de R1 à R8 sur le nouveau bundle n'a jamais été posé en question. Il le sera à son tour.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T09:44:51Z UTC : verrou de la cascade passé
+
+`m1b-verrou.sh verrou` a tourné de 2026-11-20T09:42:35Z à 2026-11-20T09:44:05Z, avec code 0, 33 OK et 0 KO. VR1 à VR7 tiennent ([résultat](m1b-predictions.md)).
+- **Verrou neuf** : [`m1b-verrou.json`](m1b-verrou.json) (`c544599a…`). Il ne diffère du verrou de M4a (`b6d0f8f1`) que par le bootstrap : `config.bootstrap_image`, `bootstrap.pull_digest` (`6de899ac…`), `bootstrap.id` (`ff96017c…`) et `bootstrap.image_digest` (`77cff176…`). Les 222 rpm sont identiques.
+- **Premier usage des deux images de M1b** : l'outillage démarre sous Kata, le pod tire le bootstrap anonymement, et mock le prend comme prêt.
+
+**Suite de la cascade** : l'artefact de M4a, republié avec ce verrou. Il demande trois choses :
+- une écriture dans Zot ;
+- de nouvelles constantes dans `m4a.sh` (`VERROU_SHA`, `PULL_DIGEST`, `IMAGE_DIGEST`, `BOOTSTRAP`, `OUTILLAGE`) ;
+- le remplacement de `poc/packaging/verrou-rpm.json`.
+
+Je pose la question du tag avant toute écriture.

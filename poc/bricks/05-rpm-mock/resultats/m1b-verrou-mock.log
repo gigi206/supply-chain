@@ -1,0 +1,543 @@
+### /w/res-verrou/root.log
+DEBUG util.py:537:  perl-IO-Socket-IP|/@noarch|/@GPL+ or Artistic|/@0.41|/@5.el9|/@(none)|/@e15309272bc8233c371974031d4038f4|/@(none)
+DEBUG util.py:537:  perl-Time-Local|/@noarch|/@GPL+ or Artistic|/@1.300|/@7.el9|/@2|/@1ceb12a5fab9494f14aeeae4f98974f8|/@(none)
+DEBUG util.py:537:  perl-File-Path|/@noarch|/@GPL+ or Artistic|/@2.18|/@4.el9|/@(none)|/@0913f114ee7544e2c36b3c1306b3cacd|/@(none)
+DEBUG util.py:537:  perl-IO-Socket-SSL|/@noarch|/@(GPL+ or Artistic) and MPLv2.0|/@2.073|/@2.el9|/@(none)|/@cb9d5e58fbe6d47b52744c67b088b98c|/@(none)
+DEBUG util.py:537:  perl-Net-SSLeay|/@x86_64|/@Artistic-2.0|/@1.94|/@3.el9|/@(none)|/@001848fd9f8a8c4f66d831638949cbff|/@(none)
+DEBUG util.py:537:  perl-Pod-Escapes|/@noarch|/@GPL+ or Artistic|/@1.07|/@460.el9.0.1|/@1|/@c6c94dde8b8c16ea0d9ae66e0ef4a4cb|/@(none)
+DEBUG util.py:537:  perl-Text-Tabs+Wrap|/@noarch|/@TTWL|/@2013.0523|/@460.el9.0.1|/@(none)|/@76fdb8715ee5a07495562548bbf66d63|/@(none)
+DEBUG util.py:537:  perl-Mozilla-CA|/@noarch|/@MPLv2.0|/@20200520|/@6.el9|/@(none)|/@379218f96763af378c71e840443183f8|/@(none)
+DEBUG util.py:537:  perl-Class-Struct|/@noarch|/@GPL+ or Artistic|/@0.66|/@481.1.el9_6|/@0|/@3202ccab5e6c6b0db803a7842e6b83f5|/@(none)
+DEBUG util.py:537:  perl-POSIX|/@x86_64|/@GPL+ or Artistic|/@1.94|/@481.1.el9_6|/@0|/@b0ff90ba4108a40c7242242b8e60daf8|/@(none)
+DEBUG util.py:537:  perl-Term-ANSIColor|/@noarch|/@GPL+ or Artistic|/@5.01|/@461.el9.0.1|/@(none)|/@a1860327f42a070371b2cd671cd980be|/@(none)
+DEBUG util.py:537:  perl-IPC-Open3|/@noarch|/@GPL+ or Artistic|/@1.21|/@481.1.el9_6|/@0|/@bf64fe9fd2a4ef3945b15240d570bfd3|/@(none)
+DEBUG util.py:537:  perl-subs|/@noarch|/@GPL+ or Artistic|/@1.03|/@481.1.el9_6|/@0|/@977f2c5a42f9f04cf7b0c0959df94842|/@(none)
+DEBUG util.py:537:  perl-File-Temp|/@noarch|/@GPL+ or Artistic|/@0.231.100|/@4.el9|/@1|/@f59e524679a0053d68e5543e8e7e314f|/@(none)
+DEBUG util.py:537:  perl-Term-Cap|/@noarch|/@GPL+ or Artistic|/@1.17|/@460.el9.0.1|/@(none)|/@a02eda5eb74278d88ac2f9fc1abd326f|/@(none)
+DEBUG util.py:537:  perl-Pod-Simple|/@noarch|/@GPL+ or Artistic|/@3.42|/@4.el9|/@1|/@82d3854aa1de3ebb86a9312a6340e90f|/@(none)
+DEBUG util.py:537:  perl-HTTP-Tiny|/@noarch|/@GPL+ or Artistic|/@0.076|/@462.el9|/@(none)|/@c0d71e59cd5878a35fb4e106c7f2a7b7|/@(none)
+DEBUG util.py:537:  perl-Socket|/@x86_64|/@GPL+ or Artistic|/@2.031|/@4.el9|/@4|/@249702354e9054c64a9e9e44c213ec96|/@(none)
+DEBUG util.py:537:  perl-SelectSaver|/@noarch|/@GPL+ or Artistic|/@1.02|/@481.1.el9_6|/@0|/@a98d550fd36618409ba5dd24196a1527|/@(none)
+DEBUG util.py:537:  perl-Symbol|/@noarch|/@GPL+ or Artistic|/@1.08|/@481.1.el9_6|/@0|/@a945d62472a270e999af3dc901779584|/@(none)
+DEBUG util.py:537:  perl-File-stat|/@noarch|/@GPL+ or Artistic|/@1.09|/@481.1.el9_6|/@0|/@5b79bd7181b0a897d60b6e38b47ee79d|/@(none)
+DEBUG util.py:537:  perl-podlators|/@noarch|/@(GPL+ or Artistic) and FSFAP|/@4.14|/@460.el9.0.1|/@1|/@8635014cbb4597f185f7124e77ecdb1b|/@(none)
+DEBUG util.py:537:  perl-Pod-Perldoc|/@noarch|/@GPL+ or Artistic|/@3.28.01|/@461.el9|/@(none)|/@83cda205537bd2ad32547af109e20f11|/@(none)
+DEBUG util.py:537:  perl-Fcntl|/@x86_64|/@GPL+ or Artistic|/@1.13|/@481.1.el9_6|/@0|/@b71b4e94c5b6d4773921aac73a7bbbde|/@(none)
+DEBUG util.py:537:  perl-Text-ParseWords|/@noarch|/@GPL+ or Artistic|/@3.30|/@460.el9|/@(none)|/@f0cff9642d107f0207c44c00e68af130|/@(none)
+DEBUG util.py:537:  perl-mro|/@x86_64|/@GPL+ or Artistic|/@1.23|/@481.1.el9_6|/@0|/@159cfe5bc49c6df0dc698f2c6e2ca03e|/@(none)
+DEBUG util.py:537:  perl-IO|/@x86_64|/@GPL+ or Artistic|/@1.43|/@481.1.el9_6|/@0|/@8cace3ce9b7aefd379cec1acd8a7e2a7|/@(none)
+DEBUG util.py:537:  perl-overloading|/@noarch|/@GPL+ or Artistic|/@0.02|/@481.1.el9_6|/@0|/@4b9f641f5e1352cdc8ddaafa21439118|/@(none)
+DEBUG util.py:537:  perl-Pod-Usage|/@noarch|/@GPL+ or Artistic|/@2.01|/@4.el9|/@4|/@98f6af2a3d64753ac904d5d9407e878e|/@(none)
+DEBUG util.py:537:  perl-Errno|/@x86_64|/@GPL+ or Artistic|/@1.30|/@481.1.el9_6|/@0|/@5a282c90f78631504f5802de659b98cd|/@(none)
+DEBUG util.py:537:  perl-File-Basename|/@noarch|/@GPL+ or Artistic|/@2.85|/@481.1.el9_6|/@0|/@6057464999c6d7b6b1a8d893d76bd38b|/@(none)
+DEBUG util.py:537:  perl-Getopt-Std|/@noarch|/@GPL+ or Artistic|/@1.12|/@481.1.el9_6|/@0|/@60128235c0831ee80bcc79541665872d|/@(none)
+DEBUG util.py:537:  perl-MIME-Base64|/@x86_64|/@(GPL+ or Artistic) and MIT|/@3.16|/@4.el9|/@(none)|/@79131d65e200b0c6e64dc18850ff8a06|/@(none)
+DEBUG util.py:537:  perl-Scalar-List-Utils|/@x86_64|/@GPL+ or Artistic|/@1.56|/@462.el9|/@4|/@25431cd814537699d04a6bd116464a28|/@(none)
+DEBUG util.py:537:  perl-constant|/@noarch|/@GPL+ or Artistic|/@1.33|/@461.el9.0.1|/@(none)|/@f35cd6a19158668ed3856b33884d936d|/@(none)
+DEBUG util.py:537:  perl-Storable|/@x86_64|/@GPL+ or Artistic|/@3.21|/@460.el9|/@1|/@f562f7fa711e68402776f692f3add570|/@(none)
+DEBUG util.py:537:  perl-overload|/@noarch|/@GPL+ or Artistic|/@1.31|/@481.1.el9_6|/@0|/@91186cacedc81dfe85381da01627ee4d|/@(none)
+DEBUG util.py:537:  perl-parent|/@noarch|/@GPL+ or Artistic|/@0.238|/@460.el9|/@1|/@cd964be73bdf6940a87b3d0fe0476847|/@(none)
+DEBUG util.py:537:  perl-vars|/@noarch|/@GPL+ or Artistic|/@1.05|/@481.1.el9_6|/@0|/@48d8ec93b2b169381b601ee9504284e3|/@(none)
+DEBUG util.py:537:  perl-Getopt-Long|/@noarch|/@GPLv2+ or Artistic|/@2.52|/@4.el9|/@1|/@d27908b132dda891df7dc6951fa2c34b|/@(none)
+DEBUG util.py:537:  perl-Carp|/@noarch|/@GPL+ or Artistic|/@1.50|/@460.el9.0.1|/@(none)|/@abfd0a7186623c8c3ade066b63d9df5a|/@(none)
+DEBUG util.py:537:  perl-Exporter|/@noarch|/@GPL+ or Artistic|/@5.74|/@461.el9|/@(none)|/@c01c2a31a2561b748052cc0463c35215|/@(none)
+DEBUG util.py:537:  perl-PathTools|/@x86_64|/@(GPL+ or Artistic) and BSD|/@3.78|/@461.el9|/@(none)|/@835426614e155f37f1ffa650efe6de40|/@(none)
+DEBUG util.py:537:  perl-Encode|/@x86_64|/@(GPL+ or Artistic) and Artistic 2.0 and UCD|/@3.08|/@462.el9|/@4|/@cf3cbbaf60be22194fd1dae2a20da92a|/@(none)
+DEBUG util.py:537:  perl-libs|/@x86_64|/@(GPL+ or Artistic) and BSD and HSRL and MIT and UCD and Public domain|/@5.32.1|/@481.1.el9_6|/@4|/@c071ac9e460132c8752cd07c836ab126|/@(none)
+DEBUG util.py:537:  perl-interpreter|/@x86_64|/@GPL+ or Artistic|/@5.32.1|/@481.1.el9_6|/@4|/@776fe5177ff52565dc20c394dfd94415|/@(none)
+DEBUG util.py:537:  kernel-srpm-macros|/@noarch|/@MIT|/@1.0|/@14.el9|/@(none)|/@247198282ea72b12664b7f5c5acfe2c6|/@(none)
+DEBUG util.py:537:  openssl|/@x86_64|/@Apache-2.0|/@3.5.1|/@7.el9_7|/@1|/@1437ffe3f226c79f0e9ced2b371b6ac2|/@(none)
+DEBUG util.py:537:  libpwquality|/@x86_64|/@BSD or GPLv2+|/@1.4.4|/@8.el9|/@(none)|/@fca0191f7104f50acf34e27c0fb604a8|/@(none)
+DEBUG util.py:537:  pam|/@x86_64|/@BSD and GPLv2+|/@1.5.1|/@26.el9_6|/@(none)|/@b395ec5681ea90955b0d1a5e3a49de05|/@(none)
+DEBUG util.py:537:  libevent|/@x86_64|/@BSD and ISC|/@2.1.12|/@8.el9_4|/@(none)|/@d9405087fd87d67381a1f397a7e25664|/@(none)
+DEBUG util.py:537:  openldap|/@x86_64|/@OLDAP-2.8|/@2.6.8|/@4.el9.0.1|/@(none)|/@d6eeb39b5a1a6617fb438717dc519ecb|/@(none)
+DEBUG util.py:537:  libcurl|/@x86_64|/@MIT|/@7.76.1|/@35.el9_7.3|/@(none)|/@cedfb44fde8998e3f72220d9960fe398|/@(none)
+DEBUG util.py:537:  elfutils-debuginfod-client|/@x86_64|/@GPL-3.0-or-later AND (GPL-2.0-or-later OR LGPL-3.0-or-later)|/@0.193|/@1.el9.rocky.0.1|/@(none)|/@b7e37afbef8453481b3b571f00ffe461|/@(none)
+DEBUG util.py:537:  binutils-gold|/@x86_64|/@GPLv3+|/@2.35.2|/@67.el9_7.1|/@(none)|/@023a79a841f39d90b74c84d09a6311dc|/@(none)
+DEBUG util.py:537:  binutils|/@x86_64|/@GPLv3+|/@2.35.2|/@67.el9_7.1|/@(none)|/@cda5e16ee9e27ba339192f6bfd71e8b7|/@(none)
+DEBUG util.py:537:  elfutils|/@x86_64|/@GPL-3.0-or-later AND (GPL-2.0-or-later OR LGPL-3.0-or-later) AND GFDL-1.3-no-invariants-or-later|/@0.193|/@1.el9.rocky.0.1|/@(none)|/@859c7303d411818876e971ad1a5a6f29|/@(none)
+DEBUG util.py:537:  gdb-minimal|/@x86_64|/@GPL-3.0-or-later AND BSD-3-Clause AND FSFAP AND LGPL-2.1-or-later AND GPL-2.0-or-later AND LGPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain AND GFDL-1.3-or-later AND LGPL-2.0-or-later WITH GCC-exception-2.0 AND GPL-3.0-or-later WITH GCC-exception-3.1 AND GPL-2.0-or-later WITH GNU-compiler-exception AND MIT|/@16.3|/@2.el9|/@(none)|/@1b03ec4b25a19f20a01d4820bdf5c48f|/@(none)
+DEBUG util.py:537:  debugedit|/@x86_64|/@GPLv3+ and GPLv2+ and LGPLv2+|/@5.0|/@11.el9|/@(none)|/@952c172e9aa1ed92551b65f98d2c9505|/@(none)
+DEBUG util.py:537:  curl|/@x86_64|/@MIT|/@7.76.1|/@35.el9_7.3|/@(none)|/@782d9fa38fe5344c533327540a318b31|/@(none)
+DEBUG util.py:537:  rpm|/@x86_64|/@GPLv2+|/@4.16.1.3|/@39.el9|/@(none)|/@f3931592da0e928b9daf2c251ef7eee7|/@(none)
+DEBUG util.py:537:  rpm-libs|/@x86_64|/@GPLv2+ and LGPLv2+ with exceptions|/@4.16.1.3|/@39.el9|/@(none)|/@768f539586b50b309e5116b32cfb8c98|/@(none)
+DEBUG util.py:537:  rpm-build-libs|/@x86_64|/@GPLv2+ and LGPLv2+ with exceptions|/@4.16.1.3|/@39.el9|/@(none)|/@ba01d44123a6ecf8826896f1e6d3e2ba|/@(none)
+DEBUG util.py:537:  efi-srpm-macros|/@noarch|/@GPLv3+|/@6|/@4.el9|/@(none)|/@fbb5241da61a9803c97c5faebdca409c|/@(none)
+DEBUG util.py:537:  lua-srpm-macros|/@noarch|/@MIT|/@1|/@6.el9|/@(none)|/@870f5bd7a9f316ac2a42d6cda3bc6d41|/@(none)
+DEBUG util.py:537:  fonts-srpm-macros|/@noarch|/@GPLv3+|/@2.0.5|/@7.el9.1|/@1|/@356003bd30cda7187d766cba0c547d8c|/@(none)
+DEBUG util.py:537:  go-srpm-macros|/@noarch|/@GPLv3+|/@3.6.0|/@14.el9_7|/@(none)|/@680bd12fbd7818af6650851fe73b38ea|/@(none)
+DEBUG util.py:537:  python-srpm-macros|/@noarch|/@MIT and Python|/@3.9|/@54.el9|/@(none)|/@69d130ef9a21da361859ceeacf238881|/@(none)
+DEBUG util.py:537:  pyproject-srpm-macros|/@noarch|/@MIT|/@1.16.2|/@1.el9|/@(none)|/@96c50e62d638304e39b582e0e3516e5d|/@(none)
+DEBUG util.py:537:  redhat-rpm-config|/@noarch|/@GPL+|/@210|/@1.el9|/@(none)|/@979b3e97c1d85b8552cbd4f6f89cf9bc|/@(none)
+DEBUG util.py:537:  rpm-build|/@x86_64|/@GPLv2+|/@4.16.1.3|/@39.el9|/@(none)|/@fd6be0e485cdb453a7ba5d907f57dee4|/@(none)
+DEBUG util.py:537:  util-linux|/@x86_64|/@GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain|/@2.37.4|/@21.el9_7|/@(none)|/@7302edfdbd843cdb6f5a1a8dee3491be|/@(none)
+DEBUG util.py:537:  which|/@x86_64|/@GPLv3|/@2.21|/@30.el9_6|/@(none)|/@0e055838636b786507f4a6c791bd7bb8|/@(none)
+DEBUG util.py:537:  libmpc|/@x86_64|/@LGPLv3+|/@1.2.1|/@4.el9|/@(none)|/@9d370c48a81c56b99bdb7c4d0aae607e|/@(none)
+DEBUG util.py:537:  cpp|/@x86_64|/@GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD|/@11.5.0|/@11.el9|/@(none)|/@8c2641b1830d9fc7321db4a789be17a5|/@(none)
+DEBUG util.py:537:  openssl-devel|/@x86_64|/@Apache-2.0|/@3.5.1|/@7.el9_7|/@1|/@861c691d500ba8fb4b89eb1a6dd57376|/@(none)
+DEBUG util.py:537:  nodejs-libs|/@x86_64|/@MIT and ASL 2.0 and ISC and BSD|/@16.20.2|/@8.el9_4|/@1|/@2c904777174aeb242bf4795addf0b756|/@(none)
+DEBUG util.py:537:  llvm-filesystem|/@x86_64|/@Apache-2.0 WITH LLVM-exception OR NCSA|/@20.1.8|/@3.el9|/@(none)|/@8a73100e6104985835d17af870ac7a86|/@(none)
+DEBUG util.py:537:  kernel-headers|/@x86_64|/@((GPL-2.0-only WITH Linux-syscall-note) OR BSD-2-Clause) AND ((GPL-2.0-only WITH Linux-syscall-note) OR BSD-3-Clause) AND ((GPL-2.0-only WITH Linux-syscall-note) OR CDDL-1.0) AND ((GPL-2.0-only WITH Linux-syscall-note) OR Linux-OpenIB) AND ((GPL-2.0-only WITH Linux-syscall-note) OR MIT) AND ((GPL-2.0-or-later WITH Linux-syscall-note) OR BSD-3-Clause) AND ((GPL-2.0-or-later WITH Linux-syscall-note) OR MIT) AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND BSD-3-Clause-Clear AND GFDL-1.1-no-invariants-or-later AND GPL-1.0-or-later AND (GPL-1.0-or-later OR BSD-3-Clause) AND (GPL-1.0-or-later WITH Linux-syscall-note) AND GPL-2.0-only AND (GPL-2.0-only OR Apache-2.0) AND (GPL-2.0-only OR BSD-2-Clause) AND (GPL-2.0-only OR BSD-3-Clause) AND (GPL-2.0-only OR CDDL-1.0) AND (GPL-2.0-only OR GFDL-1.1-no-invariants-or-later) AND (GPL-2.0-only OR GFDL-1.2-no-invariants-only) AND (GPL-2.0-only WITH Linux-syscall-note) AND GPL-2.0-or-later AND (GPL-2.0-or-later OR BSD-2-Clause) AND (GPL-2.0-or-later OR BSD-3-Clause) AND (GPL-2.0-or-later OR CC-BY-4.0) AND (GPL-2.0-or-later WITH GCC-exception-2.0) AND (GPL-2.0-or-later WITH Linux-syscall-note) AND ISC AND LGPL-2.0-or-later AND (LGPL-2.0-or-later OR BSD-2-Clause) AND (LGPL-2.0-or-later WITH Linux-syscall-note) AND LGPL-2.1-only AND (LGPL-2.1-only OR BSD-2-Clause) AND (LGPL-2.1-only WITH Linux-syscall-note) AND LGPL-2.1-or-later AND (LGPL-2.1-or-later WITH Linux-syscall-note) AND (Linux-OpenIB OR GPL-2.0-only) AND (Linux-OpenIB OR GPL-2.0-only OR BSD-2-Clause) AND Linux-man-pages-copyleft AND MIT AND (MIT OR GPL-2.0-only) AND (MIT OR GPL-2.0-or-later) AND (MIT OR LGPL-2.1-only) AND (MPL-1.1 OR GPL-2.0-only) AND (X11 OR GPL-2.0-only) AND (X11 OR GPL-2.0-or-later) AND Zlib AND (copyleft-next-0.3.1 OR GPL-2.0-or-later)|/@5.14.0|/@611.55.1.el9_7|/@(none)|/@4399912cb6acfd18c84cc79f2755e25e|/@(none)
+DEBUG util.py:537:  golang-src|/@noarch|/@BSD and Public Domain|/@1.25.9|/@1.el9_7|/@(none)|/@b3b272e933a863bc889510d5305a3902|/@(none)
+DEBUG util.py:537:  glibc-headers|/@x86_64|/@LGPLv2+ and LGPLv2+ with exceptions and GPLv2+ and GPLv2+ with exceptions and BSD and Inner-Net and ISC and Public Domain and GFDL|/@2.34|/@231.el9_7.10|/@(none)|/@d2a4edd9f429305558fe39e19f0c1579|/@(none)
+DEBUG util.py:537:  libxcrypt-devel|/@x86_64|/@LGPLv2+ and BSD and Public Domain|/@4.4.18|/@3.el9|/@(none)|/@fda458b53a75fcd4b21c7f7e2b02e461|/@(none)
+DEBUG util.py:537:  glibc-devel|/@x86_64|/@LGPLv2+ and LGPLv2+ with exceptions and GPLv2+ and GPLv2+ with exceptions and BSD and Inner-Net and ISC and Public Domain and GFDL|/@2.34|/@231.el9_7.10|/@(none)|/@43f4916d4ed4e4612743b3c8f11be646|/@(none)
+DEBUG util.py:537:  make|/@x86_64|/@GPLv3+|/@4.3|/@8.el9|/@1|/@8cb0facf22181efda18b2ad4f29ce8a2|/@(none)
+DEBUG util.py:537:  gcc|/@x86_64|/@GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD|/@11.5.0|/@11.el9|/@(none)|/@315068cb65b0d618978ce2dd8eab236d|/@(none)
+DEBUG util.py:537:  golang-race|/@x86_64|/@BSD and Public Domain|/@1.25.9|/@1.el9_7|/@(none)|/@4eaa03223ee025015770b6a576f90fe0|/@(none)
+DEBUG util.py:537:  golang|/@x86_64|/@BSD and Public Domain|/@1.25.9|/@1.el9_7|/@(none)|/@f84394fc92164b6ac446f586e61c57cd|/@(none)
+DEBUG util.py:537:  golang-bin|/@x86_64|/@BSD and Public Domain|/@1.25.9|/@1.el9_7|/@(none)|/@cca579810673e59c3d7f4e189b00bcd3|/@(none)
+DEBUG util.py:537:  libedit|/@x86_64|/@BSD|/@3.1|/@38.20210216cvs.el9|/@(none)|/@82d03f76417695578b5140e36da31fb2|/@(none)
+DEBUG util.py:537:  llvm-libs|/@x86_64|/@Apache-2.0 WITH LLVM-exception OR NCSA|/@20.1.8|/@3.el9|/@(none)|/@4f2eb7f6460186452c52fc4e54d30fa8|/@(none)
+DEBUG util.py:537:  annobin|/@x86_64|/@GPL-3.0-or-later AND LGPL-2.0-or-later AND (GPL-2.0-or-later WITH GCC-exception-2.0) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND GFDL-1.3-or-later|/@12.98|/@1.el9|/@(none)|/@cac6ac6096eeaa85df3bbca0b97b627d|/@(none)
+DEBUG util.py:537:  gcc-plugin-annobin|/@x86_64|/@GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD|/@11.5.0|/@11.el9|/@(none)|/@0d6d4f306e8e095f4d107d93460d7be4|/@(none)
+DEBUG util.py:537:  nodejs|/@x86_64|/@MIT and ASL 2.0 and ISC and BSD|/@16.20.2|/@8.el9_4|/@1|/@66696738ae249f7e4689f5e62b442b5c|/@(none)
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-derivee-x86_64/root
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/mount', '-n', '-t', 'tmpfs', '-o', 'private,mode=0755', 'tmpfs', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG file_util.py:17:  ensuring that dir exists: /w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/mount', '-n', '-o', 'rbind', '/w/mock/poc-rocky-9.7-derivee-x86_64/root', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/mount', '-n', '-o', 'remount,private,rbind', '--target', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/usr/bin/dnf-3', '--installroot=/w/mock/poc-rocky-9.7-derivee-x86_64/root', 'repoquery', '-q', '--location', 'alternatives-1.24-2.el9.x86_64', 'annobin-12.98-1.el9.x86_64', 'audit-libs-3.1.5-7.el9.x86_64', 'basesystem-11-13.el9.0.1.noarch', 'bash-5.1.8-9.el9.x86_64', 'binutils-gold-2.35.2-67.el9_7.1.x86_64', 'binutils-2.35.2-67.el9_7.1.x86_64', 'bzip2-libs-1.0.8-10.el9_5.x86_64', 'bzip2-1.0.8-10.el9_5.x86_64', 'ca-certificates-2025.2.80_v9.0.305-91.el9.noarch', 'coreutils-common-8.32-39.el9.x86_64', 'coreutils-8.32-39.el9.x86_64', 'cpio-2.13-16.el9.x86_64', 'cpp-11.5.0-11.el9.x86_64', 'cracklib-dicts-2.9.6-27.el9.x86_64', 'cracklib-2.9.6-27.el9.x86_64', 'crypto-policies-20250905-1.git377cc42.el9.noarch', 'curl-7.76.1-35.el9_7.3.x86_64', 'cyrus-sasl-lib-2.1.27-22.el9_7.x86_64', 'debugedit-5.0-11.el9.x86_64', 'diffutils-3.7-12.el9.x86_64', 'dwz-0.16-1.el9.x86_64', 'ed-1.14.2-12.el9.x86_64', 'efi-srpm-macros-6-4.el9.noarch', 'elfutils-debuginfod-client-0.193-1.el9.rocky.0.1.x86_64', 'elfutils-default-yama-scope-0.193-1.el9.rocky.0.1.noarch', 'elfutils-libelf-0.193-1.el9.rocky.0.1.x86_64', 'elfutils-libs-0.193-1.el9.rocky.0.1.x86_64', 'elfutils-0.193-1.el9.rocky.0.1.x86_64', 'file-libs-5.39-16.el9.x86_64', 'filesystem-3.16-5.el9.x86_64', 'file-5.39-16.el9.x86_64', 'findutils-4.8.0-7.el9.x86_64', 'fonts-srpm-macros-2.0.5-7.el9.1.noarch', 'gawk-5.1.0-6.el9.x86_64', 'gcc-plugin-annobin-11.5.0-11.el9.x86_64', 'gcc-11.5.0-11.el9.x86_64', 'gdb-minimal-16.3-2.el9.x86_64', 'gdbm-libs-1.23-1.el9.x86_64', 'ghc-srpm-macros-1.5.0-6.el9.noarch', 'glibc-common-2.34-231.el9_7.10.x86_64', 'glibc-devel-2.34-231.el9_7.10.x86_64', 'glibc-gconv-extra-2.34-231.el9_7.10.x86_64', 'glibc-headers-2.34-231.el9_7.10.x86_64', 'glibc-minimal-langpack-2.34-231.el9_7.10.x86_64', 'glibc-2.34-231.el9_7.10.x86_64', 'gmp-6.2.0-13.el9.x86_64', 'go-srpm-macros-3.6.0-14.el9_7.noarch', 'golang-bin-1.25.9-1.el9_7.x86_64', 'golang-race-1.25.9-1.el9_7.x86_64', 'golang-src-1.25.9-1.el9_7.noarch', 'golang-1.25.9-1.el9_7.x86_64', 'grep-3.6-5.el9.x86_64', 'groff-base-1.22.4-10.el9.0.1.x86_64', 'gzip-1.12-1.el9.x86_64', 'info-6.7-15.el9.x86_64', 'json-c-0.14-11.el9.x86_64', 'kernel-headers-5.14.0-611.55.1.el9_7.x86_64', 'kernel-srpm-macros-1.0-14.el9.noarch', 'keyutils-libs-1.6.3-1.el9.x86_64', 'krb5-libs-1.21.1-9.el9_7.x86_64', 'libacl-2.3.1-4.el9.x86_64', 'libarchive-3.5.3-9.el9_7.x86_64', 'libattr-2.5.1-3.el9.x86_64', 'libblkid-2.37.4-21.el9_7.x86_64', 'libbrotli-1.0.9-9.el9_7.x86_64', 'libcap-ng-0.8.2-7.el9.x86_64', 'libcap-2.48-10.el9_7.1.x86_64', 'libcom_err-1.46.5-8.el9.x86_64', 'libcurl-7.76.1-35.el9_7.3.x86_64', 'libdb-5.3.28-57.el9_6.x86_64', 'libeconf-0.4.1-4.el9.x86_64', 'libedit-3.1-38.20210216cvs.el9.x86_64', 'libevent-2.1.12-8.el9_4.x86_64', 'libfdisk-2.37.4-21.el9_7.x86_64', 'libffi-3.4.2-8.el9.x86_64', 'libgcc-11.5.0-11.el9.x86_64', 'libgcrypt-1.10.0-11.el9.x86_64', 'libgomp-11.5.0-11.el9.x86_64', 'libgpg-error-1.42-5.el9.x86_64', 'libidn2-2.3.0-7.el9.x86_64', 'libmount-2.37.4-21.el9_7.x86_64', 'libmpc-1.2.1-4.el9.x86_64', 'libnghttp2-1.43.0-6.el9_7.1.x86_64', 'libpkgconf-1.7.3-10.el9.x86_64', 'libpsl-0.21.1-5.el9.x86_64', 'libpwquality-1.4.4-8.el9.x86_64', 'libselinux-3.6-3.el9.x86_64', 'libsemanage-3.6-5.el9_6.x86_64', 'libsepol-3.6-3.el9.x86_64', 'libsigsegv-2.13-4.el9.x86_64', 'libsmartcols-2.37.4-21.el9_7.x86_64', 'libssh-config-0.10.4-17.el9_7.noarch', 'libssh-0.10.4-17.el9_7.x86_64', 'libstdc++-11.5.0-11.el9.x86_64', 'libtasn1-4.16.0-9.el9.x86_64', 'libtool-ltdl-2.4.6-46.el9.x86_64', 'libunistring-0.9.10-15.el9.x86_64', 'libutempter-1.2.1-6.el9.x86_64', 'libuuid-2.37.4-21.el9_7.x86_64', 'libverto-0.3.2-3.el9.x86_64', 'libxcrypt-devel-4.4.18-3.el9.x86_64', 'libxcrypt-4.4.18-3.el9.x86_64', 'libxml2-2.9.13-14.el9_7.x86_64', 'libzstd-1.5.5-1.el9.x86_64', 'llvm-filesystem-20.1.8-3.el9.x86_64', 'llvm-libs-20.1.8-3.el9.x86_64', 'lua-libs-5.4.4-4.el9.x86_64', 'lua-srpm-macros-1-6.el9.noarch', 'lz4-libs-1.9.3-5.el9.x86_64', 'make-4.3-8.el9.x86_64', 'mpfr-4.1.0-7.el9.x86_64', 'ncurses-base-6.2-12.20210508.el9.noarch', 'ncurses-libs-6.2-12.20210508.el9.x86_64', 'ncurses-6.2-12.20210508.el9.x86_64', 'nodejs-libs-16.20.2-8.el9_4.x86_64', 'nodejs-16.20.2-8.el9_4.x86_64', 'ocaml-srpm-macros-6-6.el9.noarch', 'openblas-srpm-macros-2-11.el9.noarch', 'openldap-2.6.8-4.el9.0.1.x86_64', 'openssl-devel-3.5.1-7.el9_7.x86_64', 'openssl-fips-provider-3.5.1-7.el9_7.x86_64', 'openssl-libs-3.5.1-7.el9_7.x86_64', 'openssl-3.5.1-7.el9_7.x86_64', 'p11-kit-trust-0.25.3-3.el9_5.x86_64', 'p11-kit-0.25.3-3.el9_5.x86_64', 'pam-1.5.1-26.el9_6.x86_64', 'patch-2.7.6-16.el9.x86_64', 'pcre2-syntax-10.40-6.el9.noarch', 'pcre2-10.40-6.el9.x86_64', 'pcre-8.44-4.el9.x86_64', 'perl-AutoLoader-5.74-481.1.el9_6.noarch', 'perl-B-1.80-481.1.el9_6.x86_64', 'perl-Carp-1.50-460.el9.0.1.noarch', 'perl-Class-Struct-0.66-481.1.el9_6.noarch', 'perl-Data-Dumper-2.174-462.el9.x86_64', 'perl-Digest-MD5-2.58-4.el9.x86_64', 'perl-Digest-1.19-4.el9.0.1.noarch', 'perl-Encode-3.08-462.el9.x86_64', 'perl-Errno-1.30-481.1.el9_6.x86_64', 'perl-Exporter-5.74-461.el9.noarch', 'perl-Fcntl-1.13-481.1.el9_6.x86_64', 'perl-File-Basename-2.85-481.1.el9_6.noarch', 'perl-File-Path-2.18-4.el9.noarch', 'perl-File-Temp-0.231.100-4.el9.noarch', 'perl-File-stat-1.09-481.1.el9_6.noarch', 'perl-FileHandle-2.03-481.1.el9_6.noarch', 'perl-Getopt-Long-2.52-4.el9.noarch', 'perl-Getopt-Std-1.12-481.1.el9_6.noarch', 'perl-HTTP-Tiny-0.076-462.el9.noarch', 'perl-IO-Socket-IP-0.41-5.el9.noarch', 'perl-IO-Socket-SSL-2.073-2.el9.noarch', 'perl-IO-1.43-481.1.el9_6.x86_64', 'perl-IPC-Open3-1.21-481.1.el9_6.noarch', 'perl-MIME-Base64-3.16-4.el9.x86_64', 'perl-Mozilla-CA-20200520-6.el9.noarch', 'perl-Net-SSLeay-1.94-3.el9.x86_64', 'perl-POSIX-1.94-481.1.el9_6.x86_64', 'perl-PathTools-3.78-461.el9.x86_64', 'perl-Pod-Escapes-1.07-460.el9.0.1.noarch', 'perl-Pod-Perldoc-3.28.01-461.el9.noarch', 'perl-Pod-Simple-3.42-4.el9.noarch', 'perl-Pod-Usage-2.01-4.el9.noarch', 'perl-Scalar-List-Utils-1.56-462.el9.x86_64', 'perl-SelectSaver-1.02-481.1.el9_6.noarch', 'perl-Socket-2.031-4.el9.x86_64', 'perl-Storable-3.21-460.el9.x86_64', 'perl-Symbol-1.08-481.1.el9_6.noarch', 'perl-Term-ANSIColor-5.01-461.el9.0.1.noarch', 'perl-Term-Cap-1.17-460.el9.0.1.noarch', 'perl-Text-ParseWords-3.30-460.el9.noarch', 'perl-Text-Tabs+Wrap-2013.0523-460.el9.0.1.noarch', 'perl-Time-Local-1.300-7.el9.noarch', 'perl-URI-5.09-3.el9.0.1.noarch', 'perl-base-2.27-481.1.el9_6.noarch', 'perl-constant-1.33-461.el9.0.1.noarch', 'perl-if-0.60.800-481.1.el9_6.noarch', 'perl-interpreter-5.32.1-481.1.el9_6.x86_64', 'perl-libnet-3.13-4.el9.noarch', 'perl-libs-5.32.1-481.1.el9_6.x86_64', 'perl-mro-1.23-481.1.el9_6.x86_64', 'perl-overloading-0.02-481.1.el9_6.noarch', 'perl-overload-1.31-481.1.el9_6.noarch', 'perl-parent-0.238-460.el9.noarch', 'perl-podlators-4.14-460.el9.0.1.noarch', 'perl-srpm-macros-1-41.el9.noarch', 'perl-subs-1.03-481.1.el9_6.noarch', 'perl-vars-1.05-481.1.el9_6.noarch', 'pkgconf-m4-1.7.3-10.el9.noarch', 'pkgconf-pkg-config-1.7.3-10.el9.x86_64', 'pkgconf-1.7.3-10.el9.x86_64', 'popt-1.18-8.el9.x86_64', 'publicsuffix-list-dafsa-20210518-3.el9.noarch', 'pyproject-srpm-macros-1.16.2-1.el9.noarch', 'python-srpm-macros-3.9-54.el9.noarch', 'qt5-srpm-macros-5.15.9-1.el9.noarch', 'readline-8.1-4.el9.x86_64', 'redhat-rpm-config-210-1.el9.noarch', 'rocky-gpg-keys-9.7-1.7.el9.noarch', 'rocky-release-9.7-1.7.el9.noarch', 'rocky-repos-9.7-1.7.el9.noarch', 'rpm-build-libs-4.16.1.3-39.el9.x86_64', 'rpm-build-4.16.1.3-39.el9.x86_64', 'rpm-libs-4.16.1.3-39.el9.x86_64', 'rpm-4.16.1.3-39.el9.x86_64', 'rust-srpm-macros-17-4.el9.noarch', 'sed-4.8-9.el9.x86_64', 'setup-2.13.7-10.el9.noarch', 'shadow-utils-4.9-15.el9.x86_64', 'sqlite-libs-3.34.1-9.el9_7.x86_64', 'systemd-libs-252-55.el9_7.9.rocky.0.1.x86_64', 'tar-1.34-9.el9_7.x86_64', 'tzdata-2026a-1.el9_7.noarch', 'unzip-6.0-59.el9.x86_64', 'util-linux-core-2.37.4-21.el9_7.x86_64', 'util-linux-2.37.4-21.el9_7.x86_64', 'which-2.21-30.el9_6.x86_64', 'xz-libs-5.2.5-8.el9_0.x86_64', 'xz-5.2.5-8.el9_0.x86_64', 'zip-3.0-35.el9.x86_64', 'zlib-1.2.11-40.el9.x86_64', 'zstd-1.5.5-1.el9.x86_64'] with env {'TERM': 'vt100', 'SHELL': '/bin/bash', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'PROMPT_COMMAND': 'printf "\\033]0;<mock-chroot>\\007"', 'PS1': '<mock-chroot> \\s-\\v\\$ ', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/a/annobin-12.98-1.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/c/cpp-11.5.0-11.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/d/debugedit-5.0-11.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/d/dwz-0.16-1.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/e/efi-srpm-macros-6-4.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/f/fonts-srpm-macros-2.0.5-7.el9.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/gcc-11.5.0-11.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/gcc-plugin-annobin-11.5.0-11.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/gdb-minimal-16.3-2.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/ghc-srpm-macros-1.5.0-6.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/glibc-devel-2.34-231.el9_7.10.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/glibc-headers-2.34-231.el9_7.10.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/go-srpm-macros-3.6.0-14.el9_7.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/golang-1.25.9-1.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/golang-bin-1.25.9-1.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/golang-race-1.25.9-1.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/g/golang-src-1.25.9-1.el9_7.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/k/kernel-headers-5.14.0-611.55.1.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/k/kernel-srpm-macros-1.0-14.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/l/libmpc-1.2.1-4.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/l/libxcrypt-devel-4.4.18-3.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/l/llvm-filesystem-20.1.8-3.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/l/llvm-libs-20.1.8-3.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/l/lua-srpm-macros-1-6.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/n/nodejs-16.20.2-8.el9_4.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/n/nodejs-libs-16.20.2-8.el9_4.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/o/ocaml-srpm-macros-6-6.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/o/openblas-srpm-macros-2-11.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/o/openssl-devel-3.5.1-7.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/patch-2.7.6-16.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-AutoLoader-5.74-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-B-1.80-481.1.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Carp-1.50-460.el9.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Class-Struct-0.66-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Data-Dumper-2.174-462.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Digest-1.19-4.el9.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Digest-MD5-2.58-4.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Encode-3.08-462.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Errno-1.30-481.1.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Exporter-5.74-461.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Fcntl-1.13-481.1.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-File-Basename-2.85-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-File-Path-2.18-4.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-File-Temp-0.231.100-4.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-File-stat-1.09-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-FileHandle-2.03-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Getopt-Long-2.52-4.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Getopt-Std-1.12-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-HTTP-Tiny-0.076-462.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-IO-1.43-481.1.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-IO-Socket-IP-0.41-5.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-IO-Socket-SSL-2.073-2.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-IPC-Open3-1.21-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-MIME-Base64-3.16-4.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Mozilla-CA-20200520-6.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Net-SSLeay-1.94-3.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-POSIX-1.94-481.1.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-PathTools-3.78-461.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Pod-Escapes-1.07-460.el9.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Pod-Perldoc-3.28.01-461.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Pod-Simple-3.42-4.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Pod-Usage-2.01-4.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Scalar-List-Utils-1.56-462.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-SelectSaver-1.02-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Socket-2.031-4.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Storable-3.21-460.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Symbol-1.08-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Term-ANSIColor-5.01-461.el9.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Term-Cap-1.17-460.el9.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Text-ParseWords-3.30-460.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Text-Tabs+Wrap-2013.0523-460.el9.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-Time-Local-1.300-7.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-URI-5.09-3.el9.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-base-2.27-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-constant-1.33-461.el9.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-if-0.60.800-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-interpreter-5.32.1-481.1.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-libnet-3.13-4.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-libs-5.32.1-481.1.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-mro-1.23-481.1.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-overload-1.31-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-overloading-0.02-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-parent-0.238-460.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-podlators-4.14-460.el9.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-srpm-macros-1-41.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-subs-1.03-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/perl-vars-1.05-481.1.el9_6.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/pyproject-srpm-macros-1.16.2-1.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/p/python-srpm-macros-3.9-54.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/q/qt5-srpm-macros-5.15.9-1.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/r/redhat-rpm-config-210-1.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/r/rpm-build-4.16.1.3-39.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/r/rust-srpm-macros-17-4.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/a/alternatives-1.24-2.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/a/audit-libs-3.1.5-7.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/b/basesystem-11-13.el9.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/b/bash-5.1.8-9.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/b/binutils-2.35.2-67.el9_7.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/b/binutils-gold-2.35.2-67.el9_7.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/b/bzip2-1.0.8-10.el9_5.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/b/bzip2-libs-1.0.8-10.el9_5.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/c/ca-certificates-2025.2.80_v9.0.305-91.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/c/coreutils-8.32-39.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/c/coreutils-common-8.32-39.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/c/cpio-2.13-16.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/c/cracklib-2.9.6-27.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/c/cracklib-dicts-2.9.6-27.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/c/crypto-policies-20250905-1.git377cc42.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/c/curl-7.76.1-35.el9_7.3.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/c/cyrus-sasl-lib-2.1.27-22.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/d/diffutils-3.7-12.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/e/ed-1.14.2-12.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/e/elfutils-0.193-1.el9.rocky.0.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/e/elfutils-debuginfod-client-0.193-1.el9.rocky.0.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/e/elfutils-default-yama-scope-0.193-1.el9.rocky.0.1.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/e/elfutils-libelf-0.193-1.el9.rocky.0.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/e/elfutils-libs-0.193-1.el9.rocky.0.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/f/file-5.39-16.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/f/file-libs-5.39-16.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/f/filesystem-3.16-5.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/f/findutils-4.8.0-7.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g/gawk-5.1.0-6.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g/gdbm-libs-1.23-1.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g/glibc-2.34-231.el9_7.10.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g/glibc-common-2.34-231.el9_7.10.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g/glibc-gconv-extra-2.34-231.el9_7.10.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g/glibc-minimal-langpack-2.34-231.el9_7.10.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g/gmp-6.2.0-13.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g/grep-3.6-5.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g/groff-base-1.22.4-10.el9.0.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/g/gzip-1.12-1.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/i/info-6.7-15.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/j/json-c-0.14-11.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/k/keyutils-libs-1.6.3-1.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/k/krb5-libs-1.21.1-9.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libacl-2.3.1-4.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libarchive-3.5.3-9.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libattr-2.5.1-3.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libblkid-2.37.4-21.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libbrotli-1.0.9-9.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libcap-2.48-10.el9_7.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libcap-ng-0.8.2-7.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libcom_err-1.46.5-8.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libcurl-7.76.1-35.el9_7.3.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libdb-5.3.28-57.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libeconf-0.4.1-4.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libedit-3.1-38.20210216cvs.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libevent-2.1.12-8.el9_4.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libfdisk-2.37.4-21.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libffi-3.4.2-8.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libgcc-11.5.0-11.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libgcrypt-1.10.0-11.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libgomp-11.5.0-11.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libgpg-error-1.42-5.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libidn2-2.3.0-7.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libmount-2.37.4-21.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libnghttp2-1.43.0-6.el9_7.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libpkgconf-1.7.3-10.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libpsl-0.21.1-5.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libpwquality-1.4.4-8.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libselinux-3.6-3.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libsemanage-3.6-5.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libsepol-3.6-3.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libsigsegv-2.13-4.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libsmartcols-2.37.4-21.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libssh-0.10.4-17.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libssh-config-0.10.4-17.el9_7.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libstdc++-11.5.0-11.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libtasn1-4.16.0-9.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libtool-ltdl-2.4.6-46.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libunistring-0.9.10-15.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libutempter-1.2.1-6.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libuuid-2.37.4-21.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libverto-0.3.2-3.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libxcrypt-4.4.18-3.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libxml2-2.9.13-14.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/libzstd-1.5.5-1.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/lua-libs-5.4.4-4.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/l/lz4-libs-1.9.3-5.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/m/make-4.3-8.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/m/mpfr-4.1.0-7.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/n/ncurses-6.2-12.20210508.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/n/ncurses-base-6.2-12.20210508.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/n/ncurses-libs-6.2-12.20210508.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/o/openldap-2.6.8-4.el9.0.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/o/openssl-3.5.1-7.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/o/openssl-fips-provider-3.5.1-7.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/o/openssl-libs-3.5.1-7.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/p11-kit-0.25.3-3.el9_5.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/p11-kit-trust-0.25.3-3.el9_5.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/pam-1.5.1-26.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/pcre-8.44-4.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/pcre2-10.40-6.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/pcre2-syntax-10.40-6.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/pkgconf-1.7.3-10.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/pkgconf-m4-1.7.3-10.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/pkgconf-pkg-config-1.7.3-10.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/popt-1.18-8.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/p/publicsuffix-list-dafsa-20210518-3.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/r/readline-8.1-4.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/r/rocky-gpg-keys-9.7-1.7.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/r/rocky-release-9.7-1.7.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/r/rocky-repos-9.7-1.7.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/r/rpm-4.16.1.3-39.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/r/rpm-build-libs-4.16.1.3-39.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/r/rpm-libs-4.16.1.3-39.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/s/sed-4.8-9.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/s/setup-2.13.7-10.el9.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/s/shadow-utils-4.9-15.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/s/sqlite-libs-3.34.1-9.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/s/systemd-libs-252-55.el9_7.9.rocky.0.1.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/t/tar-1.34-9.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/t/tzdata-2026a-1.el9_7.noarch.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/u/unzip-6.0-59.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/u/util-linux-2.37.4-21.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/u/util-linux-core-2.37.4-21.el9_7.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/w/which-2.21-30.el9_6.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/x/xz-5.2.5-8.el9_0.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/x/xz-libs-5.2.5-8.el9_0.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/z/zip-3.0-35.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/z/zlib-1.2.11-40.el9.x86_64.rpm
+DEBUG util.py:537:  https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/z/zstd-1.5.5-1.el9.x86_64.rpm
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-derivee-x86_64/root
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/w/mock/poc-rocky-9.7-derivee-x86_64/root'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+INFO podman.py:113:  Using container image: sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+INFO podman.py:267:  Reading image {"pull_digest": "{{ .Digest }}", "id": "{{.Id}}", "architecture": "{{ .Architecture }}"} from sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+INFO podman.py:29:  Calculating sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 image OCI digest
+DEBUG backend.py:763:  Copying packages to result dir
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-derivee-x86_64/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/poc-rocky-9.7-derivee-x86_64/root/var/cache/dnf'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/poc-rocky-9.7-derivee-x86_64/root/var/cache/yum'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64/root/dev/pts'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64/root/dev/shm'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:200:  kill orphans in chroot /w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/var/cache/dnf'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/var/cache/yum'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/dev/pts'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/dev/shm'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/sys'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+DEBUG util.py:717:  child environment: None
+DEBUG util.py:636:  Executing command: ['/bin/umount', '-n', '-l', '/w/mock/poc-rocky-9.7-derivee-x86_64-bootstrap/root/proc'] with env {'TERM': 'vt100', 'SHELL': '/bin/sh', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'LANG': 'C.UTF-8'} and shell False
+DEBUG util.py:688:  Child return code was: 0
+### /w/res-verrou/build.log
+Mock Version: 6.9
+Executing command: ['bash', '--login', '-c', '/usr/bin/rpmbuild -bs --noclean --target x86_64 --nodeps /builddir/build/SPECS/sample-app.spec'] with env {'TERM': 'vt100', 'SHELL': '/bin/bash', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'PROMPT_COMMAND': 'printf "\\033]0;<mock-chroot>\\007"', 'PS1': '<mock-chroot> \\s-\\v\\$ ', 'LANG': 'C.UTF-8'} and shell False
+warning: Macro expanded in comment on line 3: %_buildhost) viennent de la configuration
+Building target platforms: x86_64
+Building for target x86_64
+setting SOURCE_DATE_EPOCH=1794787200
+Wrote: /builddir/build/SRPMS/sample-app-1.0.0-2.el9.src.rpm
+Child return code was: 0
+Mock Version: 6.9
+Executing command: ['bash', '--login', '-c', '/usr/bin/rpmbuild -bs --noclean --target x86_64 --nodeps /builddir/build/SPECS/sample-app.spec'] with env {'TERM': 'vt100', 'SHELL': '/bin/bash', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'PROMPT_COMMAND': 'printf "\\033]0;<mock-chroot>\\007"', 'PS1': '<mock-chroot> \\s-\\v\\$ ', 'LANG': 'C.UTF-8'} and shell False
+warning: Macro expanded in comment on line 3: %_buildhost) viennent de la configuration
+Building target platforms: x86_64
+Building for target x86_64
+setting SOURCE_DATE_EPOCH=1794787200
+Wrote: /builddir/build/SRPMS/sample-app-1.0.0-2.el9.src.rpm
+Child return code was: 0
+Executing command: ['bash', '--login', '-c', '/usr/bin/rpmbuild -bs --noclean --target x86_64 --nodeps /builddir/build/SPECS/sample-app.spec'] with env {'TERM': 'vt100', 'SHELL': '/bin/bash', 'HOME': '/builddir', 'HOSTNAME': 'mock', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'PROMPT_COMMAND': 'printf "\\033]0;<mock-chroot>\\007"', 'PS1': '<mock-chroot> \\s-\\v\\$ ', 'LANG': 'C.UTF-8'} and shell False
+warning: Macro expanded in comment on line 3: %_buildhost) viennent de la configuration
+Building target platforms: x86_64
+Building for target x86_64
+setting SOURCE_DATE_EPOCH=1794787200
+Wrote: /builddir/build/SRPMS/sample-app-1.0.0-2.el9.src.rpm
+Child return code was: 0
+### /w/verrou-srpm.log
+perl-Time-Local-1.300-7.el9.noarch
+perl-URI-5.09-3.el9.0.1.noarch
+perl-base-2.27-481.1.el9_6.noarch
+perl-constant-1.33-461.el9.0.1.noarch
+perl-if-0.60.800-481.1.el9_6.noarch
+perl-interpreter-5.32.1-481.1.el9_6.x86_64
+perl-libnet-3.13-4.el9.noarch
+perl-libs-5.32.1-481.1.el9_6.x86_64
+perl-mro-1.23-481.1.el9_6.x86_64
+perl-overload-1.31-481.1.el9_6.noarch
+perl-overloading-0.02-481.1.el9_6.noarch
+perl-parent-0.238-460.el9.noarch
+perl-podlators-4.14-460.el9.0.1.noarch
+perl-srpm-macros-1-41.el9.noarch
+perl-subs-1.03-481.1.el9_6.noarch
+perl-vars-1.05-481.1.el9_6.noarch
+pkgconf-1.7.3-10.el9.x86_64
+pkgconf-m4-1.7.3-10.el9.noarch
+pkgconf-pkg-config-1.7.3-10.el9.x86_64
+popt-1.18-8.el9.x86_64
+publicsuffix-list-dafsa-20210518-3.el9.noarch
+pyproject-srpm-macros-1.16.2-1.el9.noarch
+python-srpm-macros-3.9-54.el9.noarch
+qt5-srpm-macros-5.15.9-1.el9.noarch
+readline-8.1-4.el9.x86_64
+redhat-rpm-config-210-1.el9.noarch
+rocky-gpg-keys-9.7-1.7.el9.noarch
+rocky-release-9.7-1.7.el9.noarch
+rocky-repos-9.7-1.7.el9.noarch
+rpm-4.16.1.3-39.el9.x86_64
+rpm-build-4.16.1.3-39.el9.x86_64
+rpm-build-libs-4.16.1.3-39.el9.x86_64
+rpm-libs-4.16.1.3-39.el9.x86_64
+rust-srpm-macros-17-4.el9.noarch
+sed-4.8-9.el9.x86_64
+setup-2.13.7-10.el9.noarch
+shadow-utils-4.9-15.el9.x86_64
+sqlite-libs-3.34.1-9.el9_7.x86_64
+systemd-libs-252-55.el9_7.9.rocky.0.1.x86_64
+tar-1.34-9.el9_7.x86_64
+tzdata-2026a-1.el9_7.noarch
+unzip-6.0-59.el9.x86_64
+util-linux-2.37.4-21.el9_7.x86_64
+util-linux-core-2.37.4-21.el9_7.x86_64
+which-2.21-30.el9_6.x86_64
+xz-5.2.5-8.el9_0.x86_64
+xz-libs-5.2.5-8.el9_0.x86_64
+zip-3.0-35.el9.x86_64
+zlib-1.2.11-40.el9.x86_64
+zstd-1.5.5-1.el9.x86_64
+Start: buildsrpm
+Start: rpmbuild -bs
+Finish: rpmbuild -bs
+Finish: buildsrpm
+INFO: Done(/w/src/sample-app.spec) Config(poc-rocky-9.7-derivee-x86_64) 0 minutes 39 seconds
+INFO: Results and/or logs in: /w/res-verrou
+INFO: Cleaning up build root ('cleanup_on_success=True')
+Start: clean chroot
+Finish: clean chroot
+Finish: run
+### /w/verrou-calc.log
+INFO: mock.py version 6.9 starting (python version = 3.9.25, NVR = mock-6.9-1.el9), args: /usr/libexec/mock/mock -r poc-rocky-9.7-derivee-x86_64 --isolation=simple --resultdir=/w/res-verrou --calculate-build-dependencies --no-cleanup-after /w/res-verrou/sample-app-1.0.0-2.el9.src.rpm
+Start(bootstrap): init plugins
+INFO: selinux disabled
+Finish(bootstrap): init plugins
+Start: init plugins
+INFO: selinux disabled
+Finish: init plugins
+INFO: Signal handler active
+Start: run
+INFO: Start(/w/res-verrou/sample-app-1.0.0-2.el9.src.rpm)  Config(poc-rocky-9.7-derivee-x86_64)
+Start: clean chroot
+Finish: clean chroot
+Mock Version: 6.9
+INFO: Mock Version: 6.9
+Start(bootstrap): chroot init
+INFO: calling preinit hooks
+INFO: enabled root cache
+INFO: enabled package manager cache
+Start(bootstrap): cleaning package manager metadata
+Finish(bootstrap): cleaning package manager metadata
+INFO: Package manager dnf4 detected and used (fallback)
+Finish(bootstrap): chroot init
+Start: chroot init
+INFO: calling preinit hooks
+INFO: enabled root cache
+Start: unpacking root cache
+Finish: unpacking root cache
+INFO: enabled package manager cache
+Start: cleaning package manager metadata
+Finish: cleaning package manager metadata
+INFO: enabled HW Info plugin
+INFO: Package manager dnf4 detected and used (direct choice)
+INFO: Buildroot is handled by package management downloaded with a bootstrap image:
+  rpm-4.16.1.3-39.el9.x86_64
+  python3-dnf-4.14.0-31.el9.rocky.0.1.noarch
+  python3-dnf-plugins-core-4.3.0-24.el9_7.noarch
+  yum-4.14.0-31.el9.rocky.0.1.noarch
+Start: dnf4 update
+Finish: dnf4 update
+Finish: chroot init
+Start: build phase for sample-app-1.0.0-2.el9.src.rpm
+Start: build setup for sample-app-1.0.0-2.el9.src.rpm
+Finish: build setup for sample-app-1.0.0-2.el9.src.rpm
+Start: rpmbuild sample-app-1.0.0-2.el9.src.rpm
+Start: Outputting list of installed packages
+Finish: Outputting list of installed packages
+Start: Generating the buildroot lockfile: buildroot_lock.json
+INFO: Using container image: sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+INFO: Reading image {"pull_digest": "{{ .Digest }}", "id": "{{.Id}}", "architecture": "{{ .Architecture }}"} from sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+INFO: Calculating sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 image OCI digest
+Finish: Generating the buildroot lockfile: buildroot_lock.json
+Finish: rpmbuild sample-app-1.0.0-2.el9.src.rpm
+Finish: build phase for sample-app-1.0.0-2.el9.src.rpm
+INFO: Done(/w/res-verrou/sample-app-1.0.0-2.el9.src.rpm) Config(poc-rocky-9.7-derivee-x86_64) 0 minutes 27 seconds
+INFO: Results and/or logs in: /w/res-verrou
+Finish: run

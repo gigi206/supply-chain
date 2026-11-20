@@ -2116,3 +2116,27 @@ Lancée sous l'accord permanent du 18/11, puisque l'étape est en lecture seule.
 - **Relevé, sans pari** : la valeur de `bootstrap.image_digest` (`18d64b03…` le 17/11, celle qu'épingle `IMAGE_DIGEST` de `m4a.sh`) et la durée.
 
 **Portée prévue** : si VR1 à VR7 tiennent, le verrou neuf ne diffère de celui de M4a que par le bootstrap, et le buildroot résolu est le même. Le point suivant de la cascade, l'artefact de M4a, demande une écriture dans Zot. Je la poserai en question, avec un tag neuf.
+
+### Verrou de la cascade : résultat, écrit le 20/11/2026 à 2026-11-20T09:44:51Z UTC
+
+`m1b-verrou.sh verrou` a tourné de 2026-11-20T09:42:35Z à 2026-11-20T09:44:05Z, avec code 0, 33 OK et 0 KO ([journal](m1b-verrou-verrou.log), [journaux de mock](m1b-verrou-mock.log)). Le pod `m1b-05-verrou` a été retiré, et il est absent du cluster après l'étape. Le verrou neuf est [`m1b-verrou.json`](m1b-verrou.json) : sha256 `c544599a…`, 111 567 octets.
+
+| Prédiction | Tenue | Mesure |
+|---|---|---|
+| VR1 | oui | gardes G0 à G6 passées, pod admis et prêt sur `mock-rocky9@70f8c412…`, sous Kata |
+| VR2 | oui | configuration de base `a8e5f2bc…`, configuration neuve `3c1dd63d…` livrée, `--debug-config` rc 0 ; `mock-6.9-1.el9`, `mock-core-configs-45.2-1.el9`, `podman-5.8.2-8.el9_8` (et `python3-dnf-4.14.0-34.el9_8.rocky.0.1`) |
+| VR3 | oui | `podman pull` anonyme de `rocky9-bootstrap@6de899ac…` par le pod : rc 0 en 9 s ; `inspect` donne ce digest, linux/amd64 |
+| VR4 | oui | `--buildsrpm` rc 0 en 40 s ; src.rpm `c802e60a…`, comme le 17/11 et en M4c |
+| VR5 | oui | `--calculate-build-dependencies` rc 0 en 28 s ; « Not updating bootstrap chroot » après chaque appel ; zéro ligne de repli dans les trois fichiers |
+| VR6 | oui | bootstrap de mock et image tirée : 153 lignes communes, aucune propre à l'un ou à l'autre |
+| VR7 | oui | quatre feuilles diffèrent de `b6d0f8f1`, exactement celles prévues ; 222 rpm égaux champ par champ ; `pull_digest` `6de899ac…` ; `id` `ff96017c…` |
+
+**Relevé, sans pari** : `bootstrap.image_digest` vaut désormais `77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca` (`18d64b03…` le 17/11). C'est la valeur que M4a épingle dans `IMAGE_DIGEST` et que `mock --hermetic-build` contrôle (« Checking image digest »). Elle change donc avec le bootstrap, comme `PULL_DIGEST`. L'étape a duré 1 min 30 s, de la première garde au retrait du pod.
+
+**Lecture** :
+- les deux images de M1b s'exécutent ;
+- l'outillage porte la même configuration de base que l'image d'essai de S1 ;
+- le bootstrap neuf est accepté comme prêt par mock ;
+- la résolution du buildroot ne change pas. Le verrou neuf ne remplace que la référence du bootstrap.
+
+**Non mesuré ici** : la construction hermétique avec ce verrou (M4b et M4c, plus loin dans la cascade). Le tirage anonyme de `builds/` par podman depuis un pod est désormais mesuré une fois.

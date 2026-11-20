@@ -544,3 +544,4 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
   - la provenance passe : une attestation signée par Chains par PipelineRun (2026-11-20T09:22:25Z, PV1 à PV7).
 
   Réserves : amorce figée, un nœud et un hôte, prefetch ouvert en 443, porte ne connaissant pas `construire-racine-rpm`. La cascade avant M5b n'est pas commencée.
+- 2026-11-20T09:42:35Z : premier point de la cascade avant M5b, le verrou refait avec le bootstrap de M1b (`m1b-verrou.sh`, VR1 à VR7 tenues). Les deux images de M1b s'exécutent dans un pod Kata, et mock prend le bootstrap neuf comme prêt. Le verrou [`m1b-verrou.json`](resultats/m1b-verrou.json) (`c544599a…`) ne diffère de celui de M4a que par la référence du bootstrap ; les 222 rpm sont identiques ([résultat](resultats/m1b-predictions.md)).

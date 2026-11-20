@@ -193,3 +193,14 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Non mesuré** :
   - l'usage de ces images par la construction rpm (la cascade M4a à M4c refaite, avant le rejeu M5b) ;
   - leur jugement par la porte.
+
+**Additif du 20/11/2026, écrit à 09:45 UTC : premier usage des images de M1b** ([résultat](../../poc/bricks/05-rpm-mock/resultats/m1b-predictions.md)). Le verrou de la construction rpm a été refait hors de la plateforme, avec l'outillage et le bootstrap construits par la plateforme (`m1b-verrou.sh`, le 20/11/2026 de 09:42:35 à 09:44:05 UTC).
+- **Mesuré** :
+  - l'outillage `70f8c412…` démarre sous Kata ;
+  - un pod tire le bootstrap `6de899ac…` anonymement dans Zot ;
+  - mock le prend comme prêt ;
+  - le buildroot résolu est identique à celui de M4a (222 rpm, champ par champ).
+
+  Seule la référence du bootstrap change dans le verrou : image, digest du manifeste, configuration et `image_digest`.
+- **Conséquence pour la règle générique** : remplacer l'image de builder par celle de la plateforme ne change pas les entrées résolues de la construction. Elle change la référence du bootstrap, que le verrou porte et que la construction hermétique contrôle.
+- **Non mesuré** : la construction hermétique avec ce verrou (M4b et M4c refaits) et le jugement par la porte.
