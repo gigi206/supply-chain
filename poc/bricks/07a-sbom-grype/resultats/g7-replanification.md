@@ -704,3 +704,21 @@ N1 est lue en v2 (note ci-dessus). La copie préparée à 20:17:04Z est copiée 
 - après : v3, sha256 `b13a1375ca6f4ed4dac242c0a0701fab8b5e37903c90628cf9939c4bd34511c7`, l'empreinte attendue par la tâche du 29/11.
 
 Le mode du fichier n'est pas changé par la copie. `bash -n` et shellcheck sont repassés sur le dépôt avant le commit. L'essai V1 à V3 suit, avec les prédictions de la note de 20:17:04Z.
+
+## Résultat de l'essai de la v3, V1 à V3 (note de 2026-11-20T22:01:01Z ; rien n'est réécrit au-dessus)
+
+**Mesures** (résumés des journaux, aucune ligne brute) :
+- V1, [`g7-balayage-19-11-v3-essai.log`](g7-balayage-19-11-v3-essai.log) : statut 200, 331 lignes, 8 masquées, 309 gc, du 2026-11-19T15:48:21.396899617Z au 2026-11-19T21:03:47.081968486Z ; décisions 14 × vulndb/grype keep ; passages : `builds/scan/essai-07a` 2, `builds/scan/essai-scan` 2, `builds/scan/sample-app` 2, `builds/scan/sample-app-deb` 2, `vulndb/grype` 2.
+- V2 : code 2, 1 ligne(s) sur la sortie d'erreur, aucun journal `g7-balayage-20-11-v3-inverse.log`.
+- V3, [`g7-balayage-19-11-v3-jour.log`](g7-balayage-19-11-v3-jour.log) : statut 200, 172 lignes, 4 masquées, 161 gc ; décisions 7 × vulndb/grype keep ; passages : `builds/scan/essai-07a` 1, `builds/scan/essai-scan` 1, `builds/scan/sample-app` 1, `builds/scan/sample-app-deb` 1, `vulndb/grype` 1.
+
+**Confrontation** (note de 20:17:04Z) :
+- V1, tenu : statut 200, 331 lignes, 8 masquées, 309 gc
+- V1, tenu : premier 2026-11-19T15:48:21.396899617Z, dernier 2026-11-19T21:03:47.081968486Z
+- V1, tenu : 14 keep dans vulndb/grype, rien d'autre
+- V1, tenu : 2 passages pour chaque dépôt suivi
+- V2, tenu : code 2, message sur stderr, aucun journal
+- V3, tenu : 172 lignes, 4 masquées, 161 gc, 7 keep (= g7-balayage-19-11.log)
+- V3, tenu : 1 passage par dépôt suivi
+
+**V1 à V3 tenues.** La v3 est l'empreinte que lira la tâche du 29/11.
