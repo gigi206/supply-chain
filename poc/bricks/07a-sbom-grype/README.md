@@ -346,3 +346,8 @@ Mesure hors réseau sur l'hôte ([`rpm-distro.sh`](rpm-distro.sh), [prédictions
 - Les lignes de `zot.service` sont dans Loki.
 - Le script passe en v2, pour lire Loki seul, et la lecture du 19/11 est prédite (BD1 à BD4).
 - Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T19:26:42Z.
+
+**Additif du 20/11/2026 (2026-11-20T19:28:08Z UTC), G7, lecture du 19/11 dans Loki** : un balayage part au démarrage de Zot (BD1 tenue).
+- Le dernier balayage a fini le 19/11 à 21:03:47 UTC, avec 7 décisions `keep`.
+- Nouvelle projection, calculée : premières suppressions réelles au balayage n°8, le 28/11 vers 01:52 UTC ; premier scan du deb au n°9, le 29/11 vers 02:31 UTC. Tout redémarrage de Zot remet ce calendrier à zéro.
+- Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T19:28:08Z.

@@ -348,3 +348,69 @@ Les lignes de `zot.service` devraient donc y être environ 30 jours. **Ce n'est 
 | BD4 | Lignes de Loki sans masquage, et sous le plafond de 5000 | moyenne |
 
 **Conséquence pour ce soir.** Avec BD1, le prochain balayage commencerait 24 h et environ 5 s après la fin de celui du démarrage, soit vers 20:50–21:10 UTC le 20/11. Sans balayage au démarrage, il commencerait vers 20:53 UTC, si l'écart de 28 min 25 s du 13/11 se répète. Ce sont des calculs, pas des mesures.
+
+## Lecture du 19/11 dans Loki : un balayage part au démarrage de Zot (note de 2026-11-20T19:28:08Z ; rien n'est réécrit au-dessus)
+
+**Lecture** du 20/11 à 19:26:50 UTC, au dépôt `8ad78e90` (script v2 `d68c726a…`, Loki seul, sans sudo, [journal](g7-balayage-19-11.log)). Fenêtre du 19/11, de 20:00 à 23:59 UTC. Loki rend 172 lignes, dont 4 masquées.
+- Les lignes « executing gc of orphaned blobs » vont de **20:24:14 à 21:03:47 UTC**, au nombre de 161.
+- Ces lignes mêlent deux balayages : celui du premier passage de `stockage.sh zot` (20:24:09), interrompu par le second redémarrage, et celui qui suit le démarrage de 20:24:46.
+  - Le résumé ne les sépare pas. Le nombre de dépôts du second balayage n'est donc pas mesuré.
+- **Passages, au dernier balayage** :
+  - `builds/scan/essai-07a` à 20:39:55 ;
+  - `essai-scan` à 20:40:08 ;
+  - `sample-app` à 20:40:31 ;
+  - `sample-app-deb` à 20:40:47 ;
+  - `vulndb/grype` à 21:03:21.
+- **7 décisions**, toutes `keep` dans `vulndb/grype` (« retained by mostRecentlyPushedCount:11 policy »).
+
+| # | Verdict |
+|---|---|
+| BD1 | **Tenue** : les premières lignes de gc arrivent 5 s après le premier démarrage. Un balayage part au démarrage de Zot. La lecture ne montre pas l'heure exacte de départ après le second démarrage |
+| BD2 | **Tenue avec réserve** : 161 lignes, deux balayages mêlés. Durée du second d'au plus 39 min 1 s (2341 s, depuis 20:24:46) |
+| BD3 | **Tenue** : 7 `keep`, aucune autre décision |
+| BD4 | **Non tenue pour le masquage** : 4 lignes masquées, sans doute les dépôts au motif masqué comme le 15/11 (non lu). **Tenue pour le plafond** : 172 lignes, sous 5000 |
+
+**Conséquence** : l'hypothèse « balayage au démarrage », invérifiable le 15/11, est vérifiée ici. Elle explique aussi les 28 min 25 s du 14/11. Le calendrier part désormais de la fin de ce balayage, le 19/11 à 21:03:47 UTC.
+
+### Nouvelle projection (CALCUL, pas une mesure)
+
+Hypothèses :
+- loi B : début = fin du précédent + 24 h + 4,940 s ;
+- durée constante de 2341 s, qui est un majorant ;
+- passages à début + 909,7 s pour les dépôts de scan et à début + 2315,4 s pour `vulndb/grype`, comme le 19/11 ;
+- **aucun redémarrage de Zot.** Tout passage de `stockage.sh zot` relance un balayage et remet ce calendrier à zéro.
+
+Heures UTC. Un balayage glisse d'environ 39 min par jour et passe minuit à partir du n°5.
+
+| Balayage | Début | Dépôts de scan | `vulndb/grype` | Fin |
+|---|---|---|---|---|
+| n°1 | 20/11 21:03:52 | 20/11 21:19 | 20/11 21:42 | 20/11 21:42:53 |
+| n°2 | 21/11 21:42:58 | 21/11 21:58 | 21/11 22:21 | 21/11 22:21:59 |
+| n°3 | 22/11 22:22:04 | 22/11 22:37 | 22/11 23:00 | 22/11 23:01:05 |
+| n°4 | 23/11 23:01:10 | 23/11 23:16 | 23/11 23:39 | 23/11 23:40:11 |
+| n°5 | 24/11 23:40:16 | 24/11 23:55 | 25/11 00:18 | 25/11 00:19:17 |
+| n°6 | 26/11 00:19:22 | 26/11 00:34 | 26/11 00:57 | 26/11 00:58:23 |
+| n°7 | 27/11 00:58:28 | 27/11 01:13 | 27/11 01:37 | 27/11 01:37:29 |
+| n°8 | 28/11 01:37:34 | 28/11 01:52 | 28/11 02:16 | 28/11 02:16:35 |
+| n°9 | 29/11 02:16:40 | 29/11 02:31 | 29/11 02:55 | 29/11 02:55:41 |
+| n°10 | 30/11 02:55:46 | 30/11 03:10 | 30/11 03:34 | 30/11 03:34:47 |
+
+### Prédictions par balayage
+
+Elles remplacent les heures de B24, B27 et B28. Le contenu change de balayage, comme suit.
+
+**Éligibilité** : poussée + 336 h, avant le passage sur le dépôt.
+- Les heures des scans du 15/11 sont supposées (09:31 et 11:16), non relues.
+- Les tags de `vulndb/grype` sont poussés vers 08:05 UTC, d'après le 15/11.
+
+| # | Balayage | Prédit | Marge |
+|---|---|---|---|
+| N1 | n°1, ce soir (20/11) | Début à 21:03:52 UTC, à ± 120 s. 8 décisions `keep` dans `vulndb/grype` (tags du 13/11 au 20/11). Aucune suppression | — |
+| N5 | n°5 (24/11 23:40 → 25/11 00:19) | Retrait du tag du 13/11 dans `vulndb/grype` (12e tag poussé le 24/11). Aucune autre suppression | environ 16 h |
+| N6, N7 | n°6 et n°7 | Retrait d'un tag chacun (14/11, puis 15/11). Aucune autre suppression | environ 16 h |
+| N8 | **n°8 (28/11 01:37 → 02:16)** | **Premières suppressions réelles** : 2 scans du 13/11 dans `builds/scan/sample-app`, 16 témoins dans `essai-scan`, base du 13/11 effacée, retrait du tag du 16/11 | 13 h et plus |
+| N9 | n°9 (29/11 02:16 → 02:55) | Scan du 14/11 (09:31) dans `sample-app`, **premier scan du deb (14/11, 21:01:45)** dans `sample-app-deb`, base du 14/11 effacée, retrait du tag du 17/11 | 5 h 30 pour le deb |
+
+**Lectures** : Loki garde les lignes de `zot.service` (lu ici). Chaque lecture peut donc se faire sans sudo, après la fin du balayage, tant que la plateforme n'est pas recréée.
+- La lecture de N1 est couverte par ton « Oui » de ce soir. Je la ferai après 22:00 UTC, en Loki seul.
+- Pour voir N8 et N9, le rejeu de M5b, qui recrée Zot et Loki, devrait attendre le 29/11 vers 03:00 UTC. **C'est ta décision** : tu acceptes de tout perdre au rejeu.
