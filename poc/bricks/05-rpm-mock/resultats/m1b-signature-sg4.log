@@ -1,0 +1,7 @@
+# vérification SG4 (tâches), 2026-11-20T08:57:35Z ; Client version: 0.46.2
+clé publique : ~/.cache/supply-chain-poc/08/pki/taches.pub, sha256 9e118e036265b4de…
+prefetch-racine-rpm.signee.yaml : sha256 14e83b3dd3c66c12f878653ff638cdcf0413ceed363876944afa38dcc2d39262 ; tkn task verify : vérifiée
+prefetch-racine-rpm altérée (memory) : modifiée ; tkn task verify : refusée
+construire-racine-rpm.signee.yaml : sha256 9069ad2613a8a1270d02f7dec685f48f41e0698a0ad4648eb77dfb4c973ef058 ; tkn task verify : vérifiée
+construire-racine-rpm altérée (memory) : modifiée ; tkn task verify : refusée
+pipelines : non signées à ce stade (second passage après revue)

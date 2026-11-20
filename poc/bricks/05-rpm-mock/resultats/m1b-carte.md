@@ -764,3 +764,23 @@ Accord du propriétaire : « Oui, lance-la ». `sortie-builds.sh m1b_sans_sortie
 Les trois étapes réseau de M1b (`m1b_sortie`, `m1b_sans_sortie`, `m1b_temoins`) sont faites. `s1.sh prealables` attend toujours un `NotIn` à trois labels : à adapter avant le rejeu M5b.
 
 **Suite** : signature des tâches de M1b (`SIGNER=1`, écriture dans Zot, sur accord), puis revue de la liste `taches.yml`.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T08:58:34Z UTC : premier passage de la signature
+
+Accord du propriétaire pour les écritures dans Zot : « Oui, signe ». `SIGNER=1 m1b-signature.sh taches` (sha256 `abe1e507…`, celui des prédictions) est parti à 2026-11-20T08:57:02Z, avec code 0, 17 OK et 0 KO ([`m1b-signature-taches.log`](m1b-signature-taches.log)).
+- **SG1, tenue** :
+  - les quatre rendus de `m1bt-20` égalent ceux validés par Tekton (TD1), et les quatre objets sont admis en dry-run serveur ;
+  - les deux tâches sont signées par la clé des tâches, puis relues : égales au rendu, signature exceptée, avec l'image de l'amorce `ed654c69…` ;
+  - elles sont versionnées dans [`builders/prefetch-racine-rpm.signee.yaml`](../builders/prefetch-racine-rpm.signee.yaml) (`14e83b3d…`) et [`builders/construire-racine-rpm.signee.yaml`](../builders/construire-racine-rpm.signee.yaml) (`9069ad26…`) ;
+  - leurs bundles sont poussés dans Zot au tag `m1b`, sous les digests relus par `crane` : `prefetch-racine-rpm@sha256:16a32993…` et `construire-racine-rpm@sha256:bdde08ed…`. **Ces écritures sont définitives** ;
+  - les deux lignes « à ajouter » sont imprimées, et les pipelines ne sont pas signées ;
+  - avant les poussées, 3 613 925 376 octets étaient libres sur `/` de sc-stockage (la garde exige 1 Gio).
+- **SG4, tenue pour les tâches** ([`m1b-signature-sg4.log`](m1b-signature-sg4.log)) : `tkn task verify`, avec la vraie clé publique des tâches (`9e118e03…`), accepte les deux tâches versionnées et refuse une copie altérée de chacune. Pour les pipelines, la vérification attend le second passage.
+- **SG2 et SG3** : ils seront jugés au second passage.
+
+**Suite** :
+1. ta revue des deux entrées proposées pour `politique/porte/taches.yml` ;
+2. le second passage, qui signe les pipelines ;
+3. les PipelineRuns, sur leur propre accord.
+
+La ConfigMap `porte` du cluster est toujours en retard sur `taches.yml` (note de 16:51:28 UTC le 19/11). Elle ne joue pas à l'admission des PipelineRuns, seulement pour un verdict de la porte.

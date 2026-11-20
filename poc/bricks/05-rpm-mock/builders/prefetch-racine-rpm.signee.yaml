@@ -1,0 +1,265 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEUCIQDhinql6FPQeIJgKKYUwJFU0qOqLOQCEQiv33na0xhNcgIgBKbYxDf2Svp+5+u1a6EACmyMWoaajHVU8nDhKanra4I=
+  name: prefetch-racine-rpm
+spec:
+  params:
+  - name: depots
+    type: string
+  - name: liste
+    type: string
+  - name: cles
+    type: string
+  - name: cle_sup
+    type: string
+  - name: couche
+    type: string
+  results:
+  - name: BASE_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  stepTemplate:
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsGroup: 65532
+      runAsNonRoot: true
+      runAsUser: 65532
+    volumeMounts:
+    - mountPath: /tmp
+      name: tmp
+  steps:
+  - env:
+    - name: HOME
+      value: /tmp
+    image: sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+    name: prefetch
+    resources:
+      limits:
+        cpu: "2"
+        memory: 2Gi
+      requests:
+        cpu: "2"
+        memory: 2Gi
+    script: |
+      #!/bin/bash
+      set -euo pipefail
+      export LC_ALL=C
+      umask 022
+      # Entrées fixées par la pipeline signée (substitution de Tekton) ; lignes vides ignorées partout.
+      cat > /tmp/depots <<'FIN_DEPOTS'
+      $(params.depots)
+      FIN_DEPOTS
+      cat > /tmp/liste <<'FIN_LISTE'
+      $(params.liste)
+      FIN_LISTE
+      cat > /tmp/cles <<'FIN_CLES'
+      $(params.cles)
+      FIN_CLES
+      cat > /tmp/cle-sup <<'FIN_CLE_SUP'
+      $(params.cle_sup)
+      FIN_CLE_SUP
+      COUCHE='$(params.couche)'
+      S='$(workspaces.sortie.path)'
+      ko() { echo "KO   $*" >&2; exit 1; }
+      hex() { case $1 in *[!0-9a-f]*|'') return 1 ;; esac; [ ${#1} = "$2" ]; }
+      fp() { gpg --batch --with-colons --show-keys "$1" 2> /dev/null | awk -F: '$1 == "fpr" {print $10; exit}'; }
+      get() { # fichier URL [options de curl…] : HTTPS seul, code 200 exigé
+        local f=$1 u=$2 c; shift 2
+        c=$(curl -sS --proto =https --max-time 300 "$@" -o "$f" -w '%{http_code}' "$(printf %s "$u" | sed 's/+/%2B/g')" < /dev/null) \
+          || ko "curl en échec : $u"
+        [ "$c" = 200 ] || ko "HTTP $c : $u"
+      }
+      for o in curl gpg gpgv rpm python3 sha256sum stat find; do command -v "$o" > /dev/null 2>&1 || ko "$o absent de l'image"; done
+      # Contrôles des paramètres
+      nc=0
+      while read -r nom sha empreinte reste; do
+        [ -n "$nom" ] || continue
+        [ -z "$reste" ] || ko "ligne de cles à plus de trois champs : $nom"
+        case $nom in RPM-GPG-KEY-[A-Za-z0-9-]*) ;; *) ko "nom de clé invalide : $nom" ;; esac
+        case $nom in *[!A-Za-z0-9-]*) ko "nom de clé invalide : $nom" ;; esac
+        hex "$sha" 64 || ko "sha256 de clé invalide : $nom"
+        case $empreinte in *[!0-9A-F]*|'') ko "empreinte invalide : $nom" ;; esac; [ ${#empreinte} = 40 ] || ko "empreinte invalide : $nom"
+        nc=$((nc + 1))
+      done < /tmp/cles
+      [ "$nc" -ge 1 ] || ko "aucune clé"
+      nd=0
+      while read -r nom url sha sig reste; do
+        [ -n "$nom" ] || continue
+        [ -z "$reste" ] || ko "ligne de depots à plus de quatre champs : $nom"
+        case $nom in *[!a-z0-9]*|'') ko "nom de dépôt invalide : $nom" ;; esac
+        case $url in https://dl.rockylinux.org/vault/rocky/9.[0-9]/*|https://dl.fedoraproject.org/pub/archive/epel/9.[0-9]/*) ;;
+          *) ko "URL hors des sources figées : $url" ;; esac
+        case $url in *..*|*[!A-Za-z0-9._/:-]*|*/) ko "URL invalide : $url" ;; esac
+        hex "$sha" 64 || ko "sha256 de repomd.xml invalide : $nom"
+        [ "$sig" = - ] || awk -v k="$sig" '$1 == k {t = 1} END {exit !t}' /tmp/cles || ko "clé de signature inconnue : $nom $sig"
+        nd=$((nd + 1))
+      done < /tmp/depots
+      [ "$nd" -ge 1 ] || ko "aucun dépôt"
+      [ "$(awk 'NF {print $1}' /tmp/depots | sort | uniq -d | wc -l)" = 0 ] || ko "dépôt en double"
+      nl=0
+      while read -r dep f sha reste; do
+        case $dep in ''|'#'*) continue ;; esac
+        [ -z "$reste" ] || ko "ligne de liste à plus de trois champs : $f"
+        awk -v d="$dep" '$1 == d {t = 1} END {exit !t}' /tmp/depots || ko "dépôt inconnu dans la liste : $dep"
+        case $f in *.rpm) ;; *) ko "nom de rpm invalide : $f" ;; esac
+        case $f in *[!A-Za-z0-9._+~^-]*) ko "nom de rpm invalide : $f" ;; esac
+        hex "$sha" 64 || ko "sha256 invalide : $f"
+        nl=$((nl + 1))
+      done < /tmp/liste
+      [ "$nl" -ge 1 ] || ko "liste vide"
+      if [ "$COUCHE" != - ]; then
+        read -r cd_ cm cs reste <<< "$COUCHE"
+        [ -n "$cs" ] && [ -z "$reste" ] || ko "couche : « dépôt sha256-manifeste sha256-couche » attendu"
+        case $cd_ in amont/*) ;; *) ko "dépôt de la couche hors de amont/ : $cd_" ;; esac
+        case $cd_ in *..*|*[!a-z0-9/._-]*) ko "dépôt de la couche invalide : $cd_" ;; esac
+        hex "$cm" 64 || ko "sha256 du manifeste de base invalide"
+        hex "$cs" 64 || ko "sha256 de la couche invalide"
+      fi
+      M=$S/miroir; C=$S/cles
+      [ ! -e "$M" ] && [ ! -e "$C" ] && [ ! -e "$S/couche.tar.gz" ] || ko "workspace déjà rempli : $S"
+      mkdir -p "$M" "$C"
+      echo "$(id) ; $(rpm --version) ; $(gpgv --version | head -n 1) ; $(curl --version | head -n 1 | cut -d' ' -f1,2) ; $(python3 --version)"
+      t0=$(date +%s)
+      # Clés
+      while read -r nom sha empreinte; do
+        [ -n "$nom" ] || continue
+        if [ -f "/etc/pki/rpm-gpg/$nom" ]; then cp "/etc/pki/rpm-gpg/$nom" "$C/$nom"; o="image"
+        else
+          [ "$(sed -n '1p' /tmp/cle-sup)" != - ] || ko "clé absente de l'image et cle_sup vide : $nom"
+          python3 -I -c 'import sys; t = open(sys.argv[1], encoding="ascii").read().strip("\n"); open(sys.argv[2], "w", encoding="ascii").write(t + "\n")' \
+            /tmp/cle-sup "$C/$nom"
+          o="paramètre cle_sup"
+        fi
+        [ "$(sha256sum < "$C/$nom" | cut -c1-64)" = "$sha" ] || ko "sha256 de la clé $nom ($o)"
+        [ "$(fp "$C/$nom")" = "$empreinte" ] || ko "empreinte de la clé $nom ($o)"
+        gpg --no-default-keyring --keyring "/tmp/$nom.gpg" --batch --quiet --import "$C/$nom" < /dev/null 2> /dev/null || ko "import de $nom"
+        echo "clé $nom ($o) : $(stat -c %s "$C/$nom") octets, sha256 et empreinte conformes"
+      done < /tmp/cles
+      # repomd.xml, signature et métadonnées
+      while read -r nom url sha sig; do
+        [ -n "$nom" ] || continue
+        d=$M/$nom; mkdir -p "$d/repodata"
+        get "$d/repodata/repomd.xml" "$url/repodata/repomd.xml"
+        [ "$(sha256sum < "$d/repodata/repomd.xml" | cut -c1-64)" = "$sha" ] || ko "$nom : repomd.xml différent du sha256 fixé"
+        if [ "$sig" != - ]; then
+          get "$d/repodata/repomd.xml.asc" "$url/repodata/repomd.xml.asc"
+          v=$(gpgv --keyring "/tmp/$sig.gpg" --status-fd 1 "$d/repodata/repomd.xml.asc" "$d/repodata/repomd.xml" < /dev/null 2> /dev/null \
+            | awk '$2 == "VALIDSIG" {print $NF}' || true)
+          [ "$v" = "$(awk -v k="$sig" '$1 == k {print $3}' /tmp/cles)" ] || ko "$nom : signature de repomd.xml (signataire ${v:-aucun})"
+          echo "$nom : repomd.xml $sha, signature valide ($sig)"
+        else
+          echo "$nom : repomd.xml $sha, non signé (ancre : sha256 fixé par la pipeline)"
+        fi
+        python3 -I - "$d/repodata/repomd.xml" > /tmp/meta <<'PY' || ko "$nom : lecture de repomd.xml"
+      import sys, xml.etree.ElementTree as E
+      n = {'r': 'http://linux.duke.edu/metadata/repo'}
+      for d in E.parse(sys.argv[1]).getroot().findall('r:data', n):
+          if d.get('type').endswith('_db'):
+              continue
+          c = d.find('r:checksum', n)
+          assert c.get('type') == 'sha256', c.get('type')
+          h = d.find('r:location', n).get('href')
+          assert h.startswith('repodata/') and '..' not in h and '/' not in h[9:], h
+          print(d.get('type'), h, c.text)
+      PY
+        k=0
+        while read -r ty h s; do
+          get "$d/$h" "$url/$h"
+          [ "$(sha256sum < "$d/$h" | cut -c1-64)" = "$s" ] || ko "$nom : $ty ($h), sha256 différent de repomd.xml"
+          k=$((k + 1))
+        done < /tmp/meta
+        echo "$nom : $k fichier(s) de métadonnées, sha256 conformes à repomd.xml"
+      done < /tmp/depots
+      # rpm de la liste, cherchés dans primary
+      python3 -I - "$M" /tmp/liste > /tmp/a-telecharger <<'PY' || ko "rpm de la liste absents de primary ou sha256 différent"
+      import gzip, lzma, os, sys, xml.etree.ElementTree as E
+      m, liste = sys.argv[1:]
+      nr = {'r': 'http://linux.duke.edu/metadata/repo'}; nc = '{http://linux.duke.edu/metadata/common}'
+      pk = {}
+      for depot in sorted(os.listdir(m)):
+          for d in E.parse(f'{m}/{depot}/repodata/repomd.xml').getroot().findall('r:data', nr):
+              if d.get('type') != 'primary':
+                  continue
+              h = d.find('r:location', nr).get('href')
+              o = gzip.open if h.endswith('.gz') else lzma.open if h.endswith('.xz') else None
+              assert o, h
+              for _, p in E.iterparse(o(f'{m}/{depot}/{h}')):
+                  if p.tag == nc + 'package':
+                      loc = p.find(nc + 'location').get('href')
+                      pk[(depot, loc.rsplit('/', 1)[-1])] = (loc, p.find(nc + 'checksum').text)
+                      p.clear()
+      ko = 0
+      for l in open(liste, encoding='utf-8'):
+          if not l.strip() or l.startswith('#'):
+              continue
+          depot, f, s = l.split()
+          loc, c = pk.get((depot, f), (None, None))
+          if c != s or '..' in loc:
+              ko += 1; print(f'KO   {depot} {f} : primary {c}', file=sys.stderr); continue
+          print(depot, loc, s)
+      sys.exit(1 if ko else 0)
+      PY
+      n=0
+      while read -r dep loc sha; do
+        u=$(awk -v d="$dep" '$1 == d {print $2}' /tmp/depots)
+        f=$M/$dep/$loc
+        [ ! -e "$f" ] || ko "rpm en double : $dep $loc"
+        mkdir -p "${f%/*}"
+        get "$f" "$u/$loc"
+        [ "$(sha256sum < "$f" | cut -c1-64)" = "$sha" ] || ko "sha256 différent : $dep $loc"
+        echo "$f" >> /tmp/rpms
+        n=$((n + 1))
+      done < /tmp/a-telecharger
+      [ "$n" = "$nl" ] || ko "rpm téléchargés : $n sur $nl"
+      echo "rpm téléchargés, sha256 égal à la liste et à primary : $n, $(xargs stat -c %s < /tmp/rpms | awk '{s += $1} END {print s}') octets"
+      B=/tmp/rpmdb
+      rpm --dbpath "$B" --initdb < /dev/null || ko "rpmdb vide non créée"
+      for k in "$C"/*; do rpm --dbpath "$B" --import "$k" < /dev/null || ko "import de ${k##*/} dans rpm"; done
+      r=0; xargs rpm --dbpath "$B" -K < /tmp/rpms > /tmp/k.log 2>&1 || r=$?
+      k=$(grep -c ': digests signatures OK$' /tmp/k.log || true)
+      echo "rpm -K : rc $r, $k OK sur $n"
+      [ "$r" = 0 ] && [ "$k" = "$n" ] || ko "signatures des rpm"
+      # Base : manifeste, puis couche
+      if [ "$COUCHE" != - ]; then
+        get /tmp/base-manifeste "https://sc-stockage.poc.test:5000/v2/$cd_/manifests/sha256:$cm" --cacert /etc/ca-poc/ca.crt \
+          -H 'Accept: application/vnd.oci.image.manifest.v1+json'
+        [ "$(sha256sum < /tmp/base-manifeste | cut -c1-64)" = "$cm" ] || ko "sha256 du manifeste de base"
+        python3 -I - /tmp/base-manifeste "sha256:$cs" <<'PY' || ko "manifeste de base : image OCI à une seule couche, la couche fixée, attendue"
+      import json, sys
+      m = json.load(open(sys.argv[1], encoding="utf-8"))
+      assert m.get("mediaType") == "application/vnd.oci.image.manifest.v1+json", m.get("mediaType")
+      assert [c["digest"] for c in m["layers"]] == [sys.argv[2]], [c["digest"] for c in m["layers"]]
+      PY
+        echo "manifeste de base $cd_@sha256:$cm : $(stat -c %s /tmp/base-manifeste) octets, image OCI à une couche, sha256:$cs"
+        get "$S/couche.tar.gz" "https://sc-stockage.poc.test:5000/v2/$cd_/blobs/sha256:$cs" --cacert /etc/ca-poc/ca.crt
+        [ "$(sha256sum < "$S/couche.tar.gz" | cut -c1-64)" = "$cs" ] || ko "sha256 de la couche"
+        echo "couche $cd_ sha256:$cs : $(stat -c %s "$S/couche.tar.gz") octets, conforme"
+        printf '{"uri":"oci://sc-stockage.poc.test:5000/%s","digest":"sha256:%s"}' "$cd_" "$cm" > '$(results.BASE_ARTIFACT_INPUTS.path)'
+        echo "résultat BASE_ARTIFACT_INPUTS : oci://sc-stockage.poc.test:5000/$cd_ sha256:$cm"
+      else
+        echo "aucune base : BASE_ARTIFACT_INPUTS non écrit"
+      fi
+      ( cd "$S" && find . -type f | sed 's|^\./||' | sort | xargs sha256sum ) > /tmp/entrees.sha256
+      echo "entrées : $(wc -l < /tmp/entrees.sha256) fichiers, $(du -sb "$S" | cut -f1) octets ; liste des sha256 : $(sha256sum < /tmp/entrees.sha256 | cut -c1-64) ; en $(($(date +%s) - t0)) s"
+    volumeMounts:
+    - mountPath: /etc/ca-poc
+      name: ca-poc
+      readOnly: true
+  volumes:
+  - emptyDir: {}
+    name: tmp
+  - configMap:
+      name: ca-poc
+    name: ca-poc
+  workspaces:
+  - name: sortie
