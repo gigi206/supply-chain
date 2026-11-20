@@ -223,3 +223,21 @@ Le rejeu reste exclu avant la mesure de G7 du 28/11.
 **Suite** :
 - Un écart sur l'un des 9 : arrêt, archivage, et l'hypothèse de l'estimation n'est pas tenue (nouvelle signature et revue de `taches.yml`, ta décision).
 - 9 sur 9 : l'étape de republication sera écrite comme un script frère, sans toucher aux `m1b-*.sh` de mesure. Elle ne prendra ni clé ni `SIGNER` et poussera les tâches avant les pipelines. Elle s'arrêtera au premier digest hors liste. Elle portera sur 5 fichiers (trois tâches rpm, deux pipelines) : `m1b-signature.sh taches` republie déjà les deux tâches `builders`.
+
+## Note datée du 20/11/2026, écrite à 2026-11-20T16:28:06Z UTC : banc de republication, résultat, et prédiction d'un passage sous `TZ=UTC`
+
+**Passage** le 20/11/2026 à 16:27:19 UTC, au dépôt `23727e28`. Le banc rend 1 avec « bilan : 36 OK, 9 KO » ([`m5b-republication-banc.log`](m5b-republication-banc.log)). Les 9 KO sont tous des C3. Les poussées durent 1 s.
+
+- **RE1 tenue** : tkn 0.46.2 et crane 0.20.6. `SOURCE_DATE_EPOCH` est absente. `bundle` est extraite telle quelle de `commun.sh` et ne porte pas `--ctime`.
+- **RE2 tenue** : au tag `m1b`, les 9 digests sont égaux aux attendus lus dans le dépôt (9 C1).
+- **RE3 tenue** : le tag `banc2` redonne les 9 mêmes digests (9 C2).
+- **RE4 non tenue dans sa forme** : la date de création vaut `1970-01-01T01:00:00+01:00` pour les 9, et non `1970-01-01T00:00:00Z`. C'est le même instant, l'époque 0, mais tkn l'écrit dans le fuseau local de l'hôte : Europe/Paris, `TZ` non posée.
+  - La configuration, et donc le digest, contient ce texte. Les digests de la liste revue ont été poussés sous ce même fuseau, et c'est pourquoi RE2 tient.
+  - Ni `rejeu.sh` ni `commun.sh` ne posent `TZ`.
+
+**Conséquence pour l'hypothèse de l'estimation** : elle est tenue sur le banc pour les 9 fichiers. Elle l'est pour un hôte au fuseau Europe/Paris, qui écrit `+01:00` pour le 1er janvier 1970 (pas d'heure d'été en 1970). Zot, Tekton et l'admission restent non couverts.
+
+**Prédiction, écrite avant le lancement** : le même banc, inchangé, est relancé sous `TZ=UTC`. Il utilise un dossier neuf (`banc-m5b-republication-utc`), le port 5910 et le journal `m5b-republication-banc-utc.log`.
+- **RE5** (haute) : la date de création vaut `1970-01-01T00:00:00Z` pour les 9 (9 C3 OK).
+- **RE6** (haute) : les 9 digests diffèrent des attendus, aux deux tags (18 KO en C1 et C2). Le digest dépend donc du fuseau de l'hôte.
+- Si RE5 et RE6 tiennent, l'étape de republication devra fixer `TZ=Europe/Paris` pour `tkn bundle push`. Il faudra aussi le signaler comme une condition de reproductibilité des bundles de toute la plateforme. Ce constat ne touche pas la 06 en S5b, poussée depuis le même hôte.
