@@ -88,3 +88,13 @@ Partie D, neuve : `entrees-scan.py` du patch, fonctions `comptes` et `entrees` a
 Passage 3 : un écart, `deux` sans prédicat. Cause mesurée par une sonde hors dépôt et hors réseau, sur le SBOM et les deux documents du cas : Grype 0.104.1 sort en code 1, sans message sous `-q`, avec `--vex a,b` ; il donne 4/1 avec `--vex a --vex b`, et 4/1 avec le second document seul. Le patch passe désormais un `--vex` par document, et le banc reprend les mêmes commandes. Le motif de rejet n'est plus entre guillemets droits, qui coupaient la ligne `REJET|` du journal.
 
 Prédictions inchangées pour tous les cas ; en particulier `deux` : 2, 2, 0 ; 4/1 ; horodatage de l'entrée 2026-11-01. Ligne `REJET|` du cas `fixed` entière.
+
+## Ajout avant le cinquième passage (écrit le 2026-11-21, date -u de 17:47:48 UTC dans la même commande que l’écriture)
+
+Après relecture du conseiller : un document que le filtre du scanner retient mais que Grype refuserait ferait échouer le scan entier (`set -e`), chaque jour, sans prédicat. Le filtre ne regarde ni `vulnerability` ni `products`. Trois cas neufs en B, en mode `vex` ; les autres prédictions sont inchangées.
+
+| Cas | Journal `VEX|` | Grype | Confiance |
+|---|---|---|---|
+| énoncé valide sans `products` | 1, 1, 0 | 5/0 (énoncé sans effet) ; refus de Grype possible | faible |
+| énoncé valide sans `vulnerability` | 1, 1, 0 | 5/0 (énoncé sans effet) ; refus de Grype possible | faible |
+| `--vex a,b` sur les deux documents du cas `deux` (sonde du passage 3, archivée) | sans objet | code 1 ; `--vex a --vex b` : 4/1 | haute |

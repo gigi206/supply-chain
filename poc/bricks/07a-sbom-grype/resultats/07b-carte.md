@@ -513,3 +513,27 @@ Réponses du propriétaire, le 21/11/2026, aux questions posées après la note 
 | 9 | `plateforme.sh` et `rejeu.sh` : `g5_regles`, contre-épreuves de G5, témoins de G6 | dépôt | les témoins de G6 lisent la valeur de 1 ; sans elle, `g6` s'arrête en KO |
 
 **Question au propriétaire** : la valeur de `vex_age_max_jours` (choix 3). Rien n'est posé avant elle et avant l'accord de chaque pièce.
+
+## Compléments de la tranche 3, après relecture du conseiller (note de 2026-11-21T17:51:53Z ; la note de 2026-11-21T17:44:18Z n'est pas réécrite)
+
+1. **Passage 5** ([journal](07b-t3-banc-5.log) : 67 OK, 0 KO ; banc `5ec7f0a25f13b136…`, témoins `23249e05286b2bf7…`, même patch `234d449aefb5507a…`). Trois cas neufs, prédits avant le passage (section « Ajout avant le cinquième passage ») :
+   - **Un document retenu par le filtre, mais sans `products` ou sans `vulnerability`** : Grype ne le refuse pas, l'énoncé est sans effet, 5/0.
+     - Le risque visé : sous `set -e`, un document que Grype refuserait ferait échouer le scan entier, chaque jour, sans prédicat, jusqu'au refus de la porte par `scan_recent`.
+     - Seules ces deux formes sont mesurées. Le patch n'a pas de repli « scan sans `--vex` si Grype refuse les VEX » : c'est une limite, à trancher avant la pose.
+     - Un document sans effet compte pourtant dans `vex.documents` et dans l'horodatage le plus ancien : il peut avancer l'échéance des autres.
+   - **La sonde du passage 3 est archivée** : `--vex a,b` donne le code 1 ; `--vex a --vex b` donne 4/1.
+2. **Les refus de cosign sont distincts** (quatrième champ de la ligne `VEX|` des journaux de cas du passage 4, lus avant l'effacement du banc) :
+   - autre sujet, simple : « no matching attestations » ;
+   - autre sujet, adverse : « provided artifact digest does not match any digest in statement » ;
+   - autre clé : « accepted signatures do not match threshold » ;
+   - clé absente : « loading public key ».
+   Dans le cas adverse, c'est donc cosign qui refuse : la revérification du sujet par `scan-outil vex` n'a tourné qu'en cas unitaire (`autre-sujet`).
+3. **Un appelant de `scan-outil` est hors du patch** : `06-deb-sbuild/s6a.sh` (brique 06, close) appelle `fusion` à cinq arguments, avec le binaire du cache `~/.cache/supply-chain-poc/07a/outil/scan-outil`, que le patch ne reconstruit pas. Si ce script est rejoué avec un `scan-outil` neuf, il faudra lui ajouter l'image en sixième argument. Aucun autre appelant hors `resultats/` et hors worktrees.
+4. **Environnement de cosign dans `analyser`** : `scan-job.yaml` lui donne `HOME=/travail` et `TMPDIR=/travail` (volume inscriptible), comme à `attester`. Le banc lui donnait aussi un `HOME` inscriptible. Ce n'est pas mesuré dans le pod : la pièce 5 de la pose commence par un pod d'essai.
+5. **Portée de la mesure 0** : deux artefacts à modules Go (image et deb de sample-app), avec le SBOM source de G0. Rien n'est mesuré sur un artefact à paquets de distribution, comme le rpm du dossier 7 de la 05.
+6. **Pièce 8 de la pose** : aucun script ni essai de signature avec `hashivault://vex`. Seul existe `publier_vex` du banc, avec une clé locale jetable.
+7. **Deux écarts de méthode, de mon fait** :
+   - j'ai lancé un `rm -rf` en clair sur un dossier `__pycache__` de la brique, qui existait avant la session ;
+   - j'ai redaté les en-têtes des deux premières sections des [prédictions](07b-t3-predictions.md) (heures approchées remplacées par les heures mesurées) après les passages 1 et 2, sans toucher aux prédictions elles-mêmes.
+
+**Valeur de `vex_age_max_jours`, sans recommandation** : aucune cadence propre aux VEX n'est écrite dans le dépôt. Une seule cadence de revue y figure : le ré-audit **trimestriel** des projets (`docs/01`, B13). Il porte sur la santé des projets, pas sur les VEX.

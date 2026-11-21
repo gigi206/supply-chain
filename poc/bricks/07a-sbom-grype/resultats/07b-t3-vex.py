@@ -2,6 +2,7 @@
 
   doc <fichier> <horodatage-du-document|-> <énoncé>…
       énoncé : « statut;justification;impact;horodatage;vulnérabilité;produit;sous-composant », « - » pour un champ absent
+      (vulnérabilité ou produit absent : clé absente de l'énoncé, cas du passage 5)
   enonce <fichier> <predicateType> <sha256-du-sujet> <prédicat.json> [contexte]
       énoncé in-toto v0.1 non signé (cas unitaires de scan-outil vex) ; contexte remplace @context du prédicat
 
@@ -26,11 +27,14 @@ def doc(f, horodatage, *enonces):
         d["timestamp"] = horodatage
     for e in enonces:
         statut, justif, impact, h, vuln, produit, sous = e.split(";")
-        s = {"vulnerability": {"name": vuln}, "status": statut}
-        p = {"@id": produit}
-        if sous != "-":
-            p["subcomponents"] = [{"@id": sous}]
-        s["products"] = [p]
+        s = {"status": statut}
+        if vuln != "-":
+            s["vulnerability"] = {"name": vuln}
+        if produit != "-":
+            p = {"@id": produit}
+            if sous != "-":
+                p["subcomponents"] = [{"@id": sous}]
+            s["products"] = [p]
         if justif != "-":
             s["justification"] = justif
         if impact != "-":

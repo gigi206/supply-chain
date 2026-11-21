@@ -1,0 +1,109 @@
+début : 2026-11-21T17:47:59Z
+outils : grype 0.104.1, syft 1.38.0, cosign v3.1.4, zot v2.1.22, ec v0.10.42, go1.24.7
+patch : politique/07b-t3.patch 234d449aefb5507a… ; 07b-t3-vex.py 23249e05286b2bf7…
+OK   patch appliqué sur une copie des fichiers du dépôt
+OK   scan-outil du patch construit
+OK   go vet
+## A. hôte, hors réseau
+OK   fusion, image sans digest : code 1
+OK   compatibilité image : prédicat neuf sans VEX = prédicat d'avant + bloc vex vide
+OK   compatibilité deb : prédicat neuf sans VEX = prédicat d'avant + bloc vex vide
+OK   ec opa check
+OK   ec opa test : PASS: 39/39
+OK   mutations couvertes : 22/22
+## A. scan-outil vex, cas unitaires (énoncés non signés)
+OK   vex valide : retenu 2026-11-20T00:00:00Z
+OK   vex fixed : rejeté
+     raison : énoncé 0 : statut « fixed », seul not_affected est passé
+OK   vex affected : rejeté
+     raison : énoncé 0 : statut « affected », seul not_affected est passé
+OK   vex sans-impact : rejeté
+     raison : énoncé 0 : impact_statement absent
+OK   vex impact-blanc : rejeté
+     raison : énoncé 0 : impact_statement absent
+OK   vex sans-justification : rejeté
+     raison : énoncé 0 : justification absente ou hors spécification
+OK   vex justification-libre : rejeté
+     raison : énoncé 0 : justification absente ou hors spécification
+OK   vex mixte : rejeté
+     raison : énoncé 1 : impact_statement absent
+OK   vex autre-sujet : rejeté
+     raison : sujet différent du digest scanné
+OK   vex autre-type : rejeté
+     raison : type de prédicat inattendu : https://example.com/autre
+OK   vex autre-contexte : rejeté
+     raison : @context inattendu : https://openvex.dev/ns/v0.1.0
+OK   vex sans-horodatage-enonce : retenu 2026-11-20T00:00:00Z
+OK   vex deux-horodatages : retenu 2026-11-03T08:00:00Z
+OK   vex horodatage-illisible : rejeté
+     raison : énoncé 0 : horodatage illisible
+OK   vex aucun-enonce : rejeté
+     raison : aucun énoncé VEX
+OK   vex sans fichier : 0 retenu, 0 rejeté
+OK   document écrit = prédicat de l'énoncé
+OK   predicat : écartée par un VEX sans document retenu : code 1
+## B. scanner.sh du patch, Zot jetable 127.0.0.1:15002
+OK   image poussée (complet) : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+     BASE|2026-11-04, 127.0.0.1:15002/vulndb/grype@sha256:cf55d9efce79ed6d45b4c31a7e875cd1a59d745152d2739fa178841b110c3cab, empreinte sha256:ed08c5e32eb299ebc83b87ab05b23debd749b55c30cf73281ec4223851b5f896, 0 s
+     IMPORT|3222 Mo, 84 s ; 3411 Mo dans le volume, au plus haut
+     ARTEFACT|image, 2 PURL versionnées dans l'artefact seul
+     SBOM|5 composants avec PURL (D1 a), 2 s
+     VEX|1 énoncé(s) vérifié(s), 1 retenu(s), 0 rejeté(s)|127.0.0.1:15002/builds/vex/complet/sample-app|cosign code 0
+     SCAN|127.0.0.1:15002/builds/complet/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 1 écartée(s) par un VEX, 0 s
+     PREDICAT|sha256 fcbab27983bc6ada975da7fbf762de5ad58bfc45e4ae431b9ef6f69197088813, 86 s en tout
+VEX|1 énoncé(s) vérifié(s), 1 retenu(s), 0 rejeté(s)|127.0.0.1:15002/builds/vex/complet/sample-app|cosign code 0
+OK   complet : VEX vérifiés, retenus, rejetés 1,1,0
+OK   complet : entrées sans VEX / avec VEX : 4/1
+OK   complet : entrée écartée : GHSA-mqqf-5wvp-8fh8 not_affected 2026-11-20T17:48:09Z
+OK   complet : documents du prédicat = empreinte de l'énoncé signé : 174ca0175a815541587f3eaa1129cd0105fd15801de51fd5b638dc42e6725c19
+OK   X (sha256:0f3b9eef1560bbf30c9ac5084ba87a9b5574603e8321f72e09af504c0c9cbe39) différent de Y
+OK   simple : VEX vérifiés, retenus, rejetés 0,0,0
+OK   simple : entrées sans VEX / avec VEX : 5/0
+     referrers de Y sous builds/vex/adverse : 1
+OK   adverse : VEX vérifiés, retenus, rejetés 0,0,0
+OK   adverse : entrées sans VEX / avec VEX : 5/0
+OK   etrangere : VEX vérifiés, retenus, rejetés 0,0,0
+OK   etrangere : entrées sans VEX / avec VEX : 5/0
+OK   fixed : VEX vérifiés, retenus, rejetés 1,0,1
+     REJET|énoncé 0 : statut « fixed », seul not_affected est passé
+OK   fixed : entrées sans VEX / avec VEX : 5/0
+OK   sans-impact : VEX vérifiés, retenus, rejetés 1,0,1
+     REJET|énoncé 0 : impact_statement absent
+OK   sans-impact : entrées sans VEX / avec VEX : 5/0
+OK   deux : VEX vérifiés, retenus, rejetés 2,2,0
+OK   deux : entrées sans VEX / avec VEX : 4/1
+OK   deux : horodatage de l'entrée : 2026-11-01T00:00:00Z
+OK   sans-cle : VEX vérifiés, retenus, rejetés 0,0,0
+OK   sans-cle : entrées sans VEX / avec VEX : 5/0
+     cosign code 1 : loading verifierfrom key opts: loading public key: open /home/gigi/.cache/supply-chain-poc/07a/t3/banc/cle/absente.pub: no such file or directory
+OK   deb poussé : sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+     DEB|sample-app_1.0.0-2_amd64.deb, sha256 f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b, 1953492 octets
+     EXTRAIT|3 fichiers dans data.tar
+     ARTEFACT|deb, 2 PURL versionnées dans l'artefact seul
+     SBOM|5 composants avec PURL (D1 a), 2 s
+     VEX|1 énoncé(s) vérifié(s), 1 retenu(s), 0 rejeté(s)|127.0.0.1:15002/builds/vex/deb-complet/sample-app-deb|cosign code 0
+     SCAN|127.0.0.1:15002/builds/deb-complet/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, 66 vulnérabilités, 0 KEV, 1 écartée(s) par un VEX, 1 s
+OK   deb-complet : VEX vérifiés, retenus, rejetés 1,1,0
+OK   deb-complet : entrées sans VEX / avec VEX : 65/1
+OK   futur : VEX vérifiés, retenus, rejetés 1,1,0
+OK   futur : entrées sans VEX / avec VEX : 4/1
+     sans-produits : grype et predicat sans erreur ; 
+OK   sans-produits : VEX vérifiés, retenus, rejetés 1,1,0
+OK   sans-produits : entrées sans VEX / avec VEX : 5/0
+     sans-vulnerabilite : grype et predicat sans erreur ; 
+OK   sans-vulnerabilite : VEX vérifiés, retenus, rejetés 1,1,0
+OK   sans-vulnerabilite : entrées sans VEX / avec VEX : 5/0
+OK   Grype, --vex a,b : code 1
+OK   Grype, --vex a --vex b : code 0, 4/1
+## C. porte : ec validate input de l'hôte, règles du patch
+OK   politique de banc : vex_age_max_jours 30 (valeur de banc, pas un choix)
+OK   porte, image complet, validité 30 j : code 0, admis
+OK   porte, VEX daté du futur : code 1, scan.kev_without_vex
+OK   porte, autre sujet adverse (sans VEX) : code 1, scan.kev_without_vex
+OK   porte, politique du patch telle quelle (null) : code 1, scan.kev_without_vex
+## D. entrees-scan.py du patch, sur les prédicats de B
+OK   D complet : 18 séries, trouvées 5, écartées 1, kev écartées 0, lignes 5, lignes avec vex 1
+OK   D deb-complet : 18 séries, trouvées 66, écartées 1, kev écartées 0, lignes 66, lignes avec vex 1
+OK   base de G0, source, image et deb inchangés (012b4f76d27382f7)
+fin : 2026-11-21T17:51:14Z
+## bilan : 0 écart(s) aux prédictions

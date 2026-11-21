@@ -177,6 +177,24 @@ if [ "${1:-}" = ns ]; then
   vex doc "$T/v-futur.json" 2027-01-01T00:00:00Z "not_affected;$JUSTIF;$IMPACT;-;$VULN;pkg:oci/sample-app@$Y;$SYFT"
   publier_vex vex "$T/v-futur.json" "$Y" builds/futur/sample-app "$Y" builds/vex/futur/sample-app
   vex_seul futur builds/futur/sample-app "$Y"; juger_vex futur 1,1,0 4/1
+  # 11, 12 (passage 5) : énoncé retenu par le filtre, sans products ou sans vulnerability ; issue de Grype relevée
+  for c in sans-produits sans-vulnerabilite; do
+    pousser "$M0/image" "builds/$c/sample-app" > /dev/null
+    case $c in sans-produits) e="not_affected;$JUSTIF;$IMPACT;-;$VULN;-;-" ;; *) e="not_affected;$JUSTIF;$IMPACT;-;-;pkg:oci/sample-app@$Y;$SYFT" ;; esac
+    vex doc "$T/v-$c.json" "$H1" "$e"
+    publier_vex vex "$T/v-$c.json" "$Y" "builds/$c/sample-app" "$Y" "builds/vex/$c/sample-app"
+    vex_seul "$c" "builds/$c/sample-app" "$Y"
+    echo "     $c : $(grep '^code' "$T/cas/$c.journal" || echo 'grype et predicat sans erreur') ; $(grep -v '^VEX\|^REJET\|^code' "$T/cas/$c.journal" | head -1 | cut -c1-200)"
+    juger_vex "$c" 1,1,0 5/0
+  done
+  # 13 (passage 5) : sonde du passage 3 archivée, sur les deux documents du cas deux
+  for forme in virgule repete; do
+    c=0
+    case $forme in virgule) set -- --vex "$T/cas/deux/vex/vex-0.json,$T/cas/deux/vex/vex-1.json" ;; *) set -- --vex "$T/cas/deux/vex/vex-0.json" --vex "$T/cas/deux/vex/vex-1.json" ;; esac
+    grype_hors_ligne "sbom:$T/cas/deux/sbom.json" "$@" -o json --file "$T/cas/deux-$forme.json" -q > "$T/cas/deux-$forme.err" 2>&1 || c=$?
+    r="code $c"; [ "$c" != 0 ] || r="$r, $(jq -r '"\(.matches | length)/\(.ignoredMatches // [] | length)"' "$T/cas/deux-$forme.json")"
+    case $forme in virgule) attendu "Grype, --vex a,b" "$r" "code 1" ;; *) attendu "Grype, --vex a --vex b" "$r" "code 0, 4/1" ;; esac
+  done
   echo "$KO" > "$T/ko-ns"
   exit 0
 fi
