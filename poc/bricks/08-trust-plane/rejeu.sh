@@ -58,6 +58,11 @@
 # Correction du 20/11/2026 (carte de M5b, note de 2026-11-20T17:58:49Z) : les sorties de signature sont sous le TAG, donc une reprise
 # à « 05 (images) » sous un TAG_05 neuf repart de « 05 (signature) » ; vm.sh detruire efface $W (l. 152) : entree copie avant
 # le démontage les entrées de l'hôte que lisent signature, images et artefact (m5b-rejeu.sh, E05).
+# Additif du 21/11/2026 : tranche 1 de la 07b (entrees-scan, posé le 21/11, 07b-t1-pose.log), à sec, PAS ENCORE REJOUÉ.
+# entrees-scan.sh pose juste après « 06 (S6a, fraicheur) » : pose exige deux artefacts dans SCANS, que l'unité fraicheur-scan
+# ne porte qu'après fraicheur de la 06. Sans elle, une VM recréée (M5b) perdrait entrees-scan (carte de la 07b, note de
+# 2026-11-21T16:37:53Z). pose écrit sur sc-stockage (sudo, comme g8_metriques) ; verif est hors du rejeu (« une fois par scan »
+# ne se prouve qu'au scan quotidien suivant).
 #
 # Usage (racine du dépôt) : [POUSSER_VSA=1] [TAG_05=<tag>] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail
@@ -220,6 +225,7 @@ if [ "$DISTRO" = rke2 ] && [ "$RESEAU" = cilium ]; then
   }
   etape "06 (S6a, periodique)" periodique_s6a
   etape "06 (S6a, fraicheur)" mise exec -- "$b06/s6a.sh" fraicheur
+  etape "07b (entrees-scan, pose)" mise exec -- "$here/../07a-sbom-grype/entrees-scan.sh" pose   # additif du 21/11/2026
   etape "06 (S6a, grafana)" mise exec -- "$b06/s6a.sh" grafana
   if [ "${POUSSER_VSA:-}" = 1 ]; then
     etape "06 (S6b, pousser_vsa)" mise exec -- "$b06/s6b.sh" pousser_vsa

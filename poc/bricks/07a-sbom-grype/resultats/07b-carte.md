@@ -855,3 +855,10 @@ C'est plus strict que le couple vulnérabilité et produit pour les rétractatio
 - Le refus d'un identifiant absent du scan suppose que le prédicat fourni est à jour. Une vulnérabilité apparue depuis, avec une base plus récente, demande un prédicat plus récent.
 
 **Heures mesurées** : de 21:32:16 UTC (note précédente) à 21:54:57 UTC.
+
+## Branchement d'`entrees-scan` au rejeu (note de 2026-11-21T22:02:57Z ; à sec, non rejoué ; complète le paragraphe « Rejeu » de la note de 16:37:53Z)
+
+- `08-trust-plane/rejeu.sh` appelle désormais `entrees-scan.sh pose` dans l'étape « 07b (entrees-scan, pose) », juste après « 06 (S6a, fraicheur) ». Un additif daté est ajouté dans son en-tête.
+- **Pourquoi à cet endroit** : `pose` exige deux artefacts dans `SCANS` (contrôle « deux artefacts dans SCANS »), et l'unité `fraicheur-scan` ne porte le deb qu'après `fraicheur` de la 06.
+- `verif` reste hors du rejeu : « une fois par scan » ne se prouve qu'au scan quotidien suivant.
+- **Contrôle fait** : `bash -n`. **Non fait** : aucun rejeu, et aucun passage de `pose` dans ce contexte. `pose` relance `useradd` sous garde et réinstalle les fichiers ; sur une VM recréée, l'état part de zéro.
