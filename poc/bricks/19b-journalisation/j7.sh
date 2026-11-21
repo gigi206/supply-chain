@@ -195,11 +195,19 @@ garde_fenetre() { # pose et retour redémarrent les agents des trois nœuds : ho
   echo "OK   fenêtre : $(date -u +%Y-%m-%dT%H:%M:%SZ), hors de 08:00 à 11:30 UTC et hors des balayages n°2 et n°3"
 }
 
-reprendre_rattrapage() { kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":false}}' < /dev/null > /dev/null; echo "rattrapage repris"; }
+ETAT_RATTRAPAGE=   # .spec.suspend relevé avant la suspension (la première version remettait false en dur)
+reprendre_rattrapage() { # remet la valeur relevée, puis la relit
+  [ -n "$ETAT_RATTRAPAGE" ] || { echo "rattrapage : état de départ non relevé, rien n'est remis"; return 0; }
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p "{\"spec\":{\"suspend\":$ETAT_RATTRAPAGE}}" < /dev/null > /dev/null
+  echo "rattrapage remis : suspend=$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.spec.suspend}' < /dev/null) (état de départ : $ETAT_RATTRAPAGE)"
+}
 suspendre_rattrapage() { # comme etape_h5_cilium (08c) : aucun passage ni PipelineRun actif pendant les redémarrages
   local n
-  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' < /dev/null > /dev/null
+  ETAT_RATTRAPAGE=$(kubectl get cronjob -n declencheurs rattrapage -o json < /dev/null | jq -r '.spec.suspend // false')
+  case $ETAT_RATTRAPAGE in true|false) ;; *) echec "rattrapage : suspend illisible ($ETAT_RATTRAPAGE)" ;; esac
+  echo "rattrapage : suspend=$ETAT_RATTRAPAGE avant la suspension"
   trap reprendre_rattrapage EXIT
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' < /dev/null > /dev/null
   for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}' < /dev/null)" ] && break; sleep 2; done
   n=$(kubectl get pipelineruns -n builds -o json < /dev/null | jq '[.items[] | select(.status.completionTime == null)] | length')
   [ "$n" = 0 ] || echec "$n PipelineRun(s) actif(s) : pose reportée"

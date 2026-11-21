@@ -223,3 +223,19 @@ Accord du propriétaire : « Oui il faut mettre rke2 ». La demande nommait la p
 - **`/var/run` de sc-build** : c'est un tmpfs de 995 Mo (`findmnt` par ssh, sans sudo), sur une VM de 9 950 Mo de mémoire. Le fichier d'export, borné à 60 Mo par la rotation, est en mémoire.
 - **Volume d'une vraie construction** : l'export est posé, donc tout PipelineRun à venir remplira le fichier. Derniers PipelineRuns de `builds` : le 20/11 à 13:41:07 UTC. La mesure passive consiste à relire la taille du fichier après le prochain passage, sans rien écrire dans Zot. Cette relecture est un `kubectl exec`, à nommer dans la demande.
 - **`DISTRO`** : le défaut de `distro.sh` reste `k3s`. Le changer serait une modification de configuration pour tous les scripts de la 08, et n'est pas fait.
+
+## Correctif de la reprise du rattrapage (note de 2026-11-21T16:15:03Z ; rien n'est réécrit au-dessus)
+
+La note « Relevés après la pose » demandait que `j7.sh` relève l'état du CronJob `rattrapage` avant `retour`, puis le restaure. C'est fait, à sec : `j7.sh` passe de `edbc4fdbf9b1dfdb…` à **`ec581e035ff148a6…`**. Rien n'est lancé dans le cluster.
+
+- **`suspendre_rattrapage`** lit d'abord `.spec.suspend`, un champ absent valant `false`. Une autre valeur arrête l'étape avant toute écriture. L'état de départ est écrit dans le journal, puis le trap de sortie est posé, et enfin la suspension.
+- **`reprendre_rattrapage`** remet cette valeur, au lieu de `false` en dur, et la relit pour le journal.
+- **Banc local** ([script](j7-rattrapage-banc.sh), [journal](j7-rattrapage-banc.log)) : les deux fonctions sont extraites de `j7.sh` telles quelles, avec un faux `kubectl`. **6 cas sur 6 tenus** :
+  - départ `false`, `true` ou champ absent : état final égal au départ ;
+  - arrêt sur un PipelineRun actif, au départ `false` puis `true` : le trap remet l'état de départ ;
+  - valeur illisible : arrêt sans aucune écriture.
+- **État relevé à 16:13 UTC** (`kubectl get`, lecture seule) : `rattrapage` et `rattrapage-deb` sont à `suspend=false`, avec un dernier passage à 16:13:00 UTC.
+
+**Reste avant `retour`**, qui attend toujours un accord à part :
+- `garde_fenetre` ne connaît que les 20, 21 et 22/11. Au-delà, elle refuse tant que les balayages de Zot ne sont pas recalculés, sauf avec `FORCER_RETOUR=1`.
+- `rattrapage-deb` n'est toujours pas suspendu, comme dans `etape_h5_cilium` de la 08c.

@@ -1,0 +1,39 @@
+j7.sh : ec581e035ff148a6…
+fonctions extraites : 18 lignes
+## cas
+rattrapage : suspend=false avant la suspension
+  [faux kubectl] suspend <- true
+OK   rattrapage suspendu, aucun PipelineRun actif
+  pendant la pose : suspend=true
+  [faux kubectl] suspend <- false
+rattrapage remis : suspend=false (état de départ : false)
+OK   R1 départ false, aucun PipelineRun : FIN suspend=false (rc 0)
+rattrapage : suspend=true avant la suspension
+  [faux kubectl] suspend <- true
+OK   rattrapage suspendu, aucun PipelineRun actif
+  pendant la pose : suspend=true
+  [faux kubectl] suspend <- true
+rattrapage remis : suspend=true (état de départ : true)
+OK   R2 départ true, aucun PipelineRun : FIN suspend=true (rc 0)
+rattrapage : suspend=false avant la suspension
+  [faux kubectl] suspend <- true
+OK   rattrapage suspendu, aucun PipelineRun actif
+  pendant la pose : suspend=true
+  [faux kubectl] suspend <- false
+rattrapage remis : suspend=false (état de départ : false)
+OK   R3 champ suspend absent : FIN suspend=false (rc 0)
+rattrapage : suspend=false avant la suspension
+  [faux kubectl] suspend <- true
+KO   1 PipelineRun(s) actif(s) : pose reportée
+  [faux kubectl] suspend <- false
+rattrapage remis : suspend=false (état de départ : false)
+OK   R4 départ false, un PipelineRun actif (arrêt, trap) : FIN suspend=false (rc 1)
+rattrapage : suspend=true avant la suspension
+  [faux kubectl] suspend <- true
+KO   1 PipelineRun(s) actif(s) : pose reportée
+  [faux kubectl] suspend <- true
+rattrapage remis : suspend=true (état de départ : true)
+OK   R5 départ true, un PipelineRun actif (arrêt, trap) : FIN suspend=true (rc 1)
+KO   rattrapage : suspend illisible (bizarre)
+OK   R6 suspend illisible (arrêt avant tout patch) : FIN suspend=bizarre (rc 1)
+## bilan : 0 KO
