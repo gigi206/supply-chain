@@ -1,6 +1,7 @@
 # Architecture cible
 
-> Architecture de l'**hypothèse par défaut** : un « Konflux allégé », c'est-à-dire Tekton + Chains et des briques complémentaires. Si Konflux est retenu par l'ADR 0000, le cœur (zone Build et une partie de la zone Confiance) est remplacé par Konflux, et les autres zones restent identiques.
+> Architecture de l'**assemblage** confirmé par les bancs de l'ADR 0000 : Tekton + Chains et des briques complémentaires. Le noyau est celui de Konflux (Tekton, Chains, Hermeto, Conforma), mais Konflux lui-même est éliminé (17 contre 57), OBS et Kyverno seul ne sont pas adoptés, et Nix est en veille.
+> L'ADR 0000 partait de l'hypothèse d'un « Konflux allégé » ; la plateforme assemblée couvre plus que Konflux (deb, Forgejo, Dependency-Track, rebuild indépendant, OpenPGP, observabilité), sans son opérateur, son interface ni son cadre multi-tenant.
 > Les choix encore ouverts sont signalés par **[ADR xxxx]**.
 
 ## 1. Zones et composants
@@ -234,7 +235,7 @@ EL8 n'est pas mis automatiquement à 0.
 
 | ADR | Question | Quand |
 |---|---|---|
-| 0000 | Adopter Konflux ou OBS, ou assembler ? Challengers Nix (build) et Kyverno seul (politique) | Fin de 2a |
+| 0000 | Adopter Konflux ou OBS, ou assembler ? Challengers Nix (build) et Kyverno seul (politique). **Tranché par les bancs : assembler** | Fin de 2a (bancs terminés) |
 | 0001 | Runtime et isolation (k3s, Kata, gVisor, userns) ; infra du PoC ; administrateur du replay | Provisoire en phase 1, définitif en phase 3 |
 | 0002 | Snapshots de distros : Pulp ou aptly ; fermetures ; si Pulp, plugins manquants à écrire, comme `pulp_go` (exigence du propriétaire, 30/10/2026) | Fin de 2c |
 | 0003 | Clés, OpenPGP, TSA, TUF, PKI TLS (cert-manager et PKI d'OpenBao, reporté le 02/11/2026) | Phase 3 |
