@@ -1,0 +1,110 @@
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "subject": [
+    {
+      "name": "sample-app",
+      "digest": {
+        "sha256": "3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"
+      }
+    }
+  ],
+  "predicateType": "https://supply-chain.example/scan/v1",
+  "predicate": {
+    "malicious": [],
+    "scannedAt": "2026-11-21T09:31:55.87940934Z",
+    "scanner": {
+      "db": {
+        "built": "2026-11-21T06:20:06Z",
+        "ref": "sc-stockage.poc.test:5000/vulndb/grype@sha256:c638665e5120b3727bb1b15753ad6fd2c61364c441fe298aa5efbb9a8fe288ee",
+        "schema": "v6.1.10"
+      },
+      "id": "grype",
+      "version": "0.104.1"
+    },
+    "vulnerabilities": [
+      {
+        "aliases": [],
+        "epss": null,
+        "fixedIn": [
+          "5.3.0"
+        ],
+        "id": "GHSA-3fxj-6jh8-hvhx",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-114437"
+        ],
+        "epss": 0.00129,
+        "fixedIn": [
+          "5.4.0"
+        ],
+        "id": "GHSA-j6qf-3m9c-vwj3",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-69725"
+        ],
+        "epss": 0.00264,
+        "fixedIn": [
+          "5.2.4"
+        ],
+        "id": "GHSA-mqqf-5wvp-8fh8",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "GHSA-9g5q-2w5x-hmxf"
+        ],
+        "epss": null,
+        "fixedIn": [
+          "5.3.0"
+        ],
+        "id": "GO-2026-5775",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "severity": "Unknown"
+      },
+      {
+        "aliases": [
+          "GHSA-rjr7-jggh-pgcp"
+        ],
+        "epss": null,
+        "fixedIn": [
+          "5.3.0"
+        ],
+        "id": "GO-2026-5777",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "severity": "Unknown"
+      },
+      {
+        "aliases": [
+          "CVE-2026-97054"
+        ],
+        "epss": 0.0038,
+        "fixedIn": [
+          "1.26.11",
+          "1.27.4"
+        ],
+        "id": "GO-2026-6859",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.26.10",
+        "severity": "Medium"
+      }
+    ]
+  }
+}

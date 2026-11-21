@@ -1,0 +1,10 @@
+# Brique 07b, tranche 1 : un passage toutes les 15 min ; la liste n'est émise qu'au premier passage qui voit un nouveau referrer.
+[Unit]
+Description=Entrées du scan signé, toutes les 15 min (brique 07b, tranche 1)
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=15min
+
+[Install]
+WantedBy=timers.target

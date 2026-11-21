@@ -1,0 +1,1030 @@
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "subject": [
+    {
+      "name": "sample-app-deb",
+      "digest": {
+        "sha256": "60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e"
+      }
+    }
+  ],
+  "predicateType": "https://supply-chain.example/scan/v1",
+  "predicate": {
+    "malicious": [],
+    "scannedAt": "2026-11-21T11:16:56.316245544Z",
+    "scanner": {
+      "db": {
+        "built": "2026-11-21T06:20:06Z",
+        "ref": "sc-stockage.poc.test:5000/vulndb/grype@sha256:c638665e5120b3727bb1b15753ad6fd2c61364c441fe298aa5efbb9a8fe288ee",
+        "schema": "v6.1.10"
+      },
+      "id": "grype",
+      "version": "0.104.1"
+    },
+    "vulnerabilities": [
+      {
+        "aliases": [],
+        "epss": null,
+        "fixedIn": [
+          "5.3.0"
+        ],
+        "id": "GHSA-3fxj-6jh8-hvhx",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-114437"
+        ],
+        "epss": 0.00129,
+        "fixedIn": [
+          "5.4.0"
+        ],
+        "id": "GHSA-j6qf-3m9c-vwj3",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-69725"
+        ],
+        "epss": 0.00264,
+        "fixedIn": [
+          "5.2.4"
+        ],
+        "id": "GHSA-mqqf-5wvp-8fh8",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "GHSA-9g5q-2w5x-hmxf"
+        ],
+        "epss": null,
+        "fixedIn": [
+          "5.3.0"
+        ],
+        "id": "GO-2026-5775",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "severity": "Unknown"
+      },
+      {
+        "aliases": [
+          "GHSA-rjr7-jggh-pgcp"
+        ],
+        "epss": null,
+        "fixedIn": [
+          "5.3.0"
+        ],
+        "id": "GO-2026-5777",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "severity": "Unknown"
+      },
+      {
+        "aliases": [
+          "CVE-2025-47907"
+        ],
+        "epss": 0.00437,
+        "fixedIn": [
+          "1.23.12",
+          "1.24.6"
+        ],
+        "id": "GO-2025-3849",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2025-47906"
+        ],
+        "epss": 0.00572,
+        "fixedIn": [
+          "1.23.12",
+          "1.24.6"
+        ],
+        "id": "GO-2025-3956",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-61725"
+        ],
+        "epss": 0.00647,
+        "fixedIn": [
+          "1.24.8",
+          "1.25.2"
+        ],
+        "id": "GO-2025-4006",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2025-58187"
+        ],
+        "epss": 0.00406,
+        "fixedIn": [
+          "1.24.9",
+          "1.25.3"
+        ],
+        "id": "GO-2025-4007",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2025-58189"
+        ],
+        "epss": 0.00468,
+        "fixedIn": [
+          "1.24.8",
+          "1.25.2"
+        ],
+        "id": "GO-2025-4008",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-61723"
+        ],
+        "epss": 0.00661,
+        "fixedIn": [
+          "1.24.8",
+          "1.25.2"
+        ],
+        "id": "GO-2025-4009",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2025-47912"
+        ],
+        "epss": 0.00468,
+        "fixedIn": [
+          "1.24.8",
+          "1.25.2"
+        ],
+        "id": "GO-2025-4010",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-58185"
+        ],
+        "epss": 0.00556,
+        "fixedIn": [
+          "1.24.8",
+          "1.25.2"
+        ],
+        "id": "GO-2025-4011",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-58186"
+        ],
+        "epss": 0.00565,
+        "fixedIn": [
+          "1.24.8",
+          "1.25.2"
+        ],
+        "id": "GO-2025-4012",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-58188"
+        ],
+        "epss": 0.00381,
+        "fixedIn": [
+          "1.24.8",
+          "1.25.2"
+        ],
+        "id": "GO-2025-4013",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2025-58183"
+        ],
+        "epss": 0.00443,
+        "fixedIn": [
+          "1.24.8",
+          "1.25.2"
+        ],
+        "id": "GO-2025-4014",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-61724"
+        ],
+        "epss": 0.00556,
+        "fixedIn": [
+          "1.24.8",
+          "1.25.2"
+        ],
+        "id": "GO-2025-4015",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-61729"
+        ],
+        "epss": 0.0049,
+        "fixedIn": [
+          "1.24.11",
+          "1.25.5"
+        ],
+        "id": "GO-2025-4155",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2025-61727"
+        ],
+        "epss": 0.00304,
+        "fixedIn": [
+          "1.24.11",
+          "1.25.5"
+        ],
+        "id": "GO-2025-4175",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-68121"
+        ],
+        "epss": 0.00902,
+        "fixedIn": [
+          "1.24.13",
+          "1.25.7",
+          "1.26.0-rc.3"
+        ],
+        "id": "GO-2026-4337",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Critical"
+      },
+      {
+        "aliases": [
+          "CVE-2025-61730"
+        ],
+        "epss": 0.00324,
+        "fixedIn": [
+          "1.24.12",
+          "1.25.6"
+        ],
+        "id": "GO-2026-4340",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2025-61726"
+        ],
+        "epss": 0.02292,
+        "fixedIn": [
+          "1.24.12",
+          "1.25.6"
+        ],
+        "id": "GO-2026-4341",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2025-61728"
+        ],
+        "epss": 0.00738,
+        "fixedIn": [
+          "1.24.12",
+          "1.25.6"
+        ],
+        "id": "GO-2026-4342",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-25679"
+        ],
+        "epss": 0.00827,
+        "fixedIn": [
+          "1.25.8",
+          "1.26.1"
+        ],
+        "id": "GO-2026-4601",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-27139"
+        ],
+        "epss": 0.00219,
+        "fixedIn": [
+          "1.25.8",
+          "1.26.1"
+        ],
+        "id": "GO-2026-4602",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Low"
+      },
+      {
+        "aliases": [
+          "CVE-2026-27142"
+        ],
+        "epss": 0.00374,
+        "fixedIn": [
+          "1.25.8",
+          "1.26.1"
+        ],
+        "id": "GO-2026-4603",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-32282"
+        ],
+        "epss": 0.00297,
+        "fixedIn": [
+          "1.25.9",
+          "1.26.2"
+        ],
+        "id": "GO-2026-4864",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-32289"
+        ],
+        "epss": 0.00295,
+        "fixedIn": [
+          "1.25.9",
+          "1.26.2"
+        ],
+        "id": "GO-2026-4865",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-32288"
+        ],
+        "epss": 0.00295,
+        "fixedIn": [
+          "1.25.9",
+          "1.26.2"
+        ],
+        "id": "GO-2026-4869",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-32283"
+        ],
+        "epss": 0.00632,
+        "fixedIn": [
+          "1.25.9",
+          "1.26.2"
+        ],
+        "id": "GO-2026-4870",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-33814"
+        ],
+        "epss": 0.0084,
+        "fixedIn": [
+          "1.25.10",
+          "1.26.3"
+        ],
+        "id": "GO-2026-4918",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-32281"
+        ],
+        "epss": 0.00361,
+        "fixedIn": [
+          "1.25.9",
+          "1.26.2"
+        ],
+        "id": "GO-2026-4946",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-32280"
+        ],
+        "epss": 0.00626,
+        "fixedIn": [
+          "1.25.9",
+          "1.26.2"
+        ],
+        "id": "GO-2026-4947",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-39822"
+        ],
+        "epss": 0.00232,
+        "fixedIn": [
+          "1.25.12",
+          "1.26.5",
+          "1.27.0-rc.2"
+        ],
+        "id": "GO-2026-4970",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-39836"
+        ],
+        "epss": 0.00633,
+        "fixedIn": [
+          "1.25.10",
+          "1.26.3"
+        ],
+        "id": "GO-2026-4971",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-39825"
+        ],
+        "epss": 0.0039,
+        "fixedIn": [
+          "1.25.10",
+          "1.26.3"
+        ],
+        "id": "GO-2026-4976",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-42499"
+        ],
+        "epss": 0.00798,
+        "fixedIn": [
+          "1.25.10",
+          "1.26.3"
+        ],
+        "id": "GO-2026-4977",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-39826"
+        ],
+        "epss": 0.00371,
+        "fixedIn": [
+          "1.25.10",
+          "1.26.3"
+        ],
+        "id": "GO-2026-4980",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-33811"
+        ],
+        "epss": 0.00875,
+        "fixedIn": [
+          "1.25.10",
+          "1.26.3"
+        ],
+        "id": "GO-2026-4981",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-39823"
+        ],
+        "epss": 0.00314,
+        "fixedIn": [
+          "1.25.10",
+          "1.26.3"
+        ],
+        "id": "GO-2026-4982",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-39820"
+        ],
+        "epss": 0.00784,
+        "fixedIn": [
+          "1.25.10",
+          "1.26.3"
+        ],
+        "id": "GO-2026-4986",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-39821"
+        ],
+        "epss": 0.01834,
+        "fixedIn": [
+          "1.25.13",
+          "1.26.6",
+          "1.27.0-rc.3"
+        ],
+        "id": "GO-2026-5026",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-27145"
+        ],
+        "epss": 0.00591,
+        "fixedIn": [
+          "1.25.11",
+          "1.26.4"
+        ],
+        "id": "GO-2026-5037",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-42504"
+        ],
+        "epss": 0.0056,
+        "fixedIn": [
+          "1.25.11",
+          "1.26.4"
+        ],
+        "id": "GO-2026-5038",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-42507"
+        ],
+        "epss": 0.0037,
+        "fixedIn": [
+          "1.25.11",
+          "1.26.4"
+        ],
+        "id": "GO-2026-5039",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-42505"
+        ],
+        "epss": 0.00382,
+        "fixedIn": [
+          "1.25.12",
+          "1.26.5",
+          "1.27.0-rc.2"
+        ],
+        "id": "GO-2026-5856",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-33818"
+        ],
+        "epss": 0.00568,
+        "fixedIn": [
+          "1.25.13",
+          "1.26.6",
+          "1.27.0-rc.3"
+        ],
+        "id": "GO-2026-5972",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-56859"
+        ],
+        "epss": 0.00568,
+        "fixedIn": [
+          "1.25.13",
+          "1.26.6",
+          "1.27.0-rc.3"
+        ],
+        "id": "GO-2026-6088",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-56853"
+        ],
+        "epss": 0.00568,
+        "fixedIn": [
+          "1.25.13",
+          "1.26.6",
+          "1.27.0-rc.3"
+        ],
+        "id": "GO-2026-6089",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-56862"
+        ],
+        "epss": 0.00568,
+        "fixedIn": [
+          "1.25.13",
+          "1.26.6",
+          "1.27.0-rc.3"
+        ],
+        "id": "GO-2026-6090",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-56858"
+        ],
+        "epss": 0.0031,
+        "fixedIn": [
+          "1.25.13",
+          "1.26.6",
+          "1.27.0-rc.3"
+        ],
+        "id": "GO-2026-6091",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-56860"
+        ],
+        "epss": 0.0055,
+        "fixedIn": [
+          "1.25.13",
+          "1.26.6",
+          "1.27.0-rc.3"
+        ],
+        "id": "GO-2026-6218",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-94448"
+        ],
+        "epss": 0.00289,
+        "fixedIn": [
+          "1.26.9",
+          "1.27.2"
+        ],
+        "id": "GO-2026-6599",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-97030"
+        ],
+        "epss": 0.00289,
+        "fixedIn": [
+          "1.26.9",
+          "1.27.2"
+        ],
+        "id": "GO-2026-6600",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-78659"
+        ],
+        "epss": 0.00866,
+        "fixedIn": [
+          "1.26.9"
+        ],
+        "id": "GO-2026-6603",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-56857"
+        ],
+        "epss": 0.00553,
+        "fixedIn": [
+          "1.26.9",
+          "1.27.2"
+        ],
+        "id": "GO-2026-6604",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Critical"
+      },
+      {
+        "aliases": [
+          "CVE-2026-56866"
+        ],
+        "epss": 0.00604,
+        "fixedIn": [
+          "1.26.9",
+          "1.27.2"
+        ],
+        "id": "GO-2026-6605",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-97031"
+        ],
+        "epss": 0.00716,
+        "fixedIn": [
+          "1.26.9",
+          "1.27.2"
+        ],
+        "id": "GO-2026-6607",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-94440"
+        ],
+        "epss": 0.00706,
+        "fixedIn": [
+          "1.26.9",
+          "1.27.2"
+        ],
+        "id": "GO-2026-6608",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-78667"
+        ],
+        "epss": 0.00663,
+        "fixedIn": [
+          "1.26.9",
+          "1.27.2"
+        ],
+        "id": "GO-2026-6609",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-78660"
+        ],
+        "epss": 0.00542,
+        "fixedIn": [
+          "1.26.9"
+        ],
+        "id": "GO-2026-6610",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-78669"
+        ],
+        "epss": 0.00847,
+        "fixedIn": [
+          "1.26.9"
+        ],
+        "id": "GO-2026-6611",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-78663"
+        ],
+        "epss": 0.00858,
+        "fixedIn": [
+          "1.26.9"
+        ],
+        "id": "GO-2026-6612",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Critical"
+      },
+      {
+        "aliases": [
+          "CVE-2026-94439"
+        ],
+        "epss": 0.00528,
+        "fixedIn": [
+          "1.26.9",
+          "1.27.2"
+        ],
+        "id": "GO-2026-6613",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-97032"
+        ],
+        "epss": 0.00676,
+        "fixedIn": [
+          "1.26.9"
+        ],
+        "id": "GO-2026-6617",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "High"
+      },
+      {
+        "aliases": [
+          "CVE-2026-111943"
+        ],
+        "epss": 0.00396,
+        "fixedIn": [
+          "1.26.10",
+          "1.27.3"
+        ],
+        "id": "GO-2026-6809",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      },
+      {
+        "aliases": [
+          "CVE-2026-97054"
+        ],
+        "epss": 0.0038,
+        "fixedIn": [
+          "1.26.11",
+          "1.27.4"
+        ],
+        "id": "GO-2026-6859",
+        "kev": false,
+        "kevCves": [],
+        "package": "pkg:golang/stdlib@1.24.4",
+        "severity": "Medium"
+      }
+    ]
+  }
+}

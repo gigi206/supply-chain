@@ -1,0 +1,40 @@
+# Brique 07b, tranche 1 : entrées du scan signé en métriques (comptes) et dans le journal (liste, vers Loki). Préparé à sec, NON POSÉ.
+# Seule sortie : Zot, en lecture anonyme. Écritures : entrees-scan.prom et l'état (dernier referrer émis). @SCANS@ : « dépôt@digest »
+# séparés par des espaces, rendus à la pose comme @DIGEST@ de fraicheur-scan. Signature non vérifiée ici (cosign absent), la porte fait foi.
+[Unit]
+Description=Entrées du scan signé en métriques et dans le journal (brique 07b, tranche 1)
+After=zot.service
+
+[Service]
+Type=oneshot
+User=entrees-scan
+Group=entrees-scan
+Environment=REG=192.168.161.13:5000 CA=/etc/base-grype/ca-poc.crt "SCANS=@SCANS@"
+ExecStart=/usr/local/lib/entrees-scan/entrees-scan.py
+StateDirectory=entrees-scan
+StateDirectoryMode=0700
+TimeoutStartSec=2min
+IPAddressDeny=any
+IPAddressAllow=192.168.161.13
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ReadWritePaths=/etc/fichiers-metriques/entrees-scan.prom
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_UNIX
+SystemCallArchitectures=native
+UMask=0022

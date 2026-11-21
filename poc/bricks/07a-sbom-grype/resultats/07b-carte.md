@@ -109,3 +109,64 @@ La carte bloquait à tort les trois tranches sur les six choix.
 - **Taille** : le prédicat archivé de G4 (`resultats/g4-scan-predicat.json`) a 6 vulnérabilités en 1422 octets de JSON compact (calcul). Le couplage de la liste avec le disque de sc-stockage serait de l'ordre de quelques Ko par scan. C'est à mesurer sur un prédicat réel récent ; le scan du binaire Go de la 06 avait 140 correspondances.
 - **G7** : `zot.json` du dépôt n'a aucune règle de rétention par tirage. Un GET anonyme sur `builds/scan/*` ne change donc rien à ce que G7 mesure. Seuls `deleteReferrers` et `deleteUntagged` comptent.
 - **Signature** : aucun script du dépôt n'installe cosign sur sc-stockage. Le seul `install … cosign` du dépôt vise la VM du rejeu indépendant (`10-independent-replay/replay.sh`). Sans installation, le panneau serait étiqueté « signature non vérifiée ici, la porte fait foi ». Ce n'est pas vérifié sur la VM.
+
+## Tranche 1 à sec (note de 2026-11-21T16:27:54Z ; rien n'est réécrit au-dessus)
+
+C'est l'étape 2 du tableau, une préparation sans accord, commencée à 16:20:22 UTC. **Rien n'est posé** : ni compte, ni timer, ni panneau. Les seules lectures sont Zot en anonyme depuis l'hôte, et Loki en comptes par l'auditeur. Le travail suit la recommandation du choix 6 (les deux), qui reste à confirmer.
+
+**Lu avant d'écrire**
+- **Prédicats réels.** `builds/scan/sample-app` a 10 referrers de scan, du 13/11 à 12:45:07 UTC au 21/11 à 09:32:00 UTC. `builds/scan/sample-app-deb` en a 6, le dernier du 21/11 à 11:17:01 UTC. Les énoncés les plus récents sont archivés comme témoins :
+  - [sample-app](07b-t1-predicat-sample-app.json) : 1 713 octets compacts, 6 entrées ;
+  - [deb](07b-t1-predicat-sample-app-deb.json) : 13 184 octets, 67 entrées.
+- **Chemin vers Loki.** Le journal de sc-stockage y arrive déjà, par `19b-journalisation/config/alloy/commun/journal.alloy`, avec l'étiquette `unite`. Compte lu par l'auditeur : `fraicheur-scan.service` donne 4 lignes en 1 h et 96 en 24 h, une par passage.
+- **Chemin vers Prometheus.** `19-observabilite/systemd/fichiers.py` sert tout `/etc/fichiers-metriques/*.prom`. Aucun nom `scan_entrees*` n'existe ailleurs dans le dépôt.
+
+**Ce qui est écrit**, sans toucher à `fraicheur-scan.py` (contrôlé par G8, patché par S6a) :
+- [`systemd/entrees-scan.py`](../systemd/entrees-scan.py) (`0b6d67187c0fd0f5…`), bibliothèque standard seulement. Pour chaque « dépôt@digest » de `SCANS`, il lit le referrer de scan le plus récent, son manifeste et son bundle.
+  - **Contrôles sans signature** : type de la couche, empreinte du blob, `payloadType`, `predicateType` et sujet égal au digest demandé. Un écart donne le code 2, sans aucune écriture.
+  - **Comptes** dans `entrees-scan.prom` : `scan_entrees{depot, gravite}` sur une grille fixe de 7 gravités, zéros écrits, dont « autre » pour une valeur hors grille. S'y ajoutent `scan_entrees_kev`, `scan_entrees_avec_correctif` et `scan_entrees_scanne_timestamp_seconds`, qui relie les comptes au scan lu. Cela fait 10 séries par dépôt.
+  - **Liste** sur la sortie standard, donc dans le journal puis dans Loki : une ligne JSON par entrée, avec le dépôt et `scannedAt` dans la ligne, jamais en étiquette. Elle n'est émise qu'au premier passage qui voit un nouveau referrer : le digest du dernier manifeste émis est gardé dans `StateDirectory`. Les autres passages n'écrivent qu'une ligne de résumé.
+- [`entrees-scan.service`](../systemd/entrees-scan.service) et [`.timer`](../systemd/entrees-scan.timer) : copiés sur `fraicheur-scan`, un passage toutes les 15 min. Les mêmes durcissements s'y ajoutent, avec `@SCANS@` rendu à la pose.
+
+**Unité de compte : des entrées, pas des CVE.** Une entrée est un couple (identifiant, PURL) du prédicat. Pour sample-app, 3 entrées sur 6 ont un identifiant ou un alias CVE, et 2 sont en « Unknown ». Pour le deb, c'est 64 sur 67. Les séries et le futur panneau disent donc « entrées ».
+
+**Banc** ([script](07b-t1-banc.sh), [cas](07b-t1-banc.py), [journal](07b-t1-banc.log)) : **0 KO, 26 contrôles tenus.**
+- Les attendus sont calculés par jq, indépendamment du script :
+  - sample-app : 6 entrées, 4 Medium et 2 Unknown ;
+  - deb : 67 entrées, 3 Critical, 33 High, 28 Medium, 1 Low et 2 Unknown ;
+  - témoin de G6 : 13 entrées, dont 2 KEV.
+- **12 cas sur un faux Zot** :
+  - les deux témoins réels, puis un second passage sans ligne d'entrée et aux comptes identiques ;
+  - le témoin KEV de G6 et un prédicat vide (zéros partout) ;
+  - un dépôt sans referrer (séries absentes, les autres écrites) ;
+  - une lecture impossible (code 1, fichier inchangé) ;
+  - cinq refus à code 2, fichier inchangé : sujet, `payloadType`, empreinte, type de couche et `predicateType` ;
+  - une gravité hors grille, rangée dans « autre ».
+- **Passage réel depuis l'hôte**, sortie hors dépôt, effacée :
+  - les énoncés relus sont identiques aux témoins ;
+  - 73 lignes d'entrée au premier passage, aucune au second ;
+  - les 20 séries sont égales à jq.
+- Le banc a été corrigé deux fois avant le journal archivé : `fromdate` de jq ne lit pas le décalage `+01:00` du témoin de G6, puis un chemin jq était faux. Ces erreurs venaient du banc. Le script n'a pas changé entre ces passages.
+
+**Volume vers Loki** (mesure du passage réel, puis calculs) :
+- **Une fois par scan**, comme écrit : 19 259 octets pour les deux listes et le résumé. S'y ajoutent 125 octets de résumé par passage, soit 12 000 octets par 24 h.
+- **À chaque passage**, ce serait 96 × 19 259, soit environ 1,85 Mo par 24 h.
+- Les deux restent faibles devant les 1,8 à 1,9 Gio envoyés chaque jour par Alloy (relevé `df` du 21/11).
+
+**Résultat à donner au propriétaire, avec le choix 6.** Le deb porte 3 Critical et 33 High, toutes avec correctif, et aucune KEV. Les 67 entrées n'ont que 2 PURL distincts. sample-app porte 4 Medium et 2 Unknown, toutes avec correctif.
+
+**Requêtes prévues pour le panneau, non essayées** (rien n'est encore écrit dans Prometheus ni dans Loki) :
+- `sum by (depot, gravite) (scan_entrees)`, puis `scan_entrees_kev` et `scan_entrees_avec_correctif` ;
+- `time() - scan_entrees_scanne_timestamp_seconds` pour l'âge du scan affiché ;
+- `{source="journal", unite="entrees-scan.service"} |= "\"depot\"" | json` pour la liste, à filtrer sur le dernier `scannedAt`.
+
+**Limites**
+- **Signature non vérifiée ici.** cosign n'est pas sur sc-stockage. Le panneau dira « signature non vérifiée ici, la porte fait foi ». Un moyen de vérifier sur la VM, par installation ou par clé publique déposée, serait un choix à part.
+- **Digests épinglés**, comme pour `fraicheur-scan` : une nouvelle image ne s'affiche pas sans nouveau rendu de `SCANS`.
+- **Python de sc-stockage non relu.** `epoque` coupe les nanosecondes de `scannedAt`, que `fromisoformat` refuse avant Python 3.11. Le banc a tourné sous Python 3.13.12 de l'hôte. La version de la VM est à relire à la pose.
+- Une lecture impossible laisse une trace Python au journal (code 1), comme `fraicheur-scan`.
+
+**Pose, étape 3, sur accord à part** :
+- sudo sur sc-stockage : compte système `entrees-scan`, script, unité rendue avec `SCANS`, `entrees-scan.prom` créé vide, et timer ;
+- puis le panneau Grafana ;
+- aucune écriture dans Zot. G7 n'est pas touché : la tranche ne fait que des GET anonymes.
