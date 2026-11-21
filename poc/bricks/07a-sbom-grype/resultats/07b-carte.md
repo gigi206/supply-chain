@@ -402,3 +402,18 @@ Le fragment de `docs/03` est corrigé dans les mêmes termes. Le message du comm
    - **`fixed`** est accepté par la porte et écarté par Grype comme `not_affected` (tranche 2), sans aucune preuve. Un `fixed` écrit à la main exempterait une KEV. Recommandation : **retirer `fixed` du seuil** de la porte, puisque la correction se voit au scan suivant, quand la version change.
    - Tout VEX de démonstration porte « témoin » dans `author` et ne vise aucune KEV réelle.
    - govulncheck pourrait fonder `vulnerable_code_not_in_execute_path` pour les modules Go, mais il faudrait d'abord l'évaluer dans `docs/04`. C'est une décision à part, hors de ces recommandations.
+
+## Choix 1 à 5 tranchés (note de 2026-11-21T17:14:19Z ; rien n'est réécrit au-dessus)
+
+Réponses du propriétaire, le 21/11/2026, aux questions posées après la note précédente. Elles suivent toutes la recommandation :
+
+| Choix | Réponse (libellé choisi) | Ce qui en découle pour la tranche 3 |
+|---|---|---|
+| 1 | « Le scanner (Recommandé) » | `grype --vex` dans le scanner ; `metadata.component` de type `container` dans la fusion ; seuls les VEX attestés sur le digest scanné sont passés ; empreinte de chaque document passé dans le prédicat |
+| 2 | « Clé distincte (Recommandé) » | clé Transit neuve et sa politique OpenBao : pose sur accord |
+| 3 | « Durée dans la politique (Recommandé) » | seuil `vex_age_max_jours` ; horodatage le plus ancien des énoncés passés ; horodatage postérieur au scan refusé ; règle `kev_without_vex` réécrite |
+| 4 | « OpenVEX (Recommandé) » | ADR 0004 à rédiger : OpenVEX, CSAF non évalué, spec en brouillon v0.2 |
+| 5 | « Toi, à la main (Recommandé) » | `not_affected` passé seulement avec `justification` **et** `impact_statement` ; témoins étiquetés, aucune KEV réelle visée |
+| 5, `fixed` | « Retirer fixed (Recommandé) » | seuil `vex_statuts_acceptes` réduit à `not_affected` |
+
+**Suite** : la tranche 3 est préparée à sec (étape 5 : prédicat, règles, tests `opa`, mesures avant et après sur l'image et le deb, cas « autre sujet »). Sa pose (étape 6), la clé neuve et toute écriture dans le vrai Zot attendent chacune un accord. G7 interdit toute écriture dans le vrai Zot avant le 29/11.
