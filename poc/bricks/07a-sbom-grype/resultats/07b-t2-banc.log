@@ -1,0 +1,44 @@
+début : 2026-11-21T16:51:10Z
+outils : grype 0.104.1, syft 1.38.0, cosign v3.1.4, zot v2.1.22
+base : v6.1.10, construite 2026-11-04T06:20:59Z, sha256:ed08c5e32eb299eb… ; script 07b-t2-vex.py 281f3fe9b4190309…
+SBOM fusionné de G0 : dba7b4fe0da6643e… ; image : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## 1. grype --vex hors réseau
+OK   ref : 5/0
+     GHSA-mqqf-5wvp-8fh8 Medium pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+     GHSA-j6qf-3m9c-vwj3 Medium pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+     GO-2026-5774 Unknown pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+     GO-2026-5775 Unknown pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+     GO-2026-5777 Unknown pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+OK   syft-exact : 4/1
+     forme : {"id":"GHSA-mqqf-5wvp-8fh8","purl":"pkg:golang/github.com/go-chi/chi@v5.2.3#v5","appliedIgnoreRules":[{"namespace":"vex","vex-status":"not_affected"}]}
+OK   hermeto : 5/0
+OK   v5-nu : 5/0
+OK   sans-subpath : 4/1
+OK   sans-version : 4/1
+OK   autre-version : 5/0
+KO   autre-digest : 4/1, prédit 5/0
+KO   autre-nom : 4/1, prédit 5/0
+OK   autre-vuln : 5/0
+KO   alias-cve : 5/0, prédit 4/1
+OK   affected : 5/0
+OK   under-investigation : 5/0
+OK   fixed : 4/1
+     sbom-fusionne, code 1 : ERROR unable to find matches against VEX sources: unable to find matches against VEX documents: checking matches against VEX data: reading product identifiers from context: source type not supported f
+OK   sbom-fusionne : refus
+     sbom-composant, code 1 : ERROR failed to catalog: unable to decode sbom: sbom format not recognized
+OK   sbom-composant : refus
+     SBOM syft-json : source {"type":"image","version":"sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"}
+OK   syft-json : 4/1
+OK   csaf : 5/0
+## 2. Zot et clé jetables (espace de noms réseau vide, 127.0.0.1:15001)
+referrers de l'image sous builds/vex/sample-app : 
+     énoncé relu : predicateType https://openvex.dev/ns/v0.2.0, sujet 3a7ca1b14dbf…
+KO   image poussée : , attendu sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   zot-cle : verify-attestation, code 0, 1 énoncé
+OK   zot-cle-etrangere : refus (code 1), 0 énoncé
+     Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+OK   prédicat relu égal au VEX signé (jq -S)
+OK   zot-vex-relu : 4/1
+OK   base et image de G0 inchangées (cc628a1ae6bb06c8)
+fin : 2026-11-21T16:51:28Z
+## bilan : 4 écart(s) aux prédictions

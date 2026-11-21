@@ -278,3 +278,64 @@ Aucune écriture dans Zot, ni dans Grafana, ni dans le cluster.
 Le second passage n'a donc rien réémis pour le même referrer : c'est un premier constat, sur la VM, de « une fois par scan ». L'émission sur un **nouveau** scan reste à voir après ceux du 22/11, vers 09:32 et 11:17 UTC, avec un second `verif`.
 
 **Reste ouvert** : le branchement au rejeu (`rejeu.sh`), et un tableau de bord, qui serait un accord à part.
+
+## Tranche 2 : VEX à blanc (note de 2026-11-21T17:00:50Z ; rien n'est réécrit au-dessus)
+
+**Lancée sans accord à part** (étape 4, « lancement prévu »). Heures mesurées : de 16:45:51 UTC (premier relevé) à 16:59:33 UTC (fin du dernier passage), pour 3 h estimées.
+
+**Rien de partagé** :
+- Grype hors réseau (`unshare -rn`).
+- Zot et clés jetables sur 127.0.0.1, dans un espace de noms réseau vide, comme G6. Aucun appel au vrai Zot, à cause de G7.
+- La base de G0 et l'image archivée sont lues sans modification : l'empreinte de leur listage est la même avant et après.
+
+**Pièces** : le banc [`07b-t2-banc.sh`](07b-t2-banc.sh) (`4164579e17cc15e7…`), le générateur de témoins [`07b-t2-vex.py`](07b-t2-vex.py) (`19ea69ba02cae54a…`), et les [prédictions](07b-t2-predictions.md), écrites avant chaque passage.
+
+**Portée** :
+- La base de G0 (v6.1.10, construite le 04/11) donne 5 correspondances sur chi, pas les 6 du scan signé actuel.
+- Le VEX porte sur `GHSA-mqqf-5wvp-8fh8`, une Medium hors KEV. La règle KEV de la porte n'est donc pas exercée.
+- Tous les VEX sont des **témoins** : aucune analyse d'atteignabilité ne les fonde (choix 5).
+
+**Cinq passages**, journaux jamais réécrits :
+
+| Journal | OK | KO | Ce qui change |
+|---|---|---|---|
+| [1](07b-t2-banc.log) | 20 | 4 | Premier passage. |
+| [2](07b-t2-banc-2.log) | 26 | 3 | Cinq cas ajoutés pour situer le produit et l'alias. |
+| [3](07b-t2-banc-3.log) | 27 | 3 | Défaut du banc corrigé. |
+| [4](07b-t2-banc-4.log) | 36 | 6 | Douze cas ajoutés après relecture du conseiller. |
+| [5](07b-t2-banc-5.log) | 36 | 6 | Mêmes verdicts ; seule la coupe des messages d'erreur change. |
+
+**Défauts du banc, dits franchement** :
+- Au journal 1, le KO « image poussée » vient du banc. Le digest était écrit par un chemin relatif, et un fichier `image-poussee` s'est retrouvé à la racine du dépôt. Il contenait le bon digest, et il a été effacé.
+- Aux journaux 1 et 2, le verdict « OK sbom-composant : refus » **ne mesure rien**. Le SBOM d'entrée portait le même nom que la sortie de Grype, et la redirection le vidait avant sa lecture.
+
+**Constats, d'après le journal 5.** Les 6 écarts aux prédictions sont les cas `autre-digest`, `autre-nom`, `alias-cve` et les trois `reg-autre-*`.
+
+1. **L'entrée du scanner de la plateforme refuse `--vex`.** C'est le SBOM CycloneDX fusionné, passé par `grype sbom:` : Grype répond `source type not supported for VEX`, et le refus est le même quand `metadata.component` est de type `application`. `--vex` est accepté :
+   - quand ce composant est de type `container`, car le SBOM est alors lu comme une source `image` ;
+   - sur un SBOM syft-json d'image ;
+   - sur l'image elle-même.
+2. **Le produit n'est vérifié que si la source porte un `repoDigest`.**
+   - Avec une source `registry:` (le Zot jetable), le bon produit s'applique : `pkg:oci/…` avec sous-composant, ou la référence nue sans sous-composant. Un autre digest, un autre nom ou un texte quelconque ne s'appliquent pas.
+   - Sur l'`oci-dir`, qui n'a ni tag ni `repoDigest`, et sur le SBOM à composant `container`, **n'importe quel produit s'applique**, même `n-importe-quoi` sans sous-composant.
+   - Sur ces deux sources, la portée d'un VEX ne tient donc qu'à la vulnérabilité et au sous-composant.
+3. **Le sous-composant (PURL)** :
+   - la version est comparée : un VEX écrit pour `v5.2.2` ne s'applique pas ;
+   - le subpath `#v5` est ignoré ;
+   - un PURL sans version vaut pour toutes les versions.
+   - **Le test négatif de la 07a est confirmé dans les deux sens.** La forme d'Hermeto (`…/chi/v5@v5.2.3?type=module`) ne s'applique pas à un SBOM de Syft. La forme de Syft ne s'applique pas à un SBOM où chi porte le PURL d'Hermeto. Chaque forme s'applique à elle-même.
+   - Dans le sens inverse, seul le PURL a été changé, pas le nom du composant : seul le PURL d'Hermeto est archivé, pas son nom.
+4. **La vulnérabilité** doit être l'identifiant que Grype affiche, ou figurer dans `aliases`. `CVE-2025-69725` seul en `name` ne s'applique pas à la correspondance `GHSA-mqqf-5wvp-8fh8`.
+5. **Les statuts** :
+   - `not_affected` et `fixed` passent dans `ignoredMatches`, avec `appliedIgnoreRules: [{namespace: "vex", vex-status: …}]` ; c'est la forme que lira la tranche 3 ;
+   - `affected` et `under_investigation` restent dans `matches`.
+6. **CSAF 2.0** : le format est reconnu, alors qu'un document `{}` est refusé (« unable to detect document format »). Mais le document est sans effet : 5 correspondances, 0 ignorée. La cause n'est pas établie.
+7. **Zot et clé jetables.** Le VEX est signé en `attest-blob` (type `https://openvex.dev/ns/v0.2.0`), puis publié en referrer sous `builds/vex/sample-app`.
+   - `verify-attestation` avec la clé jetable le relit : 1 énoncé, prédicat égal au VEX signé (`jq -S`). Rendu à Grype, il donne 4/1.
+   - Avec une clé étrangère : refus, 0 énoncé.
+   - Ce banc n'a pas de cas « autre sujet ». Le lien entre le sujet et l'image n'y est pas mesuré ; il l'est pour le scan, par le même mécanisme de cosign, dans `g6-autre-digest`.
+
+**Ce que ces constats éclairent, sans recommandation.** Les choix 1 à 5 restent au propriétaire et ne sont pas posés ici.
+- **Choix 1** : en l'état, le scanner ne peut pas appliquer de VEX. Il le pourrait si son SBOM portait un composant `container`, mais le produit n'y serait pas vérifié.
+- **Choix 4** : le CSAF est sans effet dans cette version.
+- **Choix 5** : un VEX doit être écrit sur le PURL et l'identifiant que Grype affiche.
