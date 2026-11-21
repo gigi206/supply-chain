@@ -612,3 +612,30 @@ La limite de la note de 20:08:57Z est mesurée au banc jetable. Les prédictions
 - Signature par `hashivault://vex` et délai du scan quotidien : non mesurés.
 
 **Choix ouvert, au propriétaire** : retrait dans le registre (voie mesurée ici), ou règle de remplacement dans le filtre de `scan-outil`. La seconde voie n'est ni écrite ni mesurée ; elle modifierait le patch et la règle du choix 3 (âge compté depuis le document le plus ancien).
+
+## Lectures avant le choix du renouvellement (note de 2026-11-21T20:28:00Z ; à sec, rien posé ; demandées par le conseiller)
+
+**1. Rétention du vrai Zot pour `builds/vex/**`.** Source : le fichier versionné `08-trust-plane/stockage/zot.json`. La configuration déployée sur sc-stockage n'est pas relue.
+- Aucune règle ne nomme `builds/vex`. Le dépôt relève donc de la règle fourre-tout `**` : `deleteReferrers: false`, `deleteUntagged: false`.
+- Paramètres globaux : `gc: true`, `gcDelay` 1 h, `retention.delay` 336 h.
+- Selon la lecture du code faite pour G7 (`g7-predictions.md`, « déduit, pas mesuré ») : un manifeste porteur d'un `subject` n'est retiré que par `deleteReferrers`. Un VEX publié resterait donc indéfiniment.
+- Ce n'est pas mesuré : aucun VEX n'existe dans le vrai Zot, et le banc tourne avec `gc: false`.
+- Contrôle d'accès versionné : `builds/**` donne `read`, `create` et `update`, et l'accès anonyme en lecture. Aucune action `delete` n'est donnée, à personne, dans aucun dépôt.
+- Le retrait dans le vrai Zot demande donc d'ajouter un droit `delete`. C'est un changement de configuration, sur accord.
+
+**2. Ce qui reste consultable d'un VEX retiré** (lu sur le prédicat du cas `complet` du passage 6 et dans `entrees-scan.py` du patch) :
+- Prédicat :
+  - `vex.documents` garde l'empreinte sha256 et l'horodatage de chaque document ;
+  - chaque entrée écartée garde le statut et l'horodatage.
+  - Ni la justification, ni l'`impact_statement`, ni le document lui-même ne sont gardés.
+- `entrees-scan` (Loki, puis Grafana) : le même champ `vex`, soit le statut et l'horodatage.
+- Les prédicats de `builds/scan/**` sont retirés après 336 h (`deleteReferrers: true`).
+- Le document signé dans `builds/vex/**` est donc la seule copie de la justification. Le retrait l'efface, et il ne reste que l'empreinte. Où l'auteur garde ses VEX avant de les signer n'est pas décidé : la pièce 8 n'a pas de script.
+
+**3. Spec OpenVEX v0.2.0** (lue le 21/11 sur `raw.githubusercontent.com/openvex/spec/v0.2.0/OPENVEX-SPEC.md`) :
+- `version` doit être incrémenté à chaque changement du document.
+- La spec ne dit pas qu'un document de même `@id` et de version supérieure remplace le précédent. Son propre exemple de mise à jour change même d'`@id`.
+- La spec présente les VEX comme une suite d'énoncés : chacun remplace et complète les précédents.
+- L'horodatage d'un énoncé l'emporte sur celui du document.
+- Aucune règle explicite n'est donnée au consommateur.
+- **Conséquence** : une règle de remplacement ne peut pas s'appuyer sur `@id` et `version`. Elle devrait porter sur le couple vulnérabilité et produit, et garder l'énoncé le plus récent. La règle du choix 3 compte l'âge depuis le document le plus ancien ; la spec, elle, décrit des énoncés qui remplacent les précédents.
