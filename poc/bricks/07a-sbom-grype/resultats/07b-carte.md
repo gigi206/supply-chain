@@ -537,3 +537,23 @@ Réponses du propriétaire, le 21/11/2026, aux questions posées après la note 
    - j'ai redaté les en-têtes des deux premières sections des [prédictions](07b-t3-predictions.md) (heures approchées remplacées par les heures mesurées) après les passages 1 et 2, sans toucher aux prédictions elles-mêmes.
 
 **Valeur de `vex_age_max_jours`, sans recommandation** : aucune cadence propre aux VEX n'est écrite dans le dépôt. Une seule cadence de revue y figure : le ré-audit **trimestriel** des projets (`docs/01`, B13). Il porte sur la santé des projets, pas sur les VEX.
+
+## Recommandation pour `vex_age_max_jours`, demandée par le propriétaire (note de 2026-11-21T20:08:57Z ; rien n'est modifié dans la politique)
+
+Le propriétaire a demandé ce que recommande le conseiller. **Recommandation : 30 jours.** C'est un jugement, sans mesure qui le fonde. Le choix reste au propriétaire ; `policy-scan.yaml` garde `null` jusqu'à sa réponse.
+
+- **Pourquoi pas 90 jours, la cadence de B13** : l'exemption porte sur une KEV, c'est-à-dire une faille exploitée. Elle repose sur une analyse écrite à la main, que personne d'autre ne relit. B13 concerne la santé des projets, pas les VEX.
+- **Pourquoi pas 7 ou 14 jours** : un seul propriétaire renouvelle les VEX, à la main et sans script (pièce 8). Une fois l'échéance passée, la porte refuse. Une durée courte rend donc la porte bloquante à la première absence.
+- **Portée réelle** : le VEX est attesté sur un digest, et toute reconstruction exige donc un VEX neuf. La durée ne limite que les digests qui restent longtemps en service.
+- **Ce qui ne fonde pas ce chiffre** : les tests de `scan_test.rego` utilisent 30, mais c'était une valeur d'essai.
+- **Alternatives** :
+  - 90 jours, si l'on préfère la seule cadence écrite dans le dépôt et moins de re-signatures ;
+  - 14 jours, si l'on accepte la corvée pour suivre de près les délais de remédiation des KEV.
+- **Ancrage externe non retenu** : la BOD 22-01 de la CISA donnait deux semaines de remédiation pour les CVE attribuées à partir de 2021. Sa page indique qu'elle est révoquée et remplacée par la BOD 26-04, que je n'ai pas lue. Cet argument n'entre pas dans la recommandation.
+
+**Limite trouvée en vérifiant, à lever avant la pièce 8 : on ne renouvelle pas un VEX en en ajoutant un.**
+- La porte compte l'âge à partir de l'horodatage le plus ancien des documents retenus. C'est mesuré : dans le cas `deux` du banc, avec un document du 01/11 et un du 20/11, l'entrée porte 2026-11-01T00:00:00Z.
+- Un VEX est un référent OCI publié par `cosign attest-blob`. La commande `cosign attest` v3.1.4 n'a pas d'option de remplacement (aucune ligne `replace` dans son aide).
+- Pour renouveler, il faut donc retirer l'ancien référent de `builds/vex/<nom>`. Aucun script ni essai ne le fait aujourd'hui. Sans ce chemin, toute durée finit en refus à l'échéance.
+
+**Délai de prise en compte** : un VEX renouvelé n'entre dans le prédicat qu'au scan quotidien suivant. Il faut donc re-signer au moins un jour avant l'échéance.
