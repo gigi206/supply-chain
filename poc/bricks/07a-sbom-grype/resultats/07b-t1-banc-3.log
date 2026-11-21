@@ -1,0 +1,79 @@
+début : 2026-11-21T16:37:18Z
+entrees-scan.py : 01e733fdb4341fb5…, python3 de l'hôte : Python 3.13.12
+## 1. attendus (jq)
+app : 6 entrées, Medium 4, Unknown 2, KEV 0, avec correctif 6, scannedAt 1795253515
+deb : 67 entrées, Critical 3, High 33, Low 1, Medium 28, Unknown 2, KEV 0, avec correctif 67, scannedAt 1795259816
+g6 : 13 entrées, Critical 2, High 1, Medium 7, Unknown 3, KEV 2, avec correctif 13, scannedAt 1793817734
+## 2. banc local, faux Zot
+-- C1 deux témoins réels, état vide : rc 0, 73 lignes d'entrée, résumé ['entrées builds/scan/sample-app=6@2026-11-21T09:31:55.87940934Z (liste émise) builds/scan/sample-app-deb=67@2026-11-21T11:16:56.316245544Z (liste émise)']
+OK   C1 rc 0
+OK   C1 séries de sample-app = jq
+OK   C1 séries de sample-app-deb = jq
+OK   C1 grille fixe : 7 gravités par dépôt, zéros écrits
+OK   C1 liste émise : app + deb lignes
+OK   C1 dépôt et scannedAt dans chaque ligne
+OK   C1 aucune ligne sans id ni package
+OK   C1 « scanne » de chaque ligne = scannedAt de jq du dépôt (clé de jointure)
+OK   C1 résumé : deux listes émises
+-- C2 même état, second passage : rc 0, 0 lignes d'entrée, résumé ['entrées builds/scan/sample-app=6@2026-11-21T09:31:55.87940934Z builds/scan/sample-app-deb=67@2026-11-21T11:16:56.316245544Z']
+OK   C2 rc 0, aucune ligne d'entrée, comptes identiques
+OK   C2 résumé sans « liste émise »
+-- C3 témoin KEV de G6 : rc 0, 13 lignes d'entrée, résumé ['entrées temoin/g6=13@2026-11-04T19:42:14.182252936+01:00 (liste émise)']
+OK   C3 séries = jq (KEV comprises)
+OK   C3 lignes KEV dans la liste = jq
+OK   C3 « scanne » = jq malgré le décalage +01:00
+-- C4 prédicat sans entrée : rc 0, 0 lignes d'entrée, résumé ['entrées temoin/vide=0@2026-11-21T09:31:55.87940934Z (liste émise)']
+OK   C4 zéros écrits partout, scannedAt présent
+-- C5 un dépôt sans referrer de scan : rc 0, 0 lignes d'entrée, résumé ['entrées temoin/sans=aucun builds/scan/sample-app=6@2026-11-21T09:31:55.87940934Z builds/scan/sample-app-deb=67@2026-11-21T11:16:56.316245544Z']
+OK   C5 rc 0, séries du dépôt absentes, les autres écrites
+OK   C5 résumé « aucun »
+-- C6 lecture impossible (referrers absents du faux Zot) : rc 1 (URLError), 0 lignes d'entrée, résumé []
+OK   C6 rc 1, fichier inchangé, aucune ligne d'entrée
+-- C7 sujet de l'énoncé différent : rc 2, 0 lignes d'entrée, résumé []
+OK   C7 rc 2, fichier inchangé, aucune ligne d'entrée
+-- C8 payloadType faux : rc 2, 0 lignes d'entrée, résumé []
+OK   C8 rc 2, fichier inchangé, aucune ligne d'entrée
+-- C9 empreinte du bundle fausse : rc 2, 0 lignes d'entrée, résumé []
+OK   C9 rc 2, fichier inchangé, aucune ligne d'entrée
+-- C10 couche d'un autre type : rc 2, 0 lignes d'entrée, résumé []
+OK   C10 rc 2, fichier inchangé, aucune ligne d'entrée
+-- C11 predicateType de l'énoncé différent : rc 2, 0 lignes d'entrée, résumé []
+OK   C11 rc 2, fichier inchangé, aucune ligne d'entrée
+-- C12 gravité hors grille : rc 0, 6 lignes d'entrée, résumé ['entrées t/h=6@2026-11-21T09:31:55.87940934Z (liste émise)']
+OK   C12 rangée dans « autre », total conservé
+## bilan du banc : 0 KO
+## 3. passage réel, lecture anonyme de Zot depuis l'hôte
+énoncé relu (app) : scannedAt 2026-11-21T09:31:55.87940934Z, identique au témoin archivé : oui
+énoncé relu (deb) : scannedAt 2026-11-21T11:16:56.316245544Z, identique au témoin archivé : oui
+passage 1 : rc 0, 73 lignes d'entrée, 20 séries, résumé : entrées builds/scan/sample-app=6@2026-11-21T09:31:55.87940934Z (liste émise) builds/scan/sample-app-deb=67@2026-11-21T11:16:56.316245544Z (liste émise)
+OK   passage 1 : lignes d'entrée = jq (app + deb)
+passage 2 : rc 0, 0 lignes d'entrée, 20 séries, résumé : entrées builds/scan/sample-app=6@2026-11-21T09:31:55.87940934Z builds/scan/sample-app-deb=67@2026-11-21T11:16:56.316245544Z
+OK   passage 2 : aucune ligne d'entrée, comptes identiques
+OK   séries de builds/scan/sample-app = jq
+OK   séries de builds/scan/sample-app-deb = jq
+OK   jointure builds/scan/sample-app : une seule valeur de « scanne » dans la liste, égale à la série
+OK   jointure builds/scan/sample-app-deb : une seule valeur de « scanne » dans la liste, égale à la série
+séries écrites :
+  scan_entrees{depot="builds/scan/sample-app",gravite="Critical"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="High"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="Medium"} 4
+  scan_entrees{depot="builds/scan/sample-app",gravite="Low"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="Negligible"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="Unknown"} 2
+  scan_entrees{depot="builds/scan/sample-app",gravite="autre"} 0
+  scan_entrees_kev{depot="builds/scan/sample-app"} 0
+  scan_entrees_avec_correctif{depot="builds/scan/sample-app"} 6
+  scan_entrees_scanne_timestamp_seconds{depot="builds/scan/sample-app"} 1795253515
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Critical"} 3
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="High"} 33
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Medium"} 28
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Low"} 1
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Negligible"} 0
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Unknown"} 2
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="autre"} 0
+  scan_entrees_kev{depot="builds/scan/sample-app-deb"} 0
+  scan_entrees_avec_correctif{depot="builds/scan/sample-app-deb"} 67
+  scan_entrees_scanne_timestamp_seconds{depot="builds/scan/sample-app-deb"} 1795259816
+volume émis vers le journal : passage 1, 20719 octets (73 lignes d'entrée et le résumé) ; passage 2, 125 octets
+fin : 2026-11-21T16:37:18Z
+## bilan : 0 KO

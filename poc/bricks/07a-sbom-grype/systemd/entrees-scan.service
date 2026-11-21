@@ -1,5 +1,5 @@
-# Brique 07b, tranche 1 : entrées du scan signé en métriques (comptes) et dans le journal (liste, vers Loki). Préparé à sec, NON POSÉ.
-# Seule sortie : Zot, en lecture anonyme. Écritures : entrees-scan.prom et l'état (dernier referrer émis). @SCANS@ : « dépôt@digest »
+# Brique 07b, tranche 1 : entrées du scan signé en métriques (comptes) et dans le journal (liste, vers Loki). Décision « Les deux » du 21/11/2026.
+# Seule sortie : Zot, en lecture anonyme. Écritures : entrees-scan.prom et l'état (dernier referrer émis). Le marqueur de SCANS : « dépôt@digest »
 # séparés par des espaces, rendus à la pose comme @DIGEST@ de fraicheur-scan. Signature non vérifiée ici (cosign absent), la porte fait foi.
 [Unit]
 Description=Entrées du scan signé en métriques et dans le journal (brique 07b, tranche 1)

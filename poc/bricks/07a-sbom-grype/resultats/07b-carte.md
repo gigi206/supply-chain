@@ -205,3 +205,49 @@ sample-app porte `pkg:golang/stdlib@1.26.10`, avec une seule entrée. L'écart e
 **Écart de méthode, dit franchement.** Les deux passages en échec du banc, décrits dans la note précédente, ont été écrits sous le même nom, `07b-t1-banc.log`, avant le premier commit. Seul le troisième passage y est archivé, et les deux premiers sont perdus. Le complément est journalisé sous un autre nom.
 
 **Pour la pose, pas maintenant.** `SCANS` contient des `/`. Le `sed "s/@DIGEST@/…/"` de `g8_metriques`, copié tel quel, casserait. Il faudra changer de délimiteur, ou passer par un drop-in comme S6a.
+
+## Choix 6 tranché, et pose préparée à sec (note de 2026-11-21T16:37:53Z ; rien n'est réécrit au-dessus)
+
+**Décision du propriétaire**, le 21/11/2026, verbatim : « Les 2 ». L'option choisie disait : comptes dans Prometheus, liste dans Loki une fois par scan, et un panneau couvrant 7 jours.
+
+**Écart avec l'option et avec l'étape 3 du tableau : pas de tableau de bord.** Le PoC n'en a aucun. `journalisation.sh` crée le dossier de provisionnement des tableaux de bord, mais le dépôt n'y dépose rien (seul `provisioning/datasources` existe). Toute la consultation passe aujourd'hui par l'exploration de Grafana, comme pour G8.
+- La pose s'en tient à ce chemin : les requêtes de la note précédente, sur une fenêtre de 7 jours.
+- Un tableau provisionné changerait la configuration de Grafana : ce serait un accord à part.
+
+**Script de pose** [`entrees-scan.sh`](../entrees-scan.sh) (`595b9b664c9ba387…`), calqué sur `etape_g8_metriques`. Quatre étapes :
+- **`sec`** : lecture seule, sans accord.
+  - `SCANS` est relu dans l'unité `fraicheur-scan` en place, avec le drop-in de S6a : les mêmes artefacts.
+  - Le rendu se fait par une substitution de bash, pas par `sed` (`SCANS` contient des `/`).
+- **`pose`** : accord du propriétaire.
+- **`verif`** : lecture seule, par l'auditeur.
+  - Dans Prometheus, les séries sont comparées à jq sur les énoncés relus en anonyme.
+  - Dans Loki, seuls des comptes sont lus : les lignes de chaque dépôt qui portent le `scanne` de son dernier scan.
+- **`retrait`** : accord du propriétaire.
+
+Les écritures sur la VM s'arrêtent d'elles-mêmes sur un échec : `set -e` ne joue plus sous `etape || rc`. Il n'y a aucun « rm -rf », seulement `find <chemin écrit> -delete`.
+
+**`sec`, deux passages** :
+- [premier journal](07b-t1-pose-sec.log) : **son « bilan : tenu » est faux**. Il porte un KO, 2 lignes rendues au lieu d'une, car le commentaire de l'unité contenait lui aussi le marqueur. Et `etape_sec` ne renvoyait pas son KO. Les deux défauts sont corrigés.
+- [second journal](07b-t1-pose-sec-2.log) : tenu.
+  - Une seule ligne rendue, avec les digests `3a7ca1b14dbf…` et `60f25f5c3fb5…`.
+  - Sur sc-stockage : Python 3.13.5, et ni compte, ni `.prom`, ni timer `entrees-scan`.
+
+**Forme des réponses de `verif`, éprouvée sur des séries existantes** (auditeur) :
+- Les cadres de Prometheus portent `__name__` et `depot`, avec une époque en entier (`scan_dernier_referrer_timestamp_seconds`).
+- Côté Loki, `| json` sur une ligne qui n'est pas du JSON la garde, avec `__error__="JSONParserErr"` : 4 lignes de `fraicheur-scan` en 1 h. Sans étiquette `depot`, une telle ligne est écartée par le filtre de `verif`.
+- Si le compte Loki revient à 0 après la pose, il faudra d'abord vérifier la comparaison de `scanne`, qui se fait en chaîne.
+
+**En-têtes** : « non posé » est retiré du script et de l'unité, qui seront installés tels quels. Le script passe à `01e733fdb4341fb5…`. Le banc est relancé sous un troisième nom ([journal 3](07b-t1-banc-3.log)) : **30 contrôles, 0 KO**.
+
+**Rejeu.** `08-trust-plane/rejeu.sh` appelle `g8_metriques` et `s6a.sh fraicheur`, mais pas `entrees-scan`. Si M5b recrée sc-stockage, `entrees-scan` disparaît. La phrase de la note précédente, « perdu au rejeu, il fait réémettre la liste », supposait un branchement qui n'existe pas. Le brancher, après « 06 (S6a, fraicheur) » puisque `SCANS` y est lu, est un changement du rejeu, à proposer après la pose.
+
+**« Une fois par scan » n'est prouvé sur la VM qu'au prochain scan**, le 22/11 vers 09:32 UTC pour sample-app et 11:17 UTC pour le deb, d'après les derniers referrers. Un second `verif` est prévu après, sans tâche planifiée.
+
+**Pose, sur accord à part.** Elle comprend :
+- sudo sur sc-stockage ;
+- la création du compte système `entrees-scan` ;
+- le script, l'unité rendue et le fichier `entrees-scan.prom` vide ;
+- un timer toutes les 15 min, et un premier passage lancé tout de suite ;
+- une lecture sudo du journal de l'unité : le résumé, et le nombre de lignes d'entrée (les lignes elles-mêmes ne sont pas archivées).
+
+Aucune écriture dans Zot, ni dans Grafana, ni dans le cluster.

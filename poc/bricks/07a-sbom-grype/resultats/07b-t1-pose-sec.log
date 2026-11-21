@@ -1,0 +1,20 @@
+début : 2026-11-21T16:34:19Z, étape sec, entrees-scan.py bdac36b853f845b3…
+SCANS de fraicheur-scan en place : builds/scan/sample-app@sha256:3a7ca1b14dbf… builds/scan/sample-app-deb@sha256:60f25f5c3fb5…
+OK   deux artefacts dans SCANS : 2
+## unité rendue, écart au modèle
+2c2
+< # Seule sortie : Zot, en lecture anonyme. Écritures : entrees-scan.prom et l'état (dernier referrer émis). @SCANS@ : « dépôt@digest »
+---
+> # Seule sortie : Zot, en lecture anonyme. Écritures : entrees-scan.prom et l'état (dernier referrer émis). builds/scan/sample-app@sha256:3a7ca1b14dbf… builds/scan/sample-app-deb@sha256:60f25f5c3fb5… : « dépôt@digest »
+12c12
+< Environment=REG=192.168.161.13:5000 CA=/etc/base-grype/ca-poc.crt "SCANS=@SCANS@"
+---
+> Environment=REG=192.168.161.13:5000 CA=/etc/base-grype/ca-poc.crt "SCANS=builds/scan/sample-app@sha256:3a7ca1b14dbf… builds/scan/sample-app-deb@sha256:60f25f5c3fb5…"
+KO   lignes changées par le rendu : 2 (attendu : 1)
+OK   plus aucun @SCANS@ : 0
+## état sur sc-stockage (lecture, sans sudo)
+Python 3.13.5
+compte entrees-scan : absent
+entrees-scan.prom : absent
+entrees-scan.timer : not-found
+fin : 2026-11-21T16:34:19Z, bilan : tenu

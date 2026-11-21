@@ -1,5 +1,5 @@
 #!/usr/bin/python3 -I
-"""Brique 07b, tranche 1 : entrées trouvées par le scan signé, vues dans Grafana. Préparé à sec le 21/11/2026, non posé.
+"""Brique 07b, tranche 1 : entrées trouvées par le scan signé, vues dans Grafana (décision « Les deux » du 21/11/2026).
 Lancé par entrees-scan.service sur sc-stockage, même motif que fraicheur-scan (07a, G8) : lectures anonymes de Zot, par HTTPS,
 bibliothèque standard seulement.
   Pour chaque « dépôt@digest » de SCANS, le referrer de scan le plus récent (org.opencontainers.image.created, comme
