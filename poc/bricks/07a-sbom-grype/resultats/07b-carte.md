@@ -657,3 +657,20 @@ La limite de la note de 20:08:57Z est mesurée au banc jetable. Les prédictions
      C'est plus qu'un tri des documents.
 
 **Heures mesurées de ce segment** : de 20:17:00 UTC (premier `date -u`, avant toute lecture) à 20:30:14 UTC. Cela couvre la correction du banc, les prédictions (20:19:46), le passage 6 (20:20:24 à 20:23:42), les notes de 20:24:29 et 20:28:00, la lecture de la spec et ces vérifications. Le total des heures de la 07b reste loin de 2× l'estimation de 10 h.
+
+## Choix du renouvellement : remplacement dans `scan-outil` (note de 2026-11-21T20:39:16Z ; rien n'est encore écrit dans le patch)
+
+**Choix du propriétaire, verbatim : « Remplacement ».** C'est la recommandation du conseiller, un jugement sans mesure.
+
+- **Principe retenu** : pour un même couple vulnérabilité et produit, l'énoncé le plus récent l'emporte, quel que soit son statut. Le filtre de recevabilité ne s'applique qu'ensuite. Une rétractation (`affected` plus récent) fait donc tomber l'exemption.
+- Le registre reste en ajout seul, et les anciens VEX restent comme trace. Aucun droit de suppression n'est demandé dans le vrai Zot.
+- Le retrait mesuré au passage 6 n'est pas retenu. Sa mesure reste archivée.
+- **Coût annoncé** : patch régénéré (nouvelle empreinte), un passage 7 du banc avec prédictions écrites avant, et la règle du choix 3 amendée dans l'ADR 0004.
+- **Conception** : elle fait l'objet de la note suivante, écrite avant le code.
+
+## Heures de la 07b : somme par enveloppes (note de 2026-11-21T20:42:26Z ; corrige la dernière phrase de la note de 20:30:14Z)
+
+La phrase « Le total des heures de la 07b reste loin de 2× l'estimation de 10 h » a été écrite sans somme. La voici, par enveloppes. Ce sont des bornes hautes : du travail sur d'autres briques s'y intercale.
+- **20/11** : de 21:28:28 UTC (additif de la 07a qui précède la demande) à 22:18:44 UTC (correction de la carte, commit `8f5fc886`), soit au plus 0 h 50 min.
+- **21/11** : de 16:17:27 UTC (dernier commit avant la tranche 1, `7eb75cb0`, briques 05 et 19b) à 20:42:26 UTC, soit au plus 4 h 24 min.
+- **Total** : au plus 5 h 15 min, pour 10 h estimées et un seuil de décision à 20 h. Le seuil n'est pas atteint.
