@@ -45,7 +45,12 @@ Plateforme de **supply-chain logicielle** auto-hébergée. Elle vise à :
 - Forgejo Actions, Woodpecker, Jenkins : L2 ;
 - Witness : L2.
 
-La plateforme s'assemble donc autour de Tekton + Chains, avec des briques complémentaires. Ce « Konflux allégé » était l'hypothèse par défaut ; les bancs de l'[ADR 0000](docs/adr/0000-assembler-ou-adopter.md) l'ont confirmée (score du candidat contre celui de la référence) :
+La plateforme s'assemble donc autour de Tekton + Chains, avec des briques complémentaires. Elle a le même noyau que Konflux (Tekton, Chains, Hermeto, Conforma), mais elle est assemblée autrement et couvre plus :
+- deb (Konflux n'a que le rpm, en adoption), Forgejo, Dependency-Track, rebuild indépendant, OpenPGP, observabilité ;
+- d'autres choix : BuildKit, Grype, Zot, Triggers ;
+- ni l'opérateur, ni l'interface, ni le cadre multi-tenant de Konflux.
+
+L'ADR 0000 partait de l'hypothèse d'un « Konflux allégé ». Ses bancs ont confirmé l'assemblage (score du candidat contre celui de la référence) :
 - **Konflux** : éliminé, 17 contre 57 ;
 - **OBS** : non adopté, 42 contre 55, seuil à 65 ;
 - **Nix** : en veille, 74 contre 91, alors que la règle exige +15 ;
@@ -69,7 +74,7 @@ Détails, alternatives et sources : [`docs/00-etude-existant.md`](docs/00-etude-
 | [`docs/adr/`](docs/adr/README.md) | Décisions d'architecture (ADR 0000 : grilles et résultats des bancs ; ADR 0001 provisoire) |
 | [`tools/health/`](tools/health/) | Script de ré-audit trimestriel (`scorecard.sh`, `projects.tsv`) |
 
-## Briques principales (« Konflux allégé »)
+## Briques principales
 
 | Domaine | Brique |
 |---|---|
