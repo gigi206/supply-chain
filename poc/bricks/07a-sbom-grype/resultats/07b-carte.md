@@ -778,3 +778,50 @@ Changements, tous dans `b/` :
 C'est plus strict que le couple vulnérabilité et produit pour les rétractations, qui comptent quel que soit le produit et le paquet. C'est équivalent pour les exemptions.
 
 **Heures mesurées** : de 21:04:20 UTC (note précédente) à 21:11:13 UTC.
+
+## Pièce 8 : `signer-vex.sh` écrit et mesuré (note de 2026-11-21T21:32:16Z ; passage 11, rien posé ; complète le point 6 de la note de 17:51:53Z)
+
+**Le point 6 de 17:51:53Z** (« aucun script ni essai de signature ») **ne vaut plus pour le script** ; il vaut toujours pour `hashivault://vex`.
+
+**Ce que fait le script** (`politique/07b-t3.patch`, fichier neuf `signer-vex.sh`, patch `992af0d0b7073b57…` ; le précédent `02ac8e835fe74fbe…` plus ce fichier, aucune ligne existante changée) :
+- `verifier <document> <hôte/dépôt@sha256:…> <scan.json>` : juge sans signer ni toucher au registre ;
+- `signer` : juge, signe (`cosign attest-blob`, `hashivault://vex` par défaut), vérifie la signature par la clé publique, rejuge le contenu signé, puis publie le referrer dans `builds/vex/<nom>` comme `publier` de `scanner.sh`.
+- Le jugement est celui du scanner : `scan-outil vex` sur l'énoncé in-toto qui sera signé. Le script n'a pas de seconde implémentation des règles de recevabilité.
+- Il refuse **avant signature** :
+  - un statut `fixed` ;
+  - un document qui mêle `not_affected` et d'autres statuts ;
+  - une exemption que `scan-outil vex` rejette ;
+  - une rétractation hors `affected` et `under_investigation` ;
+  - un énoncé sans nom de vulnérabilité ou sans produit qui cite le digest ;
+  - un horodatage illisible ou postérieur à l'heure de la commande ;
+  - un sous-composant qui n'est pas exactement le PURL d'une entrée du prédicat de scan fourni.
+
+**Ordre réel** : le script et les cas du banc ont été écrits avant la prédiction. Une sonde hors banc a passé les 12 témoins de `verifier` (21:25:03 UTC), puis a été effacée. La prédiction (section « Ajout avant le onzième passage », 21:27:36 UTC) le dit : en partie A, elle recopie la sonde ; en partie B, elle est neuve.
+
+**Contrôles du patch refaits** : `git apply --check`, `ec opa test` 39/39, témoins de G6 et `yq` à 30.
+
+**Passage 11** ([journal](07b-t3-banc-11.log)) : 137 OK, 0 KO, de 21:27:44 à 21:31:10 UTC. C'est la prédiction.
+- **A, `verifier`** (13 cas) :
+  - acceptés : ok, rétractation, énoncé large ;
+  - refusés, chacun avec son motif : daté du futur (document ou énoncé), sous-composant absent, `fixed`, mêlé, sans `impact_statement`, autre digest, sans vulnérabilité, sans horodatage ;
+  - image sans digest : code 2.
+- **B, `signer`**, Zot jetable, clé locale :
+  - daté du futur : refusé, 0 référent ;
+  - clé étrangère : refusé avant publication, 0 référent ;
+  - clé `vex` : publié ; `scanner.sh vex` le retient (1,1,0), 4/1, et l'empreinte citée par le prédicat est celle que le script annonce ;
+  - rétractation datée de l'instant : publiée, 2 référents ; 5/0 et 1 sans exemption.
+- Les 111 contrôles du passage 10 sont inchangés.
+
+**Limites, dites en clair** :
+- Non mesurés :
+  - `hashivault://vex` (pièce 2) ;
+  - le compte d'écriture de `builds/vex/**` (pièce 4) ;
+  - un VEX réel (aucune KEV réelle).
+- Le prédicat de scan fourni au script n'est pas vérifié par lui (signature, digest). Une liste de PURL fausse fausse le contrôle des sous-composants.
+- « Futur » se juge sur l'horloge de la machine qui signe. Un VEX publié sans le script n'est pas filtré : la porte reste le seul contrôle.
+- Le script ne garde pas de copie du document. Où l'auteur garde ses VEX reste non décidé (note de 2026-11-21T20:28:00Z).
+- `git apply` et `patch` ne portent pas le bit d'exécution : appeler `bash signer-vex.sh`, ou poser le bit à la pose.
+
+**Heures mesurées** :
+- Ce segment : de 21:19:40 UTC (programmation de la lecture G7) à 21:32:16 UTC.
+- Somme des enveloppes de la 07b, prolongée jusqu'à cette note : au plus 6 h 06 pour 10 h estimées.

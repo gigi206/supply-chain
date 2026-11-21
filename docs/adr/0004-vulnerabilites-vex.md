@@ -25,6 +25,7 @@ Format **OpenVEX** (spécification v0.2.0). Le VEX est une attestation in-toto s
 - **Amendement du 2026-11-21** : Grype ne le dit toujours pas. Le prédicat retrouve désormais les énoncés qui nomment chaque entrée (identifiant et alias, des deux côtés). Un vieux document sur une autre vulnérabilité ne tire plus l'échéance des autres (mesuré : cas `partiel`).
 - **Remplacement, limites** :
   - Un document daté dans le futur gagne tous les classements jusqu'à sa date. La porte le refuse : c'est un blocage fermé. La réparation est le retrait de l'ancien référent, sur accord.
+  - **Pièce 8 (2026-11-21T21:32:16Z, passage 11)** : `signer-vex.sh` refuse avant signature un document daté du futur, selon l'horloge de la machine qui signe. Un VEX publié sans le script n'est pas filtré : la porte reste le seul contrôle. Mesuré avec une clé locale ; `hashivault://vex` ne l'est pas.
   - Un document illisible (type, sujet, contexte, horodatage) ne remplace rien.
   - Grype reçoit toujours tous les documents recevables, même remplacés : c'est le prédicat qui décide.
   - Le compteur `ecarteesSansExemption` n'a pas de série dans Grafana.

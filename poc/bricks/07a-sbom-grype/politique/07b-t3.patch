@@ -938,6 +938,123 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/
    jetons) jetons ;;
    attester) attester ;;
    publier) publier ;;
+diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbom-grype/signer-vex.sh
+--- a/poc/bricks/07a-sbom-grype/signer-vex.sh	1970-01-01 01:00:00.000000000 +0100
++++ b/poc/bricks/07a-sbom-grype/signer-vex.sh	2026-11-21 22:24:27.932214861 +0100
+@@ -0,0 +1,113 @@
++#!/usr/bin/env bash
++# Brique 07b, tranche 3, pièce 8 de la pose : juger, signer et publier un VEX (OpenVEX v0.2.0) écrit à la main par le propriétaire,
++# en referrer du digest dans builds/vex/<nom>, comme publier de scanner.sh. Écrit à sec le 21/11/2026, non posé : la clé Transit
++# hashivault://vex (pièce 2) et le compte d'écriture de builds/vex/** (pièce 4) n'existent pas encore.
++# Le jugement est celui du scanner : scan-outil vex (le même code que l'image outils-scan) sur l'énoncé in-toto qui sera signé.
++# Refus AVANT signature (code 1, ligne REFUS|… sur la sortie d'erreur) :
++#   - document illisible, @context autre que OpenVEX v0.2.0, aucun énoncé ;
++#   - statut fixed (retiré des statuts acceptés, choix 5) ; document qui mêle not_affected et d'autres statuts ;
++#   - exemption (not_affected) : document que scan-outil vex rejette (justification, impact_statement…) ou énoncé non exemptant ;
++#   - rétractation : statuts affected ou under_investigation seulement ;
++#   - énoncé sans nom de vulnérabilité, ou sans produit dont l'@id cite le digest ;
++#   - horodatage illisible, ou postérieur à l'heure de la commande (un document daté du futur gagne tous les classements, et le
++#     registre est en ajout seul : seul un retrait sur accord le répare) ;
++#   - sous-composant qui n'est pas exactement le PURL d'une entrée du prédicat de scan fourni.
++# Après signature, et avant publication : signature vérifiée par la clé publique, contenu signé (payload DSSE) rejugé de même.
++# Usage : signer-vex.sh verifier|signer <document.json> <hôte/dépôt@sha256:…> <scan.json>
++#   scan.json : prédicat de scan décodé du même digest (vulnerabilities[].package) ; ce script ne vérifie pas sa signature.
++#   signer lit : CLE (hashivault://vex par défaut ; VAULT_ADDR et VAULT_TOKEN à la charge de l'appelant), CLE_PUBLIQUE, CA
++#   (certificat du registre), CONFIG_REGISTRE (fichier d'authentification d'oras) ; SCAN_OUTIL (scan-outil par défaut).
++set -euo pipefail
++export LC_ALL=C
++usage() { echo "usage : signer-vex.sh verifier|signer <document.json> <hôte/dépôt@sha256:…> <scan.json>" >&2; exit 2; }
++[ $# = 4 ] || usage
++MODE=$1 IMAGE=$3
++case $MODE in verifier | signer) ;; *) usage ;; esac
++[ -f "$2" ] && [ -f "$4" ] || { echo "document ou prédicat de scan introuvable" >&2; exit 2; }
++printf '%s' "$IMAGE" | grep -qE '^[^@/]+/[^@]+@sha256:[0-9a-f]{64}$' || { echo "image attendue : hôte/dépôt@sha256:<64 hexadécimaux>" >&2; exit 2; }
++DOC=$(realpath -- "$2") SCAN=$(realpath -- "$4")
++OPENVEX=https://openvex.dev/ns/v0.2.0
++SCAN_OUTIL=${SCAN_OUTIL:-scan-outil}
++hex=${IMAGE##*@sha256:} r=${IMAGE%@sha256:*}
++n=${r#*/} nom=${r##*/}
++depot_vex=${r%%/*}/builds/vex/${n#builds/}
++maintenant=$(date -u +%s)
++heure=$(date -u -d "@$maintenant" +%Y-%m-%dT%H:%M:%SZ)
++w=$(mktemp -d)
++trap 'find "$w" -delete' EXIT
++refus() { echo "REFUS|$1" >&2; exit 1; }
++
++jq -e . "$DOC" > /dev/null 2>&1 || refus "document illisible (JSON)"
++jq -e --arg c "$OPENVEX" '."@context" == $c' "$DOC" > /dev/null || refus "@context autre que $OPENVEX"
++ne=$(jq '.statements | if type == "array" then length else 0 end' "$DOC")
++[ "$ne" -gt 0 ] || refus "aucun énoncé"
++statuts=$(jq -r '[.statements[].status // "-"] | unique | join(",")' "$DOC")
++case ",$statuts," in *,fixed,*) refus "statut fixed : retiré des statuts acceptés (choix 5)" ;; esac
++if jq -e 'any(.statements[]; .status == "not_affected")' "$DOC" > /dev/null; then
++  [ "$statuts" = not_affected ] || refus "not_affected mêlé à d'autres statuts ($statuts) : un document par intention"
++  nature=exemption
++else
++  jq -e 'all(.statements[]; .status == "affected" or .status == "under_investigation")' "$DOC" > /dev/null \
++    || refus "statuts hors not_affected, affected et under_investigation : $statuts"
++  nature=retractation
++fi
++jq -e 'all(.statements[]; [.vulnerability."@id"?, .vulnerability.name?, (.vulnerability.aliases? // [])[]] | map(select(type == "string" and . != "")) | length > 0)' \
++  "$DOC" > /dev/null || refus "énoncé sans nom de vulnérabilité (@id, name ou aliases)"
++jq -e --arg h "$hex" 'all(.statements[]; [(.products // [])[] | (."@id" // "") | contains($h)] | any)' "$DOC" > /dev/null \
++  || refus "énoncé sans produit dont l'@id cite le digest $hex"
++jq -r '[.vulnerabilities[]?.package // empty] | unique | .[]' "$SCAN" > "$w/purls"
++[ -s "$w/purls" ] || refus "prédicat de scan sans entrée (vulnerabilities[].package)"
++absents=$(jq -r --rawfile p "$w/purls" '([.statements[] | (.products // [])[] | (.subcomponents // [])[] | (."@id" // "")] | unique)
++  - ($p | split("\n")) | join(" ")' "$DOC")
++[ -z "$absents" ] || refus "sous-composant absent des entrées du prédicat de scan (égalité exacte) : $absents"
++larges=$(jq --arg h "$hex" '[.statements[] | select(any((.products // [])[]; (."@id" // "" | contains($h)) and ((.subcomponents // []) | length == 0)))] | length' "$DOC")
++
++mkdir "$w/vex"
++juger() { # énoncé in-toto : verdict de scan-outil vex, sinon refus
++  "$SCAN_OUTIL" vex "$hex" "$w/vex" "$1" > "$w/verdict.json" || refus "scan-outil vex en erreur"
++  [ "$(jq '.enonces // [] | length' "$w/verdict.json")" = "$ne" ] \
++    || refus "énoncés non classables par scan-outil vex (horodatage illisible ou nom absent) : $(jq '.enonces // [] | length' "$w/verdict.json")/$ne"
++  if [ "$nature" = exemption ]; then
++    [ "$(jq '.retenus | length' "$w/verdict.json")" = 1 ] || refus "rejeté par scan-outil vex : $(jq -r '.rejetes[0].raison // "?"' "$w/verdict.json")"
++    jq -e 'all(.enonces[]; .exemptant)' "$w/verdict.json" > /dev/null || refus "énoncé non exemptant selon scan-outil vex"
++  fi
++  local h
++  for h in $(jq -r '.enonces[].horodatage' "$w/verdict.json"); do
++    [ "$(date -u -d "$h" +%s)" -le "$maintenant" ] || refus "horodatage $h postérieur à l'heure de la commande ($heure)"
++  done
++}
++jq -n --arg n "$nom" --arg h "$hex" --arg t "$OPENVEX" --slurpfile d "$DOC" \
++  '{_type: "https://in-toto.io/Statement/v1", subject: [{name: $n, digest: {sha256: $h}}], predicateType: $t, predicate: $d[0]}' > "$w/enonce.json"
++juger "$w/enonce.json"
++echo "JUGE|$nature, $ne énoncé(s) dont $larges large(s), document sha256 $(sha256sum < "$DOC" | cut -c1-64), sujet sha256:$hex, VEX vers $depot_vex, $heure"
++[ "$MODE" = signer ] || exit 0
++
++CLE=${CLE:-hashivault://vex}
++case $CLE in hashivault://*) ;; *) CLE=$(realpath -- "$CLE") ;; esac
++CLE_PUBLIQUE=$(realpath -- "${CLE_PUBLIQUE:?CLE_PUBLIQUE : clé publique VEX}")
++CA=$(realpath -- "${CA:?CA : certificat du registre}")
++CONFIG_REGISTRE=$(realpath -- "${CONFIG_REGISTRE:?CONFIG_REGISTRE : authentification d oras pour builds/vex}")
++cosign signing-config create --out "$w/vide.json" > "$w/cosign.log" 2>&1 || { cat "$w/cosign.log" >&2; exit 1; }
++cosign attest-blob --key "$CLE" --signing-config "$w/vide.json" --predicate "$DOC" --type "$OPENVEX" --bundle "$w/bundle.json" \
++  --hash "$hex" --yes "$nom" >> "$w/cosign.log" 2>&1 || { cat "$w/cosign.log" >&2; refus "signature en échec"; }
++cosign verify-blob-attestation --bundle "$w/bundle.json" --new-bundle-format --key "$CLE_PUBLIQUE" --insecure-ignore-tlog --type "$OPENVEX" \
++  --digest "$hex" --digestAlg sha256 >> "$w/cosign.log" 2>&1 || refus "signature non vérifiée par la clé publique : rien n'est publié"
++jq -r .dsseEnvelope.payload "$w/bundle.json" | base64 -d > "$w/signe.json"
++juger "$w/signe.json"
++echo "SIGNE|bundle sha256 $(sha256sum < "$w/bundle.json" | cut -c1-64), énoncé signé sha256 $(sha256sum < "$w/signe.json" | cut -c1-64)"
++
++ecrire() { oras "$@" --ca-file "$CA" --registry-config "$CONFIG_REGISTRE"; }
++oras manifest fetch --ca-file "$CA" --descriptor "$IMAGE" > "$w/sujet.json"
++printf '{}' > "$w/config-vide.json"
++ecrire blob push "$depot_vex" "$w/config-vide.json" > /dev/null
++ecrire blob push "$depot_vex" "$w/bundle.json" > /dev/null
++TY=application/vnd.dev.sigstore.bundle.v0.3+json
++printf '{"schemaVersion":2,"mediaType":"application/vnd.oci.image.manifest.v1+json","artifactType":"%s",%s,%s,%s,%s}' "$TY" \
++  '"config":{"mediaType":"application/vnd.oci.empty.v1+json","digest":"sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","size":2}' \
++  "\"layers\":[{\"mediaType\":\"$TY\",\"digest\":\"sha256:$(sha256sum < "$w/bundle.json" | cut -c1-64)\",\"size\":$(wc -c < "$w/bundle.json")}]" \
++  "\"subject\":$(cat "$w/sujet.json")" \
++  "\"annotations\":{\"dev.sigstore.bundle.content\":\"dsse-envelope\",\"dev.sigstore.bundle.predicateType\":\"$OPENVEX\",\"org.opencontainers.image.created\":\"$heure\"}" \
++  > "$w/manifeste.json"
++d=sha256:$(sha256sum < "$w/manifeste.json" | cut -c1-64)
++ecrire manifest push "$depot_vex@$d" "$w/manifeste.json" > /dev/null
++echo "PUBLIE|$depot_vex@$d, referrer de sha256:$hex ; compte au scan quotidien suivant"
 diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py
 --- a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-21 17:36:55.344531612 +0100
 +++ b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-21 18:34:16.141026413 +0100

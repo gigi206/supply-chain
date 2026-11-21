@@ -6,6 +6,7 @@
 #   B. Zot et clés jetables dans un espace de noms réseau vide (127.0.0.1, comme G6 et la tranche 2) : scanner.sh du patch, mode
 #      analyser complet (image puis deb) et mode vex suivi des mêmes commandes qu'analyser, VEX témoins signés et publiés en referrers ;
 #      renouvellement d'un VEX par retrait de l'ancien référent (oras manifest delete, passage 6) ; remplacement (passages 7 à 10) ;
+#      pièce 8 (passage 11) : signer-vex.sh verifier en A (sans registre), signer en B (clé locale, jamais hashivault://vex) ;
 #   C. porte : ec validate input de l'hôte sur les prédicats produits en B, entrée écartée passée en KEV par jq ;
 #   D. entrees-scan.py du patch : fonctions comptes et entrees appelées sur les prédicats produits en B (pas de Zot, pas de VM).
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
@@ -244,6 +245,32 @@ if [ "${1:-}" = ns ]; then
   publier_vex vex "$T/v-partiel-recent.json" "$Y" builds/partiel/sample-app "$Y" builds/vex/partiel/sample-app
   vex_seul partiel builds/partiel/sample-app "$Y"; juger_vex partiel 2,2,0 3/2
   [ -s "$T/cas/partiel/scan.json" ] && attendu "partiel : horodatages des entrées" "$(horo partiel)" "GHSA-j6qf-3m9c-vwj3 2026-10-01T00:00:00Z,$VULN $H1"
+  # 18-21 (passage 11) : pièce 8, signer-vex.sh signer avec la clé locale vex (pas hashivault://vex) ; prédicat de scan du cas complet
+  echo "## B. signer-vex.sh signer (pièce 8), clé locale"
+  pousser "$M0/image" builds/signe/sample-app > /dev/null
+  referents_signe() { { curl -fsS --cacert zot.crt "https://$REG/v2/builds/vex/signe/sample-app/referrers/$Y" 2>/dev/null || echo '{}'; } | jq '.manifests // [] | length'; }
+  signer_vex() { # clé document cas : code de signer-vex.sh signer et référents après
+    local c=0
+    env COSIGN_PASSWORD='' SCAN_OUTIL="$OUT" CLE="$T/cle/$1.key" CLE_PUBLIQUE="$T/cle/vex.pub" CA="$T/zot.crt" CONFIG_REGISTRE="$T/docker/config.json" \
+      bash "$B/signer-vex.sh" signer "$2" "$REG/builds/signe/sample-app@$Y" "$T/cas/complet/scan.json" > "$T/signer-$3.log" 2>&1 || c=$?
+    echo "code $c ; référents $(referents_signe)"
+  }
+  vex doc "$T/v-signe-futur.json" "$(date -ud tomorrow +%FT%TZ)" "not_affected;$JUSTIF;$IMPACT;-;$VULN;pkg:oci/sample-app@$Y;$SYFT"
+  attendu "signer, daté du futur : refus avant signature" "$(signer_vex vex "$T/v-signe-futur.json" futur)" "code 1 ; référents 0"
+  attendu "signer, daté du futur : motif" "$(grep -c '^REFUS|horodatage' "$T/signer-futur.log")" 1
+  ok_vex "$T/v-signe-ok.json"
+  attendu "signer, clé étrangère : refus avant publication" "$(signer_vex etrangere "$T/v-signe-ok.json" etrangere)" "code 1 ; référents 0"
+  attendu "signer, clé étrangère : motif" "$(grep -c '^REFUS|signature non vérifiée' "$T/signer-etrangere.log")" 1
+  attendu "signer, clé vex : publié" "$(signer_vex vex "$T/v-signe-ok.json" ok)" "code 0 ; référents 1"
+  grep -E '^(JUGE|SIGNE|PUBLIE)\|' "$T/signer-ok.log" | cut -c1-200 | sed "s|$T|<banc>|g; s/^/     /" || true
+  vex_seul signe-ok builds/signe/sample-app "$Y"; juger_vex signe-ok 1,1,0 4/1
+  [ -s "$T/cas/signe-ok/scan.json" ] && attendu "signe-ok : entrée écartée" "$(horo signe-ok)" "$VULN $H1"
+  [ -s "$T/cas/signe-ok/scan.json" ] && attendu "signe-ok : documents du prédicat = énoncé signé annoncé par SIGNE" \
+    "$(jq -r '[.vex.documents[].sha256] | join(",")' "$T/cas/signe-ok/scan.json")" "$(sed -n 's/^SIGNE|.*énoncé signé sha256 \([0-9a-f]*\).*/\1/p' "$T/signer-ok.log")"
+  vex doc "$T/v-signe-retract.json" "$(date -u +%FT%TZ)" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
+  attendu "signer, rétractation : publiée" "$(signer_vex vex "$T/v-signe-retract.json" retract)" "code 0 ; référents 2"
+  vex_seul signe-retract builds/signe/sample-app "$Y"; juger_vex signe-retract 2,1,1 5/0
+  [ -s "$T/cas/signe-retract/scan.json" ] && attendu "signe-retract : écartées sans exemption" "$(jq -r .vex.ecarteesSansExemption "$T/cas/signe-retract/scan.json")" 1
   echo "$KO" > "$T/ko-ns"
   exit 0
 fi
@@ -377,6 +404,42 @@ large pa pb-large vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
 deux-paquets pd-deux-paquets - vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
 affected-autre-sous pa pr-autre-sous aucune ; sans exemption 1
 FIN
+
+# passage 11 : pièce 8, signer-vex.sh verifier (jugement avant signature, sans registre) ; prédicat de scan de la mesure 0
+echo "## A. signer-vex.sh verifier (pièce 8), témoins non signés"
+SV=$T/signer; mkdir -p "$SV"
+HF=$(date -ud tomorrow +%FT%TZ); HV=$(date -ud '1 day ago' +%FT%TZ)
+vex doc "$SV/ok.json" "$HV" "not_affected;$S1;-;$E"
+vex doc "$SV/futur.json" "$HF" "not_affected;$S1;-;$E"
+vex doc "$SV/futur-enonce.json" "$HV" "not_affected;$S1;$HF;$E"
+vex doc "$SV/retract.json" "$HV" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
+vex doc "$SV/large.json" "$HV" "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;-"
+vex doc "$SV/absent.json" "$HV" "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;pkg:golang/github.com/go-chi/chi@v5.2.4#v5"
+vex doc "$SV/fixed.json" "$HV" "fixed;-;-;-;$E"
+vex doc "$SV/mixte.json" "$HV" "not_affected;$S1;-;$E" "affected;-;-;-;GHSA-j6qf-3m9c-vwj3;pkg:oci/sample-app@$Y;$SYFT"
+vex doc "$SV/sans-impact.json" "$HV" "not_affected;$JUSTIF;-;-;$E"
+vex doc "$SV/autre-digest.json" "$HV" "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$DEB;$SYFT"
+vex doc "$SV/sans-vuln.json" "$HV" "not_affected;$S1;-;-;pkg:oci/sample-app@$Y;$SYFT"
+vex doc "$SV/sans-horo.json" - "not_affected;$S1;-;$E"
+while read -r c attendu_r; do
+  r=0; SCAN_OUTIL=$OUT bash "$B/signer-vex.sh" verifier "$SV/$c.json" "$REG/builds/x/sample-app@$Y" "$M0/image-avant.scan.json" > "$SV/$c.log" 2>&1 || r=$?
+  attendu "signer-vex verifier : $c" "code $r : $(sed -n 's/^\(JUGE|[a-z]*, [0-9]* énoncé(s) dont [0-9]* large(s)\).*/\1/p; s/^REFUS|\([^:(0-9]*\).*/REFUS|\1/p' "$SV/$c.log" | head -1 | sed 's/ *$//')" "$attendu_r"
+done <<'FIN'
+ok code 0 : JUGE|exemption, 1 énoncé(s) dont 0 large(s)
+futur code 1 : REFUS|horodatage
+futur-enonce code 1 : REFUS|horodatage
+retract code 0 : JUGE|retractation, 1 énoncé(s) dont 0 large(s)
+large code 0 : JUGE|exemption, 1 énoncé(s) dont 1 large(s)
+absent code 1 : REFUS|sous-composant absent des entrées du prédicat de scan
+fixed code 1 : REFUS|statut fixed
+mixte code 1 : REFUS|not_affected mêlé à d'autres statuts
+sans-impact code 1 : REFUS|rejeté par scan-outil vex
+autre-digest code 1 : REFUS|énoncé sans produit dont l'@id cite le digest
+sans-vuln code 1 : REFUS|énoncé sans nom de vulnérabilité
+sans-horo code 1 : REFUS|énoncés non classables par scan-outil vex
+FIN
+r=0; bash "$B/signer-vex.sh" verifier "$SV/ok.json" "$REG/builds/x/sample-app:t3" "$M0/image-avant.scan.json" > /dev/null 2>&1 || r=$?
+attendu "signer-vex verifier : image sans digest" "code $r" "code 2"
 
 # ------------------------------------------------------------------------------------------------------------------------------ B
 openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 1 -subj /CN=zot-jetable -addext subjectAltName=IP:127.0.0.1 \

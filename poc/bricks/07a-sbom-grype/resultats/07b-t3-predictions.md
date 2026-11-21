@@ -225,3 +225,24 @@ Changement du banc : le bloc attendu devient `documents: []`, `rejetes: 0`, `eca
 | A, `predicat` | `pa` puis un `affected` récent sur l'autre sous-composant | aucune exemption, 1 sans exemption | haute |
 | A, `predicat` | `large` et les 8 cas du septième passage | inchangés | haute |
 | B, C, D | tous les cas | inchangés | haute |
+
+## Ajout avant le onzième passage : pièce 8, `signer-vex.sh` (écrit le 2026-11-21, date -u de 21:27:36 UTC dans la même commande que l’écriture, après le code et une sonde)
+
+**Ordre réel, dit en clair** : le script et les cas du banc sont écrits **avant** cette prédiction. Une sonde hors banc a déjà passé les 12 témoins de la partie A en mode `verifier` (2026-11-21T21:25:03Z, binaire `scan-outil` du passage 10, sonde effacée ensuite). Les prédictions de la partie A recopient donc une mesure : ce ne sont pas des prédictions indépendantes. Celles de la partie B sont neuves : le mode `signer` n'a jamais tourné.
+
+Patch `992af0d0b7073b57…` : le précédent (`02ac8e835fe74fbe…`) plus un fichier neuf, `signer-vex.sh`. Aucune ligne existante ne change.
+
+| Partie | Cas | Prédiction | Confiance |
+|---|---|---|---|
+| A, `verifier` | ok, rétractation, énoncé large | code 0 ; exemption, rétractation, exemption avec 1 énoncé large | haute (sonde) |
+| A, `verifier` | daté du futur (document ou énoncé), sous-composant absent, `fixed`, mêlé, sans `impact_statement`, autre digest, sans vulnérabilité, sans horodatage | code 1, chacun avec son motif | haute (sonde) |
+| A, `verifier` | image sans digest | code 2 | haute (sonde) |
+| B, `signer` | daté du futur | code 1, motif horodatage, 0 référent : refus avant signature | haute |
+| B, `signer` | clé étrangère, clé publique `vex` | code 1, motif « signature non vérifiée », 0 référent : refus avant publication | haute |
+| B, `signer` | clé `vex`, document du jour d'avant | code 0, 1 référent ; `scanner.sh vex` le retient (1,1,0), 4/1, horodatage `H1` ; l'empreinte du prédicat égale celle annoncée par `SIGNE` | moyenne : première publication par le script (oras avec `--registry-config`) |
+| B, `signer` | rétractation `affected` datée de l'instant | code 0, 2 référents ; 2,1,1, 5/0, 1 sans exemption | moyenne |
+| B, C, D | les 111 contrôles du passage 10 | inchangés | haute |
+
+**Total prédit** : 137 OK (111 + 13 en A + 13 en B), 0 KO.
+
+**Non mesuré par ce passage** : `hashivault://vex` (pièce 2, sur accord), le compte d'écriture de `builds/vex/**` (pièce 4), et la signature du prédicat de scan fourni au script, que le script ne vérifie pas.
