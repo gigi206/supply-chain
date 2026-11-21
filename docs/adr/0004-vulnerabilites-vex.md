@@ -1,0 +1,36 @@
+# ADR 0004 : vulnérabilités et VEX (OpenVEX ou CSAF)
+
+- **Statut** : **À rédiger**. Seules les décisions du propriétaire du 21/11/2026 (brique 07b, choix 1 à 5) et leurs limites sont écrites. Restent la projection Dependency-Track, le score, les KPI de couverture VEX et la valeur de `vex_age_max_jours`.
+- **Date** : 2026-11-21
+- **Décideurs** : propriétaire du projet
+
+Sources : la [carte de la 07b](../../poc/bricks/07a-sbom-grype/resultats/07b-carte.md) (tranche 2 : mesures de Grype 0.104.1 avec `--vex` ; recommandations relues par le conseiller ; réponses du propriétaire, verbatim) et la tranche 3, préparée à sec et non posée.
+
+## Décision
+
+Format **OpenVEX** (spécification v0.2.0). Le VEX est une attestation in-toto signée, rattachée en referrer au digest de l'artefact dans un dépôt séparé (`builds/vex/<nom>`), comme le scan.
+
+| # | Question | Décision du propriétaire (21/11/2026) |
+|---|---|---|
+| 1 | Qui applique le VEX | **Le scanner** (`grype --vex`). Le prédicat de scan signé porte le résultat : chaque entrée écartée garde ses champs et reçoit `vex` (statut, horodatage) ; le prédicat cite l'empreinte de chaque document passé. |
+| 2 | Quelle clé signe un VEX | **Une clé distincte** de celle du scanner (clé Transit neuve, dont seul le propriétaire a l'usage). |
+| 3 | D'où vient l'échéance | **Une durée dans la politique** (`vex_age_max_jours`), comptée depuis l'horodatage le plus ancien des documents passés ; un horodatage postérieur au scan est refusé. |
+| 4 | Quel format | **OpenVEX** ; CSAF non évalué. |
+| 5 | Qui écrit `not_affected`, sur quelle preuve | **Le propriétaire, à la main**, avec `justification` **et** `impact_statement` ; `fixed` retiré des statuts acceptés. |
+
+## Limites, dites en clair
+
+- **La porte fait confiance au scanner pour le VEX.** Un scanner compromis écrirait `vex` lui-même ou tairait une correspondance. La clé distincte n'y change rien : elle protège seulement contre qui écrit sous `builds/vex/` sans la clé.
+- **Grype ne dit pas quel énoncé a écarté quelle correspondance.** Seul son statut est recopié. L'horodatage retenu est donc le plus ancien des documents passés : quand le plus vieux expire, toutes les exemptions du scan tombent.
+- **Il n'existe pas d'heure de signature de confiance** : la signature se fait sans journal de transparence (signing-config vide, `--insecure-ignore-tlog`). L'horodatage est celui que l'auteur écrit ; la porte refuse seulement qu'il soit postérieur au scan.
+- **Le produit du VEX n'est pas vérifié par Grype sur l'entrée du scanner** (SBOM fusionné à composant `container`, tranche 2, constat 2). La portée vient du sujet de l'attestation : seuls les VEX attestés sur le digest scanné sont passés. Chaque nouveau digest demande donc un nouveau VEX signé.
+- **Délais** : un VEX neuf ne compte qu'au scan suivant (une fois par jour) ; un VEX retiré reste effectif jusqu'au scan suivant.
+- **La spécification OpenVEX est en brouillon (v0.2)** et elle est incohérente sur `not_affected` (`justification` **ou** `impact_statement` dans un tableau, `justification` dans l'autre). Le PoC exige les deux, plus strict que la spécification.
+- **CSAF non évalué** : un seul document témoin, non validé contre le schéma, accepté sans erreur et sans effet, pour une cause non établie. Rien n'est dit de la prise en charge de CSAF par Grype.
+- **Aucun outil d'atteignabilité** n'est évalué dans `docs/04` : un `not_affected` ne repose que sur l'analyse de son auteur.
+
+## Reste ouvert
+
+- Valeur de `vex_age_max_jours` (choix du propriétaire ; la politique de la tranche 3 porte `null`, qui n'exempte aucune KEV).
+- Écart avec Dependency-Track : d'après `docs/00` (ligne 277, non revérifié), il ne lit que le VEX de CycloneDX. La projection est hors de la 07b.
+- Score « vulnérabilités après VEX » et KPI de couverture VEX (`docs/02`).

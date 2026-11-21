@@ -1,0 +1,22 @@
+# mesure 0 : 2026-11-21T17:23:20Z
+grype 0.104.1, syft 1.38.0, go1.24.7
+scan-outil construit depuis outil/main.go sha256 fa268c6920683ed8
+DEB|sample-app_1.0.0-2_amd64.deb, sha256 f66bbeb2aba31e52
+EXTRAIT|3 fichiers dans data.tar
+## image
+artefact seul : 2 PURL versionnées
+OK   image : SBOM après = SBOM avant + metadata.component seul
+image avant : 5 matches, 0 ignorées, source "sbom-file", 5 entrées au prédicat, 0 KEV
+image apres : 5 matches, 0 ignorées, source "image", 5 entrées au prédicat, 0 KEV
+OK   image : prédicats identiques hors scannedAt
+OK   image : couples (id, PURL) identiques (5)
+## deb
+artefact seul : 2 PURL versionnées
+OK   deb : SBOM après = SBOM avant + metadata.component seul
+deb avant : 66 matches, 0 ignorées, source "sbom-file", 66 entrées au prédicat, 0 KEV
+deb apres : 66 matches, 0 ignorées, source "image", 66 entrées au prédicat, 0 KEV
+OK   deb : prédicats identiques hors scannedAt
+OK   deb : couples (id, PURL) identiques (66)
+OK   deb : au moins une correspondance
+OK   base de G0 inchangée (6c64e94fec1492fe)
+# fin : 2026-11-21T17:23:29Z ; 0 KO

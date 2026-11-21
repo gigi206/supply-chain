@@ -1,0 +1,831 @@
+diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-sbom-grype/entrees-scan.sh
+--- a/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-21 17:40:30.762366132 +0100
++++ b/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-21 18:34:16.141193480 +0100
+@@ -113,8 +113,8 @@
+   s=$(scans_en_place)
+   echo "## Prometheus, lu par l'auditeur"
+   # sélecteur sur __name__ : « a or b » écarte les séries de b dont les étiquettes, nom exclu, sont déjà dans a (journal verif 1)
+-  graf prometheus '{__name__=~"scan_entrees|scan_entrees_kev|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds"}' > "$T/p.json"
+-  attendu "séries scan_entrees* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 20
++  graf prometheus '{__name__=~"scan_entrees|scan_entrees_vex|scan_entrees_kev|scan_entrees_kev_vex|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds"}' > "$T/p.json"
++  attendu "séries scan_entrees* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 36
+   for d in $s; do
+     digest=${d#*@}; d=${d%@*}
+     m=$(curl -fsS --cacert "$CA" "https://$REG/v2/$d/referrers/$digest" | jq -r '.manifests
+@@ -124,11 +124,15 @@
+     curl -fsS --cacert "$CA" "https://$REG/v2/$d/blobs/$l" | jq -r '.dsseEnvelope.payload | @base64d' > "$T/e.json"
+     att=$(jq -r --argjson t "$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)" '.predicate.vulnerabilities as $v
+       | (["Critical","High","Medium","Low","Negligible","Unknown","autre"] | map(. as $g | "g=\($g) \($v | map(select(.severity == $g)) | length)")[]),
+-        "kev \($v | map(select(.kev)) | length)", "correctif \($v | map(select((.fixedIn | length) > 0)) | length)", "scanne \($t)"' "$T/e.json")
++        (["Critical","High","Medium","Low","Negligible","Unknown","autre"] | map(. as $g | "vex g=\($g) \($v | map(select(.severity == $g and .vex)) | length)")[]),
++        "kev \($v | map(select(.kev)) | length)", "kev_vex \($v | map(select(.kev and .vex)) | length)",
++        "correctif \($v | map(select((.fixedIn | length) > 0)) | length)", "scanne \($t)"' "$T/e.json")
+     obt=$(jq -r --arg d "$d" '[.results.A.frames[]? | select((.data.values | length) > 1) | select(.schema.fields[1].labels.depot == $d)
+       | {n: .schema.fields[1].labels.__name__, g: (.schema.fields[1].labels.gravite // ""), v: .data.values[1][0]}] as $s
+       | (["Critical","High","Medium","Low","Negligible","Unknown","autre"][] as $g | $s[] | select(.n == "scan_entrees" and .g == $g) | "g=\($g) \(.v)"),
+-        ($s[] | select(.n == "scan_entrees_kev") | "kev \(.v)"), ($s[] | select(.n == "scan_entrees_avec_correctif") | "correctif \(.v)"),
++        (["Critical","High","Medium","Low","Negligible","Unknown","autre"][] as $g | $s[] | select(.n == "scan_entrees_vex" and .g == $g) | "vex g=\($g) \(.v)"),
++        ($s[] | select(.n == "scan_entrees_kev") | "kev \(.v)"), ($s[] | select(.n == "scan_entrees_kev_vex") | "kev_vex \(.v)"),
++        ($s[] | select(.n == "scan_entrees_avec_correctif") | "correctif \(.v)"),
+         ($s[] | select(.n == "scan_entrees_scanne_timestamp_seconds") | "scanne \(.v)")' "$T/p.json")
+     if [ "$att" = "$obt" ]; then ok "$d : séries de Prometheus = jq ($(printf '%s\n' "$att" | grep -v ' 0$' | paste -sd',' | sed 's/,/, /g'))"
+     else echo "KO   $d : séries de Prometheus différentes de jq"; diff <(printf '%s\n' "$att") <(printf '%s\n' "$obt") || true; ko=1; fi
+diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbom-grype/outil/main.go
+--- a/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-04 20:36:57.722552154 +0100
++++ b/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-21 18:39:36.486809931 +0100
+@@ -1,18 +1,25 @@
+ // Brique 07a, G2 (D8) : sbom_merge.py et scan_predicate.py réécrits en Go, sans dépendance, pour l'image d'outils du
+-// scanner (pas de python dans l'image). Même logique, même sortie JSON (comparée aux scripts Python sur les fichiers de G0) :
++// scanner (pas de python dans l'image). Même logique, même sortie JSON (comparée aux scripts Python sur les fichiers de G0) jusqu'à
++// la tranche 3 de la 07b, qui ajoute le composant container, le filtre des VEX et les entrées écartées par un VEX :
+ //
+-//	scan-outil fusion <a.json> <b.json> [libellé-a libellé-b] > fusion.json   (CycloneDX 1.6)
+-//	scan-outil predicat <grype.json> <ref-de-la-base> > scan.json             (https://supply-chain.example/scan/v1)
++//	scan-outil fusion <a.json> <b.json> <libellé-a> <libellé-b> <image@sha256:…> > fusion.json   (CycloneDX 1.6)
++//	scan-outil vex <sha256-du-sujet> <dossier> [énoncé.json…] > vex-retenus.json
++//	scan-outil predicat <grype.json> <ref-de-la-base> <vex-retenus.json> > scan.json          (https://supply-chain.example/scan/v1)
+ package main
+ 
+ import (
+ 	"bytes"
++	"crypto/sha256"
++	"encoding/hex"
+ 	"encoding/json"
+ 	"fmt"
+ 	"net/url"
+ 	"os"
++	"path/filepath"
+ 	"regexp"
+ 	"sort"
++	"strings"
++	"time"
+ )
+ 
+ var purlRe = regexp.MustCompile(`^pkg:([^/]+)/([^@?#]+)@([^?#]+)(?:\?[^#]*)?(?:#(.*))?$`)
+@@ -59,7 +66,24 @@
+ 	Licenses json.RawMessage `json:"licenses"`
+ }
+ 
+-func fusion(chemins, libelles []string) (any, error) {
++var imageRe = regexp.MustCompile(`^(?:[^/]+/)*([^/@:]+)(?::[^/@]*)?@(sha256:[0-9a-f]{64})$`)
++
++// conteneur : metadata.component de type container (07b, mesure 0 : sans --vex, mêmes correspondances que sans composant, image et
++// deb). Sans lui, Grype refuse --vex sur un SBOM CycloneDX (tranche 2, constat 1). Nom : dernier élément du dépôt, comme au banc.
++func conteneur(image string) (map[string]string, error) {
++	m := imageRe.FindStringSubmatch(image)
++	if m == nil {
++		return nil, fmt.Errorf("image attendue sous la forme <dépôt>@sha256:<64 hex> : %q", image)
++	}
++	p := "pkg:oci/" + m[1] + "@" + m[2]
++	return map[string]string{"type": "container", "name": m[1], "version": m[2], "bom-ref": p, "purl": p}, nil
++}
++
++func fusion(chemins, libelles []string, image string) (any, error) {
++	comp, err := conteneur(image)
++	if err != nil {
++		return nil, err
++	}
+ 	var sortie []*composant
+ 	vus := map[cle]*composant{}
+ 	for i, chemin := range chemins {
+@@ -100,23 +124,111 @@
+ 	}
+ 	return map[string]any{
+ 		"bomFormat": "CycloneDX", "specVersion": "1.6", "version": 1,
+-		"metadata":   map[string]any{"tools": map[string]any{"components": []map[string]string{{"type": "application", "name": "sbom_merge"}}}},
++		"metadata": map[string]any{"tools": map[string]any{"components": []map[string]string{{"type": "application", "name": "sbom_merge"}}},
++			"component": comp},
+ 		"components": sortie,
+ 	}, nil
+ }
+ 
++type vexEntree struct {
++	Status    string `json:"status"`
++	Timestamp string `json:"timestamp"`
++}
++
+ type vulnerabilite struct {
+-	ID       string   `json:"id"`
+-	Aliases  []string `json:"aliases"`
+-	Severity string   `json:"severity"`
+-	Kev      bool     `json:"kev"`
+-	KevCves  []string `json:"kevCves"`
+-	Epss     *float64 `json:"epss"`
+-	Package  string   `json:"package"`
+-	FixedIn  []string `json:"fixedIn"`
++	ID       string     `json:"id"`
++	Aliases  []string   `json:"aliases"`
++	Severity string     `json:"severity"`
++	Kev      bool       `json:"kev"`
++	KevCves  []string   `json:"kevCves"`
++	Epss     *float64   `json:"epss"`
++	Package  string     `json:"package"`
++	FixedIn  []string   `json:"fixedIn"`
++	Vex      *vexEntree `json:"vex,omitempty"`
++}
++
++type correspondance struct {
++	Vulnerability struct {
++		ID             string `json:"id"`
++		Severity       string `json:"severity"`
++		KnownExploited []struct {
++			Cve string `json:"cve"`
++		} `json:"knownExploited"`
++		Epss []struct {
++			Epss float64 `json:"epss"`
++		} `json:"epss"`
++		Fix *struct {
++			Versions []string `json:"versions"`
++		} `json:"fix"`
++	} `json:"vulnerability"`
++	Related []struct {
++		ID string `json:"id"`
++	} `json:"relatedVulnerabilities"`
++	Artifact struct {
++		Purl string `json:"purl"`
++	} `json:"artifact"`
++	AppliedIgnoreRules []map[string]any `json:"appliedIgnoreRules"`
++}
++
++func entreeDe(m correspondance) vulnerabilite {
++	v := m.Vulnerability
++	kev := map[string]bool{}
++	for _, k := range v.KnownExploited {
++		kev[k.Cve] = true
++	}
++	alias := map[string]bool{}
++	for _, x := range m.Related {
++		alias[x.ID] = true
++	}
++	delete(alias, v.ID)
++	var epss *float64
++	for _, e := range v.Epss {
++		if epss == nil || e.Epss > *epss {
++			e := e.Epss
++			epss = &e
++		}
++	}
++	sev := v.Severity
++	if sev == "" {
++		sev = "Unknown"
++	}
++	fix := []string{}
++	if v.Fix != nil && len(v.Fix.Versions) > 0 {
++		fix = v.Fix.Versions
++	}
++	return vulnerabilite{ID: v.ID, Aliases: trie(alias), Severity: sev, Kev: len(kev) > 0, KevCves: trie(kev), Epss: epss,
++		Package: m.Artifact.Purl, FixedIn: fix}
++}
++
++// statutVex : statut de la règle d'exclusion de namespace « vex » (Grype 0.104.1 : {"namespace":"vex","vex-status":…}, tranche 2).
++func statutVex(m correspondance) (string, bool) {
++	for _, r := range m.AppliedIgnoreRules {
++		if r["namespace"] == "vex" {
++			s, _ := r["vex-status"].(string)
++			return s, true
++		}
++	}
++	return "", false
++}
++
++type docRetenu struct {
++	Sha256     string `json:"sha256"`
++	Timestamp  string `json:"timestamp"`
++	Statements int    `json:"statements"`
++	Fichier    string `json:"fichier"`
++}
++
++type vexRetenus struct {
++	Retenus []docRetenu         `json:"retenus"`
++	Rejetes []map[string]string `json:"rejetes"`
+ }
+ 
+-func predicat(chemin, refBase string) (any, error) {
++// predicat : correspondances de Grype (matches) et correspondances écartées par un VEX (ignoredMatches dont une règle est de namespace
++// « vex »). Une entrée écartée garde tous ses champs, plus vex : statut donné par Grype et horodatage le plus ancien des documents
++// passés (Grype ne dit pas quel énoncé a écarté quelle correspondance ; choix 3 du 21/11/2026). Une correspondance écartée par une
++// autre règle que « vex » reste une entrée ordinaire : seul un VEX exempte. Si une même clé (id, PURL) est à la fois trouvée et
++// écartée, l'entrée trouvée l'emporte.
++func predicat(chemin, refBase, cheminVex string) (any, error) {
+ 	var r struct {
+ 		Descriptor struct {
+ 			Version   string `json:"version"`
+@@ -128,61 +240,44 @@
+ 				} `json:"status"`
+ 			} `json:"db"`
+ 		} `json:"descriptor"`
+-		Matches []struct {
+-			Vulnerability struct {
+-				ID             string `json:"id"`
+-				Severity       string `json:"severity"`
+-				KnownExploited []struct {
+-					Cve string `json:"cve"`
+-				} `json:"knownExploited"`
+-				Epss []struct {
+-					Epss float64 `json:"epss"`
+-				} `json:"epss"`
+-				Fix *struct {
+-					Versions []string `json:"versions"`
+-				} `json:"fix"`
+-			} `json:"vulnerability"`
+-			Related []struct {
+-				ID string `json:"id"`
+-			} `json:"relatedVulnerabilities"`
+-			Artifact struct {
+-				Purl string `json:"purl"`
+-			} `json:"artifact"`
+-		} `json:"matches"`
++		Matches        []correspondance `json:"matches"`
++		IgnoredMatches []correspondance `json:"ignoredMatches"`
+ 	}
+ 	if err := lire(chemin, &r); err != nil {
+ 		return nil, err
+ 	}
++	var vr vexRetenus
++	if err := lire(cheminVex, &vr); err != nil {
++		return nil, err
++	}
++	plusAncien := ""
++	var tMin time.Time
++	documents := make([]map[string]string, 0, len(vr.Retenus))
++	for _, d := range vr.Retenus {
++		t, err := time.Parse(time.RFC3339Nano, d.Timestamp)
++		if err != nil {
++			return nil, fmt.Errorf("horodatage illisible dans %s : %q", cheminVex, d.Timestamp)
++		}
++		if plusAncien == "" || t.Before(tMin) {
++			tMin, plusAncien = t, t.UTC().Format(time.RFC3339Nano)
++		}
++		documents = append(documents, map[string]string{"sha256": d.Sha256, "timestamp": d.Timestamp})
++	}
+ 	type id struct{ id, purl string }
+ 	vulns := map[id]vulnerabilite{}
+-	for _, m := range r.Matches {
+-		v := m.Vulnerability
+-		kev := map[string]bool{}
+-		for _, k := range v.KnownExploited {
+-			kev[k.Cve] = true
+-		}
+-		alias := map[string]bool{}
+-		for _, x := range m.Related {
+-			alias[x.ID] = true
+-		}
+-		delete(alias, v.ID)
+-		var epss *float64
+-		for _, e := range v.Epss {
+-			if epss == nil || e.Epss > *epss {
+-				e := e.Epss
+-				epss = &e
+-			}
+-		}
+-		sev := v.Severity
+-		if sev == "" {
+-			sev = "Unknown"
+-		}
+-		fix := []string{}
+-		if v.Fix != nil && len(v.Fix.Versions) > 0 {
+-			fix = v.Fix.Versions
++	for _, m := range r.IgnoredMatches {
++		e := entreeDe(m)
++		if s, ok := statutVex(m); ok {
++			if plusAncien == "" {
++				return nil, fmt.Errorf("correspondance %s écartée par un VEX alors qu'aucun document n'est retenu", e.ID)
++			}
++			e.Vex = &vexEntree{Status: s, Timestamp: plusAncien}
+ 		}
+-		vulns[id{v.ID, m.Artifact.Purl}] = vulnerabilite{ID: v.ID, Aliases: trie(alias), Severity: sev, Kev: len(kev) > 0,
+-			KevCves: trie(kev), Epss: epss, Package: m.Artifact.Purl, FixedIn: fix}
++		vulns[id{e.ID, e.Package}] = e
++	}
++	for _, m := range r.Matches {
++		e := entreeDe(m)
++		vulns[id{e.ID, e.Package}] = e
+ 	}
+ 	liste := make([]vulnerabilite, 0, len(vulns))
+ 	for _, v := range vulns {
+@@ -202,9 +297,114 @@
+ 		"vulnerabilities": liste,
+ 		// Paquets malveillants (OSV MAL-) : contrôle de la brique 07b (2c).
+ 		"malicious": []string{},
++		// Documents VEX passés à Grype (empreinte de l'énoncé signé décodé, comme scan-verifier.sh) et nombre de documents écartés.
++		"vex": map[string]any{"documents": documents, "rejetes": len(vr.Rejetes)},
+ 	}, nil
+ }
+ 
++const typeOpenVEX = "https://openvex.dev/ns/v0.2.0"
++
++// Justifications de not_affected listées par la spécification OpenVEX v0.2.0.
++var justifications = map[string]bool{"component_not_present": true, "vulnerable_code_not_present": true,
++	"vulnerable_code_not_in_execute_path": true, "vulnerable_code_cannot_be_controlled_by_adversary": true,
++	"inline_mitigations_already_exist": true}
++
++// lireVex : prédicat OpenVEX d'un énoncé in-toto vérifié par cosign, s'il est recevable ; sinon la raison du rejet. Le document
++// entier est rejeté dès qu'un énoncé ne l'est pas (choix 5 du 21/11/2026) : seul not_affected, avec une justification de la
++// spécification et un impact_statement non vide ; horodatage de l'énoncé, ou à défaut du document, lisible.
++func lireVex(b []byte, sujet string) ([]byte, string, int, string) {
++	var st struct {
++		Type          string `json:"_type"`
++		PredicateType string `json:"predicateType"`
++		Subject       []struct {
++			Digest map[string]string `json:"digest"`
++		} `json:"subject"`
++		Predicate json.RawMessage `json:"predicate"`
++	}
++	if err := json.Unmarshal(b, &st); err != nil {
++		return nil, "", 0, "énoncé illisible"
++	}
++	if st.Type != "https://in-toto.io/Statement/v0.1" && st.Type != "https://in-toto.io/Statement/v1" {
++		return nil, "", 0, "type d'énoncé inattendu : " + st.Type
++	}
++	if st.PredicateType != typeOpenVEX {
++		return nil, "", 0, "type de prédicat inattendu : " + st.PredicateType
++	}
++	vu := false
++	for _, s := range st.Subject {
++		vu = vu || s.Digest["sha256"] == sujet
++	}
++	if !vu {
++		return nil, "", 0, "sujet différent du digest scanné"
++	}
++	var d struct {
++		Context    string `json:"@context"`
++		Timestamp  string `json:"timestamp"`
++		Statements []struct {
++			Status        string `json:"status"`
++			Justification string `json:"justification"`
++			Impact        string `json:"impact_statement"`
++			Timestamp     string `json:"timestamp"`
++		} `json:"statements"`
++	}
++	if err := json.Unmarshal(st.Predicate, &d); err != nil {
++		return nil, "", 0, "prédicat OpenVEX illisible"
++	}
++	if d.Context != typeOpenVEX {
++		return nil, "", 0, "@context inattendu : " + d.Context
++	}
++	if len(d.Statements) == 0 {
++		return nil, "", 0, "aucun énoncé VEX"
++	}
++	var tMin time.Time
++	for i, s := range d.Statements {
++		switch {
++		case s.Status != "not_affected":
++			return nil, "", 0, fmt.Sprintf("énoncé %d : statut « %s », seul not_affected est passé", i, s.Status)
++		case !justifications[s.Justification]:
++			return nil, "", 0, fmt.Sprintf("énoncé %d : justification absente ou hors spécification", i)
++		case strings.TrimSpace(s.Impact) == "":
++			return nil, "", 0, fmt.Sprintf("énoncé %d : impact_statement absent", i)
++		}
++		h := s.Timestamp
++		if h == "" {
++			h = d.Timestamp
++		}
++		t, err := time.Parse(time.RFC3339Nano, h)
++		if err != nil {
++			return nil, "", 0, fmt.Sprintf("énoncé %d : horodatage illisible", i)
++		}
++		if i == 0 || t.Before(tMin) {
++			tMin = t
++		}
++	}
++	return st.Predicate, tMin.UTC().Format(time.RFC3339Nano), len(d.Statements), ""
++}
++
++// vex : documents recevables écrits dans <dossier>/vex-<n>.json (prédicat tel que signé), à passer à grype --vex ; résumé sur la sortie.
++func vex(sujet, dossier string, fichiers []string) (any, error) {
++	res := vexRetenus{Retenus: []docRetenu{}, Rejetes: []map[string]string{}}
++	for i, f := range fichiers {
++		b, err := os.ReadFile(f)
++		if err != nil {
++			return nil, err
++		}
++		s := sha256.Sum256(b)
++		e := hex.EncodeToString(s[:])
++		doc, t, n, raison := lireVex(b, sujet)
++		if raison != "" {
++			res.Rejetes = append(res.Rejetes, map[string]string{"sha256": e, "raison": raison})
++			continue
++		}
++		sortie := filepath.Join(dossier, fmt.Sprintf("vex-%d.json", i))
++		if err := os.WriteFile(sortie, doc, 0o600); err != nil {
++			return nil, err
++		}
++		res.Retenus = append(res.Retenus, docRetenu{Sha256: e, Timestamp: t, Statements: n, Fichier: sortie})
++	}
++	return res, nil
++}
++
+ func trie(e map[string]bool) []string {
+ 	l := make([]string, 0, len(e))
+ 	for k := range e {
+@@ -227,14 +427,14 @@
+ 	var res any
+ 	var err error
+ 	switch {
+-	case len(a) == 3 && a[0] == "fusion":
+-		res, err = fusion(a[1:3], []string{"hermeto", "syft"})
+-	case len(a) == 5 && a[0] == "fusion":
+-		res, err = fusion(a[1:3], a[3:5])
+-	case len(a) == 3 && a[0] == "predicat":
+-		res, err = predicat(a[1], a[2])
++	case len(a) == 6 && a[0] == "fusion":
++		res, err = fusion(a[1:3], a[3:5], a[5])
++	case len(a) >= 3 && a[0] == "vex":
++		res, err = vex(a[1], a[2], a[3:])
++	case len(a) == 4 && a[0] == "predicat":
++		res, err = predicat(a[1], a[2], a[3])
+ 	default:
+-		fmt.Fprintln(os.Stderr, "usage : scan-outil fusion <a.json> <b.json> [libellé-a libellé-b] | predicat <grype.json> <ref-de-la-base>")
++		fmt.Fprintln(os.Stderr, "usage : scan-outil fusion <a.json> <b.json> <libellé-a> <libellé-b> <image@sha256:…> | vex <sha256> <dossier> [énoncé…] | predicat <grype.json> <ref-de-la-base> <vex-retenus.json>")
+ 		os.Exit(2)
+ 	}
+ 	if err != nil {
+diff --color -ruN a/poc/bricks/07a-sbom-grype/plateforme.sh b/poc/bricks/07a-sbom-grype/plateforme.sh
+--- a/poc/bricks/07a-sbom-grype/plateforme.sh	2026-11-10 13:41:15.001842381 +0100
++++ b/poc/bricks/07a-sbom-grype/plateforme.sh	2026-11-21 18:28:08.766329724 +0100
+@@ -205,9 +205,12 @@
+   rm -f "$T/audit.log"
+ }
+ 
+-cm_scan() { # ConfigMap scan-config : CA du PoC, script du job, clé publique du scanner (seule source : ne pas en réappliquer une partie)
++cm_scan() { # ConfigMap scan-config : CA du PoC, script du job, clé publique du scanner (seule source : ne pas en réappliquer une partie) ;
++  # clé publique VEX (07b, choix 2) dès qu'elle a été prise : sans elle, scanner.sh scanne sans VEX et le journal le dit
++  local vex=()
++  [ ! -s "$R/vex-cle-publique.pem" ] || vex=(--from-file=vex.pub="$R/vex-cle-publique.pem")
+   kubectl create configmap scan-config -n scan --from-file=ca-poc.crt="$P/ca-poc.crt" --from-file=scanner.sh="$here/politique/scanner.sh" \
+-    --from-file=scanner.pub="$R/scanner-cle-publique.pem" --dry-run=client -o yaml | kubectl apply --server-side -f -
++    --from-file=scanner.pub="$R/scanner-cle-publique.pem" "${vex[@]}" --dry-run=client -o yaml | kubectl apply --server-side -f -
+ }
+ 
+ rendre_scan() { # nom : politique/scan-job.yaml rendu sur l'image
+@@ -965,15 +968,20 @@
+ "malicious": is_array(object.get(p, "malicious", null)),
+ "scanner.db.built": _date(object.get(p, ["scanner", "db", "built"], "")),
+ "kev": _kev_lisibles(p),
++"vex": _vex_lisibles(p),
++_vex_lisible(v) if not "vex" in object.keys(v)
++is_string(v.vex.status)
++_date(v.vex.timestamp)
+ not ok
+ not _age_admis(age)
+ age >= 0 - _derive
+ age <= _seuil("scan_age_max_jours") * _jour
+ not _ecart_admis(ecart)
+ v.kev == true
+-not _vex_valide(v)
++not _vex_valide(s, v)
+ v.vex.status in _seuil("vex_statuts_acceptes")
+-time.parse_rfc3339_ns(v.vex.expires) > time.now_ns()
++t <= s.t + _derive
++time.now_ns() - t <= _seuil("vex_age_max_jours") * _jour
+ FIN
+   [ "$k" = 0 ] || { echo "KO   $k condition(s) non couverte(s)" >&2; exit 1; }
+ }
+@@ -1046,10 +1054,16 @@
+   echo "## contre-épreuves du jugement, ec de l'image de la porte, entrée modifiée après la lecture (la signature n'est plus en jeu : rôle de G6)"
+   entree_modifiee '.statements[0].predicate.vulnerabilities[0].kev = true'
+   juger_entree "KEV" 1 scan.kev_without_vex
+-  entree_modifiee '.statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", expires: "2020-01-01T00:00:00Z"}}'
++  entree_modifiee '.statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", timestamp: "2020-01-01T00:00:00Z"}}'
+   juger_entree "VEX expiré" 1 scan.kev_without_vex
++  entree_modifiee '.statements[0].predicate as $p | .statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", timestamp: $p.scannedAt}}'
++  juger_entree "VEX valide (daté du scan)" 0 ""
++  entree_modifiee '.statements[0].predicate as $p | .statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "fixed", timestamp: $p.scannedAt}}'
++  juger_entree "VEX fixed (choix 5)" 1 scan.kev_without_vex
++  entree_modifiee '.statements[0].predicate as $p | .statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", timestamp: ($p.scannedAt | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601 + 86400 | todateiso8601)}}'
++  juger_entree "VEX postérieur au scan" 1 scan.kev_without_vex
+   entree_modifiee '.statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", expires: "2099-01-01T00:00:00Z"}}'
+-  juger_entree "VEX valide" 0 ""
++  juger_entree "VEX à l'ancienne forme (expires)" 1 scan.forme,scan.kev_without_vex
+   entree_modifiee '.statements[0].predicate.malicious = ["MAL-2026-1"]'
+   juger_entree "MAL-" 1 scan.malicious
+   entree_modifiee '.statements[0].predicate.scannedAt = "2026-10-01T00:00:00Z" | .statements[0].predicate.scanner.db.built = "2026-09-30T00:00:00Z"'
+@@ -1155,12 +1169,14 @@
+   # Prédicats du scan réel de G4 et du cas log4j de G0, passé par scan-outil : mêmes champs, dates du passage
+   propre() { jq --arg n "$n" --arg b "$b" '.scannedAt = $n | .scanner.db.built = $b' "$R/g4-scan-predicat.json"; }
+   kev() { jq --arg n "$n" --arg b "$b" '.scannedAt = $n | .scanner.db.built = $b' "$R/g6-predicat-kev.json"; }
+-  vex() { kev | jq --arg s "$1" --arg e "$2" '.vulnerabilities |= map(if .kev then . + {vex: {status: $s, expires: $e}} else . end)'; }
++  vex() { kev | jq --arg s "$1" --arg e "$2" '.vulnerabilities |= map(if .kev then . + {vex: {status: $s, timestamp: $e}} else . end)'; }
+   dater() { jq --arg n "$(date -ud "$1" +%FT%TZ)" --arg b "$(date -ud "$2" +%FT%TZ)" '.scannedAt = $n | .scanner.db.built = $b'; }
+   propre > "$j/propre.json"; kev > "$j/kev.json"
+   propre | jq '.malicious = ["MAL-2026-0001"]' > "$j/mal.json"
+-  vex not_affected "$(date -ud '1 day ago' +%FT%TZ)" > "$j/vex-expire.json"
+-  vex not_affected "$(date -ud '30 days' +%FT%TZ)" > "$j/vex-valide.json"
++  a=$(sed -n 's/^ *vex_age_max_jours: *\([0-9][0-9]*\) *\(#.*\)\{0,1\}$/\1/p' "$here/politique/porte/policy-scan.yaml")
++  [ -n "$a" ] || { echo "KO   vex_age_max_jours non fixé dans policy-scan.yaml (choix du propriétaire)" >&2; exit 1; }
++  vex not_affected "$(date -ud "$((a + 1)) days ago" +%FT%TZ)" > "$j/vex-expire.json"
++  vex not_affected "$(date -ud '1 day ago' +%FT%TZ)" > "$j/vex-valide.json"
+   propre | dater '8 days ago' '8 days ago 1 hour ago' > "$j/vieux.json"
+   propre | dater '1 hour' 'now' > "$j/futur.json"
+   propre | dater 'now' '4 days ago' > "$j/base-vieille.json"
+diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml b/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml
+--- a/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml	2026-11-04 21:56:37.719009291 +0100
++++ b/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml	2026-11-21 18:27:24.048472261 +0100
+@@ -8,9 +8,12 @@
+       # D4 du propriétaire (04/11/2026) : scan de 7 jours au plus, base construite 3 jours au plus avant lui
+       scan_age_max_jours: 7
+       base_age_max_jours: 3
++      # 07b, choix 5 du propriétaire (21/11/2026) : fixed retiré, un fixed écrit à la main exempterait une KEV sans preuve
+       vex_statuts_acceptes:
+         - not_affected
+-        - fixed
++      # 07b, choix 3 (21/11/2026) : durée de validité d'un VEX, en jours, depuis son horodatage. VALEUR À FIXER PAR LE PROPRIÉTAIRE
++      # avant la pose ; null : aucune KEV n'est exemptée (échec fermé, test_seuil_vex_absent_refus)
++      vex_age_max_jours: null
+     config:
+       include:
+         - scan
+diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/scan.rego b/poc/bricks/07a-sbom-grype/politique/porte/scan.rego
+--- a/poc/bricks/07a-sbom-grype/politique/porte/scan.rego	2026-11-04 21:57:22.874167596 +0100
++++ b/poc/bricks/07a-sbom-grype/politique/porte/scan.rego	2026-11-21 18:27:24.048370746 +0100
+@@ -60,6 +60,7 @@
+ 		"malicious": is_array(object.get(p, "malicious", null)),
+ 		"scanner.db.built": _date(object.get(p, ["scanner", "db", "built"], "")),
+ 		"kev": _kev_lisibles(p),
++		"vex": _vex_lisibles(p),
+ 	}
+ 	not ok
+ }
+@@ -74,6 +75,20 @@
+ 	}
+ } else := false
+ 
++# Brique 07b, tranche 3 : vex est facultatif (prédicats signés avant elle) ; présent, il porte un statut et un horodatage lisibles.
++_vex_lisibles(p) := true if {
++	every v in p.vulnerabilities {
++		_vex_lisible(v)
++	}
++} else := false
++
++_vex_lisible(v) if not "vex" in object.keys(v)
++
++_vex_lisible(v) if {
++	is_string(v.vex.status)
++	_date(v.vex.timestamp)
++}
++
+ # METADATA
+ # title: Scan récent
+ # description: >-
+@@ -109,19 +124,26 @@
+ _ecart_admis(ecart) if ecart <= _seuil("base_age_max_jours") * _jour
+ 
+ # METADATA
+-# title: Pas de KEV sans VEX valide (exceptions datées)
++# title: Pas de KEV sans VEX valide (durée de validité dans la politique)
++# description: >-
++#   Brique 07b, choix 3 et 5 du propriétaire (21/11/2026). Le scanner applique les VEX et écrit, pour chaque entrée écartée, le
++#   statut donné par Grype et l'horodatage le plus ancien des documents passés. Un VEX vaut vex_age_max_jours à partir de cet
++#   horodatage ; un horodatage postérieur au scan, au-delà de l'écart d'horloge toléré, est refusé (pas de validité prolongée en
++#   datant dans le futur). Seuls les statuts de vex_statuts_acceptes comptent (not_affected).
+ # custom:
+ #   short_name: kev_without_vex
+ deny contains {"code": "scan.kev_without_vex", "msg": sprintf("KEV sans VEX valide : %s", [v.id])} if {
+ 	some s in _retenus
+ 	some v in s.p.vulnerabilities
+ 	v.kev == true
+-	not _vex_valide(v)
++	not _vex_valide(s, v)
+ }
+ 
+-_vex_valide(v) if {
++_vex_valide(s, v) if {
+ 	v.vex.status in _seuil("vex_statuts_acceptes")
+-	time.parse_rfc3339_ns(v.vex.expires) > time.now_ns()
++	t := time.parse_rfc3339_ns(v.vex.timestamp)
++	t <= s.t + _derive
++	time.now_ns() - t <= _seuil("vex_age_max_jours") * _jour
+ }
+ 
+ # METADATA
+diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/scan_test.rego b/poc/bricks/07a-sbom-grype/politique/porte/scan_test.rego
+--- a/poc/bricks/07a-sbom-grype/politique/porte/scan_test.rego	2026-11-04 22:00:44.425751613 +0100
++++ b/poc/bricks/07a-sbom-grype/politique/porte/scan_test.rego	2026-11-21 18:27:24.048544057 +0100
+@@ -13,7 +13,8 @@
+ 
+ _type := "https://supply-chain.example/scan/v1"
+ 
+-_seuils := {"scan_age_max_jours": 7, "base_age_max_jours": 3, "vex_statuts_acceptes": ["not_affected", "fixed"]}
++# vex_age_max_jours : valeur de test seulement (la politique attend le choix du propriétaire)
++_seuils := {"scan_age_max_jours": 7, "base_age_max_jours": 3, "vex_statuts_acceptes": ["not_affected"], "vex_age_max_jours": 30}
+ 
+ _maintenant := time.parse_rfc3339_ns("2026-11-10T12:00:00Z")
+ 
+@@ -69,25 +70,89 @@
+ 	_codes(_entree([_enonce(_digest, _predicat("2026-11-09T20:40:09Z", "2026-11-09T06:20:59Z", _kev, []))])) == {"scan.kev_without_vex"}
+ }
+ 
+-_kev_vex(statut, expire) := [object.union(_kev[0], {"vex": {"status": statut, "expires": expire}})]
++# 07b, tranche 3 : vex = {status, timestamp}, écrit par le scanner ; scan à 2026-11-09T20:40:09Z, heure simulée 2026-11-10T12:00:00Z,
++# validité de test 30 jours.
++_avec(vulns) := _entree([_enonce(_digest, _predicat("2026-11-09T20:40:09Z", "2026-11-09T06:20:59Z", vulns, []))])
+ 
+-_avec_vex(statut, expire) := _entree([_enonce(_digest, _predicat("2026-11-09T20:40:09Z", "2026-11-09T06:20:59Z", _kev_vex(statut, expire), []))])
++_kev_vex(vex) := [object.union(_kev[0], {"vex": vex})]
++
++_avec_vex(statut, date) := _avec(_kev_vex({"status": statut, "timestamp": date}))
+ 
+ test_vex_valide if {
+-	_codes(_avec_vex("not_affected", "2026-12-01T00:00:00Z")) == set()
++	_codes(_avec_vex("not_affected", "2026-11-01T00:00:00Z")) == set()
++}
++
++test_vex_de_30_jours_admis if {
++	_codes(_avec_vex("not_affected", "2026-10-11T12:00:00Z")) == set()
++}
++
++test_vex_trop_vieux if {
++	_codes(_avec_vex("not_affected", "2026-10-11T11:59:59Z")) == {"scan.kev_without_vex"}
++}
++
++test_vex_ecart_horloge_tolere if {
++	_codes(_avec_vex("not_affected", "2026-11-09T20:45:09Z")) == set()
+ }
+ 
+-test_vex_expire if {
+-	_codes(_avec_vex("not_affected", "2026-11-01T00:00:00Z")) == {"scan.kev_without_vex"}
++test_vex_posterieur_au_scan if {
++	_codes(_avec_vex("not_affected", "2026-11-09T20:45:10Z")) == {"scan.kev_without_vex"}
++}
++
++test_vex_fixed_refuse if {
++	_codes(_avec_vex("fixed", "2026-11-01T00:00:00Z")) == {"scan.kev_without_vex"}
+ }
+ 
+ test_vex_statut_refuse if {
+-	_codes(_avec_vex("under_investigation", "2026-12-01T00:00:00Z")) == {"scan.kev_without_vex"}
++	_codes(_avec_vex("under_investigation", "2026-11-01T00:00:00Z")) == {"scan.kev_without_vex"}
+ }
+ 
+ test_vex_sans_date if {
+-	v := [object.union(_kev[0], {"vex": {"status": "fixed"}})]
+-	_codes(_entree([_enonce(_digest, _predicat("2026-11-09T20:40:09Z", "2026-11-09T06:20:59Z", v, []))])) == {"scan.kev_without_vex"}
++	_codes(_avec(_kev_vex({"status": "not_affected"}))) == {"scan.forme", "scan.kev_without_vex"}
++}
++
++test_vex_date_illisible if {
++	_codes(_avec_vex("not_affected", "hier")) == {"scan.forme", "scan.kev_without_vex"}
++}
++
++test_vex_sans_statut if {
++	_codes(_avec(_kev_vex({"timestamp": "2026-11-01T00:00:00Z"}))) == {"scan.forme", "scan.kev_without_vex"}
++}
++
++test_vex_ancienne_forme_expires_refusee if {
++	_codes(_avec(_kev_vex({"status": "not_affected", "expires": "2099-01-01T00:00:00Z"}))) == {"scan.forme", "scan.kev_without_vex"}
++}
++
++test_vex_illisible_hors_kev if {
++	v := [object.union(_vulns[0], {"vex": {"status": "not_affected", "timestamp": "hier"}})]
++	_codes(_avec(v)) == {"scan.forme"}
++}
++
++test_vex_hors_kev_sans_effet if {
++	v := [object.union(_vulns[0], {"vex": {"status": "not_affected", "timestamp": "2026-11-01T00:00:00Z"}})]
++	_codes(_avec(v)) == set()
++}
++
++test_bloc_vex_du_predicat_admis if {
++	p := object.union(_propre.predicate, {"vex": {"documents": [{"sha256": _autre, "timestamp": "2026-11-01T00:00:00Z"}], "rejetes": 1}})
++	_codes(_entree([_enonce(_digest, p)])) == set()
++}
++
++test_seuil_vex_absent_refus if {
++	c := {d.code |
++		some d in scan.deny with input as _avec_vex("not_affected", "2026-11-01T00:00:00Z")
++			with time.now_ns as _maintenant
++			with data.rule_data__configuration__ as object.remove(_seuils, ["vex_age_max_jours"])
++	}
++	c == {"scan.kev_without_vex"}
++}
++
++test_seuil_vex_null_refus if {
++	c := {d.code |
++		some d in scan.deny with input as _avec_vex("not_affected", "2026-11-01T00:00:00Z")
++			with time.now_ns as _maintenant
++			with data.rule_data__configuration__ as object.union(_seuils, {"vex_age_max_jours": null})
++	}
++	c == {"scan.kev_without_vex"}
+ }
+ 
+ test_malveillant if {
+diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/07a-sbom-grype/politique/scanner.sh
+--- a/poc/bricks/07a-sbom-grype/politique/scanner.sh	2026-11-14 21:57:17.523533542 +0100
++++ b/poc/bricks/07a-sbom-grype/politique/scanner.sh	2026-11-21 18:39:36.485958410 +0100
+@@ -9,6 +9,10 @@
+ #               layout du deb (une couche tar qui contient le .deb seul), data.tar extrait par busybox (ar, unxz ou gunzip, tar),
+ #               syft dir: sur le contenu extrait. Dans les deux cas, plancher : au moins une PURL versionnée dans le SBOM de
+ #               l'artefact seul, sans quoi refus (relevé 1 de S6a : un artefact vide passe sans erreur, et la fusion le masque).
++#   vex         (outils-scan) la lecture des VEX d'analyser seule, pour le banc de la 07b (tranche 3). Choix 1, 2 et 5 du propriétaire
++#               (21/11/2026) : VEX attestés sur le digest scanné, clé VEX distincte de celle du scanner ($CLE_VEX), lus dans
++#               builds/vex/<nom> en anonyme ; énoncé et sujet revérifiés par scan-outil vex ; seul not_affected avec justification et
++#               impact_statement est passé à Grype. Aucun VEX lisible : le scan se fait sans --vex (plus strict), et le journal le dit.
+ #   jetons      (openbao) rôle scan-zot : identifiants de poc-scan lus, jeton révoqué ; puis rôle scanner : jeton de 5 min, pris
+ #               juste avant la signature (D9 a), après le scan
+ #   attester    (outils-scan) cosign attest-blob --key hashivault://scanner, sans service Sigstore, sujet = digest de l'image ;
+@@ -23,6 +27,7 @@
+ CA=${CA:-/etc/scan/ca-poc.crt}
+ CLE_PUBLIQUE=${CLE_PUBLIQUE:-/etc/scan/scanner.pub}
+ CLE=${CLE:-hashivault://scanner}
++CLE_VEX=${CLE_VEX:-/etc/scan/vex.pub}
+ SECRETS=${SECRETS:-/var/run/bao}
+ PREDICAT=https://supply-chain.example/scan/v1
+ VIDE=sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a   # {} : application/vnd.oci.empty.v1+json
+@@ -87,6 +92,29 @@
+   echo "ARTEFACT|${NATURE:-image}, $n PURL versionnées dans l'artefact seul"
+ }
+ 
++lire_vex() { # VEX attestés sur $IMAGE par la clé VEX : documents recevables dans vex/, résumé dans vex-retenus.json
++  r=${IMAGE%@sha256:*} n=${r#*/}
++  depot_vex=${r%%/*}/builds/vex/${n#builds/}
++  mkdir vex
++  c=0
++  COSIGN_REPOSITORY=$depot_vex cosign verify-attestation --key "$CLE_VEX" --insecure-ignore-tlog --type https://openvex.dev/ns/v0.2.0 \
++    --registry-cacert "$CA" "$IMAGE" > vex/verifiees 2> vex/erreur || c=$?
++  i=0
++  grep '^{' vex/verifiees > vex/lignes || true
++  while IFS= read -r l; do
++    printf '%s' "$l" | sed -n 's/.*"payload":"\([^"]*\)".*/\1/p' | base64 -d > "vex/enonce-$i.json" 2> /dev/null || true
++    [ -s "vex/enonce-$i.json" ] || rm -f "vex/enonce-$i.json"
++    i=$((i + 1))
++  done < vex/lignes
++  set -- vex/enonce-*.json
++  [ -e "$1" ] || set --
++  scan-outil vex "${IMAGE##*@sha256:}" vex "$@" > vex-retenus.json
++  e=$(sed -n 's/^Error: //p' vex/erreur | head -1 | cut -c1-200 | tr '|' ' ')
++  echo "VEX|$# énoncé(s) vérifié(s), $(grep -o '"fichier"' vex-retenus.json | wc -l) retenu(s), $(grep -o '"raison"' vex-retenus.json | wc -l) rejeté(s)|$depot_vex|cosign code $c${e:+ : $e}"
++  sed -n 's/.*"raison": *"\([^"]*\)".*/REJET|\1/p' vex-retenus.json
++  rm -f vex/verifiees vex/erreur vex/lignes vex/enonce-*.json
++}
++
+ analyser() {
+   debut=$(date +%s)
+   export GRYPE_DB_CACHE_DIR=$TRAVAIL/dbcache GRYPE_DB_AUTO_UPDATE=false GRYPE_DB_VALIDATE_AGE=false GRYPE_CHECK_FOR_APP_UPDATE=false \
+@@ -110,13 +138,17 @@
+   t=$(date +%s)
+   artefact
+   syft scan dir:source -o cyclonedx-json=sbom-source.json -q
+-  scan-outil fusion sbom-source.json sbom-image.json source image > sbom.json
++  scan-outil fusion sbom-source.json sbom-image.json source image "$IMAGE" > sbom.json
+   echo "SBOM|$(grep -c '"purl"' sbom.json) composants avec PURL (D1 a), $(( $(date +%s) - t )) s"
+   t=$(date +%s)
+-  grype sbom:sbom.json -o json --file grype.json -q
+-  scan-outil predicat grype.json "$ref" > scan.json
+-  echo "SCAN|$IMAGE, $(grep -c '"kev":' scan.json) vulnérabilités, $(grep -c '"kev": true' scan.json) KEV, $(( $(date +%s) - t )) s"
+-  rm -rf dbcache image artefact source sbom-image.json sbom-source.json sbom.json grype.json .cache
++  lire_vex
++  # un --vex par document : Grype 0.104.1 refuse la liste séparée par des virgules (code 1, rien sous -q ; banc 07b-t3, passage 3)
++  set --
++  for f in $(sed -n 's/.*"fichier": *"\([^"]*\)".*/\1/p' vex-retenus.json); do set -- "$@" --vex "$f"; done
++  grype sbom:sbom.json "$@" -o json --file grype.json -q
++  scan-outil predicat grype.json "$ref" vex-retenus.json > scan.json
++  echo "SCAN|$IMAGE, $(grep -c '"kev":' scan.json) vulnérabilités, $(grep -c '"kev": true' scan.json) KEV, $(grep -c '"status":' scan.json) écartée(s) par un VEX, $(( $(date +%s) - t )) s"
++  rm -rf dbcache image artefact source sbom-image.json sbom-source.json sbom.json grype.json vex vex-retenus.json .cache
+   echo "PREDICAT|sha256 $(sha256sum < scan.json | cut -c1-64), $(( $(date +%s) - debut )) s en tout"
+ }
+ 
+@@ -179,6 +211,7 @@
+   source) source_commit ;;
+   analyser) analyser ;;
+   artefact) artefact ;;
++  vex) lire_vex ;;
+   jetons) jetons ;;
+   attester) attester ;;
+   publier) publier ;;
+diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py
+--- a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-21 17:36:55.344531612 +0100
++++ b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-21 18:34:16.141026413 +0100
+@@ -11,6 +11,9 @@
+ Sorties :
+   SORTIE (fichiers-metriques, brique 19) : comptes par dépôt, grille de gravités fixe (zéros écrits), KEV, avec correctif,
+     scannedAt du prédicat lu. Ni HELP ni TYPE, comme fraicheur-scan.prom. Le fichier est créé par la pose ; écrit sur place.
++    07b, tranche 3 : scan_entrees compte les entrées trouvées ; scan_entrees_vex (même grille) et scan_entrees_kev_vex celles
++    qu'un VEX a écartées (champ vex du prédicat, écrit par le scanner). Réelles = trouvées - écartées, par soustraction dans
++    Grafana. Ce sont les entrées que le scanner a écartées, pas celles que la porte admet : la porte juge aussi l'âge du VEX.
+   Sortie standard (journal, puis Loki par Alloy, unite="entrees-scan.service") : une ligne JSON par entrée, avec dépôt et
+     scannedAt dans la ligne (chaîne d'origine, et « scanne » en secondes, égal à la série du même nom), jamais en étiquette. Émise une seule fois par referrer de scan : le digest du dernier manifeste émis
+     est gardé dans ETAT (StateDirectory). Les autres passages n'écrivent qu'une ligne de résumé.
+@@ -83,7 +86,13 @@
+     for e in v:
+         g[e.get("severity") if e.get("severity") in GRAVITES[:-1] else "autre"] += 1
+     lignes = [f'scan_entrees{{depot="{depot}",gravite="{k}"}} {n}\n' for k, n in g.items()]
++    x = dict.fromkeys(GRAVITES, 0)
++    for e in v:
++        if e.get("vex"):
++            x[e.get("severity") if e.get("severity") in GRAVITES[:-1] else "autre"] += 1
++    lignes += [f'scan_entrees_vex{{depot="{depot}",gravite="{k}"}} {n}\n' for k, n in x.items()]
+     lignes.append(f'scan_entrees_kev{{depot="{depot}"}} {sum(1 for e in v if e.get("kev"))}\n')
++    lignes.append(f'scan_entrees_kev_vex{{depot="{depot}"}} {sum(1 for e in v if e.get("kev") and e.get("vex"))}\n')
+     lignes.append(f'scan_entrees_avec_correctif{{depot="{depot}"}} {sum(1 for e in v if e.get("fixedIn"))}\n')
+     lignes.append(f'scan_entrees_scanne_timestamp_seconds{{depot="{depot}"}} {epoque(predicat["scannedAt"])}\n')
+     return "".join(lignes)
+@@ -94,7 +103,8 @@
+     for e in predicat.get("vulnerabilities") or []:
+         yield json.dumps({"depot": depot, "scannedAt": predicat["scannedAt"], "scanne": scanne, "id": e.get("id"), "aliases": e.get("aliases"),
+                           "severity": e.get("severity"), "kev": e.get("kev"), "kevCves": e.get("kevCves"), "epss": e.get("epss"),
+-                          "fixedIn": e.get("fixedIn"), "package": e.get("package")}, ensure_ascii=False, separators=(",", ":"))
++                          "fixedIn": e.get("fixedIn"), "package": e.get("package"), "vex": e.get("vex")}, ensure_ascii=False,
++                         separators=(",", ":"))
+ 
+ 
+ def main():

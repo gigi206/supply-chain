@@ -417,3 +417,99 @@ Réponses du propriétaire, le 21/11/2026, aux questions posées après la note 
 | 5, `fixed` | « Retirer fixed (Recommandé) » | seuil `vex_statuts_acceptes` réduit à `not_affected` |
 
 **Suite** : la tranche 3 est préparée à sec (étape 5 : prédicat, règles, tests `opa`, mesures avant et après sur l'image et le deb, cas « autre sujet »). Sa pose (étape 6), la clé neuve et toute écriture dans le vrai Zot attendent chacune un accord. G7 interdit toute écriture dans le vrai Zot avant le 29/11.
+
+## Tranche 3 à sec (note de 2026-11-21T17:44:18Z ; rien n'est réécrit au-dessus)
+
+**Rien n'est posé.** Aucun fichier en service n'est modifié. La tranche 3 tient dans un patch, [`politique/07b-t3.patch`](../politique/07b-t3.patch) (`234d449aefb5507a…`), comme `g5-porte.patch`. Trois raisons à cette forme :
+- `scan-outil` est figé dans l'image `outils-scan`, épinglée par digest dans le vrai Zot. La reconstruire est une écriture interdite par G7 avant le 29/11.
+- `g4_scan` et `rejeu.sh` posent `scanner.sh` depuis le dépôt. Un `scanner.sh` neuf sur l'ancienne image casserait les scans quotidiens : `fusion` prend désormais l'image en sixième argument.
+- La valeur de `vex_age_max_jours` n'est pas choisie.
+
+**Heures mesurées** : de 17:18:18 UTC (première lecture) à 17:44:18 UTC, pour 4 h estimées.
+
+**Mesure 0, avant toute écriture** ([script](07b-t3-mesure0.sh), [journal](07b-t3-mesure0.log), [prédictions](07b-t3-predictions.md) écrites avant). Entrées : l'image et le deb que scannent les deux CronJob, copiés depuis Zot en lecture anonyme ; la base de G0 ; Grype hors réseau, sans `--vex`.
+- Avec ou sans `metadata.component` de type `container`, les prédicats sont identiques hors `scannedAt`, de même que les couples (id, PURL) : 5 pour l'image, 66 pour le deb.
+- Grype lit alors la source comme `image` au lieu de `sbom-file`.
+- 8 OK, 0 KO. Le choix 1 tient donc sur le deb comme sur l'image.
+
+**Contenu du patch** (8 fichiers) :
+- **`outil/main.go`** :
+  - `fusion` écrit toujours le composant `container` (nom : dernier élément du dépôt ; version : digest) ;
+  - un mode neuf, `vex`, revérifie chaque énoncé décodé : type in-toto, `predicateType` et `@context` OpenVEX v0.2.0, sujet égal au digest scanné. Il ne passe un document que si **tous** ses énoncés sont `not_affected`, avec une justification de la spécification, un `impact_statement` non vide et un horodatage lisible. Sinon il rejette le document entier, raison au journal ;
+  - `predicat` lit aussi `ignoredMatches`. Une entrée écartée par une règle `vex` garde tous ses champs, dont `kev`, et reçoit `vex: {status, timestamp}`, avec l'horodatage le plus ancien des documents passés. Une entrée écartée par une autre règle reste ordinaire : seul un VEX exempte. Une entrée trouvée l'emporte sur une entrée écartée de même clé. Le prédicat porte `vex.documents`, empreintes des énoncés décodés à la manière de `scan-verifier.sh`, et le nombre de documents rejetés.
+- **`politique/scanner.sh`** :
+  - fonction `lire_vex` (et mode `vex`, pour le banc) : `cosign verify-attestation` avec la clé VEX sur `builds/vex/<nom>`, lu en anonyme. Sans VEX lisible, clé absente comprise, le scan se fait sans `--vex`. C'est la direction stricte, et le journal le dit (`VEX|…|cosign code …`) ;
+  - un `--vex` par document.
+- **Porte** :
+  - `kev_without_vex` est réécrite : statut accepté, horodatage au plus 5 min après le scan, âge au plus `vex_age_max_jours` à l'heure du jugement ;
+  - la forme vérifie `vex` quand il est présent (facultatif : les prédicats déjà signés restent recevables) ;
+  - `vex_statuts_acceptes` est réduit à `not_affected`, et `vex_age_max_jours: null` refuse toute exemption tant que la valeur n'est pas choisie ;
+  - 39 tests à heure simulée au lieu de 27, dont 16 sur le VEX au lieu de 4.
+- **`plateforme.sh`** :
+  - mutations de `g5_regles` ;
+  - contre-épreuves de G5 (forme neuve, `fixed`, horodatage postérieur au scan, ancienne forme `expires`) ;
+  - témoins de G6 datés d'après `vex_age_max_jours` ;
+  - `cm_scan` monte `vex.pub` dès qu'elle existe.
+- **`systemd/entrees-scan.py` et `entrees-scan.sh`** : `scan_entrees_vex` (même grille de gravités) et `scan_entrees_kev_vex`, de 20 à 36 séries. « Réelles » = trouvées - écartées, par soustraction dans Grafana. Ce sont les entrées que le scanner a écartées, pas celles que la porte admet. La ligne Loki porte `vex`.
+
+**Banc** [`07b-t3-banc.sh`](07b-t3-banc.sh) (`4b51cc1bc17f5ad8…`), témoins [`07b-t3-vex.py`](07b-t3-vex.py) (`bb7fcf8c2fccf820…`). Le patch est appliqué à une copie des fichiers du dépôt, et ce sont ces copies qui tournent.
+- **A.** Hôte, hors réseau : `scan-outil`, compatibilité avec la mesure 0, `ec opa check`, `ec opa test` et mutations, 15 cas unitaires de `vex`.
+- **B.** Zot et clés jetables, dans un espace de noms réseau vide : le vrai `scanner.sh` du patch, en `analyser` complet (image puis deb, import de la base compris) et en mode `vex`, suivi des mêmes commandes qu'`analyser`.
+- **C.** `ec validate input` sur les prédicats produits.
+- **D.** `comptes` et `entrees` d'`entrees-scan.py`.
+
+| Journal | OK | KO | Ce qui s'est passé |
+|---|---|---|---|
+| [1](07b-t3-banc.log) | 27 | 0 | Arrêt au début de B, défaut du banc : le nom du fichier de la base contient `:`, et `oras push` y lisait un type de média. Corrigé comme `fetch-db.sh`. |
+| [2](07b-t3-banc-2.log) | 47 | 1 | **Passage interrompu par moi** : j'ai modifié le script du banc pendant qu'il tournait (ajout de la partie D). J'ai arrêté ses processus, pour que le shell principal ne lise pas le script à des positions décalées. Son KO est le même qu'au passage 3. |
+| [3](07b-t3-banc-3.log) | 59 | 1 | **Défaut réel du patch** : `deux` sans prédicat (détail ci-dessous). |
+| [4](07b-t3-banc-4.log) | 61 | 0 | Toutes les prédictions tenues. |
+
+**Le défaut du passage 3.** Grype 0.104.1 sort en code 1, sans message sous `-q`, quand les VEX sont donnés en liste séparée par des virgules (`--vex a,b`). Avec `--vex a --vex b`, il donne 4/1. La sonde est hors dépôt et hors réseau, sur le SBOM et les deux documents du cas.
+- En service, deux VEX sur un même artefact auraient fait échouer le scan, sans prédicat publié.
+- Le patch et le banc passent désormais un `--vex` par document.
+- Section « Ajout avant le quatrième passage » des prédictions.
+
+**Constats du passage 4** :
+1. Avec un VEX valide sur `GHSA-mqqf-5wvp-8fh8` :
+   - l'image donne 4/1, et l'entrée porte `not_affected` avec l'horodatage du document ;
+   - `vex.documents` est égal à l'empreinte de l'énoncé signé ;
+   - le deb, avec un témoin sur `GO-2025-3849` (`pkg:golang/stdlib@1.24.4`), donne 65/1.
+2. **Autre sujet** : aucun VEX n'est passé, et le scan donne 5/0, dans les deux variantes.
+   - Dans la variante simple, le VEX est signé pour X et rattaché à X.
+   - Dans la variante adverse, il est signé pour X et rattaché à Y. Zot sert bien ce referrer de Y, et c'est cosign qui le refuse.
+   - Une autre clé (rôle de la clé du scanner) : rien n'est passé non plus.
+3. **Statut `fixed` et `impact_statement` absent** : le document est vérifié par cosign, puis rejeté par le scanner, motif au journal. Le scan donne 5/0.
+4. **Deux documents**, datés du 01/11 et du 20/11 : 4/1, et l'entrée porte le 01/11. C'est la conséquence voulue de « le plus ancien » : quand le plus vieux expire, l'exemption tombe.
+5. **Clé VEX absente du conteneur** : cosign sort en code 1, aucun VEX n'est passé, le scan donne 5/0, et le journal le dit.
+6. **VEX daté du futur** : le scanner le passe (4/1), et c'est la porte qui le refuse.
+7. **Porte** (`ec` de l'hôte, validité de banc de 30 jours, entrée écartée passée en KEV par `jq`) :
+   - l'image est admise ;
+   - le VEX daté du futur, l'autre sujet adverse et la politique du patch telle quelle (`null`) sont refusés par `scan.kev_without_vex`.
+
+**Limites, dites franchement** :
+- `analyser` a tourné sur l'hôte : outils de mise et `ar`/`unxz` de l'hôte, pas l'image `outils-scan` (busybox), qui n'est pas reconstruite.
+- Grype et la porte ont tourné ailleurs qu'en service :
+  - la base est celle de G0 (04/11) ;
+  - pour la porte, `scanner.db.built` est réécrit à l'heure du scan, sinon `base_recente` refuse ;
+  - `ec` est celui de l'hôte (v0.10.42), pas celui de l'image de la porte.
+- Aucune KEV réelle n'existe : la règle n'est exercée que par les tests `opa` et par une KEV posée par `jq`. Les prédicats signés du 21/11 n'en ont aucune (tranche 1 : 6 et 67 entrées, 0 KEV).
+- Les contre-épreuves de G5 et les témoins de G6 du patch n'ont pas tourné : il leur faut le cluster. Seules les mutations de `g5_regles` ont tourné. Le filtre `jq` de la contre-épreuve « postérieur au scan » n'a été essayé que sur une entrée faite à la main.
+- `entrees-scan.py` n'a été appelé que par ses fonctions, sans Zot ni VM, et l'étape `verif` du patch n'a pas tourné.
+- Tous les VEX sont des témoins.
+
+**La pose (étape 6) est plus large que la carte ne le disait** : « ConfigMap de la porte » ne suffit pas. Chaque pièce demande son accord :
+
+| # | Pièce | Touche | Contrainte |
+|---|---|---|---|
+| 1 | Valeur de `vex_age_max_jours` | `policy-scan.yaml` | **choix du propriétaire** ; `null` dans le patch : aucune KEV exemptée |
+| 2 | Clé Transit `vex` et sa politique OpenBao (usage réservé au propriétaire) ; clé publique prise hors bande dans `resultats/vex-cle-publique.pem` | OpenBao | changement de configuration du cluster |
+| 3 | Image `outils-scan` reconstruite (scan-outil neuf) ; `OUTILS_SCAN_DIGEST` mis à jour | vrai Zot (`plateforme/outils-scan`) | **G7 : pas d'écriture avant le 29/11** |
+| 4 | Dépôt `builds/vex/` dans Zot : lecture anonyme, compte d'écriture pour le propriétaire | `zot.json` de sc-stockage | idem G7 ; changement de configuration |
+| 5 | `scan-config` avec `scanner.sh` neuf et `vex.pub` ; rendu des deux CronJob | espace `scan` | après 3 : un `scanner.sh` neuf sur l'ancienne image casse les scans quotidiens (`fusion` à 6 arguments) |
+| 6 | ConfigMap de la porte (`scan.rego`, `policy-scan.yaml`) | porte | après 1 ; les prédicats déjà signés restent recevables (`vex` facultatif) |
+| 7 | `entrees-scan.py` neuf sur sc-stockage | sc-stockage (sudo) | séries de 20 à 36 ; `verif` du patch |
+| 8 | Premier VEX réel écrit et signé par le propriétaire | `builds/vex/` | aucune KEV réelle aujourd'hui sur sample-app (scan du 21/11) |
+| 9 | `plateforme.sh` et `rejeu.sh` : `g5_regles`, contre-épreuves de G5, témoins de G6 | dépôt | les témoins de G6 lisent la valeur de 1 ; sans elle, `g6` s'arrête en KO |
+
+**Question au propriétaire** : la valeur de `vex_age_max_jours` (choix 3). Rien n'est posé avant elle et avant l'accord de chaque pièce.

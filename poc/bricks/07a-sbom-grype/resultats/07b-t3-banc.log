@@ -1,0 +1,45 @@
+début : 2026-11-21T17:33:04Z
+outils : grype 0.104.1, syft 1.38.0, cosign v3.1.4, zot v2.1.22, ec v0.10.42, go1.24.7
+patch : politique/07b-t3.patch 31ac1a6e17099922… ; 07b-t3-vex.py bb7fcf8c2fccf820…
+OK   patch appliqué sur une copie des fichiers du dépôt
+OK   scan-outil du patch construit
+OK   go vet
+## A. hôte, hors réseau
+OK   fusion, image sans digest : code 1
+OK   compatibilité image : prédicat neuf sans VEX = prédicat d'avant + bloc vex vide
+OK   compatibilité deb : prédicat neuf sans VEX = prédicat d'avant + bloc vex vide
+OK   ec opa check
+OK   ec opa test : PASS: 39/39
+OK   mutations couvertes : 22/22
+## A. scan-outil vex, cas unitaires (énoncés non signés)
+OK   vex valide : retenu 2026-11-20T00:00:00Z
+OK   vex fixed : rejeté
+     raison : énoncé 0 : statut "fixed", seul not_affected est passé
+OK   vex affected : rejeté
+     raison : énoncé 0 : statut "affected", seul not_affected est passé
+OK   vex sans-impact : rejeté
+     raison : énoncé 0 : impact_statement absent
+OK   vex impact-blanc : rejeté
+     raison : énoncé 0 : impact_statement absent
+OK   vex sans-justification : rejeté
+     raison : énoncé 0 : justification absente ou hors spécification
+OK   vex justification-libre : rejeté
+     raison : énoncé 0 : justification absente ou hors spécification
+OK   vex mixte : rejeté
+     raison : énoncé 1 : impact_statement absent
+OK   vex autre-sujet : rejeté
+     raison : sujet différent du digest scanné
+OK   vex autre-type : rejeté
+     raison : type de prédicat inattendu : https://example.com/autre
+OK   vex autre-contexte : rejeté
+     raison : @context inattendu : https://openvex.dev/ns/v0.1.0
+OK   vex sans-horodatage-enonce : retenu 2026-11-20T00:00:00Z
+OK   vex deux-horodatages : retenu 2026-11-03T08:00:00Z
+OK   vex horodatage-illisible : rejeté
+     raison : énoncé 0 : horodatage illisible
+OK   vex aucun-enonce : rejeté
+     raison : aucun énoncé VEX
+OK   vex sans fichier : 0 retenu, 0 rejeté
+OK   document écrit = prédicat de l'énoncé
+OK   predicat : écartée par un VEX sans document retenu : code 1
+Error: stat /home/gigi/.cache/supply-chain-poc/07a/g0/vulnerability-db_v6.1.10_2026-11-04T00:19: no such file or directory
