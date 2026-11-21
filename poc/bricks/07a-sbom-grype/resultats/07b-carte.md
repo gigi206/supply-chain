@@ -639,3 +639,21 @@ La limite de la note de 20:08:57Z est mesurée au banc jetable. Les prédictions
 - L'horodatage d'un énoncé l'emporte sur celui du document.
 - Aucune règle explicite n'est donnée au consommateur.
 - **Conséquence** : une règle de remplacement ne peut pas s'appuyer sur `@id` et `version`. Elle devrait porter sur le couple vulnérabilité et produit, et garder l'énoncé le plus récent. La règle du choix 3 compte l'âge depuis le document le plus ancien ; la spec, elle, décrit des énoncés qui remplacent les précédents.
+
+## Vérifications avant la question du renouvellement (note de 2026-11-21T20:30:14Z ; à sec, rien posé)
+
+1. **Droit `delete`, contrôle complet.** `accessControl` du `zot.json` versionné ne porte que `metrics` et `repositories`, sans `adminPolicy`. Les politiques par défaut et anonymes ne donnent que `read`. La note précédente tient : aucune action `delete` n'est donnée à personne.
+2. **Granularité du filtre** (`main.go` du patch) :
+   - Le filtre juge **des documents entiers**. Un seul énoncé autre que `not_affected` (ou sans justification, ou sans impact) fait rejeter tout le document.
+   - L'horodatage d'un document est le plus ancien de ses énoncés.
+   - L'horodatage porté par une entrée écartée est le plus ancien de **tous** les documents retenus, quelle que soit la vulnérabilité visée, car Grype ne dit pas quel énoncé a écarté quelle correspondance.
+   - **Conséquences pour le renouvellement** :
+     - Un ancien document qui vise d'autres vulnérabilités tire aussi l'échéance des autres.
+     - Un document plus récent au statut `affected` (une rétractation) est aujourd'hui rejeté par le filtre. Il ne retire donc pas l'exemption de l'ancien `not_affected` : seuls le retrait ou l'échéance la font tomber.
+   - Une règle de remplacement exigerait :
+     - un horodatage par couple vulnérabilité et produit ;
+     - le plus récent qui l'emporte quel que soit son statut ;
+     - puis le filtre de recevabilité.
+     C'est plus qu'un tri des documents.
+
+**Heures mesurées de ce segment** : de 20:17:00 UTC (premier `date -u`, avant toute lecture) à 20:30:14 UTC. Cela couvre la correction du banc, les prédictions (20:19:46), le passage 6 (20:20:24 à 20:23:42), les notes de 20:24:29 et 20:28:00, la lecture de la spec et ces vérifications. Le total des heures de la 07b reste loin de 2× l'estimation de 10 h.
