@@ -1,0 +1,11 @@
+## lancé à 2026-11-21T16:16:45Z ; intervalle 2026-11-20T16:04:23Z -> 2026-11-21T16:10:10Z (86747 s)
+## à 2026-11-20T16:04:23Z
+prometheus_tsdb_wal_storage_size_bytes :
+  {"instance":"127.0.0.1:9090","job":"prometheus"} 17337103
+prometheus_tsdb_head_chunks_storage_size_bytes :
+  {"instance":"127.0.0.1:9090","job":"prometheus"} 1364626
+## à 2026-11-21T16:10:10Z
+prometheus_tsdb_wal_storage_size_bytes :
+  {"instance":"127.0.0.1:9090","job":"prometheus"} 18372675
+prometheus_tsdb_head_chunks_storage_size_bytes :
+  {"instance":"127.0.0.1:9090","job":"prometheus"} 1385447

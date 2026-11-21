@@ -239,3 +239,7 @@ La note « Relevés après la pose » demandait que `j7.sh` relève l'état du C
 **Reste avant `retour`**, qui attend toujours un accord à part :
 - `garde_fenetre` ne connaît que les 20, 21 et 22/11. Au-delà, elle refuse tant que les balayages de Zot ne sont pas recalculés, sauf avec `FORCER_RETOUR=1`.
 - `rattrapage-deb` n'est toujours pas suspendu, comme dans `etape_h5_cilium` de la 08c.
+
+## Complément au correctif du rattrapage (note de 2026-11-21T16:17:19Z ; rien n'est réécrit au-dessus)
+
+Relecture du conseiller. Le correctif reprend l'état trouvé au départ, quel qu'il soit. Si un passage interrompu sans trap laissait `suspend=true`, le passage suivant prendrait cette valeur pour l'état de départ et la garderait. La ligne « rattrapage : suspend=… avant la suspension » du journal le montrerait. **Avant `retour`, relire que `rattrapage` est à `suspend=false`** (c'était le cas le 21/11 à 16:13 UTC).

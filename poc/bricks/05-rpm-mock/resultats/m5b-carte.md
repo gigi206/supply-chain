@@ -679,3 +679,22 @@ C'est le premier relevé prévu par les préalables du point 3, à 24 heures de 
 - Le rythme sans construction est de **409 Mo par 24 h**. C'est plus que les 200 Mo attribués à grype, et bien moins que le rythme d'environ 1,19 Go par jour relevé le 18/11 sans écriture de la brique, dont la cause n'avait pas été attribuée. Les deux mesures ne sont pas rapprochées ici.
 - À ce rythme, les 12 080 Mo libres durent environ 29,5 jours. C'est un calcul, pas une prévision. Deux effets inconnus le modifient : un plateau de Loki une fois la rétention atteinte, et la rétention de la base grype, qui reste à décider (07a).
 - **Correction** de la liste « Décisions ouvertes » de cette carte : la taille du disque dans `vm.sh` n'est plus ouverte. `docs/03` consigne que `vm.sh` crée sc-stockage à 30G, sur la décision « Ok » du 20/11 (dossier 3).
+
+## Note datée du 21/11/2026, écrite à 2026-11-21T16:17:19Z UTC : correction de la note de 2026-11-21T16:12:55Z (unités, WAL de Prometheus, `vm.sh`)
+
+Relecture du conseiller. La note de 2026-11-21T16:12:55Z n'est pas réécrite.
+
+**1. Unités.** Le `df` compte en blocs de 1 048 576 octets : ses « Mo », comme ceux des relevés précédents, sont des **Mio**. Les hausses de Zot et de Prometheus étaient, elles, données en Mo décimaux, et la somme ne tombait pas juste (206 + 14 + 201 ≠ 411). Le tableau en octets était exact. Tout en Mio :
+
+| Poste | Hausse sur l'intervalle |
+|---|---|
+| `/` de sc-stockage (`df`, au Mio près) | 411 Mio |
+| Zot, somme de `zot_repo_storage_bytes` | 196 Mio (205 900 481 octets) |
+| Prometheus : blocs, WAL et tête | 15 Mio (15 330 591 octets) |
+| **Reste, non attribué** | **environ 200 Mio** |
+
+**2. Prometheus, WAL et tête.** `prometheus_tsdb_storage_blocks_bytes` ne compte que les blocs. Le WAL (+1 035 572 octets) et les morceaux de la tête (+20 821 octets) sont lus aux deux mêmes instants ([script](sc-stockage-releve-2026-11-21-prom-2.sh), [journal](sc-stockage-releve-2026-11-21-prom-2.log)). Ils ne changent presque rien au reste.
+
+**3. Loki.** Les volumes envoyés sont en octets décimaux : 1,93, 1,96, 2,01 et 2,04 Go, soit 1,80, 1,83, 1,87 et 1,90 Gio. Les trois premières tranches durent 24 h. La dernière dure 86 747 s, l'intervalle des deux `df`.
+
+**4. `vm.sh`.** La correction de la liste « Décisions ouvertes » est vérifiée dans le code. `poc/bricks/08-trust-plane/vm.sh`, ligne 25, porte `[sc-stockage]=30G`, depuis le commit `37964407` (décision « Ok » du dossier 3). Elle corrige donc aussi le point « Disque » des préalables du point 3 de cette carte : la phrase « Le rejeu recrée sc-stockage à 20G (`vm.sh`) » est fausse depuis ce commit.
