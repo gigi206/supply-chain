@@ -339,3 +339,14 @@ Le second passage n'a donc rien réémis pour le même referrer : c'est un premi
 - **Choix 1** : en l'état, le scanner ne peut pas appliquer de VEX. Il le pourrait si son SBOM portait un composant `container`, mais le produit n'y serait pas vérifié.
 - **Choix 4** : le CSAF est sans effet dans cette version.
 - **Choix 5** : un VEX doit être écrit sur le PURL et l'identifiant que Grype affiche.
+
+## Corrections de la tranche 2, après relecture du conseiller (note de 2026-11-21T17:02:53Z ; la note de 2026-11-21T17:00:50Z n'est pas réécrite)
+
+1. **Écarts : 7 aux prédictions d'origine, pas 6.** La prédiction aveugle de `sbom-composant` était « refus » (premier tableau des [prédictions](07b-t2-predictions.md)). Le banc attend 4/1 depuis le troisième passage, valeur fixée **après** une sonde, et le dit dans la section « Ajout avant le troisième passage ». Ce septième écart porte sur la forme qui compte pour le scanner : la prédiction aveugle tenait qu'un composant `container` ne changerait rien.
+2. **CSAF, constat 6 et ligne « Choix 4 »** : « sans effet dans cette version » dit plus que la mesure. Celle-ci porte sur **un seul document témoin**, écrit à la main, non validé contre le schéma CSAF, et passé sur l'`oci-dir`. Elle montre qu'il est accepté sans erreur, mais sans effet, pour une cause non établie. Elle ne dit rien de la prise en charge du format CSAF par Grype.
+3. **Prémisse du constat 1, vérifiée dans la source** : la fusion du scanner (`outil/main.go`, ligne 103, seule clé `metadata`) n'écrit que `metadata.tools`, sans `metadata.component`. Le SBOM que le scanner passe à Grype a donc la forme de `g0/sbom-ok.json`, refusée avec `--vex`. Seule la source est lue ici : l'image déployée du scanner n'est pas reconstruite.
+4. **Deux formulations dépassent la mesure** :
+   - « le subpath `#v5` est ignoré » : seul un VEX **sans** subpath a été essayé ; il s'applique au PURL à `#v5`. Aucun cas ne porte un autre subpath.
+   - « le produit n'est vérifié que si la source porte un `repoDigest` » : c'est une corrélation sur trois sources (`registry:` avec `repoDigests`, `oci-dir` et SBOM à composant sans). La cause n'est pas isolée.
+
+Le fragment de `docs/03` est corrigé dans les mêmes termes. Le message du commit de la note précédente garde « CSAF reconnu mais sans effet » et « 6 écarts » : un message de commit ne se réécrit pas, c'est cette note qui fait foi.
