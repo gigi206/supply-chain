@@ -53,7 +53,8 @@ if [ "${1:-}" = ns ]; then
   cd "$T"
   cosign signing-config create --out vide.json > /dev/null 2>&1
   (cd "$T/cle" && COSIGN_PASSWORD='' cosign generate-key-pair --output-key-prefix vex > /dev/null 2>&1 \
-    && COSIGN_PASSWORD='' cosign generate-key-pair --output-key-prefix etrangere > /dev/null 2>&1)
+    && COSIGN_PASSWORD='' cosign generate-key-pair --output-key-prefix etrangere > /dev/null 2>&1 \
+    && COSIGN_PASSWORD='' cosign generate-key-pair --output-key-prefix scanner > /dev/null 2>&1)   # passage 14
   # base de G0 sous vulndb/grype:<date>, annotée comme par base-grype.sh
   f=$(cd "$G0" && ls vulnerability-db_*.tar.zst)
   # type de média explicite, comme fetch-db.sh : le nom du fichier contient « : » (passage 1 : oras y lisait un type)
@@ -245,14 +246,88 @@ if [ "${1:-}" = ns ]; then
   publier_vex vex "$T/v-partiel-recent.json" "$Y" builds/partiel/sample-app "$Y" builds/vex/partiel/sample-app
   vex_seul partiel builds/partiel/sample-app "$Y"; juger_vex partiel 2,2,0 3/2
   [ -s "$T/cas/partiel/scan.json" ] && attendu "partiel : horodatages des entrées" "$(horo partiel)" "GHSA-j6qf-3m9c-vwj3 2026-10-01T00:00:00Z,$VULN $H1"
-  # 18-21 (passage 11) : pièce 8, signer-vex.sh signer avec la clé locale vex (pas hashivault://vex) ; prédicat de scan du cas complet
+  # passage 14 : signer-vex.sh verifier dans le Zot jetable ; scans témoins signés par une clé locale « scanner », en referrers
+  echo "## B. signer-vex.sh verifier (pièce 8), scan signé lu et vérifié par le script"
+  SV=$T/signer; mkdir -p "$SV"
+  SV1="$JUSTIF;$IMPACT" EV="$VULN;pkg:oci/sample-app@$Y;$SYFT"
+  publier_scan() { # clé prédicat dépôt-du-sujet dépôt-scan : attestation de scan signée, referrer comme publier de scanner.sh
+    local w; w=$(mktemp -d "$T/tmp/scan.XXXX")
+    COSIGN_PASSWORD='' cosign attest-blob --key "$T/cle/$1.key" --signing-config vide.json --predicate "$2" --type "$SCAN" \
+      --bundle "$w/bundle.json" --hash "${Y#sha256:}" --yes sample-app > "$w/cosign.log" 2>&1 || { cat "$w/cosign.log"; return 1; }
+    oras manifest fetch --ca-file zot.crt --descriptor "$REG/$3@$Y" > "$w/sujet.json"
+    printf '{}' > "$w/config-vide.json"
+    oras blob push --ca-file zot.crt "$REG/$4" "$w/config-vide.json" > /dev/null
+    oras blob push --ca-file zot.crt "$REG/$4" "$w/bundle.json" > /dev/null
+    local TY=application/vnd.dev.sigstore.bundle.v0.3+json
+    printf '{"schemaVersion":2,"mediaType":"application/vnd.oci.image.manifest.v1+json","artifactType":"%s",%s,%s,%s,%s}' "$TY" \
+      '"config":{"mediaType":"application/vnd.oci.empty.v1+json","digest":"sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","size":2}' \
+      "\"layers\":[{\"mediaType\":\"$TY\",\"digest\":\"sha256:$(sha256sum < "$w/bundle.json" | cut -c1-64)\",\"size\":$(wc -c < "$w/bundle.json")}]" \
+      "\"subject\":$(cat "$w/sujet.json")" \
+      "\"annotations\":{\"dev.sigstore.bundle.content\":\"dsse-envelope\",\"dev.sigstore.bundle.predicateType\":\"$SCAN\"}" > "$w/manifeste.json"
+    oras manifest push --ca-file zot.crt "$REG/$4@sha256:$(sha256sum < "$w/manifeste.json" | cut -c1-64)" "$w/manifeste.json" > /dev/null
+  }
+  nscan() { { curl -fsS --cacert zot.crt "https://$REG/v2/builds/scan/$1/sample-app/referrers/$Y" 2>/dev/null || echo '{}'; } | jq '.manifests // [] | length'; }
+  jq '.vulnerabilities |= map(if .id == "GO-2026-5774" then .package = "pkg:golang/stdlib@1.24.4" else . end) | .scannedAt = "2026-11-01T00:00:00Z"' \
+    "$M0/image-avant.scan.json" > "$SV/scan-deux.json"
+  for d in signe deux etranger; do pousser "$M0/image" "builds/$d/sample-app" > /dev/null; done
+  publier_scan scanner "$SV/scan-deux.json" builds/signe/sample-app builds/scan/signe/sample-app
+  publier_scan scanner "$M0/image-avant.scan.json" builds/signe/sample-app builds/scan/signe/sample-app
+  publier_scan scanner "$SV/scan-deux.json" builds/deux/sample-app builds/scan/deux/sample-app
+  publier_scan etrangere "$M0/image-avant.scan.json" builds/etranger/sample-app builds/scan/etranger/sample-app
+  attendu "scans témoins publiés (signe, deux, etranger)" "$(nscan signe),$(nscan deux),$(nscan etranger)" "2,1,1"
+  HF=$(date -ud tomorrow +%FT%TZ); HV=$(date -ud '1 day ago' +%FT%TZ)
+  action() { jq -c '.statements |= map(if .status == "affected" then . + {action_statement: "témoin du banc : aucune action"} else . end)' "$1" > "$1.t" && mv "$1.t" "$1"; }
+  vex doc "$SV/ok.json" "$HV" "not_affected;$SV1;-;$EV"
+  vex doc "$SV/futur.json" "$HF" "not_affected;$SV1;-;$EV"
+  vex doc "$SV/futur-enonce.json" "$HV" "not_affected;$SV1;$HF;$EV"
+  vex doc "$SV/retract.json" "$HV" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"; action "$SV/retract.json"
+  vex doc "$SV/large.json" "$HV" "not_affected;$SV1;-;$VULN;pkg:oci/sample-app@$Y;-"
+  vex doc "$SV/absent.json" "$HV" "not_affected;$SV1;-;$VULN;pkg:oci/sample-app@$Y;pkg:golang/github.com/go-chi/chi@v5.2.4#v5"
+  vex doc "$SV/fixed.json" "$HV" "fixed;-;-;-;$EV"
+  vex doc "$SV/mixte.json" "$HV" "not_affected;$SV1;-;$EV" "affected;-;-;-;GHSA-j6qf-3m9c-vwj3;pkg:oci/sample-app@$Y;$SYFT"
+  vex doc "$SV/sans-impact.json" "$HV" "not_affected;$JUSTIF;-;-;$EV"
+  vex doc "$SV/autre-digest.json" "$HV" "not_affected;$SV1;-;$VULN;pkg:oci/sample-app@$DEB;$SYFT"
+  vex doc "$SV/sans-vuln.json" "$HV" "not_affected;$SV1;-;-;pkg:oci/sample-app@$Y;$SYFT"
+  vex doc "$SV/sans-horo.json" - "not_affected;$SV1;-;$EV"
+  vex doc "$SV/retract-faute.json" "$HV" "affected;-;-;-;CVE-2025-69752;pkg:oci/sample-app@$Y;$SYFT"; action "$SV/retract-faute.json"
+  vex doc "$SV/retract-sans-action.json" "$HV" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
+  vex doc "$SV/couple-faux.json" "$HV" "not_affected;$SV1;-;GO-2026-5774;pkg:oci/sample-app@$Y;$SYFT"
+  vex doc "$SV/couple-ok.json" "$HV" "not_affected;$SV1;-;GO-2026-5774;pkg:oci/sample-app@$Y;pkg:golang/stdlib@1.24.4"
+  sv_verifier() { # document dépôt [référence] : code et motif de signer-vex.sh verifier
+    local r=0
+    env SCAN_OUTIL="$OUT" CA="$T/zot.crt" CLE_SCANNER="$T/cle/scanner.pub" bash "$B/signer-vex.sh" verifier "$SV/$1.json" "${3:-$REG/builds/$2/sample-app@$Y}" \
+      > "$SV/$1-$2.log" 2>&1 || r=$?
+    echo "code $r : $(sed -n 's/^\(JUGE|[a-z]*, [0-9]* énoncé(s) dont [0-9]* large(s)\).*/\1/p; s/^REFUS|\([^:(0-9]*\).*/REFUS|\1/p' "$SV/$1-$2.log" | head -1 | sed 's/ *$//')"
+  }
+  while read -r c d attendu_r; do attendu "signer-vex verifier : $c ($d)" "$(sv_verifier "$c" "$d")" "$attendu_r"; done <<'FIN'
+ok signe code 0 : JUGE|exemption, 1 énoncé(s) dont 0 large(s)
+futur signe code 1 : REFUS|horodatage
+futur-enonce signe code 1 : REFUS|horodatage
+retract signe code 0 : JUGE|retractation, 1 énoncé(s) dont 0 large(s)
+large signe code 0 : JUGE|exemption, 1 énoncé(s) dont 1 large(s)
+absent signe code 1 : REFUS|sous-composant absent des entrées du prédicat de scan
+fixed signe code 1 : REFUS|statut fixed
+mixte signe code 1 : REFUS|not_affected mêlé à d'autres statuts
+sans-impact signe code 1 : REFUS|rejeté par scan-outil vex
+autre-digest signe code 1 : REFUS|énoncé sans produit dont l'@id cite le digest
+sans-vuln signe code 1 : REFUS|énoncé sans nom de vulnérabilité
+sans-horo signe code 1 : REFUS|énoncés non classables par scan-outil vex
+retract-faute signe code 1 : REFUS|énoncé dont aucun nom ne croise une entrée du prédicat de scan
+retract-sans-action signe code 1 : REFUS|affected sans action_statement
+couple-faux deux code 1 : REFUS|sous-composant sans entrée de cette vulnérabilité dans le prédicat de scan
+couple-ok deux code 0 : JUGE|exemption, 1 énoncé(s) dont 0 large(s)
+couple-ok signe code 1 : REFUS|sous-composant absent des entrées du prédicat de scan
+ok etranger code 1 : REFUS|aucun scan signé vérifié
+FIN
+  attendu "signer-vex verifier : image sans digest" "$(sv_verifier ok sans-digest "$REG/builds/signe/sample-app:t3" | cut -d' ' -f1,2)" "code 2"
+  # 18-21 (passage 11) : pièce 8, signer-vex.sh signer avec la clé locale vex (pas hashivault://vex) ; scan signé de builds/scan/signe (passage 14)
   echo "## B. signer-vex.sh signer (pièce 8), clé locale"
   pousser "$M0/image" builds/signe/sample-app > /dev/null
   referents_signe() { { curl -fsS --cacert zot.crt "https://$REG/v2/builds/vex/signe/sample-app/referrers/$Y" 2>/dev/null || echo '{}'; } | jq '.manifests // [] | length'; }
   signer_vex() { # clé document cas : code de signer-vex.sh signer et référents après
     local c=0
     env COSIGN_PASSWORD='' SCAN_OUTIL="$OUT" CLE="$T/cle/$1.key" CLE_PUBLIQUE="$T/cle/vex.pub" CA="$T/zot.crt" CONFIG_REGISTRE="$T/docker/config.json" \
-      bash "$B/signer-vex.sh" signer "$2" "$REG/builds/signe/sample-app@$Y" "$T/cas/complet/scan.json" > "$T/signer-$3.log" 2>&1 || c=$?
+      CLE_SCANNER="$T/cle/scanner.pub" bash "$B/signer-vex.sh" signer "$2" "$REG/builds/signe/sample-app@$Y" > "$T/signer-$3.log" 2>&1 || c=$?
     echo "code $c ; référents $(referents_signe)"
   }
   vex doc "$T/v-signe-futur.json" "$(date -ud tomorrow +%FT%TZ)" "not_affected;$JUSTIF;$IMPACT;-;$VULN;pkg:oci/sample-app@$Y;$SYFT"
@@ -406,59 +481,7 @@ deux-paquets pd-deux-paquets - vex not_affected 2026-11-20T00:00:00Z ; sans exem
 affected-autre-sous pa pr-autre-sous aucune ; sans exemption 1
 FIN
 
-# passage 11 : pièce 8, signer-vex.sh verifier (jugement avant signature, sans registre) ; prédicat de scan de la mesure 0
-echo "## A. signer-vex.sh verifier (pièce 8), témoins non signés"
-SV=$T/signer; mkdir -p "$SV"
-HF=$(date -ud tomorrow +%FT%TZ); HV=$(date -ud '1 day ago' +%FT%TZ)
-vex doc "$SV/ok.json" "$HV" "not_affected;$S1;-;$E"
-vex doc "$SV/futur.json" "$HF" "not_affected;$S1;-;$E"
-vex doc "$SV/futur-enonce.json" "$HV" "not_affected;$S1;$HF;$E"
-# passage 12 : affected exige action_statement (OpenVEX v0.2.0) ; ajouté par jq, 07b-t3-vex.py inchangé
-action() { jq -c '.statements |= map(if .status == "affected" then . + {action_statement: "témoin du banc : aucune action"} else . end)' "$1" > "$1.t" && mv "$1.t" "$1"; }
-vex doc "$SV/retract.json" "$HV" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
-action "$SV/retract.json"
-vex doc "$SV/large.json" "$HV" "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;-"
-vex doc "$SV/absent.json" "$HV" "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;pkg:golang/github.com/go-chi/chi@v5.2.4#v5"
-vex doc "$SV/fixed.json" "$HV" "fixed;-;-;-;$E"
-vex doc "$SV/mixte.json" "$HV" "not_affected;$S1;-;$E" "affected;-;-;-;GHSA-j6qf-3m9c-vwj3;pkg:oci/sample-app@$Y;$SYFT"
-vex doc "$SV/sans-impact.json" "$HV" "not_affected;$JUSTIF;-;-;$E"
-vex doc "$SV/autre-digest.json" "$HV" "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$DEB;$SYFT"
-vex doc "$SV/sans-vuln.json" "$HV" "not_affected;$S1;-;-;pkg:oci/sample-app@$Y;$SYFT"
-vex doc "$SV/sans-horo.json" - "not_affected;$S1;-;$E"
-while read -r c attendu_r; do
-  r=0; SCAN_OUTIL=$OUT bash "$B/signer-vex.sh" verifier "$SV/$c.json" "$REG/builds/x/sample-app@$Y" "$M0/image-avant.scan.json" > "$SV/$c.log" 2>&1 || r=$?
-  attendu "signer-vex verifier : $c" "code $r : $(sed -n 's/^\(JUGE|[a-z]*, [0-9]* énoncé(s) dont [0-9]* large(s)\).*/\1/p; s/^REFUS|\([^:(0-9]*\).*/REFUS|\1/p' "$SV/$c.log" | head -1 | sed 's/ *$//')" "$attendu_r"
-done <<'FIN'
-ok code 0 : JUGE|exemption, 1 énoncé(s) dont 0 large(s)
-futur code 1 : REFUS|horodatage
-futur-enonce code 1 : REFUS|horodatage
-retract code 0 : JUGE|retractation, 1 énoncé(s) dont 0 large(s)
-large code 0 : JUGE|exemption, 1 énoncé(s) dont 1 large(s)
-absent code 1 : REFUS|sous-composant absent des entrées du prédicat de scan
-fixed code 1 : REFUS|statut fixed
-mixte code 1 : REFUS|not_affected mêlé à d'autres statuts
-sans-impact code 1 : REFUS|rejeté par scan-outil vex
-autre-digest code 1 : REFUS|énoncé sans produit dont l'@id cite le digest
-sans-vuln code 1 : REFUS|énoncé sans nom de vulnérabilité
-sans-horo code 1 : REFUS|énoncés non classables par scan-outil vex
-FIN
-r=0; bash "$B/signer-vex.sh" verifier "$SV/ok.json" "$REG/builds/x/sample-app:t3" "$M0/image-avant.scan.json" > /dev/null 2>&1 || r=$?
-attendu "signer-vex verifier : image sans digest" "code $r" "code 2"
-# passage 12 : noms confrontés au scan (rétractation mal nommée), couple vulnérabilité et paquet, action_statement
-jq '.vulnerabilities |= map(if .id == "GO-2026-5774" then .package = "pkg:golang/stdlib@1.24.4" else . end)' "$M0/image-avant.scan.json" > "$SV/scan-deux.json"
-vex doc "$SV/retract-faute.json" "$HV" "affected;-;-;-;CVE-2025-69752;pkg:oci/sample-app@$Y;$SYFT"; action "$SV/retract-faute.json"
-vex doc "$SV/retract-sans-action.json" "$HV" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
-vex doc "$SV/couple-faux.json" "$HV" "not_affected;$S1;-;GO-2026-5774;pkg:oci/sample-app@$Y;$SYFT"
-vex doc "$SV/couple-ok.json" "$HV" "not_affected;$S1;-;GO-2026-5774;pkg:oci/sample-app@$Y;pkg:golang/stdlib@1.24.4"
-while read -r c s attendu_r; do
-  r=0; SCAN_OUTIL=$OUT bash "$B/signer-vex.sh" verifier "$SV/$c.json" "$REG/builds/x/sample-app@$Y" "$SV/$s" > "$SV/$c.log" 2>&1 || r=$?
-  attendu "signer-vex verifier : $c" "code $r : $(sed -n 's/^\(JUGE|[a-z]*, [0-9]* énoncé(s) dont [0-9]* large(s)\).*/\1/p; s/^REFUS|\([^:(0-9]*\).*/REFUS|\1/p' "$SV/$c.log" | head -1 | sed 's/ *$//')" "$attendu_r"
-done <<'FIN'
-retract-faute ../../mesure0/image-avant.scan.json code 1 : REFUS|énoncé dont aucun nom ne croise une entrée du prédicat de scan
-retract-sans-action ../../mesure0/image-avant.scan.json code 1 : REFUS|affected sans action_statement
-couple-faux scan-deux.json code 1 : REFUS|sous-composant sans entrée de cette vulnérabilité dans le prédicat de scan
-couple-ok scan-deux.json code 0 : JUGE|exemption, 1 énoncé(s) dont 0 large(s)
-FIN
+# passages 11 et 12 : les cas signer-vex.sh verifier sont en B depuis le passage 14 (le script lit le scan signé dans Zot)
 
 # ------------------------------------------------------------------------------------------------------------------------------ B
 openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 1 -subj /CN=zot-jetable -addext subjectAltName=IP:127.0.0.1 \

@@ -946,8 +946,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/
    publier) publier ;;
 diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbom-grype/signer-vex.sh
 --- a/poc/bricks/07a-sbom-grype/signer-vex.sh	1970-01-01 01:00:00.000000000 +0100
-+++ b/poc/bricks/07a-sbom-grype/signer-vex.sh	2026-11-21 22:36:04.007336029 +0100
-@@ -0,0 +1,128 @@
++++ b/poc/bricks/07a-sbom-grype/signer-vex.sh	2026-11-21 23:11:39.104660343 +0100
+@@ -0,0 +1,150 @@
 +#!/usr/bin/env bash
 +# Brique 07b, tranche 3, pièce 8 de la pose : juger, signer et publier un VEX (OpenVEX v0.2.0) écrit à la main par le propriétaire,
 +# en referrer du digest dans builds/vex/<nom>, comme publier de scanner.sh. Écrit à sec le 21/11/2026, non posé : la clé Transit
@@ -962,28 +962,33 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +#   - énoncé sans nom de vulnérabilité, ou sans produit dont l'@id cite le digest ;
 +#   - horodatage illisible, ou postérieur à l'heure de la commande (un document daté du futur gagne tous les classements, et le
 +#     registre est en ajout seul : seul un retrait sur accord le répare) ;
-+#   - sous-composant qui n'est pas exactement le PURL d'une entrée du prédicat de scan fourni ;
++#   - aucun scan signé vérifié pour le digest (passage 14 : le prédicat de scan est lu et vérifié ici, plus fourni par l'appelant) ;
++#   - sous-composant qui n'est pas exactement le PURL d'une entrée du prédicat de scan ;
 +#   - énoncé dont aucun nom ne croise l'id ou un alias d'une entrée du prédicat de scan (passage 12 : une rétractation mal nommée
 +#     ne rétracterait rien) ; sous-composant d'une exemption qui n'est le paquet d'aucune entrée portant ce nom.
 +# Après signature, et avant publication : signature vérifiée par la clé publique, contenu signé (payload DSSE) rejugé de même.
-+# Usage : signer-vex.sh verifier|signer <document.json> <hôte/dépôt@sha256:…> <scan.json>
-+#   scan.json : prédicat de scan décodé du même digest (vulnerabilities[].package) ; ce script ne vérifie pas sa signature.
-+#   signer lit : CLE (hashivault://vex par défaut ; VAULT_ADDR et VAULT_TOKEN à la charge de l'appelant), CLE_PUBLIQUE, CA
-+#   (certificat du registre), CONFIG_REGISTRE (fichier d'authentification d'oras) ; SCAN_OUTIL (scan-outil par défaut).
++# Usage : signer-vex.sh verifier|signer <document.json> <hôte/dépôt@sha256:…>
++#   Prédicat de scan : le plus récent (scannedAt) des scans attestés sur le digest dans <hôte>/builds/scan/<nom>, vérifiés par
++#   cosign verify-attestation avec CLE_SCANNER (clé publique du scanner), comme lire_vex de scanner.sh pour les VEX.
++#   Les deux modes lisent : CA (certificat du registre), CLE_SCANNER ; SCAN_OUTIL (scan-outil par défaut).
++#   signer lit en plus : CLE (hashivault://vex par défaut ; VAULT_ADDR et VAULT_TOKEN à la charge de l'appelant), CLE_PUBLIQUE,
++#   CONFIG_REGISTRE (fichier d'authentification d'oras).
 +set -euo pipefail
 +export LC_ALL=C
-+usage() { echo "usage : signer-vex.sh verifier|signer <document.json> <hôte/dépôt@sha256:…> <scan.json>" >&2; exit 2; }
-+[ $# = 4 ] || usage
++usage() { echo "usage : signer-vex.sh verifier|signer <document.json> <hôte/dépôt@sha256:…>" >&2; exit 2; }
++[ $# = 3 ] || usage
 +MODE=$1 IMAGE=$3
 +case $MODE in verifier | signer) ;; *) usage ;; esac
-+[ -f "$2" ] && [ -f "$4" ] || { echo "document ou prédicat de scan introuvable" >&2; exit 2; }
++[ -f "$2" ] || { echo "document introuvable" >&2; exit 2; }
 +printf '%s' "$IMAGE" | grep -qE '^[^@/]+/[^@]+@sha256:[0-9a-f]{64}$' || { echo "image attendue : hôte/dépôt@sha256:<64 hexadécimaux>" >&2; exit 2; }
-+DOC=$(realpath -- "$2") SCAN=$(realpath -- "$4")
++DOC=$(realpath -- "$2")
++CA=$(realpath -- "${CA:?CA : certificat du registre}")
++CLE_SCANNER=$(realpath -- "${CLE_SCANNER:?CLE_SCANNER : clé publique du scanner}")
 +OPENVEX=https://openvex.dev/ns/v0.2.0
 +SCAN_OUTIL=${SCAN_OUTIL:-scan-outil}
 +hex=${IMAGE##*@sha256:} r=${IMAGE%@sha256:*}
 +n=${r#*/} nom=${r##*/}
-+depot_vex=${r%%/*}/builds/vex/${n#builds/}
++depot_vex=${r%%/*}/builds/vex/${n#builds/} depot_scan=${r%%/*}/builds/scan/${n#builds/}
 +maintenant=$(date -u +%s)
 +heure=$(date -u -d "@$maintenant" +%Y-%m-%dT%H:%M:%SZ)
 +w=$(mktemp -d)
@@ -1010,6 +1015,24 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +  "$DOC" > /dev/null || refus "énoncé sans nom de vulnérabilité (@id, name ou aliases)"
 +jq -e --arg h "$hex" 'all(.statements[]; [(.products // [])[] | (."@id" // "") | contains($h)] | any)' "$DOC" > /dev/null \
 +  || refus "énoncé sans produit dont l'@id cite le digest $hex"
++# prédicat de scan : le plus récent des scans vérifiés par CLE_SCANNER, sujet égal au digest
++COSIGN_REPOSITORY=$depot_scan cosign verify-attestation --key "$CLE_SCANNER" --insecure-ignore-tlog --type https://supply-chain.example/scan/v1 \
++  --registry-cacert "$CA" "$IMAGE" > "$w/scans" 2> "$w/scans.err" || true
++grep '^{' "$w/scans" > "$w/lignes" || true
++i=0 nv=0 tmax=-1 meilleur=
++while IFS= read -r l; do
++  if printf '%s' "$l" | jq -r .payload | base64 -d > "$w/s-$i.json" 2> /dev/null \
++    && jq -e --arg h "$hex" '.predicateType == "https://supply-chain.example/scan/v1" and any(.subject[]; .digest.sha256 == $h)' "$w/s-$i.json" > /dev/null 2>&1; then
++    nv=$((nv + 1))
++    t=$(date -u -d "$(jq -r .predicate.scannedAt "$w/s-$i.json")" +%s 2> /dev/null || echo -1)
++    if [ "$t" -gt "$tmax" ]; then tmax=$t meilleur=$w/s-$i.json; fi
++  fi
++  i=$((i + 1))
++done < "$w/lignes"
++[ -n "$meilleur" ] || refus "aucun scan signé vérifié (clé CLE_SCANNER, $depot_scan, sujet sha256:$hex)"
++SCAN=$w/scan.json
++jq .predicate "$meilleur" > "$SCAN"
++scanne=$(jq -r .scannedAt "$SCAN")
 +jq -r '[.vulnerabilities[]?.package // empty] | unique | .[]' "$SCAN" > "$w/purls"
 +[ -s "$w/purls" ] || refus "prédicat de scan sans entrée (vulnerabilities[].package)"
 +absents=$(jq -r --rawfile p "$w/purls" '([.statements[] | (.products // [])[] | (.subcomponents // [])[] | (."@id" // "")] | unique)
@@ -1044,13 +1067,12 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +jq -n --arg n "$nom" --arg h "$hex" --arg t "$OPENVEX" --slurpfile d "$DOC" \
 +  '{_type: "https://in-toto.io/Statement/v1", subject: [{name: $n, digest: {sha256: $h}}], predicateType: $t, predicate: $d[0]}' > "$w/enonce.json"
 +juger "$w/enonce.json"
-+echo "JUGE|$nature, $ne énoncé(s) dont $larges large(s), document sha256 $(sha256sum < "$DOC" | cut -c1-64), sujet sha256:$hex, VEX vers $depot_vex, $heure"
++echo "JUGE|$nature, $ne énoncé(s) dont $larges large(s), document sha256 $(sha256sum < "$DOC" | cut -c1-64), sujet sha256:$hex, VEX vers $depot_vex, $heure ; scan du $scanne ($nv scan(s) vérifié(s))"
 +[ "$MODE" = signer ] || exit 0
 +
 +CLE=${CLE:-hashivault://vex}
 +case $CLE in hashivault://*) ;; *) CLE=$(realpath -- "$CLE") ;; esac
 +CLE_PUBLIQUE=$(realpath -- "${CLE_PUBLIQUE:?CLE_PUBLIQUE : clé publique VEX}")
-+CA=$(realpath -- "${CA:?CA : certificat du registre}")
 +CONFIG_REGISTRE=$(realpath -- "${CONFIG_REGISTRE:?CONFIG_REGISTRE : authentification d oras pour builds/vex}")
 +cosign signing-config create --out "$w/vide.json" > "$w/cosign.log" 2>&1 || { cat "$w/cosign.log" >&2; exit 1; }
 +cosign attest-blob --key "$CLE" --signing-config "$w/vide.json" --predicate "$DOC" --type "$OPENVEX" --bundle "$w/bundle.json" \

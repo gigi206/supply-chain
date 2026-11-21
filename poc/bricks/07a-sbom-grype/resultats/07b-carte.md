@@ -911,3 +911,31 @@ Patch `0d641017e662d483…`. Contrôles refaits : `git apply --check`, `ec opa t
 - CSAF, l'atteignabilité et la projection Dependency-Track sont d'autres chantiers.
 
 **Heures** : la somme des enveloppes est recalculée à chaque note ; une demande au propriétaire sera faite avant 20 h (2× l'estimation de 10 h).
+
+## Limite 1 levée : `signer-vex.sh` lit et vérifie le scan signé (note de 2026-11-21T22:17:09Z ; passage 14, rien posé)
+
+**Limite** (notes de 21:32:16Z et de l'inventaire) : le script jugeait les sous-composants et les noms sur un fichier `scan.json` fourni par l'appelant, sans en vérifier la signature.
+
+**Changement** (prédiction écrite avant le code, section « Ajout avant le quatorzième passage », 22:11:04 UTC) :
+- Le script ne prend plus de fichier. Usage : `signer-vex.sh verifier|signer <document> <hôte/dépôt@sha256:…>`.
+- Il lit les scans attestés sur le digest dans `<hôte>/builds/scan/<nom>` par `cosign verify-attestation`, avec la clé publique du scanner (`CLE_SCANNER`), comme `lire_vex` de `scanner.sh`.
+- Il garde le plus récent par `scannedAt`, converti en secondes, et refuse s'il n'en vérifie aucun.
+- Les deux modes lisent donc le registre.
+- Patch `9c08785442f9ad90…`, seul `signer-vex.sh` change. Contrôles refaits : `git apply --check`, `ec opa test` 39/39, témoins de G6 et `yq` à 30.
+
+**Banc** : les cas `verifier` passent de la partie A à la partie B (Zot jetable). Une clé locale `scanner` signe des scans témoins, publiés en referrers (2, 1 et 1 référents) :
+- `builds/signe` : un ancien scan, où `GO-2026-5774` est sur `stdlib` (01/11), puis un récent, tout sur `go-chi` ;
+- `builds/deux` : le prédicat `stdlib` seul ;
+- `builds/etranger` : un scan signé par la clé étrangère seulement.
+
+**Passage 14** ([journal](07b-t3-banc-14.log)) : 146 OK, 0 KO, de 22:12:57 à 22:16:26 UTC. C'est la prédiction.
+- Les 17 cas `verifier` des passages 11 et 12 sont inchangés, désormais sur un scan signé.
+- L'exemption de `GO-2026-5774` pour `stdlib` passe sur `builds/deux` et est refusée sur `builds/signe` : c'est bien le scan le plus récent qui est lu.
+- Le scan signé par la clé étrangère est ignoré : « aucun scan signé vérifié ».
+- `signer` publie et `scanner.sh` retient, comme au passage 11.
+
+**Limite qui reste** : un scan plus ancien que le dernier scan quotidien, mais plus récent que les autres scans publiés, ne se distingue pas d'un scan à jour. Le script prend ce qui est publié et signé ; il ne relance pas de scan.
+
+**Heures mesurées** :
+- Ce segment : de 22:10:13 UTC (inventaire) à 22:17:09 UTC.
+- Somme des enveloppes de la 07b : au plus 6 h 50 pour 10 h estimées (demande au propriétaire avant 20 h).

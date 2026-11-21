@@ -292,3 +292,24 @@ Les témoins de rétractation du banc reçoivent donc un `action_statement` par 
 **Total prédit** : 143 OK (141 + 2), 0 KO.
 
 **Non mesuré par ce passage** : `verif` (Prometheus et Grafana réels), qui demande la pose de la pièce 7.
+
+## Ajout avant le quatorzième passage : `signer-vex.sh` lit et vérifie le scan signé (écrit le 2026-11-21, date -u de 22:11:04 UTC dans la même commande que l’écriture, avant toute ligne de code ; limite 1 de l'inventaire)
+
+**Changement prévu** : `signer-vex.sh` ne prend plus de fichier `scan.json`. Il lit les scans attestés sur le digest dans `builds/scan/<nom>` (`cosign verify-attestation`, clé publique du scanner `CLE_SCANNER`, comme `lire_vex` de `scanner.sh`), garde le plus récent par `scannedAt`, et refuse s'il n'y en a aucun. Usage : `signer-vex.sh verifier|signer <document> <hôte/dépôt@sha256:…>`. `verifier` lit donc le registre.
+
+**Banc** : les cas `verifier` passent de la partie A (hors registre) à la partie B (Zot jetable). Une clé locale `scanner` signe des scans témoins, publiés en referrers :
+- `builds/signe/sample-app` : un ancien scan (le prédicat où `GO-2026-5774` est sur `stdlib`, `scannedAt` du 01/11), puis un récent (`image-avant` de la mesure 0, tout sur `go-chi`) ;
+- `builds/deux/sample-app` : le prédicat `stdlib` seul ;
+- `builds/etranger/sample-app` : un scan signé par la clé étrangère seulement.
+
+| Partie | Cas | Prédiction | Confiance |
+|---|---|---|---|
+| B, `verifier` | les 12 témoins et l'image sans digest du passage 11, sur `builds/signe` | inchangés, mêmes codes et motifs | haute |
+| B, `verifier` | les 4 cas du passage 12 ; les deux cas « couple » sur `builds/deux` | inchangés | haute |
+| B, `verifier` | exemption de `GO-2026-5774` pour `stdlib` sur `builds/signe` (le plus récent la place sur `go-chi`) | code 1, « sous-composant absent » : c'est le scan le plus récent qui est lu | moyenne : tri par `scannedAt` à décalage horaire |
+| B, `verifier` | document correct sur `builds/etranger` | code 1, « aucun scan signé vérifié » | haute |
+| B | scans publiés (référents) : `signe` 2, `deux` 1, `etranger` 1 | `2,1,1` | haute |
+| B, `signer` | les 13 contrôles des passages 11 et 12 | inchangés | haute |
+| A, C, D | les autres contrôles | inchangés | haute |
+
+**Total prédit** : 146 OK (143 + 3), 0 KO.
