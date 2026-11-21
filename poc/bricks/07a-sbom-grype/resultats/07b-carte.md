@@ -170,3 +170,38 @@ C'est l'étape 2 du tableau, une préparation sans accord, commencée à 16:20:2
 - sudo sur sc-stockage : compte système `entrees-scan`, script, unité rendue avec `SCANS`, `entrees-scan.prom` créé vide, et timer ;
 - puis le panneau Grafana ;
 - aucune écriture dans Zot. G7 n'est pas touché : la tranche ne fait que des GET anonymes.
+
+## Complément à la tranche 1 (note de 2026-11-21T16:31:27Z ; la note de 2026-11-21T16:27:54Z n'est pas réécrite)
+
+Relecture du conseiller. Quatre points.
+
+**1. Noms de séries, lus dans le vrai Prometheus.** La note précédente ne les avait vérifiés que dans le dépôt, alors que l'incident a7 venait d'un fichier servi sur la VM. Lecture par l'auditeur dans Grafana :
+- `count({__name__=~"scan_entrees.*"})` revient vide ;
+- parmi les noms en `scan_`, seule `scan_dernier_referrer_timestamp_seconds` existe, avec 2 séries.
+
+**2. Clé de jointure entre comptes et liste.** La série portait une époque en secondes, et la ligne une chaîne ISO à nanosecondes : une variable Grafana n'avait aucune clé commune pour les relier.
+- Chaque ligne porte maintenant `scanne`, l'époque entière, égale à `scan_entrees_scanne_timestamp_seconds` du même dépôt. Le script passe à **`bdac36b853f845b3…`**.
+- Le banc est relancé sous un autre nom ([journal 2](07b-t1-banc-2.log)) : **30 contrôles, 0 KO**. S'y ajoutent quatre contrôles :
+  - `scanne` est égal à jq pour chaque ligne des deux témoins ;
+  - il reste égal malgré le décalage `+01:00` du témoin de G6 ;
+  - au passage réel, pour chacun des deux dépôts, une seule valeur de `scanne`, égale à sa série.
+- La requête de liste devient `{source="journal", unite="entrees-scan.service"} | json | scanne = "$scanne"`. `$scanne` est une variable lue dans `scan_entrees_scanne_timestamp_seconds`. Elle n'est pas essayée.
+- Le volume passe à **20 719 octets par émission**. À chaque passage, ce serait environ 1,99 Mo par 24 h (calcul). Les chiffres de la note précédente valent pour la version `0b6d6718…`.
+
+**3. Sur quoi portent les entrées du deb.** Les 67 entrées n'ont que 2 PURL :
+- `pkg:golang/stdlib@1.24.4` : 62 entrées, dont **les 3 Critical et les 33 High**, plus 25 Medium et 1 Low ;
+- `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` : 3 Medium et 2 Unknown.
+
+sample-app porte `pkg:golang/stdlib@1.26.10`, avec une seule entrée. L'écart entre les deux vient donc de la version de la bibliothèque standard de Go vue dans chaque artefact. Son origine côté construction du deb n'est pas relue ici.
+
+**4. Sous-point du choix 6 : quand émettre la liste.**
+- Le volume ne départage pas : environ 33 Ko contre 1,99 Mo par 24 h, devant 1,8 à 1,9 Gio.
+- **Une fois par scan**, comme écrit :
+  - il y a un état à tenir (`StateDirectory`). Perdu au rejeu, il fait réémettre la liste une fois, sans dommage ;
+  - le panneau doit remonter jusqu'au dernier scan. Si le scan prend du retard, les comptes restent, mais la liste sort d'une fenêtre courte.
+- **À chaque passage** : aucun état, et la liste est toujours dans les 15 dernières minutes, mais en 96 copies par jour.
+- **Recommandation : une fois par scan, avec une fenêtre de panneau de 7 jours.** C'est l'âge auquel la porte refuse un scan (D4, rappelé par l'alerte `ScanBientotRefuse`). Au-delà, la liste n'a plus d'objet pour la porte, et l'alerte a déjà sonné.
+
+**Écart de méthode, dit franchement.** Les deux passages en échec du banc, décrits dans la note précédente, ont été écrits sous le même nom, `07b-t1-banc.log`, avant le premier commit. Seul le troisième passage y est archivé, et les deux premiers sont perdus. Le complément est journalisé sous un autre nom.
+
+**Pour la pose, pas maintenant.** `SCANS` contient des `/`. Le `sed "s/@DIGEST@/…/"` de `g8_metriques`, copié tel quel, casserait. Il faudra changer de délimiteur, ou passer par un drop-in comme S6a.

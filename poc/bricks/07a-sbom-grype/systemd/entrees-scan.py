@@ -12,7 +12,7 @@ Sorties :
   SORTIE (fichiers-metriques, brique 19) : comptes par dépôt, grille de gravités fixe (zéros écrits), KEV, avec correctif,
     scannedAt du prédicat lu. Ni HELP ni TYPE, comme fraicheur-scan.prom. Le fichier est créé par la pose ; écrit sur place.
   Sortie standard (journal, puis Loki par Alloy, unite="entrees-scan.service") : une ligne JSON par entrée, avec dépôt et
-    scannedAt dans la ligne, jamais en étiquette. Émise une seule fois par referrer de scan : le digest du dernier manifeste émis
+    scannedAt dans la ligne (chaîne d'origine, et « scanne » en secondes, égal à la série du même nom), jamais en étiquette. Émise une seule fois par referrer de scan : le digest du dernier manifeste émis
     est gardé dans ETAT (StateDirectory). Les autres passages n'écrivent qu'une ligne de résumé.
 Aucun referrer de scan pour un dépôt : ses séries ne sont pas écrites (absent() dans les règles), aucune ligne d'entrée."""
 import base64
@@ -90,8 +90,9 @@ def comptes(depot, predicat):
 
 
 def entrees(depot, predicat):
+    scanne = epoque(predicat["scannedAt"])  # même valeur que scan_entrees_scanne_timestamp_seconds : clé de jointure pour Grafana
     for e in predicat.get("vulnerabilities") or []:
-        yield json.dumps({"depot": depot, "scannedAt": predicat["scannedAt"], "id": e.get("id"), "aliases": e.get("aliases"),
+        yield json.dumps({"depot": depot, "scannedAt": predicat["scannedAt"], "scanne": scanne, "id": e.get("id"), "aliases": e.get("aliases"),
                           "severity": e.get("severity"), "kev": e.get("kev"), "kevCves": e.get("kevCves"), "epss": e.get("epss"),
                           "fixedIn": e.get("fixedIn"), "package": e.get("package")}, ensure_ascii=False, separators=(",", ":"))
 

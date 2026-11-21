@@ -82,6 +82,13 @@ compare() { # $1 dépôt, $2 clé dans AR
 }
 compare builds/scan/sample-app app
 compare builds/scan/sample-app-deb deb
+# Clé de jointure : « scanne » des lignes émises = série scan_entrees_scanne_timestamp_seconds du même dépôt.
+for d in builds/scan/sample-app builds/scan/sample-app-deb; do
+  l=$(grep '^{' "$T/sortie1.txt" | jq -r --arg d "$d" 'select(.depot == $d) | .scanne' | sort -u)
+  p=$(grep "^scan_entrees_scanne_timestamp_seconds{depot=\"$d\"}" "$T/s.prom" | cut -d' ' -f2)
+  if [ -n "$l" ] && [ "$l" = "$p" ]; then echo "OK   jointure $d : une seule valeur de « scanne » dans la liste, égale à la série"
+  else echo "KO   jointure $d : liste '$l', série '$p'"; KO=$((KO + 1)); fi
+done
 echo "séries écrites :"
 sed 's/^/  /' "$T/s.prom"
 echo "volume émis vers le journal : passage 1, $(wc -c < "$T/sortie1.txt") octets ($(grep -c '^{' "$T/sortie1.txt") lignes d'entrée et le résumé) ; passage 2, $(wc -c < "$T/sortie.txt") octets"

@@ -116,6 +116,8 @@ with tempfile.TemporaryDirectory(dir=os.path.expanduser("~/.cache/supply-chain-p
     verifier("C1 liste émise : app + deb lignes", len(liste) == A["app"]["n"] + A["deb"]["n"], len(liste))
     verifier("C1 dépôt et scannedAt dans chaque ligne", all(l["depot"] and l["scannedAt"] for l in liste))
     verifier("C1 aucune ligne sans id ni package", all(l["id"] and l["package"] for l in liste))
+    verifier("C1 « scanne » de chaque ligne = scannedAt de jq du dépôt (clé de jointure)",
+             all(l["scanne"] == A["app" if l["depot"] == "builds/scan/sample-app" else "deb"]["t"] for l in liste))
     verifier("C1 résumé : deux listes émises", len(resume) == 1 and resume[0].count("(liste émise)") == 2, resume)
     p1 = prom
 
@@ -128,6 +130,7 @@ with tempfile.TemporaryDirectory(dir=os.path.expanduser("~/.cache/supply-chain-p
     verifier("C3 séries = jq (KEV comprises)", rc == 0 and series(prom, "temoin/g6") == attendu_series(A["g6"]),
              f"{series(prom, 'temoin/g6')} contre {attendu_series(A['g6'])}")
     verifier("C3 lignes KEV dans la liste = jq", sum(1 for l in liste if l["kev"]) == A["g6"]["kev"])
+    verifier("C3 « scanne » = jq malgré le décalage +01:00", all(l["scanne"] == A["g6"]["t"] for l in liste))
 
     vide = json.loads(json.dumps(APP))
     vide["predicate"]["vulnerabilities"] = []
