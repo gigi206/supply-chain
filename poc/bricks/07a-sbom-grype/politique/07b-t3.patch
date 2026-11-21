@@ -520,8 +520,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/plateforme.sh b/poc/bricks/07a-sbo
    propre | dater 'now' '4 days ago' > "$j/base-vieille.json"
 diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml b/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml
 --- a/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml	2026-11-04 21:56:37.719009291 +0100
-+++ b/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml	2026-11-21 18:27:24.048472261 +0100
-@@ -8,9 +8,12 @@
++++ b/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml	2026-11-21 21:13:00.511378239 +0100
+@@ -8,9 +8,13 @@
        # D4 du propriétaire (04/11/2026) : scan de 7 jours au plus, base construite 3 jours au plus avant lui
        scan_age_max_jours: 7
        base_age_max_jours: 3
@@ -529,9 +529,10 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml b
        vex_statuts_acceptes:
          - not_affected
 -        - fixed
-+      # 07b, choix 3 (21/11/2026) : durée de validité d'un VEX, en jours, depuis son horodatage. VALEUR À FIXER PAR LE PROPRIÉTAIRE
-+      # avant la pose ; null : aucune KEV n'est exemptée (échec fermé, test_seuil_vex_absent_refus)
-+      vex_age_max_jours: null
++      # 07b, choix 3 (21/11/2026) : durée de validité d'un VEX, en jours, depuis l'horodatage le plus ancien des documents
++      # retenus. 30 : choix du propriétaire du 21/11/2026 (recommandation du conseiller, jugement sans mesure). Sans la clé,
++      # aucune KEV n'est exemptée (échec fermé, test_seuil_vex_absent_refus)
++      vex_age_max_jours: 30
      config:
        include:
          - scan

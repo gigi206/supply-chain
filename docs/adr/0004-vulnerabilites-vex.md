@@ -1,6 +1,6 @@
 # ADR 0004 : vulnérabilités et VEX (OpenVEX ou CSAF)
 
-- **Statut** : **À rédiger**. Seules les décisions du propriétaire du 21/11/2026 (brique 07b, choix 1 à 5) et leurs limites sont écrites. Restent la projection Dependency-Track, le score, les KPI de couverture VEX et la valeur de `vex_age_max_jours`.
+- **Statut** : **À rédiger**. Seules les décisions du propriétaire du 21/11/2026 (brique 07b, choix 1 à 5) et leurs limites sont écrites. Restent la projection Dependency-Track, le score et les KPI de couverture VEX. `vex_age_max_jours` est fixé à 30 jours (2026-11-21T20:13:42Z).
 - **Date** : 2026-11-21
 - **Décideurs** : propriétaire du projet
 
@@ -31,6 +31,7 @@ Format **OpenVEX** (spécification v0.2.0). Le VEX est une attestation in-toto s
 
 ## Reste ouvert
 
-- Valeur de `vex_age_max_jours` (choix du propriétaire ; la politique de la tranche 3 porte `null`, qui n'exempte aucune KEV).
+- `vex_age_max_jours` : **30 jours**, choix du propriétaire (2026-11-21T20:13:42Z), recommandation du conseiller suivie. C'est un jugement, sans mesure qui le fonde. Sans la clé, aucune KEV n'est exemptée.
+- Renouvellement : la durée part de l'horodatage le plus ancien des documents retenus. Un VEX neuf ne renouvelle donc rien tant que l'ancien reste publié dans `builds/vex/`, et `cosign attest` v3.1.4 n'a pas d'option de remplacement. Le retrait de l'ancien référent reste à outiller avant le premier VEX réel.
 - Écart avec Dependency-Track : d'après `docs/00` (ligne 277, non revérifié), il ne lit que le VEX de CycloneDX. La projection est hors de la 07b.
 - Score « vulnérabilités après VEX » et KPI de couverture VEX (`docs/02`).

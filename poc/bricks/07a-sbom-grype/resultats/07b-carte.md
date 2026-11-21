@@ -557,3 +557,18 @@ Le propriétaire a demandé ce que recommande le conseiller. **Recommandation : 
 - Pour renouveler, il faut donc retirer l'ancien référent de `builds/vex/<nom>`. Aucun script ni essai ne le fait aujourd'hui. Sans ce chemin, toute durée finit en refus à l'échéance.
 
 **Délai de prise en compte** : un VEX renouvelé n'entre dans le prédicat qu'au scan quotidien suivant. Il faut donc re-signer au moins un jour avant l'échéance.
+
+## Choix de `vex_age_max_jours` : 30 jours (note de 2026-11-21T20:13:42Z ; pièce 1 de la pose, dans le patch seulement)
+
+**Choix du propriétaire, verbatim : « 30 ».** C'est la recommandation du conseiller (note précédente).
+
+- **Seul le patch change** : la valeur `null` de `policy-scan.yaml` devient `30` dans la copie `b/` de `~/.cache/supply-chain-poc/07a/t3/`, et le commentaire est réécrit. Le patch est régénéré par `diff -ruN a b` (`e063abd2aedf18af…`, au lieu de `234d449aefb5507a…`). Aucun autre fichier du patch ne change.
+- **Rien n'est posé** : la ConfigMap de la porte est la pièce 6, qui demande son propre accord.
+- **Contrôles faits après la régénération** :
+  - `git apply --check` passe sur l'arbre ;
+  - `ec opa test` sur `b/` : 39/39 ;
+  - la ligne lue par les témoins de G6 de `plateforme.sh` donne 30 ;
+  - `yq` lit `vex_age_max_jours: 30` dans `ruleData`.
+- **La porte avec 30 jours a déjà été mesurée** : la partie C du banc tournait avec une copie de la politique où `null` était remplacé par 30.
+- **Le banc n'a pas été rejoué sur ce patch.** S'il l'était, ses lignes 308 et 309 ne trouveraient plus `null` : le cas « politique à `null` » jugerait 30 sans le dire. Il faudrait d'abord les adapter.
+- **La limite de la note précédente vaut toujours** : le retrait d'un ancien VEX n'est pas outillé, et sans lui l'échéance de 30 jours finit en refus.
