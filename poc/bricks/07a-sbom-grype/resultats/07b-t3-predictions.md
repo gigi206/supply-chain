@@ -246,3 +246,26 @@ Patch `992af0d0b7073b57…` : le précédent (`02ac8e835fe74fbe…`) plus un fic
 **Total prédit** : 137 OK (111 + 13 en A + 13 en B), 0 KO.
 
 **Non mesuré par ce passage** : `hashivault://vex` (pièce 2, sur accord), le compte d'écriture de `builds/vex/**` (pièce 4), et la signature du prédicat de scan fourni au script, que le script ne vérifie pas.
+
+## Ajout avant le douzième passage : noms confrontés au scan, `action_statement` (écrit le 2026-11-21, date -u de 21:35:33 UTC dans la même commande que l’écriture, avant toute ligne de code)
+
+**Trou du passage 11**, signalé par le conseiller et confirmé par une sonde hors banc (21:34:42 UTC, binaire et script du passage 11, sonde effacée ensuite) : une rétractation `affected` sur `CVE-2025-69752`, faute de frappe pour `CVE-2025-69725`, sort en code 0. Elle serait signée et publiée sans rien rétracter : l'exemption de la KEV resterait jusqu'à 30 jours. C'est un échec ouvert.
+
+**Correction prévue dans `signer-vex.sh`** (le jugement de `scan-outil vex` ne change pas) :
+- chaque énoncé doit avoir un nom (`@id`, `name`, `aliases`) égal à l'`id` ou à un alias d'une entrée du prédicat de scan fourni ;
+- chaque sous-composant d'une exemption doit être le paquet d'une entrée qui porte ce nom ;
+- `affected` exige un `action_statement` non vide. La spécification v0.2.0 l'écrit en MUST dans la description du champ, mais sa colonne « Required » le marque facultatif. Le script prend la lecture stricte, comme pour `not_affected`. `under_investigation` n'exige rien.
+
+Les témoins de rétractation du banc reçoivent donc un `action_statement` par `jq`, sans changer `07b-t3-vex.py`.
+
+| Partie | Cas | Prédiction | Confiance |
+|---|---|---|---|
+| A, `verifier` | rétraction sur `CVE-2025-69752` | code 1, motif « aucun nom ne croise une entrée du prédicat de scan » | haute |
+| A, `verifier` | rétractation sans `action_statement` | code 1, motif `action_statement` | haute |
+| A, `verifier` | prédicat où `GO-2026-5774` est sur `stdlib` : exemption de `GO-2026-5774` pour `go-chi` | code 1, motif « sous-composant sans entrée de cette vulnérabilité » | haute |
+| A, `verifier` | même prédicat, exemption de `GO-2026-5774` pour `stdlib` | code 0, exemption | haute |
+| A, `verifier` | les 13 cas du passage 11 (la rétractation reçoit un `action_statement`) | inchangés, mêmes motifs | haute |
+| B, `signer` | les 13 contrôles du passage 11 (la rétractation reçoit un `action_statement`) | inchangés | haute |
+| B, C, D | les autres contrôles | inchangés | haute |
+
+**Total prédit** : 141 OK (137 + 4), 0 KO.

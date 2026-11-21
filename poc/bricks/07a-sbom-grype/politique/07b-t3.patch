@@ -940,8 +940,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/
    publier) publier ;;
 diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbom-grype/signer-vex.sh
 --- a/poc/bricks/07a-sbom-grype/signer-vex.sh	1970-01-01 01:00:00.000000000 +0100
-+++ b/poc/bricks/07a-sbom-grype/signer-vex.sh	2026-11-21 22:24:27.932214861 +0100
-@@ -0,0 +1,113 @@
++++ b/poc/bricks/07a-sbom-grype/signer-vex.sh	2026-11-21 22:36:04.007336029 +0100
+@@ -0,0 +1,128 @@
 +#!/usr/bin/env bash
 +# Brique 07b, tranche 3, pièce 8 de la pose : juger, signer et publier un VEX (OpenVEX v0.2.0) écrit à la main par le propriétaire,
 +# en referrer du digest dans builds/vex/<nom>, comme publier de scanner.sh. Écrit à sec le 21/11/2026, non posé : la clé Transit
@@ -951,11 +951,14 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +#   - document illisible, @context autre que OpenVEX v0.2.0, aucun énoncé ;
 +#   - statut fixed (retiré des statuts acceptés, choix 5) ; document qui mêle not_affected et d'autres statuts ;
 +#   - exemption (not_affected) : document que scan-outil vex rejette (justification, impact_statement…) ou énoncé non exemptant ;
-+#   - rétractation : statuts affected ou under_investigation seulement ;
++#   - rétractation : statuts affected ou under_investigation seulement ; affected sans action_statement (MUST dans la description
++#     du champ, OpenVEX v0.2.0, alors que la colonne « Required » le dit facultatif : lecture stricte, comme pour not_affected) ;
 +#   - énoncé sans nom de vulnérabilité, ou sans produit dont l'@id cite le digest ;
 +#   - horodatage illisible, ou postérieur à l'heure de la commande (un document daté du futur gagne tous les classements, et le
 +#     registre est en ajout seul : seul un retrait sur accord le répare) ;
-+#   - sous-composant qui n'est pas exactement le PURL d'une entrée du prédicat de scan fourni.
++#   - sous-composant qui n'est pas exactement le PURL d'une entrée du prédicat de scan fourni ;
++#   - énoncé dont aucun nom ne croise l'id ou un alias d'une entrée du prédicat de scan (passage 12 : une rétractation mal nommée
++#     ne rétracterait rien) ; sous-composant d'une exemption qui n'est le paquet d'aucune entrée portant ce nom.
 +# Après signature, et avant publication : signature vérifiée par la clé publique, contenu signé (payload DSSE) rejugé de même.
 +# Usage : signer-vex.sh verifier|signer <document.json> <hôte/dépôt@sha256:…> <scan.json>
 +#   scan.json : prédicat de scan décodé du même digest (vulnerabilities[].package) ; ce script ne vérifie pas sa signature.
@@ -995,6 +998,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +    || refus "statuts hors not_affected, affected et under_investigation : $statuts"
 +  nature=retractation
 +fi
++jq -e 'all(.statements[] | select(.status == "affected"); (.action_statement // "" | tostring | gsub("\\s"; "")) != "")' "$DOC" > /dev/null \
++  || refus "affected sans action_statement (MUST de la description du champ, OpenVEX v0.2.0)"
 +jq -e 'all(.statements[]; [.vulnerability."@id"?, .vulnerability.name?, (.vulnerability.aliases? // [])[]] | map(select(type == "string" and . != "")) | length > 0)' \
 +  "$DOC" > /dev/null || refus "énoncé sans nom de vulnérabilité (@id, name ou aliases)"
 +jq -e --arg h "$hex" 'all(.statements[]; [(.products // [])[] | (."@id" // "") | contains($h)] | any)' "$DOC" > /dev/null \
@@ -1004,6 +1009,16 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +absents=$(jq -r --rawfile p "$w/purls" '([.statements[] | (.products // [])[] | (.subcomponents // [])[] | (."@id" // "")] | unique)
 +  - ($p | split("\n")) | join(" ")' "$DOC")
 +[ -z "$absents" ] || refus "sous-composant absent des entrées du prédicat de scan (égalité exacte) : $absents"
++inconnus=$(jq -r --slurpfile sc "$SCAN" '[$sc[0].vulnerabilities[]? | .id, (.aliases // [])[]] as $s
++  | [.statements | to_entries[] | select([.value.vulnerability."@id"?, .value.vulnerability.name?, (.value.vulnerability.aliases? // [])[]]
++    | map(select(type == "string" and . != "")) | any(.[]; . as $x | $s | any(. == $x)) | not) | .key | tostring] | join(",")' "$DOC")
++[ -z "$inconnus" ] || refus "énoncé dont aucun nom ne croise une entrée du prédicat de scan (id ou alias) : énoncé(s) $inconnus"
++couples=$(jq -r --slurpfile sc "$SCAN" --arg h "$hex" '[$sc[0].vulnerabilities[]? | {p: .package, n: ([.id] + (.aliases // []))}] as $e
++  | [.statements[] | select(.status == "not_affected")
++    | ([.vulnerability."@id"?, .vulnerability.name?, (.vulnerability.aliases? // [])[]] | map(select(type == "string" and . != ""))) as $noms
++    | (.products // [])[] | select((."@id" // "") | contains($h)) | (.subcomponents // [])[] | (."@id" // "") as $p
++    | select([$e[] | select(.p == $p and any(.n[]; . as $x | $noms | any(. == $x)))] | length == 0) | $p] | unique | join(" ")' "$DOC")
++[ -z "$couples" ] || refus "sous-composant sans entrée de cette vulnérabilité dans le prédicat de scan : $couples"
 +larges=$(jq --arg h "$hex" '[.statements[] | select(any((.products // [])[]; (."@id" // "" | contains($h)) and ((.subcomponents // []) | length == 0)))] | length' "$DOC")
 +
 +mkdir "$w/vex"

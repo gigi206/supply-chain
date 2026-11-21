@@ -268,6 +268,7 @@ if [ "${1:-}" = ns ]; then
   [ -s "$T/cas/signe-ok/scan.json" ] && attendu "signe-ok : documents du prédicat = énoncé signé annoncé par SIGNE" \
     "$(jq -r '[.vex.documents[].sha256] | join(",")' "$T/cas/signe-ok/scan.json")" "$(sed -n 's/^SIGNE|.*énoncé signé sha256 \([0-9a-f]*\).*/\1/p' "$T/signer-ok.log")"
   vex doc "$T/v-signe-retract.json" "$(date -u +%FT%TZ)" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
+  jq -c '.statements |= map(. + {action_statement: "témoin du banc : aucune action"})' "$T/v-signe-retract.json" > "$T/v-signe-retract.t" && mv "$T/v-signe-retract.t" "$T/v-signe-retract.json"   # passage 12
   attendu "signer, rétractation : publiée" "$(signer_vex vex "$T/v-signe-retract.json" retract)" "code 0 ; référents 2"
   vex_seul signe-retract builds/signe/sample-app "$Y"; juger_vex signe-retract 2,1,1 5/0
   [ -s "$T/cas/signe-retract/scan.json" ] && attendu "signe-retract : écartées sans exemption" "$(jq -r .vex.ecarteesSansExemption "$T/cas/signe-retract/scan.json")" 1
@@ -412,7 +413,10 @@ HF=$(date -ud tomorrow +%FT%TZ); HV=$(date -ud '1 day ago' +%FT%TZ)
 vex doc "$SV/ok.json" "$HV" "not_affected;$S1;-;$E"
 vex doc "$SV/futur.json" "$HF" "not_affected;$S1;-;$E"
 vex doc "$SV/futur-enonce.json" "$HV" "not_affected;$S1;$HF;$E"
+# passage 12 : affected exige action_statement (OpenVEX v0.2.0) ; ajouté par jq, 07b-t3-vex.py inchangé
+action() { jq -c '.statements |= map(if .status == "affected" then . + {action_statement: "témoin du banc : aucune action"} else . end)' "$1" > "$1.t" && mv "$1.t" "$1"; }
 vex doc "$SV/retract.json" "$HV" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
+action "$SV/retract.json"
 vex doc "$SV/large.json" "$HV" "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;-"
 vex doc "$SV/absent.json" "$HV" "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;pkg:golang/github.com/go-chi/chi@v5.2.4#v5"
 vex doc "$SV/fixed.json" "$HV" "fixed;-;-;-;$E"
@@ -440,6 +444,21 @@ sans-horo code 1 : REFUS|énoncés non classables par scan-outil vex
 FIN
 r=0; bash "$B/signer-vex.sh" verifier "$SV/ok.json" "$REG/builds/x/sample-app:t3" "$M0/image-avant.scan.json" > /dev/null 2>&1 || r=$?
 attendu "signer-vex verifier : image sans digest" "code $r" "code 2"
+# passage 12 : noms confrontés au scan (rétractation mal nommée), couple vulnérabilité et paquet, action_statement
+jq '.vulnerabilities |= map(if .id == "GO-2026-5774" then .package = "pkg:golang/stdlib@1.24.4" else . end)' "$M0/image-avant.scan.json" > "$SV/scan-deux.json"
+vex doc "$SV/retract-faute.json" "$HV" "affected;-;-;-;CVE-2025-69752;pkg:oci/sample-app@$Y;$SYFT"; action "$SV/retract-faute.json"
+vex doc "$SV/retract-sans-action.json" "$HV" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
+vex doc "$SV/couple-faux.json" "$HV" "not_affected;$S1;-;GO-2026-5774;pkg:oci/sample-app@$Y;$SYFT"
+vex doc "$SV/couple-ok.json" "$HV" "not_affected;$S1;-;GO-2026-5774;pkg:oci/sample-app@$Y;pkg:golang/stdlib@1.24.4"
+while read -r c s attendu_r; do
+  r=0; SCAN_OUTIL=$OUT bash "$B/signer-vex.sh" verifier "$SV/$c.json" "$REG/builds/x/sample-app@$Y" "$SV/$s" > "$SV/$c.log" 2>&1 || r=$?
+  attendu "signer-vex verifier : $c" "code $r : $(sed -n 's/^\(JUGE|[a-z]*, [0-9]* énoncé(s) dont [0-9]* large(s)\).*/\1/p; s/^REFUS|\([^:(0-9]*\).*/REFUS|\1/p' "$SV/$c.log" | head -1 | sed 's/ *$//')" "$attendu_r"
+done <<'FIN'
+retract-faute ../../mesure0/image-avant.scan.json code 1 : REFUS|énoncé dont aucun nom ne croise une entrée du prédicat de scan
+retract-sans-action ../../mesure0/image-avant.scan.json code 1 : REFUS|affected sans action_statement
+couple-faux scan-deux.json code 1 : REFUS|sous-composant sans entrée de cette vulnérabilité dans le prédicat de scan
+couple-ok scan-deux.json code 0 : JUGE|exemption, 1 énoncé(s) dont 0 large(s)
+FIN
 
 # ------------------------------------------------------------------------------------------------------------------------------ B
 openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 1 -subj /CN=zot-jetable -addext subjectAltName=IP:127.0.0.1 \

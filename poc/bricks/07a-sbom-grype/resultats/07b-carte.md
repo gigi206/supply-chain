@@ -825,3 +825,33 @@ C'est plus strict que le couple vulnérabilité et produit pour les rétractatio
 **Heures mesurées** :
 - Ce segment : de 21:19:40 UTC (programmation de la lecture G7) à 21:32:16 UTC.
 - Somme des enveloppes de la 07b, prolongée jusqu'à cette note : au plus 6 h 06 pour 10 h estimées.
+
+## Pièce 8 : noms confrontés au scan, `action_statement` (note de 2026-11-21T21:54:57Z ; passage 12, rien posé ; corrige la note de 21:32:16Z)
+
+**Ce qui était faux à 21:32:16Z** : le script confrontait les sous-composants au prédicat de scan, mais pas les noms de vulnérabilité.
+- Le conseiller l'a signalé. Une sonde hors banc l'a confirmé (21:34:42 UTC, sonde effacée ensuite) : une rétractation `affected` sur `CVE-2025-69752`, faute de frappe pour `CVE-2025-69725`, sortait en code 0.
+- Elle aurait été signée et publiée sans rien rétracter : l'exemption de la KEV restait jusqu'à 30 jours. C'était le seul échec ouvert du script. Les autres erreurs ne font que perdre une exemption.
+
+**Correction** (prédiction écrite avant le code, section « Ajout avant le douzième passage », 21:35:33 UTC) :
+- chaque énoncé doit avoir un nom égal à l'`id` ou à un alias d'une entrée du prédicat de scan fourni ;
+- chaque sous-composant d'une exemption doit être le paquet d'une entrée qui porte ce nom ;
+- `affected` exige un `action_statement` non vide. La spécification v0.2.0 l'écrit en MUST dans la description du champ, mais sa colonne « Required » le marque facultatif (lu le 21/11 sur le texte de l'étiquette v0.2.0, par une extraction de page, non comparé octet par octet). Le script prend la lecture stricte, comme pour `not_affected`. `under_investigation` n'exige rien.
+- `scan-outil vex` et la porte ne changent pas. Les témoins de rétractation du banc reçoivent un `action_statement` par `jq`, et `07b-t3-vex.py` ne change pas.
+- Patch `bf53ddddf09e4f5a…`, seul `signer-vex.sh` change. Contrôles refaits : `git apply --check`, `ec opa test` 39/39, témoins de G6 et `yq` à 30.
+
+**Passage 12** ([journal](07b-t3-banc-12.log)) : 141 OK, 0 KO, de 21:51:22 à 21:54:47 UTC. C'est la prédiction.
+- Refusés : la rétractation mal nommée, la rétractation sans `action_statement`, et l'exemption de `GO-2026-5774` pour `go-chi` quand le prédicat la place sur `stdlib`.
+- Acceptée : la même exemption pour `stdlib`.
+- Les 137 contrôles du passage 11 sont inchangés.
+
+**Sonde demandée par le conseiller** (hors banc, 21:37:06 à 21:37:10 UTC ; binaire du passage 11, SBOM du cas `signe-ok`, base de G0, hors réseau ; effacée ensuite) : un document recevable par `scan-outil vex` peut-il faire sortir Grype en erreur ?
+- Cinq formes testées : le témoin, un produit qui n'est pas un PURL, un sous-composant qui n'est pas un PURL, un horodatage à décalage horaire, un nom de vulnérabilité suivi d'une espace.
+- Grype sort en code 0 dans les cinq cas. Aucune erreur trouvée, sans que cela prouve qu'il n'en existe pas : le repli « scan sans `--vex` » reste ouvert, non bloquant.
+- Constat en passant : le produit qui n'est pas un PURL écarte quand même la correspondance (4 correspondances, 1 ignorée). C'est le constat 2 de la tranche 2 : Grype ne vérifie pas le produit sur le SBOM fusionné, la portée vient du sujet de l'attestation. Le sous-composant qui n'est pas un PURL et le nom suivi d'une espace n'écartent rien (5 correspondances, 0 ignorée).
+
+**Limites ajoutées** :
+- **Audit** : `JUGE`, `SIGNE`, `PUBLIE` et `REFUS` ne sortent que sur le terminal de l'auteur. Rien n'en est consultable dans Grafana, contrairement à l'exigence du propriétaire. La publication n'apparaît qu'au scan suivant, par `vex.documents` du prédicat.
+- **Renouvellement** : le script ne dit pas si le document gagnera son classement. Un horodatage plus ancien que celui du gagnant en place, ou vieux de plus de 30 jours, est signé et publié, mais ne renouvelle rien.
+- Le refus d'un identifiant absent du scan suppose que le prédicat fourni est à jour. Une vulnérabilité apparue depuis, avec une base plus récente, demande un prédicat plus récent.
+
+**Heures mesurées** : de 21:32:16 UTC (note précédente) à 21:54:57 UTC.
