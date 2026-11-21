@@ -129,3 +129,57 @@ Deux changements du banc, après le choix de `vex_age_max_jours` à 30 jours (pa
 - le délai du scan quotidien.
 
 Toutes les autres prédictions sont inchangées.
+
+## Ajout avant le septième passage : remplacement (écrit le 2026-11-21, date -u de 20:44:39 UTC dans la même commande que l’écriture, avant toute ligne de code)
+
+Choix du propriétaire du 21/11 (« Remplacement »). **Conception**, après relecture du conseiller :
+- **`scan-outil vex`** :
+  - Le filtre des documents ne change pas. Choix 5 : un document est rejeté entier dès qu'un énoncé n'est pas recevable. Les documents recevables sont écrits tels que signés et passés à Grype, comme avant.
+  - Nouveau : la sortie liste aussi les **énoncés** de tous les documents lisibles, recevables ou non. Chaque énoncé porte :
+    - ses noms : `vulnerability.name` et `aliases` ;
+    - son horodatage : celui de l'énoncé, à défaut celui du document ;
+    - son statut ;
+    - un booléen `exemptant`.
+  - `exemptant` est vrai seulement si le document est recevable et si un produit de l'énoncé cite le digest scanné.
+  - Un énoncé sans vulnérabilité n'est pas listé.
+  - Un document illisible (type, sujet, contexte, horodatage) ne compte pas.
+- **`scan-outil predicat`** :
+  - On part d'une correspondance que Grype a écartée par un VEX. Ses énoncés candidats sont ceux dont un nom croise son identifiant ou ses alias, quel que soit le produit.
+  - Le plus récent l'emporte. L'entrée ne reçoit `vex` (statut de Grype, horodatage du gagnant) que si tous les énoncés à cet horodatage sont `exemptant`.
+  - Sinon, l'entrée reste ordinaire et est comptée dans `vex.ecarteesSansExemption`.
+  - Le résultat ne dépend pas de l'ordre des fichiers : on prend un maximum, et une égalité se tranche vers l'échec fermé.
+- **Fermé dans les deux sens** :
+  - Une rétractation sous un autre nom (alias) ou pour un autre produit fait tomber l'exemption.
+  - Un `not_affected` récent pour un autre produit n'exempte pas.
+- **Limite** : avec un registre en ajout seul, un document daté dans le futur gagne tous les classements jusqu'à sa date. La porte le refuse alors (horodatage postérieur au scan) : c'est un blocage fermé. La réparation est le retrait du passage 6, sur accord.
+
+**Prédictions** (inchangées si non citées) :
+
+| Partie | Cas | Prédiction | Confiance |
+|---|---|---|---|
+| A | les 15 cas unitaires de `vex`, sans fichier, document écrit = prédicat | inchangés | haute |
+| A, predicat | remplacement (not_affected 01/11 puis 20/11) | vex `not_affected` 2026-11-20T00:00:00Z | haute |
+| A, predicat | ordre inversé des fichiers | identique : 2026-11-20T00:00:00Z | haute |
+| A, predicat | rétractation (not_affected 01/11, affected 20/11) | aucune exemption, 1 sans exemption | haute |
+| A, predicat | rétractation sous l'alias `CVE-2025-69725` | aucune exemption, 1 sans exemption | moyenne |
+| A, predicat | égalité (not_affected et affected le 20/11) | aucune exemption, 1 sans exemption | haute |
+| A, predicat | réaffirmation (affected 01/11, not_affected 20/11) | vex `not_affected` 2026-11-20T00:00:00Z | haute |
+| A, predicat | not_affected 20/11 pour un autre produit | aucune exemption, 1 sans exemption | haute |
+| A, predicat | document récent sur une autre vulnérabilité (`GHSA-j6qf-3m9c-vwj3`) | vex 2026-11-01T00:00:00Z (non concerné) | haute |
+| B | `deux` | 2, 2, 0 ; 4/1 ; horodatage de l'entrée **2026-11-20T00:00:00Z** (au lieu du 01/11) | haute |
+| B | `renouv-avant` | 2, 2, 0 ; 4/1 ; horodatage de l'entrée **la veille** (au lieu du 01/10) | haute |
+| B | `inverse` (récent publié avant l'ancien) | 2, 2, 0 ; 4/1 ; la veille | haute |
+| B | `retract-avant` (not_affected d'il y a deux jours, seul) | 1, 1, 0 ; 4/1 ; il y a deux jours | haute |
+| B | `retract-apres` (+ affected de la veille, sous l'alias `CVE-2025-69725`) | 2, 1, 1 ; **5/0** (Grype écarte, le prédicat n'exempte pas) | moyenne |
+| B | `partiel` (ancien du 01/10 sur V1 et V2, récent de la veille sur V1) | 2, 2, 0 ; 3/2 ; V1 la veille, V2 2026-10-01 | moyenne |
+| C | porte, `renouv-avant` | **code 0, admis** (au lieu du refus) | haute |
+| C | porte, `inverse` | code 0, admis | haute |
+| C | porte, `retract-avant` / `retract-apres` | code 0 / code 1, `scan.kev_without_vex` | haute / moyenne |
+| C | porte, `partiel`, V1 en KEV / V2 en KEV | code 0 / code 1, `scan.kev_without_vex` | moyenne |
+| A | `ec opa test` sur les règles du patch | toujours vert (commentaires seulement dans `scan.rego`) | haute |
+
+## Ajout avant le huitième passage (écrit le 2026-11-21, date -u de 20:51:55 UTC dans la même commande que l’écriture)
+
+Passage 7 : 105 OK, 2 KO. Les deux écarts sont les contrôles de compatibilité de la partie A (image et deb), que je n'avais pas prévus. Le prédicat neuf sans VEX porte désormais `ecarteesSansExemption: 0` dans le bloc `vex`. Comparé au prédicat d'avant, complété par `documents: []` et `rejetes: 0`, c'est la seule différence : relevée par `diff` sur les deux fichiers du banc, avant toute modification. Tous les cas du remplacement sont conformes.
+
+Changement du banc : le bloc attendu devient `documents: []`, `rejetes: 0`, `ecarteesSansExemption: 0`. Prédiction : compatibilité image et deb OK ; toutes les autres prédictions inchangées (dont tous les cas du septième passage).

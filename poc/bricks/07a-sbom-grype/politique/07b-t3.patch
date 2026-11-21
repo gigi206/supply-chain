@@ -32,7 +32,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-s
      else echo "KO   $d : séries de Prometheus différentes de jq"; diff <(printf '%s\n' "$att") <(printf '%s\n' "$obt") || true; ko=1; fi
 diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbom-grype/outil/main.go
 --- a/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-04 20:36:57.722552154 +0100
-+++ b/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-21 18:39:36.486809931 +0100
++++ b/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-21 21:45:33.145247244 +0100
 @@ -1,18 +1,25 @@
  // Brique 07a, G2 (D8) : sbom_merge.py et scan_predicate.py réécrits en Go, sans dépendance, pour l'image d'outils du
 -// scanner (pas de python dans l'image). Même logique, même sortie JSON (comparée aux scripts Python sur les fichiers de G0) :
@@ -88,7 +88,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
  	var sortie []*composant
  	vus := map[cle]*composant{}
  	for i, chemin := range chemins {
-@@ -100,23 +124,111 @@
+@@ -100,23 +124,124 @@
  	}
  	return map[string]any{
  		"bomFormat": "CycloneDX", "specVersion": "1.6", "version": 1,
@@ -122,8 +122,9 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +	Package  string     `json:"package"`
 +	FixedIn  []string   `json:"fixedIn"`
 +	Vex      *vexEntree `json:"vex,omitempty"`
-+}
-+
+ }
+ 
+-func predicat(chemin, refBase string) (any, error) {
 +type correspondance struct {
 +	Vulnerability struct {
 +		ID             string `json:"id"`
@@ -195,22 +196,34 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +	Fichier    string `json:"fichier"`
 +}
 +
++// enonce : énoncé d'un document lisible, recevable ou non (remplacement, choix du 21/11/2026). Noms : vulnerability.name et
++// aliases ; horodatage de l'énoncé, à défaut du document ; exemptant : document recevable et un produit cite le digest scanné.
++type enonce struct {
++	Noms       []string `json:"noms"`
++	Horodatage string   `json:"horodatage"`
++	Statut     string   `json:"statut"`
++	Exemptant  bool     `json:"exemptant"`
++	Document   string   `json:"document"`
++}
++
 +type vexRetenus struct {
 +	Retenus []docRetenu         `json:"retenus"`
 +	Rejetes []map[string]string `json:"rejetes"`
- }
- 
--func predicat(chemin, refBase string) (any, error) {
++	Enonces []enonce            `json:"enonces,omitempty"`
++}
++
 +// predicat : correspondances de Grype (matches) et correspondances écartées par un VEX (ignoredMatches dont une règle est de namespace
-+// « vex »). Une entrée écartée garde tous ses champs, plus vex : statut donné par Grype et horodatage le plus ancien des documents
-+// passés (Grype ne dit pas quel énoncé a écarté quelle correspondance ; choix 3 du 21/11/2026). Une correspondance écartée par une
-+// autre règle que « vex » reste une entrée ordinaire : seul un VEX exempte. Si une même clé (id, PURL) est à la fois trouvée et
-+// écartée, l'entrée trouvée l'emporte.
++// « vex »). Remplacement (choix du propriétaire du 21/11/2026) : pour une correspondance écartée, les énoncés candidats sont ceux
++// dont un nom croise son identifiant ou ses alias, quel que soit le produit ; le plus récent l'emporte, quel que soit son statut.
++// L'entrée garde alors tous ses champs, plus vex (statut donné par Grype, horodatage du gagnant), seulement si tous les énoncés à cet
++// horodatage sont exemptants ; sinon elle reste ordinaire et compte dans vex.ecarteesSansExemption (échec fermé, indépendant de
++// l'ordre des fichiers). Une correspondance écartée par une autre règle que « vex » reste une entrée ordinaire : seul un VEX exempte.
++// Si une même clé (id, PURL) est à la fois trouvée et écartée, l'entrée trouvée l'emporte.
 +func predicat(chemin, refBase, cheminVex string) (any, error) {
  	var r struct {
  		Descriptor struct {
  			Version   string `json:"version"`
-@@ -128,61 +240,44 @@
+@@ -128,61 +253,90 @@
  				} `json:"status"`
  			} `json:"db"`
  		} `json:"descriptor"`
@@ -258,6 +271,48 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +		}
 +		documents = append(documents, map[string]string{"sha256": d.Sha256, "timestamp": d.Timestamp})
 +	}
++	type candidat struct {
++		noms      map[string]bool
++		t         time.Time
++		exemptant bool
++	}
++	enonces := make([]candidat, 0, len(vr.Enonces))
++	for _, x := range vr.Enonces {
++		t, err := time.Parse(time.RFC3339Nano, x.Horodatage)
++		if err != nil {
++			return nil, fmt.Errorf("horodatage d'énoncé illisible dans %s : %q", cheminVex, x.Horodatage)
++		}
++		n := map[string]bool{}
++		for _, k := range x.Noms {
++			n[k] = true
++		}
++		enonces = append(enonces, candidat{n, t, x.Exemptant})
++	}
++	// gagnant : horodatage de l'énoncé le plus récent qui nomme la correspondance ; vrai seulement si tous les énoncés à cet horodatage
++	// sont exemptants.
++	gagnant := func(e vulnerabilite) (string, bool) {
++		noms := append([]string{e.ID}, e.Aliases...)
++		var tMax time.Time
++		trouve, exempte := false, false
++		for _, c := range enonces {
++			vise := false
++			for _, k := range noms {
++				vise = vise || c.noms[k]
++			}
++			switch {
++			case !vise:
++			case !trouve || c.t.After(tMax):
++				trouve, tMax, exempte = true, c.t, c.exemptant
++			case c.t.Equal(tMax):
++				exempte = exempte && c.exemptant
++			}
++		}
++		if !trouve || !exempte {
++			return "", false
++		}
++		return tMax.UTC().Format(time.RFC3339Nano), true
++	}
++	sansExemption := 0
  	type id struct{ id, purl string }
  	vulns := map[id]vulnerabilite{}
 -	for _, m := range r.Matches {
@@ -291,7 +346,11 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +			if plusAncien == "" {
 +				return nil, fmt.Errorf("correspondance %s écartée par un VEX alors qu'aucun document n'est retenu", e.ID)
 +			}
-+			e.Vex = &vexEntree{Status: s, Timestamp: plusAncien}
++			if t, ok := gagnant(e); ok {
++				e.Vex = &vexEntree{Status: s, Timestamp: t}
++			} else {
++				sansExemption++
++			}
  		}
 -		vulns[id{v.ID, m.Artifact.Purl}] = vulnerabilite{ID: v.ID, Aliases: trie(alias), Severity: sev, Kev: len(kev) > 0,
 -			KevCves: trie(kev), Epss: epss, Package: m.Artifact.Purl, FixedIn: fix}
@@ -303,12 +362,14 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
  	}
  	liste := make([]vulnerabilite, 0, len(vulns))
  	for _, v := range vulns {
-@@ -202,9 +297,114 @@
+@@ -202,9 +356,171 @@
  		"vulnerabilities": liste,
  		// Paquets malveillants (OSV MAL-) : contrôle de la brique 07b (2c).
  		"malicious": []string{},
 +		// Documents VEX passés à Grype (empreinte de l'énoncé signé décodé, comme scan-verifier.sh) et nombre de documents écartés.
-+		"vex": map[string]any{"documents": documents, "rejetes": len(vr.Rejetes)},
++		// ecarteesSansExemption : correspondances écartées par Grype que le remplacement n'exempte pas (rétractation, égalité, autre
++		// produit, aucun énoncé nommé).
++		"vex": map[string]any{"documents": documents, "rejetes": len(vr.Rejetes), "ecarteesSansExemption": sansExemption},
  	}, nil
  }
  
@@ -323,6 +384,13 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +// entier est rejeté dès qu'un énoncé ne l'est pas (choix 5 du 21/11/2026) : seul not_affected, avec une justification de la
 +// spécification et un impact_statement non vide ; horodatage de l'énoncé, ou à défaut du document, lisible.
 +func lireVex(b []byte, sujet string) ([]byte, string, int, string) {
++	doc, t, n, raison, _ := lireVexEnonces(b, sujet, "")
++	return doc, t, n, raison
++}
++
++// lireVexEnonces : comme lireVex, plus les énoncés d'un document lisible (type, sujet, contexte, au moins un énoncé et tous les
++// horodatages lisibles), recevable ou non, pour le remplacement. Un énoncé sans vulnérabilité nommée n'est pas listé.
++func lireVexEnonces(b []byte, sujet, empreinte string) ([]byte, string, int, string, []enonce) {
 +	var st struct {
 +		Type          string `json:"_type"`
 +		PredicateType string `json:"predicateType"`
@@ -332,20 +400,20 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +		Predicate json.RawMessage `json:"predicate"`
 +	}
 +	if err := json.Unmarshal(b, &st); err != nil {
-+		return nil, "", 0, "énoncé illisible"
++		return nil, "", 0, "énoncé illisible", nil
 +	}
 +	if st.Type != "https://in-toto.io/Statement/v0.1" && st.Type != "https://in-toto.io/Statement/v1" {
-+		return nil, "", 0, "type d'énoncé inattendu : " + st.Type
++		return nil, "", 0, "type d'énoncé inattendu : " + st.Type, nil
 +	}
 +	if st.PredicateType != typeOpenVEX {
-+		return nil, "", 0, "type de prédicat inattendu : " + st.PredicateType
++		return nil, "", 0, "type de prédicat inattendu : " + st.PredicateType, nil
 +	}
 +	vu := false
 +	for _, s := range st.Subject {
 +		vu = vu || s.Digest["sha256"] == sujet
 +	}
 +	if !vu {
-+		return nil, "", 0, "sujet différent du digest scanné"
++		return nil, "", 0, "sujet différent du digest scanné", nil
 +	}
 +	var d struct {
 +		Context    string `json:"@context"`
@@ -355,26 +423,73 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +			Justification string `json:"justification"`
 +			Impact        string `json:"impact_statement"`
 +			Timestamp     string `json:"timestamp"`
++			Vulnerability struct {
++				Name    string   `json:"name"`
++				Aliases []string `json:"aliases"`
++			} `json:"vulnerability"`
++			Products []struct {
++				ID string `json:"@id"`
++			} `json:"products"`
 +		} `json:"statements"`
 +	}
 +	if err := json.Unmarshal(st.Predicate, &d); err != nil {
-+		return nil, "", 0, "prédicat OpenVEX illisible"
++		return nil, "", 0, "prédicat OpenVEX illisible", nil
 +	}
 +	if d.Context != typeOpenVEX {
-+		return nil, "", 0, "@context inattendu : " + d.Context
++		return nil, "", 0, "@context inattendu : " + d.Context, nil
 +	}
 +	if len(d.Statements) == 0 {
-+		return nil, "", 0, "aucun énoncé VEX"
++		return nil, "", 0, "aucun énoncé VEX", nil
++	}
++	// énoncés pour le remplacement, si tous les horodatages sont lisibles ; exemptant décidé plus bas (document recevable)
++	var liste []enonce
++	for _, s := range d.Statements {
++		h := s.Timestamp
++		if h == "" {
++			h = d.Timestamp
++		}
++		t, err := time.Parse(time.RFC3339Nano, h)
++		if err != nil {
++			liste = nil
++			break
++		}
++		noms := map[string]bool{}
++		if s.Vulnerability.Name != "" {
++			noms[s.Vulnerability.Name] = true
++		}
++		for _, a := range s.Vulnerability.Aliases {
++			if a != "" {
++				noms[a] = true
++			}
++		}
++		if len(noms) == 0 {
++			continue
++		}
++		cite := false
++		for _, p := range s.Products {
++			cite = cite || (sujet != "" && strings.Contains(p.ID, sujet))
++		}
++		liste = append(liste, enonce{Noms: trie(noms), Horodatage: t.UTC().Format(time.RFC3339Nano), Statut: s.Status, Exemptant: cite,
++			Document: empreinte})
++	}
++	recevable := func(raison string) []enonce {
++		for i := range liste {
++			liste[i].Exemptant = liste[i].Exemptant && raison == ""
++		}
++		return liste
 +	}
 +	var tMin time.Time
 +	for i, s := range d.Statements {
 +		switch {
 +		case s.Status != "not_affected":
-+			return nil, "", 0, fmt.Sprintf("énoncé %d : statut « %s », seul not_affected est passé", i, s.Status)
++			r := fmt.Sprintf("énoncé %d : statut « %s », seul not_affected est passé", i, s.Status)
++			return nil, "", 0, r, recevable(r)
 +		case !justifications[s.Justification]:
-+			return nil, "", 0, fmt.Sprintf("énoncé %d : justification absente ou hors spécification", i)
++			r := fmt.Sprintf("énoncé %d : justification absente ou hors spécification", i)
++			return nil, "", 0, r, recevable(r)
 +		case strings.TrimSpace(s.Impact) == "":
-+			return nil, "", 0, fmt.Sprintf("énoncé %d : impact_statement absent", i)
++			r := fmt.Sprintf("énoncé %d : impact_statement absent", i)
++			return nil, "", 0, r, recevable(r)
 +		}
 +		h := s.Timestamp
 +		if h == "" {
@@ -382,13 +497,13 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +		}
 +		t, err := time.Parse(time.RFC3339Nano, h)
 +		if err != nil {
-+			return nil, "", 0, fmt.Sprintf("énoncé %d : horodatage illisible", i)
++			return nil, "", 0, fmt.Sprintf("énoncé %d : horodatage illisible", i), nil
 +		}
 +		if i == 0 || t.Before(tMin) {
 +			tMin = t
 +		}
 +	}
-+	return st.Predicate, tMin.UTC().Format(time.RFC3339Nano), len(d.Statements), ""
++	return st.Predicate, tMin.UTC().Format(time.RFC3339Nano), len(d.Statements), "", recevable("")
 +}
 +
 +// vex : documents recevables écrits dans <dossier>/vex-<n>.json (prédicat tel que signé), à passer à grype --vex ; résumé sur la sortie.
@@ -401,7 +516,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +		}
 +		s := sha256.Sum256(b)
 +		e := hex.EncodeToString(s[:])
-+		doc, t, n, raison := lireVex(b, sujet)
++		doc, t, n, raison, en := lireVexEnonces(b, sujet, e)
++		res.Enonces = append(res.Enonces, en...)
 +		if raison != "" {
 +			res.Rejetes = append(res.Rejetes, map[string]string{"sha256": e, "raison": raison})
 +			continue
@@ -418,7 +534,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
  func trie(e map[string]bool) []string {
  	l := make([]string, 0, len(e))
  	for k := range e {
-@@ -227,14 +427,14 @@
+@@ -227,14 +543,14 @@
  	var res any
  	var err error
  	switch {
@@ -520,7 +636,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/plateforme.sh b/poc/bricks/07a-sbo
    propre | dater 'now' '4 days ago' > "$j/base-vieille.json"
 diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml b/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml
 --- a/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml	2026-11-04 21:56:37.719009291 +0100
-+++ b/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml	2026-11-21 21:13:00.511378239 +0100
++++ b/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml	2026-11-21 21:45:50.237512841 +0100
 @@ -8,9 +8,13 @@
        # D4 du propriétaire (04/11/2026) : scan de 7 jours au plus, base construite 3 jours au plus avant lui
        scan_age_max_jours: 7
@@ -529,8 +645,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml b
        vex_statuts_acceptes:
          - not_affected
 -        - fixed
-+      # 07b, choix 3 (21/11/2026) : durée de validité d'un VEX, en jours, depuis l'horodatage le plus ancien des documents
-+      # retenus. 30 : choix du propriétaire du 21/11/2026 (recommandation du conseiller, jugement sans mesure). Sans la clé,
++      # 07b, choix 3 (21/11/2026) : durée de validité d'un VEX, en jours, depuis l'horodatage de l'énoncé gagnant (remplacement :
++      # le plus récent qui nomme l'entrée, quel que soit son statut). 30 : choix du propriétaire du 21/11/2026 (recommandation du conseiller, jugement sans mesure). Sans la clé,
 +      # aucune KEV n'est exemptée (échec fermé, test_seuil_vex_absent_refus)
 +      vex_age_max_jours: 30
      config:
@@ -538,7 +654,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/policy-scan.yaml b
          - scan
 diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/scan.rego b/poc/bricks/07a-sbom-grype/politique/porte/scan.rego
 --- a/poc/bricks/07a-sbom-grype/politique/porte/scan.rego	2026-11-04 21:57:22.874167596 +0100
-+++ b/poc/bricks/07a-sbom-grype/politique/porte/scan.rego	2026-11-21 18:27:24.048370746 +0100
++++ b/poc/bricks/07a-sbom-grype/politique/porte/scan.rego	2026-11-21 21:45:50.237402287 +0100
 @@ -60,6 +60,7 @@
  		"malicious": is_array(object.get(p, "malicious", null)),
  		"scanner.db.built": _date(object.get(p, ["scanner", "db", "built"], "")),
@@ -568,7 +684,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/scan.rego b/poc/br
  # METADATA
  # title: Scan récent
  # description: >-
-@@ -109,19 +124,26 @@
+@@ -109,19 +124,27 @@
  _ecart_admis(ecart) if ecart <= _seuil("base_age_max_jours") * _jour
  
  # METADATA
@@ -576,7 +692,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/scan.rego b/poc/br
 +# title: Pas de KEV sans VEX valide (durée de validité dans la politique)
 +# description: >-
 +#   Brique 07b, choix 3 et 5 du propriétaire (21/11/2026). Le scanner applique les VEX et écrit, pour chaque entrée écartée, le
-+#   statut donné par Grype et l'horodatage le plus ancien des documents passés. Un VEX vaut vex_age_max_jours à partir de cet
++#   statut donné par Grype et l'horodatage de l'énoncé gagnant (remplacement du 21/11 : le plus récent qui nomme l'entrée, quel que
++#   soit son statut). Un VEX vaut vex_age_max_jours à partir de cet
 +#   horodatage ; un horodatage postérieur au scan, au-delà de l'écart d'horloge toléré, est refusé (pas de validité prolongée en
 +#   datant dans le futur). Seuls les statuts de vex_statuts_acceptes comptent (not_affected).
  # custom:

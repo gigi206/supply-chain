@@ -5,7 +5,7 @@
 #      de la porte (ec opa check, ec opa test, mutations de g5_regles telles que le patch les liste) ;
 #   B. Zot et clés jetables dans un espace de noms réseau vide (127.0.0.1, comme G6 et la tranche 2) : scanner.sh du patch, mode
 #      analyser complet (image puis deb) et mode vex suivi des mêmes commandes qu'analyser, VEX témoins signés et publiés en referrers ;
-#      renouvellement d'un VEX par retrait de l'ancien référent (oras manifest delete, passage 6) ;
+#      renouvellement d'un VEX par retrait de l'ancien référent (oras manifest delete, passage 6) ; remplacement (passage 7) ;
 #   C. porte : ec validate input de l'hôte sur les prédicats produits en B, entrée écartée passée en KEV par jq ;
 #   D. entrees-scan.py du patch : fonctions comptes et entrees appelées sur les prédicats produits en B (pas de Zot, pas de VM).
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
@@ -154,7 +154,7 @@ if [ "${1:-}" = ns ]; then
   publier_vex vex "$T/v-deux-a.json" "$Y" builds/deux/sample-app "$Y" builds/vex/deux/sample-app
   publier_vex vex "$T/v-deux-b.json" "$Y" builds/deux/sample-app "$Y" builds/vex/deux/sample-app
   vex_seul deux builds/deux/sample-app "$Y"; juger_vex deux 2,2,0 4/1
-  [ -s "$T/cas/deux/scan.json" ] && attendu "deux : horodatage de l'entrée" "$(jq -r '[.vulnerabilities[] | select(has("vex")) | .vex.timestamp] | join(",")' "$T/cas/deux/scan.json")" 2026-11-01T00:00:00Z
+  [ -s "$T/cas/deux/scan.json" ] && attendu "deux : horodatage de l'entrée" "$(jq -r '[.vulnerabilities[] | select(has("vex")) | .vex.timestamp] | join(",")' "$T/cas/deux/scan.json")" 2026-11-20T00:00:00Z
   # 8. clé VEX absente du conteneur
   pousser "$M0/image" builds/sans-cle/sample-app > /dev/null
   ok_vex "$T/v-sans-cle.json"; publier_vex vex "$T/v-sans-cle.json" "$Y" builds/sans-cle/sample-app "$Y" builds/vex/sans-cle/sample-app
@@ -211,12 +211,39 @@ if [ "${1:-}" = ns ]; then
   publier_vex vex "$T/v-renouv-recent.json" "$Y" builds/renouv/sample-app "$Y" builds/vex/renouv/sample-app
   attendu "renouv : référents publiés" "$(referents)" 2
   vex_seul renouv-avant builds/renouv/sample-app "$Y"; juger_vex renouv-avant 2,2,0 4/1
-  [ -s "$T/cas/renouv-avant/scan.json" ] && attendu "renouv-avant : horodatage de l'entrée" "$(jq -r '[.vulnerabilities[] | select(has("vex")) | .vex.timestamp] | join(",")' "$T/cas/renouv-avant/scan.json")" 2026-10-01T00:00:00Z
+  [ -s "$T/cas/renouv-avant/scan.json" ] && attendu "renouv-avant : horodatage de l'entrée" "$(jq -r '[.vulnerabilities[] | select(has("vex")) | .vex.timestamp] | join(",")' "$T/cas/renouv-avant/scan.json")" "$H1"
   attendu "renouv : retrait de l'ancien référent" "$(retirer v-renouv-ancien)" "code 0 ; référents 1"
   vex_seul renouv-apres builds/renouv/sample-app "$Y"; juger_vex renouv-apres 1,1,0 4/1
   [ -s "$T/cas/renouv-apres/scan.json" ] && attendu "renouv-apres : horodatage de l'entrée" "$(jq -r '[.vulnerabilities[] | select(has("vex")) | .vex.timestamp] | join(",")' "$T/cas/renouv-apres/scan.json")" "$H1"
   attendu "renouv : retrait du dernier référent" "$(retirer v-renouv-recent)" "code 0 ; référents 0"
   vex_seul renouv-vide builds/renouv/sample-app "$Y"; juger_vex renouv-vide 0,0,0 5/0
+  # 15-17 (passage 7) : remplacement ; ordre de publication inversé, rétractation sous l'alias, remplacement partiel
+  H2=$(date -ud '2 days ago' +%FT%TZ)
+  horo() { jq -r '[.vulnerabilities[] | select(has("vex")) | "\(.id) \(.vex.timestamp)"] | join(",")' "$T/cas/$1/scan.json"; }
+  pousser "$M0/image" builds/inverse/sample-app > /dev/null
+  ok_vex "$T/v-inverse-recent.json"
+  vex doc "$T/v-inverse-ancien.json" 2026-10-01T00:00:00Z "not_affected;$JUSTIF;$IMPACT;-;$VULN;pkg:oci/sample-app@$Y;$SYFT"
+  publier_vex vex "$T/v-inverse-recent.json" "$Y" builds/inverse/sample-app "$Y" builds/vex/inverse/sample-app
+  publier_vex vex "$T/v-inverse-ancien.json" "$Y" builds/inverse/sample-app "$Y" builds/vex/inverse/sample-app
+  vex_seul inverse builds/inverse/sample-app "$Y"; juger_vex inverse 2,2,0 4/1
+  [ -s "$T/cas/inverse/scan.json" ] && attendu "inverse : horodatage de l'entrée" "$(horo inverse)" "$VULN $H1"
+  pousser "$M0/image" builds/retract/sample-app > /dev/null
+  vex doc "$T/v-retract-ancien.json" "$H2" "not_affected;$JUSTIF;$IMPACT;-;$VULN;pkg:oci/sample-app@$Y;$SYFT"
+  publier_vex vex "$T/v-retract-ancien.json" "$Y" builds/retract/sample-app "$Y" builds/vex/retract/sample-app
+  vex_seul retract-avant builds/retract/sample-app "$Y"; juger_vex retract-avant 1,1,0 4/1
+  [ -s "$T/cas/retract-avant/scan.json" ] && attendu "retract-avant : horodatage de l'entrée" "$(horo retract-avant)" "$VULN $H2"
+  vex doc "$T/v-retract-affected.json" "$H1" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
+  publier_vex vex "$T/v-retract-affected.json" "$Y" builds/retract/sample-app "$Y" builds/vex/retract/sample-app
+  vex_seul retract-apres builds/retract/sample-app "$Y"; juger_vex retract-apres 2,1,1 5/0
+  [ -s "$T/cas/retract-apres/scan.json" ] && attendu "retract-apres : écartées sans exemption" "$(jq -r .vex.ecarteesSansExemption "$T/cas/retract-apres/scan.json")" 1
+  pousser "$M0/image" builds/partiel/sample-app > /dev/null
+  vex doc "$T/v-partiel-ancien.json" 2026-10-01T00:00:00Z "not_affected;$JUSTIF;$IMPACT;-;$VULN;pkg:oci/sample-app@$Y;$SYFT" \
+    "not_affected;$JUSTIF;$IMPACT;-;GHSA-j6qf-3m9c-vwj3;pkg:oci/sample-app@$Y;$SYFT"
+  ok_vex "$T/v-partiel-recent.json"
+  publier_vex vex "$T/v-partiel-ancien.json" "$Y" builds/partiel/sample-app "$Y" builds/vex/partiel/sample-app
+  publier_vex vex "$T/v-partiel-recent.json" "$Y" builds/partiel/sample-app "$Y" builds/vex/partiel/sample-app
+  vex_seul partiel builds/partiel/sample-app "$Y"; juger_vex partiel 2,2,0 3/2
+  [ -s "$T/cas/partiel/scan.json" ] && attendu "partiel : horodatages des entrées" "$(horo partiel)" "GHSA-j6qf-3m9c-vwj3 2026-10-01T00:00:00Z,$VULN $H1"
   echo "$KO" > "$T/ko-ns"
   exit 0
 fi
@@ -246,8 +273,8 @@ attendu "fusion, image sans digest" "code $c" "code 1"
 echo '{"retenus":[],"rejetes":[]}' > "$T/vide.json"
 for a in image deb; do
   "$OUT" predicat "$M0/$a-avant.grype.json" base-g0 "$T/vide.json" > "$T/compat-$a.json"
-  [ "$(jq -S . "$T/compat-$a.json")" = "$(jq -S '. + {vex: {documents: [], rejetes: 0}}' "$M0/$a-avant.scan.json")" ] \
-    && ok "compatibilité $a : prédicat neuf sans VEX = prédicat d'avant + bloc vex vide" || ko "compatibilité $a : différences"
+  [ "$(jq -S . "$T/compat-$a.json")" = "$(jq -S '. + {vex: {documents: [], rejetes: 0, ecarteesSansExemption: 0}}' "$M0/$a-avant.scan.json")" ] \
+    && ok "compatibilité $a : prédicat neuf sans VEX = prédicat d'avant + bloc vex vide (compteur à 0, passage 8)" || ko "compatibilité $a : différences"
 done
 mkdir -p "$T/regles/m"; cp "$B/politique/porte/scan.rego" "$B/politique/porte/scan_test.rego" "$T/regles/"
 (cd "$T/regles" && ec opa check scan.rego scan_test.rego) && ok "ec opa check" || ko "ec opa check"
@@ -315,6 +342,30 @@ rm -f "$U"/sortie/*; "$OUT" vex "${Y#sha256:}" "$U/sortie" "$U/valide.json" > /d
 jq '.ignoredMatches = [.matches[0] + {appliedIgnoreRules: [{namespace: "vex", "vex-status": "not_affected"}]}] | .matches |= .[1:]' "$M0/image-avant.grype.json" > "$T/ecarte-sans-doc.json"
 c=0; "$OUT" predicat "$T/ecarte-sans-doc.json" base-g0 "$T/vide.json" > /dev/null 2> "$T/tmp/err" || c=$?
 attendu "predicat : écartée par un VEX sans document retenu" "code $c" "code 1"
+# passage 7 : remplacement, le plus récent qui nomme l'entrée l'emporte (noms et alias, tout produit) ; égalité fermée
+unite pa "$Y" "$OPENVEX" 2026-11-01T00:00:00Z "not_affected;$S1;-;$E"
+unite pb "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;$E"
+unite pr "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "affected;-;-;-;$E"
+unite pr-alias "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
+unite pr-ancien "$Y" "$OPENVEX" 2026-11-01T00:00:00Z "affected;-;-;-;$E"
+unite pb-autre-produit "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;$VULN;pkg:oci/autre@sha256:$(printf '1%.0s' $(seq 64));$SYFT"
+unite pb-autre-vuln "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;GHSA-j6qf-3m9c-vwj3;pkg:oci/sample-app@$Y;$SYFT"
+while read -r c a b attendu_r; do
+  rm -f "$U"/sortie/*
+  "$OUT" vex "${Y#sha256:}" "$U/sortie" "$U/$a.json" "$U/$b.json" > "$U/p-$c.res"
+  c2=0; "$OUT" predicat "$T/ecarte-sans-doc.json" base-g0 "$U/p-$c.res" > "$U/p-$c.scan" 2> "$T/tmp/err" || c2=$?
+  r=$(jq -r --arg v "$VULN" '([.vulnerabilities[] | select(.id == $v) | .vex // empty] | if length == 1 then "vex \(.[0].status) \(.[0].timestamp)" else "aucune" end) + " ; sans exemption \(.vex.ecarteesSansExemption)"' "$U/p-$c.scan" 2>/dev/null || echo "code $c2")
+  attendu "predicat, remplacement : $c" "$r" "$attendu_r"
+done <<'FIN'
+remplacement pa pb vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
+ordre-inverse pb pa vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
+retractation pa pr aucune ; sans exemption 1
+retractation-alias pa pr-alias aucune ; sans exemption 1
+egalite pb pr aucune ; sans exemption 1
+reaffirmation pr-ancien pb vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
+autre-produit pa pb-autre-produit aucune ; sans exemption 1
+autre-vuln pa pb-autre-vuln vex not_affected 2026-11-01T00:00:00Z ; sans exemption 0
+FIN
 
 # ------------------------------------------------------------------------------------------------------------------------------ B
 openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 1 -subj /CN=zot-jetable -addext subjectAltName=IP:127.0.0.1 \
@@ -332,13 +383,13 @@ sed "s#/etc/porte/regles-scan#$P/regles#" "$B/politique/porte/policy-scan.yaml" 
 sed "s#vex_age_max_jours: 30#vex_age_max_jours: null#" "$P/politique-30.yaml" > "$P/politique-null.yaml"
 grep -q '^ *vex_age_max_jours: 30$' "$P/politique-30.yaml" && ok "politique du patch telle quelle : vex_age_max_jours 30 (choix du propriétaire)" || ko "politique du patch : 30 absent"
 grep -q '^ *vex_age_max_jours: null$' "$P/politique-null.yaml" && ok "politique fabriquée : vex_age_max_jours null (sed inverse)" || ko "politique fabriquée : null absent"
-juger_porte() { # libellé cas politique code-attendu règles-attendues
+juger_porte() { # libellé cas politique code-attendu règles-attendues [vulnérabilité passée en KEV, défaut $VULN]
   local c=0 v
   [ -s "$T/cas/$2/scan.json" ] || { ko "$1 : aucun prédicat"; return; }
   # base datée du scan : la base de G0 (04/11) serait refusée par base_recente, hors sujet ici ; entrées écartées passées en KEV
   jq -c --arg d "${Y#sha256:}" --arg t "$SCAN" '{digest: $d, statements: [{_type: "https://in-toto.io/Statement/v0.1",
     subject: [{name: "sample-app", digest: {sha256: $d}}], predicateType: $t,
-    predicate: (.scanner.db.built = .scannedAt | .vulnerabilities |= map(if .id == "'"$VULN"'" then .kev = true else . end))}]}' \
+    predicate: (.scanner.db.built = .scannedAt | .vulnerabilities |= map(if .id == "'"${6:-$VULN}"'" then .kev = true else . end))}]}' \
     "$T/cas/$2/scan.json" > "$P/entree-$2.json"
   ec validate input "$P/entree-$2.json" --policy "$P/politique-$3.yaml" --info --output json > "$P/ec-$2-$3.json" 2> "$P/ec.err" || c=$?
   v=$(jq -r '[.filepaths[].violations[]?.metadata.code] | unique | join(",")' "$P/ec-$2-$3.json" 2>/dev/null || echo "sans verdict")
@@ -348,9 +399,14 @@ juger_porte "porte, image complet, validité 30 j" complet 30 0 ""
 juger_porte "porte, VEX daté du futur" futur 30 1 scan.kev_without_vex
 juger_porte "porte, autre sujet adverse (sans VEX)" adverse 30 1 scan.kev_without_vex
 juger_porte "porte, politique fabriquée à null (sed inverse)" complet null 1 scan.kev_without_vex
-juger_porte "porte, renouv avant retrait (document du 01/10)" renouv-avant 30 1 scan.kev_without_vex
+juger_porte "porte, renouv avant retrait (01/10 remplacé par la veille, passage 7)" renouv-avant 30 0 ""
 juger_porte "porte, renouv après retrait de l'ancien" renouv-apres 30 0 ""
 juger_porte "porte, renouv sans référent (contre-épreuve)" renouv-vide 30 1 scan.kev_without_vex
+juger_porte "porte, inverse" inverse 30 0 ""
+juger_porte "porte, retract-avant" retract-avant 30 0 ""
+juger_porte "porte, retract-apres (affected sous l'alias)" retract-apres 30 1 scan.kev_without_vex
+juger_porte "porte, partiel, V1 en KEV" partiel 30 0 ""
+juger_porte "porte, partiel, V2 en KEV" partiel 30 1 scan.kev_without_vex GHSA-j6qf-3m9c-vwj3
 
 echo "## D. entrees-scan.py du patch, sur les prédicats de B"
 for c in complet deb-complet; do

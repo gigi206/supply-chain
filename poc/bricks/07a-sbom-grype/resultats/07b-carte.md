@@ -674,3 +674,54 @@ La phrase « Le total des heures de la 07b reste loin de 2× l'estimation de 10 
 - **20/11** : de 21:28:28 UTC (additif de la 07a qui précède la demande) à 22:18:44 UTC (correction de la carte, commit `8f5fc886`), soit au plus 0 h 50 min.
 - **21/11** : de 16:17:27 UTC (dernier commit avant la tranche 1, `7eb75cb0`, briques 05 et 19b) à 20:42:26 UTC, soit au plus 4 h 24 min.
 - **Total** : au plus 5 h 15 min, pour 10 h estimées et un seuil de décision à 20 h. Le seuil n'est pas atteint.
+
+## Remplacement écrit dans le patch et mesuré au banc (note de 2026-11-21T20:56:05Z ; passages 7 et 8, rien posé)
+
+La conception et les prédictions ont été écrites avant le code (section « Ajout avant le septième passage », 20:44:39 UTC).
+
+**Patch** `f38347ad37379efa…` (remplace `e063abd2aedf18af…`). Contrôles refaits après régénération :
+- `git apply --check` passe ;
+- `ec opa test` : 39/39 ;
+- témoins de G6 et `yq` : 30.
+
+Changements, tous dans `b/` :
+- `outil/main.go` :
+  - `vex` liste les énoncés de tous les documents lisibles, recevables ou non (noms et alias, horodatage, statut, `exemptant`) ;
+  - `predicat` retient l'énoncé le plus récent qui nomme l'entrée, et compte `vex.ecarteesSansExemption`.
+  Le filtre des documents (choix 5) et les fichiers passés à Grype ne changent pas.
+- Commentaires de `scan.rego` et de `policy-scan.yaml` : plus aucun « plus ancien » dans `b/`. `go vet` et `gofmt` sont propres.
+
+**Passage 7** ([journal](07b-t3-banc-7.log)) : 105 OK, 2 KO, de 20:48:02 à 20:51:25 UTC.
+- Les deux écarts sont les contrôles de compatibilité (image, deb), que je n'avais pas prévus.
+- Cause unique, relevée par `diff` : le bloc `vex` porte désormais `ecarteesSansExemption: 0`.
+- Tous les cas du remplacement sont conformes.
+
+**Passage 8** ([journal](07b-t3-banc-8.log)) : 107 OK, 0 KO, de 20:51:55 à 20:55:18 UTC. Le contrôle de compatibilité a été adapté et la cause écrite avant (section « Ajout avant le huitième passage »).
+
+| Cas | Mesure |
+|---|---|
+| A, `predicat` : remplacement, ordre inversé, réaffirmation | exempt, horodatage 2026-11-20 (le plus récent) |
+| A, `predicat` : rétractation, rétractation sous l'alias `CVE-2025-69725`, égalité, `not_affected` pour un autre produit | aucune exemption, 1 sans exemption |
+| A, `predicat` : document récent sur une autre vulnérabilité | exempt, horodatage 2026-11-01 (non concerné) |
+| B, `deux` | horodatage de l'entrée 2026-11-20, au lieu du 01/11 |
+| B, `renouv-avant` (01/10 + veille) | horodatage de la veille ; porte **admise** (refusée au passage 6) |
+| B, `inverse` | 2, 2, 0 ; 4/1 ; la veille ; porte admise |
+| B, `retract-avant` puis `retract-apres` (affected sous l'alias) | 1, 1, 0 ; 4/1 ; admise, puis 2, 1, 1 ; 5/0 ; 1 sans exemption ; porte refusée |
+| B, `partiel` (ancien sur V1 et V2, récent sur V1) | 3/2 ; V1 la veille, V2 au 01/10 ; porte : V1 en KEV admise, V2 en KEV refusée |
+
+**Ce que cela établit** :
+- Un VEX récent renouvelle l'échéance sans rien retirer du registre.
+- Une rétractation la fait tomber, même sous un alias.
+- Une égalité ou un autre produit ne donne pas d'exemption.
+- Le résultat ne dépend pas de l'ordre des fichiers ni de l'ordre de publication.
+
+**Limites** :
+- Un document daté dans le futur gagne tous les classements jusqu'à sa date. La porte le refuse alors : c'est un blocage fermé, réparable par le retrait du passage 6, sur accord.
+- Un document illisible ne remplace rien. Une rétractation mal formée est donc ignorée.
+- Grype reçoit toujours les documents remplacés : c'est le prédicat qui décide de l'exemption.
+- `ecarteesSansExemption` n'a pas de série dans Grafana : `entrees-scan` n'est pas modifié.
+- La justification et l'impact restent hors de Grafana (statut et horodatage seulement).
+- Tout est mesuré sur des témoins, sans KEV réelle, avec une clé locale (pas `hashivault://vex`).
+- La pose reste en 9 pièces, chacune sur accord.
+
+**Heures mesurées** : de 20:38:23 UTC (premier `date -u` après le choix) à 20:56:05 UTC.
