@@ -722,3 +722,35 @@ Le mode du fichier n'est pas changé par la copie. `bash -n` et shellcheck sont 
 - V3, tenu : 1 passage par dépôt suivi
 
 **V1 à V3 tenues.** La v3 est l'empreinte que lira la tâche du 29/11.
+
+## Lecture de N2, balayage n°2 du 21/11 (note de 2026-11-21T22:32:43Z ; rien n'est réécrit au-dessus)
+
+**Commande**, programmée en arrière-plan dans la session pour 22:30 UTC, en v3 (script `b13a1375ca6f4ed4…`), Loki seul : `JOUR=2026-11-21 DE=12:00 JOUR_A=2026-11-22 A=12:00 SANS_JOURNAL=1`, lancée à 22:30:51 UTC. Journal : [`g7-balayage-21-11.log`](g7-balayage-21-11.log).
+
+**Seconde lecture**, à 22:31:30 UTC ([`g7-balayage-21-11-2.log`](g7-balayage-21-11-2.log)) : la première tombait 70 s après la dernière ligne « executing gc ». Elle devait dire si le balayage était fini. Elle donne les mêmes comptes et la même dernière ligne, 110 s après celle-ci, et autant de lignes « executing gc » que le n°1 (162).
+
+**Mesures** (résumés des journaux, aucune ligne brute) :
+- statut 200, 175 lignes, dont 4 masquées ;
+- « executing gc of orphaned blobs » : 162 lignes, du 2026-11-21T21:46:12.828014177Z au 2026-11-21T22:29:41.582076566Z ;
+- passage des dépôts suivis, un chacun :
+  - `builds/scan/essai-07a` : 2026-11-21T22:02:44.03701799Z
+  - `builds/scan/essai-scan` : 2026-11-21T22:02:49.97989519Z
+  - `builds/scan/sample-app` : 2026-11-21T22:02:57.229611383Z
+  - `builds/scan/sample-app-deb` : 2026-11-21T22:03:16.029442947Z
+  - `vulndb/grype` : 2026-11-21T22:29:19.0817249Z
+- décisions de rétention : 9, toutes `vulndb/grype` | `keep` | retained by mostRecentlyPushedCount:11 policy ;
+- `zot.service` : `ActiveEnterTimestamp=Thu 2026-11-19 20:24:46 UTC`, `NRestarts=0`.
+
+**Confrontation** (note de 20:08:18Z, N2 ; note de 22:00:16Z, conséquence de la loi B) :
+- tenu : début dans la plage de la loi B (21:46:03 à 21:46:20), 24 h et 11,196 s après la dernière ligne du n°1 ;
+- tenu : 9 décisions `keep` dans `vulndb/grype` par mostRecentlyPushedCount:11 ;
+- tenu : aucune suppression ;
+- tenu : Zot non redémarré.
+
+**N2 tenue.**
+
+**Constat, sans prédiction écrite** : le balayage s'allonge. Il a duré 2608,754 s, contre 2518,953 s pour le n°1, soit 89,801 s de plus pour le même nombre de lignes « executing gc ».
+
+**Conséquence pour la suite** (calcul, loi B, même marge de 2 à 19 s) : le n°3 doit commencer entre le 22/11 22:29:43 et le 22/11 22:30:00 UTC.
+
+**Tâche du 29/11** : sa consigne fera lire le n°2 dans `g7-balayage-21-11.log`, qui existe déjà. Le script le refusera (code 2), et la consigne dit déjà : « Un journal déjà présent est refusé par le script : dis-le, ne le contourne pas. » La tâche n'est donc pas modifiée, et le journal de cette note reste la mesure du n°2.

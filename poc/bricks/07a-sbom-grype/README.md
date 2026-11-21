@@ -399,3 +399,5 @@ Projection, calculée : premières suppressions réelles le 28/11 entre 01:37 et
 **Additif du 20/11/2026 (2026-11-20T22:00:16Z UTC), G7 : balayage n°1 lu.** **N1 tenue.** Début 2026-11-20T21:04:02.67884562Z, 8 décisions de rétention, Zot non redémarré : oui. Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T22:00:16Z.
 
 **Additif du 20/11/2026 (2026-11-20T22:01:01Z UTC), G7 : v3 de `g7-balayage.sh` appliquée et essayée.** **V1 à V3 tenues.** La v3 est l'empreinte que lira la tâche du 29/11. Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-20T22:01:01Z.
+
+**Additif du 21/11/2026 (2026-11-21T22:32:43Z UTC), G7 : balayage n°2 lu.** **N2 tenue.** Début 2026-11-21T21:46:12.828014177Z, dans la plage de la loi B, 9 décisions `keep`, aucune suppression, Zot non redémarré. Détail : [`g7-replanification.md`](resultats/g7-replanification.md), note de 2026-11-21T22:32:43Z.
