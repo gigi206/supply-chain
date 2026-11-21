@@ -572,3 +572,43 @@ Le propriétaire a demandé ce que recommande le conseiller. **Recommandation : 
 - **La porte avec 30 jours a déjà été mesurée** : la partie C du banc tournait avec une copie de la politique où `null` était remplacé par 30.
 - **Le banc n'a pas été rejoué sur ce patch.** S'il l'était, ses lignes 308 et 309 ne trouveraient plus `null` : le cas « politique à `null` » jugerait 30 sans le dire. Il faudrait d'abord les adapter.
 - **La limite de la note précédente vaut toujours** : le retrait d'un ancien VEX n'est pas outillé, et sans lui l'échéance de 30 jours finit en refus.
+
+## Renouvellement d'un VEX : retrait de l'ancien référent mesuré au banc (note de 2026-11-21T20:24:29Z ; passage 6, rien posé)
+
+La limite de la note de 20:08:57Z est mesurée au banc jetable. Les prédictions ont été écrites avant le passage (section « Ajout avant le sixième passage », 20:19:46 UTC).
+
+**Passage 6** ([journal](07b-t3-banc-6.log)) :
+- 82 OK, 0 KO, de 20:20:24 à 20:23:42 UTC ;
+- même patch `e063abd2aedf18af…` ; banc `15854e0a16688c5c…` ;
+- hors réseau ; Zot et clés jetables (`gc: false`, sans contrôle d'accès) ; rien dans le vrai Zot ni dans le cluster.
+
+**1. Politiques de la partie C, corrigées.**
+- La politique « 30 » est désormais celle du patch telle quelle. La politique « null » est fabriquée par le sed inverse.
+- Chacune est contrôlée par `grep`.
+- Les lignes 308 et 309 signalées dans la note de 20:13:42Z sont donc réglées.
+- Porte, politique à `null` : code 1, `scan.kev_without_vex`, inchangé.
+
+**2. Renouvellement par retrait.**
+- Image `builds/renouv`.
+- Deux documents sur son digest, dans `builds/vex/renouv` :
+  - un ancien, daté 2026-10-01T00:00:00Z (plus de 30 jours) ;
+  - un récent, daté de la veille.
+
+| Étape | Référents | Journal `VEX|` | Grype | Horodatage de l'entrée | Porte à 30 jours |
+|---|---|---|---|---|---|
+| avant tout retrait | 2 | 2, 2, 0 | 4/1 | 2026-10-01T00:00:00Z | code 1, `scan.kev_without_vex` |
+| après retrait de l'ancien (`oras manifest delete`, code 0) | 1 | 1, 1, 0 | 4/1 | 2026-11-20T20:20:34Z | code 0, admis |
+| après retrait du dernier (contre-épreuve, code 0) | 0 | 0, 0, 0 | 5/0 | aucune | code 1, `scan.kev_without_vex` |
+
+**Ce que cela établit** :
+- Retirer le manifeste référent suffit. Cosign ne voit plus le document, et l'âge repart du document restant.
+- Ajouter un VEX ne suffit pas, comme mesuré au cas `deux` et ici avant le retrait.
+- Sans document, l'exemption disparaît : l'échec reste fermé.
+
+**Limites** :
+- Le code 0 d'`oras manifest delete --force` ne prouve rien seul : `--force` ignore aussi une référence absente. C'est le compte des référents (2, 1, puis 0) qui tranche.
+- Le banc garde le digest du manifeste au moment de la publication. Dans la plateforme, rien ne le garde : il faudrait le retrouver par l'API referrers. Ce n'est pas mesuré.
+- Vrai Zot : il faudrait un droit de suppression sur `builds/vex/**`, c'est-à-dire un changement de configuration, sur accord. Le ramasse-miettes et la rétention ne sont pas mesurés. Je n'ai pas lu sa configuration (secrets).
+- Signature par `hashivault://vex` et délai du scan quotidien : non mesurés.
+
+**Choix ouvert, au propriétaire** : retrait dans le registre (voie mesurée ici), ou règle de remplacement dans le filtre de `scan-outil`. La seconde voie n'est ni écrite ni mesurée ; elle modifierait le patch et la règle du choix 3 (âge compté depuis le document le plus ancien).

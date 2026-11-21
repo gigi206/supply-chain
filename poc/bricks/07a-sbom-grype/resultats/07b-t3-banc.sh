@@ -5,6 +5,7 @@
 #      de la porte (ec opa check, ec opa test, mutations de g5_regles telles que le patch les liste) ;
 #   B. Zot et clés jetables dans un espace de noms réseau vide (127.0.0.1, comme G6 et la tranche 2) : scanner.sh du patch, mode
 #      analyser complet (image puis deb) et mode vex suivi des mêmes commandes qu'analyser, VEX témoins signés et publiés en referrers ;
+#      renouvellement d'un VEX par retrait de l'ancien référent (oras manifest delete, passage 6) ;
 #   C. porte : ec validate input de l'hôte sur les prédicats produits en B, entrée écartée passée en KEV par jq ;
 #   D. entrees-scan.py du patch : fonctions comptes et entrees appelées sur les prédicats produits en B (pas de Zot, pas de VM).
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
@@ -77,6 +78,7 @@ if [ "${1:-}" = ns ]; then
       "\"subject\":$(cat "$w/sujet.json")" \
       "\"annotations\":{\"dev.sigstore.bundle.content\":\"dsse-envelope\",\"dev.sigstore.bundle.predicateType\":\"$OPENVEX\"}" > "$w/manifeste.json"
     oras manifest push --ca-file zot.crt "$REG/$6@sha256:$(sha256sum < "$w/manifeste.json" | cut -c1-64)" "$w/manifeste.json" > /dev/null
+    sha256sum < "$w/manifeste.json" | cut -c1-64 > "$T/manifeste-$(basename "$2" .json)"   # passage 6 : digest du référent, pour le retrait
     jq -r .dsseEnvelope.payload "$w/bundle.json" | base64 -d | sha256sum | cut -c1-64 > "$T/empreinte-$(basename "$2" .json)"
   }
   scanner() { # mode cas [variables…] : scanner.sh du patch, dossier de travail propre au cas
@@ -195,6 +197,26 @@ if [ "${1:-}" = ns ]; then
     r="code $c"; [ "$c" != 0 ] || r="$r, $(jq -r '"\(.matches | length)/\(.ignoredMatches // [] | length)"' "$T/cas/deux-$forme.json")"
     case $forme in virgule) attendu "Grype, --vex a,b" "$r" "code 1" ;; *) attendu "Grype, --vex a --vex b" "$r" "code 0, 4/1" ;; esac
   done
+  # 14 (passage 6) : renouvellement d'un VEX par retrait de l'ancien référent ; ancien document à plus de 30 jours, récent de la veille
+  referents() { curl -fsS --cacert zot.crt "https://$REG/v2/builds/vex/renouv/sample-app/referrers/$Y" | jq '.manifests | length'; }
+  retirer() { # document : retrait du référent qui le porte ; code et référents restants
+    local c=0
+    oras manifest delete --force --ca-file zot.crt "$REG/builds/vex/renouv/sample-app@sha256:$(cat "$T/manifeste-$1")" > "$T/retrait-$1.log" 2>&1 || c=$?
+    echo "code $c ; référents $(referents)"
+  }
+  pousser "$M0/image" builds/renouv/sample-app > /dev/null
+  vex doc "$T/v-renouv-ancien.json" 2026-10-01T00:00:00Z "not_affected;$JUSTIF;$IMPACT;-;$VULN;pkg:oci/sample-app@$Y;$SYFT"
+  ok_vex "$T/v-renouv-recent.json"
+  publier_vex vex "$T/v-renouv-ancien.json" "$Y" builds/renouv/sample-app "$Y" builds/vex/renouv/sample-app
+  publier_vex vex "$T/v-renouv-recent.json" "$Y" builds/renouv/sample-app "$Y" builds/vex/renouv/sample-app
+  attendu "renouv : référents publiés" "$(referents)" 2
+  vex_seul renouv-avant builds/renouv/sample-app "$Y"; juger_vex renouv-avant 2,2,0 4/1
+  [ -s "$T/cas/renouv-avant/scan.json" ] && attendu "renouv-avant : horodatage de l'entrée" "$(jq -r '[.vulnerabilities[] | select(has("vex")) | .vex.timestamp] | join(",")' "$T/cas/renouv-avant/scan.json")" 2026-10-01T00:00:00Z
+  attendu "renouv : retrait de l'ancien référent" "$(retirer v-renouv-ancien)" "code 0 ; référents 1"
+  vex_seul renouv-apres builds/renouv/sample-app "$Y"; juger_vex renouv-apres 1,1,0 4/1
+  [ -s "$T/cas/renouv-apres/scan.json" ] && attendu "renouv-apres : horodatage de l'entrée" "$(jq -r '[.vulnerabilities[] | select(has("vex")) | .vex.timestamp] | join(",")' "$T/cas/renouv-apres/scan.json")" "$H1"
+  attendu "renouv : retrait du dernier référent" "$(retirer v-renouv-recent)" "code 0 ; référents 0"
+  vex_seul renouv-vide builds/renouv/sample-app "$Y"; juger_vex renouv-vide 0,0,0 5/0
   echo "$KO" > "$T/ko-ns"
   exit 0
 fi
@@ -305,9 +327,11 @@ KO=$((KO + $(cat "$T/ko-ns" 2>/dev/null || echo 1)))
 # ------------------------------------------------------------------------------------------------------------------------------ C
 echo "## C. porte : ec validate input de l'hôte, règles du patch"
 P=$T/porte; mkdir -p "$P/regles"; cp "$B/politique/porte/scan.rego" "$P/regles/"
-sed "s#/etc/porte/regles-scan#$P/regles#" "$B/politique/porte/policy-scan.yaml" > "$P/politique-null.yaml"
-sed "s#vex_age_max_jours: null#vex_age_max_jours: 30#" "$P/politique-null.yaml" > "$P/politique-30.yaml"
-grep -q 'vex_age_max_jours: 30' "$P/politique-30.yaml" && ok "politique de banc : vex_age_max_jours 30 (valeur de banc, pas un choix)" || ko "politique de banc"
+# passage 6 : le patch porte 30 (choix du propriétaire du 21/11) ; null est fabriqué par le sed inverse, comme contre-épreuve
+sed "s#/etc/porte/regles-scan#$P/regles#" "$B/politique/porte/policy-scan.yaml" > "$P/politique-30.yaml"
+sed "s#vex_age_max_jours: 30#vex_age_max_jours: null#" "$P/politique-30.yaml" > "$P/politique-null.yaml"
+grep -q '^ *vex_age_max_jours: 30$' "$P/politique-30.yaml" && ok "politique du patch telle quelle : vex_age_max_jours 30 (choix du propriétaire)" || ko "politique du patch : 30 absent"
+grep -q '^ *vex_age_max_jours: null$' "$P/politique-null.yaml" && ok "politique fabriquée : vex_age_max_jours null (sed inverse)" || ko "politique fabriquée : null absent"
 juger_porte() { # libellé cas politique code-attendu règles-attendues
   local c=0 v
   [ -s "$T/cas/$2/scan.json" ] || { ko "$1 : aucun prédicat"; return; }
@@ -323,7 +347,10 @@ juger_porte() { # libellé cas politique code-attendu règles-attendues
 juger_porte "porte, image complet, validité 30 j" complet 30 0 ""
 juger_porte "porte, VEX daté du futur" futur 30 1 scan.kev_without_vex
 juger_porte "porte, autre sujet adverse (sans VEX)" adverse 30 1 scan.kev_without_vex
-juger_porte "porte, politique du patch telle quelle (null)" complet null 1 scan.kev_without_vex
+juger_porte "porte, politique fabriquée à null (sed inverse)" complet null 1 scan.kev_without_vex
+juger_porte "porte, renouv avant retrait (document du 01/10)" renouv-avant 30 1 scan.kev_without_vex
+juger_porte "porte, renouv après retrait de l'ancien" renouv-apres 30 0 ""
+juger_porte "porte, renouv sans référent (contre-épreuve)" renouv-vide 30 1 scan.kev_without_vex
 
 echo "## D. entrees-scan.py du patch, sur les prédicats de B"
 for c in complet deb-complet; do

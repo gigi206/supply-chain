@@ -32,6 +32,6 @@ Format **OpenVEX** (spécification v0.2.0). Le VEX est une attestation in-toto s
 ## Reste ouvert
 
 - `vex_age_max_jours` : **30 jours**, choix du propriétaire (2026-11-21T20:13:42Z), recommandation du conseiller suivie. C'est un jugement, sans mesure qui le fonde. Sans la clé, aucune KEV n'est exemptée.
-- Renouvellement : la durée part de l'horodatage le plus ancien des documents retenus. Un VEX neuf ne renouvelle donc rien tant que l'ancien reste publié dans `builds/vex/`, et `cosign attest` v3.1.4 n'a pas d'option de remplacement. Le retrait de l'ancien référent reste à outiller avant le premier VEX réel.
+- Renouvellement : la durée part de l'horodatage le plus ancien des documents retenus. Un VEX neuf ne renouvelle donc rien tant que l'ancien reste publié dans `builds/vex/`, et `cosign attest` v3.1.4 n'a pas d'option de remplacement. Le retrait de l'ancien référent est mesuré au banc jetable (2026-11-21T20:24:29Z, passage 6). `oras manifest delete` sur le digest du manifeste référent le retire de l'API referrers ; l'échéance suit alors le document restant. Rien n'est outillé dans la plateforme : le vrai Zot demanderait un droit de suppression sur `builds/vex/**`, c'est-à-dire un changement de configuration, sur accord. L'autre voie serait une règle de remplacement dans `scan-outil`. Le choix revient au propriétaire.
 - Écart avec Dependency-Track : d'après `docs/00` (ligne 277, non revérifié), il ne lit que le VEX de CycloneDX. La projection est hors de la 07b.
 - Score « vulnérabilités après VEX » et KPI de couverture VEX (`docs/02`).

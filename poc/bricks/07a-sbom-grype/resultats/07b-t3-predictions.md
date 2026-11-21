@@ -98,3 +98,34 @@ Après relecture du conseiller : un document que le filtre du scanner retient ma
 | énoncé valide sans `products` | 1, 1, 0 | 5/0 (énoncé sans effet) ; refus de Grype possible | faible |
 | énoncé valide sans `vulnerability` | 1, 1, 0 | 5/0 (énoncé sans effet) ; refus de Grype possible | faible |
 | `--vex a,b` sur les deux documents du cas `deux` (sonde du passage 3, archivée) | sans objet | code 1 ; `--vex a --vex b` : 4/1 | haute |
+
+## Ajout avant le sixième passage (écrit le 2026-11-21, date -u de 20:19:46 UTC dans la même commande que l’écriture)
+
+Deux changements du banc, après le choix de `vex_age_max_jours` à 30 jours (patch `e063abd2aedf18af…`).
+
+**1. Politiques de la partie C.** Le patch porte désormais 30. La politique « 30 » est celle du patch telle quelle. La politique « null » est fabriquée par le sed inverse, comme contre-épreuve. Chacune est contrôlée par `grep`. Sans ce changement, le cas « politique à null » aurait jugé 30 sans le dire.
+
+| Cas | Prédiction | Confiance |
+|---|---|---|
+| politique du patch | contient `vex_age_max_jours: 30` | haute |
+| politique fabriquée | contient `vex_age_max_jours: null` | haute |
+| porte, image complet, politique à null | code 1, `scan.kev_without_vex` (inchangé) | haute |
+
+**2. Renouvellement d'un VEX par retrait de l'ancien référent (cas neuf en B, puis C).**
+- Une image est publiée sous `builds/renouv`.
+- Deux documents sont publiés sur son digest, dans `builds/vex/renouv` : un ancien, daté 2026-10-01T00:00:00Z (plus de 30 jours), et un récent, daté de la veille.
+- Le retrait se fait par `oras manifest delete --force` sur le digest du manifeste référent, dans le Zot jetable : `gc: false`, sans contrôle d'accès.
+
+| Cas | Journal `VEX|` | Grype | Horodatage de l'entrée | Porte à 30 jours | Confiance |
+|---|---|---|---|---|---|
+| avant tout retrait | 2, 2, 0 | 4/1 | 2026-10-01T00:00:00Z | code 1, `scan.kev_without_vex` | haute |
+| retrait de l'ancien | code 0 ; référents 2 puis 1 | — | — | — | moyenne |
+| après le retrait | 1, 1, 0 | 4/1 | la veille (`H1`) | code 0, admis | moyenne |
+| retrait du dernier (contre-épreuve) | code 0 ; référents 0 ; puis 0, 0, 0 | 5/0 | aucune | code 1, `scan.kev_without_vex` | moyenne |
+
+**Ce que le banc ne mesure pas** :
+- le vrai Zot (droits de suppression sur `builds/vex/**`, ramasse-miettes, rétention) ;
+- la signature par `hashivault://vex` ;
+- le délai du scan quotidien.
+
+Toutes les autres prédictions sont inchangées.
