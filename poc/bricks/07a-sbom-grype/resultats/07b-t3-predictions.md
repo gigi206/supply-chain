@@ -206,3 +206,22 @@ Changement du banc : le bloc attendu devient `documents: []`, `rejetes: 0`, `eca
 | A, `predicat` | les 8 cas du septième passage | inchangés | haute |
 | B | `deb-complet` | 1, 1, 0 ; **65/1** : l'égalité exacte entre le PURL de l'énoncé (`pkg:golang/stdlib@1.24.4`) et celui de Grype doit tenir | moyenne |
 | B, C, D | tous les autres cas | inchangés (même sous-composant que Grype) | haute |
+
+## Ajout avant le dixième passage : énoncés par paquet (écrit le 2026-11-21, date -u de 21:06:51 UTC dans la même commande que l’écriture, avant toute ligne de code)
+
+**Défaut de la règle du passage 9**, signalé par le conseiller et confirmé par une sonde hors banc sur le binaire du passage 9 (sonde effacée ensuite).
+- Un seul document, du 20/11, porte deux énoncés `not_affected` sur la même vulnérabilité : l'un pour `go-chi`, l'autre pour `stdlib`.
+- Résultat : aucune exemption, 1 sans exemption. À égalité, chaque énoncé devait couvrir l'entrée.
+- Avec deux documents, chacun ferait tomber l'autre à sa re-signature. La limite écrite à 21:04:20Z (« tant que P1 n'est pas re-signé ») est donc fausse.
+
+**Correction prévue** :
+- Un énoncé `exemptant` dont les sous-composants ne contiennent pas le paquet de l'entrée sort du classement de cette entrée.
+- Tous les autres énoncés restent : `affected`, non recevable, autre produit, énoncé large. Une rétractation garde donc sa portée large.
+
+| Partie | Cas | Prédiction | Confiance |
+|---|---|---|---|
+| A, `predicat` | `pa` (01/11, go-chi) puis un récent sur un autre sous-composant | **exempt au 2026-11-01T00:00:00Z** (non renouvelé, au lieu d'aucune exemption) | haute |
+| A, `predicat` | un document, deux énoncés de même date (go-chi, stdlib) | exempt au 2026-11-20T00:00:00Z, 0 sans exemption | haute |
+| A, `predicat` | `pa` puis un `affected` récent sur l'autre sous-composant | aucune exemption, 1 sans exemption | haute |
+| A, `predicat` | `large` et les 8 cas du septième passage | inchangés | haute |
+| B, C, D | tous les cas | inchangés | haute |

@@ -32,7 +32,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-s
      else echo "KO   $d : séries de Prometheus différentes de jq"; diff <(printf '%s\n' "$att") <(printf '%s\n' "$obt") || true; ko=1; fi
 diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbom-grype/outil/main.go
 --- a/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-04 20:36:57.722552154 +0100
-+++ b/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-21 21:59:47.032118770 +0100
++++ b/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-21 22:07:09.727442712 +0100
 @@ -1,18 +1,25 @@
  // Brique 07a, G2 (D8) : sbom_merge.py et scan_predicate.py réécrits en Go, sans dépendance, pour l'image d'outils du
 -// scanner (pas de python dans l'image). Même logique, même sortie JSON (comparée aux scripts Python sur les fichiers de G0) :
@@ -218,14 +218,14 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +// « vex »). Remplacement (choix du propriétaire du 21/11/2026) : pour une correspondance écartée, les énoncés candidats sont ceux
 +// dont un nom croise son identifiant ou ses alias, quel que soit le produit ; le plus récent l'emporte, quel que soit son statut.
 +// L'entrée garde alors tous ses champs, plus vex (statut donné par Grype, horodatage du gagnant), seulement si tous les énoncés à cet
-+// horodatage sont exemptants et couvrent son paquet ; sinon elle reste ordinaire et compte dans vex.ecarteesSansExemption (échec fermé, indépendant de
++// horodatage sont exemptants ; un énoncé exemptant qui ne couvre pas son paquet sort de son classement ; sinon elle reste ordinaire et compte dans vex.ecarteesSansExemption (échec fermé, indépendant de
 +// l'ordre des fichiers). Une correspondance écartée par une autre règle que « vex » reste une entrée ordinaire : seul un VEX exempte.
 +// Si une même clé (id, PURL) est à la fois trouvée et écartée, l'entrée trouvée l'emporte.
 +func predicat(chemin, refBase, cheminVex string) (any, error) {
  	var r struct {
  		Descriptor struct {
  			Version   string `json:"version"`
-@@ -128,61 +255,94 @@
+@@ -128,61 +255,99 @@
  				} `json:"status"`
  			} `json:"db"`
  		} `json:"descriptor"`
@@ -295,7 +295,9 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +		enonces = append(enonces, candidat{n, t, x.Exemptant, sc})
 +	}
 +	// gagnant : horodatage de l'énoncé le plus récent qui nomme la correspondance ; vrai seulement si tous les énoncés à cet horodatage
-+	// sont exemptants et couvrent son paquet (énoncé large, ou PURL de l'entrée parmi les sous-composants, égalité exacte).
++	// sont exemptants. Un énoncé exemptant qui ne couvre pas son paquet (sous-composants sans le PURL de l'entrée, égalité exacte)
++	// sort du classement de cette entrée ; tous les autres y restent (affected, non recevable, autre produit, énoncé large) : une
++	// rétractation garde sa portée large.
 +	gagnant := func(e vulnerabilite) (string, bool) {
 +		noms := append([]string{e.ID}, e.Aliases...)
 +		var tMax time.Time
@@ -304,6 +306,9 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +			vise := false
 +			for _, k := range noms {
 +				vise = vise || c.noms[k]
++			}
++			if c.exemptant && len(c.sous) > 0 && !c.sous[e.Package] {
++				vise = false
 +			}
 +			switch {
 +			case !vise:
@@ -368,7 +373,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
  	}
  	liste := make([]vulnerabilite, 0, len(vulns))
  	for _, v := range vulns {
-@@ -202,9 +362,188 @@
+@@ -202,9 +367,188 @@
  		"vulnerabilities": liste,
  		// Paquets malveillants (OSV MAL-) : contrôle de la brique 07b (2c).
  		"malicious": []string{},
@@ -557,7 +562,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
  func trie(e map[string]bool) []string {
  	l := make([]string, 0, len(e))
  	for k := range e {
-@@ -227,14 +566,14 @@
+@@ -227,14 +571,14 @@
  	var res any
  	var err error
  	switch {

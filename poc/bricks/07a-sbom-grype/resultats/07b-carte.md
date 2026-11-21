@@ -753,3 +753,28 @@ Changements, tous dans `b/` :
 **Lecteurs du bloc `vex` du prédicat** : `grep` refait avec des motifs entre guillemets, sur tout le dépôt et sur `b/`. Seuls le banc et la fixture de `scan_test.rego` le lisent. La porte et `entrees-scan` ne lisent que le champ `vex` des entrées.
 
 **Heures mesurées** : de 20:56:05 UTC (note précédente) à 21:04:20 UTC.
+
+## Énoncés par paquet (note de 2026-11-21T21:11:13Z ; passage 10, rien posé ; corrige la limite de la note de 21:04:20Z)
+
+**Ce qui était faux à 21:04:20Z** : la règle du passage 9 (chaque gagnant doit couvrir le paquet) bloquait un cas courant, celui d'une même vulnérabilité sur deux paquets avec un énoncé par paquet.
+- Le conseiller l'a signalé. Une sonde hors banc, sur le binaire du passage 9, l'a confirmé (sonde effacée ensuite) : un document du 20/11 à deux énoncés, `go-chi` et `stdlib`, ne donnait aucune exemption.
+- Avec deux documents, chacun aurait fait tomber l'autre à sa re-signature. La limite « tant que P1 n'est pas re-signé » était fausse.
+
+**Correction** (prédictions écrites avant le code, section « Ajout avant le dixième passage », 21:06:51 UTC) :
+- Un énoncé `exemptant` dont les sous-composants ne contiennent pas le paquet de l'entrée sort du classement de cette entrée.
+- Tous les autres restent : `affected`, non recevable, autre produit, énoncé large.
+- Patch `02ac8e835fe74fbe…`. Contrôles refaits : `git apply --check`, `ec opa test` 39/39, témoins de G6 et `yq` à 30. `go vet` et `gofmt` sont propres.
+
+**Passage 10** ([journal](07b-t3-banc-10.log)) : 111 OK, 0 KO, de 21:07:17 à 21:10:40 UTC.
+- Récent sur un autre sous-composant : exempt au 01/11, donc non renouvelé (au passage 9 : aucune exemption).
+- Un document, deux énoncés par paquet : exempt au 20/11.
+- `affected` récent sur l'autre paquet : aucune exemption.
+- `large`, les huit cas du septième passage, B, C et D : inchangés (`deb-complet` 65/1).
+
+**Écart avec les mots du choix, dit en clair** : le propriétaire a choisi « même vulnérabilité sur un même produit ». La règle écrite fonctionne autrement :
+- elle classe les énoncés par noms (identifiant et alias), quel que soit le produit ;
+- l'exemption exige que le gagnant cite le digest scanné ;
+- un `not_affected` qui ne couvre pas le paquet de l'entrée n'entre pas dans son classement.
+C'est plus strict que le couple vulnérabilité et produit pour les rétractations, qui comptent quel que soit le produit et le paquet. C'est équivalent pour les exemptions.
+
+**Heures mesurées** : de 21:04:20 UTC (note précédente) à 21:11:13 UTC.

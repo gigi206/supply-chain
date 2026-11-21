@@ -5,7 +5,7 @@
 #      de la porte (ec opa check, ec opa test, mutations de g5_regles telles que le patch les liste) ;
 #   B. Zot et clés jetables dans un espace de noms réseau vide (127.0.0.1, comme G6 et la tranche 2) : scanner.sh du patch, mode
 #      analyser complet (image puis deb) et mode vex suivi des mêmes commandes qu'analyser, VEX témoins signés et publiés en referrers ;
-#      renouvellement d'un VEX par retrait de l'ancien référent (oras manifest delete, passage 6) ; remplacement (passages 7 à 9) ;
+#      renouvellement d'un VEX par retrait de l'ancien référent (oras manifest delete, passage 6) ; remplacement (passages 7 à 10) ;
 #   C. porte : ec validate input de l'hôte sur les prédicats produits en B, entrée écartée passée en KEV par jq ;
 #   D. entrees-scan.py du patch : fonctions comptes et entrees appelées sur les prédicats produits en B (pas de Zot, pas de VM).
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
@@ -353,9 +353,13 @@ unite pb-autre-vuln "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;GHS
 # passage 9 : le gagnant doit couvrir le paquet de l'entrée (énoncé large, ou PURL parmi les sous-composants)
 unite pb-autre-sous "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;pkg:golang/stdlib@1.24.4"
 unite pb-large "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;-"
+# passage 10 : un énoncé exemptant qui ne couvre pas le paquet sort du classement ; une rétractation garde sa portée large
+unite pd-deux-paquets "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;$E" "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;pkg:golang/stdlib@1.24.4"
+unite pr-autre-sous "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "affected;-;-;-;$VULN;pkg:oci/sample-app@$Y;pkg:golang/stdlib@1.24.4"
 while read -r c a b attendu_r; do
   rm -f "$U"/sortie/*
-  "$OUT" vex "${Y#sha256:}" "$U/sortie" "$U/$a.json" "$U/$b.json" > "$U/p-$c.res"
+  set -- "$U/$a.json"; [ "$b" = - ] || set -- "$@" "$U/$b.json"
+  "$OUT" vex "${Y#sha256:}" "$U/sortie" "$@" > "$U/p-$c.res"
   c2=0; "$OUT" predicat "$T/ecarte-sans-doc.json" base-g0 "$U/p-$c.res" > "$U/p-$c.scan" 2> "$T/tmp/err" || c2=$?
   r=$(jq -r --arg v "$VULN" '([.vulnerabilities[] | select(.id == $v) | .vex // empty] | if length == 1 then "vex \(.[0].status) \(.[0].timestamp)" else "aucune" end) + " ; sans exemption \(.vex.ecarteesSansExemption)"' "$U/p-$c.scan" 2>/dev/null || echo "code $c2")
   attendu "predicat, remplacement : $c" "$r" "$attendu_r"
@@ -368,8 +372,10 @@ egalite pb pr aucune ; sans exemption 1
 reaffirmation pr-ancien pb vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
 autre-produit pa pb-autre-produit aucune ; sans exemption 1
 autre-vuln pa pb-autre-vuln vex not_affected 2026-11-01T00:00:00Z ; sans exemption 0
-autre-sous-composant pa pb-autre-sous aucune ; sans exemption 1
+autre-sous-composant pa pb-autre-sous vex not_affected 2026-11-01T00:00:00Z ; sans exemption 0
 large pa pb-large vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
+deux-paquets pd-deux-paquets - vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
+affected-autre-sous pa pr-autre-sous aucune ; sans exemption 1
 FIN
 
 # ------------------------------------------------------------------------------------------------------------------------------ B
