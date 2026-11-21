@@ -183,3 +183,26 @@ Choix du propriétaire du 21/11 (« Remplacement »). **Conception**, après rel
 Passage 7 : 105 OK, 2 KO. Les deux écarts sont les contrôles de compatibilité de la partie A (image et deb), que je n'avais pas prévus. Le prédicat neuf sans VEX porte désormais `ecarteesSansExemption: 0` dans le bloc `vex`. Comparé au prédicat d'avant, complété par `documents: []` et `rejetes: 0`, c'est la seule différence : relevée par `diff` sur les deux fichiers du banc, avant toute modification. Tous les cas du remplacement sont conformes.
 
 Changement du banc : le bloc attendu devient `documents: []`, `rejetes: 0`, `ecarteesSansExemption: 0`. Prédiction : compatibilité image et deb OK ; toutes les autres prédictions inchangées (dont tous les cas du septième passage).
+
+## Ajout avant le neuvième passage : couverture du paquet (écrit le 2026-11-21, date -u de 20:59:25 UTC dans la même commande que l’écriture, avant toute ligne de code)
+
+**Trou trouvé par le conseiller et confirmé par une sonde hors banc**, sur le binaire du passage 8 :
+- L'ancien document `pa` vise `go-chi` (01/11). Un récent, du 20/11, vise la même vulnérabilité sur le même produit, mais un autre sous-composant (`pkg:golang/stdlib@1.24.4`).
+- Résultat : l'entrée `go-chi` reçoit l'horodatage du 20/11, avec 0 entrée sans exemption. L'exemption est renouvelée par un énoncé qui ne la couvre pas.
+- La note de 20:56:05Z (« fermé dans les deux sens ») est donc fausse sur ce point. Aucun cas du banc ne portait un autre sous-composant.
+
+**Correction prévue (échec fermé)** :
+- Le classement reste par noms.
+- L'exemption exige en plus que chaque énoncé gagnant couvre l'entrée :
+  - soit un produit qui cite le digest n'a aucun sous-composant (énoncé large) ;
+  - soit le PURL de l'entrée figure parmi les sous-composants des produits qui citent le digest (égalité exacte).
+- `vulnerability.@id` est ajouté aux noms.
+- **Conséquence, écrite comme limite** : un énoncé récent sur P2 fait tomber l'exemption de P1 tant que P1 n'est pas re-signé.
+
+| Partie | Cas | Prédiction | Confiance |
+|---|---|---|---|
+| A, `predicat` | `pa` puis un récent sur un autre sous-composant | aucune exemption, 1 sans exemption | haute |
+| A, `predicat` | `pa` puis un récent sans sous-composant (large) | exempt, 2026-11-20T00:00:00Z | haute |
+| A, `predicat` | les 8 cas du septième passage | inchangés | haute |
+| B | `deb-complet` | 1, 1, 0 ; **65/1** : l'égalité exacte entre le PURL de l'énoncé (`pkg:golang/stdlib@1.24.4`) et celui de Grype doit tenir | moyenne |
+| B, C, D | tous les autres cas | inchangés (même sous-composant que Grype) | haute |

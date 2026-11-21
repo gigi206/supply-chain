@@ -725,3 +725,31 @@ Changements, tous dans `b/` :
 - La pose reste en 9 pièces, chacune sur accord.
 
 **Heures mesurées** : de 20:38:23 UTC (premier `date -u` après le choix) à 20:56:05 UTC.
+
+## Couverture du paquet : trou fermé (note de 2026-11-21T21:04:20Z ; passage 9, rien posé ; corrige la note de 20:56:05Z)
+
+**Ce qui était faux dans la note de 20:56:05Z** : le remplacement n'était pas « fermé dans les deux sens ».
+- Le conseiller a signalé le cas, et une sonde hors banc, sur le binaire du passage 8, l'a confirmé (sonde effacée ensuite).
+- Le cas : un ancien `not_affected` sur `go-chi` (01/11), puis un récent, du 20/11, sur la même vulnérabilité et le même produit, mais pour un autre sous-composant (`pkg:golang/stdlib@1.24.4`).
+- Résultat : l'entrée `go-chi` recevait l'horodatage du 20/11, avec 0 entrée sans exemption.
+- Aucun cas des passages 7 et 8 ne portait un autre sous-composant.
+
+**Correction** (prédictions écrites avant le code, section « Ajout avant le neuvième passage », 20:59:25 UTC) :
+- Le classement reste par noms.
+- L'exemption exige en plus que chaque énoncé gagnant couvre le paquet de l'entrée : soit un produit qui cite le digest n'a pas de sous-composant, soit le PURL de l'entrée figure parmi ses sous-composants (égalité exacte).
+- `vulnerability.@id` compte désormais parmi les noms.
+- Patch `2005250baa1c3682…`. Contrôles refaits : `git apply --check`, `ec opa test` 39/39, témoins de G6 et `yq` à 30. `go vet` et `gofmt` sont propres.
+
+**Passage 9** ([journal](07b-t3-banc-9.log)) : 109 OK, 0 KO, de 21:00:17 à 21:03:39 UTC.
+- Autre sous-composant : aucune exemption, 1 sans exemption.
+- Énoncé large, sans sous-composant : exempt au 20/11.
+- `deb-complet` : 65/1. L'égalité exacte entre le PURL de l'énoncé et celui de Grype tient sur ce cas.
+- Tous les autres cas sont inchangés.
+
+**Limites ajoutées** :
+- Un énoncé récent sur un paquet P2 fait tomber l'exemption de P1, pour la même vulnérabilité, tant que P1 n'est pas re-signé. L'échec est fermé, au prix d'une re-signature.
+- L'égalité des PURL est exacte. Un VEX écrit avec un PURL qui diffère de celui de Grype (qualificatifs, `#v5`) n'exempte pas. C'est mesuré seulement sur `go-chi` (image) et `stdlib` (deb).
+
+**Lecteurs du bloc `vex` du prédicat** : `grep` refait avec des motifs entre guillemets, sur tout le dépôt et sur `b/`. Seuls le banc et la fixture de `scan_test.rego` le lisent. La porte et `entrees-scan` ne lisent que le champ `vex` des entrées.
+
+**Heures mesurées** : de 20:56:05 UTC (note précédente) à 21:04:20 UTC.

@@ -5,7 +5,7 @@
 #      de la porte (ec opa check, ec opa test, mutations de g5_regles telles que le patch les liste) ;
 #   B. Zot et clés jetables dans un espace de noms réseau vide (127.0.0.1, comme G6 et la tranche 2) : scanner.sh du patch, mode
 #      analyser complet (image puis deb) et mode vex suivi des mêmes commandes qu'analyser, VEX témoins signés et publiés en referrers ;
-#      renouvellement d'un VEX par retrait de l'ancien référent (oras manifest delete, passage 6) ; remplacement (passage 7) ;
+#      renouvellement d'un VEX par retrait de l'ancien référent (oras manifest delete, passage 6) ; remplacement (passages 7 à 9) ;
 #   C. porte : ec validate input de l'hôte sur les prédicats produits en B, entrée écartée passée en KEV par jq ;
 #   D. entrees-scan.py du patch : fonctions comptes et entrees appelées sur les prédicats produits en B (pas de Zot, pas de VM).
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
@@ -350,6 +350,9 @@ unite pr-alias "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "affected;-;-;-;CVE-2025-697
 unite pr-ancien "$Y" "$OPENVEX" 2026-11-01T00:00:00Z "affected;-;-;-;$E"
 unite pb-autre-produit "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;$VULN;pkg:oci/autre@sha256:$(printf '1%.0s' $(seq 64));$SYFT"
 unite pb-autre-vuln "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;GHSA-j6qf-3m9c-vwj3;pkg:oci/sample-app@$Y;$SYFT"
+# passage 9 : le gagnant doit couvrir le paquet de l'entrée (énoncé large, ou PURL parmi les sous-composants)
+unite pb-autre-sous "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;pkg:golang/stdlib@1.24.4"
+unite pb-large "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;-"
 while read -r c a b attendu_r; do
   rm -f "$U"/sortie/*
   "$OUT" vex "${Y#sha256:}" "$U/sortie" "$U/$a.json" "$U/$b.json" > "$U/p-$c.res"
@@ -365,6 +368,8 @@ egalite pb pr aucune ; sans exemption 1
 reaffirmation pr-ancien pb vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
 autre-produit pa pb-autre-produit aucune ; sans exemption 1
 autre-vuln pa pb-autre-vuln vex not_affected 2026-11-01T00:00:00Z ; sans exemption 0
+autre-sous-composant pa pb-autre-sous aucune ; sans exemption 1
+large pa pb-large vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
 FIN
 
 # ------------------------------------------------------------------------------------------------------------------------------ B
