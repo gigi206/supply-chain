@@ -350,3 +350,55 @@ Le second passage n'a donc rien réémis pour le même referrer : c'est un premi
    - « le produit n'est vérifié que si la source porte un `repoDigest` » : c'est une corrélation sur trois sources (`registry:` avec `repoDigests`, `oci-dir` et SBOM à composant sans). La cause n'est pas isolée.
 
 Le fragment de `docs/03` est corrigé dans les mêmes termes. Le message du commit de la note précédente garde « CSAF reconnu mais sans effet » et « 6 écarts » : un message de commit ne se réécrit pas, c'est cette note qui fait foi.
+
+## Choix 1 à 5 : recommandations, relues par le conseiller (note de 2026-11-21T17:11:23Z ; rien n'est réécrit au-dessus)
+
+**Faits vérifiés pour ces recommandations** :
+- **Spécifications**, lues sur la branche `main` par un sous-agent ; le bloc `tracking` de CSAF n'a pas été lu en entier.
+  - OpenVEX v0.2.0 n'a aucun champ d'échéance. Ses dates sont `timestamp` (émission du document ; pour un énoncé, l'heure où l'information était vraie), `last_updated` et `action_statement_timestamp`.
+  - Pour `not_affected`, la spec est incohérente. Le tableau des champs exige `justification` **ou** `impact_statement` ; le tableau des statuts exige `justification`.
+  - Pour `fixed`, la spec n'exige aucun champ propre.
+  - CSAF 2.0 : aucun champ d'échéance lu. Les dates de `flags`, `remediations` et `threats` sont des dates d'évaluation ou de début.
+- **Porte** : le seuil `vex_statuts_acceptes` vaut `not_affected` et `fixed` (`scan_test.rego`). La règle s'intitule « exceptions datées » et compare `v.vex.expires` à l'heure courante.
+- **Scanner** : le deb passe par la même fusion que l'image (`scanner.sh`, `syft dir:` puis `scan-outil fusion`).
+- **Cadence** : CronJob `scan-sample-app` à 09:30 UTC et `scan-sample-app-deb` à 11:15 UTC, une fois par jour (`kubectl get cronjob`, 21/11 à 17:10 UTC).
+- **Clés Transit citées dans le dépôt** : `chains`, `lien`, `scanner` et `tsa`. Aucune clé VEX.
+- **ADR 0004** : aucun fichier. `docs/00`, ligne 280 : « Source en OpenVEX signée et convertie », avec la réserve « Spec OpenVEX en brouillon v0.2 ».
+- **Aucun outil d'atteignabilité** n'est évalué dans `docs/04`.
+- **Sonde hors dépôt, hors réseau** (`t2-sonde/ignore-forme`, base de G0, 21/11 à 17:10:32 UTC). Sur une correspondance écartée, Grype n'écrit que `appliedIgnoreRules: [{namespace: "vex", vex-status}]`, sans justification, sans identifiant de document et sans horodatage. La liste des documents passés est écrite une seule fois, dans `descriptor.configuration.vex-documents`.
+
+**Le choix 1 conditionne les choix 2, 3 et 5** : leurs recommandations ne valent que sous « le scanner applique ».
+
+1. **Qui applique : le scanner** (`grype --vex`). Le prédicat signé porte `vex`, que la tranche 3 tire de `ignoredMatches`.
+   - **Pour** : une seule logique de correspondance, celle de Grype, mesurée en tranche 2. La porte et Grafana en dérivent les mêmes listes : « trouvées » = `matches` + `ignoredMatches`, « réelles » = `matches`.
+   - **Contre l'option porte** : Rego devrait refaire la correspondance des PURL (formes de Syft et d'Hermeto, versions) et des alias, au risque de diverger de Grafana.
+   - **Limite, dite en clair** : la porte fait confiance au scanner pour le VEX. Un scanner compromis écrirait `vex` lui-même, ou tairait une correspondance.
+   - **Atténuation** : le prédicat cite l'empreinte de chaque document VEX passé, pour qu'un auditeur puisse revérifier.
+   - **Coût** : le SBOM fusionné doit porter un `metadata.component` de type `container`. Ce point n'est mesuré que sur l'image de sample-app, et le deb, qui porte les 3 Critical et 33 High, passe par la même fusion. Le produit n'y étant pas vérifié, la portée doit venir du sujet : le scanner ne passe à Grype que les VEX attestés sur le digest scanné.
+   - **À mesurer en tranche 3**, pour l'image et pour le deb :
+     - mêmes `matches` avant et après l'ajout du composant ;
+     - un VEX attesté sur un autre digest n'est pas passé (cas « autre sujet », absent de la tranche 2).
+   - **Délais** :
+     - un VEX neuf ne compte qu'au scan suivant, soit jusqu'à environ 24 h ;
+     - un VEX retiré reste effectif dans le prédicat jusqu'au scan suivant. La porte retient le scan le plus récent, recevable jusqu'à `scan_age_max_jours`.
+   - **Prix de la portée par le sujet** : chaque nouveau digest (reconstruction) demande un nouveau VEX signé à la main. Sinon la porte bloque une KEV déjà exemptée.
+2. **Quelle clé : une clé distincte** (par exemple `hashivault://vex` dans Transit), dont seul le propriétaire a l'usage.
+   - **Ce qu'elle apporte** : qui peut écrire sous `builds/vex/` sans la clé ne peut pas faire exempter, et l'auteur humain est séparé de la tâche de scan.
+   - **Ce qu'elle n'apporte pas**, sous le choix 1 : une protection contre un scanner compromis.
+   - **Coût** : une clé et une politique OpenBao neuves. C'est un changement de configuration du cluster, sur accord.
+3. **Échéance : la durée dans la politique, la date dans le VEX.**
+   - Un seuil neuf `vex_age_max_jours` entre dans `policy-scan.yaml`.
+   - Grype ne dit pas quel énoncé a écarté quelle correspondance. Le scanner écrit donc, pour toute correspondance écartée, l'horodatage **le plus ancien** des énoncés passés, sans refaire la correspondance.
+   - La porte calcule l'échéance à partir de cet horodatage et du seuil.
+   - Un horodatage postérieur à l'heure du scan est refusé. Il n'existe pas d'heure de signature de confiance : signing-config vide et `--insecure-ignore-tlog`.
+   - **C'est un changement** : la règle passe d'une date par exception à une durée uniforme.
+   - **Autre option** : une échéance propre à chaque exception, dans un champ hors spécification d'OpenVEX. Grype ne l'utiliserait pas, et la lecture de ce champ par le scanner n'est pas mesurée.
+4. **Format : OpenVEX.** Il est mesuré de bout en bout : appliqué par Grype 0.104.1, signé, puis relu par `verify-attestation`.
+   - L'ADR 0004 le noterait avec **CSAF non évalué** : un seul témoin non validé n'a eu aucun effet, pour une cause non établie.
+   - Il garderait aussi la réserve « spec en brouillon v0.2 ».
+   - L'écart avec Dependency-Track (VEX de CycloneDX seulement, d'après `docs/00` ligne 277, non revérifié) reste ouvert : la projection est hors de cette carte.
+5. **Qui écrit : le propriétaire, à la main.**
+   - Pour `not_affected`, le scanner exige **et** `justification` **et** `impact_statement`, sinon il ne passe pas le document. C'est plus strict que la spec, et nécessaire : Grype ne recopie pas la justification.
+   - **`fixed`** est accepté par la porte et écarté par Grype comme `not_affected` (tranche 2), sans aucune preuve. Un `fixed` écrit à la main exempterait une KEV. Recommandation : **retirer `fixed` du seuil** de la porte, puisque la correction se voit au scan suivant, quand la version change.
+   - Tout VEX de démonstration porte « témoin » dans `author` et ne vise aucune KEV réelle.
+   - govulncheck pourrait fonder `vulnerable_code_not_in_execute_path` pour les modules Go, mais il faudrait d'abord l'évaluer dans `docs/04`. C'est une décision à part, hors de ces recommandations.
