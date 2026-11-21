@@ -884,3 +884,30 @@ Patch `0d641017e662d483…`. Contrôles refaits : `git apply --check`, `ec opa t
 **Non mesuré** : `verif` sur le vrai Prometheus et le vrai Grafana, qui attend la pose de la pièce 7. Une série reste un compte : elle ne dit pas quelle entrée a perdu son exemption. Pour cela, il faut la liste dans Loki, dont la ligne porte `vex` seulement pour les entrées écartées.
 
 **Heures mesurées** : de 22:02:57 UTC (note du branchement au rejeu) à 22:09:17 UTC.
+
+## Inventaire des limites de la 07b (note de 2026-11-21T22:10:13Z ; demande du propriétaire, verbatim : « Oui lève toutes les limites »)
+
+**Portée de la demande** : le travail à sec seulement. Elle ne vaut ni accord pour les pièces 2 à 9 de la pose (cluster, vrai Zot, sudo), ni poussée, ni révision des choix 1 à 5. Une limite se lève par une mesure ; une limite qui ne peut pas l'être reste écrite.
+
+**Classe 1, levable à sec** : une prédiction et un passage par limite, dans cet ordre.
+1. **Prédicat de scan fourni à `signer-vex.sh`, non vérifié** : le script lira lui-même le scan signé le plus récent du digest et le vérifiera avec la clé publique du scanner. Le Zot jetable du banc n'a aujourd'hui aucun scan signé (`analyser` seul) : le banc devra en publier un, avec une clé locale.
+2. **Audit des VEX comptés** : `entrees-scan.py` émettra dans Loki une ligne par document VEX compté (empreinte, horodatage), une fois par scan. Les `REFUS` de `signer-vex.sh` restent sur le poste de l'auteur : les envoyer dans Loki demande une écriture de l'hôte vers Loki, donc un accord (classe 3).
+3. **Renouvellement** : `signer-vex.sh` affichera un avis, pas un refus, si le document neuf n'est pas plus récent que les énoncés déjà publiés sous le même nom, ou s'il a plus de 30 jours. La comparaison porte sur les `enonces` rendus par `scan-outil vex`, sans réécrire le classement en shell.
+4. **Repli sans `--vex`** : si Grype échoue avec les VEX, le scanner relancera sans eux, et le prédicat et les séries le diront. Aucune panne réelle n'a été trouvée (5 formes sondées), la mesure passera donc par une panne injectée (faux `grype` dans le PATH) : synthétique, et dite comme telle.
+- **Déjà levées** : la série de `ecarteesSansExemption` (passage 13). La « seule copie de la justification » de la note de 20:28:00Z ne vaut plus depuis le choix du remplacement : le registre est en ajout seul, et le document signé y reste. Le bit d'exécution : appeler `bash signer-vex.sh`, ou le poser à la pose.
+
+**Classe 2, choix du propriétaire** :
+- **Document daté du futur** : aujourd'hui, la porte le refuse (blocage fermé, choix 3). Le sortir du classement amenderait le choix 3. Seule une forme asymétrique tient : l'énoncé exemptant daté du futur sort, l'énoncé non exemptant reste ; sinon, une rétractation signée sur une horloge décalée serait ignorée sans bruit. À mesurer par un cas unitaire avant de poser la question.
+- **Heure de signature de confiance** : ce n'est pas une limite de structure, le PoC a une TSA (J5). `cosign signing-config create --tsa` et `verify-blob-attestation --use-signed-timestamps` existent en v3.1.4 (aide lue, non essayé). La porte devrait alors juger l'âge sur l'heure de la TSA, pas sur celle de l'auteur : c'est un amendement du choix 3, qui touche l'ADR 0003, et la TSA du cluster demande un accord (classe 3).
+
+**Classe 3, accord nommé** : `hashivault://vex` (pièce 2) ; compte d'écriture de `builds/vex/**` (pièce 4, pas avant le 29/11, G7) ; `verif` sur le vrai Prometheus et le vrai Grafana (pièce 7) ; scan déclenché à la publication d'un VEX (délai d'un jour) ; envoi des `REFUS` dans Loki ; essai de la TSA du cluster.
+
+**Classe 4, non levable dans la 07b** :
+- Grype ne dit pas quel énoncé a joué ; le prédicat le retrouve, mais c'est une reconstruction.
+- La porte fait confiance au scanner.
+- La spécification OpenVEX est un brouillon (v0.2), incohérent.
+- Il n'existe aucune KEV réelle sur les artefacts.
+- Le produit du VEX n'est pas vérifié par Grype sur le SBOM fusionné : la portée vient du sujet de l'attestation (constat 2 de la tranche 2).
+- CSAF, l'atteignabilité et la projection Dependency-Track sont d'autres chantiers.
+
+**Heures** : la somme des enveloppes est recalculée à chaque note ; une demande au propriétaire sera faite avant 20 h (2× l'estimation de 10 h).
