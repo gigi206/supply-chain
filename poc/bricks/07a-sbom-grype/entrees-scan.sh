@@ -112,7 +112,8 @@ etape_verif() {
   local s d digest m l att obt n
   s=$(scans_en_place)
   echo "## Prometheus, lu par l'auditeur"
-  graf prometheus 'scan_entrees or scan_entrees_kev or scan_entrees_avec_correctif or scan_entrees_scanne_timestamp_seconds' > "$T/p.json"
+  # sélecteur sur __name__ : « a or b » écarte les séries de b dont les étiquettes, nom exclu, sont déjà dans a (journal verif 1)
+  graf prometheus '{__name__=~"scan_entrees|scan_entrees_kev|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds"}' > "$T/p.json"
   attendu "séries scan_entrees* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 20
   for d in $s; do
     digest=${d#*@}; d=${d%@*}

@@ -251,3 +251,30 @@ Les écritures sur la VM s'arrêtent d'elles-mêmes sur un échec : `set -e` ne 
 - une lecture sudo du journal de l'unité : le résumé, et le nombre de lignes d'entrée (les lignes elles-mêmes ne sont pas archivées).
 
 Aucune écriture dans Zot, ni dans Grafana, ni dans le cluster.
+
+## Pose de la tranche 1 (note de 2026-11-21T16:41:07Z ; rien n'est réécrit au-dessus)
+
+**Accord du propriétaire**, le 21/11/2026, verbatim : « Oui », en réponse à « Je pose entrees-scan sur sc-stockage ? ». La demande nommait le sudo, le compte système, le timer et la lecture sudo du journal.
+
+**Pose**, de 16:38:35 à 16:38:37 UTC ([journal](07b-t1-pose.log)) : **tenue**.
+- Le script installé est identique, `01e733fd…`. Le premier passage se termine en `success`, et le timer est actif.
+- Au journal : 73 lignes d'entrée, et le résumé `sample-app=6`, `sample-app-deb=67`.
+- 20 séries sont écrites.
+- `systemd-analyze security` donne 2,9, comme `fraicheur-scan`.
+
+**Vérification par l'auditeur dans Grafana.**
+- [Premier journal](07b-t1-verif.log) : **KO, mais l'erreur venait de la requête de `verif`**, pas de la pose.
+  - Elle demandait `a or b or c or d`. En PromQL, `or` écarte les séries de droite dont les étiquettes sont déjà à gauche, sans tenir compte du nom. `scan_entrees_avec_correctif` et `scan_entrees_scanne_timestamp_seconds` ont les mêmes étiquettes que `scan_entrees_kev` : il manquait donc 4 séries sur 20.
+  - Un `count by (__name__)` sur `{__name__=~"scan_entrees.*"}` en trouve bien 14, 2, 2 et 2.
+  - La requête passe à un sélecteur sur `__name__` (`entrees-scan.sh` `5beedbca6627e3e7…`).
+- [Second journal](07b-t1-verif-2.log), à 16:40:30 UTC : **tenu**.
+  - Prometheus a 20 séries, égales à jq sur les énoncés relus en anonyme, dépôt par dépôt.
+  - Loki a 6 et 67 lignes, celles du `scanne` du dernier scan de chaque dépôt : la jointure marche dans Grafana.
+
+**Deux passages dès la pose.** Le `start` de l'étape, puis le timer, parti à son activation puisque `OnBootSec` était déjà dépassé, à 16:38:36 UTC. Comptes dans Loki, par l'auditeur, sur 24 h :
+- 1 résumé avec « liste émise » et 1 sans ;
+- 73 lignes d'entrée au total.
+
+Le second passage n'a donc rien réémis pour le même referrer : c'est un premier constat, sur la VM, de « une fois par scan ». L'émission sur un **nouveau** scan reste à voir après ceux du 22/11, vers 09:32 et 11:17 UTC, avec un second `verif`.
+
+**Reste ouvert** : le branchement au rejeu (`rejeu.sh`), et un tableau de bord, qui serait un accord à part.

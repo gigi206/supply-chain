@@ -1,0 +1,36 @@
+début : 2026-11-21T16:38:35Z, étape pose, entrees-scan.py 01e733fdb4341fb5…
+OK   deux artefacts dans SCANS : 2
+Created symlink '/etc/systemd/system/timers.target.wants/entrees-scan.timer' -> '/etc/systemd/system/entrees-scan.timer'.
+OK   entrees-scan.py installé identique : 01e733fdb4341fb52b2b4c007dbcacc328cf0ccc9ee96980d014fea4f4fc5d3c
+OK   résultat du premier passage : success
+OK   timer actif : active
+## premier passage : résumé et nombre de lignes d'entrée au journal (lignes elles-mêmes non archivées)
+entrées builds/scan/sample-app=6@2026-11-21T09:31:55.87940934Z builds/scan/sample-app-deb=67@2026-11-21T11:16:56.316245544Z
+entrees-scan.service: Deactivated successfully.
+Finished entrees-scan.service - Entrées du scan signé en métriques et dans le journal (brique 07b, tranche 1).
+lignes d'entrée : 73
+## séries écrites
+  scan_entrees{depot="builds/scan/sample-app",gravite="Critical"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="High"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="Medium"} 4
+  scan_entrees{depot="builds/scan/sample-app",gravite="Low"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="Negligible"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="Unknown"} 2
+  scan_entrees{depot="builds/scan/sample-app",gravite="autre"} 0
+  scan_entrees_kev{depot="builds/scan/sample-app"} 0
+  scan_entrees_avec_correctif{depot="builds/scan/sample-app"} 6
+  scan_entrees_scanne_timestamp_seconds{depot="builds/scan/sample-app"} 1795253515
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Critical"} 3
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="High"} 33
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Medium"} 28
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Low"} 1
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Negligible"} 0
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Unknown"} 2
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="autre"} 0
+  scan_entrees_kev{depot="builds/scan/sample-app-deb"} 0
+  scan_entrees_avec_correctif{depot="builds/scan/sample-app-deb"} 67
+  scan_entrees_scanne_timestamp_seconds{depot="builds/scan/sample-app-deb"} 1795259816
+OK   séries écrites : 20
+-> Overall exposure level for entrees-scan.service: 2.9 OK :-)
+fraicheur-scan, pour comparer : -> Overall exposure level for fraicheur-scan.service: 2.9 OK :-)
+fin : 2026-11-21T16:38:37Z, bilan : tenu
