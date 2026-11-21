@@ -502,9 +502,12 @@ juger_porte "porte, partiel, V1 en KEV" partiel 30 0 ""
 juger_porte "porte, partiel, V2 en KEV" partiel 30 1 scan.kev_without_vex GHSA-j6qf-3m9c-vwj3
 
 echo "## D. entrees-scan.py du patch, sur les prédicats de B"
-for c in complet deb-complet; do
-  [ -s "$T/cas/$c/scan.json" ] || { ko "D $c : aucun prédicat"; continue; }
-  r=$(python3 -I - "$B/systemd/entrees-scan.py" "$T/cas/$c/scan.json" <<'PYD'
+# passage 13 : séries scan_vex_* (bloc vex du prédicat, 0 s'il est absent) ; signe-retract et un prédicat d'avant la tranche 3
+cp "$M0/image-avant.scan.json" "$T/avant-t3.json"
+for c in complet deb-complet signe-retract avant-t3; do
+  p=$T/cas/$c/scan.json; [ "$c" = avant-t3 ] && p=$T/avant-t3.json
+  [ -s "$p" ] || { ko "D $c : aucun prédicat"; continue; }
+  r=$(python3 -I - "$B/systemd/entrees-scan.py" "$p" <<'PYD'
 import importlib.util, json, sys
 spec = importlib.util.spec_from_file_location("es", sys.argv[1])
 es = importlib.util.module_from_spec(spec)
@@ -515,11 +518,15 @@ t = sum(int(l.rsplit(" ", 1)[1]) for l in c.splitlines() if l.startswith("scan_e
 v = sum(int(l.rsplit(" ", 1)[1]) for l in c.splitlines() if l.startswith("scan_entrees_vex{"))
 k = [l.rsplit(" ", 1)[1] for l in c.splitlines() if l.startswith("scan_entrees_kev_vex{")]
 e = [json.loads(x) for x in es.entrees("builds/x", p)]
-print(f"{len(c.splitlines())} séries, trouvées {t}, écartées {v}, kev écartées {','.join(k)}, lignes {len(e)}, lignes avec vex {sum(1 for x in e if x.get('vex'))}")
+x = {l.split('{')[0]: l.rsplit(' ', 1)[1] for l in c.splitlines() if l.startswith('scan_vex_')}
+print(f"{len(c.splitlines())} séries, trouvées {t}, écartées {v}, kev écartées {','.join(k)}, lignes {len(e)}, lignes avec vex {sum(1 for x in e if x.get('vex'))}, "
+      f"vex {x.get('scan_vex_documents')}/{x.get('scan_vex_rejetes')}/{x.get('scan_vex_ecartees_sans_exemption')}")
 PYD
   )
-  case $c in complet) a="18 séries, trouvées 5, écartées 1, kev écartées 0, lignes 5, lignes avec vex 1" ;;
-    *) a="18 séries, trouvées 66, écartées 1, kev écartées 0, lignes 66, lignes avec vex 1" ;; esac
+  case $c in complet) a="21 séries, trouvées 5, écartées 1, kev écartées 0, lignes 5, lignes avec vex 1, vex 1/0/0" ;;
+    deb-complet) a="21 séries, trouvées 66, écartées 1, kev écartées 0, lignes 66, lignes avec vex 1, vex 1/0/0" ;;
+    signe-retract) a="21 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 1/1/1" ;;
+    *) a="21 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 0/0/0" ;; esac
   attendu "D $c" "$r" "$a"
 done
 

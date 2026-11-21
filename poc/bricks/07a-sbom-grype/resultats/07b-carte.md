@@ -862,3 +862,25 @@ C'est plus strict que le couple vulnérabilité et produit pour les rétractatio
 - **Pourquoi à cet endroit** : `pose` exige deux artefacts dans `SCANS` (contrôle « deux artefacts dans SCANS »), et l'unité `fraicheur-scan` ne porte le deb qu'après `fraicheur` de la 06.
 - `verif` reste hors du rejeu : « une fois par scan » ne se prouve qu'au scan quotidien suivant.
 - **Contrôle fait** : `bash -n`. **Non fait** : aucun rejeu, et aucun passage de `pose` dans ce contexte. `pose` relance `useradd` sous garde et réinstalle les fichiers ; sur une VM recréée, l'état part de zéro.
+
+## Séries VEX dans Prometheus (note de 2026-11-21T22:09:17Z ; passage 13, rien posé ; pièce 7 de la pose)
+
+**Limite visée** : le compteur `ecarteesSansExemption` n'avait pas de série dans Grafana, contrairement à l'exigence d'audit.
+
+**Changement**, dans `entrees-scan.py` du patch (prédiction écrite avant le code, section « Ajout avant le treizième passage », 22:04:47 UTC). Trois séries par dépôt, lues dans le bloc `vex` du prédicat, 0 si le bloc est absent :
+- `scan_vex_documents` : documents VEX passés au scanner ;
+- `scan_vex_rejetes` : documents vérifiés mais rejetés par le filtre ;
+- `scan_vex_ecartees_sans_exemption` : entrées dont le gagnant n'exempte pas.
+
+`verif` d'`entrees-scan.sh` (patch) suit : **42 séries** au lieu de 36 (21 par dépôt ; le tableau de la pose disait « séries de 20 à 36 »), et les trois valeurs comparées à `jq` sur l'énoncé relu.
+
+Patch `0d641017e662d483…`. Contrôles refaits : `git apply --check`, `ec opa test` 39/39, témoins de G6 et `yq` à 30.
+
+**Passage 13** ([journal](07b-t3-banc-13.log)) : 143 OK, 0 KO, de 22:05:38 à 22:09:07 UTC. C'est la prédiction.
+- `complet` et `deb-complet` : 21 séries, `vex` 1/0/0.
+- `signe-retract` (rétractation publiée par `signer-vex.sh`) : 1/1/1.
+- Prédicat d'avant la tranche 3 : 0/0/0.
+
+**Non mesuré** : `verif` sur le vrai Prometheus et le vrai Grafana, qui attend la pose de la pièce 7. Une série reste un compte : elle ne dit pas quelle entrée a perdu son exemption. Pour cela, il faut la liste dans Loki, dont la ligne porte `vex` seulement pour les entrées écartées.
+
+**Heures mesurées** : de 22:02:57 UTC (note du branchement au rejeu) à 22:09:17 UTC.

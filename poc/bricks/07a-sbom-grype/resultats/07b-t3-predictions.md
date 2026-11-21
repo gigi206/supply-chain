@@ -269,3 +269,26 @@ Les témoins de rétractation du banc reçoivent donc un `action_statement` par 
 | B, C, D | les autres contrôles | inchangés | haute |
 
 **Total prédit** : 141 OK (137 + 4), 0 KO.
+
+## Ajout avant le treizième passage : séries VEX dans Prometheus (écrit le 2026-11-21, date -u de 22:04:47 UTC dans la même commande que l’écriture, avant toute ligne de code)
+
+**Limite visée** (ADR 0004) : le compteur `ecarteesSansExemption` n'a pas de série dans Grafana, contrairement à l'exigence d'audit du propriétaire.
+
+**Changement prévu**, dans `entrees-scan.py` du patch (pièce 7) : trois séries par dépôt, lues dans le bloc `vex` du prédicat de scan, 0 si le bloc est absent (prédicats d'avant la tranche 3) :
+- `scan_vex_documents` : nombre de documents VEX passés au scanner ;
+- `scan_vex_rejetes` : documents vérifiés mais rejetés par le filtre ;
+- `scan_vex_ecartees_sans_exemption` : entrées dont le gagnant n'exempte pas.
+
+`verif` d'`entrees-scan.sh` (patch) suit : 42 séries au lieu de 36, et les trois valeurs comparées à `jq` sur l'énoncé relu.
+
+| Partie | Cas | Prédiction | Confiance |
+|---|---|---|---|
+| D | `complet` | 21 séries, trouvées 5, écartées 1, kev écartées 0, lignes 5, lignes avec vex 1, vex 1/0/0 | haute |
+| D | `deb-complet` | 21 séries, trouvées 66, écartées 1, kev écartées 0, lignes 66, lignes avec vex 1, vex 1/0/0 | haute |
+| D | `signe-retract` (neuf) | 21 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 1/1/1 | haute |
+| D | prédicat d'avant la tranche 3 (`image-avant` de la mesure 0, neuf) | 21 séries, vex 0/0/0 | haute |
+| A, B, C | les autres contrôles | inchangés | haute |
+
+**Total prédit** : 143 OK (141 + 2), 0 KO.
+
+**Non mesuré par ce passage** : `verif` (Prometheus et Grafana réels), qui demande la pose de la pièce 7.

@@ -1,35 +1,41 @@
 diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-sbom-grype/entrees-scan.sh
 --- a/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-21 17:40:30.762366132 +0100
-+++ b/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-21 18:34:16.141193480 +0100
++++ b/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-21 23:05:04.450242580 +0100
 @@ -113,8 +113,8 @@
    s=$(scans_en_place)
    echo "## Prometheus, lu par l'auditeur"
    # sélecteur sur __name__ : « a or b » écarte les séries de b dont les étiquettes, nom exclu, sont déjà dans a (journal verif 1)
 -  graf prometheus '{__name__=~"scan_entrees|scan_entrees_kev|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds"}' > "$T/p.json"
 -  attendu "séries scan_entrees* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 20
-+  graf prometheus '{__name__=~"scan_entrees|scan_entrees_vex|scan_entrees_kev|scan_entrees_kev_vex|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds"}' > "$T/p.json"
-+  attendu "séries scan_entrees* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 36
++  graf prometheus '{__name__=~"scan_entrees|scan_entrees_vex|scan_entrees_kev|scan_entrees_kev_vex|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds|scan_vex_documents|scan_vex_rejetes|scan_vex_ecartees_sans_exemption"}' > "$T/p.json"
++  attendu "séries scan_entrees* et scan_vex* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 42
    for d in $s; do
      digest=${d#*@}; d=${d%@*}
      m=$(curl -fsS --cacert "$CA" "https://$REG/v2/$d/referrers/$digest" | jq -r '.manifests
-@@ -124,11 +124,15 @@
+@@ -124,12 +124,20 @@
      curl -fsS --cacert "$CA" "https://$REG/v2/$d/blobs/$l" | jq -r '.dsseEnvelope.payload | @base64d' > "$T/e.json"
      att=$(jq -r --argjson t "$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)" '.predicate.vulnerabilities as $v
        | (["Critical","High","Medium","Low","Negligible","Unknown","autre"] | map(. as $g | "g=\($g) \($v | map(select(.severity == $g)) | length)")[]),
 -        "kev \($v | map(select(.kev)) | length)", "correctif \($v | map(select((.fixedIn | length) > 0)) | length)", "scanne \($t)"' "$T/e.json")
 +        (["Critical","High","Medium","Low","Negligible","Unknown","autre"] | map(. as $g | "vex g=\($g) \($v | map(select(.severity == $g and .vex)) | length)")[]),
 +        "kev \($v | map(select(.kev)) | length)", "kev_vex \($v | map(select(.kev and .vex)) | length)",
-+        "correctif \($v | map(select((.fixedIn | length) > 0)) | length)", "scanne \($t)"' "$T/e.json")
++        "correctif \($v | map(select((.fixedIn | length) > 0)) | length)", "scanne \($t)",
++        "vex_documents \(.predicate.vex.documents // [] | length)", "vex_rejetes \(.predicate.vex.rejetes // 0)",
++        "vex_sans_exemption \(.predicate.vex.ecarteesSansExemption // 0)"' "$T/e.json")
      obt=$(jq -r --arg d "$d" '[.results.A.frames[]? | select((.data.values | length) > 1) | select(.schema.fields[1].labels.depot == $d)
        | {n: .schema.fields[1].labels.__name__, g: (.schema.fields[1].labels.gravite // ""), v: .data.values[1][0]}] as $s
        | (["Critical","High","Medium","Low","Negligible","Unknown","autre"][] as $g | $s[] | select(.n == "scan_entrees" and .g == $g) | "g=\($g) \(.v)"),
 -        ($s[] | select(.n == "scan_entrees_kev") | "kev \(.v)"), ($s[] | select(.n == "scan_entrees_avec_correctif") | "correctif \(.v)"),
+-        ($s[] | select(.n == "scan_entrees_scanne_timestamp_seconds") | "scanne \(.v)")' "$T/p.json")
 +        (["Critical","High","Medium","Low","Negligible","Unknown","autre"][] as $g | $s[] | select(.n == "scan_entrees_vex" and .g == $g) | "vex g=\($g) \(.v)"),
 +        ($s[] | select(.n == "scan_entrees_kev") | "kev \(.v)"), ($s[] | select(.n == "scan_entrees_kev_vex") | "kev_vex \(.v)"),
 +        ($s[] | select(.n == "scan_entrees_avec_correctif") | "correctif \(.v)"),
-         ($s[] | select(.n == "scan_entrees_scanne_timestamp_seconds") | "scanne \(.v)")' "$T/p.json")
++        ($s[] | select(.n == "scan_entrees_scanne_timestamp_seconds") | "scanne \(.v)"),
++        ($s[] | select(.n == "scan_vex_documents") | "vex_documents \(.v)"), ($s[] | select(.n == "scan_vex_rejetes") | "vex_rejetes \(.v)"),
++        ($s[] | select(.n == "scan_vex_ecartees_sans_exemption") | "vex_sans_exemption \(.v)")' "$T/p.json")
      if [ "$att" = "$obt" ]; then ok "$d : séries de Prometheus = jq ($(printf '%s\n' "$att" | grep -v ' 0$' | paste -sd',' | sed 's/,/, /g'))"
      else echo "KO   $d : séries de Prometheus différentes de jq"; diff <(printf '%s\n' "$att") <(printf '%s\n' "$obt") || true; ko=1; fi
+     echo "## Loki, lu par l'auditeur, en comptes : $d"
 diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbom-grype/outil/main.go
 --- a/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-04 20:36:57.722552154 +0100
 +++ b/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-21 22:07:09.727442712 +0100
@@ -1072,18 +1078,20 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +echo "PUBLIE|$depot_vex@$d, referrer de sha256:$hex ; compte au scan quotidien suivant"
 diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py
 --- a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-21 17:36:55.344531612 +0100
-+++ b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-21 18:34:16.141026413 +0100
-@@ -11,6 +11,9 @@
++++ b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-21 23:05:04.450079347 +0100
+@@ -11,6 +11,11 @@
  Sorties :
    SORTIE (fichiers-metriques, brique 19) : comptes par dépôt, grille de gravités fixe (zéros écrits), KEV, avec correctif,
      scannedAt du prédicat lu. Ni HELP ni TYPE, comme fraicheur-scan.prom. Le fichier est créé par la pose ; écrit sur place.
 +    07b, tranche 3 : scan_entrees compte les entrées trouvées ; scan_entrees_vex (même grille) et scan_entrees_kev_vex celles
 +    qu'un VEX a écartées (champ vex du prédicat, écrit par le scanner). Réelles = trouvées - écartées, par soustraction dans
 +    Grafana. Ce sont les entrées que le scanner a écartées, pas celles que la porte admet : la porte juge aussi l'âge du VEX.
++    Bloc vex du prédicat (0 s'il est absent, prédicats d'avant la tranche 3) : scan_vex_documents (documents passés au scanner),
++    scan_vex_rejetes (vérifiés mais rejetés par le filtre), scan_vex_ecartees_sans_exemption (gagnant non exemptant).
    Sortie standard (journal, puis Loki par Alloy, unite="entrees-scan.service") : une ligne JSON par entrée, avec dépôt et
      scannedAt dans la ligne (chaîne d'origine, et « scanne » en secondes, égal à la série du même nom), jamais en étiquette. Émise une seule fois par referrer de scan : le digest du dernier manifeste émis
      est gardé dans ETAT (StateDirectory). Les autres passages n'écrivent qu'une ligne de résumé.
-@@ -83,7 +86,13 @@
+@@ -83,9 +88,19 @@
      for e in v:
          g[e.get("severity") if e.get("severity") in GRAVITES[:-1] else "autre"] += 1
      lignes = [f'scan_entrees{{depot="{depot}",gravite="{k}"}} {n}\n' for k, n in g.items()]
@@ -1096,8 +1104,14 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bric
 +    lignes.append(f'scan_entrees_kev_vex{{depot="{depot}"}} {sum(1 for e in v if e.get("kev") and e.get("vex"))}\n')
      lignes.append(f'scan_entrees_avec_correctif{{depot="{depot}"}} {sum(1 for e in v if e.get("fixedIn"))}\n')
      lignes.append(f'scan_entrees_scanne_timestamp_seconds{{depot="{depot}"}} {epoque(predicat["scannedAt"])}\n')
++    b = predicat.get("vex") or {}
++    lignes.append(f'scan_vex_documents{{depot="{depot}"}} {len(b.get("documents") or [])}\n')
++    lignes.append(f'scan_vex_rejetes{{depot="{depot}"}} {int(b.get("rejetes") or 0)}\n')
++    lignes.append(f'scan_vex_ecartees_sans_exemption{{depot="{depot}"}} {int(b.get("ecarteesSansExemption") or 0)}\n')
      return "".join(lignes)
-@@ -94,7 +103,8 @@
+ 
+ 
+@@ -94,7 +109,8 @@
      for e in predicat.get("vulnerabilities") or []:
          yield json.dumps({"depot": depot, "scannedAt": predicat["scannedAt"], "scanne": scanne, "id": e.get("id"), "aliases": e.get("aliases"),
                            "severity": e.get("severity"), "kev": e.get("kev"), "kevCves": e.get("kevCves"), "epss": e.get("epss"),
