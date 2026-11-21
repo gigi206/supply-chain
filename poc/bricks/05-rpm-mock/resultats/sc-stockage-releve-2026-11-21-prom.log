@@ -1,0 +1,34 @@
+## lancé à 2026-11-21T16:12:00Z ; intervalle 2026-11-20T16:04:23Z -> 2026-11-21T16:10:10Z (86747 s)
+## à 2026-11-20T16:04:23Z
+somme de zot_repo_storage_bytes :
+  {} 8425330211
+dépôts de Zot mesurés :
+  {} 166
+prometheus_tsdb_storage_blocks_bytes :
+  {"instance":"127.0.0.1:9090","job":"prometheus"} 95873207
+## à 2026-11-21T16:10:10Z
+somme de zot_repo_storage_bytes :
+  {} 8631230692
+dépôts de Zot mesurés :
+  {} 166
+prometheus_tsdb_storage_blocks_bytes :
+  {"instance":"127.0.0.1:9090","job":"prometheus"} 110147405
+## hausse par dépôt de Zot sur l'intervalle (6 premiers)
+  {"instance":"192.168.161.13:5000","job":"zot","repo":"vulndb/grype"} 205877968
+  {"instance":"192.168.161.13:5000","job":"zot","repo":"builds/scan/sample-app-deb"} 18905
+  {"instance":"192.168.161.13:5000","job":"zot","repo":"builds/scan/sample-app"} 3608
+  {"instance":"192.168.161.13:5000","job":"zot","repo":"amont/kyverno/reports-controller"} 0
+  {"instance":"192.168.161.13:5000","job":"zot","repo":"amont/kyverno/kyverno"} 0
+  {"instance":"192.168.161.13:5000","job":"zot","repo":"amont/library/debian"} 0
+## dépôts de Zot en baisse sur l'intervalle (rien = aucun)
+  {} null
+## octets envoyés par Alloy à Loki (loki_write_sent_bytes_total), par tranche de 24 h
+  {"component_id":"loki.write.sortie","component_path":"/","host":"192.168.161.13:3100","instance":"127.0.0.1:12345","job":"alloy"} 2040155494.7504554
+24 h jusqu'à 2026-11-20T16:04:23Z :
+  {"component_id":"loki.write.sortie","component_path":"/","host":"192.168.161.13:3100","instance":"127.0.0.1:12345","job":"alloy"} 2006485125.224036
+24 h jusqu'à 2026-11-19T16:04:23Z :
+  {"component_id":"loki.write.sortie","component_path":"/","host":"192.168.161.13:3100","instance":"127.0.0.1:12345","job":"alloy"} 1962936410.1424105
+24 h jusqu'à 2026-11-18T16:04:23Z :
+  {"component_id":"loki.write.sortie","component_path":"/","host":"192.168.161.13:3100","instance":"127.0.0.1:12345","job":"alloy"} 1931805304.7308092
+## node_filesystem_avail_bytes (rien = pas d'exportateur de nœud)
+  {} null

@@ -351,3 +351,7 @@ Il a été mesuré avec **un pod Kata d'essai au label `construire-rpm`, pas ave
 - le fichier filtré sur `builds/` les contient tous.
 
 Les flux ne vont pas encore dans Grafana : c'est 4b, sur un second accord. La réserve tient tant qu'une construction réelle n'a pas été lue ainsi.
+
+## Renvoi : relevé `df` de sc-stockage du 21/11 (note de 2026-11-21T16:12:55Z ; rien n'est réécrit au-dessus)
+
+Le point « À revoir » du dossier 3 attendait ce relevé. Il est pris le 21/11 à 16:10:10 UTC : **+411 Mo en 24 h sans construction, et 12 080 Mo libres**. Zot y prend 206 Mo, presque tout pour la base grype, et Prometheus 14 Mo. Environ 201 Mo ne sont pas attribués ; Loki est le candidat, mais sa taille sur disque n'est pas mesurée. Détail dans la [carte de M5b](m5b-carte.md). La tâche du 29/11 garde son objet.

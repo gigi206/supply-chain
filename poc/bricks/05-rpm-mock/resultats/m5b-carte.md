@@ -652,3 +652,30 @@ La note de 18:55:52Z reste écrite telle quelle. Sa conclusion tient : aucune de
   - X2 (`amorce`) et X3 (`m3_reseau`) : arrêt en code 1 sur la garde.
   - Le compte vaut 2 au lieu de 1, parce que deux motifs couvrent le même fichier. C'est sans effet sur le refus.
 - **Écart à tes règles, dans ma première version de l'essai** (scratchpad, lancée à 19:02:19 UTC) : elle contenait un `rm` dont la cible était une expansion de variable. Il visait seulement le faux journal du bac à sable, et il était inutile, puisque chaque cas a son propre TAG. Il est retiré de la version archivée, relancée avec le même résultat.
+
+## Note datée du 21/11/2026, écrite à 2026-11-21T16:12:55Z UTC : relevé `df` de sc-stockage du 21/11, et attribution par Prometheus
+
+C'est le premier relevé prévu par les préalables du point 3, à 24 heures de celui de l'agrandissement.
+
+**Relevé** à 16:10:10 UTC ([journal](sc-stockage-releve-2026-11-21.log)), par l'étape `apres` de [`sc-stockage-agrandir.sh`](sc-stockage-agrandir.sh), relancée sans changement : lecture seule, sans sudo.
+- `/` : 16 684 Mo utilisés et 12 080 Mo libres, contre 16 273 et 12 491 le 20/11 à 16:04:23 UTC ([journal](sc-stockage-agrandir-apres.log)).
+- **Hausse : 411 Mo en 24 h 05 min 47 s**, soit 409,4 Mo par 24 h. Le `df` arrondit au Mo.
+- Les sept services sont actifs. Le catalogue de Zot compte toujours 166 dépôts.
+- Aucun PipelineRun entre les deux relevés : le dernier date du 20/11 à 13:41:07 UTC.
+
+**Attribution par Prometheus**, lu par Grafana avec le compte auditeur, en nombres seulement ([script](sc-stockage-releve-2026-11-21-prom.sh), [journal](sc-stockage-releve-2026-11-21-prom.log)) :
+
+| Poste | Hausse sur l'intervalle | Source |
+|---|---|---|
+| Zot, somme de `zot_repo_storage_bytes` | 205 900 481 octets, dont 205 877 968 pour `vulndb/grype` | métriques de Zot |
+| Prometheus, `prometheus_tsdb_storage_blocks_bytes` | 14 274 198 octets | métriques de Prometheus |
+| **Reste, non attribué** | **environ 201 Mo** (411 Mo moins les deux lignes) | — |
+
+- **Zot** : la base grype quotidienne explique la moitié de la hausse, comme l'attribution du 20/11 l'annonçait (environ 200 Mo par jour). Aucun dépôt n'a baissé, et les deux dépôts de scan ne gagnent que quelques Ko.
+- **Loki**, candidat principal pour le reste, **non mesuré sur disque**. Alloy lui envoie environ 2 Go par 24 h (`loki_write_sent_bytes_total`), un volume stable sur quatre jours : 1,93, 1,96, 2,01 et 2,04 Go. Ce sont des octets envoyés, pas des octets stockés : les blocs de Loki sont compressés. La rétention est de 720 h (`19b-journalisation/config/loki.yaml`).
+- **Pas d'exportateur de nœud** : `node_filesystem_avail_bytes` est absent. La taille sur disque de Loki, du journal système et de containerd ne se lit pas sans sudo. Le `sudo du` reste confié au propriétaire.
+
+**Ce que cela change** :
+- Le rythme sans construction est de **409 Mo par 24 h**. C'est plus que les 200 Mo attribués à grype, et bien moins que le rythme d'environ 1,19 Go par jour relevé le 18/11 sans écriture de la brique, dont la cause n'avait pas été attribuée. Les deux mesures ne sont pas rapprochées ici.
+- À ce rythme, les 12 080 Mo libres durent environ 29,5 jours. C'est un calcul, pas une prévision. Deux effets inconnus le modifient : un plateau de Loki une fois la rétention atteinte, et la rétention de la base grype, qui reste à décider (07a).
+- **Correction** de la liste « Décisions ouvertes » de cette carte : la taille du disque dans `vm.sh` n'est plus ouverte. `docs/03` consigne que `vm.sh` crée sc-stockage à 30G, sur la décision « Ok » du 20/11 (dossier 3).
