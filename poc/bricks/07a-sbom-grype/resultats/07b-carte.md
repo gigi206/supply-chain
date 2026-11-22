@@ -1131,3 +1131,24 @@ Heure du scan témoin : 17:23:25 UTC le 21/11. Résultats pour l'entrée `GHSA-m
 **Heures mesurées** :
 - Ce segment : de 18:44:41 UTC à 19:48:35 UTC, compté d'un seul tenant.
 - Somme des enveloppes de la 07b : au plus 8 h 56 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Décision du propriétaire : exemptant daté du futur et rétractation ancienne (note de 2026-11-22T19:52:55Z ; rien posé)
+
+**Question** posée après le passage 20, en deux parties, chacune avec les coûts mesurés ou lus. Recommandations relues par le conseiller.
+
+**Réponses** (verbatim) :
+- Exemptant daté du futur : « Garder le refus (Recommandé) ». La variante est écartée, et le choix 3 ne change pas. Un exemptant daté du futur gagne le classement jusqu'à sa date, et la porte le refuse (blocage fermé). La réparation reste le retrait du référent dans le vrai Zot, sur accord. `resultats/07b-t3-variante-futur.patch` reste archivé comme mesure, hors patch.
+- Rétractation plus ancienne qu'une exemption publiée : « Garder l'avertissement (Recommandé) ». `signer-vex.sh` la signe, la publie et écrit `AVIS|rétractation`. Le refus reste possible plus tard, une fois la couverture par paquet comparée.
+
+**Réserves dites au propriétaire avant la réponse** (lues dans le code, non mesurées) :
+- La porte ne lit que `vex.status` et `vex.timestamp` de chaque entrée, jamais `vex.documents`. Qu'elle admette `futur-et-ancien` avec la variante est donc lu, pas mesuré.
+- Avec la variante, le document écarté resterait dans `vex.documents` et dans les lignes `vexDocument` de Loki, sans ligne ni série qui dise qu'il n'a pas joué.
+- L'avis de rétractation ne compare pas la couverture par paquet : il peut avertir à tort, et un refus bâti dessus pourrait bloquer une rétractation légitime.
+
+**Correction de la note précédente** (conseiller) : « Ce qu'elle ne lève pas » présente `futur-autre-produit` comme un blocage propre au futur. Ce n'est pas le cas : `autre-produit`, au 20/11, donne déjà « aucune » (remplacement, tout produit). C'est un effet du remplacement, pas de la date.
+
+**Hors de cette question** : le repli sans `--vex` (passages 18 et 19) est dans le patch, et son effet est écrit (une KEV exemptée est refusée dès un scan en repli, jusqu'au scan suivant sans panne). Il se tranche avec l'accord de la pièce du scanner, avant la pose.
+
+**Heures mesurées** :
+- Ce segment : de 18:44:41 UTC à 19:52:55 UTC, compté d'un seul tenant.
+- Somme des enveloppes de la 07b : au plus 9 h 00 pour 10 h estimées (demande au propriétaire avant 20 h).
