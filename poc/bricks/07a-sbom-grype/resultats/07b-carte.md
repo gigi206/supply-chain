@@ -955,3 +955,30 @@ Patch `0d641017e662d483…`. Contrôles refaits : `git apply --check`, `ec opa t
 - 6 et 67 lignes d'entrée en 24 h, 146 en 30 h, soit 2 × 73.
 
 **Lecture** : chaque scan a été émis une fois, et une seule, dans 94 passages sans réémission. « Une fois par scan » est donc vu sur la VM pour un nouveau scan. Rien n'est noté sur le délai entre le scan et l'émission, qui n'a pas été mesuré.
+
+## Limite 2 levée à sec : documents VEX comptés, dans Loki (note de 2026-11-22T17:52:04Z ; passage 15, rien posé)
+
+**Limite** (inventaire) : le prédicat dit quels documents VEX le scanner a reçus, mais Grafana n'en avait que le nombre (`scan_vex_documents`).
+
+**Changement** (prédiction écrite avant le code, section « Ajout avant le quinzième passage », 17:46:52 UTC) :
+- `entrees-scan.py` émet une ligne JSON par document du bloc `vex.documents` du prédicat : `depot`, `scannedAt`, `scanne`, `vexDocument` (empreinte de l'énoncé signé décodé) et `vexTimestamp`, sans `id`.
+- Ces lignes partent avec les lignes d'entrée, sous la même marque d'état : une fois par referrer de scan. Le résumé ne change pas.
+- `verif` d'`entrees-scan.sh` écarte ces lignes du compte des entrées (`| vexDocument=""`) et les compte à part, contre `jq '.predicate.vex.documents | length'`. Une réponse vide vaut 0.
+- Patch `5c41cf55e4ef7511…`. Contrôles refaits : `git apply --check`, `ec opa test` 39/39, `yq` à 30.
+
+**Sonde avant le code** ([journal](07b-t3-sonde-loki-filtre.log), auditeur, lecture seule) : sur le vrai Loki, `vexDocument=""` garde les 6 et 67 lignes des scans du jour, et `vexDocument!=""` ne rend aucune série, pas « 0 ».
+
+**Passage 15** ([journal](07b-t3-banc-15.log)) : 146 OK, 0 KO, de 17:48:26 à 17:51:57 UTC. C'est la prédiction.
+- Dans les quatre cas D, les lignes de document reprennent les empreintes du bloc `vex`, aucune n'a d'`id`, et aucune ligne d'entrée n'a de `vexDocument`.
+- `main()` passe trois fois : referrer A, encore A, puis B. Il rend 7, 1 et 7 lignes pour `complet` et `signe-retract`, 68, 1 et 68 pour `deb-complet`, et 6, 1 et 6 pour le prédicat d'avant la tranche 3, sans ligne de document. La liste est émise, puis non, puis émise.
+- La lecture de Zot est synthétique (fonction `lire` remplacée, comme au banc de la tranche 1). `main()` est le vrai.
+
+**Limites qui restent** :
+- Seuls les documents retenus ont une ligne. Les rejetés n'ont qu'un compte (`rejetes`) : les lister demanderait de changer le prédicat (`main.go`).
+- À la pose, la marque du referrer courant existe déjà. Les lignes de document n'apparaîtront donc qu'au scan suivant.
+- `verif` du patch sur le vrai Loki : `bash -n` seulement, il attend la pose.
+- Les `REFUS` de `signer-vex.sh` restent sur le poste de l'auteur (classe 3 de l'inventaire).
+
+**Heures mesurées** :
+- Ce segment : de 17:43:00 UTC (premier relevé du 22/11, `verif` de la tranche 1 compris) à 17:52:04 UTC.
+- Somme des enveloppes de la 07b : au plus 7 h 00 pour 10 h estimées (demande au propriétaire avant 20 h).

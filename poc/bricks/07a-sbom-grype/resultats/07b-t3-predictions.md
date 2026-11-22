@@ -313,3 +313,27 @@ Les témoins de rétractation du banc reçoivent donc un `action_statement` par 
 | A, C, D | les autres contrôles | inchangés | haute |
 
 **Total prédit** : 146 OK (143 + 3), 0 KO.
+
+## Ajout avant le quinzième passage : documents VEX comptés, dans Loki (écrit le 2026-11-22, date -u de 17:46:52 UTC dans la même commande que l’écriture, avant toute ligne de code ; limite 2 de l'inventaire)
+
+**Changement prévu** :
+- `entrees-scan.py` émettra une ligne JSON par document du bloc `vex.documents` du prédicat : `depot`, `scannedAt`, `scanne`, `vexDocument` (empreinte) et `vexTimestamp` (horodatage), sans `id`.
+- Ces lignes seront émises avec les lignes d'entrée, sous la même marque d'état, donc une fois par referrer de scan. Le résumé ne change pas.
+- `verif` d'`entrees-scan.sh` (patch) exclura ces lignes du compte des entrées (`| vexDocument=""`). Il comptera les documents à part (`| vexDocument!=""`) et les comparera à `jq '.predicate.vex.documents | length'`, une réponse vide valant 0.
+- Sonde du filtre, lecture seule par l'auditeur ([journal](07b-t3-sonde-loki-filtre.log)) : sur le vrai Loki, `vexDocument=""` garde 6 et 67 lignes, et `vexDocument!=""` ne rend aucune série, pas « 0 ».
+
+**Banc** : la partie D gagne, par cas :
+- les lignes de document et leurs empreintes, comparées au bloc `vex` ;
+- trois passages de `main()` sur un faux Zot (fonction `lire` remplacée, comme au banc de la tranche 1 : la lecture est synthétique, `main()` est réel) : referrer A, encore A, puis un referrer neuf B.
+
+| Cas D | Prédiction | Confiance |
+|---|---|---|
+| `complet` | 21 séries et comptes inchangés ; 1 document = prédicat ; `main` : 7 lignes (5 entrées, 1 document, résumé « liste émise »), puis 1 (résumé seul), puis 7 | haute |
+| `deb-complet` | inchangé ; 1 document ; `main` : 68, 1, 68 | haute |
+| `signe-retract` | inchangé (`vex` 1/1/1) ; 1 document ; `main` : 7, 1, 7 | haute |
+| `avant-t3` | inchangé ; 0 document, aucune ligne de document ; `main` : 6, 1, 6 | haute |
+| A, B, C | inchangés | haute |
+
+**Total prédit** : 146 OK, 0 KO. Le nombre de contrôles ne change pas, car les quatre lignes D s'allongent.
+
+**Non mesuré par ce passage** : le `verif` du patch sur le vrai Loki (`bash -n` seulement) ; il attend la pose. À la pose, la marque du referrer courant existe déjà : les lignes de document n'apparaîtront qu'au scan suivant.

@@ -9,6 +9,7 @@
 #      pièce 8 (passage 11) : signer-vex.sh verifier en A (sans registre), signer en B (clé locale, jamais hashivault://vex) ;
 #   C. porte : ec validate input de l'hôte sur les prédicats produits en B, entrée écartée passée en KEV par jq ;
 #   D. entrees-scan.py du patch : fonctions comptes et entrees appelées sur les prédicats produits en B (pas de Zot, pas de VM).
+#      Passage 15 : lignes de document VEX (documents_vex), et main() trois fois sur un faux Zot (lire remplacée) : A, A, B.
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
 # Usage (racine du dépôt, outils de mise.toml) : poc/bricks/07a-sbom-grype/resultats/07b-t3-banc.sh > <journal>
 set -euo pipefail
@@ -530,8 +531,8 @@ cp "$M0/image-avant.scan.json" "$T/avant-t3.json"
 for c in complet deb-complet signe-retract avant-t3; do
   p=$T/cas/$c/scan.json; [ "$c" = avant-t3 ] && p=$T/avant-t3.json
   [ -s "$p" ] || { ko "D $c : aucun prédicat"; continue; }
-  r=$(python3 -I - "$B/systemd/entrees-scan.py" "$p" <<'PYD'
-import importlib.util, json, sys
+  r=$(python3 -I - "$B/systemd/entrees-scan.py" "$p" "$T" <<'PYD'
+import base64, contextlib, hashlib, importlib.util, io, json, os, sys, tempfile, urllib.error
 spec = importlib.util.spec_from_file_location("es", sys.argv[1])
 es = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(es)
@@ -543,13 +544,47 @@ k = [l.rsplit(" ", 1)[1] for l in c.splitlines() if l.startswith("scan_entrees_k
 e = [json.loads(x) for x in es.entrees("builds/x", p)]
 x = {l.split('{')[0]: l.rsplit(' ', 1)[1] for l in c.splitlines() if l.startswith('scan_vex_')}
 print(f"{len(c.splitlines())} séries, trouvées {t}, écartées {v}, kev écartées {','.join(k)}, lignes {len(e)}, lignes avec vex {sum(1 for x in e if x.get('vex'))}, "
-      f"vex {x.get('scan_vex_documents')}/{x.get('scan_vex_rejetes')}/{x.get('scan_vex_ecartees_sans_exemption')}")
+      f"vex {x.get('scan_vex_documents')}/{x.get('scan_vex_rejetes')}/{x.get('scan_vex_ecartees_sans_exemption')}", end="")
+# passage 15 : lignes de document VEX, puis main() sur un faux Zot (lecture synthétique, main réel) : referrer A, encore A, puis B
+docs = [json.loads(y) for y in es.documents_vex("builds/x", p)]
+egal = "=" if ([y.get("vexDocument") for y in docs] == [y["sha256"] for y in (p.get("vex") or {}).get("documents") or []]
+               and all("id" not in y for y in docs) and all("vexDocument" not in y for y in e)) else "≠"
+sujet = "sha256:" + "5" * 64
+enonce = {"_type": "https://in-toto.io/Statement/v1", "subject": [{"name": "x", "digest": {"sha256": "5" * 64}}],
+          "predicateType": es.PREDICAT, "predicate": p}
+def zot(ref):
+    bundle = {"mediaType": es.BUNDLE, "dsseEnvelope": {"payloadType": es.INTOTO, "signatures": [{"sig": "faux"}],
+                                                        "payload": base64.b64encode(json.dumps(enonce).encode()).decode()}}
+    blob = json.dumps(bundle).encode()
+    couche = {"mediaType": es.BUNDLE, "digest": "sha256:" + hashlib.sha256(blob).hexdigest()}
+    pages = {f"builds/x/referrers/{sujet}": json.dumps({"manifests": [{"digest": ref, "annotations": {
+                 "dev.sigstore.bundle.predicateType": es.PREDICAT, "org.opencontainers.image.created": "2026-11-21T00:00:00Z"}}]}).encode(),
+             f"builds/x/manifests/{ref}": json.dumps({"layers": [couche]}).encode(), f"builds/x/blobs/{couche['digest']}": blob}
+    def lire(chemin, accepte="application/json"):
+        if chemin not in pages:
+            raise urllib.error.URLError(f"faux Zot : {chemin} absent")
+        return pages[chemin]
+    return lire
+d = tempfile.mkdtemp(dir=sys.argv[3])
+os.mkdir(os.path.join(d, "etat"))
+open(os.path.join(d, "s.prom"), "w").close()
+os.environ.update(SCANS=f"builds/x@{sujet}", SORTIE=os.path.join(d, "s.prom"), ETAT=os.path.join(d, "etat"))
+n, m = [], []
+for ref in ("sha256:" + "a" * 64, "sha256:" + "a" * 64, "sha256:" + "b" * 64):
+    es.lire = zot(ref)
+    o = io.StringIO()
+    with contextlib.redirect_stdout(o):
+        rc = es.main()
+    l = o.getvalue().splitlines()
+    n.append(f"{len(l)}" + ("" if rc == 0 else f" (rc {rc})"))
+    m.append("émise" if l and "(liste émise)" in l[-1] else "non")
+print(f", documents {len(docs)} {egal} prédicat, main {'/'.join(n)} ({', '.join(m)})")
 PYD
   )
-  case $c in complet) a="21 séries, trouvées 5, écartées 1, kev écartées 0, lignes 5, lignes avec vex 1, vex 1/0/0" ;;
-    deb-complet) a="21 séries, trouvées 66, écartées 1, kev écartées 0, lignes 66, lignes avec vex 1, vex 1/0/0" ;;
-    signe-retract) a="21 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 1/1/1" ;;
-    *) a="21 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 0/0/0" ;; esac
+  case $c in complet) a="21 séries, trouvées 5, écartées 1, kev écartées 0, lignes 5, lignes avec vex 1, vex 1/0/0, documents 1 = prédicat, main 7/1/7 (émise, non, émise)" ;;
+    deb-complet) a="21 séries, trouvées 66, écartées 1, kev écartées 0, lignes 66, lignes avec vex 1, vex 1/0/0, documents 1 = prédicat, main 68/1/68 (émise, non, émise)" ;;
+    signe-retract) a="21 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 1/1/1, documents 1 = prédicat, main 7/1/7 (émise, non, émise)" ;;
+    *) a="21 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 0/0/0, documents 0 = prédicat, main 6/1/6 (émise, non, émise)" ;; esac
   attendu "D $c" "$r" "$a"
 done
 

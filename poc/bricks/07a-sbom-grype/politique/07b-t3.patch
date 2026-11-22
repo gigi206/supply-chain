@@ -1,6 +1,6 @@
 diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-sbom-grype/entrees-scan.sh
 --- a/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-21 17:40:30.762366132 +0100
-+++ b/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-21 23:05:04.450242580 +0100
++++ b/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-22 18:47:09.886441166 +0100
 @@ -113,8 +113,8 @@
    s=$(scans_en_place)
    echo "## Prometheus, lu par l'auditeur"
@@ -12,7 +12,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-s
    for d in $s; do
      digest=${d#*@}; d=${d%@*}
      m=$(curl -fsS --cacert "$CA" "https://$REG/v2/$d/referrers/$digest" | jq -r '.manifests
-@@ -124,12 +124,20 @@
+@@ -124,18 +124,30 @@
      curl -fsS --cacert "$CA" "https://$REG/v2/$d/blobs/$l" | jq -r '.dsseEnvelope.payload | @base64d' > "$T/e.json"
      att=$(jq -r --argjson t "$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)" '.predicate.vulnerabilities as $v
        | (["Critical","High","Medium","Low","Negligible","Unknown","autre"] | map(. as $g | "g=\($g) \($v | map(select(.severity == $g)) | length)")[]),
@@ -36,6 +36,17 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-s
      if [ "$att" = "$obt" ]; then ok "$d : séries de Prometheus = jq ($(printf '%s\n' "$att" | grep -v ' 0$' | paste -sd',' | sed 's/,/, /g'))"
      else echo "KO   $d : séries de Prometheus différentes de jq"; diff <(printf '%s\n' "$att") <(printf '%s\n' "$obt") || true; ko=1; fi
      echo "## Loki, lu par l'auditeur, en comptes : $d"
+     n=$(jq '.predicate.vulnerabilities | length' "$T/e.json")
+-    graf loki "sum(count_over_time({source=\"journal\", unite=\"entrees-scan.service\"} | json | depot=\"$d\" | scanne=\"$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)\" [24h]))" > "$T/l.json"
++    # 07b, tranche 3 : les lignes de document VEX portent vexDocument et sont comptées à part ; une réponse vide vaut 0
++    graf loki "sum(count_over_time({source=\"journal\", unite=\"entrees-scan.service\"} | json | depot=\"$d\" | scanne=\"$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)\" | vexDocument=\"\" [24h]))" > "$T/l.json"
+     attendu "lignes de $d dans Loki pour ce scan (clé scanne), sur 24 h" "$(valeurs < "$T/l.json" | sed 's/^{} //')" "$n"
++    graf loki "sum(count_over_time({source=\"journal\", unite=\"entrees-scan.service\"} | json | depot=\"$d\" | scanne=\"$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)\" | vexDocument!=\"\" [24h]))" > "$T/l.json"
++    obt=$(valeurs < "$T/l.json" | sed 's/^{} //')
++    attendu "documents VEX de $d dans Loki pour ce scan, sur 24 h" "${obt:-0}" "$(jq '.predicate.vex.documents // [] | length' "$T/e.json")"
+   done
+   graf loki 'sum(count_over_time({source="journal", unite="entrees-scan.service"} |= "entrées " [24h]))' > "$T/r.json"
+   echo "lignes de résumé dans Loki sur 24 h : $(valeurs < "$T/r.json" | sed 's/^{} //')"
 diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbom-grype/outil/main.go
 --- a/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-04 20:36:57.722552154 +0100
 +++ b/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-21 22:07:09.727442712 +0100
@@ -1100,8 +1111,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +echo "PUBLIE|$depot_vex@$d, referrer de sha256:$hex ; compte au scan quotidien suivant"
 diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py
 --- a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-21 17:36:55.344531612 +0100
-+++ b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-21 23:05:04.450079347 +0100
-@@ -11,6 +11,11 @@
++++ b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-22 18:47:21.388586144 +0100
+@@ -11,9 +11,16 @@
  Sorties :
    SORTIE (fichiers-metriques, brique 19) : comptes par dépôt, grille de gravités fixe (zéros écrits), KEV, avec correctif,
      scannedAt du prédicat lu. Ni HELP ni TYPE, comme fraicheur-scan.prom. Le fichier est créé par la pose ; écrit sur place.
@@ -1113,7 +1124,12 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bric
    Sortie standard (journal, puis Loki par Alloy, unite="entrees-scan.service") : une ligne JSON par entrée, avec dépôt et
      scannedAt dans la ligne (chaîne d'origine, et « scanne » en secondes, égal à la série du même nom), jamais en étiquette. Émise une seule fois par referrer de scan : le digest du dernier manifeste émis
      est gardé dans ETAT (StateDirectory). Les autres passages n'écrivent qu'une ligne de résumé.
-@@ -83,9 +88,19 @@
++    07b, tranche 3 : une ligne de plus par document VEX du bloc vex (vexDocument : empreinte, vexTimestamp : horodatage),
++    sans id, émise avec les entrées et sous la même marque ; verif les écarte du compte des entrées (vexDocument="").
+ Aucun referrer de scan pour un dépôt : ses séries ne sont pas écrites (absent() dans les règles), aucune ligne d'entrée."""
+ import base64
+ import datetime
+@@ -83,9 +90,19 @@
      for e in v:
          g[e.get("severity") if e.get("severity") in GRAVITES[:-1] else "autre"] += 1
      lignes = [f'scan_entrees{{depot="{depot}",gravite="{k}"}} {n}\n' for k, n in g.items()]
@@ -1133,13 +1149,32 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bric
      return "".join(lignes)
  
  
-@@ -94,7 +109,8 @@
+@@ -94,9 +111,18 @@
      for e in predicat.get("vulnerabilities") or []:
          yield json.dumps({"depot": depot, "scannedAt": predicat["scannedAt"], "scanne": scanne, "id": e.get("id"), "aliases": e.get("aliases"),
                            "severity": e.get("severity"), "kev": e.get("kev"), "kevCves": e.get("kevCves"), "epss": e.get("epss"),
 -                          "fixedIn": e.get("fixedIn"), "package": e.get("package")}, ensure_ascii=False, separators=(",", ":"))
 +                          "fixedIn": e.get("fixedIn"), "package": e.get("package"), "vex": e.get("vex")}, ensure_ascii=False,
 +                         separators=(",", ":"))
++
  
  
++def documents_vex(depot, predicat):
++    """Une ligne par document VEX passé au scanner (bloc vex du prédicat, écrit par le scanner ; aucun s'il est absent)."""
++    scanne = epoque(predicat["scannedAt"])
++    for d in (predicat.get("vex") or {}).get("documents") or []:
++        yield json.dumps({"depot": depot, "scannedAt": predicat["scannedAt"], "scanne": scanne, "vexDocument": d.get("sha256"),
++                          "vexTimestamp": d.get("timestamp")}, ensure_ascii=False, separators=(",", ":"))
++
  def main():
+     scans = [s.split("@", 1) for s in os.environ["SCANS"].split()]
+     sortie = os.environ.get("SORTIE", "/etc/fichiers-metriques/entrees-scan.prom")
+@@ -126,6 +152,8 @@
+         if not deja:
+             for ligne in entrees(depot, p):
+                 print(ligne)
++            for ligne in documents_vex(depot, p):
++                print(ligne)
+             with open(marque + ".neuf", "w", encoding="ascii") as m:
+                 m.write(manifeste + "\n")
+             os.replace(marque + ".neuf", marque)

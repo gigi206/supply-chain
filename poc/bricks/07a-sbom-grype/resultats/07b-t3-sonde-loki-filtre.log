@@ -1,0 +1,4 @@
+sonde (scratchpad, non versionnée) : sha256 44c5eb9811d756e3…, auditeur de Grafana, comptes seuls ; « vide » = aucune série rendue
+heure : 2026-11-22T17:46:23Z
+builds/scan/sample-app : sans filtre 6, avec vexDocument="" 6, avec vexDocument!="" vide
+builds/scan/sample-app-deb : sans filtre 67, avec vexDocument="" 67, avec vexDocument!="" vide
