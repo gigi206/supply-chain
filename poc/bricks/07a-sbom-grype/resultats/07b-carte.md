@@ -1031,3 +1031,35 @@ Patch `0d641017e662d483…`. Contrôles refaits : `git apply --check`, `ec opa t
 **Heures mesurées** :
 - Ce segment : de 18:38:35 UTC (note précédente) à 18:44:41 UTC.
 - Somme des enveloppes de la 07b : au plus 7 h 52 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Limite 4 levée à sec : repli sans `--vex` (note de 2026-11-22T19:16:04Z ; passage 18, rien posé)
+
+**Limite** (inventaire, note de 22:10:13Z du 21/11) : si Grype échouait avec les VEX, le scan échouait, sans prédicat ni série. Aucune panne réelle n'a été trouvée (cinq formes sondées). La mesure passe donc par une **panne injectée, synthétique**.
+
+**Changement** (approche relue par le conseiller ; prédiction écrite avant le code, section « Ajout avant le dix-huitième passage », 19:07:17 UTC) :
+- `scanner.sh`, mode `analyser` : si Grype échoue alors qu'au moins un VEX est retenu, il écrit une ligne `REPLI|grype code <c> avec <N> VEX[ : <erreur>] ; scan relancé sans --vex, aucun VEX appliqué`, puis relance Grype sans `--vex`. Si la relance échoue, le scan échoue comme avant. Sans VEX retenu, un échec reste un échec.
+- `scan-outil predicat … repli` : `vex.documents` est vide, et `vex.repli` compte les documents retenus non appliqués, lus dans `vex-retenus.json`, la seule source. Le champ est absent hors repli, donc les prédicats ordinaires ne changent pas : le contrôle de compatibilité tient. En repli, une correspondance écartée par un VEX est une erreur, comme un repli sans document retenu.
+- `entrees-scan.py` écrit une série neuve, `scan_vex_repli` (0 si le champ est absent). `entrees-scan.sh` (verif) la compare à jq et attend 44 séries.
+- **Correction en passant** : la pose attendait encore 20 séries écrites. C'est le compte d'avant la tranche 3 : le patch en écrit 42 depuis le passage 13, et la pose aurait donné un faux KO. Elle attend maintenant 44.
+- `scan_test.rego` : deux tests (repli admis sans KEV, repli avec KEV refusé). Aucune règle ne change.
+- Patch `9fcb4b40dc31c95d…`. Contrôles refaits : `git apply --check`, `go vet`, `shellcheck`, `ec opa test` 41/41, `yq` à 30.
+
+**Passage 18** ([journal](07b-t3-banc-18.log)) : 186 OK, 0 KO, de 19:09:26 à 19:15:56 UTC. C'est la prédiction.
+- A : en repli sur le scan témoin, le prédicat vaut celui d'avant, plus `vex` avec `documents` vide et `repli` à 1. Code 1 sans document retenu, et code 1 avec une entrée écartée par un VEX. Code 2 pour un cinquième argument autre que `repli`.
+- B : le vrai mode `analyser` tourne avec un `grype` factice devant le vrai dans le PATH du cas. Le faux note chaque appel, puis échoue ou passe la main au vrai par son chemin absolu. L'import de la base passe toujours. Dépôt neuf `builds/repli`, un VEX recevable :
+  - `repli` (panne sur `sbom:` avec `--vex`) : appels `db 0, sbom 1, sbom 0`. Une ligne `REPLI|grype code 1 avec 1 VEX`. 1 VEX vérifié et retenu. Entrées 5/0, bloc `vex` `{documents: [], ecarteesSansExemption: 0, rejetes: 0, repli: 1}`, entrées égales à celles de `complet` sans le champ `vex`.
+  - `panne-totale` (panne sur tout `sbom:`) : mêmes appels, une ligne `REPLI|`, code 1, aucun prédicat.
+  - `complet` : `repli` absent.
+- C : la porte refuse le repli quand `GHSA-mqqf-5wvp-8fh8` est passée en KEV (`scan.kev_without_vex`), car aucun VEX n'est appliqué : la direction est stricte. Elle l'admet sans KEV : le champ passe la porte.
+- D : 22 séries par prédicat, `scan_vex_repli` à 1 pour le repli et à 0 pour les quatre autres. Les comptes de `entrees-scan.sh` à la pose et au verif valent 44 et 44, soit deux dépôts de 22.
+
+**Limites qui restent** :
+- La panne est synthétique : aucune panne réelle de Grype avec `--vex` n'est connue.
+- Une panne passagère de Grype donne aussi un repli. C'est strict, mais c'est un faux positif possible.
+- En repli, `documents` est vide, et aucune ligne `vexDocument` ne part dans Loki. Seules les lignes `VEX|` et `REPLI|` du journal du pod disent quels VEX n'ont pas joué.
+- Aucune alerte ni aucun panneau sur `scan_vex_repli` : cela demande un accord (tableau de bord provisionné).
+- Rien n'est posé : l'image `outils-scan` du scanner et `entrees-scan.py` sur sc-stockage sont des pièces de la pose, chacune sur accord.
+
+**Heures mesurées** :
+- Ce segment : de 19:03:15 UTC à 19:16:04 UTC.
+- Somme des enveloppes de la 07b : au plus 8 h 05 pour 10 h estimées (demande au propriétaire avant 20 h).

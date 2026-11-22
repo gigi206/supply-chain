@@ -11,6 +11,8 @@
 #   D. entrees-scan.py du patch : fonctions comptes et entrees appelées sur les prédicats produits en B (pas de Zot, pas de VM).
 #      Passage 15 : lignes de document VEX (documents_vex), et main() trois fois sur un faux Zot (lire remplacée) : A, A, B.
 # Passage 16 : avis de renouvellement de signer-vex.sh (B, dépôt builds/avis ; seuil par défaut confronté à la politique en C).
+# Passage 18 : repli sans --vex de scanner.sh (limite 4) : predicat en A ; en B, grype factice devant le vrai (panne injectée,
+#   synthétique) ; porte en C ; série scan_vex_repli et comptes de entrees-scan.sh en D.
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
 # Usage (racine du dépôt, outils de mise.toml) : poc/bricks/07a-sbom-grype/resultats/07b-t3-banc.sh > <journal>
 set -euo pipefail
@@ -126,6 +128,7 @@ if [ "${1:-}" = ns ]; then
   if [ -s "$T/cas/complet/scan.json" ]; then
     attendu "complet : entrée écartée" "$(jq -r '[.vulnerabilities[] | select(has("vex")) | "\(.id) \(.vex.status) \(.vex.timestamp)"] | join(",")' "$T/cas/complet/scan.json")" "$VULN not_affected $H1"
     attendu "complet : documents du prédicat = empreinte de l'énoncé signé" "$(jq -r '[.vex.documents[].sha256] | join(",")' "$T/cas/complet/scan.json")" "$(cat "$T/empreinte-v-complet")"
+    attendu "complet : repli absent du prédicat (passage 18)" "$(jq '.vex | has("repli")' "$T/cas/complet/scan.json")" false
   fi
   # 2. autre sujet, simple : VEX signé pour X, referrer de X
   d=$(pousser "$M0/image" builds/simple/sample-app)
@@ -408,6 +411,48 @@ FIN
   attendu "signer, rétractation ancienne : lignes PUBLIE" "$(grep -c '^PUBLIE|' "$T/signer-avis-retract.log")" 1
   vex_seul avis-apres builds/avis/sample-app "$Y"; juger_vex avis-apres 3,1,2 4/1
   [ -s "$T/cas/avis-apres/scan.json" ] && attendu "avis-apres : entrée écartée" "$(horo avis-apres)" "$VULN $HA.5Z"
+  # passage 18 : repli sans --vex (limite 4). Panne injectée, donc synthétique : grype factice devant le vrai dans le PATH du cas ;
+  # il note chaque appel (sous-commande, nombre de --vex), puis échoue (PANNE=vex : sbom: avec --vex ; tout : tout sbom:) ou passe la main
+  echo "## B. scanner.sh analyser, repli sans --vex (passage 18, panne injectée)"
+  mkdir -p "$T/faux"
+  cat > "$T/faux/grype" <<'FAUX'
+#!/bin/sh
+n=0 s=autre
+for a in "$@"; do
+  case $a in --vex) n=$((n + 1)) ;; sbom:*) s=sbom ;; db) [ "$s" = sbom ] || s=db ;; esac
+done
+echo "$s $n" >> "$APPELS"
+case $PANNE:$s:$n in
+  vex:sbom:0) ;;
+  vex:sbom:*) echo "panne injectée par le banc : --vex refusé" >&2; exit 1 ;;
+  tout:sbom:*) echo "panne injectée par le banc : scan refusé" >&2; exit 1 ;;
+esac
+exec "$GRYPE_VRAI" "$@"
+FAUX
+  chmod +x "$T/faux/grype"
+  GV=$(command -v grype)
+  pousser "$M0/image" builds/repli/sample-app > /dev/null
+  ok_vex "$T/v-repli.json"; publier_vex vex "$T/v-repli.json" "$Y" builds/repli/sample-app "$Y" builds/vex/repli/sample-app
+  appels() { paste -sd, - < "$T/faux/appels-$1" 2>/dev/null || echo aucun; }
+  for c in repli panne-totale; do
+    mkdir -p "$T/cas/$c"; cp -r "$G0/source" "$T/cas/$c/source"
+    p=vex; [ "$c" = repli ] || p=tout
+    scanner analyser "$c" IMAGE="$REG/builds/repli/sample-app@$Y" BASES="$REG/vulndb/grype" PATH="$T/faux:$T/outil:$PATH" \
+      GRYPE_VRAI="$GV" PANNE="$p" APPELS="$T/faux/appels-$c"
+    { grep -E '^(VEX|REJET|REPLI|SCAN|PREDICAT)\|' "$T/cas/$c.journal" || true; } | cut -c1-260 | sed "s|$T|<banc>|g; s/^/     /"
+    attendu "$c : appels de grype (sous-commande, nombre de --vex)" "$(appels "$c")" "db 0,sbom 1,sbom 0"
+  done
+  attendu "repli : ligne REPLI" "$(grep -c '^REPLI|' "$T/cas/repli.journal") ; $(sed -n 's/^REPLI|\(grype code [0-9]* avec [0-9]* VEX\).*/\1/p' "$T/cas/repli.journal")" \
+    "1 ; grype code 1 avec 1 VEX"
+  juger_vex repli 1,1,0 5/0
+  if [ -s "$T/cas/repli/scan.json" ]; then
+    attendu "repli : bloc vex du prédicat" "$(jq -cS .vex "$T/cas/repli/scan.json")" '{"documents":[],"ecarteesSansExemption":0,"rejetes":0,"repli":1}'
+    [ "$(jq -S '.vulnerabilities | map(del(.vex))' "$T/cas/repli/scan.json")" = "$(jq -S '.vulnerabilities | map(del(.vex))' "$T/cas/complet/scan.json")" ] \
+      && ok "repli : entrées = celles de complet sans le champ vex" || ko "repli : entrées différentes de celles de complet"
+  fi
+  attendu "panne-totale : lignes REPLI" "$(grep -c '^REPLI|' "$T/cas/panne-totale.journal")" 1
+  attendu "panne-totale : code final" "$(tail -1 "$T/cas/panne-totale.journal")" "code 1"
+  attendu "panne-totale : prédicat" "$([ -e "$T/cas/panne-totale/scan.json" ] && echo présent || echo absent)" absent
   echo "$KO" > "$T/ko-ns"
   exit 0
 fi
@@ -541,6 +586,17 @@ large pa pb-large vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
 deux-paquets pd-deux-paquets - vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
 affected-autre-sous pa pr-autre-sous aucune ; sans exemption 1
 FIN
+# passage 18 : predicat en repli (limite 4) : aucun document appliqué, repli = nombre de documents retenus
+rm -f "$U"/sortie/*; "$OUT" vex "${Y#sha256:}" "$U/sortie" "$U/valide.json" > "$U/r-valide.res"
+"$OUT" predicat "$M0/image-avant.grype.json" base-g0 "$U/r-valide.res" repli > "$T/repli-image.json"
+[ "$(jq -S . "$T/repli-image.json")" = "$(jq -S '. + {vex: {documents: [], rejetes: 0, ecarteesSansExemption: 0, repli: 1}}' "$M0/image-avant.scan.json")" ] \
+  && ok "predicat repli : prédicat d'avant + bloc vex vide et repli 1" || ko "predicat repli : différences"
+c=0; "$OUT" predicat "$M0/image-avant.grype.json" base-g0 "$T/vide.json" repli > /dev/null 2> "$T/tmp/err" || c=$?
+attendu "predicat repli sans document retenu" "code $c" "code 1"
+c=0; "$OUT" predicat "$T/ecarte-sans-doc.json" base-g0 "$U/r-valide.res" repli > /dev/null 2> "$T/tmp/err" || c=$?
+attendu "predicat repli avec une entrée écartée par un VEX" "code $c" "code 1"
+c=0; "$OUT" predicat "$M0/image-avant.grype.json" base-g0 "$U/r-valide.res" autre > /dev/null 2> "$T/tmp/err" || c=$?
+attendu "predicat à 5 arguments, dernier autre que repli" "code $c" "code 2"
 
 # passages 11 et 12 : les cas signer-vex.sh verifier sont en B depuis le passage 14 (le script lit le scan signé dans Zot)
 
@@ -587,11 +643,13 @@ juger_porte "porte, retract-avant" retract-avant 30 0 ""
 juger_porte "porte, retract-apres (affected sous l'alias)" retract-apres 30 1 scan.kev_without_vex
 juger_porte "porte, partiel, V1 en KEV" partiel 30 0 ""
 juger_porte "porte, partiel, V2 en KEV" partiel 30 1 scan.kev_without_vex GHSA-j6qf-3m9c-vwj3
+juger_porte "porte, repli (passage 18), $VULN en KEV : aucun VEX appliqué" repli 30 1 scan.kev_without_vex
+juger_porte "porte, repli, aucune KEV : champ repli accepté" repli 30 0 "" AUCUNE
 
 echo "## D. entrees-scan.py du patch, sur les prédicats de B"
 # passage 13 : séries scan_vex_* (bloc vex du prédicat, 0 s'il est absent) ; signe-retract et un prédicat d'avant la tranche 3
 cp "$M0/image-avant.scan.json" "$T/avant-t3.json"
-for c in complet deb-complet signe-retract avant-t3; do
+for c in complet deb-complet signe-retract avant-t3 repli; do
   p=$T/cas/$c/scan.json; [ "$c" = avant-t3 ] && p=$T/avant-t3.json
   [ -s "$p" ] || { ko "D $c : aucun prédicat"; continue; }
   r=$(python3 -I - "$B/systemd/entrees-scan.py" "$p" "$T" <<'PYD'
@@ -607,7 +665,7 @@ k = [l.rsplit(" ", 1)[1] for l in c.splitlines() if l.startswith("scan_entrees_k
 e = [json.loads(x) for x in es.entrees("builds/x", p)]
 x = {l.split('{')[0]: l.rsplit(' ', 1)[1] for l in c.splitlines() if l.startswith('scan_vex_')}
 print(f"{len(c.splitlines())} séries, trouvées {t}, écartées {v}, kev écartées {','.join(k)}, lignes {len(e)}, lignes avec vex {sum(1 for x in e if x.get('vex'))}, "
-      f"vex {x.get('scan_vex_documents')}/{x.get('scan_vex_rejetes')}/{x.get('scan_vex_ecartees_sans_exemption')}", end="")
+      f"vex {x.get('scan_vex_documents')}/{x.get('scan_vex_rejetes')}/{x.get('scan_vex_ecartees_sans_exemption')}/{x.get('scan_vex_repli')}", end="")
 # passage 15 : lignes de document VEX, puis main() sur un faux Zot (lecture synthétique, main réel) : referrer A, encore A, puis B
 docs = [json.loads(y) for y in es.documents_vex("builds/x", p)]
 egal = "=" if ([y.get("vexDocument") for y in docs] == [y["sha256"] for y in (p.get("vex") or {}).get("documents") or []]
@@ -644,12 +702,25 @@ for ref in ("sha256:" + "a" * 64, "sha256:" + "a" * 64, "sha256:" + "b" * 64):
 print(f", documents {len(docs)} {egal} prédicat, main {'/'.join(n)} ({', '.join(m)})")
 PYD
   )
-  case $c in complet) a="21 séries, trouvées 5, écartées 1, kev écartées 0, lignes 5, lignes avec vex 1, vex 1/0/0, documents 1 = prédicat, main 7/1/7 (émise, non, émise)" ;;
-    deb-complet) a="21 séries, trouvées 66, écartées 1, kev écartées 0, lignes 66, lignes avec vex 1, vex 1/0/0, documents 1 = prédicat, main 68/1/68 (émise, non, émise)" ;;
-    signe-retract) a="21 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 1/1/1, documents 1 = prédicat, main 7/1/7 (émise, non, émise)" ;;
-    *) a="21 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 0/0/0, documents 0 = prédicat, main 6/1/6 (émise, non, émise)" ;; esac
+  case $c in complet) a="22 séries, trouvées 5, écartées 1, kev écartées 0, lignes 5, lignes avec vex 1, vex 1/0/0/0, documents 1 = prédicat, main 7/1/7 (émise, non, émise)" ;;
+    deb-complet) a="22 séries, trouvées 66, écartées 1, kev écartées 0, lignes 66, lignes avec vex 1, vex 1/0/0/0, documents 1 = prédicat, main 68/1/68 (émise, non, émise)" ;;
+    signe-retract) a="22 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 1/1/1/0, documents 1 = prédicat, main 7/1/7 (émise, non, émise)" ;;
+    repli) a="22 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 0/0/0/1, documents 0 = prédicat, main 6/1/6 (émise, non, émise)" ;;
+    *) a="22 séries, trouvées 5, écartées 0, kev écartées 0, lignes 5, lignes avec vex 0, vex 0/0/0/0, documents 0 = prédicat, main 6/1/6 (émise, non, émise)" ;; esac
   attendu "D $c" "$r" "$a"
 done
+# passage 18 : séries attendues par entrees-scan.sh à la pose et au verif = deux dépôts × séries de comptes()
+n=$(python3 -I - "$B/systemd/entrees-scan.py" "$T/cas/complet/scan.json" <<'PYN'
+import importlib.util, json, sys
+spec = importlib.util.spec_from_file_location("es", sys.argv[1])
+es = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(es)
+print(len(es.comptes("builds/x", json.load(open(sys.argv[2], encoding="utf-8"))).splitlines()))
+PYN
+)
+attendu "D entrees-scan.sh : séries attendues à la pose et au verif (2 dépôts × $n)" \
+  "$(sed -n 's/.*"séries écrites".* \([0-9]*\)$/\1/p' "$B/entrees-scan.sh") et $(sed -n 's/.*"séries scan_entrees\* et scan_vex\* dans Prometheus".* \([0-9]*\)$/\1/p' "$B/entrees-scan.sh")" \
+  "$((2 * n)) et $((2 * n))"
 
 apres=$(empreinte)
 [ "$avant" = "$apres" ] && ok "base de G0, source, image et deb inchangés ($avant)" || ko "entrées modifiées : $avant puis $apres"

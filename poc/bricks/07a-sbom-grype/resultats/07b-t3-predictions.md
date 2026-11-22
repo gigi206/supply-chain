@@ -401,3 +401,39 @@ Les témoins de rétractation du banc reçoivent donc un `action_statement` par 
 | `avis-apres` : entrée écartée | `GHSA-mqqf-5wvp-8fh8`, horodatage de P1 à `.5` s | haute |
 
 **Total prédit** : 167 OK, 0 KO (162, plus 5 contrôles).
+
+## Ajout avant le dix-huitième passage : repli sans `--vex` (limite 4) (écrit le 2026-11-22, date -u de 19:07:17 UTC dans la même commande que l’écriture, avant le code ; approche relue par le conseiller)
+
+**Changement prévu** :
+- `scanner.sh`, mode `analyser` : si Grype échoue alors qu'au moins un VEX est retenu, une ligne `REPLI|grype code <c> avec <N> VEX[ : <erreur>] ; …` est écrite, puis Grype est relancé sans `--vex`. Si la relance échoue, le scan échoue comme avant. Sans VEX retenu, un échec de Grype reste un échec.
+- `scan-outil predicat … repli` (cinquième argument facultatif) : `vex.documents` est vide, et `vex.repli` vaut le nombre de documents retenus non appliqués, lu dans `vex-retenus.json`. Hors repli, le champ est absent, et les prédicats ordinaires ne changent pas. En repli, une correspondance écartée par un VEX est une erreur, comme un repli sans document retenu.
+- `entrees-scan.py` : nouvelle série `scan_vex_repli` (0 si le champ est absent). `entrees-scan.sh` : verif l'ajoute à sa comparaison avec jq (44 séries pour deux dépôts au lieu de 42). La pose attendait encore 20 séries écrites, compte d'avant la tranche 3 (42 depuis le patch) : corrigé à 44, en passant.
+- `scan_test.rego` : deux tests, repli admis sans KEV, repli avec KEV refusé par `scan.kev_without_vex`. Aucune règle ne change.
+
+**Banc** : la panne est **injectée, donc synthétique**. Un faux `grype`, placé devant le vrai dans le PATH du cas, note chaque appel (sous-commande, nombre de `--vex`) puis appelle le vrai par son chemin absolu. Il échoue sur `sbom:` avec au moins un `--vex` (cas `repli`), ou sur tout `sbom:` (cas `panne-totale`). L'import de la base passe toujours. Les deux cas utilisent le vrai mode `analyser`, sur un dépôt neuf `builds/repli` avec un VEX recevable.
+
+| Contrôle | Prédiction | Confiance |
+|---|---|---|
+| A : `predicat … repli` sur le scan témoin, avec 1 document retenu | prédicat d'avant + `vex` = documents vide, rejetés 0, sans exemption 0, `repli` 1 | haute |
+| A : `predicat … repli` sans document retenu | code 1 | haute |
+| A : `predicat … repli` avec une entrée écartée par un VEX | code 1 | haute |
+| A : `predicat` à 5 arguments dont le dernier n'est pas `repli` | code 2 (usage) | haute |
+| A : `ec opa test` | `PASS: 41/41` | haute |
+| B, `complet` : `repli` absent du prédicat | false | haute |
+| B, `repli` : appels du faux | `db 0,sbom 1,sbom 0` | haute |
+| B, `repli` : ligne `REPLI|` | 1 ligne, `grype code 1 avec 1 VEX` | haute |
+| B, `repli` : VEX vérifiés, retenus, rejetés | 1,1,0 | haute |
+| B, `repli` : entrées sans VEX / avec VEX | 5/0 | haute |
+| B, `repli` : bloc `vex` du prédicat | `{"documents":[],"ecarteesSansExemption":0,"rejetes":0,"repli":1}` | haute |
+| B, `repli` : entrées = celles de `complet` sans le champ `vex` | égales | moyenne (entrée écartée contre entrée trouvée) |
+| B, `panne-totale` : appels du faux | `db 0,sbom 1,sbom 0` | haute |
+| B, `panne-totale` : lignes `REPLI|`, code final, prédicat | 1 ; `code 1` ; absent | haute |
+| C : porte sur le repli, `GHSA-mqqf-5wvp-8fh8` en KEV | code 1, `scan.kev_without_vex` (la direction est stricte) | haute |
+| C : porte sur le repli, aucune KEV | code 0, admis (le champ passe la porte) | haute |
+| D : les quatre cas existants | 22 séries au lieu de 21, `scan_vex_repli` à 0 | haute |
+| D : `repli` | 22 séries, trouvées 5, écartées 0, vex 0/0/0/1, documents 0, main 6/1/6 | haute |
+| D : séries attendues par `entrees-scan.sh` à la pose et au verif | 44 et 44 (2 × 22) | haute |
+
+**Durée** : deux `analyser` de plus, donc deux imports de base, non prédite.
+
+**Total prédit** : 186 OK, 0 KO (167, plus 4 en A, 11 en B, 2 en C, 2 en D).

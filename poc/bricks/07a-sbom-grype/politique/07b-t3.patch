@@ -1,18 +1,28 @@
 diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-sbom-grype/entrees-scan.sh
 --- a/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-21 17:40:30.762366132 +0100
-+++ b/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-22 18:47:09.886441166 +0100
-@@ -113,8 +113,8 @@
++++ b/poc/bricks/07a-sbom-grype/entrees-scan.sh	2026-11-22 20:07:49.991278194 +0100
+@@ -103,7 +103,8 @@
+   sur "sudo journalctl -u entrees-scan.service -o cat --no-pager | grep -v '^{' | tail -n 3; echo \"lignes d'entrée : \$(sudo journalctl -u entrees-scan.service -o cat --no-pager | grep -c '^{')\"" | masque
+   echo "## séries écrites"
+   sur "cat /etc/fichiers-metriques/entrees-scan.prom" | masque | sed 's/^/  /'
+-  attendu "séries écrites" "$(sur "wc -l < /etc/fichiers-metriques/entrees-scan.prom")" 20
++  # 07b, tranche 3 : 22 séries par dépôt, deux dépôts (20 avant la tranche 3 ; 42 avant le repli, passage 18)
++  attendu "séries écrites" "$(sur "wc -l < /etc/fichiers-metriques/entrees-scan.prom")" 44
+   sur "systemd-analyze security entrees-scan.service 2>/dev/null | tail -n 1; systemd-analyze security fraicheur-scan.service 2>/dev/null | tail -n 1 | sed 's/^/fraicheur-scan, pour comparer : /'"
+   return $ko
+ }
+@@ -113,8 +114,8 @@
    s=$(scans_en_place)
    echo "## Prometheus, lu par l'auditeur"
    # sélecteur sur __name__ : « a or b » écarte les séries de b dont les étiquettes, nom exclu, sont déjà dans a (journal verif 1)
 -  graf prometheus '{__name__=~"scan_entrees|scan_entrees_kev|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds"}' > "$T/p.json"
 -  attendu "séries scan_entrees* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 20
-+  graf prometheus '{__name__=~"scan_entrees|scan_entrees_vex|scan_entrees_kev|scan_entrees_kev_vex|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds|scan_vex_documents|scan_vex_rejetes|scan_vex_ecartees_sans_exemption"}' > "$T/p.json"
-+  attendu "séries scan_entrees* et scan_vex* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 42
++  graf prometheus '{__name__=~"scan_entrees|scan_entrees_vex|scan_entrees_kev|scan_entrees_kev_vex|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds|scan_vex_documents|scan_vex_rejetes|scan_vex_ecartees_sans_exemption|scan_vex_repli"}' > "$T/p.json"
++  attendu "séries scan_entrees* et scan_vex* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 44
    for d in $s; do
      digest=${d#*@}; d=${d%@*}
      m=$(curl -fsS --cacert "$CA" "https://$REG/v2/$d/referrers/$digest" | jq -r '.manifests
-@@ -124,18 +124,30 @@
+@@ -124,18 +125,31 @@
      curl -fsS --cacert "$CA" "https://$REG/v2/$d/blobs/$l" | jq -r '.dsseEnvelope.payload | @base64d' > "$T/e.json"
      att=$(jq -r --argjson t "$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)" '.predicate.vulnerabilities as $v
        | (["Critical","High","Medium","Low","Negligible","Unknown","autre"] | map(. as $g | "g=\($g) \($v | map(select(.severity == $g)) | length)")[]),
@@ -21,7 +31,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-s
 +        "kev \($v | map(select(.kev)) | length)", "kev_vex \($v | map(select(.kev and .vex)) | length)",
 +        "correctif \($v | map(select((.fixedIn | length) > 0)) | length)", "scanne \($t)",
 +        "vex_documents \(.predicate.vex.documents // [] | length)", "vex_rejetes \(.predicate.vex.rejetes // 0)",
-+        "vex_sans_exemption \(.predicate.vex.ecarteesSansExemption // 0)"' "$T/e.json")
++        "vex_sans_exemption \(.predicate.vex.ecarteesSansExemption // 0)", "vex_repli \(.predicate.vex.repli // 0)"' "$T/e.json")
      obt=$(jq -r --arg d "$d" '[.results.A.frames[]? | select((.data.values | length) > 1) | select(.schema.fields[1].labels.depot == $d)
        | {n: .schema.fields[1].labels.__name__, g: (.schema.fields[1].labels.gravite // ""), v: .data.values[1][0]}] as $s
        | (["Critical","High","Medium","Low","Negligible","Unknown","autre"][] as $g | $s[] | select(.n == "scan_entrees" and .g == $g) | "g=\($g) \(.v)"),
@@ -32,7 +42,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-s
 +        ($s[] | select(.n == "scan_entrees_avec_correctif") | "correctif \(.v)"),
 +        ($s[] | select(.n == "scan_entrees_scanne_timestamp_seconds") | "scanne \(.v)"),
 +        ($s[] | select(.n == "scan_vex_documents") | "vex_documents \(.v)"), ($s[] | select(.n == "scan_vex_rejetes") | "vex_rejetes \(.v)"),
-+        ($s[] | select(.n == "scan_vex_ecartees_sans_exemption") | "vex_sans_exemption \(.v)")' "$T/p.json")
++        ($s[] | select(.n == "scan_vex_ecartees_sans_exemption") | "vex_sans_exemption \(.v)"),
++        ($s[] | select(.n == "scan_vex_repli") | "vex_repli \(.v)")' "$T/p.json")
      if [ "$att" = "$obt" ]; then ok "$d : séries de Prometheus = jq ($(printf '%s\n' "$att" | grep -v ' 0$' | paste -sd',' | sed 's/,/, /g'))"
      else echo "KO   $d : séries de Prometheus différentes de jq"; diff <(printf '%s\n' "$att") <(printf '%s\n' "$obt") || true; ko=1; fi
      echo "## Loki, lu par l'auditeur, en comptes : $d"
@@ -49,7 +60,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/entrees-scan.sh b/poc/bricks/07a-s
    echo "lignes de résumé dans Loki sur 24 h : $(valeurs < "$T/r.json" | sed 's/^{} //')"
 diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbom-grype/outil/main.go
 --- a/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-04 20:36:57.722552154 +0100
-+++ b/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-21 22:07:09.727442712 +0100
++++ b/poc/bricks/07a-sbom-grype/outil/main.go	2026-11-22 20:07:49.990655067 +0100
 @@ -1,18 +1,25 @@
  // Brique 07a, G2 (D8) : sbom_merge.py et scan_predicate.py réécrits en Go, sans dépendance, pour l'image d'outils du
 -// scanner (pas de python dans l'image). Même logique, même sortie JSON (comparée aux scripts Python sur les fichiers de G0) :
@@ -105,7 +116,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
  	var sortie []*composant
  	vus := map[cle]*composant{}
  	for i, chemin := range chemins {
-@@ -100,23 +124,126 @@
+@@ -100,23 +124,129 @@
  	}
  	return map[string]any{
  		"bomFormat": "CycloneDX", "specVersion": "1.6", "version": 1,
@@ -203,9 +214,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +		}
 +	}
 +	return "", false
- }
- 
--func predicat(chemin, refBase string) (any, error) {
++}
++
 +type docRetenu struct {
 +	Sha256     string `json:"sha256"`
 +	Timestamp  string `json:"timestamp"`
@@ -223,8 +233,9 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +	Exemptant      bool     `json:"exemptant"`
 +	SousComposants []string `json:"sousComposants,omitempty"`
 +	Document       string   `json:"document"`
-+}
-+
+ }
+ 
+-func predicat(chemin, refBase string) (any, error) {
 +type vexRetenus struct {
 +	Retenus []docRetenu         `json:"retenus"`
 +	Rejetes []map[string]string `json:"rejetes"`
@@ -238,11 +249,14 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +// horodatage sont exemptants ; un énoncé exemptant qui ne couvre pas son paquet sort de son classement ; sinon elle reste ordinaire et compte dans vex.ecarteesSansExemption (échec fermé, indépendant de
 +// l'ordre des fichiers). Une correspondance écartée par une autre règle que « vex » reste une entrée ordinaire : seul un VEX exempte.
 +// Si une même clé (id, PURL) est à la fois trouvée et écartée, l'entrée trouvée l'emporte.
-+func predicat(chemin, refBase, cheminVex string) (any, error) {
++// Repli (limite 4, passage 18) : Grype a échoué avec les VEX et le scan a été relancé sans eux. Aucun document n'est appliqué :
++// documents est vide, aucune correspondance ne peut être écartée par un VEX (sinon erreur), et vex.repli compte les documents
++// retenus non appliqués. Hors repli, le champ est absent : les prédicats ordinaires ne changent pas.
++func predicat(chemin, refBase, cheminVex string, repli bool) (any, error) {
  	var r struct {
  		Descriptor struct {
  			Version   string `json:"version"`
-@@ -128,61 +255,99 @@
+@@ -128,61 +258,109 @@
  				} `json:"status"`
  			} `json:"db"`
  		} `json:"descriptor"`
@@ -276,6 +290,13 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +	var vr vexRetenus
 +	if err := lire(cheminVex, &vr); err != nil {
 +		return nil, err
++	}
++	nRepli := len(vr.Retenus)
++	if repli {
++		if nRepli == 0 {
++			return nil, fmt.Errorf("repli sans document retenu dans %s", cheminVex)
++		}
++		vr.Retenus, vr.Enonces = nil, nil
 +	}
 +	plusAncien := ""
 +	var tMin time.Time
@@ -371,6 +392,9 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +	for _, m := range r.IgnoredMatches {
 +		e := entreeDe(m)
 +		if s, ok := statutVex(m); ok {
++			if repli {
++				return nil, fmt.Errorf("correspondance %s écartée par un VEX alors que le scan est un repli sans VEX", e.ID)
++			}
 +			if plusAncien == "" {
 +				return nil, fmt.Errorf("correspondance %s écartée par un VEX alors qu'aucun document n'est retenu", e.ID)
 +			}
@@ -390,14 +414,26 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
  	}
  	liste := make([]vulnerabilite, 0, len(vulns))
  	for _, v := range vulns {
-@@ -202,9 +367,188 @@
+@@ -195,6 +373,10 @@
+ 		return liste[i].ID < liste[j].ID
+ 	})
+ 	d := r.Descriptor
++	blocVex := map[string]any{"documents": documents, "rejetes": len(vr.Rejetes), "ecarteesSansExemption": sansExemption}
++	if repli {
++		blocVex["repli"] = nRepli
++	}
+ 	return map[string]any{
+ 		"scanner": map[string]any{"id": "grype", "version": d.Version,
+ 			"db": map[string]any{"built": d.DB.Status.Built, "schema": d.DB.Status.SchemaVersion, "ref": refBase}},
+@@ -202,9 +384,189 @@
  		"vulnerabilities": liste,
  		// Paquets malveillants (OSV MAL-) : contrôle de la brique 07b (2c).
  		"malicious": []string{},
 +		// Documents VEX passés à Grype (empreinte de l'énoncé signé décodé, comme scan-verifier.sh) et nombre de documents écartés.
 +		// ecarteesSansExemption : correspondances écartées par Grype que le remplacement n'exempte pas (rétractation, égalité, autre
 +		// produit, aucun énoncé nommé).
-+		"vex": map[string]any{"documents": documents, "rejetes": len(vr.Rejetes), "ecarteesSansExemption": sansExemption},
++		// repli : documents retenus non appliqués (Grype en échec avec les VEX), seulement en repli.
++		"vex": blocVex,
  	}, nil
  }
  
@@ -579,7 +615,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
  func trie(e map[string]bool) []string {
  	l := make([]string, 0, len(e))
  	for k := range e {
-@@ -227,14 +571,14 @@
+@@ -227,14 +589,16 @@
  	var res any
  	var err error
  	switch {
@@ -594,10 +630,12 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/outil/main.go b/poc/bricks/07a-sbo
 +	case len(a) >= 3 && a[0] == "vex":
 +		res, err = vex(a[1], a[2], a[3:])
 +	case len(a) == 4 && a[0] == "predicat":
-+		res, err = predicat(a[1], a[2], a[3])
++		res, err = predicat(a[1], a[2], a[3], false)
++	case len(a) == 5 && a[0] == "predicat" && a[4] == "repli":
++		res, err = predicat(a[1], a[2], a[3], true)
  	default:
 -		fmt.Fprintln(os.Stderr, "usage : scan-outil fusion <a.json> <b.json> [libellé-a libellé-b] | predicat <grype.json> <ref-de-la-base>")
-+		fmt.Fprintln(os.Stderr, "usage : scan-outil fusion <a.json> <b.json> <libellé-a> <libellé-b> <image@sha256:…> | vex <sha256> <dossier> [énoncé…] | predicat <grype.json> <ref-de-la-base> <vex-retenus.json>")
++		fmt.Fprintln(os.Stderr, "usage : scan-outil fusion <a.json> <b.json> <libellé-a> <libellé-b> <image@sha256:…> | vex <sha256> <dossier> [énoncé…] | predicat <grype.json> <ref-de-la-base> <vex-retenus.json> [repli]")
  		os.Exit(2)
  	}
  	if err != nil {
@@ -763,7 +801,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/scan.rego b/poc/br
  # METADATA
 diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/scan_test.rego b/poc/bricks/07a-sbom-grype/politique/porte/scan_test.rego
 --- a/poc/bricks/07a-sbom-grype/politique/porte/scan_test.rego	2026-11-04 22:00:44.425751613 +0100
-+++ b/poc/bricks/07a-sbom-grype/politique/porte/scan_test.rego	2026-11-21 18:27:24.048544057 +0100
++++ b/poc/bricks/07a-sbom-grype/politique/porte/scan_test.rego	2026-11-22 20:07:49.991362995 +0100
 @@ -13,7 +13,8 @@
  
  _type := "https://supply-chain.example/scan/v1"
@@ -872,10 +910,26 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/porte/scan_test.rego b/p
  }
  
  test_malveillant if {
+@@ -167,3 +232,15 @@
+ 	c := {d.code | some d in scan.deny with input as _entree([_propre]) with time.now_ns as _maintenant}
+ 	c == {"scan.scan_recent", "scan.base_recente"}
+ }
++
++# 07b, limite 4 (passage 18) : repli sans --vex, aucun VEX appliqué ; le champ repli du bloc vex ne change rien à la porte.
++_bloc_repli := {"vex": {"documents": [], "rejetes": 0, "ecarteesSansExemption": 0, "repli": 1}}
++
++test_repli_admis if {
++	_codes(_entree([_enonce(_digest, object.union(_propre.predicate, _bloc_repli))])) == set()
++}
++
++test_repli_kev_refuse if {
++	p := object.union(_predicat("2026-11-09T20:40:09Z", "2026-11-09T06:20:59Z", _kev, []), _bloc_repli)
++	_codes(_entree([_enonce(_digest, p)])) == {"scan.kev_without_vex"}
++}
 diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/07a-sbom-grype/politique/scanner.sh
 --- a/poc/bricks/07a-sbom-grype/politique/scanner.sh	2026-11-14 21:57:17.523533542 +0100
-+++ b/poc/bricks/07a-sbom-grype/politique/scanner.sh	2026-11-21 18:39:36.485958410 +0100
-@@ -9,6 +9,10 @@
++++ b/poc/bricks/07a-sbom-grype/politique/scanner.sh	2026-11-22 20:07:49.989721332 +0100
+@@ -9,6 +9,11 @@
  #               layout du deb (une couche tar qui contient le .deb seul), data.tar extrait par busybox (ar, unxz ou gunzip, tar),
  #               syft dir: sur le contenu extrait. Dans les deux cas, plancher : au moins une PURL versionnée dans le SBOM de
  #               l'artefact seul, sans quoi refus (relevé 1 de S6a : un artefact vide passe sans erreur, et la fusion le masque).
@@ -883,10 +937,11 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/
 +#               (21/11/2026) : VEX attestés sur le digest scanné, clé VEX distincte de celle du scanner ($CLE_VEX), lus dans
 +#               builds/vex/<nom> en anonyme ; énoncé et sujet revérifiés par scan-outil vex ; seul not_affected avec justification et
 +#               impact_statement est passé à Grype. Aucun VEX lisible : le scan se fait sans --vex (plus strict), et le journal le dit.
++#               Grype en échec avec les VEX (limite 4, passage 18) : relancé sans eux, ligne REPLI| au journal, vex.repli dans le prédicat.
  #   jetons      (openbao) rôle scan-zot : identifiants de poc-scan lus, jeton révoqué ; puis rôle scanner : jeton de 5 min, pris
  #               juste avant la signature (D9 a), après le scan
  #   attester    (outils-scan) cosign attest-blob --key hashivault://scanner, sans service Sigstore, sujet = digest de l'image ;
-@@ -23,6 +27,7 @@
+@@ -23,6 +28,7 @@
  CA=${CA:-/etc/scan/ca-poc.crt}
  CLE_PUBLIQUE=${CLE_PUBLIQUE:-/etc/scan/scanner.pub}
  CLE=${CLE:-hashivault://scanner}
@@ -894,7 +949,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/
  SECRETS=${SECRETS:-/var/run/bao}
  PREDICAT=https://supply-chain.example/scan/v1
  VIDE=sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a   # {} : application/vnd.oci.empty.v1+json
-@@ -87,6 +92,29 @@
+@@ -87,6 +93,29 @@
    echo "ARTEFACT|${NATURE:-image}, $n PURL versionnées dans l'artefact seul"
  }
  
@@ -924,7 +979,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/
  analyser() {
    debut=$(date +%s)
    export GRYPE_DB_CACHE_DIR=$TRAVAIL/dbcache GRYPE_DB_AUTO_UPDATE=false GRYPE_DB_VALIDATE_AGE=false GRYPE_CHECK_FOR_APP_UPDATE=false \
-@@ -110,13 +138,17 @@
+@@ -110,13 +139,30 @@
    t=$(date +%s)
    artefact
    syft scan dir:source -o cyclonedx-json=sbom-source.json -q
@@ -940,14 +995,27 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/
 +  # un --vex par document : Grype 0.104.1 refuse la liste séparée par des virgules (code 1, rien sous -q ; banc 07b-t3, passage 3)
 +  set --
 +  for f in $(sed -n 's/.*"fichier": *"\([^"]*\)".*/\1/p' vex-retenus.json); do set -- "$@" --vex "$f"; done
-+  grype sbom:sbom.json "$@" -o json --file grype.json -q
-+  scan-outil predicat grype.json "$ref" vex-retenus.json > scan.json
++  c=0
++  grype sbom:sbom.json "$@" -o json --file grype.json -q 2> grype.err || c=$?
++  cat grype.err >&2
++  repli=
++  if [ "$c" != 0 ]; then
++    [ $# -gt 0 ] || exit "$c"
++    # repli (limite 4) : aucun VEX appliqué, donc la direction stricte ; le prédicat le dit (vex.repli), et les séries
++    e=$(head -1 grype.err | cut -c1-200 | tr '|' ' ')
++    echo "REPLI|grype code $c avec $(($# / 2)) VEX${e:+ : $e} ; scan relancé sans --vex, aucun VEX appliqué"
++    rm -f grype.json
++    grype sbom:sbom.json -o json --file grype.json -q
++    repli=repli
++  fi
++  rm -f grype.err
++  scan-outil predicat grype.json "$ref" vex-retenus.json $repli > scan.json
 +  echo "SCAN|$IMAGE, $(grep -c '"kev":' scan.json) vulnérabilités, $(grep -c '"kev": true' scan.json) KEV, $(grep -c '"status":' scan.json) écartée(s) par un VEX, $(( $(date +%s) - t )) s"
 +  rm -rf dbcache image artefact source sbom-image.json sbom-source.json sbom.json grype.json vex vex-retenus.json .cache
    echo "PREDICAT|sha256 $(sha256sum < scan.json | cut -c1-64), $(( $(date +%s) - debut )) s en tout"
  }
  
-@@ -179,6 +211,7 @@
+@@ -179,6 +225,7 @@
    source) source_commit ;;
    analyser) analyser ;;
    artefact) artefact ;;
@@ -1167,8 +1235,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +echo "PUBLIE|$depot_vex@$d, referrer de sha256:$hex ; compte au scan quotidien suivant"
 diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py
 --- a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-21 17:36:55.344531612 +0100
-+++ b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-22 18:47:21.388586144 +0100
-@@ -11,9 +11,16 @@
++++ b/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py	2026-11-22 20:07:49.990843680 +0100
+@@ -11,9 +11,17 @@
  Sorties :
    SORTIE (fichiers-metriques, brique 19) : comptes par dépôt, grille de gravités fixe (zéros écrits), KEV, avec correctif,
      scannedAt du prédicat lu. Ni HELP ni TYPE, comme fraicheur-scan.prom. Le fichier est créé par la pose ; écrit sur place.
@@ -1176,7 +1244,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bric
 +    qu'un VEX a écartées (champ vex du prédicat, écrit par le scanner). Réelles = trouvées - écartées, par soustraction dans
 +    Grafana. Ce sont les entrées que le scanner a écartées, pas celles que la porte admet : la porte juge aussi l'âge du VEX.
 +    Bloc vex du prédicat (0 s'il est absent, prédicats d'avant la tranche 3) : scan_vex_documents (documents passés au scanner),
-+    scan_vex_rejetes (vérifiés mais rejetés par le filtre), scan_vex_ecartees_sans_exemption (gagnant non exemptant).
++    scan_vex_rejetes (vérifiés mais rejetés par le filtre), scan_vex_ecartees_sans_exemption (gagnant non exemptant),
++    scan_vex_repli (documents retenus non appliqués : Grype en échec avec les VEX, scan relancé sans eux ; limite 4).
    Sortie standard (journal, puis Loki par Alloy, unite="entrees-scan.service") : une ligne JSON par entrée, avec dépôt et
      scannedAt dans la ligne (chaîne d'origine, et « scanne » en secondes, égal à la série du même nom), jamais en étiquette. Émise une seule fois par referrer de scan : le digest du dernier manifeste émis
      est gardé dans ETAT (StateDirectory). Les autres passages n'écrivent qu'une ligne de résumé.
@@ -1185,7 +1254,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bric
  Aucun referrer de scan pour un dépôt : ses séries ne sont pas écrites (absent() dans les règles), aucune ligne d'entrée."""
  import base64
  import datetime
-@@ -83,9 +90,19 @@
+@@ -83,9 +91,20 @@
      for e in v:
          g[e.get("severity") if e.get("severity") in GRAVITES[:-1] else "autre"] += 1
      lignes = [f'scan_entrees{{depot="{depot}",gravite="{k}"}} {n}\n' for k, n in g.items()]
@@ -1202,10 +1271,11 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bric
 +    lignes.append(f'scan_vex_documents{{depot="{depot}"}} {len(b.get("documents") or [])}\n')
 +    lignes.append(f'scan_vex_rejetes{{depot="{depot}"}} {int(b.get("rejetes") or 0)}\n')
 +    lignes.append(f'scan_vex_ecartees_sans_exemption{{depot="{depot}"}} {int(b.get("ecarteesSansExemption") or 0)}\n')
++    lignes.append(f'scan_vex_repli{{depot="{depot}"}} {int(b.get("repli") or 0)}\n')
      return "".join(lignes)
  
  
-@@ -94,9 +111,18 @@
+@@ -94,9 +113,18 @@
      for e in predicat.get("vulnerabilities") or []:
          yield json.dumps({"depot": depot, "scannedAt": predicat["scannedAt"], "scanne": scanne, "id": e.get("id"), "aliases": e.get("aliases"),
                            "severity": e.get("severity"), "kev": e.get("kev"), "kevCves": e.get("kevCves"), "epss": e.get("epss"),
@@ -1225,7 +1295,7 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bric
  def main():
      scans = [s.split("@", 1) for s in os.environ["SCANS"].split()]
      sortie = os.environ.get("SORTIE", "/etc/fichiers-metriques/entrees-scan.prom")
-@@ -126,6 +152,8 @@
+@@ -126,6 +154,8 @@
          if not deja:
              for ligne in entrees(depot, p):
                  print(ligne)
