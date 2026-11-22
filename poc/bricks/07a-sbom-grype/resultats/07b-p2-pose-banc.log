@@ -1,0 +1,226 @@
+début : 2026-11-22T22:16:58Z
+OK   bao : empreinte du binaire extrait (07b-p2-bao.log) : 9c5f36287c673f38
+OK   bao : version et commit : v2.7.2 (9e0a0d3c3504a0a00b45e61355afac5e35c78379),
+cosign : v3.1.4
+vex-openbao.sh de l'arbre du patch : sha256 e4d59af97816491a… ; vex-signature.hcl : b08375bf3ab329f5…
+OK   OpenBao jetable en TLS : version, scellé : 2.7.2 false
+OK   audit déclaratif du banc : banc/ file
+OK   cluster imité : clés Transit, montages kv : chains,lien,scanner,tsa ; kv/,transit/
+## 1. releve
+## cas releve (vex-openbao.sh releve) : code 0
+    > étape releve commencée : 2026-11-22T22:17:00Z ; vex-openbao.sh e4d59af97816491a… ; BANC
+    > OpenBao : version 2.7.2, initialisé true, scellé false
+    > OK   OpenBao initialisé et descellé
+    > clés Transit (nom type dernière_version exportable) :
+    >      chains ecdsa-p256 1 false
+    >      lien ecdsa-p256 1 false
+    >      scanner ecdsa-p256 1 false
+    >      tsa ecdsa-p256 1 false
+    > OK   transit/keys/vex absente
+    > OK   /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/resultats/vex-cle-publique.pem absent
+    > politiques : default root
+    > OK   politique vex-signature absente
+    > méthodes d'authentification (hors la méthode native) : 
+    > OK   montage userpass/ absent
+    > étape releve finie : 2026-11-22T22:17:01Z
+    > OK   K3 : aucune ligne de bloc privé dans le journal
+    > OK   K4 : valeur du jeton root absente du journal
+OK   releve : code ; vex, clé publique, politique, userpass absents ; KO : code 0 ; 1 1 1 1 ; 0
+## 2. cle_vex
+## cas cle_vex (vex-openbao.sh cle_vex) : code 0
+    > étape cle_vex commencée : 2026-11-22T22:17:01Z ; vex-openbao.sh e4d59af97816491a… ; BANC
+    > OpenBao : version 2.7.2, initialisé true, scellé false
+    > OK   OpenBao initialisé et descellé
+    > avant :
+    >      chains ecdsa-p256 1 false
+    >      lien ecdsa-p256 1 false
+    >      scanner ecdsa-p256 1 false
+    >      tsa ecdsa-p256 1 false
+    > ### création (seule écriture de l'étape)
+    >      | Key                       Value
+    >      | ---                       -----
+    >      | allow_plaintext_backup    false
+    >      | auto_rotate_period        0s
+    >      | deletion_allowed          false
+    >      | derived                   false
+    >      | exportable                false
+    >      | imported_key              false
+    >      | keys                      map[1:map[certificate_chain: creation_time:2026-11-22T23:17:01.922453149+01:00 name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+    >      | MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEc1jzGBGjOkOLl0lN8/lJB0Hyf1IA
+    >      | DxcsBu6HUmpDsE0L43Nhzi2UpU10EQdl2SW+P5X11GPg4o21uR+UphkhPw==
+    >      | -----END PUBLIC KEY-----
+    >      | ]]
+    >      | latest_version            1
+    >      | min_available_version     0
+    >      | min_decryption_version    1
+    >      | min_encryption_version    0
+    >      | name                      vex
+    >      | soft_deleted              false
+    >      | supports_decryption       false
+    >      | supports_derivation       false
+    >      | supports_encryption       false
+    >      | supports_signing          true
+    >      | type                      ecdsa-p256
+    > OK   bao write -f transit/keys/vex : code 0
+    > ### relecture
+    > OK   clé vex (type, exportable, sauvegarde en clair, suppression, version, signature) : ecdsa-p256,false,false,false,1,true
+    >      Public-Key: (256 bit field, 128 bit security level);NIST CURVE: P-256
+    > OK   clé publique exportée : /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/resultats/vex-cle-publique.pem (fichier sha256 b8d59eae672ed6d3e7fd4eaad1ae50ef1b8d476546746cd188c0ae64c51b2fb2 ; SPKI sha256 049a57516ea21071df7c6ef8a45e2551f6500a4bdf55bb2e4364daa45b401612)
+    > après :
+    >      chains ecdsa-p256 1 false
+    >      lien ecdsa-p256 1 false
+    >      scanner ecdsa-p256 1 false
+    >      tsa ecdsa-p256 1 false
+    >      vex ecdsa-p256 1 false
+    > OK   seule différence : transit/keys/vex ajoutée ; les autres clés Transit sont inchangées (type, version, exportable)
+    > étape cle_vex finie : 2026-11-22T22:17:02Z
+    > OK   K3 : aucune ligne de bloc privé dans le journal
+    > OK   K4 : valeur du jeton root absente du journal
+OK   cle_vex : code ; clé conforme ; seule différence ; KO : code 0 ; 1 1 ; 0
+OK   clé publique archivée : courbe ; SPKI égal à celui lu par la racine du banc : P-256 ; égal
+## cas cle_vex-relance (vex-openbao.sh cle_vex) : code 1
+    > étape cle_vex commencée : 2026-11-22T22:17:02Z ; vex-openbao.sh e4d59af97816491a… ; BANC
+    > OpenBao : version 2.7.2, initialisé true, scellé false
+    > OK   OpenBao initialisé et descellé
+    > KO   /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/resultats/vex-cle-publique.pem existe déjà : rien n'est écrasé
+    > étape cle_vex finie : 2026-11-22T22:17:02Z
+    > OK   K3 : aucune ligne de bloc privé dans le journal
+    > OK   K4 : valeur du jeton root absente du journal
+    > bilan : 1 ligne(s) KO
+OK   cle_vex relancée : code ; refus « existe déjà » ; clés Transit : code 1 ; 1 ; chains,lien,scanner,tsa,vex
+## 3. acces_vex refusée avant toute écriture
+## cas sans-terminal (vex-openbao.sh acces_vex) : code 1
+    > REFUS : /dev/tty illisible : acces_vex se lance dans le terminal du propriétaire, pas depuis une session sans terminal
+OK   acces_vex sans terminal : code ; refus : code 1 ; 1
+## cas differents (vex-openbao.sh acces_vex) : code 1
+    > REFUS : les deux saisies diffèrent ; rien n'est écrit
+OK   acces_vex, saisies différentes : code ; refus : code 1 ; 1
+## cas court (vex-openbao.sh acces_vex) : code 1
+    > REFUS : mot de passe de moins de 12 caractères ; rien n'est écrit
+OK   acces_vex, 11 caractères : code ; refus : code 1 ; 1
+OK   après les trois refus : politiques et méthodes inchangées ; aucun journal d'acces_vex : inchangées ; 0
+## 4. acces_vex conforme
+## cas acces_vex (vex-openbao.sh acces_vex) : code 0
+    > OK   mot de passe saisi deux fois, identique, 24 caractères (valeur jamais affichée)
+    > étape acces_vex commencée : 2026-11-22T22:17:03Z ; vex-openbao.sh e4d59af97816491a… ; BANC
+    > OpenBao : version 2.7.2, initialisé true, scellé false
+    > OK   OpenBao initialisé et descellé
+    > OK   clé vex présente et conforme : ecdsa-p256,false,false,false,1,true
+    > avant : politiques default root ; méthodes (hors la méthode native) 
+    > ### écriture 1 : politique vex-signature
+    >      | Success! Uploaded policy: vex-signature
+    > OK   politique vex-signature relue = politique/vex-signature.hcl (hors commentaires et lignes vides : c304cbd05ec856cb)
+    > ### écriture 2 : montage userpass/
+    >      | Success! Enabled userpass auth method at: userpass/
+    > ### écriture 3 : utilisateur proprietaire (mot de passe sur l'entrée standard, sans saut de ligne)
+    >      | Success! Data written to: auth/userpass/users/proprietaire
+    > OK   utilisateur proprietaire écrit : code 0
+    > OK   utilisateur proprietaire (politiques, sans default, durée, durée maximale) : vex-signature,true,900,900
+    > OK   politiques : seule vex-signature ajoutée (ou déjà là)
+    > OK   méthodes d'authentification : seul userpass/ ajouté (ou déjà là)
+    > clés Transit après : chains ecdsa-p256 1 false;lien ecdsa-p256 1 false;scanner ecdsa-p256 1 false;tsa ecdsa-p256 1 false;vex ecdsa-p256 1 false
+    > étape acces_vex finie : 2026-11-22T22:17:04Z
+    > OK   K3 : aucune ligne de bloc privé dans le journal
+    > OK   K4 : valeur du jeton root absente du journal
+    > OK   K6 : valeur du mot de passe absente du journal
+OK   acces_vex : code ; politique relue ; utilisateur ; seules différences ; K4 ; K6 ; KO : code 0 ; 1 1 1 1 ; 1 ; 1 ; 0
+OK   politiques et méthodes du banc après acces_vex : default,root,vex-signature ; token/,userpass/
+OK   mot de passe absent de la sortie et du journal d'acces_vex : 0
+## 5. connexion avec le mot de passe posé par le canal du script
+OK   connexion, fichier sans saut de ligne final : code 0
+OK   connexion, fichier avec saut de ligne final : code 2
+OK   connexion par l'invite de bao sous un pty (canal du propriétaire) : code 0 ; invite vue
+OK   rien écrit dans le HOME des connexions : 0
+## 6. acces_vex relancée avec un autre mot de passe
+## cas relance (vex-openbao.sh acces_vex) : code 1
+    > OK   mot de passe saisi deux fois, identique, 24 caractères (valeur jamais affichée)
+    > étape acces_vex commencée : 2026-11-22T22:17:05Z ; vex-openbao.sh e4d59af97816491a… ; BANC
+    > OpenBao : version 2.7.2, initialisé true, scellé false
+    > OK   OpenBao initialisé et descellé
+    > OK   clé vex présente et conforme : ecdsa-p256,false,false,false,1,true
+    > avant : politiques default root vex-signature ; méthodes (hors la méthode native) userpass/ userpass
+    > KO   utilisateur proprietaire déjà présent : aucune écriture (le mot de passe n'est jamais réécrit par ce script)
+    > étape acces_vex finie : 2026-11-22T22:17:06Z
+    > OK   K3 : aucune ligne de bloc privé dans le journal
+    > OK   K4 : valeur du jeton root absente du journal
+    > OK   K6 : valeur du mot de passe absente du journal
+    > bilan : 1 ligne(s) KO
+OK   acces_vex relancée : code ; refus « déjà présent » : code 1 ; 1
+OK   après la relance : premier mot de passe ; autre mot de passe : code 0 ; code 2
+## 7. fuite injectée (copie du script) : K6 vide le journal
+OK   copie : une ligne de fuite injectée : 1
+## cas fuite (vex-openbao.sh acces_vex) : code 1
+    > OK   mot de passe saisi deux fois, identique, 24 caractères (valeur jamais affichée)
+    > KO   K6 : valeur du mot de passe dans le journal : journal vidé
+OK   fuite : code ; journal réduit à la ligne K6 ; mot de passe absent de la sortie : code 1 ; 1 1 ; 0
+## 8. essai du propriétaire
+## cas essai (vex-openbao.sh essai) : code 0
+    > étape essai commencée : 2026-11-22T22:17:06Z ; vex-openbao.sh e4d59af97816491a… ; BANC
+    > OK   bao de l'hôte : empreinte 9c5f36287c673f386e1533e9c044169a248e4ee50dd54810fa766e95bd41b788 (OpenBao v2.7.2 (9e0a0d3c3504a0a00b45e61355afac5e35c78379), committed 2026-10-26T20:32:27Z)
+    > OK   redirection ouverte : 127.0.0.1:18200 → openbao-0:8200 (processus 515787)
+    > ### connexion du propriétaire (userpass, -no-store)
+    > OK   connexion : code 0 ; politiques vex-signature ; durée 900 s ; secret dans un fichier 600 ; rien dans /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/travail/home : 0 fichier(s)
+    > OK   secret du propriétaire : vex-signature seule, 900 s
+    > ### essais avec le secret du propriétaire
+    >      | ACCEPTE|lecture de transit/keys/vex
+    >      | ACCEPTE|signature avec la clé vex
+    >      | REFUSE|signature avec la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|signature avec la clé scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|signature avec la clé tsa|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|signature avec la clé lien|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|lecture de transit/keys/chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|export de la clé vex|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|clé vex rendue exportable|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|sauvegarde de la clé vex|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|lecture de kv/scan/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|liste des politiques|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|création d'un secret enfant|Code: 403. Errors: * 1 error occurred: * permission denied 
+    >      | REFUSE|consultation de soi|Code: 403. Errors: * 1 error occurred: * permission denied 
+    > OK   essai lecture de transit/keys/vex : ACCEPTE
+    > OK   essai signature avec la clé vex : ACCEPTE
+    > OK   essai signature avec la clé chains : REFUSE
+    > OK   essai signature avec la clé scanner : REFUSE
+    > OK   essai signature avec la clé tsa : REFUSE
+    > OK   essai signature avec la clé lien : REFUSE
+    > OK   essai lecture de transit/keys/chains : REFUSE
+    > OK   essai export de la clé vex : REFUSE
+    > OK   essai clé vex rendue exportable : REFUSE
+    > OK   essai sauvegarde de la clé vex : REFUSE
+    > OK   essai lecture de kv/scan/zot : REFUSE
+    > OK   essai liste des politiques : REFUSE
+    > OK   essai création d'un secret enfant : REFUSE
+    > OK   essai consultation de soi : REFUSE
+    > ### signature vérifiée sur l'hôte avec la clé publique archivée
+    >      signature Transit : préfixe vault:v1, 70 octets DER
+    > OK   openssl : signature de la clé vex vérifiée par /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/resultats/vex-cle-publique.pem (Verified OK)
+    > OK   témoin : même signature sur une autre entrée refusée (Verification failure)
+    > ### clé publique vue par cosign (client hashivault de signer-vex.sh)
+    > OK   cosign public-key --key hashivault://vex : code 0, SPKI égal à /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/resultats/vex-cle-publique.pem (v3.1.4)
+    > ### révocation de soi, puis signature refusée
+    > OK   révocation de soi : code 0
+    > OK   signature avec la clé vex après révocation : REFUSE
+    > OK   redirection fermée : processus 515787 arrêté (banc : le port est celui du serveur du banc, non sondé)
+    > étape essai finie : 2026-11-22T22:17:09Z
+    > OK   K3 : aucune ligne de bloc privé dans le journal
+    > OK   K4 : valeur du jeton root absente du journal
+    > OK   K5 : valeur du secret du propriétaire absente du journal
+    > OK   fichier du secret du propriétaire effacé
+OK   essai : code ; connexion ; 900 s ; essais conformes ; KO : code 0 ; 1 1 ; 14 ; 0
+OK   essai : openssl ; témoin ; cosign hashivault ; révocation ; signature après révocation : 1 1 1 1 1
+OK   essai : redirection fermée ; K4 ; K5 ; fichier du secret effacé ; rien dans le HOME du client : 1 ; 1 ; 1 ; 1 ; 0
+## cas essai-relance (vex-openbao.sh essai) : code 1
+    > étape essai commencée : 2026-11-22T22:17:09Z ; vex-openbao.sh e4d59af97816491a… ; BANC
+    > OK   bao de l'hôte : empreinte 9c5f36287c673f386e1533e9c044169a248e4ee50dd54810fa766e95bd41b788 (OpenBao v2.7.2 (9e0a0d3c3504a0a00b45e61355afac5e35c78379), committed 2026-10-26T20:32:27Z)
+    > KO   /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/travail existe déjà (essai précédent ?) : rien n'est écrasé
+    > étape essai finie : 2026-11-22T22:17:09Z
+    > OK   K3 : aucune ligne de bloc privé dans le journal
+    > OK   K4 : valeur du jeton root absente du journal
+    > bilan : 1 ligne(s) KO
+OK   essai relancé : code ; refus « existe déjà » : code 1 ; 1
+## 9. audit du banc
+OK   audit : écriture de l'utilisateur proprietaire, par identité : root 1
+OK   audit : signatures réussies sur transit/sign/vex, par identité : userpass-proprietaire 1
+OK   faux kubectl : appels inattendus : 0
+fin : 2026-11-22T22:17:09Z
+## bilan : 0 écart(s)
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc

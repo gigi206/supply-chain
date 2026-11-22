@@ -561,3 +561,47 @@ Le **jeton du propriétaire simulé** est émis par la racine du banc : politiqu
 - **Changement** : le device d'audit du banc est déclaré dans un fichier de configuration passé à `bao server -dev -config=…`, comme le fait la 08 pour l'OpenBao du cluster. Un essai jetable hors banc l'a confirmé (device `banc/` listé, lignes écrites).
 - **Contrôle ajouté** : « audit déclaratif du banc » : `banc/ file`. Confiance haute.
 - **Total prédit** : **254 OK, 0 KO**. Les autres prédictions ne changent pas.
+
+## Ajout avant le banc de pose de la pièce 2 : `vex-openbao.sh` (date -u de 22:09:33 UTC, le 2026-11-22, avant tout code)
+
+**Objet** : écrire à sec le script qui posera la pièce 2 dans l'OpenBao du cluster, et l'éprouver sur l'OpenBao 2.7.2 jetable des passages 21 et 22, avec cette fois TLS (`-dev-tls`). Rien n'est lancé sur le vrai cluster, pas même la lecture `releve`, car `kubectl exec` dans `openbao-0` avec le jeton racine demande un accord.
+
+**Script** : `poc/bricks/07a-sbom-grype/vex-openbao.sh`, calqué sur `o5-openbao.sh` de la 09. Il est ajouté à l'arbre du patch, à côté de `politique/vex-signature.hcl` qu'il lit, donc le patch change d'empreinte (11 fichiers). Il a quatre étapes, chacune refusant si son objet existe déjà :
+- `releve` : lecture seule (état, clés Transit, politiques, méthodes d'authentification) ;
+- `cle_vex` : clé Transit `vex` (ecdsa-p256, non exportable, sans sauvegarde en clair), clé publique exportée dans `resultats/vex-cle-publique.pem` (chemin attendu par `cm_scan`), seule différence vérifiée ;
+- `acces_vex` : **lancé par le propriétaire dans son terminal**. Le mot de passe est saisi deux fois sur `/dev/tty`, sans écho, et refusé si les saisies diffèrent ou s'il compte moins de 12 caractères. Puis viennent la politique `vex-signature`, le montage `userpass/` et l'utilisateur `proprietaire`. Le mot de passe passe par l'entrée standard de `kubectl exec`, puis par celle de `bao write … password=-` dans le pod, jamais en argument. L'étape refuse si la politique, le montage ou l'utilisateur existe déjà : une relance ne réécrit jamais le mot de passe (contournement du passage 22) ;
+- `essai` : **lancé par le propriétaire**. Redirection 127.0.0.1 vers `openbao-0:8200` (comme `o5-cosign.sh`), `bao login -method=userpass -no-store` par l'invite, puis une signature `transit/sign/vex` vérifiée par openssl avec la clé publique archivée, des refus croisés, `cosign public-key --key hashivault://vex` comparé à la clé archivée, `token revoke -self`, et un refus après révocation. Le jeton vit dans un fichier 0600 effacé à la sortie.
+
+Les journaux évitent « jeton » et « token », que le masquage remplace. Les valeurs de l'utilisateur sont donc relues par `jq` en valeurs seules. Contrôles de fin de journal, comme K4 et K5 de la 09 : la valeur du jeton racine et celle du mot de passe sont absentes du journal, sinon le journal est vidé.
+
+**Banc** : `resultats/07b-p2-pose-banc.sh`, dans `unshare -rn`.
+- OpenBao 2.7.2 en `-dev -dev-tls`, audit déclaré dans la configuration (passage 22).
+- Clés `chains`, `scanner`, `tsa` et `lien` créées d'abord, pour imiter le cluster.
+- Faux `kubectl` : `exec` lance un `sh` local pointé sur le serveur du banc ; `port-forward` annonce le port du serveur.
+- Secrets du banc seulement, jamais `08/secrets`.
+- Hors du vrai terminal, le mot de passe vient d'un fichier du banc désigné par une variable lue seulement quand `BANC` est posé.
+
+| Cas | Prédit | Confiance |
+|---|---|---|
+| `releve`, OpenBao neuf | code 0 ; `vex` absente, PEM absent, politique absente, `userpass/` absent | haute |
+| `cle_vex` | code 0 ; `ecdsa-p256,false,false,false,1,true` ; PEM lisible par openssl (P-256) ; seule différence : `vex` ajoutée | haute |
+| `cle_vex` relancée | code 1 ; refus « existe déjà », clés inchangées | haute |
+| `acces_vex` sans terminal ni fichier du banc | code 1 ; refus avant toute écriture (`/dev/tty` illisible dans la session) | moyenne (message de `/dev/tty`) |
+| `acces_vex`, saisies différentes | code 1 ; rien écrit (politique et `userpass/` absents) | haute |
+| `acces_vex`, mot de passe de 11 caractères | code 1 ; rien écrit | haute |
+| `acces_vex` | code 0 ; politique relue = fichier ; seule méthode ajoutée : `userpass/` ; utilisateur : `vex-signature`, sans `default`, 900 s, 900 s | haute |
+| journal d'`acces_vex` | valeur du mot de passe et du jeton racine absentes | haute |
+| `acces_vex` relancée avec un autre mot de passe | code 1 ; refus « existe déjà » ; la connexion avec le premier mot de passe marche encore | haute |
+| connexion par `password=@fichier` sans saut de ligne final (mot de passe posé par le canal du script) | code 0 | **moyenne** : c'est le point qui peut casser (`password=-` ou le heredoc pourraient garder un saut de ligne) |
+| connexion par `password=@fichier` avec un saut de ligne final | code 2 | **basse** : `bao` peut retirer le saut de ligne d'un fichier, auquel cas le contrôle ne discrimine pas |
+| connexion par l'invite, sous un pty (canal réel du propriétaire) | code 0 | moyenne (pilotage du pty) |
+| `essai` | code 0 ; signature acceptée et vérifiée par openssl ; témoin refusé ; refus : signature `chains`, `scanner`, `tsa`, `lien`, lecture de `transit/keys/chains`, export de `vex`, `vex` rendue exportable, sauvegarde de `vex`, `kv`, liste des politiques, création d'un jeton, consultation de soi ; `cosign public-key` = clé archivée (SPKI) ; révocation acceptée ; signature après révocation refusée ; fichier du jeton effacé, redirection fermée | moyenne (`cosign` à travers `-dev-tls` et le nom TLS du banc) |
+| audit du banc | signature réussie sur `transit/sign/vex` : `userpass-proprietaire 1` ; création de l'utilisateur : `root 1` | moyenne |
+
+**Total** : le nombre exact de lignes OK dépend du code, pas encore écrit. Il sera fixé par un ajout daté, après le code et avant le premier passage. Les prédictions de comportement ci-dessus ne changeront pas.
+
+**Total prédit du banc de pose de la pièce 2** (date -u de 22:15:23 UTC, après le code, avant le premier passage) : **31 OK, 0 KO**, un par appel d'`attendu` du banc (2 dans le parent, 29 dans l'espace de noms). Script éprouvé : `vex-openbao.sh` de l'arbre du patch, sha256 `e4d59af97816491a…`. Les prédictions de comportement ne changent pas. Un KO sur « connexion, fichier avec saut de ligne final » (confiance basse) voudrait dire que `bao` retire le saut de ligne : la prédiction serait fausse, sans défaut du script.
+
+**Correction avant la relance du banc de pose de la pièce 2** (date -u de 22:16:26 UTC, avant la relance) : le premier passage ([journal](07b-p2-pose-banc-premier-passage.log)) a fini à 11 OK et 20 KO. L'OpenBao du banc n'a jamais démarré : `bao server -dev -dev-tls` exige que le dossier de `-dev-tls-cert-dir` existe, et le banc ne le créait pas. C'est un défaut du banc, non du script. Les 11 OK venaient de refus et de contrôles qui ne demandent pas de serveur. Un essai jetable hors banc, avec le dossier créé, a donné `2.7.2 false` en TLS, avec le nom `localhost` présent dans le certificat. Changement : le banc crée ce dossier (0700). Les prédictions et le total (**31 OK, 0 KO**) ne changent pas.
+
+**Deuxième correction du banc de pose de la pièce 2** (date -u de 22:16:58 UTC, avant la relance) : le deuxième passage ([journal](07b-p2-pose-banc-deuxieme-passage.log)) a fini à 30 OK et 1 KO. Le KO vient de la forme attendue par le banc : OpenBao liste les politiques dans l'ordre `default,vex-signature,root`, non trié, alors que j'attendais `default,root,vex-signature`. L'ensemble est le même, et le script n'est pas en cause : il trie lui-même ses listes avant de les comparer. Toutes les prédictions de comportement ont tenu, y compris les deux de confiance basse ou moyenne : le fichier avec saut de ligne final est refusé (code 2), et l'invite sous un pty accepte le mot de passe. Changement : le banc trie la liste. Le total prédit (**31 OK, 0 KO**) ne change pas.

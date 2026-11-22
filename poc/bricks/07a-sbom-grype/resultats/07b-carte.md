@@ -1292,3 +1292,56 @@ Le banc l'empreinte et le lance en mode dev, dans l'espace de noms réseau vide 
 **Heures mesurées** :
 - Segment : de 21:14:37 UTC à 21:58:48 UTC, compté d'un seul tenant.
 - Somme des enveloppes de la 07b : au plus 11 h 06 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Pièce 2 : script de pose `vex-openbao.sh` écrit et éprouvé à sec (note de 2026-11-22T22:18:22Z ; banc synthétique, rien posé)
+
+**Objet** : préparer la pose de la pièce 2 dans l'OpenBao du cluster, sans la faire. Rien n'a touché le cluster, pas même la lecture `releve` : un `kubectl exec` dans `openbao-0` avec le jeton racine demande un accord. Seule lecture faite : `kubectl get` de la ConfigMap `openbao-config`. Elle est égale à `08-trust-plane/openbao/config.hcl` (hors commentaires) et ne contient pas `log_raw`. Les valeurs sensibles restent donc en HMAC dans l'audit et dans Loki, mot de passe compris. Le conseiller avait fait de ce point un préalable bloquant.
+
+**Script** : `poc/bricks/07a-sbom-grype/vex-openbao.sh` (sha256 `e4d59af97816491a…`), calqué sur `o5-openbao.sh` de la 09. Il est dans l'arbre du patch, à côté de `politique/vex-signature.hcl`, dont seul le commentaire d'en-tête change (l'identité est tranchée). Le patch passe à **11 fichiers**, sha256 `6c98e264fd91e1a9…` au lieu de `08d36964…`. Il s'applique à une copie des fichiers du dépôt et redonne exactement l'arbre `b`.
+
+| Étape | Qui la lance | Ce qu'elle fait |
+|---|---|---|
+| `releve` | la session, sur accord | lecture : état, clés Transit, politiques, méthodes ; absence de `vex`, de la clé publique, de la politique, de `userpass/` |
+| `cle_vex` | la session, sur accord | clé `vex` (ecdsa-p256, non exportable, sans sauvegarde en clair) ; `resultats/vex-cle-publique.pem`, lu par `cm_scan` ; seule différence vérifiée ; refus si elle existe |
+| `acces_vex` | **le propriétaire, dans son terminal** | mot de passe saisi deux fois sur `/dev/tty`, sans écho (12 caractères au moins) ; politique `vex-signature`, montage `userpass/`, utilisateur `proprietaire` (15 min, sans `default`) ; **refus si l'utilisateur existe** : jamais de réécriture du mot de passe |
+| `essai` | **le propriétaire, dans son terminal** | redirection 127.0.0.1 vers `openbao-0:8200` ; `bao login -no-store` par l'invite ; signature vérifiée par openssl ; 12 refus ; `cosign public-key --key hashivault://vex` ; révocation de soi ; refus après révocation |
+
+Le mot de passe passe sur l'entrée standard de `kubectl exec`, puis sur celle de `bao write … password=-` dans le pod. Il n'a pas de saut de ligne et n'est jamais en argument. En fin d'étape, les contrôles de journal hérités de la 09 (K3 à K5) et K6 (le mot de passe) vident le journal si une valeur secrète y figure.
+
+**Banc** ([script](07b-p2-pose-banc.sh), [journal](07b-p2-pose-banc.log)) : OpenBao 2.7.2 jetable en `-dev -dev-tls`, dans `unshare -rn`. Le faux `kubectl` lance localement les commandes `exec` et annonce le port pour `port-forward`. Les mots de passe sont aléatoires, propres au banc. Trois passages :
+- [premier](07b-p2-pose-banc-premier-passage.log) : 11 OK, 20 KO, serveur jamais démarré (`-dev-tls-cert-dir` doit exister) ;
+- [deuxième](07b-p2-pose-banc-deuxieme-passage.log) : 30 OK, 1 KO, ordre non trié de la liste des politiques attendu trié par le banc ;
+- troisième : **31 OK, 0 KO**, de 22:16:58 à 22:17:09 UTC.
+
+Les deux défauts venaient du banc, et chacun a reçu une correction datée avant la relance.
+
+| Contrôle | Résultat |
+|---|---|
+| `releve`, puis `cle_vex` | code 0 ; clé `ecdsa-p256,false,false,false,1,true` ; P-256, SPKI égal à celui de la racine ; seule différence |
+| `cle_vex` relancée | code 1, « existe déjà », clés inchangées |
+| `acces_vex` sans terminal, saisies différentes, 11 caractères | code 1 trois fois, rien écrit, aucun journal |
+| `acces_vex` | code 0 ; politique relue ; utilisateur `vex-signature,true,900,900` ; seuls ajouts : `vex-signature`, `userpass/` ; K4 et K6 |
+| connexion, fichier **sans** saut de ligne / **avec** saut de ligne / **invite de `bao` sous un pty** | code 0 / code 2 / code 0, invite vue |
+| `acces_vex` relancée avec un autre mot de passe | code 1, « déjà présent » ; l'ancien mot de passe marche encore, le nouveau est refusé |
+| fuite injectée dans une copie du script | code 1 ; journal réduit à la ligne K6 ; mot de passe absent de la sortie |
+| `essai` | code 0 ; 900 s ; 14 essais conformes ; openssl et témoin ; SPKI de cosign égal ; révocation ; refus après ; K4, K5 ; fichier du jeton effacé ; aucun fichier dans le `HOME` du client |
+| `essai` relancé | code 1, « existe déjà » |
+| audit du banc | écriture de l'utilisateur : `root 1` ; signature sur `transit/sign/vex` : `userpass-proprietaire 1` |
+
+**Lecture** : le point qui pouvait casser tient sur le banc. Un mot de passe posé par le canal du script (entrée standard, `password=-`) est accepté à l'octet près par le canal réel du propriétaire, l'invite de `bao`. Le contrôle discrimine : le même mot de passe suivi d'un saut de ligne est refusé. Une relance ne change jamais le mot de passe.
+
+**Limites** :
+- Le canal réel n'est pas mesuré : entrée standard de `kubectl exec` jusqu'au pod, fin de flux, `sh` de l'image OpenBao lisant la première ligne puis passant la main à `bao`. La même fonction `racine` lit déjà le jeton ainsi dans le cluster (07a, 08, 09). En revanche, la lecture du reste du flux par `bao` est nouvelle.
+- TLS du banc : certificat `-dev-tls` et nom `localhost`, pas la CA du PoC ni `openbao.openbao.svc.cluster.local`. La redirection est simulée.
+- L'audit est lu dans un fichier du banc, pas dans Loki. Le compte de `userpass-proprietaire` dans Grafana se fera après l'`essai` réel, par l'auditeur.
+- `07b-t3-banc.sh` n'a pas été relancé sur le patch `6c98e264`. Le patch n'ajoute qu'un fichier et un commentaire, et redonne l'arbre `b`.
+
+**Pour poser la pièce 2** (accord nommé du propriétaire, non demandé ici) :
+1. reporter dans le dépôt les deux fichiers de la pièce : `vex-openbao.sh` et `politique/vex-signature.hcl` ;
+2. lancer `releve`, puis `cle_vex`, par la session (`kubectl exec` dans `openbao-0` avec le jeton racine ; nouvelle clé Transit) ;
+3. le propriétaire lance `acces_vex` (nouvelle politique, **nouvelle méthode d'authentification `userpass/`**, mot de passe qu'il choisit), puis `essai` (redirection de port locale le temps de l'étape) ;
+4. compter `userpass-proprietaire` dans Loki, par l'auditeur.
+
+**Heures mesurées** :
+- Segment : de 22:05:47 UTC à 22:18:22 UTC, compté d'un seul tenant.
+- Somme des enveloppes de la 07b : au plus 11 h 19 pour 10 h estimées (demande au propriétaire avant 20 h).

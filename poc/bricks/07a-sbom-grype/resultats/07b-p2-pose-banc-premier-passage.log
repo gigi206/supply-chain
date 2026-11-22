@@ -1,0 +1,106 @@
+début : 2026-11-22T22:15:28Z
+OK   bao : empreinte du binaire extrait (07b-p2-bao.log) : 9c5f36287c673f38
+OK   bao : version et commit : v2.7.2 (9e0a0d3c3504a0a00b45e61355afac5e35c78379),
+cosign : v3.1.4
+vex-openbao.sh de l'arbre du patch : sha256 e4d59af97816491a… ; vex-signature.hcl : b08375bf3ab329f5…
+cp: cannot stat '/home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/tls-dev/vault-ca.pem': No such file or directory
+cp: cannot stat '/home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/bao-home/.vault-token': No such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+KO   OpenBao jetable en TLS : version, scellé :  (attendu : 2.7.2 false)
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+KO   audit déclaratif du banc :  (attendu : banc/ file)
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+KO   cluster imité : clés Transit, montages kv :  ;  (attendu : chains,lien,scanner,tsa ; kv/,transit/)
+## 1. releve
+## cas releve (vex-openbao.sh releve) : code 1
+    > /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/arbre/poc/bricks/07a-sbom-grype/vex-openbao.sh: line 351: /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/secrets/openbao-root.token: No such file or directory
+    > KO   K4 : valeur du jeton root dans le journal : journal vidé
+KO   releve : code ; vex, clé publique, politique, userpass absents ; KO : code 1 ; 0 0 0 0 ; 1 (attendu : code 0 ; 1 1 1 1 ; 0)
+## 2. cle_vex
+## cas cle_vex (vex-openbao.sh cle_vex) : code 1
+    > /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/arbre/poc/bricks/07a-sbom-grype/vex-openbao.sh: line 351: /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/secrets/openbao-root.token: No such file or directory
+    > KO   K4 : valeur du jeton root dans le journal : journal vidé
+KO   cle_vex : code ; clé conforme ; seule différence ; KO : code 1 ; 0 0 ; 1 (attendu : code 0 ; 1 1 ; 0)
+Could not open file or uri for loading private key of Public Key from /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/resultats/vex-cle-publique.pem: No such file or directory
+Could not open file or uri for loading private key of Public Key from /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/resultats/vex-cle-publique.pem: No such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+Could not find or decode private key of Public Key from <stdin>
+KO   clé publique archivée : courbe ; SPKI égal à celui lu par la racine du banc :  ; égal (attendu : P-256 ; égal)
+## cas cle_vex-relance (vex-openbao.sh cle_vex) : code 1
+    > /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/arbre/poc/bricks/07a-sbom-grype/vex-openbao.sh: line 351: /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/secrets/openbao-root.token: No such file or directory
+    > KO   K4 : valeur du jeton root dans le journal : journal vidé
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+KO   cle_vex relancée : code ; refus « existe déjà » ; clés Transit : code 1 ; 0 ;  (attendu : code 1 ; 1 ; chains,lien,scanner,tsa,vex)
+## 3. acces_vex refusée avant toute écriture
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+## cas sans-terminal (vex-openbao.sh acces_vex) : code 1
+    > REFUS : /dev/tty illisible : acces_vex se lance dans le terminal du propriétaire, pas depuis une session sans terminal
+OK   acces_vex sans terminal : code ; refus : code 1 ; 1
+## cas differents (vex-openbao.sh acces_vex) : code 1
+    > REFUS : les deux saisies diffèrent ; rien n'est écrit
+OK   acces_vex, saisies différentes : code ; refus : code 1 ; 1
+## cas court (vex-openbao.sh acces_vex) : code 1
+    > REFUS : mot de passe de moins de 12 caractères ; rien n'est écrit
+OK   acces_vex, 11 caractères : code ; refus : code 1 ; 1
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+OK   après les trois refus : politiques et méthodes inchangées ; aucun journal d'acces_vex : inchangées ; 0
+## 4. acces_vex conforme
+## cas acces_vex (vex-openbao.sh acces_vex) : code 1
+    > OK   mot de passe saisi deux fois, identique, 24 caractères (valeur jamais affichée)
+    > /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/arbre/poc/bricks/07a-sbom-grype/vex-openbao.sh: line 351: /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/secrets/openbao-root.token: No such file or directory
+    > KO   K4 : valeur du jeton root dans le journal : journal vidé
+KO   acces_vex : code ; politique relue ; utilisateur ; seules différences ; K4 ; K6 ; KO : code 1 ; 0 0 0 0 ; 0 ; 0 ; 1 (attendu : code 0 ; 1 1 1 1 ; 1 ; 1 ; 0)
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+failed to read environment: Error loading CA File: open /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/tls/vault-ca.pem: no such file or directory
+KO   politiques et méthodes du banc après acces_vex :  ;  (attendu : default,root,vex-signature ; token/,userpass/)
+OK   mot de passe absent de la sortie et du journal d'acces_vex : 0
+## 5. connexion avec le mot de passe posé par le canal du script
+KO   connexion, fichier sans saut de ligne final : code 2 (attendu : code 0)
+OK   connexion, fichier avec saut de ligne final : code 2
+KO   connexion par l'invite de bao sous un pty (canal du propriétaire) : code 2 ; invite absente (attendu : code 0 ; invite vue)
+OK   rien écrit dans le HOME des connexions : 0
+## 6. acces_vex relancée avec un autre mot de passe
+## cas relance (vex-openbao.sh acces_vex) : code 1
+    > OK   mot de passe saisi deux fois, identique, 24 caractères (valeur jamais affichée)
+    > /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/arbre/poc/bricks/07a-sbom-grype/vex-openbao.sh: line 351: /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/secrets/openbao-root.token: No such file or directory
+    > KO   K4 : valeur du jeton root dans le journal : journal vidé
+KO   acces_vex relancée : code ; refus « déjà présent » : code 1 ; 0 (attendu : code 1 ; 1)
+KO   après la relance : premier mot de passe ; autre mot de passe : code 2 ; code 2 (attendu : code 0 ; code 2)
+## 7. fuite injectée (copie du script) : K6 vide le journal
+OK   copie : une ligne de fuite injectée : 1
+## cas fuite (vex-openbao.sh acces_vex) : code 1
+    > OK   mot de passe saisi deux fois, identique, 24 caractères (valeur jamais affichée)
+    > /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/arbre/poc/bricks/07a-sbom-grype/vex-openbao-fuite.sh: line 352: /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/secrets/openbao-root.token: No such file or directory
+    > KO   K4 : valeur du jeton root dans le journal : journal vidé
+KO   fuite : code ; journal réduit à la ligne K6 ; mot de passe absent de la sortie : code 1 ; 1 0 ; 0 (attendu : code 1 ; 1 1 ; 0)
+## 8. essai du propriétaire
+## cas essai (vex-openbao.sh essai) : code 1
+    > /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/arbre/poc/bricks/07a-sbom-grype/vex-openbao.sh: line 351: /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/secrets/openbao-root.token: No such file or directory
+    > KO   K4 : valeur du jeton root dans le journal : journal vidé
+KO   essai : code ; connexion ; 900 s ; essais conformes ; KO : code 1 ; 0 0 ; 0 ; 1 (attendu : code 0 ; 1 1 ; 14 ; 0)
+KO   essai : openssl ; témoin ; cosign hashivault ; révocation ; signature après révocation : 0 0 0 0 0 (attendu : 1 1 1 1 1)
+find: '/home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/travail/home': No such file or directory
+KO   essai : redirection fermée ; K4 ; K5 ; fichier du secret effacé ; rien dans le HOME du client : 0 ; 0 ; 0 ; 0 ; 0 (attendu : 1 ; 1 ; 1 ; 1 ; 0)
+## cas essai-relance (vex-openbao.sh essai) : code 1
+    > /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/arbre/poc/bricks/07a-sbom-grype/vex-openbao.sh: line 351: /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/b/secrets/openbao-root.token: No such file or directory
+    > KO   K4 : valeur du jeton root dans le journal : journal vidé
+KO   essai relancé : code ; refus « existe déjà » : code 1 ; 0 (attendu : code 1 ; 1)
+## 9. audit du banc
+jq: error: Could not open file /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/bao-audit.log: No such file or directory
+KO   audit : écriture de l'utilisateur proprietaire, par identité :  (attendu : root 1)
+jq: error: Could not open file /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc/bao-audit.log: No such file or directory
+KO   audit : signatures réussies sur transit/sign/vex, par identité :  (attendu : userpass-proprietaire 1)
+OK   faux kubectl : appels inattendus : 0
+fin : 2026-11-22T22:16:00Z
+## bilan : 20 écart(s)
+à effacer après archivage (chemin littéral) : /home/gigi/.cache/supply-chain-poc/07a/p2-pose-banc
