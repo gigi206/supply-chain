@@ -1345,3 +1345,38 @@ Les deux défauts venaient du banc, et chacun a reçu une correction datée avan
 **Heures mesurées** :
 - Segment : de 22:05:47 UTC à 22:18:22 UTC, compté d'un seul tenant.
 - Somme des enveloppes de la 07b : au plus 11 h 19 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Pièce 2 : quatrième passage du banc de pose, chemins du propriétaire mesurés (note de 2026-11-22T22:25:52Z ; banc synthétique, rien posé)
+
+**Correction de la note de 22:18:22 UTC** : elle disait que « le canal réel du propriétaire » était mesuré. Ce n'était vrai que pour `bao login` lancé directement sous un pty, pas pour le script. Les branches terminal de `vex-openbao.sh` n'avaient jamais tourné : `lire_mdp` sur `/dev/tty` (seul son refus) et la connexion d'`essai` par l'invite. Le conseiller a relevé ce manque, avec deux autres :
+- **piège de relance** : `essai` refusait tout dossier de travail existant, et ce dossier était créé avant la connexion. Une faute de frappe du propriétaire aurait donc bloqué toute relance ;
+- **reprise d'`acces_vex`** après un échec partiel : code jamais exécuté ;
+- **compte en octets** : sous `LC_ALL=C`, `${#MDP}` compte des octets, alors que le message dit « caractères ».
+
+**Changements du script** (sha256 `8e2177864616a82a…`) :
+- `essai` crée un dossier neuf par lancement (`mktemp -d`) et refuse si `/dev/tty` est illisible, comme `acces_vex` ;
+- la branche de connexion se choisit sur `BANC_MDP_CONNEXION`, et non plus sur `BANC` ;
+- la longueur se compte par `wc -m` sous `C.UTF-8`, avec `printf` interne, donc sans argument.
+
+Le patch devient `78dce9acc3953267…` (11 fichiers) ; il s'applique à une copie des fichiers du dépôt et redonne l'arbre `b`.
+
+**Banc** ([journal](07b-p2-pose-banc-4.log)) : le premier essai du passage ([journal](07b-p2-pose-banc-4-premier-passage.log)) a fini à 36 OK et 1 KO. Le motif `-path '*/home/*'` correspondait aussi à `/home/<utilisateur>`, ce qui est un défaut du banc ; la correction a été datée avant la relance. La relance a donné **37 OK, 0 KO**, de 22:24:53 à 22:25:09 UTC, comme prédit. Un pilote pty du banc répond aux invites et n'affiche qu'un résumé, avec le nombre d'échos du mot de passe dans tout ce que le terminal a reçu.
+
+| Cas neuf | Résultat |
+|---|---|
+| 11 caractères accentués (21 octets) | code 1, refus |
+| politique modifiée dans OpenBao, utilisateur effacé | code 1, « présente et différente », rien écrit |
+| politique remise, `acces_vex` **sous pty** (deux invites) | code 0 ; politique « laissée », montage « laissé » ; utilisateur conforme ; K6 ; **invites vues 2, échos 0** |
+| connexion : troisième mot de passe / premier | code 0 / code 2 |
+| `essai`, mauvais mot de passe | code 1, connexion refusée |
+| `essai` relancé **sous pty** (invite de `bao`) | code 0 ; **invites vues 1, échos 0** ; 14 essais conformes ; K4, K5 |
+| dossiers d'essai | 2, un par lancement ; aucun fichier de jeton restant ; dossiers `home` des clients vides |
+| audit du banc | écritures de l'utilisateur : `root 2` ; signature : `userpass-proprietaire 1` |
+
+**Lecture** : les deux étapes du propriétaire tournent par leur vrai chemin de terminal. Le pilote attend 0,5 s après chaque invite : aucune course entre l'invite et la coupure de l'écho n'a été vue, sans que ce soit une preuve. Une connexion ratée se relance. Une pose interrompue reprend sans réécrire ce qui est conforme et sans écraser ce qui ne l'est pas.
+
+**Limites, inchangées** : le canal `kubectl exec` jusqu'au pod n'est pas mesuré, ni le TLS du PoC, ni l'audit dans Loki. `07b-t3-banc.sh` n'a pas tourné sur ce patch, et devra repasser avant toute autre pièce (ses 254 OK citent `08d36964`).
+
+**Heures mesurées** :
+- Segment : de 22:05:47 UTC à 22:25:52 UTC, compté d'un seul tenant.
+- Somme des enveloppes de la 07b : au plus 11 h 27 pour 10 h estimées (demande au propriétaire avant 20 h).

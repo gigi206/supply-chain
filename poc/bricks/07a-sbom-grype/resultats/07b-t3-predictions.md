@@ -605,3 +605,37 @@ Les journaux évitent « jeton » et « token », que le masquage remplace. Les 
 **Correction avant la relance du banc de pose de la pièce 2** (date -u de 22:16:26 UTC, avant la relance) : le premier passage ([journal](07b-p2-pose-banc-premier-passage.log)) a fini à 11 OK et 20 KO. L'OpenBao du banc n'a jamais démarré : `bao server -dev -dev-tls` exige que le dossier de `-dev-tls-cert-dir` existe, et le banc ne le créait pas. C'est un défaut du banc, non du script. Les 11 OK venaient de refus et de contrôles qui ne demandent pas de serveur. Un essai jetable hors banc, avec le dossier créé, a donné `2.7.2 false` en TLS, avec le nom `localhost` présent dans le certificat. Changement : le banc crée ce dossier (0700). Les prédictions et le total (**31 OK, 0 KO**) ne changent pas.
 
 **Deuxième correction du banc de pose de la pièce 2** (date -u de 22:16:58 UTC, avant la relance) : le deuxième passage ([journal](07b-p2-pose-banc-deuxieme-passage.log)) a fini à 30 OK et 1 KO. Le KO vient de la forme attendue par le banc : OpenBao liste les politiques dans l'ordre `default,vex-signature,root`, non trié, alors que j'attendais `default,root,vex-signature`. L'ensemble est le même, et le script n'est pas en cause : il trie lui-même ses listes avant de les comparer. Toutes les prédictions de comportement ont tenu, y compris les deux de confiance basse ou moyenne : le fichier avec saut de ligne final est refusé (code 2), et l'invite sous un pty accepte le mot de passe. Changement : le banc trie la liste. Le total prédit (**31 OK, 0 KO**) ne change pas.
+
+## Ajout avant le quatrième passage du banc de pose de la pièce 2 (date -u de 22:21:30 UTC, le 2026-11-22, avant tout code)
+
+**Objet** : le conseiller a relevé trois chemins jamais exécutés, que seul le propriétaire prendra et que la session ne pourra pas déboguer faute de terminal :
+- les branches terminal du script (`lire_mdp` sur `/dev/tty` et la connexion d'`essai` par l'invite), le pty du troisième passage ayant lancé `bao login` directement ;
+- la relance d'`essai` après une connexion ratée : le dossier de travail restait, et toute relance répondait « existe déjà » ;
+- la reprise d'`acces_vex` après un échec partiel (« politique identique : laissée », « montage présent : laissé », « politique différente : refus »).
+
+Il a aussi noté que `${#MDP}`, sous `LC_ALL=C`, compte des octets, alors que le message dit « caractères ».
+
+**Changements prévus** :
+- `essai` crée un dossier neuf par lancement (`mktemp -d`), donc une connexion ratée n'empêche plus la relance ;
+- la branche de connexion se choisit sur `BANC_MDP_CONNEXION`, et non plus sur `BANC`, comme `lire_mdp` le fait déjà ;
+- la longueur du mot de passe se compte en caractères (`wc -m` sous `C.UTF-8`) ;
+- le banc passe `acces_vex` et `essai` sous un pty, avec `BANC` mais sans fichier de mot de passe, et ajoute les cas de reprise. Le cas « `essai` relancé, refus » disparaît.
+
+Journal neuf : `07b-p2-pose-banc-4.log`. Le journal du troisième passage n'est pas réécrit.
+
+| Cas neuf | Prédit | Confiance |
+|---|---|---|
+| `acces_vex`, 11 caractères accentués (plus de 12 octets) | code 1, refus « moins de 12 caractères » | moyenne (locale `C.UTF-8` présente) |
+| utilisateur effacé par la racine du banc, politique modifiée dans OpenBao, `acces_vex` | code 1, « présente et différente », utilisateur toujours absent, politique toujours modifiée | haute |
+| politique remise conforme, `acces_vex` **sous pty, deux invites**, troisième mot de passe | code 0 ; « laissée » et « laissé » ; utilisateur conforme ; K6 ; deux invites vues | moyenne (pilotage du pty, `read -s` sur `/dev/tty`) |
+| connexion avec le troisième mot de passe / avec le premier | code 0 / code 2 | haute |
+| `essai`, mauvais mot de passe (fichier) | code 1, connexion refusée | haute |
+| `essai` relancé **sous pty**, invite de `bao` | code 0 ; 14 essais conformes ; invite vue ; aucun fichier dans les `HOME` des clients | moyenne (invite de `bao` sur `/dev/tty`, sortie standard vers le journal) |
+| audit : écritures (création ou mise à jour) de l'utilisateur, par identité | `root 2` | moyenne (nom de l'opération) |
+| audit : signatures réussies sur `transit/sign/vex`, par identité | `userpass-proprietaire 1` | haute |
+
+Les autres cas du troisième passage gardent leur prédiction. Le total sera fixé par un ajout daté, après le code et avant le passage.
+
+**Total prédit du quatrième passage du banc de pose** (date -u de 22:24:11 UTC, après le code, avant le passage) : **37 OK, 0 KO**. C'est 31, moins le cas « `essai` relancé, refus », qui disparaît, plus 7 contrôles : 11 caractères accentués, politique différente, reprise sous pty, connexions après la reprise, mauvais mot de passe, `essai` sous pty, un dossier par lancement. Le contrôle de connexion directe sous pty change de forme : le pilote n'affiche qu'un résumé, `pty : code 0 ; invites vues 1 ; échos du mot de passe 0`. Script éprouvé : `vex-openbao.sh` sha256 `8e2177864616a82a…`. Journal : `07b-p2-pose-banc-4.log`.
+
+**Correction avant la relance du quatrième passage du banc de pose** (date -u de 22:24:53 UTC, avant la relance) : le premier essai du quatrième passage ([journal](07b-p2-pose-banc-4-premier-passage.log)) a fini à 36 OK et 1 KO. Le KO, « rien dans le HOME du client : 10 », vient du banc. Le motif `-path '*/home/*'` correspond aussi au début de tous les chemins (`/home/<utilisateur>/…`), si bien que les 10 fichiers comptés étaient les fichiers de travail des deux dossiers d'essai. Recompté avant l'effacement du banc, chaque dossier `home` des clients contient 0 fichier. Changement : le banc compte dans `travail/essai-*/home`. Toutes les prédictions de comportement ont tenu, y compris les deux pilotages sous pty (`invites vues 2`, puis `invites vues 1`, `échos du mot de passe 0`). Le total (**37 OK, 0 KO**) ne change pas.

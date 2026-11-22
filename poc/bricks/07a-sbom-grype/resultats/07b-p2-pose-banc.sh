@@ -10,6 +10,9 @@
 # avec le mot de passe posé par le canal du script (fichier sans saut de ligne, fichier avec saut de ligne, invite de bao sous un
 # pty) ; acces_vex relancée avec un autre mot de passe (refus, ancien mot de passe toujours valable) ; fuite injectée dans une
 # copie du script (journal vidé par K6) ; essai, puis relancé ; audit du banc par identité.
+# Quatrième passage (chemins relevés par le conseiller) : acces_vex et essai pilotés sous un pty, avec BANC mais sans fichier de
+# mot de passe (branches terminal du script) ; reprise d'acces_vex après échec partiel (politique différente : refus ; politique
+# et montage déjà là : laissés) ; mot de passe de 11 caractères accentués ; essai après une connexion ratée (dossier neuf).
 # Usage (racine du dépôt) : poc/bricks/07a-sbom-grype/resultats/07b-p2-pose-banc.sh > <journal>
 set -uo pipefail
 export LC_ALL=C
@@ -63,17 +66,23 @@ esac
 FIN
   chmod +x "$BANC/bin/kubectl"
   # mots de passe du banc : 24 caractères aléatoires (base64 de 18 octets), sans saut de ligne dans les fichiers de connexion
-  m1=$(head -c 18 /dev/urandom | base64); m2=$(head -c 18 /dev/urandom | base64)
+  m1=$(head -c 18 /dev/urandom | base64); m2=$(head -c 18 /dev/urandom | base64); m3=$(head -c 18 /dev/urandom | base64)
   (umask 077
     printf '%s\n%s\n' "$m1" "$m1" > "$T/mdp/deux"; printf '%s\n%s\n' "$m1" "$m2" > "$T/mdp/differents"
     printf '%s\n%s\n' "${m1:0:11}" "${m1:0:11}" > "$T/mdp/court"; printf '%s\n%s\n' "$m2" "$m2" > "$T/mdp/autre-deux"
-    printf '%s' "$m1" > "$T/mdp/connexion"; printf '%s\n' "$m1" > "$T/mdp/connexion-nl"; printf '%s' "$m2" > "$T/mdp/autre")
-  m1=; m2=
+    printf '%s' "$m1" > "$T/mdp/connexion"; printf '%s\n' "$m1" > "$T/mdp/connexion-nl"; printf '%s' "$m2" > "$T/mdp/autre"
+    printf '%s' "$m3" > "$T/mdp/troisieme"; printf '%s\n%s\n' "éééééééééé1" "éééééééééé1" > "$T/mdp/court-accentue")
+  m1=; m2=; m3=
 
   lancer() { # cas étape [VAR=valeur…] : script du patch avec BANC ; sortie et journal copiés ; rend le code
     local cas=$1 e=$2 c=0; shift 2
     : > "$BANC/resultats/vex-openbao-$e.log"
-    env BANC="$BANC" "$@" bash "${SCRIPT:-$S}" "$e" > "$T/sorties/$cas.out" 2>&1 < /dev/null || c=$?
+    if [ -n "${PTY_MOTIFS:-}" ]; then   # quatrième passage : terminal piloté ; résumé du pty, puis journal de l'étape
+      env BANC="$BANC" "$@" python3 -I "$T/pty.py" "$PTY_MDP" "$PTY_MOTIFS" -- bash "${SCRIPT:-$S}" "$e" > "$T/sorties/$cas.out" 2>&1 < /dev/null || c=$?
+      cat "$BANC/resultats/vex-openbao-$e.log" >> "$T/sorties/$cas.out"
+    else
+      env BANC="$BANC" "$@" bash "${SCRIPT:-$S}" "$e" > "$T/sorties/$cas.out" 2>&1 < /dev/null || c=$?
+    fi
     cp "$BANC/resultats/vex-openbao-$e.log" "$T/journaux/$cas.log"
     echo "## cas $cas (vex-openbao.sh $e) : code $c" >&2
     sed 's/^/    > /' "$T/sorties/$cas.out" >&2
@@ -117,8 +126,11 @@ FIN
   attendu "acces_vex, saisies différentes : code ; refus" "code $c ; $(n differents 'REFUS : les deux saisies diffèrent')" "code 1 ; 1"
   c=$(lancer court acces_vex BANC_MDP="$T/mdp/court")
   attendu "acces_vex, 11 caractères : code ; refus" "code $c ; $(n court 'REFUS : mot de passe de moins de 12 caractères')" "code 1 ; 1"
-  attendu "après les trois refus : politiques et méthodes inchangées ; aucun journal d'acces_vex" \
-    "$([ "$(politiques)" = "$p0" ] && [ "$(methodes)" = "$m0" ] && echo inchangées || echo changées) ; $(cat "$T/journaux/sans-terminal.log" "$T/journaux/differents.log" "$T/journaux/court.log" | grep -c .)" "inchangées ; 0"
+  c=$(lancer court-accentue acces_vex BANC_MDP="$T/mdp/court-accentue")
+  attendu "acces_vex, 11 caractères accentués ($(head -1 "$T/mdp/court-accentue" | tr -d '\n' | wc -c) octets) : code ; refus" \
+    "code $c ; $(n court-accentue 'REFUS : mot de passe de moins de 12 caractères')" "code 1 ; 1"
+  attendu "après les quatre refus : politiques et méthodes inchangées ; aucun journal d'acces_vex" \
+    "$([ "$(politiques)" = "$p0" ] && [ "$(methodes)" = "$m0" ] && echo inchangées || echo changées) ; $(cat "$T/journaux/sans-terminal.log" "$T/journaux/differents.log" "$T/journaux/court.log" "$T/journaux/court-accentue.log" | grep -c .)" "inchangées ; 0"
 
   echo "## 4. acces_vex conforme"
   c=$(lancer acces_vex acces_vex BANC_MDP="$T/mdp/deux")
@@ -133,15 +145,18 @@ FIN
   attendu "connexion, fichier sans saut de ligne final" "$(connexion "$T/mdp/connexion")" "code 0"
   attendu "connexion, fichier avec saut de ligne final" "$(connexion "$T/mdp/connexion-nl")" "code 2"
   cat > "$T/pty.py" <<'PY'
-import os, pty, select, sys
+# pty.py <fichier du mot de passe> <motif1|motif2…> -- commande… : répond le mot de passe (suivi de \r) à chaque invite, dans
+# l'ordre, 0,5 s après l'avoir vue ; n'affiche que le résumé (jamais la sortie de la commande) ; sort avec le code de la commande
+import os, pty, select, sys, time
 mdp = open(sys.argv[1], "rb").read()
+motifs = [m.encode() for m in sys.argv[2].split("|")]
+cmd = sys.argv[sys.argv.index("--") + 1:]
 pid, fd = pty.fork()
 if pid == 0:
-    os.execvp(sys.argv[2], sys.argv[2:])
-vu = b""
-envoye = False
+    os.execvp(cmd[0], cmd)
+vu, tout, k = b"", b"", 0
 while True:
-    r, _, _ = select.select([fd], [], [], 30)
+    r, _, _ = select.select([fd], [], [], 60)
     if not r:
         break
     try:
@@ -150,17 +165,20 @@ while True:
         break
     if not d:
         break
-    if not envoye:
-        vu += d
-        if b"assword" in vu:
-            os.write(fd, mdp + b"\r")
-            envoye = True
+    tout += d
+    vu += d
+    if k < len(motifs) and motifs[k] in vu:
+        time.sleep(0.5)
+        os.write(fd, mdp + b"\r")
+        k, vu = k + 1, b""
 _, st = os.waitpid(pid, 0)
-print("code", os.waitstatus_to_exitcode(st), ";", "invite vue" if envoye else "invite absente")
+c = os.waitstatus_to_exitcode(st)
+print("pty : code", c, "; invites vues", k, "; échos du mot de passe", tout.count(mdp))
+sys.exit(c if 0 <= c < 256 else 1)
 PY
   attendu "connexion par l'invite de bao sous un pty (canal du propriétaire)" \
-    "$(HOME=$T/proprio BAO_ADDR=$A BAO_CACERT=$BANC/tls/vault-ca.pem python3 -I "$T/pty.py" "$T/mdp/connexion" "$BAO" login -method=userpass -no-store -format=json username=proprietaire)" \
-    "code 0 ; invite vue"
+    "$(HOME=$T/proprio BAO_ADDR=$A BAO_CACERT=$BANC/tls/vault-ca.pem python3 -I "$T/pty.py" "$T/mdp/connexion" Password -- "$BAO" login -method=userpass -no-store -format=json username=proprietaire)" \
+    "pty : code 0 ; invites vues 1 ; échos du mot de passe 0"
   attendu "rien écrit dans le HOME des connexions" "$(find "$T/proprio" -type f | grep -c .)" 0
 
   echo "## 6. acces_vex relancée avec un autre mot de passe"
@@ -176,8 +194,27 @@ PY
     "code $c ; $(grep -c . "$T/journaux/fuite.log") $(grep -c '^KO   K6 : valeur du mot de passe dans le journal : journal vidé$' "$T/journaux/fuite.log") ; $(head -1 "$T/mdp/deux" | tr -d '\n' | grep -c -F -f - "$T/sorties/fuite.out")" \
     "code 1 ; 1 1 ; 0"
 
+  echo "## 7b. reprise d'acces_vex après échec partiel (quatrième passage)"
+  sc() { grep -v -e '^#' -e '^[[:space:]]*$' | sha256sum | cut -c1-16; }
+  rb delete auth/userpass/users/proprietaire > /dev/null
+  { cat "$B/politique/vex-signature.hcl"; printf 'path "transit/keys/scanner" {\n  capabilities = ["read"]\n}\n'; } | rb policy write vex-signature - > /dev/null
+  hm=$(rb policy read vex-signature | sc)
+  c=$(lancer differente acces_vex BANC_MDP="$T/mdp/deux")
+  attendu "politique différente dans OpenBao, utilisateur absent : code ; refus ; utilisateur ; politique" \
+    "code $c ; $(n differente 'KO   politique vex-signature présente et différente du fichier : aucune écriture') ; $(rb read auth/userpass/users/proprietaire > /dev/null 2>&1 && echo présent || echo absent) ; $([ "$(rb policy read vex-signature | sc)" = "$hm" ] && echo inchangée || echo changée)" \
+    "code 1 ; 1 ; absent ; inchangée"
+  rb policy write vex-signature "$B/politique/vex-signature.hcl" > /dev/null
+  c=$(PTY_MDP=$T/mdp/troisieme PTY_MOTIFS='sans écho|une seconde fois' lancer reprise-pty acces_vex)
+  attendu "reprise sous pty (deux invites) : code ; pty ; laissée ; laissé ; utilisateur ; K6 ; KO" \
+    "code $c ; $(sed -n 1p "$T/sorties/reprise-pty.out") ; $(n reprise-pty 'OK   politique vex-signature déjà présente et identique au fichier : laissée') $(n reprise-pty 'OK   montage userpass/ déjà présent : laissé') $(n reprise-pty 'OK   utilisateur proprietaire (politiques, sans default, durée, durée maximale) : vex-signature,true,900,900') ; $(n reprise-pty 'OK   K6 : ') ; $(nko reprise-pty)" \
+    "code 0 ; pty : code 0 ; invites vues 2 ; échos du mot de passe 0 ; 1 1 1 ; 1 ; 0"
+  attendu "après la reprise : troisième mot de passe ; premier mot de passe" "$(connexion "$T/mdp/troisieme") ; $(connexion "$T/mdp/connexion")" "code 0 ; code 2"
+
   echo "## 8. essai du propriétaire"
-  c=$(lancer essai essai BANC_MDP_CONNEXION="$T/mdp/connexion")
+  c=$(lancer essai-faux essai BANC_MDP_CONNEXION="$T/mdp/autre")
+  attendu "essai, mauvais mot de passe : code ; connexion refusée" "code $c ; $(n essai-faux 'KO   connexion : code 2')" "code 1 ; 1"
+  c=$(PTY_MDP=$T/mdp/troisieme PTY_MOTIFS=Password lancer essai essai)
+  attendu "essai relancé sous pty (invite de bao) : pty" "$(sed -n 1p "$T/sorties/essai.out")" "pty : code 0 ; invites vues 1 ; échos du mot de passe 0"
   attendu "essai : code ; connexion ; 900 s ; essais conformes ; KO" \
     "code $c ; $(n essai 'OK   connexion : code 0 ; politiques vex-signature ; durée 900 s ; secret dans un fichier 600') $(n essai 'OK   secret du propriétaire : vex-signature seule, 900 s') ; $(grep -c '^OK   essai ' "$T/sorties/essai.out") ; $(nko essai)" \
     "code 0 ; 1 1 ; 14 ; 0"
@@ -185,17 +222,16 @@ PY
     "$(n essai 'OK   openssl : signature de la clé vex vérifiée') $(n essai 'OK   témoin : même signature sur une autre entrée refusée') $(n essai 'OK   cosign public-key --key hashivault://vex : code 0, SPKI égal') $(n essai 'OK   révocation de soi : code 0') $(n essai 'OK   signature avec la clé vex après révocation : REFUSE')" \
     "1 1 1 1 1"
   attendu "essai : redirection fermée ; K4 ; K5 ; fichier du secret effacé ; rien dans le HOME du client" \
-    "$(n essai 'OK   redirection fermée') ; $(n essai 'OK   K4 : ') ; $(n essai 'OK   K5 : ') ; $(n essai 'OK   fichier du secret du propriétaire effacé') ; $(find "$BANC/travail/home" -type f | grep -c .)" \
+    "$(n essai 'OK   redirection fermée') ; $(n essai 'OK   K4 : ') ; $(n essai 'OK   K5 : ') ; $(n essai 'OK   fichier du secret du propriétaire effacé') ; $(cat <(find "$BANC"/travail/essai-*/home -type f) | grep -c .)" \
     "1 ; 1 ; 1 ; 1 ; 0"
-  c=$(lancer essai-relance essai BANC_MDP_CONNEXION="$T/mdp/connexion")
-  attendu "essai relancé : code ; refus « existe déjà »" "code $c ; $(n essai-relance "existe déjà (essai précédent ?) : rien n'est écrasé")" "code 1 ; 1"
+  attendu "dossiers d'essai : un par lancement ; fichier du secret restant" "$(find "$BANC/travail" -mindepth 1 -maxdepth 1 -type d -name 'essai-*' | grep -c .) ; $(find "$BANC/travail" -name secret | grep -c .)" "2 ; 0"
 
   echo "## 9. audit du banc"
   compte_audit() { # filtre jq sur les réponses : « nom affiché nombre », triés, séparés par des virgules
     jq -r "select(.type == \"response\") | select($1) | .auth.display_name" "$T/bao-audit.log" | sort | uniq -c | awk '{print $2 " " $1}' | paste -sd, -
   }
   attendu "audit : écriture de l'utilisateur proprietaire, par identité" \
-    "$(compte_audit '.request.path == "auth/userpass/users/proprietaire" and .request.operation != "read" and ((.error // "") == "")')" "root 1"
+    "$(compte_audit '.request.path == "auth/userpass/users/proprietaire" and (.request.operation == "create" or .request.operation == "update") and ((.error // "") == "")')" "root 2"
   attendu "audit : signatures réussies sur transit/sign/vex, par identité" \
     "$(compte_audit '(.request.path | startswith("transit/sign/vex")) and ((.error // "") == "")')" "userpass-proprietaire 1"
   attendu "faux kubectl : appels inattendus" "$(grep -c -v -e '^exec -i -n openbao openbao-0 -- ' -e '^port-forward -n openbao pod/openbao-0 --address 127.0' "$T/appels")" 0

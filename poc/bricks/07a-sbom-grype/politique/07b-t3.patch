@@ -1326,8 +1326,8 @@ diff -ruN a/poc/bricks/07a-sbom-grype/systemd/entrees-scan.py b/poc/bricks/07a-s
              os.replace(marque + ".neuf", marque)
 diff -ruN a/poc/bricks/07a-sbom-grype/vex-openbao.sh b/poc/bricks/07a-sbom-grype/vex-openbao.sh
 --- a/poc/bricks/07a-sbom-grype/vex-openbao.sh	1970-01-01 01:00:00.000000000 +0100
-+++ b/poc/bricks/07a-sbom-grype/vex-openbao.sh	2026-11-22 23:15:13.096603631 +0100
-@@ -0,0 +1,372 @@
++++ b/poc/bricks/07a-sbom-grype/vex-openbao.sh	2026-11-22 23:22:18.293281991 +0100
+@@ -0,0 +1,381 @@
 +#!/usr/bin/env bash
 +# Brique 07b, tranche 3, pièce 2 de la pose : clé Transit « vex », politique vex-signature et identité du propriétaire par
 +# userpass dans l'OpenBao du cluster (décision du propriétaire du 22/11/2026 : « userpass puis Keycloak à part »). Écrit à sec
@@ -1349,16 +1349,16 @@ diff -ruN a/poc/bricks/07a-sbom-grype/vex-openbao.sh b/poc/bricks/07a-sbom-grype
 +#              contournement par la racine que l'audit doit montrer, note du passage 22). Le mot de passe passe sur l'entrée
 +#              standard de kubectl exec, puis sur celle de « bao write … password=- » dans le pod, sans saut de ligne ; jamais en
 +#              argument, jamais affiché.
-+#   essai      À LANCER PAR LE PROPRIÉTAIRE DANS SON TERMINAL, après acces_vex. Redirection 127.0.0.1:<port libre> vers
-+#              openbao-0:8200 (o5-cosign.sh de la 09), fermée à la sortie ; connexion « bao login -method=userpass -no-store »
-+#              par l'invite de bao (mot de passe tapé par le propriétaire) ; jeton dans un fichier 0600 du dossier de travail,
-+#              effacé à la fin. Essais : lecture de la clé vex et signature acceptées (signature vérifiée par openssl avec la clé
++#   essai      À LANCER PAR LE PROPRIÉTAIRE DANS SON TERMINAL, après acces_vex (refus si /dev/tty est illisible). Redirection
++#              127.0.0.1:<port libre> vers openbao-0:8200 (o5-cosign.sh de la 09), fermée à la sortie ; connexion « bao login
++#              -method=userpass -no-store » par l'invite de bao (mot de passe tapé par le propriétaire) ; jeton dans un fichier
++#              0600 d'un dossier de travail neuf à chaque lancement (une connexion ratée n'empêche pas la relance), effacé à la fin. Essais : lecture de la clé vex et signature acceptées (signature vérifiée par openssl avec la clé
 +#              publique archivée, témoin sur une autre entrée refusé) ; autres clés, export, configuration et sauvegarde de vex,
 +#              kv, politiques, secret enfant et consultation de soi refusés ; cosign public-key --key hashivault://vex égale à la
 +#              clé archivée (SPKI) ; révocation de soi acceptée ; signature après révocation refusée.
 +# Banc : BANC=<dossier> remplace kubectl, le jeton root, la CA et le nom TLS par ceux du banc ; journal dans ce dossier. Seulement
 +# avec BANC, BANC_MDP (deux lignes : saisies d'acces_vex) et BANC_MDP_CONNEXION (mot de passe de la connexion d'essai, sans saut
-+# de ligne) remplacent le terminal.
++# de ligne) remplacent le terminal ; sans elles, le banc pilote le terminal par un pty.
 +# Usage (racine du dépôt) : poc/bricks/07a-sbom-grype/vex-openbao.sh <étape>   (journal : resultats/vex-openbao-<étape>.log)
 +# Les lignes de journal évitent les mots « jeton » et « token », que le masquage remplace (le jeton y est dit « secret »).
 +set -euo pipefail
@@ -1435,7 +1435,7 @@ diff -ruN a/poc/bricks/07a-sbom-grype/vex-openbao.sh b/poc/bricks/07a-sbom-grype
 +}
 +
 +lire_mdp() { # MDP ← mot de passe saisi deux fois ; code 1 et motif (sans la valeur) si refus
-+  local src m2=
++  local src n m2=''
 +  if [ -n "${BANC:-}" ] && [ -n "${BANC_MDP:-}" ]; then src=$BANC_MDP; else src=/dev/tty; fi
 +  if ! (: < "$src") 2>/dev/null; then
 +    echo "REFUS : $src illisible : acces_vex se lance dans le terminal du propriétaire, pas depuis une session sans terminal"; return 1
@@ -1449,8 +1449,10 @@ diff -ruN a/poc/bricks/07a-sbom-grype/vex-openbao.sh b/poc/bricks/07a-sbom-grype
 +  exec 3<&-
 +  if [ "$MDP" != "$m2" ]; then MDP=; m2=; echo "REFUS : les deux saisies diffèrent ; rien n'est écrit"; return 1; fi
 +  m2=
-+  if [ "${#MDP}" -lt 12 ]; then MDP=; echo "REFUS : mot de passe de moins de 12 caractères ; rien n'est écrit"; return 1; fi
-+  echo "OK   mot de passe saisi deux fois, identique, ${#MDP} caractères (valeur jamais affichée)"
++  # caractères, pas octets (LC_ALL=C compterait les octets) ; printf est interne : la valeur ne passe pas en argument
++  n=$(printf '%s' "$MDP" | LC_ALL=C.UTF-8 wc -m)
++  if [ "$n" -lt 12 ]; then MDP=; echo "REFUS : mot de passe de moins de 12 caractères ; rien n'est écrit"; return 1; fi
++  echo "OK   mot de passe saisi deux fois, identique, $n caractères (valeur jamais affichée)"
 +}
 +
 +ouvrir() { # redirection 127.0.0.1:<port libre> → openbao-0:8200 ; PORT et PF (o5-cosign.sh)
@@ -1592,12 +1594,11 @@ diff -ruN a/poc/bricks/07a-sbom-grype/vex-openbao.sh b/poc/bricks/07a-sbom-grype
 +  [ -f "$CA" ] || { ko "CA absente : $CA"; return 1; }
 +  [ "$(sha256sum < "$BAO" | cut -c1-64)" = "$BAO_SHA256" ] && echo "OK   bao de l'hôte : empreinte $BAO_SHA256 ($("$BAO" version | head -1))" \
 +    || { ko "bao de l'hôte : empreinte différente de $BAO_SHA256"; return 1; }
-+  [ ! -e "$W" ] || { ko "${W} existe déjà (essai précédent ?) : rien n'est écrasé"; return 1; }
-+  (umask 077 && mkdir -p "$W/home")
++  (umask 077 && mkdir -p "$W/home")   # W : dossier neuf de ce lancement (mktemp), une connexion ratée n'empêche pas la relance
 +  trap fermer EXIT
 +  ouvrir || return 1
 +  echo "### connexion du propriétaire (userpass, -no-store)"
-+  if [ -n "${BANC:-}" ]; then
++  if [ -n "${BANC:-}" ] && [ -n "${BANC_MDP_CONNEXION:-}" ]; then
 +    client "$BAO" login -method=userpass -no-store -format=json username="$UTIL" password=@"$BANC_MDP_CONNEXION" > "$W/connexion.json" 2> "$W/connexion.err"; c=$?
 +  else
 +    printf 'connexion à OpenBao (userpass, %s) : bao demande le mot de passe\n' "$UTIL" > /dev/tty
@@ -1665,7 +1666,14 @@ diff -ruN a/poc/bricks/07a-sbom-grype/vex-openbao.sh b/poc/bricks/07a-sbom-grype
 +      lire_mdp || exit 1
 +      set -e
 +    fi
-+    if [ "$e" = essai ]; then if [ -n "${BANC:-}" ]; then COSIGN=$BANC/bin/cosign; else COSIGN=$(cd "$TOP" && mise which cosign); fi; fi
++    if [ "$e" = essai ]; then
++      if [ -n "${BANC:-}" ]; then COSIGN=$BANC/bin/cosign; else COSIGN=$(cd "$TOP" && mise which cosign); fi
++      if { [ -z "${BANC:-}" ] || [ -z "${BANC_MDP_CONNEXION:-}" ]; } && ! (: < /dev/tty) 2>/dev/null; then
++        echo "REFUS : /dev/tty illisible : essai se lance dans le terminal du propriétaire, pas depuis une session sans terminal"; exit 1
++      fi
++      mkdir -p "$W"
++      W=$(umask 077 && mktemp -d "$W/essai-$(date -u +%Y%m%dT%H%M%SZ)-XXXX"); JT=$W/secret
++    fi
 +    mkdir -p "$R"
 +    L=$R/vex-openbao-$e.log
 +    set +e
@@ -1681,6 +1689,7 @@ diff -ruN a/poc/bricks/07a-sbom-grype/vex-openbao.sh b/poc/bricks/07a-sbom-grype
 +    n=$(tr -d '\n' < "$S8/openbao-root.token" | grep -c -F -f - "$L" || true)   # valeur lue par le script, jamais affichée
 +    [ "$n" = 0 ] || vider "KO   K4 : valeur du jeton root dans le journal : journal vidé"
 +    echo "OK   K4 : valeur du jeton root absente du journal" >> "$L"
++    [ -e "$JT" ] && [ ! -s "$JT" ] && rm -f -- "$JT"   # connexion ratée : fichier vide
 +    if [ -s "$JT" ]; then
 +      n=$(tr -d '\n' < "$JT" | grep -c -F -f - "$L" || true)
 +      [ "$n" = 0 ] || vider "KO   K5 : valeur du secret du propriétaire dans le journal : journal vidé"
