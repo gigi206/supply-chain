@@ -1380,3 +1380,29 @@ Le patch devient `78dce9acc3953267…` (11 fichiers) ; il s'applique à une copi
 **Heures mesurées** :
 - Segment : de 22:05:47 UTC à 22:25:52 UTC, compté d'un seul tenant.
 - Somme des enveloppes de la 07b : au plus 11 h 27 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Pièce 2 posée dans le cluster : clé `vex` (note de 2026-11-22T22:37:49Z ; accord du propriétaire ; `acces_vex` et `essai` en attente)
+
+**Accord** (verbatim) : « Oui », à la question « Je pose la pièce 2 dans l'OpenBao du cluster ? ». Il couvre quatre choses :
+1. reporter les deux fichiers dans le dépôt ;
+2. lancer `releve` et `cle_vex` par `kubectl exec` avec le jeton racine ;
+3. le propriétaire lance de sa main `acces_vex` et `essai` ;
+4. l'auditeur compte `userpass-proprietaire` dans Loki.
+
+**Fait par la session** :
+- **Report** (a614595b) : `vex-openbao.sh` (sha256 `8e217786…`) et `politique/vex-signature.hcl` (`b08375bf…`), tels qu'éprouvés au quatrième passage du banc. Ils sortent du patch, qui passe à 9 fichiers (`c6d4b8a1…`). Le patch s'applique à une copie du dépôt et redonne l'arbre `b`.
+- **Prédiction** écrite avant tout lancement (22:36:30 UTC).
+- [`releve`](vex-openbao-releve.log), de 22:36:34 à 22:36:36 UTC : 7 OK, 0 KO, conforme à la prédiction. OpenBao 2.7.2, initialisé, descellé ; clés `chains`, `lien`, `scanner`, `tsa` (version 1, non exportables) ; `vex`, clé publique, politique `vex-signature` et `userpass/` absents ; seule méthode hors la méthode native : `jwt/`. Neuf politiques, relevées telles quelles.
+- [`cle_vex`](vex-openbao-cle_vex.log), de 22:36:39 à 22:36:43 UTC : 7 OK, 0 KO. Clé `vex` créée, `ecdsa-p256,false,false,false,1,true`. Clé publique P-256 exportée dans [`vex-cle-publique.pem`](vex-cle-publique.pem) (fichier sha256 `79f7eece…`, SPKI sha256 `2b81df72314a72e85276ce55aa6625306b47ab37e2c9e2a28878ce374b9df1a9`). Seule différence : `vex` ajoutée, les quatre autres clés sont inchangées. K3 et K4 tenus.
+
+**Reste, de la main du propriétaire** :
+- `acces_vex` : politique `vex-signature`, nouvelle méthode `userpass/`, utilisateur `proprietaire`, mot de passe choisi par lui ;
+- puis `essai` : redirection 127.0.0.1 le temps de l'étape, connexion, signature d'essai, refus croisés, révocation.
+
+Ensuite seulement viendra le compte de l'auditeur dans Loki.
+
+**Ce que la clé ne fait pas encore** : seule la racine peut signer avec elle tant que `vex-signature` n'est pas posée. Les fichiers versionnés des sept politiques non natives (`chains-signature`, `chains-zot`, `horodatage-zot`, `lien-signature`, `scan-zot`, `scanner-signature`, `tsa-signature`) ne citent ni `vex` ni de joker sous `transit/`. Les versions déployées n'ont pas été relues ici, et la politique native `default` non plus. Personne ne la lit non plus : la ConfigMap `scan-config` n'a pas `vex.pub` (pièce 5, non posée).
+
+**Heures mesurées** :
+- Segment : de 22:36:02 UTC à 22:37:49 UTC, compté d'un seul tenant.
+- Somme des enveloppes de la 07b : au plus 11 h 28 pour 10 h estimées (demande au propriétaire avant 20 h).

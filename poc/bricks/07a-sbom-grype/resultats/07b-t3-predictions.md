@@ -639,3 +639,17 @@ Les autres cas du troisième passage gardent leur prédiction. Le total sera fix
 **Total prédit du quatrième passage du banc de pose** (date -u de 22:24:11 UTC, après le code, avant le passage) : **37 OK, 0 KO**. C'est 31, moins le cas « `essai` relancé, refus », qui disparaît, plus 7 contrôles : 11 caractères accentués, politique différente, reprise sous pty, connexions après la reprise, mauvais mot de passe, `essai` sous pty, un dossier par lancement. Le contrôle de connexion directe sous pty change de forme : le pilote n'affiche qu'un résumé, `pty : code 0 ; invites vues 1 ; échos du mot de passe 0`. Script éprouvé : `vex-openbao.sh` sha256 `8e2177864616a82a…`. Journal : `07b-p2-pose-banc-4.log`.
 
 **Correction avant la relance du quatrième passage du banc de pose** (date -u de 22:24:53 UTC, avant la relance) : le premier essai du quatrième passage ([journal](07b-p2-pose-banc-4-premier-passage.log)) a fini à 36 OK et 1 KO. Le KO, « rien dans le HOME du client : 10 », vient du banc. Le motif `-path '*/home/*'` correspond aussi au début de tous les chemins (`/home/<utilisateur>/…`), si bien que les 10 fichiers comptés étaient les fichiers de travail des deux dossiers d'essai. Recompté avant l'effacement du banc, chaque dossier `home` des clients contient 0 fichier. Changement : le banc compte dans `travail/essai-*/home`. Toutes les prédictions de comportement ont tenu, y compris les deux pilotages sous pty (`invites vues 2`, puis `invites vues 1`, `échos du mot de passe 0`). Le total (**37 OK, 0 KO**) ne change pas.
+
+## Ajout avant la pose réelle de la pièce 2 (date -u de 22:36:30 UTC, le 2026-11-22, avant tout lancement sur le cluster)
+
+**Accord** du propriétaire, « Oui » (22/11/2026), pour quatre choses : reporter les deux fichiers de la pièce 2 dans le dépôt (fait, a614595b) ; lancer `releve` puis `cle_vex` par `kubectl exec` avec le jeton racine ; lancer, de sa main, `acces_vex` puis `essai` ; puis le compte de `userpass-proprietaire` dans Loki par l'auditeur. Ici, seuls `releve` et `cle_vex` sont lancés par la session.
+
+| Étape et contrôle | Prédit | Confiance |
+|---|---|---|
+| `releve` : état | OpenBao 2.7.2, initialisé, descellé | haute |
+| `releve` : clés Transit | `chains`, `lien`, `scanner`, `tsa`, chacune ecdsa-p256, non exportable | moyenne (une rotation non notée est possible) |
+| `releve` : absences | `vex`, `resultats/vex-cle-publique.pem`, politique `vex-signature`, montage `userpass/` : absents | haute |
+| `releve` : méthodes d'authentification hors la méthode native | `jwt/ jwt` seule | moyenne |
+| `releve` : code ; KO | code 0 ; 0 KO | haute |
+| `cle_vex` | code 0 ; `ecdsa-p256,false,false,false,1,true` ; clé publique P-256 ; seule différence : `vex` ajoutée | haute |
+| journaux | K3 et K4 : OK | haute |

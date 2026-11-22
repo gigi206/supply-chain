@@ -1,0 +1,17 @@
+étape releve commencée : 2026-11-22T22:36:34Z ; vex-openbao.sh 8e2177864616a82a…
+OpenBao : version 2.7.2, initialisé true, scellé false
+OK   OpenBao initialisé et descellé
+clés Transit (nom type dernière_version exportable) :
+     chains ecdsa-p256 1 false
+     lien ecdsa-p256 1 false
+     scanner ecdsa-p256 1 false
+     tsa ecdsa-p256 1 false
+OK   transit/keys/vex absente
+OK   resultats/vex-cle-publique.pem absent
+politiques : chains-signature chains-zot default horodatage-zot lien-signature root scan-zot scanner-signature tsa-signature
+OK   politique vex-signature absente
+méthodes d'authentification (hors la méthode native) : jwt/ jwt
+OK   montage userpass/ absent
+étape releve finie : 2026-11-22T22:36:36Z
+OK   K3 : aucune ligne de bloc privé dans le journal
+OK   K4 : valeur du jeton root absente du journal
