@@ -1152,3 +1152,41 @@ Heure du scan témoin : 17:23:25 UTC le 21/11. Résultats pour l'entrée `GHSA-m
 **Heures mesurées** :
 - Ce segment : de 18:44:41 UTC à 19:52:55 UTC, compté d'un seul tenant.
 - Somme des enveloppes de la 07b : au plus 9 h 00 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Pièces de la pose : fichiers du patch rattachés, tableau corrigé (note de 2026-11-22T20:09:09Z ; lecture seule, rien posé ; relue par le conseiller)
+
+**Pourquoi** : le tableau des 9 pièces date du 21/11. Le patch a changé depuis, jusqu'au passage 19 (`9fcb4b40dc31c95d…`). Les accords nommés se donneront sur ce tableau, il doit donc dire ce que chaque pièce touche.
+
+**Fichiers du patch, rattachés** (lus dans `07b-t3.patch`, 9 fichiers, aucun orphelin) :
+
+| Fichier | Pièce |
+|---|---|
+| `outil/main.go` | 3 (image `outils-scan`) |
+| `politique/scanner.sh` | 5 |
+| `plateforme.sh`, fonction `cm_scan` (clé `vex.pub` dans `scan-config`) | 5 |
+| `politique/porte/policy-scan.yaml`, `scan.rego`, `scan_test.rego` | 1 et 6 |
+| `systemd/entrees-scan.py` | 7 |
+| `entrees-scan.sh` (étapes `pose` et `verif`) | 7 |
+| `signer-vex.sh` (fichier neuf) | 8 |
+| `plateforme.sh`, `g5_regles`, contre-épreuves de G5, témoins de G6 | 9 |
+
+**Corrections du tableau du 21/11** :
+- **Pièce 7** : « séries de 20 à 36 » est périmé. Le patch attend **44 séries** (22 par dépôt, deux dépôts), dans `pose` comme dans `verif`. La pièce comprend aussi `entrees-scan.sh`, qui la pose et la vérifie.
+- **Pièce 9** : `rejeu.sh` n'est pas dans le patch. Il appelle `g6_temoins` et, depuis la note du 21/11 à 22:02:57Z, `entrees-scan.sh pose`. La pièce 9 ne touche donc que `plateforme.sh`.
+- **Pièce 5** : elle touche aussi `plateforme.sh` (`cm_scan` ajoute `vex.pub` quand la clé publique existe ; sans elle, `scanner.sh` scanne sans VEX et le journal le dit).
+
+**Pièces 6 et 9, lues** : G5 et G6 copient `policy-scan.yaml` et `scan.rego` du **dépôt** dans la racine de la porte. Ils prennent la clé du scanner dans `resultats/` (témoin `porte` de G6) et lisent les images de la porte dans Zot, en anonyme. Ils ne lisent jamais la ConfigMap déployée. La pièce 6 (ConfigMap dans le cluster) et la pièce 9 ne sont donc pas liées par la ConfigMap. Toutes deux supposent que le patch est appliqué au dépôt.
+
+**Ce qui est posable avant le 29/11** : les pièces 3 et 4 écrivent dans le vrai Zot (G7). La pièce 5 suit la 3, la 8 suit la 2 et la 4, et le repli se tranche avec le scanner. Restent :
+- **Pièce 2** : elle n'a **ni script ni mode d'authentification du propriétaire**. `signer-vex.sh` attend `VAULT_ADDR` et le jeton d'OpenBao de l'appelant. La clé `vex` et sa politique se calqueraient sur la clé `scanner` de G3 (ajout pur). En revanche, le jeton du propriétaire est un choix : qui l'émet, avec quelle durée. Si les scripts du PoC peuvent l'émettre avec le jeton racine, « réservé au propriétaire » n'est que nominal. La signature avec `hashivault://vex` n'a jamais été essayée (point 6 de la note de 17:51:53Z du 21/11). Elle se mesure à sec sur un OpenBao 2.7.2 jetable, tiré de l'image signée déjà en miroir. Ce sera le passage suivant.
+- **Pièce 7** : `entrees-scan.py` neuf écrit 0 pour le bloc `vex` absent des prédicats d'avant la tranche 3 (lu dans le code, non mesuré sur la VM). Posée seule, elle n'apporterait que 24 séries à zéro. Elle obligerait aussi à appliquer deux fichiers du patch au dépôt, puis à régénérer le patch. Enfin, une nouvelle `pose` pourrait réémettre dans Loki les lignes d'un scan déjà listé, ce qui doublerait le compte sur 24 h (non vérifié). **Recommandation : attendre**, et la poser avec les autres.
+- **Pièces 6 et 9** : rien de mesurable tant que le scanner n'émet pas `vex`.
+
+**Hors pose** :
+- **Heure de signature de confiance (TSA)** : classe 2 de l'inventaire, **écrite, non essayée**. Elle amende le choix 3 et l'ADR 0003, et la TSA du cluster demande un accord.
+- **G7, balayage n°3** (attendu le 22/11 vers 22:30 UTC) : il n'est pas relevé ce soir. La tâche du 29/11 lit les n°2 à n°9 et ne dépend pas du nombre de séries.
+
+**Heures mesurées** :
+- Enveloppe fermée à 20:06:09 UTC : au plus 9 h 14 (33187 s).
+- Segment suivant : de 20:06:09 UTC à 20:09:09 UTC, compté d'un seul tenant.
+- Somme des enveloppes de la 07b : au plus 9 h 17 pour 10 h estimées (demande au propriétaire avant 20 h).
