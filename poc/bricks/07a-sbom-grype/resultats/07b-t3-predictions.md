@@ -496,3 +496,37 @@ Les témoins de rétractation du banc reçoivent donc un `action_statement` par 
 **Total prédit** : 224 OK, 0 KO (192, plus 3 pour la variante, 1 de compatibilité, 11 pour la table existante, 16 pour les cas neufs sur deux binaires et 2 pour l'heure illisible). Patch inchangé : `9fcb4b40dc31c95d…`.
 
 **Correction avant le vingtième passage** (date -u de 19:40:00 UTC, avant tout lancement) : la table existante du remplacement compte 12 cas, et non 11 (j'avais oublié `affected-autre-sous`). Le total prédit devient **225 OK, 0 KO**. Les autres prédictions ne changent pas.
+
+## Ajout avant le vingt-et-unième passage : pièce 2, clé Transit `vex` (date -u de 20:12:52 UTC, le 2026-11-22, avant tout code)
+
+**Objet** : mesurer à sec la signature avec `hashivault://vex`, jamais essayée (point 6 de la note du 21/11 à 17:51:53Z). C'est la pièce 2 de la pose, mesurée dans un OpenBao jetable, sans réseau, jamais dans celui du cluster. Mesure **synthétique**.
+
+**Préparation, hors banc** (`resultats/07b-p2-bao.sh`, journal `07b-p2-bao.log`) : lecture anonyme de la copie de l'image OpenBao 2.7.2 en miroir dans Zot (`amont/openbao/openbao`, digest épinglé de la 08). Prédictions :
+- l'index signé référence le manifeste linux/amd64 `sha256:a78eb12a…` ;
+- la signature de l'index est revérifiée sur la copie de Zot avec l'identité de la 08 (workflow `release-images.yml` au tag v2.7.2, commit `9e0a0d3c…`, déclencheur `release`) ;
+- `usr/bin/bao` est extrait dans `~/.cache/supply-chain-poc/07a/bao-2.7.2/` ; empreinte `9c5f36287c673f38…` (relevée par un essai d'extraction dans ce segment, dossier `p2-essai` effacé ensuite) ;
+- `bao version` donne v2.7.2, commit `9e0a0d3c3504a0a00b45e61355afac5e35c78379`.
+
+Confiance haute, sauf pour la signature : moyenne, car elle n'a été revérifiée qu'à la 08 et dépend de la racine TUF en cache.
+
+**Banc, partie A** (hôte) : empreinte du binaire `9c5f36287c673f38` et `v2.7.2 (9e0a0d3c…)`, soit 2 OK. Confiance haute.
+
+**Banc, partie B** (espace de noms réseau vide) : serveur `bao server -dev` sur 127.0.0.1:18200. Le jeton racine est écrit par le serveur dans un `HOME` du banc et n'est jamais passé en argument. Transit est activé. Les clés `vex`, `scanner` et `chains` sont en ecdsa-p256, non exportables. Les politiques `vex-signature` (fichier neuf du patch, calqué sur `scanner-signature`) et `scanner-signature` (fichier du dépôt) sont posées.
+
+Le **jeton du propriétaire simulé** est émis par la racine du banc : politique `vex-signature` seule, sans `default`, orphelin, 15 min. Le vrai mode est un choix du propriétaire. Image et scan signé dans un dépôt neuf, `builds/bao`.
+
+| Contrôle | Prédit | Confiance |
+|---|---|---|
+| OpenBao jetable : version, scellé | `2.7.2 false` | haute |
+| clé vex (type, exportable, sauvegarde en clair, suppression) | `ecdsa-p256,false,false,false` | haute |
+| politique `vex-signature` relue = fichier | empreintes égales | haute |
+| jeton simulé : politiques, durée, renouvelable | `vex-signature 900 true` | moyenne (renouvelable) |
+| signer, jeton vex, clé `hashivault://scanner` | `code 1 ; référents 0 ; refus signature en échec` | haute |
+| signer, jeton vex, clé `hashivault://chains` | idem | haute |
+| signer, jeton scanner, clé `hashivault://vex` | idem | haute |
+| signer, jeton vex, clé `hashivault://vex` | `code 0 ; référents 1 ; refus aucun` | moyenne (premier essai de cosign avec hashivault sans `default`) |
+| scanner.sh vex, `CLE_VEX` = clé publique tirée de Transit | VEX vérifiés, retenus, rejetés `1,1,0` | haute |
+| scanner.sh vex, clé locale `vex.pub` | `0,0,0` | haute |
+| jeton vex : création d'une clé, export de `vex`, `deletion_allowed` sur `vex`, écriture d'une politique, lecture de la clé `scanner`, émission d'un jeton | 6 refus, chacun `code 2 ; 1` (« permission denied ») | moyenne (texte de l'erreur) |
+
+**Total prédit** : **244 OK, 0 KO**. Ce sont les 226 du passage 20, plus 2 en A et 16 en B. Le patch change, puisqu'il gagne `politique/vex-signature.hcl` : son empreinte sera relevée au passage. Aucun autre fichier du patch ne change.

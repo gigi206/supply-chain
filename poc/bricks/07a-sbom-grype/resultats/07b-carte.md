@@ -1190,3 +1190,47 @@ Heure du scan témoin : 17:23:25 UTC le 21/11. Résultats pour l'entrée `GHSA-m
 - Enveloppe fermée à 20:06:09 UTC : au plus 9 h 14 (33187 s).
 - Segment suivant : de 20:06:09 UTC à 20:09:09 UTC, compté d'un seul tenant.
 - Somme des enveloppes de la 07b : au plus 9 h 17 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Pièce 2 mesurée à sec : `hashivault://vex` dans un OpenBao jetable (note de 2026-11-22T20:24:19Z ; passage 21, synthétique, rien posé ; approche relue par le conseiller)
+
+**Pourquoi** : la signature avec `hashivault://vex` n'avait jamais été essayée (point 6 de la note du 21/11 à 17:51:53Z). La pièce 2 n'avait ni politique ni essai.
+
+**OpenBao jetable** ([préparation](07b-p2-bao.sh), [journal](07b-p2-bao.log)) :
+- binaire `bao` extrait de la copie de l'image OpenBao 2.7.2 en miroir dans Zot (digest épinglé de la 08), par lecture anonyme ;
+- signature de l'index revérifiée sur cette copie avec l'identité de la 08 ;
+- `bao version` donne le commit du tag v2.7.2, celui du cluster.
+
+Le banc l'empreinte et le lance en mode dev, dans l'espace de noms réseau vide de la partie B. Le jeton racine est écrit par le serveur dans un `HOME` du banc, jamais passé en argument. Ce n'est **pas** l'OpenBao du cluster : c'est une mesure synthétique.
+
+**Ajout au patch** (`08d36964085e0814…`, au lieu de `9fcb4b40…`) : `politique/vex-signature.hcl`, calquée sur `scanner-signature` de G3. Elle permet la lecture de `transit/keys/vex`, la signature par `transit/sign/vex` et la révocation de son propre jeton. Elle refuse le reste : autres clés, export, sauvegarde, configuration, renouvellement. Les autres fichiers du patch ne changent pas. La pièce 2 compte donc un fichier du patch : le tableau de la note précédente passe à 10 fichiers.
+
+**Jeton du propriétaire simulé** : il est émis par la racine du banc, avec la politique `vex-signature` seule, sans `default`, orphelin, pour 15 min. Ce n'est pas un choix : le vrai mode d'authentification du propriétaire reste à trancher.
+
+**Passage 21** ([journal](07b-t3-banc-21.log)) : 244 OK, 0 KO, de 20:14:20 à 20:22:15 UTC. C'est le total prédit à 20:12:52 UTC (226 du passage 20, plus 2 en A et 16 en B).
+
+| Contrôle | Résultat |
+|---|---|
+| OpenBao jetable | 2.7.2, descellé |
+| clé `vex` | ecdsa-p256, non exportable, sans sauvegarde en clair, suppression interdite |
+| politique relue | égale au fichier |
+| jeton simulé | `vex-signature` seule, 900 s, renouvelable (mais `renew-self` hors politique) |
+| `signer`, jeton vex, `hashivault://vex` | **code 0, publié** (1 référent) |
+| `signer`, jeton vex, `hashivault://scanner` ou `hashivault://chains` | refus « signature en échec », rien publié |
+| `signer`, jeton du scanner, `hashivault://vex` | refus « signature en échec », rien publié |
+| `scanner.sh vex`, clé publique tirée de Transit | 1 vérifié, 1 retenu, 0 rejeté |
+| `scanner.sh vex`, clé locale du banc | 0, 0, 0 |
+| jeton vex : création de clé, export, `deletion_allowed`, écriture de politique, lecture de la clé `scanner`, émission de jeton | 6 refus, « permission denied » |
+
+**Lu après le passage** : un refus croisé dit seulement que la signature a échoué, pas pourquoi. Les journaux de cosign des trois cas (`signer-bao-vex-scanner`, `signer-bao-vex-chains`, `signer-bao-scanner-vex`), lus sous masque, portent chacun deux lignes 403 « permission denied ». L'échec vient donc bien de la politique.
+
+**Ce que la mesure établit** : la chaîne `signer-vex.sh` → cosign → Transit fonctionne sans la politique `default`, et le scanner retient le document avec la clé publique exportée de Transit. La politique sépare les clés dans les deux sens.
+
+**Limites** :
+- OpenBao jetable en mode dev, en HTTP sur 127.0.0.1 : ni le TLS ni le stockage du cluster, ni sa configuration réelle.
+- Le jeton est émis par la racine. Si les scripts du PoC émettent le vrai jeton avec la racine, « réservé au propriétaire » n'est que nominal. Le mode d'authentification du propriétaire reste **ouvert** : c'est un choix, posé plus tard.
+- Pas d'essai de l'expiration du jeton ni de sa révocation.
+- Rien n'est posé : la pièce 2 dans le cluster est un changement de configuration d'OpenBao, sur accord nommé.
+
+**Heures mesurées** :
+- Segment : de 20:06:09 UTC à 20:24:19 UTC, compté d'un seul tenant. Il comprend un échange hors 07b (reconstruction récursive, question du propriétaire) que je n'ai pas daté : c'est un surcompte, d'où « au plus ».
+- Somme des enveloppes de la 07b : au plus 9 h 32 pour 10 h estimées (demande au propriétaire avant 20 h).

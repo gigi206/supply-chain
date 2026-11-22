@@ -16,6 +16,8 @@
 # Passage 19 : même grype factice, sans VEX retenu : l'échec reste un échec, sans relance.
 # Passage 20 : exemptant daté du futur, forme asymétrique (A) : variante hors patch (resultats/07b-t3-variante-futur.patch, amende le
 #   choix 3) appliquée à une copie de outil/ ; même table sur le binaire du patch et sur celui de la variante.
+# Passage 21 : pièce 2, signer-vex.sh signer avec hashivault://vex dans un OpenBao 2.7.2 jetable (mode dev, B, espace de noms réseau
+#   vide ; binaire extrait et vérifié par resultats/07b-p2-bao.sh) ; jeton du propriétaire simulé, émis par la racine du banc.
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
 # Usage (racine du dépôt, outils de mise.toml) : poc/bricks/07a-sbom-grype/resultats/07b-t3-banc.sh > <journal>
 set -euo pipefail
@@ -469,6 +471,63 @@ FAUX
   attendu "$c : message du faux dans le journal" "$(grep -c 'panne injectée par le banc : scan refusé' "$T/cas/$c.journal" || true)" 1
   attendu "$c : code final" "$(tail -1 "$T/cas/$c.journal")" "code 1"
   attendu "$c : prédicat" "$([ -e "$T/cas/$c/scan.json" ] && echo présent || echo absent)" absent
+  # passage 21 : pièce 2, clé Transit vex dans un OpenBao 2.7.2 jetable (mode dev, 127.0.0.1:18200 ; jeton racine écrit par le serveur
+  # dans $T/bao-home, jamais passé en argument). Jeton du propriétaire simulé : émis par la racine du banc, politique vex-signature
+  # seule, sans default, orphelin, 15 min (le mode réel est un choix du propriétaire). Image et scan signé dans un dépôt neuf.
+  echo "## B. pièce 2 : signer-vex.sh signer avec hashivault://vex, OpenBao jetable (passage 21, synthétique)"
+  mkdir -p "$T/bao-home"; (umask 077 && mkdir -p "$T/cle/bao")
+  HOME=$T/bao-home "$BAO" server -dev -dev-listen-address=127.0.0.1:18200 > "$T/bao.out" 2>&1 & bp=$!
+  # shellcheck disable=SC2064   # développement à la pose, voulu
+  trap "kill $zp $bp 2>/dev/null || true" EXIT
+  export VAULT_ADDR=http://127.0.0.1:18200
+  rb() { HOME=$T/bao-home "$BAO" "$@"; }   # racine du banc : jeton lu par le client dans $T/bao-home
+  for _ in $(seq 40); do rb status > /dev/null 2>&1 && break; sleep 0.25; done
+  attendu "OpenBao jetable : version, scellé" "$(rb status -format=json | jq -r '"\(.version) \(.sealed)"')" "2.7.2 false"
+  rb secrets enable transit > /dev/null
+  for k in vex scanner chains; do rb write -f "transit/keys/$k" type=ecdsa-p256 exportable=false allow_plaintext_backup=false > /dev/null; done
+  rb policy write vex-signature "$B/politique/vex-signature.hcl" > /dev/null
+  rb policy write scanner-signature "$B/politique/scanner-signature.hcl" > /dev/null
+  attendu "clé vex (type, exportable, sauvegarde en clair, suppression)" \
+    "$(rb read -format=json transit/keys/vex | jq -r '.data | [.type, .exportable, .allow_plaintext_backup, .deletion_allowed] | join(",")')" "ecdsa-p256,false,false,false"
+  attendu "politique vex-signature relue = fichier (hors commentaires et lignes vides)" \
+    "$(rb policy read vex-signature | grep -v -e '^#' -e '^$' | sha256sum | cut -c1-16)" "$(grep -v -e '^#' -e '^$' "$B/politique/vex-signature.hcl" | sha256sum | cut -c1-16)"
+  rb read -format=json transit/keys/vex | jq -r '.data.keys | to_entries | max_by(.key | tonumber) | .value.public_key' > "$T/cle/vex-bao.pub"
+  jeton_bao() { rb token create -policy="$1" -no-default-policy -orphan -ttl=15m -format=json > "$T/cle/bao/$1.json"
+    jq -r .auth.client_token "$T/cle/bao/$1.json" > "$T/cle/bao/$1"; }
+  jeton_bao vex-signature; jeton_bao scanner-signature
+  attendu "jeton du propriétaire simulé : politiques, durée, renouvelable" \
+    "$(jq -r '.auth | "\(.policies | join(",")) \(.lease_duration) \(.renewable)"' "$T/cle/bao/vex-signature.json")" "vex-signature 900 true"
+  pousser "$M0/image" builds/bao/sample-app > /dev/null
+  publier_scan scanner "$M0/image-avant.scan.json" builds/bao/sample-app builds/scan/bao/sample-app
+  ok_vex "$T/v-bao-ok.json"
+  signer_bao() { # jeton clé cas : code de signer-vex.sh signer, référents de builds/vex/bao après, motif du refus
+    local c=0
+    VAULT_TOKEN=$(cat "$T/cle/bao/$1") SCAN_OUTIL="$OUT" CLE="hashivault://$2" CLE_PUBLIQUE="$T/cle/vex-bao.pub" CA="$T/zot.crt" \
+      CONFIG_REGISTRE="$T/docker/config.json" CLE_SCANNER="$T/cle/scanner.pub" bash "$B/signer-vex.sh" signer "$T/v-bao-ok.json" \
+      "$REG/builds/bao/sample-app@$Y" > "$T/signer-bao-$3.log" 2>&1 || c=$?
+    echo "code $c ; référents $(nvex bao) ; refus $(sed -n 's/^REFUS|\([^:]*\).*/\1/p' "$T/signer-bao-$3.log" | head -1 | sed 's/ *$//' | grep . || echo aucun)"
+  }
+  attendu "signer, jeton vex, clé hashivault://scanner" "$(signer_bao vex-signature scanner vex-scanner)" "code 1 ; référents 0 ; refus signature en échec"
+  attendu "signer, jeton vex, clé hashivault://chains" "$(signer_bao vex-signature chains vex-chains)" "code 1 ; référents 0 ; refus signature en échec"
+  attendu "signer, jeton scanner, clé hashivault://vex" "$(signer_bao scanner-signature vex scanner-vex)" "code 1 ; référents 0 ; refus signature en échec"
+  attendu "signer, jeton vex, clé hashivault://vex" "$(signer_bao vex-signature vex ok)" "code 0 ; référents 1 ; refus aucun"
+  grep -E '^(JUGE|SIGNE|PUBLIE)\|' "$T/signer-bao-ok.log" | cut -c1-200 | sed "s|$T|<banc>|g; s/^/     /" || true
+  { grep -h -i 'error\|denied' "$T/signer-bao-vex-scanner.log" || true; } | sed '/jeton\|token/I c\[ligne masquée : motif jeton|token]' | head -2 | cut -c1-200 | sed "s|$T|<banc>|g; s/^/     refus vex-scanner : /"
+  scanner vex bao-lu IMAGE="$REG/builds/bao/sample-app@$Y" CLE_VEX="$T/cle/vex-bao.pub"
+  attendu "bao-lu (clé publique tirée de Transit) : VEX vérifiés, retenus, rejetés" "$(ligne_vex bao-lu)" "1,1,0"
+  scanner vex bao-cle-locale IMAGE="$REG/builds/bao/sample-app@$Y"
+  attendu "bao-cle-locale (vex.pub du banc) : VEX vérifiés, retenus, rejetés" "$(ligne_vex bao-cle-locale)" "0,0,0"
+  refuse_bao() { # libellé commande… : avec le jeton vex-signature, code et nombre de lignes « permission denied »
+    local c=0
+    VAULT_TOKEN=$(cat "$T/cle/bao/vex-signature") HOME=$T/tmp "$BAO" "${@:2}" > /dev/null 2> "$T/tmp/bao.err" || c=$?
+    attendu "jeton vex-signature : $1" "code $c ; $(grep -c 'permission denied' "$T/tmp/bao.err" || true)" "code 2 ; 1"
+  }
+  refuse_bao "création d'une clé" write -f transit/keys/autre
+  refuse_bao "export de la clé vex" read transit/export/signing-key/vex
+  refuse_bao "suppression autorisée sur vex" write transit/keys/vex/config deletion_allowed=true
+  refuse_bao "écriture d'une politique" policy write autre "$B/politique/vex-signature.hcl"
+  refuse_bao "lecture de la clé scanner" read transit/keys/scanner
+  refuse_bao "émission d'un jeton" token create -policy=vex-signature
   echo "$KO" > "$T/ko-ns"
   exit 0
 fi
@@ -483,7 +542,7 @@ echo "outils : grype $(grype version 2>/dev/null | awk '/^Version/ {print $2}'),
  cosign $(cosign version 2>/dev/null | awk '/^GitVersion/ {print $2}'), zot $(zot --version 2>&1 | grep -o 'v[0-9][0-9.]*' | head -1), ec $(ec version 2>/dev/null | awk '/^Version/ {print $2}'), $(go version | cut -d' ' -f3)"
 echo "patch : politique/07b-t3.patch $(sha256sum < "$RACINE/poc/bricks/07a-sbom-grype/politique/07b-t3.patch" | cut -c1-16)… ; 07b-t3-vex.py $(sha256sum < "$R/07b-t3-vex.py" | cut -c1-16)…"
 avant=$(empreinte)
-for f in outil/main.go outil/go.mod politique/scanner.sh politique/porte/scan.rego politique/porte/scan_test.rego politique/porte/policy-scan.yaml plateforme.sh entrees-scan.sh systemd/entrees-scan.py; do
+for f in outil/main.go outil/go.mod politique/scanner.sh politique/porte/scan.rego politique/porte/scan_test.rego politique/porte/policy-scan.yaml plateforme.sh entrees-scan.sh systemd/entrees-scan.py politique/scanner-signature.hcl; do
   mkdir -p "$(dirname "$B/$f")"; cp "$RACINE/poc/bricks/07a-sbom-grype/$f" "$B/$f"
 done
 (cd "$T/arbre" && patch -p1 --quiet < "$RACINE/poc/bricks/07a-sbom-grype/politique/07b-t3.patch") && ok "patch appliqué sur une copie des fichiers du dépôt" \
@@ -672,7 +731,11 @@ openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 
   -addext basicConstraints=critical,CA:TRUE -keyout "$T/cle/zot.key" -out "$T/zot.crt" 2> /dev/null
 jq -n --arg r "$T/zot" --arg c "$T/zot.crt" --arg k "$T/cle/zot.key" '{distSpecVersion: "1.1.1", storage: {rootDirectory: $r, gc: false},
   http: {address: "127.0.0.1", port: "15002", tls: {cert: $c, key: $k}}, log: {level: "error"}}' > "$T/zot.json"
-OUT=$OUT unshare -rn bash "$0" ns
+# passage 21 : binaire bao extrait et vérifié hors du banc (resultats/07b-p2-bao.log) ; ici, empreinte et commit seulement
+BAO=$HOME/.cache/supply-chain-poc/07a/bao-2.7.2/bao
+attendu "bao : empreinte du binaire extrait (07b-p2-bao.log)" "$(sha256sum < "$BAO" | cut -c1-16)" 9c5f36287c673f38
+attendu "bao : version et commit" "$("$BAO" version | cut -d' ' -f2,3)" "v2.7.2 (9e0a0d3c3504a0a00b45e61355afac5e35c78379),"
+OUT=$OUT BAO=$BAO unshare -rn bash "$0" ns
 KO=$((KO + $(cat "$T/ko-ns" 2>/dev/null || echo 1)))
 
 # ------------------------------------------------------------------------------------------------------------------------------ C

@@ -1023,6 +1023,26 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/
    jetons) jetons ;;
    attester) attester ;;
    publier) publier ;;
+diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/vex-signature.hcl b/poc/bricks/07a-sbom-grype/politique/vex-signature.hcl
+--- a/poc/bricks/07a-sbom-grype/politique/vex-signature.hcl	1970-01-01 01:00:00.000000000 +0100
++++ b/poc/bricks/07a-sbom-grype/politique/vex-signature.hcl	2026-11-22 21:12:59.642832413 +0100
+@@ -0,0 +1,16 @@
++# Brique 07b, pièce 2 de la pose : politique du seul jeton du propriétaire qui signe les VEX (calque de scanner-signature de la
++# 07a). Les appels du client hashivault de cosign (lecture de la clé publique, signature), plus la révocation de son propre jeton.
++# Ni les clés scanner, chains et tsa, ni export, ni sauvegarde, ni configuration de la clé, ni renouvellement. Qui émet ce jeton,
++# et pour combien de temps, est un choix du propriétaire (non tranché) ; le banc du passage 21 l'émet avec la racine d'un OpenBao jetable.
++path "transit/keys/vex" {
++  capabilities = ["read"]
++}
++path "transit/sign/vex" {
++  capabilities = ["update"]
++}
++path "transit/sign/vex/*" {
++  capabilities = ["update"]
++}
++path "auth/token/revoke-self" {
++  capabilities = ["update"]
++}
 diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbom-grype/signer-vex.sh
 --- a/poc/bricks/07a-sbom-grype/signer-vex.sh	1970-01-01 01:00:00.000000000 +0100
 +++ b/poc/bricks/07a-sbom-grype/signer-vex.sh	2026-11-22 19:32:53.742708545 +0100

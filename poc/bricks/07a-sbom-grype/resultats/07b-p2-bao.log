@@ -1,0 +1,13 @@
+début : 2026-11-22T20:13:16Z
+outils : cosign v3.1.4, crane 0.20.6
+OK   l'index signé référence le manifeste linux/amd64 sha256:a78eb12a9fc7a3ebb4bec1724e2bdd6a28e33394820641d061166919a3f1866b
+OK   signature de amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f dans Zot : https://github.com/openbao/openbao/.github/workflows/release-images.yml@refs/tags/v2.7.2, commit 9e0a0d3c3504a0a00b45e61355afac5e35c78379, déclencheur release
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The code-signing certificate was verified using trusted certificate authority certificates
+signatures vérifiées : 4
+bao : 181848661 octets, sha256 9c5f36287c673f386e1533e9c044169a248e4ee50dd54810fa766e95bd41b788
+OpenBao v2.7.2 (9e0a0d3c3504a0a00b45e61355afac5e35c78379), committed 2026-10-26T20:32:27Z
+OK   bao version : v2.7.2, commit du tag
+fin : 2026-11-22T20:13:18Z
+## bilan : 0
