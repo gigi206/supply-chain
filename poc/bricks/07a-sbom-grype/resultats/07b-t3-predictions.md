@@ -437,3 +437,20 @@ Les témoins de rétractation du banc reçoivent donc un `action_statement` par 
 **Durée** : deux `analyser` de plus, donc deux imports de base, non prédite.
 
 **Total prédit** : 186 OK, 0 KO (167, plus 4 en A, 11 en B, 2 en C, 2 en D).
+
+## Ajout avant le dix-neuvième passage : échec de Grype sans VEX retenu (écrit le 2026-11-22, date -u de 19:18:18 UTC dans la même commande que l’écriture ; demandé par le conseiller après le passage 18)
+
+**Pourquoi** : la note de 19:16:04Z dit « Sans VEX retenu, un échec reste un échec ». Aucun cas du passage 18 ne le mesure, et ce chemin a changé (stderr capturé, puis `exit "$c"`). C'est celui de tous les scans sans VEX. Le patch ne change pas : `9fcb4b40dc31c95d…`.
+
+**Banc** : un cas `sans-vex-panne`, avec le même `grype` factice, `PANNE=tout` (panne injectée, synthétique), sur un dépôt neuf `builds/sans-vex` sans VEX publié, en mode `analyser` réel.
+
+| Contrôle | Prédiction | Confiance |
+|---|---|---|
+| appels du faux | `db 0,sbom 0` (aucune relance) | haute |
+| VEX vérifiés, retenus, rejetés | 0,0,0 | haute |
+| lignes `REPLI|` | 0 | haute |
+| message du faux dans le journal du cas | 1 ligne (le stderr de Grype reste visible) | haute |
+| code final | `code 1` | haute |
+| prédicat | absent | haute |
+
+**Total prédit** : 192 OK, 0 KO (186, plus 6 contrôles).

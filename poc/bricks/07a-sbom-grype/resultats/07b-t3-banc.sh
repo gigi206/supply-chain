@@ -13,6 +13,7 @@
 # Passage 16 : avis de renouvellement de signer-vex.sh (B, dépôt builds/avis ; seuil par défaut confronté à la politique en C).
 # Passage 18 : repli sans --vex de scanner.sh (limite 4) : predicat en A ; en B, grype factice devant le vrai (panne injectée,
 #   synthétique) ; porte en C ; série scan_vex_repli et comptes de entrees-scan.sh en D.
+# Passage 19 : même grype factice, sans VEX retenu : l'échec reste un échec, sans relance.
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
 # Usage (racine du dépôt, outils de mise.toml) : poc/bricks/07a-sbom-grype/resultats/07b-t3-banc.sh > <journal>
 set -euo pipefail
@@ -453,6 +454,19 @@ FAUX
   attendu "panne-totale : lignes REPLI" "$(grep -c '^REPLI|' "$T/cas/panne-totale.journal")" 1
   attendu "panne-totale : code final" "$(tail -1 "$T/cas/panne-totale.journal")" "code 1"
   attendu "panne-totale : prédicat" "$([ -e "$T/cas/panne-totale/scan.json" ] && echo présent || echo absent)" absent
+  # passage 19 : panne totale sur un dépôt sans VEX publié : aucune relance, l'échec reste un échec
+  c=sans-vex-panne
+  pousser "$M0/image" builds/sans-vex/sample-app > /dev/null
+  mkdir -p "$T/cas/$c"; cp -r "$G0/source" "$T/cas/$c/source"
+  scanner analyser "$c" IMAGE="$REG/builds/sans-vex/sample-app@$Y" BASES="$REG/vulndb/grype" PATH="$T/faux:$T/outil:$PATH" \
+    GRYPE_VRAI="$GV" PANNE=tout APPELS="$T/faux/appels-$c"
+  { grep -E '^(VEX|REJET|REPLI|SCAN|PREDICAT)\|' "$T/cas/$c.journal" || true; } | cut -c1-260 | sed "s|$T|<banc>|g; s/^/     /"
+  attendu "$c : appels de grype (sous-commande, nombre de --vex)" "$(appels "$c")" "db 0,sbom 0"
+  attendu "$c : VEX vérifiés, retenus, rejetés" "$(ligne_vex "$c")" "0,0,0"
+  attendu "$c : lignes REPLI" "$(grep -c '^REPLI|' "$T/cas/$c.journal" || true)" 0
+  attendu "$c : message du faux dans le journal" "$(grep -c 'panne injectée par le banc : scan refusé' "$T/cas/$c.journal" || true)" 1
+  attendu "$c : code final" "$(tail -1 "$T/cas/$c.journal")" "code 1"
+  attendu "$c : prédicat" "$([ -e "$T/cas/$c/scan.json" ] && echo présent || echo absent)" absent
   echo "$KO" > "$T/ko-ns"
   exit 0
 fi

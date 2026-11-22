@@ -1063,3 +1063,26 @@ Patch `0d641017e662d483…`. Contrôles refaits : `git apply --check`, `ec opa t
 **Heures mesurées** :
 - Ce segment : de 19:03:15 UTC à 19:16:04 UTC.
 - Somme des enveloppes de la 07b : au plus 8 h 05 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Échec sans VEX retenu et effet du repli (note de 2026-11-22T19:26:25Z ; passage 19, rien posé ; complète la note de 19:16:04Z, relue par le conseiller)
+
+**Ce qui n'était pas mesuré à 19:16:04Z** : « Sans VEX retenu, un échec reste un échec ». Ce chemin a changé au passage 18 (stderr capturé, puis `exit "$c"`), et c'est celui de tous les scans sans VEX.
+
+**Passage 19** ([journal](07b-t3-banc-19.log)) : 192 OK, 0 KO, de 19:18:23 à 19:26:14 UTC. C'est la prédiction (section « Ajout avant le dix-neuvième passage », 19:18:18 UTC). Patch inchangé, `9fcb4b40dc31c95d…`.
+- Cas `sans-vex-panne` : même `grype` factice (panne injectée, synthétique) en panne totale, dépôt neuf `builds/sans-vex` sans VEX publié, mode `analyser` réel.
+- Résultat : appels `db 0, sbom 0` (aucune relance), VEX 0,0,0, aucune ligne `REPLI|`, message du faux dans le journal (le stderr de Grype reste visible), code 1, aucun prédicat.
+
+**Effet du repli sur la porte** (lu dans `scan.rego`, non mesuré sur un scan antérieur) :
+- `_retenus` garde le scan le plus récent.
+- Avant le passage 18, un scan en échec ne publiait rien, et le scan précédent restait jugé, exemptions comprises.
+- Un repli publie un scan signé sans exemption. Une KEV exemptée est donc refusée dès ce scan, jusqu'au scan suivant sans panne.
+
+C'est la direction stricte, mais c'est un changement d'effet, à lire par le propriétaire.
+
+**Précision sur la note de 19:16:04Z** : « la pose aurait donné un faux KO » est lu dans le code (`attendu … 20`, contre 42 séries écrites par le patch), pas mesuré. Aucun autre compte en dur n'a été trouvé dans `entrees-scan.sh` ni dans `plateforme.sh` de l'arbre b.
+
+**Correction des heures** (conseiller) : la note de 19:16:04Z partait de 19:03:15 UTC et ne comptait pas l'intervalle de 18:44:41 à 19:03:15 UTC (poussée et compactage). La note du passage 16 comptait ces intervalles d'un seul tenant. Recalculée ainsi, la somme est d'au plus 8 h 24 à 19:16:04Z, et non 8 h 05.
+
+**Heures mesurées** :
+- Ce segment : de 18:44:41 UTC à 19:26:25 UTC, compté d'un seul tenant.
+- Somme des enveloppes de la 07b : au plus 8 h 34 pour 10 h estimées (demande au propriétaire avant 20 h).
