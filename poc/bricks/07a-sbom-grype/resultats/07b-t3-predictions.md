@@ -667,3 +667,22 @@ Les autres cas du troisième passage gardent leur prédiction. Le total sera fix
 | `essai` : connexion, essais, openssl, cosign, révocation | `vex-signature` seule, 900 s ; 14 essais conformes ; signature vérifiée par `resultats/vex-cle-publique.pem` ; SPKI de cosign égal ; refus après révocation | moyenne |
 | `essai` : K4, K5 ; redirection fermée ; KO | OK ; OK ; 0 | haute |
 | Loki, auditeur : signatures réussies sur `transit/sign/vex`, par `auth_display_name`, depuis 22:42 UTC | `userpass-proprietaire 1` | moyenne (forme des champs dans Loki) |
+
+## Ajout avant le vingt-troisième passage du grand banc : patch `c6d4b8a1` (date -u de 22:52:57 UTC, le 2026-11-22, avant tout code)
+
+**Pourquoi** : les 254 OK du vingt-deuxième passage citent le patch `08d36964`. Depuis, le patch est passé à `6c98e264`, `78dce9ac`, puis `c6d4b8a1` (9 fichiers) : `vex-openbao.sh` et `vex-signature.hcl` en sont sortis, reportés dans le dépôt (a614595b).
+
+**Relevé à sec, avant tout code** : les dix fichiers que le banc copie du dépôt, pris à 35cf1969 avec l'ancien patch et à HEAD avec le nouveau, donnent le même arbre, à une exception près. `politique/vex-signature.hcl` manque dans le nouvel arbre : le banc ne le copie pas, c'est l'ancien patch qui le créait. Sans correction, les passages 21 et 22 du banc (`rb policy write vex-signature "$B/politique/vex-signature.hcl"`) échoueraient. La version du dépôt ne diffère de celle de l'ancien patch que par deux lignes de commentaire. Hors commentaires et lignes vides, l'empreinte est la même : `c304cbd05ec856cb`.
+
+**Correction prévue du banc** : ajouter `politique/vex-signature.hcl` à la liste des fichiers copiés du dépôt, avec une ligne de commentaire datée. Rien d'autre ne change. `vex-openbao.sh` n'est pas lu par le grand banc ; il a son propre banc (`07b-p2-pose-banc.sh`).
+
+| Contrôle | Prédit | Confiance |
+|---|---|---|
+| ligne du patch | `c6d4b8a13caa1c2d…` | haute |
+| patch appliqué, scan-outil construit, `go vet` | OK | haute |
+| politique `vex-signature` relue = fichier | `c304cbd05ec856cb` | haute |
+| comptes | 254 OK, 0 KO, bilan « 0 écart(s) » | haute |
+| lignes OK et KO comparées à celles du passage 22, heures ISO et empreintes de 64 caractères masquées | aucune différence | moyenne (d'autres valeurs variables ont pu échapper au relevé des passages 21 et 22) |
+| base de G0, source, image et deb | inchangés | haute |
+
+Aucun passage entre 21:40 et 21:50 UTC. Rien de partagé : ni le vrai Zot, ni le cluster, ni les VM.

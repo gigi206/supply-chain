@@ -1435,3 +1435,29 @@ Dossier d'essai effacé après archivage.
 **Heures mesurées** :
 - Segment : de 22:39:40 UTC à 22:44:17 UTC, compté d'un seul tenant.
 - Somme des enveloppes de la 07b : au plus 11 h 33 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Grand banc repassé sur le patch `c6d4b8a1` (passage 23, note de 2026-11-22T23:01:27Z)
+
+**Pourquoi** : les 254 OK du passage 22 citaient le patch `08d36964`. Depuis, `vex-openbao.sh` et `vex-signature.hcl` sont sortis du patch et entrés dans le dépôt (a614595b).
+
+**Relevé à sec, avant tout code** : les dix fichiers que le banc copie, pris à 35cf1969 avec l'ancien patch et à HEAD avec le nouveau, donnent le même arbre, à une exception près. `politique/vex-signature.hcl` manquait : c'est l'ancien patch qui le créait. Sans correction, les passages 21 et 22 du banc auraient échoué. Hors commentaires, la version du dépôt a la même empreinte que l'ancienne (`c304cbd05ec856cb`).
+
+**Correction du banc**, datée dans son en-tête : `politique/vex-signature.hcl` est ajouté aux fichiers copiés du dépôt. Rien d'autre ne change.
+
+**Prédiction** écrite avant la correction (22:52:57 UTC). Tout a tenu, sauf une ligne de la comparaison au passage 22, prédite avec une confiance moyenne. Le masque prédit (heures ISO à la seconde, empreintes de 64 caractères) laissait passer une heure à fraction de seconde : `avis-apres : entrée écartée`, `2026-11-12T21:54:04.5Z` au passage 22, `2026-11-12T22:56:37.5Z` au passage 23. Ce cas date ses VEX à partir de l'heure du passage (`$HA.5Z`, ligne 420 du banc) ; il change donc à chaque passage, comme aux passages 21 et 22. Avec la fraction de seconde masquée aussi, aucune différence.
+
+[Passage 23](07b-t3-banc-23.log), de 22:53:06 à 23:01:04 UTC :
+- 254 OK, 0 KO, bilan « 0 écart(s) » ; patch `c6d4b8a13caa1c2d…` ;
+- politique `vex-signature` relue = fichier (`c304cbd05ec856cb`) ;
+- lignes OK et KO égales, une à une, à celles du passage 22, une fois masquées les heures ISO (fraction de seconde comprise) et les empreintes de 64 caractères ;
+- base de G0, source, image et deb inchangées.
+
+La condition posée à la pièce 2 est levée : le grand banc tient sur le patch tel qu'il est.
+
+**Reste** :
+- pièces 3 et 4, pas avant le 29/11 ;
+- pièce 5 : `vex.pub` dans `scan-config`, sur accord.
+
+**Heures mesurées** :
+- Segment : de 22:51:51 UTC à 23:01:27 UTC, compté d'un seul tenant.
+- Somme des enveloppes de la 07b : au plus 11 h 43 pour 10 h estimées (demande au propriétaire avant 20 h).

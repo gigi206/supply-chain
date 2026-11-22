@@ -19,6 +19,7 @@
 # Passage 21 : pièce 2, signer-vex.sh signer avec hashivault://vex dans un OpenBao 2.7.2 jetable (mode dev, B, espace de noms réseau
 #   vide ; binaire extrait et vérifié par resultats/07b-p2-bao.sh) ; jeton du propriétaire simulé, émis par la racine du banc.
 # Passage 22 : userpass du propriétaire (décision du 22/11), connexion -no-store, révocation, traces dans un audit file du banc.
+# Passage 23 (22/11, 22:52:57 UTC) : patch c6d4b8a1 ; politique/vex-signature.hcl sort du patch et vient du dépôt (a614595b).
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
 # Usage (racine du dépôt, outils de mise.toml) : poc/bricks/07a-sbom-grype/resultats/07b-t3-banc.sh > <journal>
 set -euo pipefail
@@ -586,7 +587,7 @@ echo "outils : grype $(grype version 2>/dev/null | awk '/^Version/ {print $2}'),
  cosign $(cosign version 2>/dev/null | awk '/^GitVersion/ {print $2}'), zot $(zot --version 2>&1 | grep -o 'v[0-9][0-9.]*' | head -1), ec $(ec version 2>/dev/null | awk '/^Version/ {print $2}'), $(go version | cut -d' ' -f3)"
 echo "patch : politique/07b-t3.patch $(sha256sum < "$RACINE/poc/bricks/07a-sbom-grype/politique/07b-t3.patch" | cut -c1-16)… ; 07b-t3-vex.py $(sha256sum < "$R/07b-t3-vex.py" | cut -c1-16)…"
 avant=$(empreinte)
-for f in outil/main.go outil/go.mod politique/scanner.sh politique/porte/scan.rego politique/porte/scan_test.rego politique/porte/policy-scan.yaml plateforme.sh entrees-scan.sh systemd/entrees-scan.py politique/scanner-signature.hcl; do
+for f in outil/main.go outil/go.mod politique/scanner.sh politique/porte/scan.rego politique/porte/scan_test.rego politique/porte/policy-scan.yaml plateforme.sh entrees-scan.sh systemd/entrees-scan.py politique/scanner-signature.hcl politique/vex-signature.hcl; do
   mkdir -p "$(dirname "$B/$f")"; cp "$RACINE/poc/bricks/07a-sbom-grype/$f" "$B/$f"
 done
 (cd "$T/arbre" && patch -p1 --quiet < "$RACINE/poc/bricks/07a-sbom-grype/politique/07b-t3.patch") && ok "patch appliqué sur une copie des fichiers du dépôt" \
