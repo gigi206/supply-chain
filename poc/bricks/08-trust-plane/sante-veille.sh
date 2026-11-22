@@ -188,6 +188,54 @@ etape_idees() {
   done
 }
 
+# Ajout du 22/11/2026, écrit à 23:16:31 UTC (date -u), sur question du propriétaire (« Penses-tu que GUAC (Graph for
+# Understanding Artifact Composition) serait intéressant pour notre projet ? ») ; archivage accordé (« Oui archive à analyser plus
+# tard »). Même lecture publique que releves (API GitHub, API Scorecard), sur 90 jours avant le 22/11/2026, plus les approbateurs
+# des PR humaines (fusionnées par un robot) et les lignes de code qui décident de l'usage, à la release v1.1.0 et au commit de
+# main relevé : collecteurs et certifiers, authentification du serveur GraphQL, lecture des referrers OCI. Lu, rien installé ni
+# exécuté ; les étapes et journaux précédents ne sont pas modifiés.
+etape_guac() {
+  local r=guacsec/guac depuis=2026-08-24T00:00:00Z un_an=2025-11-22 v s f
+  echo "## $r (relevé à $(date -u +%H:%M:%S) UTC)"
+  echo "API Scorecard : $(curl -s --max-time 20 "https://api.securityscorecards.dev/projects/github.com/$r" | jq -r '"score \(.score), relevé du \(.date[0:10]) ; " + ([.checks[] | select(.name | test("^(Maintained|Signed-Releases|Code-Review|Vulnerabilities|Branch-Protection)$")) | "\(.name) \(.score)"] | join(", "))')"
+  gh api "repos/$r" --jq '"nom final \(.full_name), archivé \(.archived), licence \(.license.spdx_id), créé le \(.created_at[0:10]), dernier push \(.pushed_at[0:10]), branche \(.default_branch), étoiles \(.stargazers_count)"'
+  v=$(gh api "repos/$r/releases/latest" --jq '"\(.tag_name) du \(.published_at[0:10]), \(.assets | length) fichiers attachés"' 2>/dev/null) || v=aucune
+  echo "dernière release : $v"
+  echo "releases depuis le $un_an : $(gh api "repos/$r/releases?per_page=30" --jq "[.[] | select(.published_at > \"$un_an\") | \"\(.tag_name) (\(.published_at[0:10]), \(.assets | length) fichiers)\"] | join(\", \")")"
+  echo "fichiers de la dernière release liés aux signatures et à la provenance :"
+  gh api "repos/$r/releases/latest" --jq '[.assets[].name | select(test("\\.(sig|pem|crt|bundle|sigstore(\\.json)?|intoto\\.jsonl|att)$|provenance|checksums|sha256|sbom"; "i"))] | if length == 0 then "  aucun" else .[] | "  " + . end' 2>/dev/null || echo "  aucune release"
+  gh api "repos/$r/commits?since=$depuis&per_page=100" --paginate --jq '.[] | [(.author.login // "-"), (.commit.author.email | split("@")[1]), (.author.type // "-")] | @tsv' > "$T/guac-commits.tsv"
+  echo "commits depuis $depuis : $(wc -l < "$T/guac-commits.tsv"), dont robots $(awk -F'\t' '$3 == "Bot" || $1 ~ /bot/' "$T/guac-commits.tsv" | wc -l) ; auteurs humains (compte, domaine de l'adresse) :"
+  awk -F'\t' '$3 != "Bot" && $1 !~ /bot/ {print $1 "\t" $2}' "$T/guac-commits.tsv" | sort | uniq -c | sort -rn | head -12 | sed 's/^/  /'
+  gh api "repos/$r/commits?since=${un_an}T00:00:00Z&per_page=100" --paginate --jq '.[] | [(.author.login // "-"), .commit.author.date[0:7], (.author.type // "-")] | @tsv' > "$T/guac-an.tsv"
+  echo "commits par mois depuis le $un_an (tous auteurs) : $(cut -f2 "$T/guac-an.tsv" | sort | uniq -c | awk '{printf "%s %s, ", $2, $1}')"
+  echo "auteurs humains sur un an : $(awk -F'\t' '$3 != "Bot" && $1 !~ /bot/ {print $1}' "$T/guac-an.tsv" | sort | uniq -c | sort -rn | head -10 | awk '{printf "%s %s, ", $2, $1}')"
+  gh pr list --repo "$r" --state merged --limit 100 --json author,mergedBy,mergedAt,reviews > "$T/guac-pr.json"
+  echo "100 dernières PR fusionnées, du $(jq -r '.[-1].mergedAt[0:10]' "$T/guac-pr.json") au $(jq -r '.[0].mergedAt[0:10]' "$T/guac-pr.json") :"
+  echo "  auteurs : $(jq -r '[.[] | .author.login] | group_by(.) | map("\(.[0]) \(length)") | sort_by(-(split(" ")[1] | tonumber)) | join(", ")' "$T/guac-pr.json")"
+  echo "  fusionneurs : $(jq -r '[.[] | (.mergedBy.login // "-")] | group_by(.) | map("\(.[0]) \(length)") | sort_by(-(split(" ")[1] | tonumber)) | join(", ")' "$T/guac-pr.json")"
+  echo "  PR hors dependabot : $(jq '[.[] | select(.author.login | test("dependabot") | not)] | length' "$T/guac-pr.json") ; approbateurs (APPROVED, une fois par PR) : $(jq -r '[.[] | select(.author.login | test("dependabot") | not) | [.reviews[] | select(.state == "APPROVED") | .author.login] | unique[]] | group_by(.) | map("\(.[0]) \(length)") | sort_by(-(split(" ")[1] | tonumber)) | join(", ")' "$T/guac-pr.json")"
+  echo "  PR hors dependabot sans approbation : $(jq '[.[] | select(.author.login | test("dependabot") | not) | select([.reviews[] | select(.state == "APPROVED")] | length == 0)] | length' "$T/guac-pr.json")"
+  echo "PR ouvertes : $(gh pr list --repo "$r" --state open --limit 200 --json number --jq length), dont dependabot $(gh pr list --repo "$r" --state open --limit 200 --author 'app/dependabot' --json number --jq length)"
+  echo "SECURITY.md : $(gh api "repos/$r/contents/SECURITY.md" --jq .name 2>/dev/null | grep -x SECURITY.md || echo "absent du dépôt")"
+  echo "avis publiés : $(gh api "repos/$r/security-advisories?per_page=100" --jq 'length') ; depuis un an : $(gh api "repos/$r/security-advisories?per_page=100" --jq "[.[] | select(.published_at > \"$un_an\")] | length")"
+  s=$(gh api "repos/$r/commits/main" --jq .sha)
+  for v in v1.1.0 "$s"; do
+    echo "## code à $v (relevé à $(date -u +%H:%M:%S) UTC)"
+    echo "- collecteurs (pkg/handler/collector) : $(gh api "repos/$r/contents/pkg/handler/collector?ref=$v" --jq '[.[] | select(.type == "dir" and .name != "testdata") | .name] | join(" ")')"
+    echo "- certifiers (pkg/certifier) : $(gh api "repos/$r/contents/pkg/certifier?ref=$v" --jq '[.[] | select(.type == "dir") | .name] | join(" ")')"
+    echo "- commandes (cmd) : $(gh api "repos/$r/contents/cmd?ref=$v" --jq '[.[] | select(.type == "dir") | .name] | join(" ")')"
+    echo "- serveur GraphQL (cmd/guacgql/cmd), lignes qui parlent d'authentification, de TLS ou d'écoute (hors en-tête de licence) :"
+    for f in root.go server.go; do
+      brut "$r" "cmd/guacgql/cmd/$f" "$v" | grep -n -i -E 'auth|tls|ListenAndServe|middleware' | grep -v -E 'GUAC Authors' | cut -c1-160 | sed "s/^/    $f:/"
+    done
+    echo "- collecteur OCI (pkg/handler/collector/oci/oci.go), lecture des referrers :"
+    brut "$r" pkg/handler/collector/oci/oci.go "$v" | grep -n -E 'func .*[Rr]eferrer|ReferrerList' | cut -c1-160 | sed 's/^/    /'
+  done
+  echo "## limites"
+  echo "- lu, rien installé ni exécuté ; fonctionnement hors ligne (sans certifiers ni collecteurs en ligne) non essayé ; absence d'authentification déduite de deux fichiers du serveur GraphQL, pas d'un essai ni de la documentation ; employeurs non vérifiés (domaines des adresses seulement) ; signatures des releases non vérifiées ; règles de fusion de Kodiak (approbations exigées) non lues"
+}
+
 for e in "$@"; do
   echo "# sante-veille.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/sante-veille-$e.log"
   "etape_$e" 2>&1 | sed -u "s#$HOME#~#g" | tee -a "$R/sante-veille-$e.log"

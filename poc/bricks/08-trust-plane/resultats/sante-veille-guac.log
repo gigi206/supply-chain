@@ -1,0 +1,92 @@
+# sante-veille.sh guac, 2026-11-22T23:16:59Z
+## guacsec/guac (relevé à 23:16:59 UTC)
+API Scorecard : score 8.3, relevé du 2026-11-19 ; Maintained 10, Code-Review 10, Vulnerabilities 5, Signed-Releases 8, Branch-Protection -1
+nom final guacsec/guac, archivé false, licence Apache-2.0, créé le 2022-06-10, dernier push 2026-11-17, branche main, étoiles 1581
+dernière release : v1.1.0 du 2026-03-13, 53 fichiers attachés
+releases depuis le 2025-11-22 : v1.1.0 (2026-03-13, 53 fichiers)
+fichiers de la dernière release liés aux signatures et à la provenance :
+  guaccollect-linux-amd64.spdx.sbom.json
+  guaccollect-linux-arm64.spdx.sbom.json
+  guaccollect-windows-amd64.exe.spdx.sbom.json
+  guaccollect.spdx.sbom.json
+  guaccsub-linux-amd64.spdx.sbom.json
+  guaccsub-linux-arm64.spdx.sbom.json
+  guaccsub-windows-amd64.exe.spdx.sbom.json
+  guaccsub.spdx.sbom.json
+  guacgql-linux-amd64.spdx.sbom.json
+  guacgql-linux-arm64.spdx.sbom.json
+  guacgql-windows-amd64.exe.spdx.sbom.json
+  guacgql.spdx.sbom.json
+  guacingest-linux-amd64.spdx.sbom.json
+  guacingest-linux-arm64.spdx.sbom.json
+  guacingest-windows-amd64.exe.spdx.sbom.json
+  guacingest.spdx.sbom.json
+  guacone-linux-amd64.spdx.sbom.json
+  guacone-linux-arm64.spdx.sbom.json
+  guacone-windows-amd64.exe.spdx.sbom.json
+  guacone.spdx.sbom.json
+  guacrest-linux-amd64.spdx.sbom.json
+  guacrest-linux-arm64.spdx.sbom.json
+  guacrest-windows-amd64.exe.spdx.sbom.json
+  guacrest.spdx.sbom.json
+  guac_checksums.txt
+  guac_checksums.txt.bundle
+commits depuis 2026-08-24T00:00:00Z : 122, dont robots 80 ; auteurs humains (compte, domaine de l'adresse) :
+       14 gaganhr94	gmail.com
+        7 Nikhil-cp1905	users.noreply.github.com
+        5 Amankumar-10012004	users.noreply.github.com
+        3 gangadhar-res	resolve.ai
+        2 pujitha24	gmail.com
+        2 omlahore	gmail.com
+        2 Abhishek9639	gmail.com
+        1 yash1262	gmail.com
+        1 sloemo01	gmail.com
+        1 mvanhorn	users.noreply.github.com
+        1 jeffmendoza	jlm.name
+        1 dgellman	gmail.com
+commits par mois depuis le 2025-11-22 (tous auteurs) : 2025-12 3, 2026-02 48, 2026-03 50, 2026-04 65, 2026-05 13, 2026-06 41, 2026-07 34, 2026-08 57, 2026-09 50, 2026-10 19, 2026-11 29, 
+auteurs humains sur un an : gaganhr94 53, Nikhil-cp1905 10, gangadhar-res 6, pujitha24 5, Amankumar-10012004 5, dgellman 3, brandtkeller 3, omlahore 2, mvanhorn 2, mihaimaruseac 2, 
+100 dernières PR fusionnées, du 2026-08-31 au 2026-11-17 :
+  auteurs : app/dependabot 72, gaganhr94 10, Amankumar-10012004 5, Nikhil-cp1905 3, gangadhar-res 2, omlahore 2, arpitjain099 1, devashridatta-dotcom 1, jeffmendoza 1, mvanhorn 1, sloemo01 1, yash1262 1
+  fusionneurs : app/kodiakhq 98, gaganhr94 1, jeffmendoza 1
+  PR hors dependabot : 28 ; approbateurs (APPROVED, une fois par PR) : mihaimaruseac 28, gaganhr94 18, kodiakhq 11
+  PR hors dependabot sans approbation : 0
+PR ouvertes : 11, dont dependabot 1
+SECURITY.md : SECURITY.md
+avis publiés : 0 ; depuis un an : 0
+## code à v1.1.0 (relevé à 23:17:15 UTC)
+- collecteurs (pkg/handler/collector) : deps_dev file gcs git github kubescape oci s3
+- certifiers (pkg/certifier) : attestation certify clearlydefined components eol osv scorecard
+- commandes (cmd) : guaccollect guaccsub guacgql guacingest guacone guacrest
+- serveur GraphQL (cmd/guacgql/cmd), lignes qui parlent d'authentification, de TLS ou d'écoute (hors en-tête de licence) :
+    root.go:34:	tlsCertFile string
+    root.go:35:	tlsKeyFile  string
+    root.go:48:		flags.tlsCertFile = viper.GetString("gql-tls-cert-file")
+    root.go:49:		flags.tlsKeyFile = viper.GetString("gql-tls-key-file")
+    root.go:64:		"gql-tls-cert-file",
+    root.go:65:		"gql-tls-key-file",
+    server.go:109:	if flags.tlsCertFile != "" && flags.tlsKeyFile != "" {
+    server.go:121:			logger.Infof("server finished: %s", server.ListenAndServeTLS(flags.tlsCertFile, flags.tlsKeyFile))
+    server.go:123:			logger.Infof("server finished: %s", server.ListenAndServe())
+- collecteur OCI (pkg/handler/collector/oci/oci.go), lecture des referrers :
+    339:func (o *ociCollector) fetchReferrerArtifacts(ctx context.Context, repo string, rc *regclient.RegClient, image ref.Ref, docChannel chan<- *processor.Documen
+    342:	referrerList, err := rc.ReferrerList(ctx, image)
+## code à af8abdb5e1a4823f7c2afa1b5fddcbba7fc2e98f (relevé à 23:17:18 UTC)
+- collecteurs (pkg/handler/collector) : blob deps_dev file gcs git github kubescape oci s3
+- certifiers (pkg/certifier) : attestation certify clearlydefined components datadog_malware eol osv scorecard vexhub
+- commandes (cmd) : guaccollect guaccsub guacgql guacingest guacone guacrest
+- serveur GraphQL (cmd/guacgql/cmd), lignes qui parlent d'authentification, de TLS ou d'écoute (hors en-tête de licence) :
+    root.go:34:	tlsCertFile string
+    root.go:35:	tlsKeyFile  string
+    root.go:48:		flags.tlsCertFile = viper.GetString("gql-tls-cert-file")
+    root.go:49:		flags.tlsKeyFile = viper.GetString("gql-tls-key-file")
+    root.go:64:		"gql-tls-cert-file",
+    root.go:65:		"gql-tls-key-file",
+    server.go:109:	if flags.tlsCertFile != "" && flags.tlsKeyFile != "" {
+    server.go:121:			logger.Infof("server finished: %s", server.ListenAndServeTLS(flags.tlsCertFile, flags.tlsKeyFile))
+    server.go:123:			logger.Infof("server finished: %s", server.ListenAndServe())
+- collecteur OCI (pkg/handler/collector/oci/oci.go), lecture des referrers :
+    374:func (o *ociCollector) fetchReferrerArtifacts(ctx context.Context, repo string, rc *regclient.RegClient, image ref.Ref, docChannel chan<- *processor.Documen
+    377:	referrerList, err := rc.ReferrerList(ctx, image)
+## limites
+- lu, rien installé ni exécuté ; fonctionnement hors ligne (sans certifiers ni collecteurs en ligne) non essayé ; absence d'authentification déduite de deux fichiers du serveur GraphQL, pas d'un essai ni de la documentation ; employeurs non vérifiés (domaines des adresses seulement) ; signatures des releases non vérifiées ; règles de fusion de Kodiak (approbations exigées) non lues
