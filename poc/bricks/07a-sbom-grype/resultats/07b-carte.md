@@ -1234,3 +1234,61 @@ Le banc l'empreinte et le lance en mode dev, dans l'espace de noms réseau vide 
 **Heures mesurées** :
 - Segment : de 20:06:09 UTC à 20:24:19 UTC, compté d'un seul tenant. Il comprend un échange hors 07b (reconstruction récursive, question du propriétaire) que je n'ai pas daté : c'est un surcompte, d'où « au plus ».
 - Somme des enveloppes de la 07b : au plus 9 h 32 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Décision du propriétaire : identité de la pièce 2 (note de 2026-11-22T21:16:55Z ; rien posé ; recommandation relue par le conseiller)
+
+**Question** : comment le propriétaire obtient-il le jeton qui signe avec `hashivault://vex` ? Aucun mode n'est strict, puisque le jeton racine d'OpenBao est sur l'hôte. Le critère retenu : dans l'audit d'OpenBao, une signature légitime et un contournement par la racine laissent-ils des traces distinctes ?
+
+**Lu avant la question** (lecture seule) :
+- **L'audit d'OpenBao est dans Grafana.** L'auditeur l'a lu dans Loki, en comptes, à 20:47 UTC : sur 24 h, 4 430 lignes de requête et 4 signatures Transit, toutes nommées par l'identité qui signe (`auth_display_name` du compte de service du scanner).
+- La clé `lien` de la 09 sert le service de signature, pas un humain : elle n'est pas un précédent.
+- `bao login -no-store` n'écrit pas le jeton dans l'assistant de jetons (aide de `bao` 2.7.2).
+- Keycloak n'a pas de fiche dans `docs/04`, et `docs/01` ne contient aucune exigence d'identité humaine ni de MFA : c'est un besoin neuf. Le Forgejo du PoC répond 404 sur `/.well-known/openid-configuration` (cause non lue).
+
+**Échanges** (verbatim) :
+- « En production on ne va pas taper un mdp à chaque fois, si ? » Réponse : signer un VEX est un jugement humain, à chaque exemption et à chaque renouvellement (au plus tard tous les 30 jours). Ce n'est pas à chaque build. En production, l'annuaire de l'entreprise en OIDC, avec MFA, remplacerait `userpass` (évaluation, non mesurée).
+- « Ben monte à ce moment là un keycloak ? » Réserves dites : composant neuf sur le chemin de confiance des VEX (base de données, secrets, TLS, flux réseau, installation sur accord) ; son compte d'administration serait un second chemin pour signer, d'où la condition d'envoyer ses événements dans Loki ; rien ne presse, puisque la pièce 8 ne vient pas avant le 29/11.
+
+**Réponse** (verbatim) : « userpass puis Keycloak à part (Recommandé) ».
+- La pièce 2 se fera avec `userpass`. Le propriétaire choisit et tape son mot de passe, jamais la session ni un script. `bao login -no-store` rend un jeton court, limité à `vex-signature`, révoqué après la signature.
+- Mesure d'abord sur l'OpenBao jetable (passage 22) : connexion, signature, révocation, et traces distinctes dans l'audit pour une signature par `userpass` et pour un contournement par la racine.
+- Keycloak sera une brique à part, ouverte plus tard. Elle commencera par une fiche `docs/04` en lecture publique, sans installation.
+
+**Heures mesurées** :
+- Enveloppe refermée à 21:14:37 UTC : au plus 10 h 22 (37295 s), estimation de 10 h dépassée. Le surcompte vient de l'attente des réponses, comptée faute de `date -u` aux reprises.
+- Somme des enveloppes de la 07b : au plus 10 h 24 à 21:16:55 UTC, pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Pièce 2 : `userpass` du propriétaire mesuré, traces d'audit distinctes (note de 2026-11-22T21:58:48Z ; passage 22, synthétique, rien posé)
+
+**Objet** : mesurer le mode choisi (`userpass`) et le critère du choix, sur le même OpenBao 2.7.2 jetable que le passage 21. Le banc ajoute un device d'audit `file`, activé avant toute signature. Le mot de passe du banc est aléatoire, dans un fichier 0600, lu par `bao` (`password=@fichier`), jamais en argument.
+
+**Premier passage, arrêté** ([journal](07b-t3-banc-22-premier-passage.log), lancé à 21:18:07 UTC) : 205 OK, 0 KO, puis arrêt au début de la section OpenBao. OpenBao 2.7.2 refuse d'activer un device d'audit par l'API et exige une déclaration dans la configuration. Je ne l'avais pas prévu. Le banc déclare désormais son audit dans un fichier passé à `bao server -dev -config=…`, comme la 08. La correction a été écrite à 21:27:03 UTC, avant la relance, avec un contrôle en plus.
+
+**Passage 22** ([journal](07b-t3-banc-22.log)) : 254 OK, 0 KO, de 21:50:32 à 21:58:37 UTC. C'est le total prédit après correction (244, plus 10).
+
+| Contrôle | Résultat |
+|---|---|
+| audit du banc | déclaré dans la configuration, `banc/` de type `file` |
+| utilisateur `proprietaire` | politique `vex-signature` seule, sans `default`, 15 min |
+| `bao login -method=userpass -no-store` | code 0, aucun jeton écrit dans le `HOME` de la connexion |
+| jeton rendu | `vex-signature`, utilisateur `proprietaire`, 900 s |
+| `signer`, jeton `userpass`, `hashivault://vex` | code 0, publié |
+| `token revoke -self` | code 0 |
+| `signer` avec le jeton révoqué | refus « signature en échec », rien publié |
+| mauvais mot de passe | code 2, « invalid username or password » |
+| audit : changement du mot de passe par la racine | une réponse, sous `root` |
+| audit : signatures réussies sur `transit/sign/vex` | `token` 1 (jeton émis par la racine, passage 21), `userpass-proprietaire` 1 |
+
+**Lecture** : le critère de la décision tient, avec une réserve. Une signature du propriétaire et une signature par un jeton émis par la racine portent des noms distincts (`userpass-proprietaire`, `token`). En revanche, après un changement de mot de passe par la racine, une connexion puis une signature porteraient **le nom du propriétaire**. Seule la ligne du changement de mot de passe (sous `root`) trahit ce contournement. La surveillance dans Grafana doit donc porter sur ce chemin (`auth/userpass/users/proprietaire/password`) et sur les jetons émis par la racine, pas sur les signatures seules.
+
+**Keycloak, correction de la note de décision précédente** : sur la remarque du propriétaire, « Mais ça rajoute encore des briques... », puis « Que recommende l'advisor ? », Keycloak n'est plus une « brique à part ». Il est **rangé en fin de projet**, avec la revue de Konflux et le build récursif, sur recommandation du conseiller. Ce rangement n'est pas confirmé par le propriétaire. Aucune brique n'est créée : rien au README ni dans `docs/04`. Qu'un annuaire d'entreprise existe en production est une hypothèse, non vérifiée.
+
+**Limites** :
+- OpenBao jetable en mode dev ; audit dans un fichier du banc, pas dans Loki. Que ces noms arrivent tels quels dans Grafana se déduit du relevé de 20:47 UTC (`auth_display_name` lu dans Loki pour le scanner), sans être mesuré pour `userpass`.
+- Un contournement plus discret reste possible pour qui tient la racine : émettre un jeton dont le nom affiché imite celui du propriétaire (non essayé), ou se connecter avec le mot de passe changé ; seul le changement de mot de passe est mesuré ici. L'audit ne le rend que visible, pas impossible.
+- L'expiration du jeton (15 min) n'est pas mesurée.
+- Le mot de passe réel sera choisi et tapé par le propriétaire. Rien n'est posé : `userpass` et la clé `vex` dans l'OpenBao du cluster forment la pièce 2, sur accord nommé.
+
+**Heures mesurées** :
+- Segment : de 21:14:37 UTC à 21:58:48 UTC, compté d'un seul tenant.
+- Somme des enveloppes de la 07b : au plus 11 h 06 pour 10 h estimées (demande au propriétaire avant 20 h).

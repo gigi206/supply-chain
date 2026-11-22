@@ -530,3 +530,34 @@ Le **jeton du propriétaire simulé** est émis par la racine du banc : politiqu
 | jeton vex : création d'une clé, export de `vex`, `deletion_allowed` sur `vex`, écriture d'une politique, lecture de la clé `scanner`, émission d'un jeton | 6 refus, chacun `code 2 ; 1` (« permission denied ») | moyenne (texte de l'erreur) |
 
 **Total prédit** : **244 OK, 0 KO**. Ce sont les 226 du passage 20, plus 2 en A et 16 en B. Le patch change, puisqu'il gagne `politique/vex-signature.hcl` : son empreinte sera relevée au passage. Aucun autre fichier du patch ne change.
+
+## Ajout avant le vingt-deuxième passage : pièce 2, `userpass` du propriétaire et traces d'audit (date -u de 21:17:38 UTC, le 2026-11-22, avant tout code)
+
+**Objet** : mesurer à sec le mode choisi par le propriétaire (`userpass`, décision de 21:16:55 UTC) et le critère qui l'a fait choisir : dans l'audit d'OpenBao, une signature par `userpass` et un contournement par la racine laissent-ils des traces distinctes ? Même OpenBao jetable que le passage 21, mesure **synthétique**.
+
+**Changements du banc** :
+- un device d'audit `file` dans le banc (`$T/bao-audit.log`), activé juste après Transit, donc avant les signatures du passage 21 ;
+- après les refus du passage 21 : `userpass` activé, utilisateur `proprietaire` (politique `vex-signature` seule, sans `default`, 15 min) ;
+- le mot de passe est aléatoire, dans un fichier 0600 du banc, et lu par `bao` (`password=@fichier`), jamais en argument ;
+- dépôt neuf `builds/up` (image et scan signé).
+
+| Contrôle | Prédit | Confiance |
+|---|---|---|
+| utilisateur `userpass` : politiques, sans default, durée | `vex-signature true 900` | haute |
+| `bao login -method=userpass -no-store` : code, jeton écrit dans le `HOME` de la connexion | `code 0 ; absent` | moyenne (`password=@fichier` à la connexion) |
+| jeton du propriétaire : politiques, utilisateur, durée | `vex-signature proprietaire 900` | haute |
+| `signer`, jeton `userpass`, `hashivault://vex` | `code 0 ; référents 1 ; refus aucun` | haute |
+| révocation par le propriétaire (`token revoke -self`) | `code 0` | haute |
+| `signer` après révocation | `code 1 ; référents 1 ; refus signature en échec` | haute |
+| connexion avec un mauvais mot de passe | `code 2 ; 1` (« invalid username or password ») | moyenne (texte) |
+| audit : changement du mot de passe du propriétaire par la racine (contournement) | `root 1` | moyenne (nom affiché de la racine) |
+| audit : signatures réussies sur `transit/sign/vex`, par identité | `token 1,userpass-proprietaire 1` | moyenne (noms affichés par défaut) |
+
+**Lecture attendue** : la dernière ligne est le critère de la décision. La signature du passage 21 (jeton émis par la racine) apparaît sous `token`, celle du propriétaire sous `userpass-proprietaire`. Le contournement (la racine change le mot de passe) laisse sa propre ligne sous `root`.
+
+**Total prédit** : **253 OK, 0 KO** (244 du passage 21, plus 9). Le patch ne change pas (`08d36964085e0814…`).
+
+**Correction avant la relance du vingt-deuxième passage** (date -u de 21:27:03 UTC, avant la relance) : le premier passage, lancé à 21:18:07 UTC ([journal](07b-t3-banc-22-premier-passage.log)), s'est arrêté au début de la section OpenBao, après 205 OK et 0 KO. OpenBao 2.7.2 refuse d'activer un device d'audit par l'API (« use declarative, config-based audit device management instead »). Je ne l'avais pas prévu. Le banc sortait en code 2, et mon enrobage affichait ce code sans le traiter comme un échec.
+- **Changement** : le device d'audit du banc est déclaré dans un fichier de configuration passé à `bao server -dev -config=…`, comme le fait la 08 pour l'OpenBao du cluster. Un essai jetable hors banc l'a confirmé (device `banc/` listé, lignes écrites).
+- **Contrôle ajouté** : « audit déclaratif du banc » : `banc/ file`. Confiance haute.
+- **Total prédit** : **254 OK, 0 KO**. Les autres prédictions ne changent pas.

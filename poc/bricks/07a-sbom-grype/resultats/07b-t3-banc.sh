@@ -18,6 +18,7 @@
 #   choix 3) appliquée à une copie de outil/ ; même table sur le binaire du patch et sur celui de la variante.
 # Passage 21 : pièce 2, signer-vex.sh signer avec hashivault://vex dans un OpenBao 2.7.2 jetable (mode dev, B, espace de noms réseau
 #   vide ; binaire extrait et vérifié par resultats/07b-p2-bao.sh) ; jeton du propriétaire simulé, émis par la racine du banc.
+# Passage 22 : userpass du propriétaire (décision du 22/11), connexion -no-store, révocation, traces dans un audit file du banc.
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
 # Usage (racine du dépôt, outils de mise.toml) : poc/bricks/07a-sbom-grype/resultats/07b-t3-banc.sh > <journal>
 set -euo pipefail
@@ -476,7 +477,9 @@ FAUX
   # seule, sans default, orphelin, 15 min (le mode réel est un choix du propriétaire). Image et scan signé dans un dépôt neuf.
   echo "## B. pièce 2 : signer-vex.sh signer avec hashivault://vex, OpenBao jetable (passage 21, synthétique)"
   mkdir -p "$T/bao-home"; (umask 077 && mkdir -p "$T/cle/bao")
-  HOME=$T/bao-home "$BAO" server -dev -dev-listen-address=127.0.0.1:18200 > "$T/bao.out" 2>&1 & bp=$!
+  # passage 22 : device d'audit déclaré dans la configuration (OpenBao 2.7 refuse l'activation par l'API : premier passage du 22)
+  printf 'audit "file" "banc" {\n  options {\n    file_path = "%s"\n  }\n}\n' "$T/bao-audit.log" > "$T/bao-audit.hcl"
+  HOME=$T/bao-home "$BAO" server -dev -dev-listen-address=127.0.0.1:18200 -config="$T/bao-audit.hcl" > "$T/bao.out" 2>&1 & bp=$!
   # shellcheck disable=SC2064   # développement à la pose, voulu
   trap "kill $zp $bp 2>/dev/null || true" EXIT
   export VAULT_ADDR=http://127.0.0.1:18200
@@ -484,6 +487,7 @@ FAUX
   for _ in $(seq 40); do rb status > /dev/null 2>&1 && break; sleep 0.25; done
   attendu "OpenBao jetable : version, scellé" "$(rb status -format=json | jq -r '"\(.version) \(.sealed)"')" "2.7.2 false"
   rb secrets enable transit > /dev/null
+  attendu "audit déclaratif du banc (passage 22)" "$(rb audit list -format=json | jq -r 'to_entries[] | "\(.key) \(.value.type)"' | paste -sd, -)" "banc/ file"
   for k in vex scanner chains; do rb write -f "transit/keys/$k" type=ecdsa-p256 exportable=false allow_plaintext_backup=false > /dev/null; done
   rb policy write vex-signature "$B/politique/vex-signature.hcl" > /dev/null
   rb policy write scanner-signature "$B/politique/scanner-signature.hcl" > /dev/null
@@ -528,6 +532,46 @@ FAUX
   refuse_bao "écriture d'une politique" policy write autre "$B/politique/vex-signature.hcl"
   refuse_bao "lecture de la clé scanner" read transit/keys/scanner
   refuse_bao "émission d'un jeton" token create -policy=vex-signature
+  # passage 22 : identité du propriétaire par userpass (décision du 22/11) ; mot de passe aléatoire du banc dans un fichier 0600, lu
+  # par bao (password=@fichier), jamais en argument ; jeton de connexion non écrit (-no-store) ; audit du banc lu en comptes
+  echo "## B. pièce 2 : userpass du propriétaire, révocation, traces d'audit (passage 22, synthétique)"
+  (umask 077 && head -c 24 /dev/urandom | base64 > "$T/cle/bao/mdp" && printf 'faux-mot-de-passe' > "$T/cle/bao/faux")
+  rb auth enable userpass > /dev/null
+  rb write auth/userpass/users/proprietaire password=@"$T/cle/bao/mdp" token_policies=vex-signature token_no_default_policy=true \
+    token_ttl=15m token_max_ttl=15m > /dev/null
+  attendu "userpass : politiques, sans default, durée" \
+    "$(rb read -format=json auth/userpass/users/proprietaire | jq -r '.data | "\(.token_policies | join(",")) \(.token_no_default_policy) \(.token_ttl)"')" "vex-signature true 900"
+  mkdir -p "$T/proprio"
+  c=0; HOME=$T/proprio "$BAO" login -method=userpass -no-store -format=json username=proprietaire password=@"$T/cle/bao/mdp" \
+    > "$T/cle/bao/login.json" 2> "$T/tmp/bao.err" || c=$?
+  (umask 077 && jq -r '.auth.client_token // empty' "$T/cle/bao/login.json" > "$T/cle/bao/proprietaire" 2> /dev/null || true)
+  attendu "login userpass -no-store : code, jeton écrit dans le HOME de la connexion" \
+    "code $c ; $([ -e "$T/proprio/.vault-token" ] && echo écrit || echo absent)" "code 0 ; absent"
+  attendu "jeton du propriétaire : politiques, utilisateur, durée" \
+    "$(jq -r '.auth | "\(.policies | join(",")) \(.metadata.username) \(.lease_duration)"' "$T/cle/bao/login.json" 2> /dev/null)" "vex-signature proprietaire 900"
+  pousser "$M0/image" builds/up/sample-app > /dev/null
+  publier_scan scanner "$M0/image-avant.scan.json" builds/up/sample-app builds/scan/up/sample-app
+  signer_up() { # jeton cas : code de signer-vex.sh signer (clé hashivault://vex), référents de builds/vex/up après, motif du refus
+    local c=0
+    VAULT_TOKEN=$(cat "$T/cle/bao/$1") SCAN_OUTIL="$OUT" CLE=hashivault://vex CLE_PUBLIQUE="$T/cle/vex-bao.pub" CA="$T/zot.crt" \
+      CONFIG_REGISTRE="$T/docker/config.json" CLE_SCANNER="$T/cle/scanner.pub" bash "$B/signer-vex.sh" signer "$T/v-bao-ok.json" \
+      "$REG/builds/up/sample-app@$Y" > "$T/signer-up-$2.log" 2>&1 || c=$?
+    echo "code $c ; référents $(nvex up) ; refus $(sed -n 's/^REFUS|\([^:]*\).*/\1/p' "$T/signer-up-$2.log" | head -1 | sed 's/ *$//' | grep . || echo aucun)"
+  }
+  attendu "signer, jeton userpass, clé hashivault://vex" "$(signer_up proprietaire ok)" "code 0 ; référents 1 ; refus aucun"
+  c=0; VAULT_TOKEN=$(cat "$T/cle/bao/proprietaire") HOME=$T/tmp "$BAO" token revoke -self > /dev/null 2> "$T/tmp/bao.err" || c=$?
+  attendu "révocation par le propriétaire (token revoke -self)" "code $c" "code 0"
+  attendu "signer après révocation" "$(signer_up proprietaire revoque)" "code 1 ; référents 1 ; refus signature en échec"
+  c=0; HOME=$T/proprio "$BAO" login -method=userpass -no-store username=proprietaire password=@"$T/cle/bao/faux" > /dev/null 2> "$T/tmp/bao.err" || c=$?
+  attendu "login, mauvais mot de passe" "code $c ; $(grep -c -i 'invalid username or password' "$T/tmp/bao.err" || true)" "code 2 ; 1"
+  rb write auth/userpass/users/proprietaire/password password=@"$T/cle/bao/faux" > /dev/null   # contournement par la racine
+  compte_audit() { # filtre jq sur les réponses : « nom affiché nombre », triés, séparés par des virgules
+    jq -r "select(.type == \"response\") | select($1) | .auth.display_name" "$T/bao-audit.log" | sort | uniq -c | awk '{print $2 " " $1}' | paste -sd, -
+  }
+  attendu "audit : changement du mot de passe du propriétaire par la racine (contournement)" \
+    "$(compte_audit '.request.path == "auth/userpass/users/proprietaire/password"')" "root 1"
+  attendu "audit : signatures réussies sur transit/sign/vex, par identité" \
+    "$(compte_audit '(.request.path | startswith("transit/sign/vex")) and ((.error // "") == "")')" "token 1,userpass-proprietaire 1"
   echo "$KO" > "$T/ko-ns"
   exit 0
 fi
