@@ -400,6 +400,14 @@ vieux-29 code 0 ; publiés 2 ; avis âge
 vieux-28 code 0 ; publiés 2 ; avis aucun
 FIN
   grep -hE '^(PUBLIES|AVIS|ECHEANCE)\|' "$SV/avis-ancien.log" "$SV/avis-retract-ancienne.log" "$SV/avis-vieux-29.log" | cut -c1-240 | sed "s|$T|<banc>|g; s/^/     /" || true
+  # passage 17 : la rétractation ancienne en mode signer (après les cas verifier) : avis, publication, puis l'exemption de P1 tient
+  c=0
+  env COSIGN_PASSWORD='' SCAN_OUTIL="$OUT" CLE="$T/cle/vex.key" CLE_PUBLIQUE="$T/cle/vex.pub" CA="$T/zot.crt" CONFIG_REGISTRE="$T/docker/config.json" \
+    CLE_SCANNER="$T/cle/scanner.pub" bash "$B/signer-vex.sh" signer "$SV/avis-retract-ancienne.json" "$REG/builds/avis/sample-app@$Y" > "$T/signer-avis-retract.log" 2>&1 || c=$?
+  attendu "signer, rétractation ancienne (passage 17)" "code $c ; référents $(nvex avis) ; $(resume_avis "$T/signer-avis-retract.log")" "code 0 ; référents 4 ; publiés 2 ; avis rétractation"
+  attendu "signer, rétractation ancienne : lignes PUBLIE" "$(grep -c '^PUBLIE|' "$T/signer-avis-retract.log")" 1
+  vex_seul avis-apres builds/avis/sample-app "$Y"; juger_vex avis-apres 3,1,2 4/1
+  [ -s "$T/cas/avis-apres/scan.json" ] && attendu "avis-apres : entrée écartée" "$(horo avis-apres)" "$VULN $HA.5Z"
   echo "$KO" > "$T/ko-ns"
   exit 0
 fi

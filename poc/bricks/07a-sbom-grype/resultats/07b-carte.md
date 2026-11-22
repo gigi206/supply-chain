@@ -1017,3 +1017,17 @@ Patch `0d641017e662d483…`. Contrôles refaits : `git apply --check`, `ec opa t
 **Heures mesurées** :
 - Ce segment : de 17:43:00 UTC à 18:38:35 UTC, compté d'un seul tenant, y compris la poussée et le compactage entre 17:52:04 et 18:27:19 UTC.
 - Somme des enveloppes de la 07b : au plus 7 h 46 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Rétractation ancienne en mode `signer` (note de 2026-11-22T18:44:41Z ; passage 17, rien posé ; complète la note de 18:38:35Z)
+
+**Ce qui n'était pas mesuré à 18:38:35Z** : la note dit qu'une rétractation plus ancienne qu'une exemption publiée « est signée et publiée ». Au passage 16, les avis n'avaient été vus qu'en mode `verifier`. Le conseiller l'a relevé.
+
+**Passage 17** ([journal](07b-t3-banc-17.log)) : 167 OK, 0 KO, de 18:40:58 à 18:44:31 UTC. C'est la prédiction (section « Ajout avant le dix-septième passage », 18:40:43 UTC). Patch inchangé, `dbad512077db97a6…`.
+- `signer` du document `retract-ancienne` sur `builds/avis`, après les 11 cas `verifier` : code 0, `AVIS|rétractation`, une ligne `PUBLIE|`, 4 référents.
+- Scan suivant (mode `vex` de `scanner.sh`, puis les commandes d'`analyser`) : 3 VEX vérifiés, 1 retenu, 2 rejetés. L'entrée `GHSA-mqqf-5wvp-8fh8` reste écartée avec l'horodatage de P1 : la rétractation ne rétracte rien.
+
+**Ce que cela confirme** : l'avis est le seul signal. Le document est publié dans le registre en ajout seul, et l'exemption tient jusqu'à son échéance. La question au propriétaire (avis ou refus) repose donc sur un fait mesuré.
+
+**Heures mesurées** :
+- Ce segment : de 18:38:35 UTC (note précédente) à 18:44:41 UTC.
+- Somme des enveloppes de la 07b : au plus 7 h 52 pour 10 h estimées (demande au propriétaire avant 20 h).

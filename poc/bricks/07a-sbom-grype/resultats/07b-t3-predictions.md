@@ -383,3 +383,21 @@ Les témoins de rétractation du banc reçoivent donc un `action_statement` par 
 **Total prédit** : 162 OK, 0 KO (146, plus 16 contrôles).
 
 **Non mesuré par ce passage** : `hashivault://vex` et le vrai Zot. L'avis reste un avis : une rétractation plus ancienne qu'une exemption publiée est signée et publiée, sans rien rétracter. La passer en refus serait un choix du propriétaire.
+
+## Ajout avant le dix-septième passage : rétractation ancienne en mode `signer` (écrit le 2026-11-22, date -u de 18:40:43 UTC dans la même commande que l’écriture ; demandé par le conseiller après le passage 16)
+
+**Pourquoi** : la note de 18:38:35Z dit qu'une rétractation plus ancienne qu'une exemption publiée « est signée et publiée ». Au passage 16, les avis n'ont été vus qu'en mode `verifier`. Ce passage le mesure en mode `signer`. `signer-vex.sh` ne change pas : le patch reste `dbad512077db97a6…`.
+
+**Banc** : après les 11 cas `verifier` de `builds/avis`, pour ne pas changer leur « publiés 2 » :
+- `signer` du document `retract-ancienne` sur `builds/avis`, clé `vex` ;
+- puis le mode `vex` de `scanner.sh` et les commandes d'`analyser` sur ce dépôt (cas `avis-apres`).
+
+| Contrôle | Prédiction | Confiance |
+|---|---|---|
+| `signer` de la rétractation ancienne | code 0 ; référents 4 ; publiés 2 ; avis rétractation | haute |
+| lignes `PUBLIE|` du journal de `signer` | 1 | haute |
+| `avis-apres` : VEX vérifiés, retenus, rejetés | 3,1,2 (P1, P3 et la rétractation ; P2 ignoré ; seul P1 recevable) | haute |
+| `avis-apres` : entrées sans VEX / avec VEX | 4/1 : l'exemption de P1 tient, la rétractation plus ancienne ne rétracte rien | haute |
+| `avis-apres` : entrée écartée | `GHSA-mqqf-5wvp-8fh8`, horodatage de P1 à `.5` s | haute |
+
+**Total prédit** : 167 OK, 0 KO (162, plus 5 contrôles).
