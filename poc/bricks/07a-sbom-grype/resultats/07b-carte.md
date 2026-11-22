@@ -939,3 +939,19 @@ Patch `0d641017e662d483…`. Contrôles refaits : `git apply --check`, `ec opa t
 **Heures mesurées** :
 - Ce segment : de 22:10:13 UTC (inventaire) à 22:17:09 UTC.
 - Somme des enveloppes de la 07b : au plus 6 h 50 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Second `verif` de la tranche 1, après les scans du 22/11 (note de 2026-11-22T17:44:16Z ; lecture seule, rien posé)
+
+**But** (note de 16:41:07Z du 21/11) : voir l'émission sur un **nouveau** scan, puisque la pose n'avait montré que la non-réémission sur le même referrer.
+
+**[`verif`](07b-t1-verif-3.log)**, de 17:43:20 à 17:43:21 UTC, `entrees-scan.sh` `5beedbca6627e3e7…` inchangé : **tenu**.
+- Prometheus a 20 séries, égales à jq sur les énoncés relus en anonyme.
+- `builds/scan/sample-app` : `scanne` passe au 22/11 09:31:56 UTC (scan précédent : 21/11 09:31:55), 6 lignes dans Loki pour ce scan.
+- `builds/scan/sample-app-deb` : `scanne` passe au 22/11 11:16:56 UTC (scan précédent : 21/11 11:16:56), 67 lignes dans Loki pour ce scan.
+
+**[Comptes dans Loki](07b-t1-loki-comptes.log)**, par l'auditeur, à 17:43:44 UTC (comptes seuls, aucune ligne brute ; requêtes `count_over_time` sur `{source="journal", unite="entrees-scan.service"}`) :
+- 96 résumés en 24 h : un passage toutes les 15 min ;
+- 2 résumés « liste émise » en 24 h, un par nouveau scan, et 3 en 30 h avec celui de la pose ;
+- 6 et 67 lignes d'entrée en 24 h, 146 en 30 h, soit 2 × 73.
+
+**Lecture** : chaque scan a été émis une fois, et une seule, dans 94 passages sans réémission. « Une fois par scan » est donc vu sur la VM pour un nouveau scan. Rien n'est noté sur le délai entre le scan et l'émission, qui n'a pas été mesuré.
