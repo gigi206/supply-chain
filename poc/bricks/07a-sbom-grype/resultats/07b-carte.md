@@ -982,3 +982,38 @@ Patch `0d641017e662d483…`. Contrôles refaits : `git apply --check`, `ec opa t
 **Heures mesurées** :
 - Ce segment : de 17:43:00 UTC (premier relevé du 22/11, `verif` de la tranche 1 compris) à 17:52:04 UTC.
 - Somme des enveloppes de la 07b : au plus 7 h 00 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Limite 3 levée à sec : avis de renouvellement dans `signer-vex.sh` (note de 2026-11-22T18:38:35Z ; passage 16, rien posé)
+
+**Limite** (note de 21:54:57Z du 21/11, inventaire) : le script ne disait pas si le document gagnerait son classement. Un horodatage plus ancien que celui du gagnant en place, ou vieux de plus de 30 jours, était signé et publié sans rien renouveler.
+
+**Changement** (approche relue par le conseiller ; prédiction écrite avant le code, section « Ajout avant le seizième passage », 18:31:58 UTC) :
+- `CLE_PUBLIQUE` (clé publique VEX) est exigée dans les deux modes.
+- Après le premier jugement, avant toute signature, le script lit les VEX publiés sur le digest dans `builds/vex/<nom>`, comme `lire_vex` de `scanner.sh`, et les passe à `scan-outil vex`. Une ligne `PUBLIES|` donne toujours le nombre d'énoncés publiés vérifiés et le code de cosign.
+- Un énoncé publié est concurrent s'il nomme une entrée du scan qui porte un nom de l'énoncé neuf (id ou alias). Tous les énoncés publiés comptent, recevables ou non, comme dans le classement de `gagnant`. Les horodatages sont comparés en entiers à la nanoseconde.
+- Avis (`AVIS|`, code de sortie inchangé) :
+  - `renouvellement` : exemption pas plus récente qu'un énoncé concurrent ;
+  - `rétractation` : rétractation dans le même cas ;
+  - `âge` : exemption dont l'échéance (horodatage + `VEX_AGE_MAX_JOURS`, 30 par défaut) est passée ou à moins d'un jour.
+- `ECHEANCE|` donne l'échéance de chaque énoncé d'exemption.
+- Patch `dbad512077db97a6…`, seul `signer-vex.sh` change. Contrôles refaits : `git apply --check`, `ec opa test` 39/39, `yq` à 30.
+
+**Passage 16** ([journal](07b-t3-banc-16.log)) : 162 OK, 0 KO, de 18:34:15 à 18:37:47 UTC. C'est la prédiction.
+- Les 18 cas `verifier` des passages 11, 12 et 14 sont inchangés. Ils lisent 0, 0, 0 et 2 énoncés publiés (les deux VEX de `builds/vex/deux`).
+- Dépôt `builds/avis` : P1 (clé VEX, il y a 10 jours, à 0,5 s), P2 (clé étrangère, il y a 1 h), P3 (clé VEX, non recevable, il y a 5 jours). Deux énoncés sont lus : P2 est ignoré, et cosign rend les attestations valides quand une autre échoue (code 0).
+- Avis `renouvellement` : même horodatage que P1, même seconde sans fraction (0,5 s plus ancien), alias `CVE-2025-69725` plus ancien, et exemption plus ancienne que P3, non recevable.
+- Aucun avis : 1 jour (P2 ignoré), même seconde à 0,7 s (une comparaison à la seconde aurait averti), rétractation récente, exemption de 28 jours.
+- Avis `rétractation` : rétractation plus ancienne que P1. Avis `âge` : 31 jours, et 708 h (échéance dans 12 h).
+- `signer` : 0 énoncé publié avant le premier document, 1 avant la rétractation, aucun avis dans les deux cas.
+- Le seuil par défaut du script (30) est égal à `vex_age_max_jours` de la politique du patch, lu par `yq`.
+
+**Limites qui restent** :
+- **Avis, pas refus.** Une rétractation plus ancienne qu'une exemption publiée est signée et publiée, mais ne rétracte rien : c'est l'échec ouvert corrigé au passage 12, par un autre chemin. La passer en refus est un choix du propriétaire. Elle rejoint la question unique prévue avec le cas de l'exemptant daté du futur.
+- La couverture par paquet n'est pas comparée : l'avis peut avertir à tort (« peut ne pas renouveler »).
+- Sans VEX publié, cosign sort en code 1 (« no matching attestations ») : seul le message distingue ce cas d'un registre illisible.
+- `AVIS`, `REFUS` et `PUBLIE` restent sur le terminal de l'auteur (classe 3 de l'inventaire).
+- `hashivault://vex` et le vrai Zot ne sont pas mesurés.
+
+**Heures mesurées** :
+- Ce segment : de 17:43:00 UTC à 18:38:35 UTC, compté d'un seul tenant, y compris la poussée et le compactage entre 17:52:04 et 18:27:19 UTC.
+- Somme des enveloppes de la 07b : au plus 7 h 46 pour 10 h estimées (demande au propriétaire avant 20 h).

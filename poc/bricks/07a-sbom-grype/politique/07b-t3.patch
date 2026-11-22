@@ -957,8 +957,8 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/
    publier) publier ;;
 diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbom-grype/signer-vex.sh
 --- a/poc/bricks/07a-sbom-grype/signer-vex.sh	1970-01-01 01:00:00.000000000 +0100
-+++ b/poc/bricks/07a-sbom-grype/signer-vex.sh	2026-11-21 23:11:39.104660343 +0100
-@@ -0,0 +1,150 @@
++++ b/poc/bricks/07a-sbom-grype/signer-vex.sh	2026-11-22 19:32:53.742708545 +0100
+@@ -0,0 +1,206 @@
 +#!/usr/bin/env bash
 +# Brique 07b, tranche 3, pièce 8 de la pose : juger, signer et publier un VEX (OpenVEX v0.2.0) écrit à la main par le propriétaire,
 +# en referrer du digest dans builds/vex/<nom>, comme publier de scanner.sh. Écrit à sec le 21/11/2026, non posé : la clé Transit
@@ -977,12 +977,22 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +#   - sous-composant qui n'est pas exactement le PURL d'une entrée du prédicat de scan ;
 +#   - énoncé dont aucun nom ne croise l'id ou un alias d'une entrée du prédicat de scan (passage 12 : une rétractation mal nommée
 +#     ne rétracterait rien) ; sous-composant d'une exemption qui n'est le paquet d'aucune entrée portant ce nom.
++# Avis, sans refus (passage 16, limite 3 de l'inventaire) : les VEX déjà publiés sur le digest (builds/vex/<nom>, vérifiés par
++#   CLE_PUBLIQUE, comme lire_vex de scanner.sh) sont lus et passés à scan-outil vex ; ligne PUBLIES| toujours écrite (nombre d'énoncés
++#   publiés vérifiés, code de cosign). Un énoncé publié concurrent nomme une entrée du scan qui porte un nom de l'énoncé neuf (id ou
++#   alias). Horodatages comparés à la nanoseconde.
++#   - AVIS|renouvellement : exemption pas plus récente qu'un énoncé publié concurrent (recevable ou non, tout statut) ;
++#   - AVIS|rétractation : rétractation dans le même cas, qui peut ne rien rétracter ;
++#   - AVIS|âge : exemption dont l'échéance (horodatage + VEX_AGE_MAX_JOURS, 30 par défaut, comme vex_age_max_jours de la politique)
++#     est passée ou à moins d'un jour (un VEX ne compte qu'au scan quotidien suivant) ; ECHEANCE| pour chaque énoncé d'exemption.
++#   La couverture par paquet n'est pas comparée : l'avis peut avertir à tort.
 +# Après signature, et avant publication : signature vérifiée par la clé publique, contenu signé (payload DSSE) rejugé de même.
 +# Usage : signer-vex.sh verifier|signer <document.json> <hôte/dépôt@sha256:…>
 +#   Prédicat de scan : le plus récent (scannedAt) des scans attestés sur le digest dans <hôte>/builds/scan/<nom>, vérifiés par
 +#   cosign verify-attestation avec CLE_SCANNER (clé publique du scanner), comme lire_vex de scanner.sh pour les VEX.
-+#   Les deux modes lisent : CA (certificat du registre), CLE_SCANNER ; SCAN_OUTIL (scan-outil par défaut).
-+#   signer lit en plus : CLE (hashivault://vex par défaut ; VAULT_ADDR et VAULT_TOKEN à la charge de l'appelant), CLE_PUBLIQUE,
++#   Les deux modes lisent : CA (certificat du registre), CLE_SCANNER, CLE_PUBLIQUE (clé publique VEX, pour les VEX publiés) ;
++#   SCAN_OUTIL (scan-outil par défaut), VEX_AGE_MAX_JOURS (30 par défaut).
++#   signer lit en plus : CLE (hashivault://vex par défaut ; VAULT_ADDR et VAULT_TOKEN à la charge de l'appelant),
 +#   CONFIG_REGISTRE (fichier d'authentification d'oras).
 +set -euo pipefail
 +export LC_ALL=C
@@ -995,6 +1005,9 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +DOC=$(realpath -- "$2")
 +CA=$(realpath -- "${CA:?CA : certificat du registre}")
 +CLE_SCANNER=$(realpath -- "${CLE_SCANNER:?CLE_SCANNER : clé publique du scanner}")
++CLE_PUBLIQUE=$(realpath -- "${CLE_PUBLIQUE:?CLE_PUBLIQUE : clé publique VEX}")
++VEX_AGE_MAX_JOURS=${VEX_AGE_MAX_JOURS:-30}
++printf '%s' "$VEX_AGE_MAX_JOURS" | grep -qE '^[0-9]+$' || { echo "VEX_AGE_MAX_JOURS : entier attendu" >&2; exit 2; }
 +OPENVEX=https://openvex.dev/ns/v0.2.0
 +SCAN_OUTIL=${SCAN_OUTIL:-scan-outil}
 +hex=${IMAGE##*@sha256:} r=${IMAGE%@sha256:*}
@@ -1079,11 +1092,54 @@ diff --color -ruN a/poc/bricks/07a-sbom-grype/signer-vex.sh b/poc/bricks/07a-sbo
 +  '{_type: "https://in-toto.io/Statement/v1", subject: [{name: $n, digest: {sha256: $h}}], predicateType: $t, predicate: $d[0]}' > "$w/enonce.json"
 +juger "$w/enonce.json"
 +echo "JUGE|$nature, $ne énoncé(s) dont $larges large(s), document sha256 $(sha256sum < "$DOC" | cut -c1-64), sujet sha256:$hex, VEX vers $depot_vex, $heure ; scan du $scanne ($nv scan(s) vérifié(s))"
++
++# avis de renouvellement (passage 16) : une fois, avant toute signature ; aucun refus
++ns() { date -u -d "$1" +%s%N; }
++mkdir "$w/pub" "$w/pubvex"
++cp=0
++COSIGN_REPOSITORY=$depot_vex cosign verify-attestation --key "$CLE_PUBLIQUE" --insecure-ignore-tlog --type "$OPENVEX" \
++  --registry-cacert "$CA" "$IMAGE" > "$w/pub/verifiees" 2> "$w/pub/erreur" || cp=$?
++grep '^{' "$w/pub/verifiees" > "$w/pub/lignes" || true
++pub=() i=0
++while IFS= read -r l; do
++  if printf '%s' "$l" | jq -r .payload | base64 -d > "$w/pub/enonce-$i.json" 2> /dev/null && [ -s "$w/pub/enonce-$i.json" ]; then
++    pub+=("$w/pub/enonce-$i.json")
++  fi
++  i=$((i + 1))
++done < "$w/pub/lignes"
++"$SCAN_OUTIL" vex "$hex" "$w/pubvex" ${pub[@]+"${pub[@]}"} > "$w/publies.json" || refus "scan-outil vex en erreur sur les VEX publiés"
++e=$(sed -n 's/^Error: //p' "$w/pub/erreur" | head -1 | cut -c1-200 | tr '|' ' ')
++echo "PUBLIES|$(jq '.enonces // [] | length' "$w/publies.json") énoncé(s) publié(s) vérifié(s) dans $depot_vex (CLE_PUBLIQUE), cosign code $cp${e:+ : $e}"
++jour=86400000000000 now=$((maintenant * 1000000000)) duree=$((VEX_AGE_MAX_JOURS * 86400000000000))
++while IFS= read -r x; do
++  k=$(jq -r .key <<< "$x") st=$(jq -r .value.statut <<< "$x") hs=$(jq -r .value.horodatage <<< "$x") noms=$(jq -c .value.noms <<< "$x")
++  ts=$(ns "$hs")
++  etendus=$(jq -c --argjson n "$noms" '[.vulnerabilities[]? | [.id] + (.aliases // []) | select(any(.[]; . as $y | $n | any(. == $y)))]
++    | add // [] | . + $n | unique' "$SCAN")
++  tc=-1 hc='' sc=''
++  while read -r h2 s2; do
++    t2=$(ns "$h2")
++    if [ "$t2" -gt "$tc" ]; then tc=$t2 hc=$h2 sc=$s2; fi
++  done < <(jq -r --argjson x "$etendus" '.enonces[]? | select(any(.noms[]; . as $y | $x | any(. == $y))) | "\(.horodatage) \(.statut)"' "$w/publies.json")
++  ici="énoncé $k ($(jq -r 'join(",")' <<< "$noms")) du $hs"
++  if [ "$tc" -ge "$ts" ]; then
++    if [ "$st" = not_affected ]; then
++      echo "AVIS|renouvellement : $ici : énoncé publié du $hc ($sc) au moins aussi récent sur une entrée du scan de même nom ; ce document peut ne pas renouveler l'exemption (couverture par paquet non comparée)"
++    else
++      echo "AVIS|rétractation : $ici : énoncé publié du $hc ($sc) au moins aussi récent sur une entrée du scan de même nom ; cette rétractation peut ne rien rétracter (couverture par paquet non comparée)"
++    fi
++  fi
++  if [ "$st" = not_affected ]; then
++    ech=$(date -u -d "@$(((ts + duree) / 1000000000))" +%Y-%m-%dT%H:%M:%SZ)
++    echo "ECHEANCE|énoncé $k : $ech ($VEX_AGE_MAX_JOURS jours après $hs)"
++    [ $((ts + duree - now)) -ge "$jour" ] \
++      || echo "AVIS|âge : $ici : échéance $ech passée ou à moins d'un jour ; un VEX ne compte qu'au scan quotidien suivant"
++  fi
++done < <(jq -c '.enonces | to_entries[]' "$w/verdict.json")
 +[ "$MODE" = signer ] || exit 0
 +
 +CLE=${CLE:-hashivault://vex}
 +case $CLE in hashivault://*) ;; *) CLE=$(realpath -- "$CLE") ;; esac
-+CLE_PUBLIQUE=$(realpath -- "${CLE_PUBLIQUE:?CLE_PUBLIQUE : clé publique VEX}")
 +CONFIG_REGISTRE=$(realpath -- "${CONFIG_REGISTRE:?CONFIG_REGISTRE : authentification d oras pour builds/vex}")
 +cosign signing-config create --out "$w/vide.json" > "$w/cosign.log" 2>&1 || { cat "$w/cosign.log" >&2; exit 1; }
 +cosign attest-blob --key "$CLE" --signing-config "$w/vide.json" --predicate "$DOC" --type "$OPENVEX" --bundle "$w/bundle.json" \

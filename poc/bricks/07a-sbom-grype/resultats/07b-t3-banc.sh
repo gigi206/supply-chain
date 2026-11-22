@@ -10,6 +10,7 @@
 #   C. porte : ec validate input de l'hôte sur les prédicats produits en B, entrée écartée passée en KEV par jq ;
 #   D. entrees-scan.py du patch : fonctions comptes et entrees appelées sur les prédicats produits en B (pas de Zot, pas de VM).
 #      Passage 15 : lignes de document VEX (documents_vex), et main() trois fois sur un faux Zot (lire remplacée) : A, A, B.
+# Passage 16 : avis de renouvellement de signer-vex.sh (B, dépôt builds/avis ; seuil par défaut confronté à la politique en C).
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
 # Usage (racine du dépôt, outils de mise.toml) : poc/bricks/07a-sbom-grype/resultats/07b-t3-banc.sh > <journal>
 set -euo pipefail
@@ -296,8 +297,8 @@ if [ "${1:-}" = ns ]; then
   vex doc "$SV/couple-ok.json" "$HV" "not_affected;$SV1;-;GO-2026-5774;pkg:oci/sample-app@$Y;pkg:golang/stdlib@1.24.4"
   sv_verifier() { # document dépôt [référence] : code et motif de signer-vex.sh verifier
     local r=0
-    env SCAN_OUTIL="$OUT" CA="$T/zot.crt" CLE_SCANNER="$T/cle/scanner.pub" bash "$B/signer-vex.sh" verifier "$SV/$1.json" "${3:-$REG/builds/$2/sample-app@$Y}" \
-      > "$SV/$1-$2.log" 2>&1 || r=$?
+    env SCAN_OUTIL="$OUT" CA="$T/zot.crt" CLE_SCANNER="$T/cle/scanner.pub" CLE_PUBLIQUE="$T/cle/vex.pub" bash "$B/signer-vex.sh" verifier "$SV/$1.json" \
+      "${3:-$REG/builds/$2/sample-app@$Y}" > "$SV/$1-$2.log" 2>&1 || r=$?
     echo "code $r : $(sed -n 's/^\(JUGE|[a-z]*, [0-9]* énoncé(s) dont [0-9]* large(s)\).*/\1/p; s/^REFUS|\([^:(0-9]*\).*/REFUS|\1/p' "$SV/$1-$2.log" | head -1 | sed 's/ *$//')"
   }
   while read -r c d attendu_r; do attendu "signer-vex verifier : $c ($d)" "$(sv_verifier "$c" "$d")" "$attendu_r"; done <<'FIN'
@@ -321,6 +322,10 @@ couple-ok signe code 1 : REFUS|sous-composant absent des entrées du prédicat d
 ok etranger code 1 : REFUS|aucun scan signé vérifié
 FIN
   attendu "signer-vex verifier : image sans digest" "$(sv_verifier ok sans-digest "$REG/builds/signe/sample-app:t3" | cut -d' ' -f1,2)" "code 2"
+  # passage 16 : ligne PUBLIES| (énoncés publiés vérifiés par CLE_PUBLIQUE) et lignes AVIS| (type seul)
+  resume_avis() { echo "publiés $(sed -n 's/^PUBLIES|\([0-9]*\) .*/\1/p' "$1") ; avis $(sed -n 's/^AVIS|\([^ ]*\) :.*/\1/p' "$1" | sort -u | paste -sd, - | grep . || echo aucun)"; }
+  attendu "signer-vex verifier : énoncés publiés lus (ok, retract, large sur signe ; couple-ok sur deux)" \
+    "$(for x in ok-signe retract-signe large-signe couple-ok-deux; do sed -n 's/^PUBLIES|\([0-9]*\) .*/\1/p' "$SV/$x.log"; done | paste -sd, -)" "0,0,0,2"
   # 18-21 (passage 11) : pièce 8, signer-vex.sh signer avec la clé locale vex (pas hashivault://vex) ; scan signé de builds/scan/signe (passage 14)
   echo "## B. signer-vex.sh signer (pièce 8), clé locale"
   pousser "$M0/image" builds/signe/sample-app > /dev/null
@@ -338,6 +343,7 @@ FIN
   attendu "signer, clé étrangère : refus avant publication" "$(signer_vex etrangere "$T/v-signe-ok.json" etrangere)" "code 1 ; référents 0"
   attendu "signer, clé étrangère : motif" "$(grep -c '^REFUS|signature non vérifiée' "$T/signer-etrangere.log")" 1
   attendu "signer, clé vex : publié" "$(signer_vex vex "$T/v-signe-ok.json" ok)" "code 0 ; référents 1"
+  attendu "signer, clé vex : énoncés publiés lus et avis (passage 16)" "$(resume_avis "$T/signer-ok.log")" "publiés 0 ; avis aucun"
   grep -E '^(JUGE|SIGNE|PUBLIE)\|' "$T/signer-ok.log" | cut -c1-200 | sed "s|$T|<banc>|g; s/^/     /" || true
   vex_seul signe-ok builds/signe/sample-app "$Y"; juger_vex signe-ok 1,1,0 4/1
   [ -s "$T/cas/signe-ok/scan.json" ] && attendu "signe-ok : entrée écartée" "$(horo signe-ok)" "$VULN $H1"
@@ -346,8 +352,54 @@ FIN
   vex doc "$T/v-signe-retract.json" "$(date -u +%FT%TZ)" "affected;-;-;-;CVE-2025-69725;pkg:oci/sample-app@$Y;$SYFT"
   jq -c '.statements |= map(. + {action_statement: "témoin du banc : aucune action"})' "$T/v-signe-retract.json" > "$T/v-signe-retract.t" && mv "$T/v-signe-retract.t" "$T/v-signe-retract.json"   # passage 12
   attendu "signer, rétractation : publiée" "$(signer_vex vex "$T/v-signe-retract.json" retract)" "code 0 ; référents 2"
+  attendu "signer, rétractation : énoncés publiés lus et avis (passage 16)" "$(resume_avis "$T/signer-retract.log")" "publiés 1 ; avis aucun"
   vex_seul signe-retract builds/signe/sample-app "$Y"; juger_vex signe-retract 2,1,1 5/0
   [ -s "$T/cas/signe-retract/scan.json" ] && attendu "signe-retract : écartées sans exemption" "$(jq -r .vex.ecarteesSansExemption "$T/cas/signe-retract/scan.json")" 1
+  # passage 16 : avis de renouvellement (limite 3) ; builds/avis : scan signé, P1 (clé vex, 10 jours, .5 s), P2 (clé étrangère, 1 h),
+  # P3 (clé vex, non recevable : sans impact_statement, 5 jours)
+  echo "## B. signer-vex.sh, avis de renouvellement (passage 16)"
+  pousser "$M0/image" builds/avis/sample-app > /dev/null
+  publier_scan scanner "$M0/image-avant.scan.json" builds/avis/sample-app builds/scan/avis/sample-app
+  HA=$(date -ud '10 days ago' +%FT%T) EM="pkg:oci/sample-app@$Y;$SYFT"
+  vex doc "$T/v-avis-p1.json" "$HA.500000000Z" "not_affected;$SV1;-;$EV"
+  vex doc "$T/v-avis-p2.json" "$(date -ud '1 hour ago' +%FT%TZ)" "not_affected;$SV1;-;$EV"
+  vex doc "$T/v-avis-p3.json" "$(date -ud '5 days ago' +%FT%TZ)" "not_affected;$JUSTIF;-;-;GHSA-j6qf-3m9c-vwj3;$EM"
+  publier_vex vex "$T/v-avis-p1.json" "$Y" builds/avis/sample-app "$Y" builds/vex/avis/sample-app
+  publier_vex etrangere "$T/v-avis-p2.json" "$Y" builds/avis/sample-app "$Y" builds/vex/avis/sample-app
+  publier_vex vex "$T/v-avis-p3.json" "$Y" builds/avis/sample-app "$Y" builds/vex/avis/sample-app
+  nvex() { { curl -fsS --cacert zot.crt "https://$REG/v2/builds/vex/$1/sample-app/referrers/$Y" 2>/dev/null || echo '{}'; } | jq '.manifests // [] | length'; }
+  attendu "builds/avis : scans et référents VEX" "$(nscan avis),$(nvex avis)" "1,3"
+  vex doc "$SV/avis-recent.json" "$(date -ud '1 day ago' +%FT%TZ)" "not_affected;$SV1;-;$EV"
+  vex doc "$SV/avis-egal.json" "$HA.500000000Z" "not_affected;$SV1;-;$EV"
+  vex doc "$SV/avis-ancien.json" "${HA}Z" "not_affected;$SV1;-;$EV"
+  vex doc "$SV/avis-fraction.json" "$HA.700000000Z" "not_affected;$SV1;-;$EV"
+  vex doc "$SV/avis-alias.json" "$(date -ud '11 days ago' +%FT%TZ)" "not_affected;$SV1;-;CVE-2025-69725;$EM"
+  vex doc "$SV/avis-retract-ancienne.json" "$(date -ud '11 days ago' +%FT%TZ)" "affected;-;-;-;$EV"; action "$SV/avis-retract-ancienne.json"
+  vex doc "$SV/avis-retract-recente.json" "$(date -ud '1 day ago' +%FT%TZ)" "affected;-;-;-;$EV"; action "$SV/avis-retract-recente.json"
+  vex doc "$SV/avis-non-recevable.json" "$(date -ud '6 days ago' +%FT%TZ)" "not_affected;$SV1;-;GHSA-j6qf-3m9c-vwj3;$EM"
+  vex doc "$SV/avis-vieux-31.json" "$(date -ud '31 days ago' +%FT%TZ)" "not_affected;$SV1;-;GO-2026-5775;$EM"
+  vex doc "$SV/avis-vieux-29.json" "$(date -ud '708 hours ago' +%FT%TZ)" "not_affected;$SV1;-;GO-2026-5777;$EM"
+  vex doc "$SV/avis-vieux-28.json" "$(date -ud '28 days ago' +%FT%TZ)" "not_affected;$SV1;-;GO-2026-5774;$EM"
+  sv_avis() { # cas : code, énoncés publiés et avis de signer-vex.sh verifier sur builds/avis
+    local r=0
+    env SCAN_OUTIL="$OUT" CA="$T/zot.crt" CLE_SCANNER="$T/cle/scanner.pub" CLE_PUBLIQUE="$T/cle/vex.pub" bash "$B/signer-vex.sh" verifier "$SV/avis-$1.json" \
+      "$REG/builds/avis/sample-app@$Y" > "$SV/avis-$1.log" 2>&1 || r=$?
+    echo "code $r ; $(resume_avis "$SV/avis-$1.log")"
+  }
+  while read -r c attendu_r; do attendu "signer-vex verifier, avis : $c" "$(sv_avis "$c")" "$attendu_r"; done <<'FIN'
+recent code 0 ; publiés 2 ; avis aucun
+egal code 0 ; publiés 2 ; avis renouvellement
+ancien code 0 ; publiés 2 ; avis renouvellement
+fraction code 0 ; publiés 2 ; avis aucun
+alias code 0 ; publiés 2 ; avis renouvellement
+retract-ancienne code 0 ; publiés 2 ; avis rétractation
+retract-recente code 0 ; publiés 2 ; avis aucun
+non-recevable code 0 ; publiés 2 ; avis renouvellement
+vieux-31 code 0 ; publiés 2 ; avis âge
+vieux-29 code 0 ; publiés 2 ; avis âge
+vieux-28 code 0 ; publiés 2 ; avis aucun
+FIN
+  grep -hE '^(PUBLIES|AVIS|ECHEANCE)\|' "$SV/avis-ancien.log" "$SV/avis-retract-ancienne.log" "$SV/avis-vieux-29.log" | cut -c1-240 | sed "s|$T|<banc>|g; s/^/     /" || true
   echo "$KO" > "$T/ko-ns"
   exit 0
 fi
@@ -500,6 +552,9 @@ sed "s#/etc/porte/regles-scan#$P/regles#" "$B/politique/porte/policy-scan.yaml" 
 sed "s#vex_age_max_jours: 30#vex_age_max_jours: null#" "$P/politique-30.yaml" > "$P/politique-null.yaml"
 grep -q '^ *vex_age_max_jours: 30$' "$P/politique-30.yaml" && ok "politique du patch telle quelle : vex_age_max_jours 30 (choix du propriétaire)" || ko "politique du patch : 30 absent"
 grep -q '^ *vex_age_max_jours: null$' "$P/politique-null.yaml" && ok "politique fabriquée : vex_age_max_jours null (sed inverse)" || ko "politique fabriquée : null absent"
+# passage 16 : seuil par défaut de l'avis d'âge de signer-vex.sh, confronté à la politique du patch
+attendu "signer-vex.sh : VEX_AGE_MAX_JOURS par défaut = vex_age_max_jours de la politique" \
+  "$(sed -n 's/^VEX_AGE_MAX_JOURS=\${VEX_AGE_MAX_JOURS:-\([0-9]*\)}$/\1/p' "$B/signer-vex.sh")" "$(yq '.sources[0].ruleData.vex_age_max_jours' "$B/politique/porte/policy-scan.yaml")"
 juger_porte() { # libellé cas politique code-attendu règles-attendues [vulnérabilité passée en KEV, défaut $VULN]
   local c=0 v
   [ -s "$T/cas/$2/scan.json" ] || { ko "$1 : aucun prédicat"; return; }

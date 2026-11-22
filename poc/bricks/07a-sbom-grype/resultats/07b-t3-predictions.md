@@ -337,3 +337,49 @@ Les témoins de rétractation du banc reçoivent donc un `action_statement` par 
 **Total prédit** : 146 OK, 0 KO. Le nombre de contrôles ne change pas, car les quatre lignes D s'allongent.
 
 **Non mesuré par ce passage** : le `verif` du patch sur le vrai Loki (`bash -n` seulement) ; il attend la pose. À la pose, la marque du referrer courant existe déjà : les lignes de document n'apparaîtront qu'au scan suivant.
+
+## Ajout avant le seizième passage : avis de renouvellement dans `signer-vex.sh` (écrit le 2026-11-22, date -u de 18:31:58 UTC dans la même commande que l’écriture, avant toute ligne de code ; limite 3 de l'inventaire)
+
+**Changement prévu** (approche relue par le conseiller) :
+- `signer-vex.sh` exige `CLE_PUBLIQUE` (clé publique VEX) dans les deux modes, plus seulement en `signer`.
+- Après le premier jugement, et avant toute signature, il lit les VEX déjà publiés sur le digest dans `builds/vex/<nom>`, comme `lire_vex` de `scanner.sh` : `cosign verify-attestation` avec `CLE_PUBLIQUE`, puis `scan-outil vex` sur les énoncés vérifiés. Ce second appel ne porte que sur les publiés.
+- Il écrit toujours une ligne `PUBLIES|` : le nombre d'énoncés publiés vérifiés, le code de cosign et sa première erreur. « Pas d'avis » ne veut donc jamais dire « non comparé ».
+- **Même entrée** : les noms d'un énoncé neuf sont étendus par les entrées du scan déjà lu (id et alias). Un énoncé publié concurrent est un énoncé dont un nom croise ces noms étendus. La comparaison porte sur tous les `enonces` publiés, recevables ou non, comme le classement de `gagnant`.
+- **Comparaison** : en entiers à la nanoseconde (`date -u -d … +%s%N`), jamais en chaînes.
+- **Avis** (lignes `AVIS|`, sortie standard, code inchangé) :
+  - `renouvellement` : une exemption dont l'horodatage est inférieur ou égal à celui d'un énoncé publié concurrent ;
+  - `rétractation` : une rétractation dans le même cas, qui peut ne rien rétracter ;
+  - `âge` : une exemption dont l'échéance (horodatage + `VEX_AGE_MAX_JOURS`, défaut 30) est passée ou à moins d'un jour, le délai du scan quotidien. Il ne s'applique pas aux rétractations.
+- Une ligne `ECHEANCE|` donne l'échéance de chaque énoncé d'exemption.
+- La couverture par paquet n'est pas reproduite : l'avis peut avertir à tort, et il le dit (« peut »).
+- Le calcul se fait hors de `juger`, une seule fois, y compris en mode `signer`.
+
+**Banc** :
+- `sv_verifier` et `signer_vex` reçoivent `CLE_PUBLIQUE`. Les 18 cas `verifier` des passages 11, 12 et 14 sont inchangés.
+- Nouveau dépôt `builds/avis` : un scan signé par la clé `scanner` (prédicat d'avant la tranche 3) et trois VEX publiés :
+  - P1 : exemption de `GHSA-mqqf-5wvp-8fh8`, clé `vex`, datée d'il y a 10 jours, à `.500000000` s ;
+  - P2 : la même, clé étrangère, datée d'il y a 1 h ;
+  - P3 : exemption non recevable (sans `impact_statement`) de `GHSA-j6qf-3m9c-vwj3`, clé `vex`, datée d'il y a 5 jours.
+
+| Contrôle | Prédiction | Confiance |
+|---|---|---|
+| seuil par défaut du script = `vex_age_max_jours` de la politique (`yq`) | 30 | haute |
+| énoncés publiés lus par les cas `verifier` acceptés (ok, retract, large, couple-ok sur `deux`) | 0,0,0,2 (les deux VEX publiés sous `builds/vex/deux` au cas 7) | haute |
+| `builds/avis` : scans et référents VEX | 1,3 | haute |
+| `recent` : exemption de `GHSA-mqqf` d'il y a 1 jour | code 0 ; publiés 2 ; avis aucun (P2 ignoré : clé étrangère) | moyenne (cosign rend-il les attestations valides quand l'une échoue ? non mesuré) |
+| `egal` : même horodatage que P1, à la nanoseconde | code 0 ; publiés 2 ; avis renouvellement | haute |
+| `ancien` : même seconde que P1, sans fraction (0,5 s plus ancien) | code 0 ; publiés 2 ; avis renouvellement | haute |
+| `fraction` : même seconde que P1, à `.700000000` | code 0 ; publiés 2 ; avis aucun (une comparaison à la seconde avertirait) | haute |
+| `alias` : exemption nommée `CVE-2025-69725` (alias), il y a 11 jours | code 0 ; publiés 2 ; avis renouvellement | haute |
+| `retract-ancienne` : `affected` sur `GHSA-mqqf`, il y a 11 jours | code 0 ; publiés 2 ; avis rétractation | haute |
+| `retract-recente` : `affected` sur `GHSA-mqqf`, il y a 1 jour | code 0 ; publiés 2 ; avis aucun | haute |
+| `non-recevable` : exemption de `GHSA-j6qf`, il y a 6 jours (P3, non recevable, est plus récent) | code 0 ; publiés 2 ; avis renouvellement | haute |
+| `vieux-31` : exemption de `GO-2026-5775`, il y a 31 jours | code 0 ; publiés 2 ; avis âge | haute |
+| `vieux-29` : exemption de `GO-2026-5777`, il y a 708 h (29,5 jours) | code 0 ; publiés 2 ; avis âge | haute |
+| `vieux-28` : exemption de `GO-2026-5774`, il y a 28 jours | code 0 ; publiés 2 ; avis aucun | haute |
+| `signer` du passage 11, document publié en premier (`signer-ok.log`) | publiés 0 ; avis aucun | haute |
+| `signer` de la rétractation, plus récente que l'exemption publiée (`signer-retract.log`) | publiés 1 ; avis aucun | haute |
+
+**Total prédit** : 162 OK, 0 KO (146, plus 16 contrôles).
+
+**Non mesuré par ce passage** : `hashivault://vex` et le vrai Zot. L'avis reste un avis : une rétractation plus ancienne qu'une exemption publiée est signée et publiée, sans rien rétracter. La passer en refus serait un choix du propriétaire.
