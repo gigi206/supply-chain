@@ -1086,3 +1086,48 @@ C'est la direction stricte, mais c'est un changement d'effet, à lire par le pro
 **Heures mesurées** :
 - Ce segment : de 18:44:41 UTC à 19:26:25 UTC, compté d'un seul tenant.
 - Somme des enveloppes de la 07b : au plus 8 h 34 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Exemptant daté du futur : forme asymétrique mesurée hors patch (note de 2026-11-22T19:48:35Z ; passage 20, rien posé ; approche relue par le conseiller)
+
+**Question** (inventaire, classe 2) : aujourd'hui, un document daté du futur gagne tous les classements jusqu'à sa date, et la porte le refuse (blocage fermé). Le sortir du classement amenderait le choix 3. Seule une forme asymétrique tient. Elle est mesurée ici par un cas unitaire, avant la question au propriétaire.
+
+**Variante, hors patch** ([diff](07b-t3-variante-futur.patch), `afa6b30d0838019d…`) : `07b-t3.patch` ne change pas (`9fcb4b40dc31c95d…`). Le banc applique le diff à une copie de `outil/` du patch et construit un second binaire. Seul `predicat` change :
+- limite = heure du scan (`descriptor.timestamp`, que la porte lit dans `scannedAt`) plus 5 min (le `_derive` de la porte, constante dupliquée en Go) ;
+- dans le classement d'une entrée, un énoncé **exemptant** postérieur à la limite sort ; un énoncé **non exemptant** reste, quelle que soit sa date ;
+- s'il y a des énoncés et que l'heure du scan est illisible, c'est une erreur (échec fermé).
+
+**Passage 20** ([journal](07b-t3-banc-20.log)) : 226 OK, 0 KO, de 19:40:06 à 19:48:11 UTC.
+- Chaque contrôle prédit tient (section « Ajout avant le vingtième passage », 19:38:25 UTC). Le bilan du banc est de 0 écart.
+- **Le total prédit, lui, était faux** : la correction de 19:40:00 UTC (12 cas dans la table existante, non 11) annonçait 225. Or 192 + 3 + 1 + 12 + 16 + 2 font 226. C'est une erreur d'addition dans la prédiction, pas un contrôle de plus : la comparaison au passage 19 donne 34 contrôles neufs et aucun perdu.
+
+Heure du scan témoin : 17:23:25 UTC le 21/11. Résultats pour l'entrée `GHSA-mqqf-5wvp-8fh8` (aujourd'hui → variante) :
+
+| Cas | Documents | Aujourd'hui | Variante |
+|---|---|---|---|
+| futur-seul | exemptant du 2027-01-01 | exemptée au 2027-01-01 (refus de la porte en KEV) | aucune exemption |
+| futur-et-ancien | exemptant du 01/11 + exemptant du 2027-01-01 | exemptée au 2027-01-01 (refus de la porte en KEV) | **exemptée au 01/11** |
+| retractation-future | exemptant du 01/11 + `affected` du 2027-01-01 | aucune | aucune |
+| futur-egalite | exemptant et `affected` du 2027-01-01 | aucune | aucune |
+| retractation-puis-futur | exemptant du 01/11 + `affected` du 20/11 + exemptant du 2027-01-01 | exemptée au 2027-01-01 (refus de la porte en KEV) | **aucune** |
+| futur-autre-produit | exemptant du 01/11 + `not_affected` du 2027-01-01 pour un autre produit | aucune | aucune |
+| bord-4-min | exemptant du 01/11 + exemptant à 17:27:25Z | exemptée à 17:27:25Z | idem |
+| bord-6-min | exemptant du 01/11 + exemptant à 17:29:25Z | exemptée à 17:29:25Z (refus de la porte en KEV) | **exemptée au 01/11** |
+
+- Les 12 cas existants du remplacement donnent le même résultat sur les deux binaires, et le prédicat de compatibilité de l'image est identique.
+- Heure du scan illisible : code 0 aujourd'hui (l'heure est recopiée sans être lue), code 1 avec la variante.
+
+**Lecture** :
+- **Ce que la variante change** : un exemptant daté du futur ne masque plus une exemption valide plus ancienne (`futur-et-ancien`, `bord-6-min`). Dans `retractation-puis-futur`, il ne lève plus une rétractation : aujourd'hui, le résultat est un refus de la porte ; avec la variante, l'entrée reste sans exemption. C'est la même issue à la porte pour une KEV, mais pour la bonne raison.
+- **Ce qu'elle garde** : une rétractation datée du futur garde son effet (`retractation-future`). C'est la preuve de l'asymétrie : sans elle, une rétractation signée sur une horloge décalée serait ignorée sans bruit.
+- **Ce qu'elle ne lève pas** : un `not_affected` daté du futur pour un autre produit n'est pas exemptant, et il reste dans le classement (`futur-autre-produit`). Ce cas reste un blocage fermé.
+- La « réparation par retrait sur accord » n'est plus nécessaire pour un exemptant daté du futur. Elle reste nécessaire pour un énoncé non exemptant daté du futur.
+
+**Limites** :
+- La constante de 5 min est dupliquée entre Go et rego. Si l'une change sans l'autre, le scanner et la porte divergent.
+- L'heure du scan est celle de la machine du scanner. Une horloge du scanner en avance élargit la fenêtre.
+- Mesuré au niveau du prédicat seulement : le refus de la porte sur un horodatage futur est déjà mesuré (cas `futur`, partie C), mais la variante n'a pas été jugée à la porte ni dans le mode `analyser` réel.
+- Rien n'est posé, et le patch ne contient pas la variante : elle amende le choix 3, c'est au propriétaire de décider.
+
+**Heures mesurées** :
+- Ce segment : de 18:44:41 UTC à 19:48:35 UTC, compté d'un seul tenant.
+- Somme des enveloppes de la 07b : au plus 8 h 56 pour 10 h estimées (demande au propriétaire avant 20 h).

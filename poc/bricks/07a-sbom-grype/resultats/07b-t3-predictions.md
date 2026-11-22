@@ -454,3 +454,45 @@ Les témoins de rétractation du banc reçoivent donc un `action_statement` par 
 | prédicat | absent | haute |
 
 **Total prédit** : 192 OK, 0 KO (186, plus 6 contrôles).
+
+## Ajout avant le vingtième passage : exemptant daté du futur, forme asymétrique, cas unitaire (écrit le 2026-11-22, date -u de 19:38:25 UTC dans la même commande que l’écriture ; approche relue par le conseiller)
+
+**Pourquoi** : l'inventaire (classe 2) dit qu'une seule forme tient si l'on sort le document daté du futur du classement : l'énoncé **exemptant** daté du futur sort, l'énoncé **non exemptant** reste. C'est à mesurer par un cas unitaire avant la question au propriétaire.
+
+**Ce n'est pas le patch** : la variante amende le choix 3, donc `07b-t3.patch` reste à `9fcb4b40dc31c95d…`. Elle vit dans un petit diff à part, `resultats/07b-t3-variante-futur.patch`, appliqué par le banc sur la copie de `outil/` du patch. Le banc en tire un second binaire. Les deux binaires passent la même table.
+
+**Variante** (seul `predicat` change) :
+- L'heure de référence est celle du scan, `descriptor.timestamp` de Grype (celle que la porte lit dans `scannedAt`), plus 5 min, l'écart d'horloge de la porte (`_derive`). Ce n'est pas l'horloge de la machine.
+- Dans le classement d'une entrée, un énoncé exemptant postérieur à cette limite sort. Un énoncé non exemptant reste, quelle que soit sa date.
+- S'il y a des énoncés et que l'heure du scan est illisible, c'est une erreur (échec fermé).
+
+**Heure du scan témoin** (`ecarte-sans-doc.json`, tiré de `image-avant.grype.json`) : 2026-11-21T18:23:25.018413605+01:00, soit 17:23:25 UTC le 21/11. Tous les documents de la table existante datent du 20/11 au plus tard. Aucun n'est donc « futur » pour la variante.
+
+**Cas neufs** (`pf` : exemptant daté du 2027-01-01 ; `prf` : `affected` du 2027-01-01 ; `pnf-autre-produit` : `not_affected` du 2027-01-01 pour un autre produit, non exemptant ; `p4` et `p6` : exemptants à l'heure du scan plus 4 et 6 min, soit 17:27:25Z et 17:29:25Z) :
+
+| Cas | Documents | Aujourd'hui | Variante | Confiance |
+|---|---|---|---|---|
+| futur-seul | pf | `vex not_affected 2027-01-01T00:00:00Z ; sans exemption 0` | `aucune ; sans exemption 1` | haute |
+| futur-et-ancien | pa, pf | `vex … 2027-01-01T00:00:00Z ; sans exemption 0` | `vex … 2026-11-01T00:00:00Z ; sans exemption 0` | haute |
+| retractation-future | pa, prf | `aucune ; sans exemption 1` | idem | haute |
+| futur-egalite | pf, prf | `aucune ; sans exemption 1` | idem | haute |
+| retractation-puis-futur | pa, pr, pf | `vex … 2027-01-01T00:00:00Z ; sans exemption 0` | `aucune ; sans exemption 1` | haute |
+| futur-autre-produit | pa, pnf-autre-produit | `aucune ; sans exemption 1` | idem | haute |
+| bord-4-min | pa, p4 | `vex … 2026-11-21T17:27:25Z ; sans exemption 0` | idem | haute |
+| bord-6-min | pa, p6 | `vex … 2026-11-21T17:29:25Z ; sans exemption 0` | `vex … 2026-11-01T00:00:00Z ; sans exemption 0` | haute |
+
+**Lecture attendue** :
+- Les lignes `futur-et-ancien` et `bord-6-min` portent le changement d'effet : un exemptant daté du futur ne masque plus une exemption valide plus ancienne.
+- `retractation-future` est la preuve de l'asymétrie : une rétractation datée du futur garde son effet.
+- Dans `retractation-puis-futur`, aujourd'hui, l'exemptant daté du futur l'emporte sur la rétractation du 20/11 : c'est un énoncé daté du futur qui lève une rétractation, et la porte le refuse alors (horodatage postérieur au scan). Avec la variante, la rétractation reste gagnante.
+- `futur-autre-produit` montre que la variante ne lève pas tout le blocage : un `not_affected` daté du futur pour un autre produit n'est pas exemptant et reste dans le classement.
+
+**Autres contrôles** :
+- Toute la table existante du remplacement (11 cas) sur le binaire de la variante : résultats inchangés. Confiance haute.
+- Compatibilité de l'image sur la variante : prédicat égal à celui du binaire du patch. Confiance haute.
+- Heure du scan illisible (`descriptor.timestamp` à `x`, documents de `remplacement`) : aujourd'hui code 0 (l'heure est recopiée sans être lue), variante code 1. Confiance moyenne pour aujourd'hui, haute pour la variante.
+- Diff de la variante appliqué, binaire construit, `go vet` : 3 OK.
+
+**Total prédit** : 224 OK, 0 KO (192, plus 3 pour la variante, 1 de compatibilité, 11 pour la table existante, 16 pour les cas neufs sur deux binaires et 2 pour l'heure illisible). Patch inchangé : `9fcb4b40dc31c95d…`.
+
+**Correction avant le vingtième passage** (date -u de 19:40:00 UTC, avant tout lancement) : la table existante du remplacement compte 12 cas, et non 11 (j'avais oublié `affected-autre-sous`). Le total prédit devient **225 OK, 0 KO**. Les autres prédictions ne changent pas.

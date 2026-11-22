@@ -1,0 +1,31 @@
+diff --color -ruN a/outil/main.go b/outil/main.go
+--- a/outil/main.go	2026-11-22 20:38:29.129109948 +0100
++++ b/outil/main.go	2026-11-22 20:38:36.822995474 +0100
+@@ -309,6 +309,17 @@
+ 		}
+ 		enonces = append(enonces, candidat{n, t, x.Exemptant, sc})
+ 	}
++	// Variante « exemptant daté du futur » (cas unitaire du passage 20, hors patch : amende le choix 3) : limite = heure du scan
++	// (descriptor.timestamp, lue par la porte dans scannedAt) + 5 min (_derive de la porte, constante dupliquée). Un énoncé
++	// exemptant postérieur à la limite sort du classement ; un énoncé non exemptant y reste, quelle que soit sa date.
++	var limite time.Time
++	if len(enonces) > 0 {
++		ts, err := time.Parse(time.RFC3339Nano, r.Descriptor.Timestamp)
++		if err != nil {
++			return nil, fmt.Errorf("heure du scan illisible dans %s : %q", chemin, r.Descriptor.Timestamp)
++		}
++		limite = ts.Add(5 * time.Minute)
++	}
+ 	// gagnant : horodatage de l'énoncé le plus récent qui nomme la correspondance ; vrai seulement si tous les énoncés à cet horodatage
+ 	// sont exemptants. Un énoncé exemptant qui ne couvre pas son paquet (sous-composants sans le PURL de l'entrée, égalité exacte)
+ 	// sort du classement de cette entrée ; tous les autres y restent (affected, non recevable, autre produit, énoncé large) : une
+@@ -325,6 +336,9 @@
+ 			if c.exemptant && len(c.sous) > 0 && !c.sous[e.Package] {
+ 				vise = false
+ 			}
++			if c.exemptant && c.t.After(limite) {
++				vise = false
++			}
+ 			switch {
+ 			case !vise:
+ 			case !trouve || c.t.After(tMax):

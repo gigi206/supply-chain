@@ -14,6 +14,8 @@
 # Passage 18 : repli sans --vex de scanner.sh (limite 4) : predicat en A ; en B, grype factice devant le vrai (panne injectée,
 #   synthétique) ; porte en C ; série scan_vex_repli et comptes de entrees-scan.sh en D.
 # Passage 19 : même grype factice, sans VEX retenu : l'échec reste un échec, sans relance.
+# Passage 20 : exemptant daté du futur, forme asymétrique (A) : variante hors patch (resultats/07b-t3-variante-futur.patch, amende le
+#   choix 3) appliquée à une copie de outil/ ; même table sur le binaire du patch et sur celui de la variante.
 # Les VEX sont des témoins (07b-t3-vex.py) : aucune analyse d'atteignabilité ne les fonde.
 # Usage (racine du dépôt, outils de mise.toml) : poc/bricks/07a-sbom-grype/resultats/07b-t3-banc.sh > <journal>
 set -euo pipefail
@@ -580,6 +582,7 @@ unite pb-large "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;$VULN;pk
 unite pd-deux-paquets "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "not_affected;$S1;-;$E" "not_affected;$S1;-;$VULN;pkg:oci/sample-app@$Y;pkg:golang/stdlib@1.24.4"
 unite pr-autre-sous "$Y" "$OPENVEX" 2026-11-20T00:00:00Z "affected;-;-;-;$VULN;pkg:oci/sample-app@$Y;pkg:golang/stdlib@1.24.4"
 while read -r c a b attendu_r; do
+  echo "$c $a $b" >> "$U/table-remplacement"
   rm -f "$U"/sortie/*
   set -- "$U/$a.json"; [ "$b" = - ] || set -- "$@" "$U/$b.json"
   "$OUT" vex "${Y#sha256:}" "$U/sortie" "$@" > "$U/p-$c.res"
@@ -600,6 +603,56 @@ large pa pb-large vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
 deux-paquets pd-deux-paquets - vex not_affected 2026-11-20T00:00:00Z ; sans exemption 0
 affected-autre-sous pa pr-autre-sous aucune ; sans exemption 1
 FIN
+# passage 20 : exemptant daté du futur, forme asymétrique. Variante hors patch (amende le choix 3) : limite = heure du scan + 5 min ;
+# un énoncé exemptant postérieur sort du classement, un non exemptant reste. Même table sur les deux binaires.
+mkdir -p "$T/variante"; cp -r "$B/outil" "$T/variante/"
+(cd "$T/variante" && patch -p1 --quiet < "$R/07b-t3-variante-futur.patch") && ok "variante : diff appliqué à une copie de outil/ du patch" \
+  || ko "variante : diff non applicable"
+OUTV=$T/variante/scan-outil
+(cd "$T/variante/outil" && CGO_ENABLED=0 GOFLAGS=-mod=mod GOCACHE=$T/tmp/gocache go build -trimpath -buildvcs=false -o "$OUTV" .) \
+  && ok "variante : scan-outil construit" || ko "variante : construction"
+(cd "$T/variante/outil" && GOCACHE=$T/tmp/gocache go vet .) && ok "variante : go vet" || ko "variante : go vet"
+"$OUTV" predicat "$M0/image-avant.grype.json" base-g0 "$T/vide.json" > "$T/compat-image-variante.json"
+[ "$(jq -S . "$T/compat-image-variante.json")" = "$(jq -S . "$T/compat-image.json")" ] \
+  && ok "variante : compatibilité image, prédicat égal à celui du binaire du patch" || ko "variante : compatibilité image, différences"
+echo "     heure du scan témoin (ecarte-sans-doc.json) : $(jq -r .descriptor.timestamp "$T/ecarte-sans-doc.json")"
+resume() { jq -r --arg v "$VULN" '([.vulnerabilities[] | select(.id == $v) | .vex // empty] | if length == 1 then "vex \(.[0].status) \(.[0].timestamp)" else "aucune" end) + " ; sans exemption \(.vex.ecarteesSansExemption)"' "$1" 2>/dev/null; }
+juger_rempl() { # binaire cas documents (séparés par des virgules) : résumé de l'entrée VULN, ou code de sortie
+  local o=$1 c=$2 l=$3 x c2=0
+  set --; for x in ${l//,/ }; do set -- "$@" "$U/$x.json"; done
+  rm -f "$U"/sortie/*
+  "$o" vex "${Y#sha256:}" "$U/sortie" "$@" > "$U/q-$c.res" < /dev/null
+  "$o" predicat "$T/ecarte-sans-doc.json" base-g0 "$U/q-$c.res" > "$U/q-$c.scan" 2> "$T/tmp/err" < /dev/null || c2=$?
+  if [ -s "$U/q-$c.scan" ]; then resume "$U/q-$c.scan"; else echo "code $c2"; fi
+}
+while read -r c a b; do
+  l=$a; [ "$b" = - ] || l=$a,$b
+  attendu "variante, table du remplacement : $c" "$(juger_rempl "$OUTV" "t-$c" "$l")" "$(resume "$U/p-$c.scan")"
+done < "$U/table-remplacement"
+unite pf "$Y" "$OPENVEX" 2027-01-01T00:00:00Z "not_affected;$S1;-;$E"
+unite prf "$Y" "$OPENVEX" 2027-01-01T00:00:00Z "affected;-;-;-;$E"
+unite pnf-autre-produit "$Y" "$OPENVEX" 2027-01-01T00:00:00Z "not_affected;$S1;-;$VULN;pkg:oci/autre@sha256:$(printf '1%.0s' $(seq 64));$SYFT"
+unite p4 "$Y" "$OPENVEX" 2026-11-21T17:27:25Z "not_affected;$S1;-;$E"
+unite p6 "$Y" "$OPENVEX" 2026-11-21T17:29:25Z "not_affected;$S1;-;$E"
+while IFS='|' read -r cl auj var; do
+  read -r c l <<< "$cl"
+  attendu "futur, binaire du patch : $c" "$(juger_rempl "$OUT" "a-$c" "$l")" "$auj"
+  attendu "futur, variante : $c" "$(juger_rempl "$OUTV" "v-$c" "$l")" "$var"
+done <<'FIN'
+futur-seul pf|vex not_affected 2027-01-01T00:00:00Z ; sans exemption 0|aucune ; sans exemption 1
+futur-et-ancien pa,pf|vex not_affected 2027-01-01T00:00:00Z ; sans exemption 0|vex not_affected 2026-11-01T00:00:00Z ; sans exemption 0
+retractation-future pa,prf|aucune ; sans exemption 1|aucune ; sans exemption 1
+futur-egalite pf,prf|aucune ; sans exemption 1|aucune ; sans exemption 1
+retractation-puis-futur pa,pr,pf|vex not_affected 2027-01-01T00:00:00Z ; sans exemption 0|aucune ; sans exemption 1
+futur-autre-produit pa,pnf-autre-produit|aucune ; sans exemption 1|aucune ; sans exemption 1
+bord-4-min pa,p4|vex not_affected 2026-11-21T17:27:25Z ; sans exemption 0|vex not_affected 2026-11-21T17:27:25Z ; sans exemption 0
+bord-6-min pa,p6|vex not_affected 2026-11-21T17:29:25Z ; sans exemption 0|vex not_affected 2026-11-01T00:00:00Z ; sans exemption 0
+FIN
+jq '.descriptor.timestamp = "x"' "$T/ecarte-sans-doc.json" > "$T/heure-illisible.json"
+c=0; "$OUT" predicat "$T/heure-illisible.json" base-g0 "$U/p-remplacement.res" > /dev/null 2> "$T/tmp/err" || c=$?
+attendu "heure du scan illisible, binaire du patch" "code $c" "code 0"
+c=0; "$OUTV" predicat "$T/heure-illisible.json" base-g0 "$U/p-remplacement.res" > /dev/null 2> "$T/tmp/err" || c=$?
+attendu "heure du scan illisible, variante" "code $c" "code 1"
 # passage 18 : predicat en repli (limite 4) : aucun document appliqué, repli = nombre de documents retenus
 rm -f "$U"/sortie/*; "$OUT" vex "${Y#sha256:}" "$U/sortie" "$U/valide.json" > "$U/r-valide.res"
 "$OUT" predicat "$M0/image-avant.grype.json" base-g0 "$U/r-valide.res" repli > "$T/repli-image.json"
