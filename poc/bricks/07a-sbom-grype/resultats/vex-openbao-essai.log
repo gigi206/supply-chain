@@ -1,0 +1,50 @@
+étape essai commencée : 2026-11-22T22:42:39Z ; vex-openbao.sh 8e2177864616a82a…
+OK   bao de l'hôte : empreinte 9c5f36287c673f386e1533e9c044169a248e4ee50dd54810fa766e95bd41b788 (OpenBao v2.7.2 (9e0a0d3c3504a0a00b45e61355afac5e35c78379), committed 2026-10-26T20:32:27Z)
+OK   redirection ouverte : 127.0.0.1:44309 → openbao-0:8200 (processus 538004)
+### connexion du propriétaire (userpass, -no-store)
+OK   connexion : code 0 ; politiques vex-signature ; durée 900 s ; secret dans un fichier 600 ; rien dans /home/gigi/.cache/supply-chain-poc/07a/vex-openbao/essai-20261122T224239Z-3mVW/home : 0 fichier(s)
+OK   secret du propriétaire : vex-signature seule, 900 s
+### essais avec le secret du propriétaire
+     | ACCEPTE|lecture de transit/keys/vex
+     | ACCEPTE|signature avec la clé vex
+     | REFUSE|signature avec la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|signature avec la clé scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|signature avec la clé tsa|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|signature avec la clé lien|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|lecture de transit/keys/chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|export de la clé vex|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|clé vex rendue exportable|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|sauvegarde de la clé vex|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|lecture de kv/scan/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|liste des politiques|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|création d'un secret enfant|Code: 403. Errors: * 1 error occurred: * permission denied 
+     | REFUSE|consultation de soi|Code: 403. Errors: * 1 error occurred: * permission denied 
+OK   essai lecture de transit/keys/vex : ACCEPTE
+OK   essai signature avec la clé vex : ACCEPTE
+OK   essai signature avec la clé chains : REFUSE
+OK   essai signature avec la clé scanner : REFUSE
+OK   essai signature avec la clé tsa : REFUSE
+OK   essai signature avec la clé lien : REFUSE
+OK   essai lecture de transit/keys/chains : REFUSE
+OK   essai export de la clé vex : REFUSE
+OK   essai clé vex rendue exportable : REFUSE
+OK   essai sauvegarde de la clé vex : REFUSE
+OK   essai lecture de kv/scan/zot : REFUSE
+OK   essai liste des politiques : REFUSE
+OK   essai création d'un secret enfant : REFUSE
+OK   essai consultation de soi : REFUSE
+### signature vérifiée sur l'hôte avec la clé publique archivée
+     signature Transit : préfixe vault:v1, 71 octets DER
+OK   openssl : signature de la clé vex vérifiée par resultats/vex-cle-publique.pem (Verified OK)
+OK   témoin : même signature sur une autre entrée refusée (Verification failure)
+### clé publique vue par cosign (client hashivault de signer-vex.sh)
+OK   cosign public-key --key hashivault://vex : code 0, SPKI égal à resultats/vex-cle-publique.pem (v3.1.4)
+### révocation de soi, puis signature refusée
+OK   révocation de soi : code 0
+OK   signature avec la clé vex après révocation : REFUSE
+OK   redirection fermée : processus 538004 arrêté
+étape essai finie : 2026-11-22T22:42:42Z
+OK   K3 : aucune ligne de bloc privé dans le journal
+OK   K4 : valeur du jeton root absente du journal
+OK   K5 : valeur du secret du propriétaire absente du journal
+OK   fichier du secret du propriétaire effacé

@@ -1406,3 +1406,32 @@ Ensuite seulement viendra le compte de l'auditeur dans Loki.
 **Heures mesurées** :
 - Segment : de 22:36:02 UTC à 22:37:49 UTC, compté d'un seul tenant.
 - Somme des enveloppes de la 07b : au plus 11 h 28 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Pièce 2 posée : politique, `userpass` et essai réel ; mot de passe généré par la session (note de 2026-11-22T22:44:17Z)
+
+**Décision du propriétaire** (verbatim) : « Fais le », puis « Créé en un et retiens le pour lr poc ». Elle amende la décision de 21:16:55 UTC, selon laquelle le propriétaire choisissait et tapait son mot de passe lui-même.
+- Un premier lancement d'`acces_vex` dans son terminal (22:39:40 UTC) a été arrêté à l'invite, sans aucune écriture (aucun journal).
+- Le mot de passe a été généré par la session à 22:42 UTC : 24 caractères (base64 de 18 octets aléatoires), sans saut de ligne. Il est rangé dans `~/.cache/supply-chain-poc/07a/secrets/openbao-proprietaire.password` (0600, dossier 0700), comme les autres secrets du PoC, et n'est jamais affiché.
+- Le script n'a pas changé (sha256 `8e217786…`). `acces_vex` et `essai` sont passés par leur branche terminal, pilotée par le pilote pty du quatrième passage du banc, qui lit ce fichier.
+- Prédiction écrite avant le lancement (22:42:17 UTC). Tout a tenu comme prédit.
+
+| Étape | Résultat |
+|---|---|
+| [`acces_vex`](vex-openbao-acces_vex.log), 22:42:30 à 22:42:35 UTC | pty : code 0, 2 invites, 0 écho ; politique `vex-signature` relue = fichier ; `userpass/` monté ; utilisateur `vex-signature,true,900,900` ; seuls ajouts ; K3, K4, K6 ; 10 OK, 0 KO |
+| [`essai`](vex-openbao-essai.log), 22:42:39 à 22:42:42 UTC | pty : code 0, 1 invite, 0 écho ; vraie redirection (127.0.0.1 vers `openbao-0:8200`), CA du PoC ; connexion `-no-store`, `vex-signature` seule, 900 s ; 14 essais conformes ; signature vérifiée par openssl avec `vex-cle-publique.pem`, témoin refusé ; SPKI de cosign (`hashivault://vex`) égal ; révocation, puis signature refusée ; redirection fermée ; K3, K4, K5, fichier du jeton effacé ; 28 OK, 0 KO |
+| [Loki](vex-openbao-loki.log), auditeur à travers Grafana ([requêtes](vex-openbao-loki.sh), comptes seuls), 22:43:17 UTC, 15 min | signatures réussies sur `transit/sign/vex` : `userpass-proprietaire 1` ; refusées : 1, sans identité (jeton révoqué) ; écriture de l'utilisateur : `root 1` ; connexion `userpass` : 1, réussie ; création de la clé `vex` : `root 1` |
+
+**Limites levées** par cette pose, que le banc laissait ouvertes : le canal `kubectl exec` jusqu'au pod (mot de passe sur l'entrée standard, `password=-`), puis la connexion acceptée ; le TLS du PoC et le nom `openbao.openbao.svc.cluster.local` ; la redirection réelle ; le nom `userpass-proprietaire` dans Grafana.
+
+**Réserve, conséquence de la décision** : le nom `userpass-proprietaire` dit désormais qu'un détenteur du fichier a signé, et non que le propriétaire l'a fait de sa main. La session, comme quiconque lit ce fichier sur l'hôte, peut signer un VEX à ce nom. L'audit sépare toujours ce nom de `root` et de `token`. Mais le fichier et le jeton racine sont sur le même hôte : « réservé au propriétaire » n'est plus que nominal, comme l'était le jeton émis par la racine avant la décision du 22/11. Revenir au choix d'avant ne demande rien de neuf. La racine change le mot de passe pour une valeur tapée par le propriétaire, ce qui laisse une ligne `root` dans l'audit, puis le fichier est effacé. La politique `vex-signature` ne permet pas au propriétaire de faire ce changement lui-même.
+
+**Reste** :
+- pièces 3 et 4, pas avant le 29/11 ;
+- pièce 5 : `vex.pub` dans `scan-config` ;
+- `07b-t3-banc.sh` à repasser sur le patch `c6d4b8a1` avant toute autre pièce.
+
+Dossier d'essai effacé après archivage.
+
+**Heures mesurées** :
+- Segment : de 22:39:40 UTC à 22:44:17 UTC, compté d'un seul tenant.
+- Somme des enveloppes de la 07b : au plus 11 h 33 pour 10 h estimées (demande au propriétaire avant 20 h).

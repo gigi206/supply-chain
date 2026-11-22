@@ -1,0 +1,6 @@
+heure : 2026-11-22T22:43:17Z ; fenêtre : 15 min
+signatures réussies sur transit/sign/vex, par identité : userpass-proprietaire 1
+signatures refusées sur transit/sign/vex, par identité : - 1
+écritures de l'utilisateur proprietaire (création ou mise à jour), par identité : root 1
+connexions userpass de proprietaire, par résultat (vide = réussie) : - 1
+création de la clé vex, par identité : root 1

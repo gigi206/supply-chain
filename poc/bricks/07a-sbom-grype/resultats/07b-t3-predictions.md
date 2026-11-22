@@ -653,3 +653,17 @@ Les autres cas du troisième passage gardent leur prédiction. Le total sera fix
 | `releve` : code ; KO | code 0 ; 0 KO | haute |
 | `cle_vex` | code 0 ; `ecdsa-p256,false,false,false,1,true` ; clé publique P-256 ; seule différence : `vex` ajoutée | haute |
 | journaux | K3 et K4 : OK | haute |
+
+## Ajout avant acces_vex et essai réels (date -u de 22:42:17 UTC, le 2026-11-22, avant le lancement)
+
+**Changement de décision du propriétaire** (verbatim) : « Fais le », puis « Créé en un et retiens le pour lr poc ». Le mot de passe n'est plus tapé par le propriétaire. La session l'a généré à 22:42 UTC : 24 caractères (base64 de 18 octets aléatoires), sans saut de ligne, dans `~/.cache/supply-chain-poc/07a/secrets/openbao-proprietaire.password` (0600, dossier 0700). Il n'est jamais affiché. Le script n'est pas modifié : `acces_vex` et `essai` passent par leur branche terminal, pilotée par le même pilote pty que le quatrième passage du banc, qui lit ce fichier. Un premier lancement d'`acces_vex` dans le terminal du propriétaire (22:39:40 UTC) a été arrêté à l'invite, sans aucune écriture (aucun journal).
+
+| Étape et contrôle | Prédit | Confiance |
+|---|---|---|
+| `acces_vex` : pty | `code 0 ; invites vues 2 ; échos du mot de passe 0` | moyenne (premier passage par `kubectl exec` réel) |
+| `acces_vex` : politique, montage, utilisateur | politique relue = fichier ; `userpass/` ajouté ; `vex-signature,true,900,900` ; seuls ajouts | moyenne (même raison) |
+| `acces_vex` : K4, K6 ; KO | OK ; 0 | haute |
+| `essai` : pty | `code 0 ; invites vues 1 ; échos du mot de passe 0` | moyenne (TLS du PoC, nom `openbao.openbao.svc.cluster.local`, vraie redirection) |
+| `essai` : connexion, essais, openssl, cosign, révocation | `vex-signature` seule, 900 s ; 14 essais conformes ; signature vérifiée par `resultats/vex-cle-publique.pem` ; SPKI de cosign égal ; refus après révocation | moyenne |
+| `essai` : K4, K5 ; redirection fermée ; KO | OK ; OK ; 0 | haute |
+| Loki, auditeur : signatures réussies sur `transit/sign/vex`, par `auth_display_name`, depuis 22:42 UTC | `userpass-proprietaire 1` | moyenne (forme des champs dans Loki) |
