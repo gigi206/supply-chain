@@ -2029,3 +2029,12 @@ Le dépôt et sc-stockage sont de nouveau alignés pour `zot.json`. Aucune écri
 **Suite** : la tâche planifiée du 29/11 à 05:40 UTC lirait avant les premières suppressions du deb (balayage du 29/11, de 17:07 à 18:20 selon la projection) ; sa replanification attend l'accord du propriétaire, **non modifiée**.
 
 **Heures** : de 14:24:01 UTC à 14:26:18 UTC, dans l'enveloppe de la 07b.
+
+## Additif n°2 après le pod d'essai (note de 2026-11-23T14:28:53Z) : contrôles refaits avec témoin, à la demande du conseiller
+
+- **Patch `07b-t3`** : le premier contrôle (point 3 de l'additif précédent) n'avait pas de témoin positif (filtre `awk` sur `diff --git`, alors que le patch est en `diff -ruN`). Refait : **943 lignes commençant par `+` ou `-`** (dont les 16 en-têtes des 8 fichiers, donc 927 lignes ajoutées ou retirées), dont **0** contenant `zot`, `systemctl`, `restart` ou `daemon-reload` (sans tenir compte de la casse). La conclusion de l'additif précédent tient, maintenant mesurée.
+- **`scanner.sh` avant et après le report de la pièce 5** (`06a7cf8a~1` contre `06a7cf8a`) : cinq morceaux changés (en-tête, variables avec `CLE_VEX`, `lire_vex` ajoutée, `analyser`, aiguillage des modes) ; **`attester()` identique** (empreinte `9dbe14cb…` des deux côtés), **`publier()` et `oras_ecriture()` identiques** (`a4cb3799…`). Avec la comparaison des couches, `attester` et `publier` ne changent ni de code ni de binaires à la pose : le risque résiduel relevé avant la demande d'accord de la pose est fermé.
+- **Scripts de la tâche du 29/11** : `g7-balayage.sh` `b13a1375…` (v3) et `g7-etat.sh` `a12f0653…` (v2), les empreintes de sa consigne.
+- **Relevés précédents** : [`vex-depot-etat.log`](vex-depot-etat.log) et [`piece5-couches.log`](piece5-couches.log) viennent de commandes de session (curl anonyme ; `crane manifest`, `crane blob` et comparaison des membres tar), sans script dans le dépôt ; leur entête dit ce qu'ils lisent.
+
+**Heures** : de 14:26:18 UTC à 14:28:53 UTC, dans l'enveloppe de la 07b.
