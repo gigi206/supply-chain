@@ -232,3 +232,9 @@
 05 M5b rejeu (m5b-1) fermeture	2026-11-23T17:57:20Z	
 05 M5b rejeu (m5b-1) fermeture fait	2026-11-23T18:00:01Z	
 05 M5b republication (m5b-1) pipeline_construction	2026-11-23T18:00:02Z	
+05 M5b rejeu (m5b-2) entree	2026-11-23T18:25:35Z	
+05 M5b rejeu (m5b-2) entree fait	2026-11-23T18:25:35Z	
+05 M5b republication (m5b-2) pipeline_construction	2026-11-23T18:25:35Z	
+05 M5b republication (m5b-2) pipeline_construction fait	2026-11-23T18:25:37Z	
+05 M5b rejeu (m5b-2) construction_rpm	2026-11-23T18:25:37Z	
+05 M5b rejeu (m5b-2) construction_rpm fait	2026-11-23T18:27:51Z	

@@ -1,0 +1,23 @@
+# m5b-republier.sh pipeline_construction, 2026-11-23T18:25:35Z
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 192.168.161.13:5000 ; tag : m5b-2 ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## construction/sample-app-rpm.m1b.signee.yaml
+OK   sha256 du fichier : 8b96852f970da6e1bccab3491587705cff16cafdf3649e312f9d6b87208e66e8
+OK   annotation de signature : true
+OK   digest attendu égal à PIPELINE_REF de m1b-construction.sh : sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+OK   référence du contenu signé présente dans Zot : builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+OK   référence du contenu signé présente dans Zot : builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+OK   référence du contenu signé présente dans Zot : entrees/sample-app/packaging-rpm@sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48 : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   référence du contenu signé présente dans Zot : tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5 : sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+OK   référence du contenu signé présente dans Zot : tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f : sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   référence du contenu signé présente dans Zot : tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b : sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+références par digest du contenu signé : 6
+OK   tekton/pipelines/sample-app-rpm:m5b-2 avant la poussée : absent
+relevé : octets libres sur / de sc-stockage (porte /var/lib/zot) avant les poussées : 18141597696
+## poussées (tag m5b-2, tkn 0.46.2, TZ=Europe/Paris)
+poussée 1 : tekton/pipelines/sample-app-rpm:m5b-2
+OK   construction/sample-app-rpm.m1b.signee.yaml poussé, digest : sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+OK   tekton/pipelines/sample-app-rpm:m5b-2 relu (lecture anonyme) : sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+poussées : 1

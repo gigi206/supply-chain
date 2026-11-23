@@ -1,0 +1,108 @@
+# m5b-rejeu.sh construction_rpm, 2026-11-23T18:25:37Z
+## gardes, avant toute création
+OK   PIPELINE_REF de m1b-construction.sh : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+OK   FERMETURE_RPM et PACKAGING de m1b-construction.sh : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   pipeline présente dans Zot par digest (lecture anonyme) : sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+OK   entrée présente dans Zot par digest : builds/fermetures/sample-app-rpm@sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f : sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f
+OK   entrée présente dans Zot par digest : builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+OK   entrée présente dans Zot par digest : entrees/sample-app/packaging-rpm@sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48 : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+politiques de builds : NetworkPolicy construction-racine-rpm-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-racine-rpm-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
+OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 
+relevé : politiques de builds qui sélectionnent preparer-rpm : CiliumNetworkPolicy CiliumNetworkPolicy builds-sans-internet
+/ de sc-stockage : 18141433856 octets libres à 18:25:37 (garde : 1073741824)
+OK   m5b-2-construction-1 : pipeline par digest : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a
+OK   m5b-2-construction-1 : podTemplate commun sans env ; Kata pour construire seule : [false,["construire:kata"]]
+OK   m5b-2-construction-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+## m5b-2-construction-1
+m5b-2-construction-1 créé à 18:25:38 (sc-stockage.poc.test:5000/tekton/pipelines/sample-app-rpm@sha256:7d361cb1d5ea9b7994727f839bc4365a29e4ebdc7948fceff4176b4a371abd6a)
+m5b-2-construction-1 : condition Succeeded « True|Succeeded », relevée à 18:27:44
+     début 2026-11-23T18:25:38Z ; fin 2026-11-23T18:27:44Z
+### TaskRun m5b-2-construction-1-construire (tâche construire) : True|Succeeded
+     résultat DIGEST_CONSTRUIT : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     pod m5b-2-construction-1-construire-pod : nœud sc-build, runtimeClassName « kata », tekton.dev/task construire-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-construire : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-construire : demandes {"cpu":"2","memory":"6Gi"} ; limites {"cpu":"2","memory":"6Gi"}
+     journal de step-construire : 247 lignes, dont 222 « paquet » (non répétées)
+       invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0, gid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+       mock-6.9-1.el9.noarch ; tar (GNU tar) 1.34 ; gzip 1.12
+       témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+       témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+       témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+       témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+       fermeture confrontée au verrou : 222 rpm (noms et sigmd5), image de bootstrap (manifest.json égal au pull_digest), repodata 4 fichiers, dossier dir: 4 fichiers, aucun autre objet
+       dossier dir: sc-stockage.poc.test@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 ; image_digest du verrou 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca
+       Source0 sample-app-1.0.0.tar.gz (époque 1793229566) : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6
+       avant mock, capacité de /w : 3059832 kB ; utilisés : 452724 kB
+       mock --hermetic-build : rc 0 en 43 s
+       lignes « Using container image: dir: » : sortie 1 ; root.log 1
+       lignes « Checking image digest: 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca » : sortie 1 ; root.log 1
+       lignes « falling back to chroot installation » : sortie 0 ; root.log 0
+       lignes « Expected digest for image » : sortie 0 ; root.log 0
+       lignes « No space left on device » : sortie 0 ; root.log 0
+       lignes http ou https de mock.out : 0
+       lignes http ou https de root.log : 0
+       lignes http ou https de build.log : 0
+       paquets du buildroot (rpm --root) : 222
+       après mock (buildroot gardé), capacité de /w : 3059832 kB ; utilisés : 1592640 kB
+       rpm : sample-app-1.0.0-2.el9.src.rpm sha256 c802e60a511c140e3a6761752b0c9966b2d8959a909d2a3b73d85f9b4bfd1128 (151068 octets) ; NEVRA sample-app-1.0.0-2.el9.x86_64 ; BUILDHOST reproducible ; BUILDTIME 1794787200
+       rpm : sample-app-1.0.0-2.el9.x86_64.rpm sha256 864d55f486f423cec854cdeecd3458b13e83a5e4f4d70f77345b7e99b808c68f (2173376 octets) ; NEVRA sample-app-1.0.0-2.el9.x86_64 ; BUILDHOST reproducible ; BUILDTIME 1794787200
+       couche sha256:ac3e3ef14c6e54fbba4f297b00f32bfeff840ef9bbe55a1a95bda853ee55e8e4 (2181120 octets) ; configuration sha256:48c5e33207f73ac7907cfae080f9fbd0a501d79565d06905688b351a53aa0cc4 ; manifeste sha256:07b7bd6feb489bff10aa92b7fd632a50a7958
+       image.tar : 2191360 octets
+### TaskRun m5b-2-construction-1-preparer (tâche preparer) : True|Succeeded
+     résultat CHAINS-GIT_COMMIT : 6391fd437f26696847041be3226bbbf633f55a2f
+     résultat CHAINS-GIT_URL : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+     résultat FERMETURE_RPM_ARTIFACT_INPUTS : {"digest":"sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f","uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-rpm"}
+     résultat FERMETURE_SOURCES_ARTIFACT_INPUTS : {"digest":"sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21","uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources"}
+     résultat PACKAGING_ARTIFACT_INPUTS : {"digest":"sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48","uri":"oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-rpm"}
+     pod m5b-2-construction-1-preparer-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task preparer-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-assemblage : terminated code 0 raison Completed
+     conteneur step-entrees : terminated code 0 raison Completed
+     conteneur step-sources : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-sources : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-entrees : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-assemblage : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     journal de step-sources : 1 lignes, dont 0 « paquet » (non répétées)
+       git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     journal de step-entrees : 1 lignes, dont 0 « paquet » (non répétées)
+       fermeture rpm : 230 fichiers ; fermeture applicative : 8 fichiers ; packaging : 2 fichiers
+     journal de step-assemblage : 4 lignes, dont 0 « paquet » (non répétées)
+       all modules verified
+       go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+       marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+       entrées prêtes : src (41 fichiers), fermeture rpm (230 fichiers), spec 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6, verrou c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+### TaskRun m5b-2-construction-1-publier (tâche publier) : True|Succeeded
+     résultat IMAGE_DIGEST : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+     résultat IMAGE_URL : sc-stockage.poc.test:5000/builds/sample-app-rpm
+     pod m5b-2-construction-1-publier-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task publier-image, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-publier : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-publier : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     journal de step-publier : 1 lignes, dont 0 « paquet » (non répétées)
+       publiée : sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 (relue en lecture anonyme)
+résultat de IMAGE_URL : sc-stockage.poc.test:5000/builds/sample-app-rpm
+résultat de IMAGE_DIGEST : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+OK   PipelineRun m5b-2-construction-1 : True|Succeeded
+OK   construire : témoins réseau en échec : 4
+OK   construire : mock --hermetic-build rc 0 : 1
+OK   construire : aucune ligne http ou https (mock.out, root.log, build.log) : 3
+OK   dépôt publié : sc-stockage.poc.test:5000/builds/sample-app-rpm
+OK   construire : DIGEST_CONSTRUIT égal au digest publié : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119
+OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 1
+relevé : artefact rpm sc-stockage.poc.test:5000/builds/sample-app-rpm@sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 ; celui de la cascade sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119 : égaux (relevé, non exigé)
+OK   PipelineRun m5b-2-construction-1 signé par Chains : true
+/ de sc-stockage : 18129801216 octets libres à 18:27:51

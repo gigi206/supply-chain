@@ -1,4 +1,4 @@
-# s4b.sh taches_sources, 2026-11-14T22:22:26Z
+# s4b.sh taches_sources, 2026-11-23T18:24:12Z
 ## prefetch-gomod v2 (tkn 0.46.2)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 OK   prefetch-gomod : signature versionnée conforme au gabarit rendu, signature exceptée
@@ -7,4 +7,4 @@ OK   v2 distincte de la version 1 de la voie image (5e7e5662)
 ## pipeline prefetch-sources-sample-app
 OK   demande Hermeto rendue dans la pipeline sources : [{"type": "gomod"}, {"type": "npm", "path": "web"}]
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app@sha256:b0d37e5901dc636df492b87b0759f123ebee189675f44c7197f382f96c76a312
+sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app@sha256:5355a66025c5769ad680fee7cea858a8905c31237296f452a4d6e98a01af471e

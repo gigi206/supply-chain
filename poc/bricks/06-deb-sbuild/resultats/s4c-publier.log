@@ -1,4 +1,4 @@
-# s4c.sh publier, 2026-11-14T22:18:39Z
+# s4c.sh publier, 2026-11-23T18:24:02Z
 OK   C5 deux poussées dans Zot, même digest : sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
 OK   C5 digest Zot égal au digest local : sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
 OK   C6 fichiers tirés par digest égaux au dépôt : f8a143cdfd9240bffd39406a6d94d7d661bab477c66d2415d59adc5591eaf773
