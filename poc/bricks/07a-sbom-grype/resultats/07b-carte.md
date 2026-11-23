@@ -2236,3 +2236,22 @@ Demande du propriétaire : « Pièce 8 d'abord » (préparer la pièce 8 pendant
 - [Passage 1](vex-gabarit-banc.log) (21:53:43Z) : 23 OK, **4 écarts du banc** : le shim `go` de mise ne trouve pas de version dans la copie extraite (sans `mise.toml`), le juge n'est pas construit. Banc corrigé (`GO=$(mise which go)`).
 - [Passage 2](vex-gabarit-banc-2.log) (21:53:55Z) : **26 OK, 1 écart**. Juge construit à l'empreinte `7dde1a8ed457f254` (celle de l'image `b799feda`) ; tableau, gabarit, refus et juge sur gabarit brut (rejeté) et témoin rempli (retenu, exemptant) conformes. **Écart, de la prédiction** : le témoin jugé sur un autre digest est **retenu** (1 0), pas rejeté. Lu dans le code (`outil/main.go`, l. 494-508) : un produit qui ne cite pas le digest rend l'énoncé **non exemptant**, sans rejeter le document ; c'est `signer-vex.sh` qui refuse avant signature (« énoncé non exemptant selon scan-outil vex », et plus tôt « énoncé sans produit dont l'@id cite le digest »). Le script n'est pas en cause.
 - **Prédiction du passage 3** (attente corrigée : « retenu, non exemptant », `1 0 false`) : 27 OK, 0 écart.
+
+## Pièce 8 préparée : banc tenu, et ce qui revient au propriétaire (note de 2026-11-23T21:54:36Z ; rien signé ni posé)
+
+[Passage 3](vex-gabarit-banc-3.log) (21:54:26Z) : **27 OK, 0 écart**, la prédiction corrigée tient. `vex-gabarit.sh` est prêt ; il n'a pas encore lu le vrai Zot (en cours de recréation par le rejeu `un-trait-1`).
+
+**Entrées de sample-app dans le dernier prédicat archivé** (`g4-scan-predicat.json`, scan du 23/11 à 16:39:31Z, non vérifié ici) : 6 entrées, 0 KEV, **toutes avec un correctif** : 5 sur `chi` v5.2.3 (corrigées en 5.2.4, 5.3.0 ou 5.4.0), 1 sur `stdlib` 1.26.10 (corrigée en 1.26.11 et 1.27.4). Le deb (prédicat du 21/11, ancien scanner) : 67 entrées, 0 KEV, toutes avec un correctif. Ces listes sont à relire sur le scan signé d'après le rejeu.
+
+**Ce que mesurent déjà les relevés, à savoir avant d'écrire un VEX** :
+- avec 0 KEV, un VEX ne change pas le verdict de la porte (elle ne bloque que les KEV sans VEX et les paquets malveillants) : il change les séries `scan_entrees_vex*` et `scan_vex*`, donc les « réelles » de Grafana ;
+- un VEX ne compte qu'au scan suivant (09:30 pour sample-app, 11:15 pour le deb, ou un scan lancé à la main) ;
+- un VEX `not_affected` expire pour la porte après 30 jours (`vex_age_max_jours`) ;
+- un VEX publié n'est retiré que sur accord (registre en ajout seul).
+
+**Décisions du propriétaire, pour la pièce 8** :
+1. quelles entrées couvrir (identifiant exact du tableau), et pour chacune la justification parmi les cinq de la spécification et l'`impact_statement` ; la session n'en propose aucune (aucune analyse d'atteignabilité n'a été faite) ;
+2. où garder les VEX non signés (chemin du gabarit, sans défaut) ;
+3. accord nommé pour la signature par `hashivault://vex` avec le compte `proprietaire` (clé neuve du rejeu, jamais essayée), puis pour la publication dans `builds/vex/**` du vrai Zot.
+
+**Suite, après le rejeu** (lecture seule) : `vex-gabarit.sh` sur le vrai Zot pour sample-app et le deb, recoupé par `signer-vex.sh verifier` sur un témoin (même `scannedAt` et même nombre de scans que la ligne `JUGE|`) ; le témoin n'est jamais signé.
