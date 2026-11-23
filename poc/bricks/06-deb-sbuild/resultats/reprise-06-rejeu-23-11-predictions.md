@@ -119,3 +119,18 @@ Ce que ce document ne règle pas : le prochain rejeu de zéro effacera de nouvea
 - **Heures** : de 19:31:27 UTC (deb replacé) à 20:18:03 UTC, soit 46 min 36 s, comptées au rejeu de zéro (la 06 est close).
   - Les fins de A (19:44:30) et de C (20:12:18) sont calculées : heure de début du journal plus durée affichée par `rejeu.sh`.
 - **Journaux réécrits** par les scripts : leurs versions précédentes sont dans `a32c5689`.
+
+## VSA du deb et portes : prédiction (`date -u` de 2026-11-23T20:21:43Z, avant les lancements ; accord du propriétaire « Oui, POUSSER_VSA=1 »)
+
+**Ordre choisi** : dans le rejeu complet, `s4d3.sh porte` tourne avant S6, quand le deb n'a ni scan ni VSA. Le script attend donc « refus » pour les deux. Elle est lancée ici **en premier** (V1), avant `pousser_vsa`, pour rester au plus près de cet ordre. Le scan du deb existe déjà (S6a `periodique`, 20:11 UTC) : **un écart d'ordre est prévu** sur la mesure « deb : scan ».
+
+- **V1** : `DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/s4d3.sh porte` (journal `s4d3-porte.log` réécrit ; version du 15/11 dans git).
+  - Attendu : `ec` en succès, sans violation, avertissement `trusted_task.tagged` ; horodatage `ok`, enveloppes toutes couvertes ; VSA `refus` ; les cinq règles du PoC parmi les succès ; image sample-app `true||trusted_task.tagged`, horodatage `ok`, VSA et scan `ok|ok`.
+  - **Écart prévu** : « deb : scan » vaut `ok`, attendu `refus` par le script. Le scan du deb est présent et sans KEV, et la porte en service (pièce 6) l'accepte. Le bilan du script sera donc KO pour cette seule mesure.
+  - Confiance : moyenne. La porte a changé avec la pièce 6, et sa nouvelle règle n'a jamais jugé le deb.
+- **V2** : `DISTRO=rke2 POUSSER_VSA=1 DEPUIS='06 (S6b, pousser_vsa)' JUSQUA='06 (S6a, porte)' mise run confiance:rejeu -- 06-vsa` (journal `08-trust-plane/resultats/rejeu-06-vsa.log`).
+  - `garder` relit la copie avant le démontage sauté.
+  - `pousser_vsa` : bundle archivé revérifié sur l'hôte, sans connexion hors de Zot. Manifeste poussé `sha256:97b4100d…`, comme le 16/11 (confiance moyenne à haute : manifeste sans annotation datée). Referrers et étiquettes de `builds/sample-app-deb` inchangés.
+  - `lire_vsa` : tout OK. La VSA est acceptée par la clé du domaine seule, et la provenance par la clé de Chains seule.
+  - S6a `porte` : `ec` en succès, horodatage `ok`, VSA `ok`, scan `ok`, Job de la porte `1/`.
+  - Confiance moyenne : la porte a changé avec la pièce 6 et n'a jamais jugé le deb depuis.
