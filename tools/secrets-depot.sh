@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Cherche chaque secret des briques 08, 09 (fichiers nommés) et 10, et tout en-tête de clé privée seul sur sa ligne, dans les fichiers modifiés ou nouveaux du dépôt (motifs en fichier, jamais en argument).
+# Cherche chaque secret des briques 08, 09 et 07a (fichiers nommés) et 10, et tout en-tête de clé privée seul sur sa ligne, dans les fichiers modifiés ou nouveaux du dépôt (motifs en fichier, jamais en argument).
 # À lancer avant chaque commit. Les motifs vivent dans un dossier privé (0700), supprimé même en cas d'échec.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -19,6 +19,14 @@ for f in "$Z"/cle-openpgp.asc "$Z"/revocation.asc "$Z"/openbao-lien.secret "$Z"/
 done
 # 09 : authentification de poc-lien dans zot-poc-lien-docker/config.json = base64 de « poc-lien:<mot de passe> », calculée sans argument.
 [ ! -f "$Z/zot-poc-lien.password" ] || { printf 'poc-lien:'; tr -d '\n' < "$Z/zot-poc-lien.password"; } | base64 -w0 > "$M/motif-09-zot-poc-lien-auth"
+# 07a (ajout du 23/11/2026, brique 07b) : mot de passe OpenBao du propriétaire (pièce 2) et de poc-vex (pièce 4), fichiers nommés ;
+# authentification de poc-vex en base64, calculée sans argument.
+Z7="$HOME"/.cache/supply-chain-poc/07a/secrets
+for f in "$Z7"/openbao-proprietaire.password "$Z7"/zot-poc-vex.password; do
+  [ -f "$f" ] || continue
+  grep -v -e '^$' "$f" | awk 'length($0) >= 16' > "$M/motif-07a-${f##*/}" || true
+done
+[ ! -f "$Z7/zot-poc-vex.password" ] || { printf 'poc-vex:'; tr -d '\n' < "$Z7/zot-poc-vex.password"; } | base64 -w0 > "$M/motif-07a-zot-poc-vex-auth"
 mapfile -t fichiers < <({ git diff --name-only HEAD; git ls-files --others --exclude-standard; } | sort -u)
 n=$(find "$M" -name 'motif-*' | wc -l)
 echo "fichiers : ${#fichiers[@]} ; motifs : $n"

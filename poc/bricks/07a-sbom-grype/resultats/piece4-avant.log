@@ -1,0 +1,10 @@
+# piece4-vex-zot.sh avant, 2026-11-23T13:21:19Z ; dépôt 1dd1b59e ; zot.json eb3496c7b1ba2d23
+OK   Jobs de scan actifs : 0
+zot.service : NRestarts=0 ActiveState=active ActiveEnterTimestamp=Mon 2026-11-23 08:33:34 UTC
+OK   configuration installée = zot.json d'avant la pièce 4 : 094282b49e2172aeb3fe3f4e2df5f912d67dc995422dd6b30ce8f21658e47c68
+OK   configuration installée différente du zot.json du dépôt (pièce 4 pas encore posée) : oui
+OK   comptes du htpasswd installé (noms seuls) : poc-build,poc-ecriture,poc-fermetures,poc-horodatage,poc-images,poc-lien,poc-metriques,poc-replay,poc-scan,poc-vulndb
+OK   journal stockage-zot.log gardé sous stockage-zot-avant-poc-vex.log (# stockage.sh zot, 2026-11-19T20:24:42Z)
+OK   zot.json du dépôt dans le journal à venir (empreinte) : eb3496c7b1ba2d23
+# fin 2026-11-23T13:21:19Z
+bilan : tenue

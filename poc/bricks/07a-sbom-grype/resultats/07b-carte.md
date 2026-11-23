@@ -1857,3 +1857,19 @@ Script neuf [`piece4-vex-zot.sh`](../piece4-vex-zot.sh). `compte` génère le mo
 **Divergence** : jusqu'à la pose, le `zot.json` du dépôt et celui de sc-stockage diffèrent (entrée `builds/vex/**`). Un passage de `stockage.sh zot` ou un rejeu poserait l'entrée et le compte `poc-vex` sans décision, et redémarrerait Zot.
 
 **Heures** : de 13:03:48 UTC à 13:19:44 UTC, dans l'enveloppe de la 07b.
+
+## Pièce 4 posée : `builds/vex/**` et `poc-vex` dans le vrai Zot (note de 2026-11-23T13:22:44Z ; accord du propriétaire, « Oui, pose la 4 »)
+
+| Étape | Résultat |
+|---|---|
+| [`avant`](piece4-avant.log), 13:21:19 UTC | tenue : aucun Job actif ; Zot actif depuis 08:33:34 ; configuration installée = `zot.json` d'avant la pièce 4 (`094282b4…`) ; 10 comptes ; journal du 19/11 gardé sous [`stockage-zot-avant-poc-vex.log`](../../08-trust-plane/resultats/stockage-zot-avant-poc-vex.log) |
+| **un seul passage** de `mise run confiance:stockage -- zot`, 13:21:29 à 13:21:35 UTC, en arrière-plan | code 0 ([journal](../../08-trust-plane/resultats/stockage-zot.log)) : 11 lignes htpasswd dont `poc-vex` (hash fourni par la 07a) ; Zot redémarré (13:21:33), HTTP 200 ; exposition systemd 3.0 |
+| [`apres`](piece4-apres.log), 13:21:43 UTC | tenue : configuration installée = `zot.json` du dépôt (`eb3496c7…`) ; 11 comptes ; `poc-vex` authentifié (200), mauvais mot de passe refusé (401) ; `poc-ecriture` toujours authentifié ; référents anonymes de `builds/vex/sample-app` (dépôt absent) : 200 ; référents de `builds/scan/sample-app` toujours lisibles ; redémarrage visible dans Grafana (6 lignes de systemd) |
+
+Le dépôt et sc-stockage sont de nouveau alignés pour `zot.json`. Aucune écriture dans `builds/vex/**` : le premier document viendra de la pièce 8. Les droits de `poc-vex` sur le vrai Zot ne sont mesurés que par l'authentification ; le détail (création par digest, refus des autres comptes) l'a été sur le Zot jetable, avec le même `accessControl`.
+
+**Contrôle des secrets** : `tools/secrets-depot.sh` ne cherchait ni le mot de passe OpenBao du propriétaire (pièce 2) ni celui de `poc-vex`. Ils sont ajoutés (fichiers nommés de `07a/secrets`, et l'authentification base64 de `poc-vex`) : 55 motifs au lieu de 52. Aucun des deux ne figure dans HEAD, ni dans les commits depuis le 22/11 (`git grep -F -f`).
+
+**G7** : Zot a redémarré à 13:21:33 UTC. Un balayage de démarrage est attendu, et la chaîne repartira de sa fin ; la projection de 12:55:48Z est caduque. Si la loi B tient, le balayage du 24/11 tombera vers 14 h, et non plus sur le scan de 09:30 : la réserve sur `releve_24` (note de 12:55:48Z) tombe avec elle, à vérifier. La fin du balayage de démarrage est à mesurer avant de replanifier la tâche du 29/11 (sur accord).
+
+**Heures** : de 13:20:25 UTC à 13:22:44 UTC, dans l'enveloppe de la 07b.

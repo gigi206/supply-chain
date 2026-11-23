@@ -1,0 +1,15 @@
+# piece4-vex-zot.sh apres, 2026-11-23T13:21:43Z ; dépôt 1dd1b59e ; zot.json eb3496c7b1ba2d23
+zot.service : NRestarts=0 ActiveState=active ActiveEnterTimestamp=Mon 2026-11-23 13:21:33 UTC
+OK   Zot : /v2/ en anonyme : 200
+OK   configuration installée = zot.json du dépôt : eb3496c7b1ba2d2370338a04be5736f415ce06453e4ae70ac765d30af32528da
+OK   comptes du htpasswd installé (noms seuls) : poc-build,poc-ecriture,poc-fermetures,poc-horodatage,poc-images,poc-lien,poc-metriques,poc-replay,poc-scan,poc-vex,poc-vulndb
+OK   poc-vex authentifié sur /v2/ : 200
+OK   poc-vex, mauvais mot de passe, refusé sur /v2/ : 401
+OK   poc-ecriture toujours authentifié sur /v2/ : 200
+OK   référents anonymes de builds/vex/sample-app (dépôt absent) : 200
+OK   référents anonymes de builds/scan/sample-app toujours lisibles : true
+Loki, systemd (init.scope) sur zot.service, 15 min : 6
+OK   redémarrage de Zot visible dans Grafana (Loki) : 6 lignes
+Loki, zot.service, lignes de démarrage (starting|listening|config), 15 min : 30
+# fin 2026-11-23T13:21:45Z
+bilan : tenue

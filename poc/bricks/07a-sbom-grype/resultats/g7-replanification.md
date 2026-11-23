@@ -789,3 +789,7 @@ Conséquences (calcul) :
 **Couplage avec la 07b** : la règle « rien dans le vrai Zot avant le n°9 » vient des couplages de la [carte de la 07b](07b-carte.md) (précaution de session ; aucune décision du propriétaire retrouvée). `g7-etat.sh` compare les digests qui **disparaissent** ; une écriture hors de `builds/scan/**` et de `vulndb/grype` ne les touche pas, mais un redémarrage de Zot (`stockage.sh zot`, comme le 19/11) recalerait encore la chaîne. Non vérifié : l'effet d'une nouvelle image `outils-scan` sur les referrers des scans quotidiens. Lever ou garder la règle est un choix du propriétaire.
 
 **Heures** : de 12:47:04 UTC à 12:55:48 UTC, hors enveloppe.
+
+## Note de 2026-11-23T13:22:44Z : nouveau redémarrage de Zot (pièce 4 de la 07b), rien n'est réécrit
+
+Zot a redémarré le 23/11 à 13:21:33 UTC (passage de `stockage.sh zot`, accord du propriétaire). La projection de la note de 12:55:48Z est **caduque**. Un balayage de démarrage est attendu ; sa fin, mesurée dans Loki, servira de base à la nouvelle projection (balayage du 24/11 vers 14 h si la loi B tient). La tâche du 29/11 reste non modifiée.

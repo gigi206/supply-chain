@@ -10,7 +10,16 @@
 #           jetables ; publication d'un referrer comme publier de scanner.sh (blob push puis manifest push par digest) ;
 #           contrôles : qui écrit et qui est refusé sous builds/vex/**, lecture anonyme, référents d'un dépôt absent (code HTTP),
 #           non-régression de builds/** et de builds/scan/**
-# Usage (racine du dépôt) : mise exec -- poc/bricks/07a-sbom-grype/piece4-vex-zot.sh compte | sec   (journal : resultats/piece4-<étape>.log)
+#   avant   (ajout du 23/11/2026, accord du propriétaire « Oui, pose la 4 ») refuse de 09:00 à 10:00 et de 11:00 à 11:45 UTC et si un
+#           Job de scan est actif ; lecture seule sur sc-stockage (ssh, sudo pour les seules empreintes et noms de comptes) : état de
+#           zot.service, empreinte de /etc/zot/config.json = zot.json d'avant la pièce 4 (parent de 1dd1b59e), noms des comptes du
+#           htpasswd (10) ; journal stockage-zot.log du 19/11 gardé sous stockage-zot-avant-poc-vex.log (08-trust-plane)
+#   (entre les deux, un seul passage : mise run confiance:stockage -- zot)
+#   apres   lecture seule : Zot redémarré et en 200, configuration installée = zot.json du dépôt, 11 comptes dont poc-vex ;
+#           authentification de poc-vex (mot de passe par -K -) et refus d'un mauvais mot de passe sur /v2/ ; référents anonymes de
+#           builds/vex/sample-app sur le digest de l'image (dépôt absent : 200 attendu) ; aucune écriture dans le vrai Zot ;
+#           redémarrage visible dans Grafana (Loki, comptes)
+# Usage (racine du dépôt) : mise exec -- poc/bricks/07a-sbom-grype/piece4-vex-zot.sh compte | sec | avant | apres   (journal : resultats/piece4-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
@@ -21,7 +30,7 @@ S7=$O/07a/secrets
 ZOT_JSON=$RACINE/poc/bricks/08-trust-plane/stockage/zot.json
 ZOT_SHA=33b9b5bfe05d6788c076de951a01920477dbd6395c330146e23cc2340073e52e   # mise.lock, zot v2.1.22 (stockage.sh)
 e=${1:-}
-case $e in compte|sec) ;; *) echo "usage : $0 compte | sec" >&2; exit 64 ;; esac
+case $e in compte|sec|avant|apres) ;; *) echo "usage : $0 compte | sec | avant | apres" >&2; exit 64 ;; esac
 L=$R/piece4-$e.log
 [ ! -e "$L" ] || { echo "journal déjà présent : $L (les journaux ne sont jamais réécrits)" >&2; exit 1; }
 T=$O/07a/piece4-$e
@@ -29,6 +38,17 @@ ko=0
 ok() { echo "OK   $*"; }
 attendu() { if [ "$2" = "$3" ]; then ok "$1 : $2"; else echo "KO   $1 : $2 (attendu : $3)"; ko=1; fi; }
 
+if [ "$e" = avant ]; then
+  hm=$(date -u +%H%M)
+  if { [ "$hm" -ge 0900 ] && [ "$hm" -lt 1000 ]; } || { [ "$hm" -ge 1100 ] && [ "$hm" -lt 1145 ]; }; then
+    echo "refusé de 09:00 à 10:00 et de 11:00 à 11:45 UTC (passages des scans) : aucun journal" >&2; exit 1; fi
+fi
+O8=$O/08
+SSH_OPTS=(-i "$O8/ssh/id_ed25519" -o UserKnownHostsFile="$O8/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
+sur() { ssh -n "${SSH_OPTS[@]}" poc@192.168.161.13 "$@"; }
+export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
+P=$O8/pki
+COMPTES10=poc-build,poc-ecriture,poc-fermetures,poc-horodatage,poc-images,poc-lien,poc-metriques,poc-replay,poc-scan,poc-vulndb
 {
 echo "# piece4-vex-zot.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ) ; dépôt $(git -C "$here" rev-parse --short=8 HEAD) ; zot.json $(sha256sum < "$ZOT_JSON" | cut -c1-16)"
 case $e in
@@ -123,6 +143,36 @@ case $e in
     r=$(publier "$SC" builds/scan/sample-app scan); case $r in publié*) ok "poc-scan publie toujours dans builds/scan/sample-app" ;; *) echo "KO   poc-scan refusé dans builds/scan/sample-app : $r"; ko=1 ;; esac
     r=$(publier "$E" builds/autre ecriture); case $r in publié*) ok "poc-ecriture publie toujours dans builds/autre" ;; *) echo "KO   poc-ecriture refusé dans builds/autre : $r"; ko=1 ;; esac
     attendu "mot de passe de poc-vex absent des sorties de Zot" "$(grep -c -F -f "$S7/zot-poc-vex.password" "$T/zot.out" "$T/zot.log" 2>/dev/null | awk -F: '{s += $NF} END {print s + 0}')" 0 ;;
+  avant)
+    attendu "Jobs de scan actifs" "$(kubectl get jobs -n scan -o json | jq '[.items[] | select((.status.active // 0) > 0)] | length')" 0
+    echo "zot.service : $(sur 'systemctl show zot.service -p ActiveState -p ActiveEnterTimestamp -p NRestarts' | paste -sd' ')"
+    Z0=$(git -C "$RACINE" show 1dd1b59e^:poc/bricks/08-trust-plane/stockage/zot.json | sha256sum | cut -c1-64)
+    attendu "configuration installée = zot.json d'avant la pièce 4" "$(sur 'sudo sha256sum /etc/zot/config.json' | cut -c1-64)" "$Z0"
+    attendu "configuration installée différente du zot.json du dépôt (pièce 4 pas encore posée)" "$([ "$Z0" != "$(sha256sum < "$ZOT_JSON" | cut -c1-64)" ] && echo oui)" oui
+    attendu "comptes du htpasswd installé (noms seuls)" "$(sur 'sudo cut -d: -f1 /etc/zot/htpasswd' | sort | paste -sd,)" "$COMPTES10"
+    J8=$RACINE/poc/bricks/08-trust-plane/resultats
+    if [ ! -e "$J8/stockage-zot-avant-poc-vex.log" ]; then cp "$J8/stockage-zot.log" "$J8/stockage-zot-avant-poc-vex.log" && ok "journal stockage-zot.log gardé sous stockage-zot-avant-poc-vex.log ($(head -1 "$J8/stockage-zot.log"))"
+    else echo "KO   stockage-zot-avant-poc-vex.log existe déjà"; ko=1; fi
+    attendu "zot.json du dépôt dans le journal à venir (empreinte)" "$(sha256sum < "$ZOT_JSON" | cut -c1-16)" eb3496c7b1ba2d23 ;;
+  apres)
+    echo "zot.service : $(sur 'systemctl show zot.service -p ActiveState -p ActiveEnterTimestamp -p NRestarts' | paste -sd' ')"
+    attendu "Zot : /v2/ en anonyme" "$(curl -s -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" https://192.168.161.13:5000/v2/)" 200
+    attendu "configuration installée = zot.json du dépôt" "$(sur 'sudo sha256sum /etc/zot/config.json' | cut -c1-64)" "$(sha256sum < "$ZOT_JSON" | cut -c1-64)"
+    attendu "comptes du htpasswd installé (noms seuls)" "$(sur 'sudo cut -d: -f1 /etc/zot/htpasswd' | sort | paste -sd,)" "$(printf '%s\n' ${COMPTES10//,/ } poc-vex | sort | paste -sd,)"
+    attendu "poc-vex authentifié sur /v2/" "$(printf 'user = "poc-vex:%s"\n' "$(cat "$S7/zot-poc-vex.password")" | curl -s -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" -K - https://192.168.161.13:5000/v2/)" 200
+    attendu "poc-vex, mauvais mot de passe, refusé sur /v2/" "$(printf 'user = "poc-vex:%s"\n' "$(openssl rand -hex 24)" | curl -s -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" -K - https://192.168.161.13:5000/v2/)" 401
+    attendu "poc-ecriture toujours authentifié sur /v2/" "$(printf 'user = "poc-ecriture:%s"\n' "$(cat "$O8/secrets/zot-poc-ecriture.password")" | curl -s -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" -K - https://192.168.161.13:5000/v2/)" 200
+    IMG=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+    attendu "référents anonymes de builds/vex/sample-app (dépôt absent)" "$(curl -s -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" "https://192.168.161.13:5000/v2/builds/vex/sample-app/referrers/$IMG")" 200
+    attendu "référents anonymes de builds/scan/sample-app toujours lisibles" "$(curl -s --cacert "$P/ca-poc.crt" "https://192.168.161.13:5000/v2/builds/scan/sample-app/referrers/$IMG" | jq '.manifests | length > 0')" true
+    q() { printf 'user = "auditeur:%s"\n' "$(cat "$O8/secrets/grafana-auditeur.password")" \
+      | curl -sS -K - --cacert "$P/ca-poc.crt" -H 'Content-Type: application/json' -X POST https://192.168.161.13:3001/api/ds/query \
+        -d "$(jq -nc --arg q "$1" --arg t "$(date -u +%s)000" '{from:$t,to:$t,queries:[{refId:"A",datasource:{uid:"loki"},expr:$q,queryType:"instant",maxLines:1}]}')" \
+      | jq -r '[.results.A.frames[]? | select((.data.values | length) > 1) | .data.values[1][0]] | if length == 0 then "aucune" else join(",") end'; }
+    n=$(q 'sum(count_over_time({noeud="sc-stockage", source="journal", unite="init.scope"} |= "zot.service" [15m]))')
+    echo "Loki, systemd (init.scope) sur zot.service, 15 min : $n"
+    case $n in aucune|0) echo "KO   redémarrage de Zot absent de Grafana (Loki)"; ko=1 ;; *) ok "redémarrage de Zot visible dans Grafana (Loki) : $n lignes" ;; esac
+    echo "Loki, zot.service, lignes de démarrage (starting|listening|config), 15 min : $(q 'sum(count_over_time({noeud="sc-stockage", source="journal", unite="zot.service"} |~ "(?i)starting|listening|config" [15m]))')" ;;
 esac
 echo "# fin $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 [ "$ko" = 0 ] && echo "bilan : tenue" || echo "bilan : KO"
