@@ -264,6 +264,12 @@ if [ "$DISTRO" = rke2 ] && [ "$RESEAU" = cilium ]; then
 else
   echo "## 08c, J8 (résolveurs), 06 et 05 : sautés (DISTRO=$DISTRO, RESEAU=$RESEAU ; RKE2 et Cilium seulement)"
 fi
+# Additif du 2026-11-23T18:43:04Z : Kyverno corrigé en service (décision du propriétaire « Image + politique », posé le 23/11 après M5b) :
+# image corrigée reconstruite et poussée (essais/kyverno-correctif@eec37159), puis politique horodatage-livraison et bascule du
+# contrôleur d'admission, en fin de rejeu (après les étapes qui mesurent l'image officielle et après le bloc 05). Journaux suffixés.
+etape "08 (Kyverno corrigé, image)" env KA_SUFFIXE="rejeu-$lib" mise exec -- "$here/kyverno-admission.sh" construire
+etape "08 (Kyverno corrigé, image poussée)" env KA_SUFFIXE="rejeu-$lib" mise exec -- "$here/kyverno-admission.sh" image
+etape "08 (Kyverno corrigé, pose)" mise exec -- "$here/kyverno-permanent.sh" pose "rejeu-$lib"
 echo "## 08d : rien à rejouer (relevés seuls, rien installé ; cert-manager lié à l'exposition de services, D7)"
 etape fuites mise run confiance:fuites -- "$lib"
 [ "$DISTRO" = k3s ] || etape "08b (CIS)" mise exec -- "$here/../08b-rke2/rke2.sh" cis

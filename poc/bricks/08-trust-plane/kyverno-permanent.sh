@@ -56,9 +56,9 @@ FIN
 }
 h() { sha256sum | cut -c1-16; }
 image_en_service() { kubectl get deploy -n kyverno "$DEP" -o jsonpath='{.spec.template.spec.containers[?(@.name=="kyverno")].image}'; }
-cas() { # libellé espace image attendu(PASS|FAIL) interne-attendu(oui|non|*) : OK ou KO
+cas() { # libellé espace image attendu(PASS|FAIL) interne-attendu(oui|non|*) [zone] : OK ou KO
   local r d i
-  pod "essai-$1" "$2" "$3" > "$T/$1.yaml"
+  pod "essai-$1" "$2" "$3" "${6:-}" > "$T/$1.yaml"
   r=$(admission "$T/$1.yaml" "$NOM"); d=${r%%$'\t'*}; i=$(cut -f2 <<< "$r")
   if [ "$d" = "$4" ] && { [ "$5" = '*' ] || [ "$i" = "$5" ]; }; then echo "OK   $1 : $d ; erreur interne : $i"
   else echo "KO   $1 : $d (attendu $4), erreur interne : $i (attendue $5) ; $(cut -f3 <<< "$r" | cut -c1-200)"; KO=1; fi
@@ -93,9 +93,18 @@ etape_pose() {
   echo "## recette : image corrigée"
   cas horodate "$NS_LIV" "$img" PASS non
   cas sans-provenance "$NS_LIV" "$OFFICIELLE" FAIL non
-  cas hors-livraison "$NS_HORS" "$img" PASS non
+  cas hors-livraison "$NS_HORS" "$img" PASS non confiance   # horodatage est en zone confiance (zone-confiance de J6)
   [ "$(image_en_service)" = "$CORRIGEE" ] && echo "OK   image en service : corrigée ($CORR)" || { echo "KO   image en service $(image_en_service)"; KO=1; }
   echo "retour arrière (sur accord) : poc/bricks/08-trust-plane/kyverno-permanent.sh retour"
+}
+
+etape_recette() { # ajout du 2026-11-23T18:42:27Z : recette seule, dry-run serveur, image corrigée en service (pose : témoin hors de livraison
+  # sans nodeSelector, refusé par zone-confiance, défaut du script)
+  [ "$(image_en_service)" = "$CORRIGEE" ] && echo "OK   image en service : corrigée" || { echo "NON JUGÉ : image en service $(image_en_service)"; exit 3; }
+  local img=$REG/builds/essai-signature@$APP_DIGEST
+  cas horodate "$NS_LIV" "$img" PASS non
+  cas sans-provenance "$NS_LIV" "$OFFICIELLE" FAIL non
+  cas hors-livraison "$NS_HORS" "$img" PASS non confiance
 }
 
 etape_retour() {
@@ -107,7 +116,7 @@ etape_retour() {
 }
 
 e=${1:?usage : $0 sec|pose|retour [suffixe]}
-case $e in sec|pose|retour) ;; *) echo "usage : $0 sec|pose|retour [suffixe]" >&2; exit 2 ;; esac
+case $e in sec|pose|recette|retour) ;; *) echo "usage : $0 sec|pose|recette|retour [suffixe]" >&2; exit 2 ;; esac
 L=$R/kyverno-permanent-$e${2:+-$2}.log
 [ ! -e "$L" ] || { echo "$L existe déjà, rien lancé"; exit 2; }
 KO=0

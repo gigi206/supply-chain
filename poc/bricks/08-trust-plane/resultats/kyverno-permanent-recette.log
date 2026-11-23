@@ -1,0 +1,7 @@
+# kyverno-permanent.sh recette, 2026-11-23T18:42:27Z
+OK   image en service : corrigée
+OK   horodate : PASS ; erreur interne : non
+OK   sans-provenance : FAIL ; erreur interne : non
+OK   hors-livraison : PASS ; erreur interne : non
+# fin 2026-11-23T18:42:28Z
+bilan : tenue
