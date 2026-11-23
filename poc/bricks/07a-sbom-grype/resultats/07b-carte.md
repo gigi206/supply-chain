@@ -1958,3 +1958,29 @@ Le dépôt et sc-stockage sont de nouveau alignés pour `zot.json`. Aucune écri
 - `piece5-scanner.sh sec` et le passage 24 du banc supposent le patch d'avant ; leurs journaux restent valables, ils ne sont pas relancés tels quels.
 
 **Heures** : de 13:43:47 UTC (dernière heure mesurée avant ce segment) à 13:53:59 UTC, dans l'enveloppe de la 07b. **Somme de la 07b** (calcul) : au plus 11 h 58 avant 12:47:04 UTC, plus tout le temps écoulé depuis, relevés G7 compris (borne haute) : **au plus 13 h 04 min 55 s** pour 10 h estimées. Le seuil de décision (20 h) n'est pas atteint.
+
+## Pièce 6 à sec : prédiction (date -u de 13:56:25 UTC, le 2026-11-23, avant le lancement)
+
+**Pourquoi maintenant** : en attendant la fin du balayage de Zot, sans lecture de Zot. La pose de la 6 reste après la 5 (ordre inchangé, aucun gain observable à l'inverser).
+
+**Mesure** : [`piece6-porte.sh`](../piece6-porte.sh) `sec`. Copie de HEAD, patch appliqué ; `ec opa check` et `ec opa test` ; ConfigMap `porte` rendue par `cm_porte` de la 08 (apply remplacé par `cat`) et comparée au service clé par clé ; porte neuve contre des prédicats du banc.
+
+**Prédiction** :
+- `ec opa test` : tous les tests passent ;
+- seules `scan.rego` et `policy-scan.yaml` changent dans la ConfigMap ; les 12 autres clés sont égales au service ;
+- porte neuve : prédicats d'avant la tranche 3 et prédicats neufs sans VEX admis sans KEV ; une KEV sans VEX refusée (`scan.kev_without_vex`) ; une KEV écartée par un VEX du banc (horodaté le 22/11) admise ; repli avec une KEV refusé.
+- Confiance haute pour les verdicts (déjà mesurés au banc, section C) ; moyenne pour le rendu de la ConfigMap (`cm_porte` jamais rendu hors de la 08).
+
+## Pièce 6 à sec : résultat (note de 2026-11-23T13:57:10Z)
+
+[`piece6-porte.sh`](../piece6-porte.sh) `sec`, de 13:56:25 à 13:56:26 UTC : **1 KO**, sur le rendu de la ConfigMap ([journal](piece6-porte-sec.log)). Le reste de la prédiction tient.
+
+- `ec opa test` : 41/41 ; `ec opa check` passe.
+- Porte neuve, 7 cas sur 7 conformes : prédicats d'avant la tranche 3 et prédicats neufs sans VEX admis sans KEV ; KEV sans VEX refusée ; KEV écartée par un VEX du banc admise (`complet`, `deb-complet`) ; repli avec une KEV refusé.
+- **Rendu de la ConfigMap `porte`** : 14 clés, comme au service. `scan.rego` et `policy-scan.yaml` changent, comme prévu, **mais aussi `taches.yml`** (service `cdac17f1…`, 76 lignes ; dépôt `cb2d78ff…`, 138 lignes).
+
+**Cause de l'écart** (lue, non une erreur de la mesure) : la liste revue du dépôt contient les tâches de la brique 05 ajoutées les 18 et 20/11 (`prefetch-rpm`, `preparer-rpm`, `construire-rpm` et leurs versions de M1b, commits `05e2fe81` à `e2f15c1b`). Elles n'ont jamais été posées dans la porte. Ce retard est déjà noté dans la [carte de M5b](../../05-rpm-mock/resultats/m5b-carte.md) (« son retard sur `taches.yml` disparaît avec le rejeu », déduit du code). Ma prédiction l'ignorait.
+
+**Conséquence pour la pièce 6** : `cm_porte` est la seule source de la ConfigMap. La poser ajouterait donc aussi ces tâches à la liste revue de la porte déployée, c'est-à-dire un changement de politique de la porte hors de la 07b. **À trancher par le propriétaire au moment de la pièce 6** : poser la ConfigMap entière (liste revue comprise), ou attendre le rejeu. La pose de la pièce 5 n'en dépend pas.
+
+**Heures** : de 13:55:36 UTC à 13:57:10 UTC, dans l'enveloppe de la 07b.

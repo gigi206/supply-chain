@@ -1,0 +1,29 @@
+# piece6-porte.sh sec, 2026-11-23T13:56:25Z ; HEAD 06a7cf8a75f9 ; ec v0.10.42
+## copie de HEAD, patch appliqué
+OK   patch 07b-t3 appliqué à la copie (84ad5dd1066424e1)
+OK   politique du patch : vex_age_max_jours : 30
+OK   politique du patch : statuts acceptés : ["not_affected"]
+## règles du patch : ec opa check et ec opa test
+OK   ec opa check
+OK   ec opa test : PASS: 41/41
+## ConfigMap porte : texte de cm_porte de la copie, apply remplacé par cat
+OK   cm_porte de la copie = cm_porte de HEAD : e50fb5b5035030a8
+OK   cm_porte : une seule substitution apply -> cat : 1/0
+OK   rendu de la ConfigMap porte, code : 0
+OK   clés présentes, service et rendu : ca-poc.crt,chains.pub,horodatage.sh,policy-scan.yaml,policy-trusted-task.yaml,policy.yaml,porte.rego,scan-verifier.sh,scan.rego,scanner.pub,taches.yml,tsa-racine-confiance.json,vsa.pub,vsa.sh
+KO   clés dont le contenu change : policy-scan.yaml,scan.rego,taches.yml (attendu : policy-scan.yaml,scan.rego)
+  policy-scan.yaml : service 9683068ab3a73eee, rendu 25a5acecf9960487
+  scan.rego : service a928fdc03ca50bc3, rendu 1a08ff56f3461bb3
+  taches.yml : service cdac17f17549350b, rendu cb2d78ff9a5321e2
+  kubectl diff --server-side porte : code 1, 117 lignes changées
+## porte neuve (ec validate input, politique du patch) contre des prédicats d'avant et neufs
+OK   avant-t3-sans-kev : 0 
+OK   compat-image-sans-kev : 0 
+OK   compat-deb-sans-kev : 0 
+OK   avant-t3-une-kev : 1 scan.kev_without_vex
+OK   complet-kev-ecartee : 0 
+OK   deb-complet-kev-ecartee : 0 
+OK   repli-une-kev : 1 scan.kev_without_vex
+  note : VEX du banc horodatés le 22/11 à 08:08:08 ; admis tant qu'ils ont moins de 30 jours (jusqu'au 22/12)
+# fin 2026-11-23T13:56:26Z
+bilan : 1 KO
