@@ -2138,3 +2138,5 @@ Question posée : « Je clos la 06 maintenant, avec la réserve du rejeu de zér
 - **Hors de la 06** : l'option E (`outils-prefetch` construite dans la chaîne) relève de la brique 03 ; la signature OpenPGP relève de la 09.
 
 **Effort** (aucune conversion nouvelle) : 0,696 à 0,701 pw consommés au 14/11, selon la note de ce jour (base de 40 h par pw), puis 6:34:16 de commits jusqu'au 19/11 à 14:54:10 UTC. Ce second chiffre est une borne basse, et ses blocs sont partagés avec d'autres briques (la 05 le 16/11). Les deux chiffres ne sont pas additionnés.
+
+**Additif du 23/11/2026 (note de 2026-11-23T19:32:17Z) : reprise du bloc 06 après le rejeu de zéro** : carte et prédictions R1 à R7 écrites avant tout lancement ([`reprise-06-rejeu-23-11-predictions.md`](resultats/reprise-06-rejeu-23-11-predictions.md)) ; S1 et S2 ne sont pas à refaire (archives lues par S4a `comparaison` seule, hors rejeu) ; deb de S3 `f66bbeb2…` replacé depuis une copie de l'hôte ; trois lancements (S4a et S4b ; `s4d.sh prealables` ; S4d à S6a `grafana`), sans VSA poussée.

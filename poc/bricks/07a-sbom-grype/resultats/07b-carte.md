@@ -2201,3 +2201,6 @@ Le propriétaire a choisi : clé VEX recréée automatiquement par le rejeu (com
 
 **Cause de l'arrêt, défaut de conception du rejeu** : les étapes S4 de la 06 lisent des entrées de l'hôte sous `$W` que le rejeu ne produit pas (`s1-06/hote`, `s1-06/Packages`, `s1-06/racine.tar`, `s2-06/chroot.tar`, `s3-06/build-1/…deb`, produits par S1 à S3) ; `vm.sh detruire` efface `$W` : la 06 ne pouvait pas se rejouer telle quelle (déjà effacées à l'incident `m5b-1`). Reconstruction : S1 `prealables` (instantané Debian épinglé, gpgv), S1 `racine`, S2, S3 (pods Kata), à décider.
 
+## Correction (note de 2026-11-23T19:32:17Z) : `racine.tar` et `chroot.tar` ne sont pas des entrées du rejeu
+
+La note de 16:53:47Z ci-dessus range `s1-06/racine.tar` et `s2-06/chroot.tar` parmi les entrées perdues du bloc 06 et conclut à une reconstruction par S1 `racine` et S2. **C'est faux pour le rejeu** : `s4a.sh` ne les lit qu'à la ligne 324, dans `etape_comparaison`, que le rejeu ne lance pas (`rejeu.sh`, l. 217 : `prealables taches reseau pipeline`). Les entrées réellement manquantes étaient le deb de S3 (`f66bbeb2…`, copie retrouvée sur l'hôte et replacée à 19:31:27Z) et `s4d-06/digest-attendu` (refait par `s4d.sh prealables`). Carte et prédictions de la reprise : [`reprise-06-rejeu-23-11-predictions.md`](../../06-deb-sbuild/resultats/reprise-06-rejeu-23-11-predictions.md).
