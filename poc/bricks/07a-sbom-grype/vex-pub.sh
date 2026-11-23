@@ -18,6 +18,8 @@
 #            (job du 23/11 à 09:30 UTC) : job réussi, ConfigMap montée entière, scan-config inchangée depuis la pose ; préfixes
 #            des lignes du journal égaux à ceux du passage du 22/11 ; vulnérabilités et base relevées des deux jours (information) ;
 #            lignes du pod dans Loki, à travers Grafana, égales à celles de kubectl logs (comptes seuls)
+#   scan_1115  (ajout du 23/11/2026, après scan_0930) même relecture pour le premier passage de scan-sample-app-deb avec vex.pub
+#            montée (job du 23/11 à 11:15 UTC), comparé au passage du 22/11 à 11:15
 # Usage (racine du dépôt) : poc/bricks/07a-sbom-grype/vex-pub.sh <étape>   (journal : resultats/vex-pub-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
@@ -29,7 +31,7 @@ export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
 CLE=$R/vex-cle-publique.pem
 SPKI_ATTENDU=2b81df72314a72e85276ce55aa6625306b47ab37e2c9e2a28878ce374b9df1a9
 e=${1:-}
-case $e in releve|pose|grafana|grafana_plage|scan_0930) ;; *) echo "usage : $0 releve | pose | grafana | grafana_plage | scan_0930" >&2; exit 64 ;; esac
+case $e in releve|pose|grafana|grafana_plage|scan_0930|scan_1115) ;; *) echo "usage : $0 releve | pose | grafana | grafana_plage | scan_0930 | scan_1115" >&2; exit 64 ;; esac
 L=$R/vex-pub-$e.log
 [ ! -e "$L" ] || { echo "journal déjà présent : $L (les journaux ne sont jamais réécrits)" >&2; exit 1; }
 ko=0
@@ -103,6 +105,30 @@ case $e in
     [ "$(date -u +%Y%m%d%H%M)" -ge 202611230933 ] || { echo "KO   avant 09:33 UTC le 23/11 : rien relevé"; exit 1; }
     jobs_du() { kubectl get jobs -n scan -o json | jq -r --arg d "$1" '.items[] | select(.metadata.ownerReferences[0].name == "scan-sample-app" and .status.startTime == $d) | .metadata.name'; }
     j=$(jobs_du 2026-11-23T09:30:00Z); j0=$(jobs_du 2026-11-22T09:30:00Z)
+    echo "job du 23/11 : ${j:-aucun} ; job du 22/11 : ${j0:-aucun}"
+    [ -n "$j" ] && [ -n "$j0" ] || { echo "KO   job manquant"; exit 1; }
+    attendu "job du 23/11 (réussi/échoué/actif)" "$(kubectl get job "$j" -n scan -o json | jq -r '"\(.status.succeeded // 0)/\(.status.failed // 0)/\(.status.active // 0)"')" 1/0/0
+    echo "  durée : $(kubectl get job "$j" -n scan -o json | jq -r '"\(.status.startTime) -> \(.status.completionTime)"')"
+    pod=$(kubectl get pods -n scan -l job-name="$j" -o jsonpath='{.items[0].metadata.name}')
+    attendu "volume config du pod : scan-config entière (sans items)" "$(kubectl get pod "$pod" -n scan -o json | jq -c '[.spec.volumes[] | select(.configMap.name == "scan-config") | .configMap.items // "entière"]')" '["entière"]'
+    attendu "resourceVersion de scan-config (celle de la pose)" "$(kubectl get cm scan-config -n scan -o jsonpath='{.metadata.resourceVersion}')" 8257360
+    attendu "clé vex.pub dans scan-config (empreinte)" "$(cm_cle vex.pub | h)" 79f7eece2f98f442
+    jl() { kubectl logs -n scan "job/$1" --all-containers 2>&1; }
+    pref() { jl "$1" | awk '{ if (tolower($0) ~ /jeton|token/) print "masquée"; else { split($0, a, "|"); print a[1] } }' | sort | paste -sd,; }
+    p=$(pref "$j"); p0=$(pref "$j0"); echo "  préfixes du 23/11 : $p"
+    attendu "préfixes des lignes du journal, triés (23/11 = 22/11)" "$p" "$p0"
+    for x in "$j0" "$j"; do echo "  $x : $(jl "$x" | grep -E '^(BASE|SCAN)\|' | sed 's/@sha256:[0-9a-f]*//; s/, empreinte .*//' | paste -sd' ')"; done
+    nl=$(jl "$j" | wc -l)
+    GRAF=https://192.168.161.13:3001
+    body=$(jq -nc --arg q "sum(count_over_time({espace=\"scan\", pod=\"$pod\"} [3h]))" --arg t "$(date -u +%s)000" '{from:$t,to:$t,queries:[{refId:"A",datasource:{uid:"loki"},expr:$q,queryType:"instant",maxLines:1}]}')
+    nk=$(printf 'user = "auditeur:%s"\n' "$(cat "$O/08/secrets/grafana-auditeur.password")" \
+      | curl -sS -K - --cacert "$P/ca-poc.crt" -H 'Content-Type: application/json' -X POST "$GRAF/api/ds/query" -d "$body" \
+      | jq -r '[.results.A.frames[]? | select((.data.values | length) > 1) | .data.values[1][0]] | if length == 0 then "aucune" else join(",") end')
+    attendu "lignes du pod $pod dans Grafana (Loki) = kubectl logs" "$nk" "$nl" ;;
+  scan_1115)
+    [ "$(date -u +%Y%m%d%H%M)" -ge 202611231118 ] || { echo "KO   avant 11:18 UTC le 23/11 : rien relevé"; exit 1; }
+    jobs_du() { kubectl get jobs -n scan -o json | jq -r --arg d "$1" '.items[] | select(.metadata.ownerReferences[0].name == "scan-sample-app-deb" and .status.startTime == $d) | .metadata.name'; }
+    j=$(jobs_du 2026-11-23T11:15:00Z); j0=$(jobs_du 2026-11-22T11:15:00Z)
     echo "job du 23/11 : ${j:-aucun} ; job du 22/11 : ${j0:-aucun}"
     [ -n "$j" ] && [ -n "$j0" ] || { echo "KO   job manquant"; exit 1; }
     attendu "job du 23/11 (réussi/échoué/actif)" "$(kubectl get job "$j" -n scan -o json | jq -r '"\(.status.succeeded // 0)/\(.status.failed // 0)/\(.status.active // 0)"')" 1/0/0

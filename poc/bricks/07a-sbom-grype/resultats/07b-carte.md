@@ -1653,3 +1653,21 @@ Conséquence, si ce passage réussit : l'alerte `BaseGrypeVieillie` sera active 
 **Leçon pour la supervision** : `Persistent=true` ne couvre pas une VM qui reste à moitié vivante. Le timer peut se déclencher alors que le service ne peut pas aboutir. Seules l'alerte `BaseGrypeVieillie` et la porte voient le trou, avec un jour de marge.
 
 **Heures** : de 09:43:25 UTC (heure du relevé, première mesurée de ce tour) à 09:43:56 UTC, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
+
+## Scan deb de 11:15 avec `vex.pub` montée : prédiction (date -u de 09:54:23 UTC, le 2026-11-23, avant le passage)
+
+Premier passage de `scan-sample-app-deb` depuis la pose de 08:16. Le CronJob monte lui aussi `scan-config` entière. Relevé en lecture seule par l'étape datée `scan_1115` de [vex-pub.sh](../vex-pub.sh), copie de `scan_0930` pour ce CronJob, lancée après 11:18 UTC. Comparaison avec le passage du 22/11 à 11:15 (11:15:00 à 11:17:05Z ; 14 lignes, dont 3 masquées ; 67 vulnérabilités, 0 KEV).
+
+| Contrôle | Prédit | Confiance |
+|---|---|---|
+| job du 23/11 à 11:15 | réussi (1/0/0) | haute (scan de 09:30 réussi après la panne) |
+| volume `config` du pod | `scan-config` entière | haute |
+| `scan-config` | resourceVersion 8257360, celle de la pose | haute |
+| préfixes des lignes du journal, triés | égaux à ceux du 22/11 | haute |
+| base | **même base que le 22/11** (2026-11-22) : le timer ne repasse que le 24/11 à 08:04:02 UTC | haute |
+| vulnérabilités | relevées seulement (même base et même paquet : 67 attendues, sans engagement) | sans objet |
+| lignes du pod dans Grafana (Loki) | égales à celles de `kubectl logs` | haute (égalité vue à 09:30) |
+
+Effet attendu de la clé : **aucun**, pour la même raison qu'à 09:30.
+
+**Écart de l'étape, avant le passage** : un premier lancement à 09:54:02 UTC, pour éprouver le garde-fou d'heure, a bien refusé. Mais le journal `vex-pub-scan_1115.log` est écrit avant le contrôle d'heure. Ce journal d'essai (deux lignes, jamais commité) a été effacé pour laisser le nom au vrai passage. `scan_0930` a le même défaut, sans effet puisqu'il n'a tourné qu'après l'heure.
