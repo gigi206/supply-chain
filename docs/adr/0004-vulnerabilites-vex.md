@@ -73,5 +73,5 @@ Sources : la [carte de la 07b](../../poc/bricks/07a-sbom-grype/resultats/07b-car
 ## Additif du 23/11/2026 (note de 2026-11-23T23:40:07Z) : clé VEX après le rejeu `un-trait-1`
 
 - La reprise du rejeu `un-trait-1` (fin à 23:34:39Z, aucun KO) a recréé la clé Transit `vex` : SPKI **`aeef0a8c482be447…`** (au lieu de `d0a12faa…`). C’est la troisième SPKI VEX archivée (`2b81df72…`, `d0a12faa…`, `aeef0a8c…`) : la limite « un VEX signé avant un rejeu n'est plus accepté après » est confirmée, sans VEX perdu, puisqu'aucun n'a été signé.
-- Relevé en lecture seule sur le vrai Zot ([journal](../../poc/bricks/07a-sbom-grype/resultats/vex-gabarit-zot.log)) : sample-app, 6 entrées ; deb, 67 entrées ; 0 KEV ; aucun VEX publié. Un témoin non signé passe `signer-vex.sh verifier`.
+- Relevé en lecture seule sur le vrai Zot ([journal](../../poc/bricks/07a-sbom-grype/resultats/vex-gabarit-zot.log)) : sample-app, 6 entrées ; deb, 67 entrées ; 0 KEV ; aucun VEX publié sur sample-app (le deb n’a pas été interrogé). Un témoin non signé passe `signer-vex.sh verifier`.
 - Le statut reste « À rédiger » : les trois questions de la [fiche](../../poc/bricks/07a-sbom-grype/resultats/adr0004-besoins.md) (Dependency-Track, score, KPI) attendent le propriétaire.

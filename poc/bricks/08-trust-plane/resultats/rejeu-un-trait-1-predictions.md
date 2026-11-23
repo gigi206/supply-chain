@@ -111,3 +111,7 @@ Journal : [`rejeu-un-trait-1.log`](rejeu-un-trait-1.log). `TAG_05=m5b-3` est neu
 **Conséquences** : clés publiques archivées réécrites (scanner `007f233f…`, VEX `aeef0a8c…`, témoin de G6) ; les clés Transit `chains`, `scanner` et `tsa` sont en version 1 dans l’OpenBao du passage de 20:35 ; l’image corrigée de Kyverno est en service ; l’export Hubble posé à la main le 20/11 n’est pas dans `rejeu.sh` : perdu avec les VM (non relevé dans Cilium). **Non mesuré** : un rejeu entier d'un seul trait avec la correction de `secrets_ctrl_juge` (le démontage et J2 à « J8 (helm-cilium) » viennent du passage de 20:35:05Z).
 
 *Note de 2026-11-23T23:41:20Z* : export Hubble relevé en lecture seule après la reprise : `cilium-config` à 163 clés (l'état de la 08c), sans `hubble-flowlogs-config-path` ; ConfigMap `cilium-flowlog-config` absent. L'export posé le 20/11 est bien perdu.
+
+*Correction de 2026-11-23T23:43:41Z* (relecture du conseiller) :
+- U3 : la SPKI `aeef0a8c…` a été relue par `openssl pkey` entre 23:34:43 et 23:35:40 UTC (le premier appel visait un mauvais chemin et a rendu l'empreinte du vide), et non « à 23:35 ».
+- Conséquences : « dans l'OpenBao du passage de 20:35 » n'est pas mesuré. Le relevé de « 07b (clé VEX) » (22:26:03Z) montre seulement `chains`, `scanner` et `tsa` en version 1 avant la création de `vex`. Le pod `openbao-0` relevé à 23:43 a été créé à 22:39:43Z (redémarrage pendant la reprise, cause non relevée).

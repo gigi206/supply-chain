@@ -2284,3 +2284,9 @@ Demande du propriétaire : « Pièce 8 d'abord » (préparer la pièce 8 pendant
   - `PUBLIES|0` : aucun VEX publié sur sample-app.
 - **Écart d'adresse** : `sc-stockage.poc.test` ne se résout pas sur l'hôte (premier essai : REFUS, puis attente, arrêté) ; le relevé lit le registre par `192.168.161.13:5000`, comme le banc.
 - **Pièce 8** : rien signé, rien publié. Le contenu (entrées, justification, impact) et l'accord nommé pour signer par `hashivault://vex` restent au propriétaire.
+
+*Correction et heures, note de 2026-11-23T23:43:41Z* :
+- Dans le relevé, l'en-tête de `vex-gabarit.sh` donne « empreinte de la clé 09708ff49e5e4d6d » : c'est le sha256 du **fichier** `scanner-cle-publique.pem` (vérifié par `sha256sum` à 23:43). La SPKI de la même clé est `007f233f…`.
+- « Aucun VEX publié » n'est mesuré que sur **sample-app** (`PUBLIES|0`). Le deb n'a pas été interrogé.
+- Deb : 62 des 67 entrées portent sur `pkg:golang/stdlib@1.24.4` et 5 sur `go-chi/chi`. Les 3 Critical (`GO-2026-4337`, `GO-2026-6604`, `GO-2026-6612`) portent toutes sur la bibliothèque standard de Go 1.24.4.
+- **Heures** : plus 23:36:45 à 23:43:41 UTC (6 min 56 s : relevé sur le vrai Zot et notes). **Total : au plus 14 h 47 min 29 s**, pour 10 h estimées. Le seuil de 20 h n'est pas atteint.
