@@ -93,7 +93,8 @@ FIN
   attendu "0644 : aucun journal écrit" "$(test -e "$BANC/resultats/vex-openbao-acces_vex-rejeu-banc1.log" && echo présent || echo absent)" absent
   c=$(lancer acces acces_vex REJEU=banc1 MDP_FICHIER="$T/mdp/proprietaire")
   attendu "0600 : code" "$c" 0
-  attendu "0600 : lecture dans MDP_FICHIER annoncée" "$(grep -c 'OK   mot de passe lu dans MDP_FICHIER (rejeu), 24 caractères' "$BANC/resultats/vex-openbao-acces_vex-rejeu-banc1.log")" 1
+  # lire_mdp parle avant l'ouverture du journal (comme la saisie au terminal) : l'annonce est sur la sortie (passage 1 : KO du banc)
+  attendu "0600 : lecture dans MDP_FICHIER annoncée (sortie)" "$(grep -c 'OK   mot de passe lu dans MDP_FICHIER (rejeu), 24 caractères' "$T/sorties/acces.out")" 1
   attendu "utilisateur proprietaire : politiques" "$(rb read -format=json auth/userpass/users/proprietaire | jq -r '.data.token_policies | join(",")')" vex-signature
   attendu "K6 : mot de passe absent du journal" "$(grep -c -F -f "$T/mdp/proprietaire" "$BANC/resultats/vex-openbao-acces_vex-rejeu-banc1.log")" 0
   attendu "K6 annoncé au journal" "$(grep -c '^OK   K6 : ' "$BANC/resultats/vex-openbao-acces_vex-rejeu-banc1.log")" 1

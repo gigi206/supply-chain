@@ -1,0 +1,135 @@
+début : 2026-11-23T14:57:49Z ; HEAD c73abe6e05d3
+OK   bao : empreinte du binaire extrait (07b-p2-bao.log) : 9c5f36287c673f38
+HEAD : vex-openbao.sh df2ffb9dd8ad5b63… ; rejeu.sh 18421f2bfed2c146…
+OK   OpenBao jetable en TLS : version, scellé : 2.7.2 false
+## 1. cle_vex en REJEU, avec un .pem et un journal de pose déjà présents
+## cas rejeu1 (vex-openbao.sh cle_vex, REJEU=banc1) : code 0
+    > étape cle_vex commencée : 2026-11-23T14:57:50Z ; vex-openbao.sh df2ffb9dd8ad5b63… ; BANC
+    > OpenBao : version 2.7.2, initialisé true, scellé false
+    > OK   OpenBao initialisé et descellé
+    >      rejeu : /home/gigi/.cache/supply-chain-poc/07a/rejeu-vex-banc/b/resultats/vex-cle-publique.pem existant (SPKI sha256 8b43078dce2abb215412f0a94b8099ded39b9d65186f366d970678f999840efe) remplacé par la clé neuve
+    > avant :
+    >      ancienne ecdsa-p256 1 false
+    >      chains ecdsa-p256 1 false
+    >      lien ecdsa-p256 1 false
+    >      scanner ecdsa-p256 1 false
+    >      tsa ecdsa-p256 1 false
+    > ### création (seule écriture de l'étape)
+    >      | Key                       Value
+    >      | ---                       -----
+    >      | allow_plaintext_backup    false
+    >      | auto_rotate_period        0s
+    >      | deletion_allowed          false
+    >      | derived                   false
+    >      | exportable                false
+    >      | imported_key              false
+    >      | keys                      map[1:map[certificate_chain: creation_time:2026-11-23T15:57:51.513560702+01:00 name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+    >      | MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEY/M8aHlBwIlYMLseyycA3zjP4qZs
+    >      | 3/HNGyy9mlaor0MtffYVH0NDpP1AeZn0nsffAtuP5bXD2Yv7SVBapy9fyg==
+    >      | -----END PUBLIC KEY-----
+    >      | ]]
+    >      | latest_version            1
+    >      | min_available_version     0
+    >      | min_decryption_version    1
+    >      | min_encryption_version    0
+    >      | name                      vex
+    >      | soft_deleted              false
+    >      | supports_decryption       false
+    >      | supports_derivation       false
+    >      | supports_encryption       false
+    >      | supports_signing          true
+    >      | type                      ecdsa-p256
+    > OK   bao write -f transit/keys/vex : code 0
+    > ### relecture
+    > OK   clé vex (type, exportable, sauvegarde en clair, suppression, version, signature) : ecdsa-p256,false,false,false,1,true
+    >      Public-Key: (256 bit field, 128 bit security level);NIST CURVE: P-256
+    > OK   clé publique exportée : /home/gigi/.cache/supply-chain-poc/07a/rejeu-vex-banc/b/resultats/vex-cle-publique.pem (fichier sha256 ee241053eafe5ad11cb3083bf396e51868f3a62ac92221dec0a7c16f4357f978 ; SPKI sha256 c1ce37eeaf712b6ceddc9e5ddd071a2709f72c03b689388913799bb133739ecb)
+    > après :
+    >      ancienne ecdsa-p256 1 false
+    >      chains ecdsa-p256 1 false
+    >      lien ecdsa-p256 1 false
+    >      scanner ecdsa-p256 1 false
+    >      tsa ecdsa-p256 1 false
+    >      vex ecdsa-p256 1 false
+    > OK   seule différence : transit/keys/vex ajoutée ; les autres clés Transit sont inchangées (type, version, exportable)
+    > étape cle_vex finie : 2026-11-23T14:57:52Z
+    > OK   K3 : aucune ligne de bloc privé dans le journal
+    > OK   K4 : valeur du jeton root absente du journal
+OK   cle_vex REJEU=banc1 : code : 0
+OK   journal du rejeu à part : présent
+OK   journal de la pose intact : 24afce07adee294a43f86ab057b65c892a540e15cd599da53ff05dd508911f4f  -
+OK   .pem remplacé (SPKI différente de l'ancienne) : oui
+OK   .pem = clé publique de transit/keys/vex : c1ce37eeaf712b6ceddc9e5ddd071a2709f72c03b689388913799bb133739ecb
+OK   message de remplacement au journal : 1
+## 2. même REJEU relancé : refus (journal présent), .pem inchangé
+## cas rejeu1-bis (vex-openbao.sh cle_vex, REJEU=banc1) : code 1
+    > REFUS : journal déjà présent : /home/gigi/.cache/supply-chain-poc/07a/rejeu-vex-banc/b/resultats/vex-openbao-cle_vex-rejeu-banc1.log
+OK   code ; refus : 1 ; 1
+OK   .pem inchangé : c1ce37eeaf712b6ceddc9e5ddd071a2709f72c03b689388913799bb133739ecb
+## 3. autre REJEU, clé vex déjà là : refus, .pem inchangé
+## cas rejeu2 (vex-openbao.sh cle_vex, REJEU=banc2) : code 1
+    > étape cle_vex commencée : 2026-11-23T14:57:52Z ; vex-openbao.sh df2ffb9dd8ad5b63… ; BANC
+    > OpenBao : version 2.7.2, initialisé true, scellé false
+    > OK   OpenBao initialisé et descellé
+    >      rejeu : /home/gigi/.cache/supply-chain-poc/07a/rejeu-vex-banc/b/resultats/vex-cle-publique.pem existant (SPKI sha256 c1ce37eeaf712b6ceddc9e5ddd071a2709f72c03b689388913799bb133739ecb) remplacé par la clé neuve
+    > avant :
+    >      ancienne ecdsa-p256 1 false
+    >      chains ecdsa-p256 1 false
+    >      lien ecdsa-p256 1 false
+    >      scanner ecdsa-p256 1 false
+    >      tsa ecdsa-p256 1 false
+    >      vex ecdsa-p256 1 false
+    > KO   transit/keys/vex existe déjà : aucune écriture
+    > étape cle_vex finie : 2026-11-23T14:57:53Z
+    > OK   K3 : aucune ligne de bloc privé dans le journal
+    > OK   K4 : valeur du jeton root absente du journal
+    > bilan : 1 ligne(s) KO
+OK   code non nul ; KO clé présente : oui ; 1
+OK   .pem inchangé : c1ce37eeaf712b6ceddc9e5ddd071a2709f72c03b689388913799bb133739ecb
+## 4. acces_vex en REJEU : fichier en 0644 refusé, puis 0600 accepté
+## cas acces-ouvert (vex-openbao.sh acces_vex, REJEU=banc1 MDP_FICHIER=/home/gigi/.cache/supply-chain-poc/07a/rejeu-vex-banc/mdp/ouvert) : code 1
+    > REFUS : MDP_FICHIER absent ou pas en 0600
+OK   0644 : code ; refus : 1 ; 1
+OK   0644 : aucun journal écrit : absent
+## cas acces (vex-openbao.sh acces_vex, REJEU=banc1 MDP_FICHIER=/home/gigi/.cache/supply-chain-poc/07a/rejeu-vex-banc/mdp/proprietaire) : code 0
+    > OK   mot de passe lu dans MDP_FICHIER (rejeu), 24 caractères (valeur jamais affichée)
+    > étape acces_vex commencée : 2026-11-23T14:57:53Z ; vex-openbao.sh df2ffb9dd8ad5b63… ; BANC
+    > OpenBao : version 2.7.2, initialisé true, scellé false
+    > OK   OpenBao initialisé et descellé
+    > OK   clé vex présente et conforme : ecdsa-p256,false,false,false,1,true
+    > avant : politiques default root ; méthodes (hors la méthode native) 
+    > ### écriture 1 : politique vex-signature
+    >      | Success! Uploaded policy: vex-signature
+    > OK   politique vex-signature relue = politique/vex-signature.hcl (hors commentaires et lignes vides : c304cbd05ec856cb)
+    > ### écriture 2 : montage userpass/
+    >      | Success! Enabled userpass auth method at: userpass/
+    > ### écriture 3 : utilisateur proprietaire (mot de passe sur l'entrée standard, sans saut de ligne)
+    >      | Success! Data written to: auth/userpass/users/proprietaire
+    > OK   utilisateur proprietaire écrit : code 0
+    > OK   utilisateur proprietaire (politiques, sans default, durée, durée maximale) : vex-signature,true,900,900
+    > OK   politiques : seule vex-signature ajoutée (ou déjà là)
+    > OK   méthodes d'authentification : seul userpass/ ajouté (ou déjà là)
+    > clés Transit après : ancienne ecdsa-p256 1 false;chains ecdsa-p256 1 false;lien ecdsa-p256 1 false;scanner ecdsa-p256 1 false;tsa ecdsa-p256 1 false;vex ecdsa-p256 1 false
+    > étape acces_vex finie : 2026-11-23T14:57:54Z
+    > OK   K3 : aucune ligne de bloc privé dans le journal
+    > OK   K4 : valeur du jeton root absente du journal
+    > OK   K6 : valeur du mot de passe absente du journal
+OK   0600 : code : 0
+KO   0600 : lecture dans MDP_FICHIER annoncée : 0 (attendu : 1)
+OK   utilisateur proprietaire : politiques : vex-signature
+OK   K6 : mot de passe absent du journal : 0
+OK   K6 annoncé au journal : 1
+OK   connexion userpass avec le fichier : code : 0
+## 5. sans REJEU, sans terminal : refus (comportement d'avant)
+## cas sans-rejeu (vex-openbao.sh acces_vex, MDP_FICHIER=/home/gigi/.cache/supply-chain-poc/07a/rejeu-vex-banc/mdp/proprietaire) : code 1
+    > REFUS : /dev/tty illisible : acces_vex se lance dans le terminal du propriétaire, pas depuis une session sans terminal
+OK   code ; refus terminal : 1 ; 1
+## 6. essai en REJEU : refus
+## cas essai-rejeu (vex-openbao.sh essai, REJEU=banc1 BANC_MDP_CONNEXION=/home/gigi/.cache/supply-chain-poc/07a/rejeu-vex-banc/mdp/proprietaire) : code 1
+    > REFUS : essai hors du rejeu (terminal du propriétaire)
+OK   code ; refus : 1 ; 1
+## 7. fonction vex07b de rejeu.sh (pipefail) : un échec reste un échec
+OK   vex07b cle_vex (clé présente) : code non nul : oui
+OK   vex07b : trois dernières lignes seulement : 3
+fin : 2026-11-23T14:57:55Z
+## bilan : 1 écart(s)
