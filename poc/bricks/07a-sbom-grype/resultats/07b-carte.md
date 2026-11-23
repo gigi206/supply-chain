@@ -2255,3 +2255,14 @@ Demande du propriétaire : « Pièce 8 d'abord » (préparer la pièce 8 pendant
 3. accord nommé pour la signature par `hashivault://vex` avec le compte `proprietaire` (clé neuve du rejeu, jamais essayée), puis pour la publication dans `builds/vex/**` du vrai Zot.
 
 **Suite, après le rejeu** (lecture seule) : `vex-gabarit.sh` sur le vrai Zot pour sample-app et le deb, recoupé par `signer-vex.sh verifier` sur un témoin (même `scannedAt` et même nombre de scans que la ligne `JUGE|`) ; le témoin n'est jamais signé.
+
+## Décision du propriétaire : VEX non signés dans le dépôt (note de 2026-11-23T21:55:43Z ; rien n'est créé)
+
+À la question « Où gardez-vous vos VEX non signés ? », le propriétaire répond (verbatim) : « Dans le dépôt ».
+
+**Lieu retenu par la session** : `poc/bricks/07a-sbom-grype/vex/`, à côté de `signer-vex.sh` et de `vex-gabarit.sh` ; un fichier par document, nommé par le dépôt et l'objet (par exemple `vex/sample-app-<objet>.json`). Le dossier n'est créé qu'avec le premier gabarit. `vex-gabarit.sh` garde un chemin obligatoire, sans défaut : le banc reste valable tel quel.
+
+**Effets** :
+- la justification n'a plus une seule copie : le brouillon, puis la version signée, restent dans l'historique de git, même après un retrait du VEX dans Zot (limite relevée dans la note de 2026-11-21T20:28:00Z) ;
+- un brouillon commité n'est pas une décision : seul le document signé et publié compte pour le scanner et la porte ;
+- REUSE couvre `**` (`REUSE.toml`) et `tools/secrets-depot.sh` passe avant chaque commit, comme pour tout fichier du dépôt.
