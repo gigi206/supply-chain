@@ -2168,3 +2168,16 @@ Le propriétaire a choisi : clé VEX recréée automatiquement par le rejeu (com
 - `g2_image` redonne `b799feda…` sous le tag `-vex` (confiance haute : `scan-outil` reconstruit = `7dde1a8e…`, couches mesurées) ;
 - **arrêts probables ailleurs** (confiance basse que le rejeu passe d'un trait) : 07a, 08c, 06 et 05 n'ont jamais été rejouées depuis leurs ajouts ; chaque arrêt est relevé, corrigé dans le dépôt si la cause est dans le code, et repris par `DEPUIS=` ;
 - durée : plusieurs heures, non estimée plus finement (le rejeu complet du 03/11 couvrait moins d'étapes).
+
+## Rejeu m5b-1 : incident, arrêt au démontage (note de 2026-11-23T15:03:53Z)
+
+[Journal](../../08-trust-plane/resultats/rejeu-m5b-1.log) : lancé à 15:02:27 UTC, **arrêt à 15:02:32 UTC, code 1, dans l'étape « démontage »** (`vm.sh detruire`).
+
+**Ce qui s'est passé** :
+- **Erreur de lancement, de ma part** : la commande ne passait pas `DISTRO=rke2`. `distro.sh` prend `k3s` par défaut, alors que le cluster est en RKE2 (08b). Le bloc de M5b ne s'exécute qu'avec `DISTRO=rke2` : **`m5b-rejeu.sh entree` n'a pas tourné**, donc les entrées de l'hôte n'ont pas été copiées hors du dossier de travail. (Le rejeu aurait aussi installé k3s et sauté la 08c, la 06 et la 05.)
+- Le démontage a détruit les trois VM, leurs volumes, le pool et le réseau : **la plateforme est à terre** (attendu par un rejeu de zéro).
+- `vm.sh detruire` a ensuite lancé `rm -rf` sur `~/.cache/supply-chain-poc/08/travail` : 510 fichiers du cache de modules Go (lecture seule) n'ont pas pu être effacés, d'où l'arrêt. Tout le reste du dossier est effacé, **dont les entrées de M5b** (`m1bt-20-05` : quatre rendus de `prealables` et `banc-digest-o`, `-b` ; `m4a-05/layout-1`). Aucune autre copie sur l'hôte (recherche par nom et par empreinte). Restent `m1b-construction-05`, `m4c-05` et `s4d-06`, en partie.
+
+**Conséquences** : M5b ne peut pas repartir tel quel (son `entree` exige ces entrées) ; leur reconstruction est à étudier. Rien n'a été relancé ni effacé depuis.
+
+**Deux défauts du code relevés** : la commande du rejeu documentée n'impose pas `DISTRO=rke2` (défaut `k3s`) ; `vm.sh detruire` ne sait pas effacer un cache de modules Go (fichiers en lecture seule).
