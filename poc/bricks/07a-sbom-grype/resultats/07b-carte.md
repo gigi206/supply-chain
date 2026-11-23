@@ -2213,3 +2213,20 @@ Mesuré à la reprise du bloc 06 ([résultat](../../06-deb-sbuild/resultats/repr
 - « 07b (entrees-scan, pose) » a écrit 44 séries.
 
 Ce qui était « non atteint » le 23/11 à 16:53:47Z est donc fait. Reste la pièce 8.
+
+## Pièce 8, préparation à sec : `vex-gabarit.sh`, prédiction du banc (date -u de 21:53:23 UTC, le 2026-11-23, avant le lancement ; pendant le rejeu `un-trait-1` ; approche relue par le conseiller)
+
+Demande du propriétaire : « Pièce 8 d'abord » (préparer la pièce 8 pendant le rejeu). Le contenu du VEX reste sa décision ; rien n'est signé ni posé.
+
+**Correction d'une phrase de la session** : la liste nominative des entrées n'existe pas « que dans les scans signés ». `entrees-scan.py` (pièce 7) émet dans Loki une ligne JSON par entrée (identifiant, alias, gravité, KEV, EPSS, paquet, corrigé dans, `vex`), consultable dans Grafana ; il ne vérifie pas la signature (docstring de `systemd/entrees-scan.py`).
+
+**[`vex-gabarit.sh`](../vex-gabarit.sh)** (neuf) : lit le dernier scan signé du digest comme `signer-vex.sh` (`cosign verify-attestation` par la clé du scanner), écrit le tableau des entrées et, pour les seuls identifiants donnés, un gabarit OpenVEX `not_affected` (produit `pkg:oci/<nom>@sha256:<hex>`, sous-composants = paquets du prédicat à l'octet près, alias repris) où `author`, `timestamp`, `justification` et `impact_statement` sont laissés vides exprès. Chemin du gabarit obligatoire, sans défaut : le lieu où le propriétaire garde ses VEX non signés n'est pas décidé.
+
+**Banc** ([`vex-gabarit-banc.sh`](vex-gabarit-banc.sh), hôte seul, sans registre : `PREDICAT=` sur `g4-scan-predicat.json` et `07b-t1-predicat-sample-app-deb.json`) ; juge : `scan-outil` reconstruit depuis une copie de HEAD (`git archive`, `GOPROXY=off`), `outil/` du dépôt intact. **Prédiction** :
+- empreinte du juge `7dde1a8ed457f254` (celle de l'image `b799feda`, mesurée à 14:41) ;
+- tableau : 6 lignes pour sample-app, 67 pour le deb (énoncé in-toto accepté), alias `CVE-2026-114437` de `GHSA-j6qf-3m9c-vwj3` affiché ;
+- gabarit : un énoncé, produit et sous-composant exacts, champs vides, mode 0600 ; **gabarit brut rejeté** par `scan-outil vex` ; **témoin rempli** (« témoin, aucune analyse », `vulnerable_code_not_in_execute_path`) **retenu et exemptant** ; le même témoin sur un autre digest rejeté ;
+- refus : identifiant absent (code 1, rien écrit), gabarit existant, identifiant sans chemin, chemin sans identifiant, image sans digest (code 2), sans `PREDICAT` ni `CA` (code 1) ;
+- **bilan : 0 écart**. Confiance : haute pour le tableau et les refus, moyenne pour le jugement (premier passage de `scan-outil vex` sur un document produit par ce script).
+
+**Non couvert par ce banc** : la lecture du scan signé dans le vrai Zot (après le rejeu, en lecture seule, recoupée par `signer-vex.sh verifier`) ; toute signature.
