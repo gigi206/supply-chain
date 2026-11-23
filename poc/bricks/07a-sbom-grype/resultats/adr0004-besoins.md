@@ -54,3 +54,13 @@ Les options 3a à 3d ne s'excluent pas. Un tableau de bord Grafana qui les affic
 3. KPI de couverture VEX : lesquels parmi 3a à 3d ? Avec un tableau de bord Grafana ?
 
 Les réponses seront écrites dans l'ADR 0004, verbatim, avec la date ; l'ADR ne passera de « À rédiger » à une autre valeur que sur décision du propriétaire.
+
+## Corrections après relecture du conseiller (note de 2026-11-23T22:05:07Z ; rien n'est réécrit au-dessus)
+
+- **EPSS : les comptes ci-dessus sont inversés.** Le jq comptait les EPSS **présents**. Les entrées **sans** EPSS sont 3 sur 6 pour sample-app, **3 sur 67** pour le deb et 3 sur 13 pour le témoin G6. Mesuré par jq entre 22:04:20 et 22:04:40 UTC : ce sont exactement les entrées **sans identifiant CVE** (ni en id ni en alias : `GHSA-3fxj-6jh8-hvhx`, `GO-2026-5775`, `GO-2026-5777`), et toutes celles qui ont un CVE ont un EPSS (3 sur 3, 64 sur 64). L'EPSS est donné par CVE. Pour l'option 2a, la valeur par défaut d'EPSS pèse donc sur les entrées sans CVE, pas sur la moitié des entrées.
+- **Option 2a** : les séries de Prometheus ne portent pas l'EPSS ; le calcul se fait depuis le prédicat signé ou les lignes de Loki (qui portent `epss`), pas depuis les séries.
+- **Option 2b** : `outil/main.go` ne lit aucun champ CVSS dans la sortie de Grype, et aucune sortie de Grype archivée dans le dépôt ne contient `cvss` (grep du 23/11, entre 22:04:20 et 22:04:40 UTC) : la présence d'un CVSS dans la sortie de Grype 0.104.1 n'est **pas mesurée**.
+- **Option 3c** : l'horodatage de chaque document VEX passé est déjà dans Loki (`vexTimestamp`), et chaque entrée écartée porte `vex` (statut, horodatage). L'échéance se déduit donc de Loki ; elle manque seulement dans Prometheus.
+- **Unité de compte** : une entrée est un couple (identifiant, PURL), pas une CVE. Mesuré à 22:04:40 UTC sur les deux prédicats archivés : **aucun identifiant n'est l'alias d'une autre entrée, et aucun alias n'est partagé** par deux entrées. Pas de double compte visible aujourd'hui pour 2a et 3a ; à recontrôler à chaque base Grype (le témoin G6 du 04/11 avait `GO-2026-5774` avec l'alias `GHSA-3fxj-6jh8-hvhx`, que le scan du 23/11 liste seul).
+- **« Aucun tableau de bord »** : à lire « aucun fichier hors de `resultats/` ne nomme ces séries, hors de la 07a » (la recherche excluait `resultats/`).
+- **Dependency-Track** : « ni OpenVEX ni CSAF » reste **non revérifié** dans la documentation publique de la v5 ; c'est ce point qui fixe le prix de l'option 1b. À relire avant de trancher 1b.

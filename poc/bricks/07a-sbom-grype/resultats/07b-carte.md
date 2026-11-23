@@ -2266,3 +2266,9 @@ Demande du propriétaire : « Pièce 8 d'abord » (préparer la pièce 8 pendant
 - la justification n'a plus une seule copie : le brouillon, puis la version signée, restent dans l'historique de git, même après un retrait du VEX dans Zot (limite relevée dans la note de 2026-11-21T20:28:00Z) ;
 - un brouillon commité n'est pas une décision : seul le document signé et publié compte pour le scanner et la porte ;
 - REUSE couvre `**` (`REUSE.toml`) et `tools/secrets-depot.sh` passe avant chaque commit, comme pour tout fichier du dépôt.
+
+## ADR 0004 : fiche des besoins, et heures de la 07b (note de 2026-11-23T22:05:19Z)
+
+[Fiche des besoins](adr0004-besoins.md) écrite à sec (22:01:31Z), corrigée après relecture du conseiller (22:05:07Z : comptes d'EPSS inversés, options 2a, 2b et 3c précisées, unité de compte mesurée, Dependency-Track non revérifié). Reportée dans `docs/03` (ligne 07a) et l'ADR 0004 (additif). Aucune décision.
+
+**Heures** (bornes hautes, par enveloppes ; du travail sur d'autres briques s'y intercale) : au plus 14 h 03 min 37 s à 14:52:36 UTC (note de 14:53:21Z) ; plus 14:52:36 à 14:59:26 UTC (6 min 50 s, intégration au rejeu) ; plus 20:24:21 à 20:34:16 UTC (9 min 55 s, additif du README de la 07a) ; plus 21:45:08 à 22:05:19 UTC (20 min 11 s, pièce 8 préparée et fiche). **Total : au plus 14 h 40 min 33 s**, pour 10 h estimées et un seuil de décision à 20 h. Le seuil n'est pas atteint. Le travail sur le bloc 06 et le rejeu est compté aux briques 06, 05 et 08.

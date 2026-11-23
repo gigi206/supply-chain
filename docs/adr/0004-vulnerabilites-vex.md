@@ -60,3 +60,12 @@ Sources : la [carte de la 07b](../../poc/bricks/07a-sbom-grype/resultats/07b-car
   - **un VEX signé avant un rejeu n'est plus accepté après** : la porte et le scanner ne connaissent que la clé neuve. C'est cohérent avec « tout perdre » en démonstration (Zot est neuf aussi), mais c'est une limite pour une plateforme durable, où la clé devrait survivre au rejeu.
 - **Mesuré à la reprise du bloc 06** (note de 2026-11-23T20:14:03Z) : S6a du rejeu garde `vex.pub` dans `scan-config`, égale à la clé neuve, et le scan du deb porte la ligne `VEX|` (0 énoncé) ; « 07b (entrees-scan, pose) » écrit 44 séries.
 - **Le statut reste « À rédiger »** : la projection Dependency-Track, le score « vulnérabilités après VEX » et les KPI de couverture VEX sont des besoins à définir avec le propriétaire ; la pièce 8 lui revient.
+
+## Additif du 23/11/2026 (note de 2026-11-23T22:05:19Z) : pièce 8 préparée, besoins à définir
+
+Sources : la [carte de la 07b](../../poc/bricks/07a-sbom-grype/resultats/07b-carte.md), notes de 21:53:23Z à 21:55:43Z, et la [fiche des besoins](../../poc/bricks/07a-sbom-grype/resultats/adr0004-besoins.md).
+
+- **Pièce 8 préparée, rien signé** : [`vex-gabarit.sh`](../../poc/bricks/07a-sbom-grype/vex-gabarit.sh) lit le dernier scan signé comme `signer-vex.sh` et écrit un gabarit OpenVEX `not_affected` dont l'auteur, la date, la justification et l'impact sont vides ; banc tenu (27 OK, 0 écart). Mesuré au banc : `scan-outil vex` retient un document dont le produit ne cite pas le digest, mais l'énoncé n'exempte rien ; `signer-vex.sh` le refuse avant signature.
+- **Décision du propriétaire** (verbatim, 21:55:43Z) : « Dans le dépôt » pour les VEX non signés (`poc/bricks/07a-sbom-grype/vex/`). La justification n'est donc plus seulement dans le document signé : elle reste dans l'historique de git.
+- **Besoins à définir** (projection Dependency-Track, part « vulnérabilités après VEX » du score, KPI de couverture VEX) : options dans la fiche, aucune décision. Deux faits mesurés : le prédicat ne porte pas de CVSS (le score « CVSS × EPSS » de `docs/02` n'est pas calculable tel quel) ; l'EPSS manque exactement pour les entrées sans identifiant CVE.
+- **Le statut reste « À rédiger ».**
