@@ -1943,3 +1943,18 @@ Le dépôt et sc-stockage sont de nouveau alignés pour `zot.json`. Aucune écri
 **Reste avant la pose** : le pod d'essai (`source` et `analyser` seuls, image par digest, `scanner.sh` du patch dans une ConfigMap au nom distinct, rien publié), après la fin du balayage de démarrage de Zot ; puis `releve_24`.
 
 **Heures** : de 13:39:45 UTC à 13:41:40 UTC, dans l'enveloppe de la 07b.
+
+## Pièce 5 préparée dans le dépôt, non posée (note de 2026-11-23T13:53:59Z ; même démarche que la pièce 4, commit 1dd1b59e)
+
+**Fait** (le dépôt et le cluster divergent jusqu'à la pose) :
+- `politique/scanner.sh` : section du patch appliquée au dépôt (`patch -p1`, essai à blanc d'abord) ; empreinte `7251df15…`, celle du rendu de la pièce 5 à sec ;
+- `plateforme.sh` : `OUTILS_SCAN_DIGEST` = `b799feda…` (ancien `7eb4f26e…` gardé en commentaire) ;
+- `politique/07b-t3.patch` régénéré sans la section `scanner.sh` (`b5a5e8d8…` vers `84ad5dd1…`, 8 fichiers) ; `git apply --check` passe sur le dépôt neuf.
+- [`piece5-essai.sh`](../piece5-essai.sh) lit désormais `scanner.sh` dans HEAD (empreinte contrôlée).
+- [`piece5-pose.sh`](../piece5-pose.sh) écrit, non lancé : `pose` (accord du propriétaire) refuse sans `releve_24` tenu, sans pod d'essai tenu, avec un pod de scan actif ou dans les 10 min qui précèdent un passage ; rend les objets depuis une copie de HEAD (jamais `plateforme.sh` dans le dépôt, dont le journal `g7_periodique.log` serait réécrit ; `g7_periodique` seulement avec `G7_SEC=1`) ; puis `cm_scan` et `kubectl apply --server-side` des deux CronJob ; contrôle après : seule `scanner.sh` change, spec des CronJob égale à celle d'avant, image ramenée. `grafana` relit les écritures dans l'audit de l'API.
+
+**Limites ouvertes par ce report** :
+- **rejeu de zéro** : `etape_g2_image` construit l'image depuis `outil/main.go` du dépôt, encore l'ancien (le neuf est dans le patch, pièce 3), et la compare à `OUTILS_SCAN_DIGEST` : elle serait KO jusqu'au report de `main.go`. Hors rejeu, rien ne lance `g2_image`. À régler avec le report du reste du patch (pièce 9), avec la poussée sous l'ancien tag déjà notée.
+- `piece5-scanner.sh sec` et le passage 24 du banc supposent le patch d'avant ; leurs journaux restent valables, ils ne sont pas relancés tels quels.
+
+**Heures** : de 13:43:47 UTC (dernière heure mesurée avant ce segment) à 13:53:59 UTC, dans l'enveloppe de la 07b. **Somme de la 07b** (calcul) : au plus 11 h 58 avant 12:47:04 UTC, plus tout le temps écoulé depuis, relevés G7 compris (borne haute) : **au plus 13 h 04 min 55 s** pour 10 h estimées. Le seuil de décision (20 h) n'est pas atteint.

@@ -9,6 +9,11 @@
 #               layout du deb (une couche tar qui contient le .deb seul), data.tar extrait par busybox (ar, unxz ou gunzip, tar),
 #               syft dir: sur le contenu extrait. Dans les deux cas, plancher : au moins une PURL versionnée dans le SBOM de
 #               l'artefact seul, sans quoi refus (relevé 1 de S6a : un artefact vide passe sans erreur, et la fusion le masque).
+#   vex         (outils-scan) la lecture des VEX d'analyser seule, pour le banc de la 07b (tranche 3). Choix 1, 2 et 5 du propriétaire
+#               (21/11/2026) : VEX attestés sur le digest scanné, clé VEX distincte de celle du scanner ($CLE_VEX), lus dans
+#               builds/vex/<nom> en anonyme ; énoncé et sujet revérifiés par scan-outil vex ; seul not_affected avec justification et
+#               impact_statement est passé à Grype. Aucun VEX lisible : le scan se fait sans --vex (plus strict), et le journal le dit.
+#               Grype en échec avec les VEX (limite 4, passage 18) : relancé sans eux, ligne REPLI| au journal, vex.repli dans le prédicat.
 #   jetons      (openbao) rôle scan-zot : identifiants de poc-scan lus, jeton révoqué ; puis rôle scanner : jeton de 5 min, pris
 #               juste avant la signature (D9 a), après le scan
 #   attester    (outils-scan) cosign attest-blob --key hashivault://scanner, sans service Sigstore, sujet = digest de l'image ;
@@ -23,6 +28,7 @@ TRAVAIL=${TRAVAIL:-/travail}
 CA=${CA:-/etc/scan/ca-poc.crt}
 CLE_PUBLIQUE=${CLE_PUBLIQUE:-/etc/scan/scanner.pub}
 CLE=${CLE:-hashivault://scanner}
+CLE_VEX=${CLE_VEX:-/etc/scan/vex.pub}
 SECRETS=${SECRETS:-/var/run/bao}
 PREDICAT=https://supply-chain.example/scan/v1
 VIDE=sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a   # {} : application/vnd.oci.empty.v1+json
@@ -87,6 +93,29 @@ artefact() { # image lue par digest ; SBOM de l'artefact seul dans sbom-image.js
   echo "ARTEFACT|${NATURE:-image}, $n PURL versionnées dans l'artefact seul"
 }
 
+lire_vex() { # VEX attestés sur $IMAGE par la clé VEX : documents recevables dans vex/, résumé dans vex-retenus.json
+  r=${IMAGE%@sha256:*} n=${r#*/}
+  depot_vex=${r%%/*}/builds/vex/${n#builds/}
+  mkdir vex
+  c=0
+  COSIGN_REPOSITORY=$depot_vex cosign verify-attestation --key "$CLE_VEX" --insecure-ignore-tlog --type https://openvex.dev/ns/v0.2.0 \
+    --registry-cacert "$CA" "$IMAGE" > vex/verifiees 2> vex/erreur || c=$?
+  i=0
+  grep '^{' vex/verifiees > vex/lignes || true
+  while IFS= read -r l; do
+    printf '%s' "$l" | sed -n 's/.*"payload":"\([^"]*\)".*/\1/p' | base64 -d > "vex/enonce-$i.json" 2> /dev/null || true
+    [ -s "vex/enonce-$i.json" ] || rm -f "vex/enonce-$i.json"
+    i=$((i + 1))
+  done < vex/lignes
+  set -- vex/enonce-*.json
+  [ -e "$1" ] || set --
+  scan-outil vex "${IMAGE##*@sha256:}" vex "$@" > vex-retenus.json
+  e=$(sed -n 's/^Error: //p' vex/erreur | head -1 | cut -c1-200 | tr '|' ' ')
+  echo "VEX|$# énoncé(s) vérifié(s), $(grep -o '"fichier"' vex-retenus.json | wc -l) retenu(s), $(grep -o '"raison"' vex-retenus.json | wc -l) rejeté(s)|$depot_vex|cosign code $c${e:+ : $e}"
+  sed -n 's/.*"raison": *"\([^"]*\)".*/REJET|\1/p' vex-retenus.json
+  rm -f vex/verifiees vex/erreur vex/lignes vex/enonce-*.json
+}
+
 analyser() {
   debut=$(date +%s)
   export GRYPE_DB_CACHE_DIR=$TRAVAIL/dbcache GRYPE_DB_AUTO_UPDATE=false GRYPE_DB_VALIDATE_AGE=false GRYPE_CHECK_FOR_APP_UPDATE=false \
@@ -110,13 +139,30 @@ analyser() {
   t=$(date +%s)
   artefact
   syft scan dir:source -o cyclonedx-json=sbom-source.json -q
-  scan-outil fusion sbom-source.json sbom-image.json source image > sbom.json
+  scan-outil fusion sbom-source.json sbom-image.json source image "$IMAGE" > sbom.json
   echo "SBOM|$(grep -c '"purl"' sbom.json) composants avec PURL (D1 a), $(( $(date +%s) - t )) s"
   t=$(date +%s)
-  grype sbom:sbom.json -o json --file grype.json -q
-  scan-outil predicat grype.json "$ref" > scan.json
-  echo "SCAN|$IMAGE, $(grep -c '"kev":' scan.json) vulnérabilités, $(grep -c '"kev": true' scan.json) KEV, $(( $(date +%s) - t )) s"
-  rm -rf dbcache image artefact source sbom-image.json sbom-source.json sbom.json grype.json .cache
+  lire_vex
+  # un --vex par document : Grype 0.104.1 refuse la liste séparée par des virgules (code 1, rien sous -q ; banc 07b-t3, passage 3)
+  set --
+  for f in $(sed -n 's/.*"fichier": *"\([^"]*\)".*/\1/p' vex-retenus.json); do set -- "$@" --vex "$f"; done
+  c=0
+  grype sbom:sbom.json "$@" -o json --file grype.json -q 2> grype.err || c=$?
+  cat grype.err >&2
+  repli=
+  if [ "$c" != 0 ]; then
+    [ $# -gt 0 ] || exit "$c"
+    # repli (limite 4) : aucun VEX appliqué, donc la direction stricte ; le prédicat le dit (vex.repli), et les séries
+    e=$(head -1 grype.err | cut -c1-200 | tr '|' ' ')
+    echo "REPLI|grype code $c avec $(($# / 2)) VEX${e:+ : $e} ; scan relancé sans --vex, aucun VEX appliqué"
+    rm -f grype.json
+    grype sbom:sbom.json -o json --file grype.json -q
+    repli=repli
+  fi
+  rm -f grype.err
+  scan-outil predicat grype.json "$ref" vex-retenus.json $repli > scan.json
+  echo "SCAN|$IMAGE, $(grep -c '"kev":' scan.json) vulnérabilités, $(grep -c '"kev": true' scan.json) KEV, $(grep -c '"status":' scan.json) écartée(s) par un VEX, $(( $(date +%s) - t )) s"
+  rm -rf dbcache image artefact source sbom-image.json sbom-source.json sbom.json grype.json vex vex-retenus.json .cache
   echo "PREDICAT|sha256 $(sha256sum < scan.json | cut -c1-64), $(( $(date +%s) - debut )) s en tout"
 }
 
@@ -179,6 +225,7 @@ case $MODE in
   source) source_commit ;;
   analyser) analyser ;;
   artefact) artefact ;;
+  vex) lire_vex ;;
   jetons) jetons ;;
   attester) attester ;;
   publier) publier ;;
