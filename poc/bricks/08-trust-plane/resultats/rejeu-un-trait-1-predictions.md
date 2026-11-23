@@ -74,3 +74,16 @@ Journal : [`rejeu-un-trait-1.log`](rejeu-un-trait-1.log). `TAG_05=m5b-3` est neu
 **Limites** : les démarrages connus sont le courant et le précédent du conteneur kube-apiserver ; un redémarrage plus ancien de deux crans n'est pas couvert (il compterait, contrôle plus strict). Sous k3s (pas de pod statique), rien n'est écarté, comme dans `refus_droits`. La rafale mesurée court jusqu'à 73 s après le démarrage (21:22:20Z) ; la fenêtre reste de 60 s, celle de `refus_droits`, plus stricte. **Non mesuré** : `etape_controleurs` entière avec la correction (elle tournera à la reprise ou au rejeu suivant).
 
 **Suite, au choix du propriétaire** : reprise à « J8 (contrôleurs) » (libellé neuf, `TAG_05=m5b-4` : `entree` refuse `m5b-3`, dont le journal existe ; reprise antérieure au bloc 08c, non encore appliqué : permise par `rejeu.sh`, l. 40-43), ou rejeu de zéro sous un libellé neuf.
+
+## Reprise à « J8 (contrôleurs) » : prédiction (date -u de 22:14:20 UTC, le 2026-11-23, avant le lancement ; choix du propriétaire « Reprise, VSA=1 »)
+
+**Commande** : `DISTRO=rke2 POUSSER_VSA=1 TAG_05=m5b-4 DEPUIS='J8 (contrôleurs)' mise run confiance:rejeu -- un-trait-1-reprise`. Journal [`rejeu-un-trait-1-reprise.log`](rejeu-un-trait-1-reprise.log). Libellé et `TAG_05=m5b-4` libres (relevé par `ls` à 22:14:20 UTC).
+
+**Prédiction** :
+- R0, avant tout démontage (blocs exécutés même en reprise) : `m5b-rejeu.sh entree` sous `m5b-4` (copie relue) et `rejeu-entrees.sh garder` (copie relue) tenus ; étapes antérieures « sautées » ;
+- R1, « J8 (contrôleurs) » : tenue, avec 2 lignes `CONSTAT  écarté, kube-apiserver démarrant` (le watch de 21:21:09Z) ; le reste de l'étape comme dans `plateforme-1` ;
+- puis U3 à U13 de la prédiction de 20:34:16Z, inchangées (07a et 07b avec clé VEX neuve ≠ `d0a12faa…` ; VSA et contrôles 6, 7, G6 ; 08c ; « 06 (entrées de l'hôte) » `replacer` : 3 fichiers copiés, `$W` ayant été effacé par le démontage de 20:35 ; S4c à S6a ; S4d3 `porte` ; S6b et S6a `porte` ; bloc 05 sous `m5b-4` ; Kyverno corrigé ; `fuites` et CIS).
+
+**Durée** : à partir des mesures de `un-trait-1` et `plateforme-1`, environ 2 h (calcul, non garanti) ; fin attendue avant 01:00 UTC, loin de la fenêtre de 09:00.
+
+**Réserve** : ce n'est plus un rejeu « d'un trait » : le démontage et les étapes jusqu'à « J8 (helm-cilium) » viennent du passage de 20:35:05Z.
