@@ -1,0 +1,45 @@
+# kyverno-correctif.sh cli_autre, 2026-11-23T15:32:11Z
+## préalables (lecture anonyme de Zot)
+horodatage/bundles : 13 referrer(s)
+essais-j5/sans-jeton : 1 referrer(s)
+essais-j5/jeton-altere : 1 referrer(s)
+essais-j5/autre-signature : 1 referrer(s)
+essais-j5/tsa-etrangere : 1 referrer(s)
+essais-j5/aucun : 0 referrer(s)
+## témoins bloquants
+OK   cosign accepte le bundle valide de horodatage/bundles avec son jeton (référence de J5)
+## CLI officiel 1.19.2 (témoin : le bug doit se montrer)
+OK   officiel, j5-temoin : PASS
+OK   officiel, j5-jeton-valide : ERREUR
+OK   officiel, j5-sans-jeton : FAIL
+OK   officiel, j5-aucun-bundle : FAIL
+OK   officiel, j5-jeton-altere : ERREUR
+OK   officiel, j5-autre-signature : ERREUR
+OK   officiel, j5-tsa-etrangere : ERREUR
+OK   officiel, j5-att-historique : FAIL
+## CLI 1.20.0 : ~/.cache/supply-chain-poc/08/kyverno-1.20.0/bin/kyverno (sha256 26054ccd42f4f1ed, Git commit ID: f666af06e9bd310c7e730f1523c0430e90371a89)
+IDENTIQUE j5-temoin : PASS
+     nil pointer dans la sortie verbeuse : 0
+BUG       j5-jeton-valide : ERREUR (corrigé attendu : PASS)
+     evaluation returned an internal error, not a resource refusal error="internal error: runtime error: invalid memory address or nil pointer dereference"
+     nil pointer dans la sortie verbeuse : 1
+IDENTIQUE j5-sans-jeton : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)"
+     nil pointer dans la sortie verbeuse : 0
+IDENTIQUE j5-aucun-bundle : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: "
+     nil pointer dans la sortie verbeuse : 0
+BUG       j5-jeton-altere : ERREUR (corrigé attendu : FAIL)
+     evaluation returned an internal error, not a resource refusal error="internal error: runtime error: invalid memory address or nil pointer dereference"
+     nil pointer dans la sortie verbeuse : 1
+BUG       j5-autre-signature : ERREUR (corrigé attendu : FAIL)
+     evaluation returned an internal error, not a resource refusal error="internal error: runtime error: invalid memory address or nil pointer dereference"
+     nil pointer dans la sortie verbeuse : 1
+BUG       j5-tsa-etrangere : ERREUR (corrigé attendu : FAIL)
+     evaluation returned an internal error, not a resource refusal error="internal error: runtime error: invalid memory address or nil pointer dereference"
+     nil pointer dans la sortie verbeuse : 1
+IDENTIQUE j5-att-historique : FAIL
+     image verification failed error="cosign bundle verification failed"
+     nil pointer dans la sortie verbeuse : 0
+cas qui distinguent le correctif : comme le correctif 0, comme le bug 4 (sur 4)
+bilan : 1.20.0 garde le bug
