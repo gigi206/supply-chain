@@ -1,0 +1,430 @@
+# m5b-rejeu.sh images, 2026-11-23T17:48:22Z
+## mesure d'un autre jour : m1bt-20 (~/.cache/supply-chain-poc/05/rejeu-entrees/m1bt-20-05)
+OK   o : digest du banc de m1bt-20 égal à celui de m1bt3 : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   o : DIGEST_CONSTRUIT de l'essai m1bt-20-co égal au banc : 1
+o : image.tar de l'essai m1bt-20-co : 343951360 octets
+OK   b : digest du banc de m1bt-20 égal à celui de m1bt3 : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   b : DIGEST_CONSTRUIT de l'essai m1bt-20-cb égal au banc : 1
+b : image.tar de l'essai m1bt-20-cb : 241991680 octets
+## pipeline builder-mock-rocky9
+OK   builder-mock-rocky9 relue dans Zot au tag m1b (lecture anonyme) : sc-stockage.poc.test:5000/tekton/pipelines/builder-mock-rocky9@sha256:1f636c780a95d34e17bee6af26953cd7a9a762ab4c4b4084e09772f6cce3a70a
+OK   builder-mock-rocky9 signée : nom : builder-mock-rocky9
+OK   builder-mock-rocky9 signée : tâches (celles de la signature et publier-image) : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251 sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   builder-mock-rocky9 signée : dépôt publié : sc-stockage.poc.test:5000/builds/builders/mock-rocky9
+OK   builder-mock-rocky9 signée : racine fixée : 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+## pipeline builder-rocky9-bootstrap
+OK   builder-rocky9-bootstrap relue dans Zot au tag m1b (lecture anonyme) : sc-stockage.poc.test:5000/tekton/pipelines/builder-rocky9-bootstrap@sha256:050949a39733ebabe29d7b11d48e7e4327b90cc6f3d370aac018ddd699d955f4
+OK   builder-rocky9-bootstrap signée : nom : builder-rocky9-bootstrap
+OK   builder-rocky9-bootstrap signée : tâches (celles de la signature et publier-image) : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251 sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
+OK   dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   builder-rocky9-bootstrap signée : dépôt publié : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap
+OK   builder-rocky9-bootstrap signée : racine fixée : b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+## politiques de builds (lecture seule)
+politiques de builds : NetworkPolicy construction-racine-rpm-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-racine-rpm-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
+OK   NotIn de builds-sans-internet : prefetch-deb,prefetch-gomod,prefetch-racine-rpm,prefetch-rpm
+OK   politiques qui sélectionnent un pod de prefetch-racine-rpm : CiliumNetworkPolicy prefetch-racine-rpm-sortie
+OK   politiques qui sélectionnent un pod de construire-racine-rpm : CiliumNetworkPolicy builds-sans-internet, NetworkPolicy construction-racine-rpm-sans-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-racine-rpm : 
+OK   types des NetworkPolicy qui sélectionnent un pod de construire-racine-rpm : Egress+Ingress
+## PipelineRuns absents, avant toute création
+OK   m5b-1-o-1 absent
+OK   m5b-1-o-2 absent
+OK   m5b-1-b-1 absent
+OK   m5b-1-b-2 absent
+## dépôts des images et place dans Zot, avant toute création
+OK   dépôt sc-stockage.poc.test:5000/builds/builders/mock-rocky9 absent (aucune publication antérieure ; sinon décision avant toute relance) : 1
+OK   dépôt sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap absent (aucune publication antérieure ; sinon décision avant toute relance) : 1
+/ de sc-stockage : 18967879680 octets libres à 17:48:22 (garde d'entrée : 1073741824 + 343951360 + 241991680)
+relevé : / de sc-build : 22479220736 octets libres (PVC local-path)
+## m5b-1-o-1 (builder-mock-rocky9)
+/ de sc-stockage : 18967879680 octets libres à 17:48:23 (garde : 1073741824 + 343951360)
+OK   m5b-1-o-1 : podTemplate commun sans env ; Kata pour construire seule ; aucun paramètre : [false,["construire:kata"],false]
+OK   m5b-1-o-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+m5b-1-o-1 créé à 17:48:23 (sc-stockage.poc.test:5000/tekton/pipelines/builder-mock-rocky9@sha256:1f636c780a95d34e17bee6af26953cd7a9a762ab4c4b4084e09772f6cce3a70a)
+m5b-1-o-1 : condition Succeeded « True|Succeeded », relevée à 17:51:21
+     début 2026-11-23T17:48:23Z ; fin 2026-11-23T17:51:20Z
+### TaskRun m5b-1-o-1-construire (tâche construire) : True|Succeeded ; début 2026-11-23T17:49:34Z ; fin 2026-11-23T17:51:12Z
+     résultat DIGEST_CONSTRUIT : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+     pod m5b-1-o-1-construire-pod : nœud sc-build, runtimeClassName « kata », tekton.dev/task construire-racine-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-construire : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-construire : demandes {"cpu":"2","memory":"6Gi"} ; limites {"cpu":"2","memory":"6Gi"}
+     journal de step-construire : 27 lignes
+       invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+       versions : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 
+       témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+       témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+       témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+       entrées revérifiées : 2 clé(s), 3 dépôt(s), 199 rpm, couche aucune
+       %_install_langs lu par rpm de python, env -i HOME=/m/h : [en_US] ; umask 0022
+       tmpfs /w : 1 Mo (avant dnf)
+       limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 1073741824 / 1073741824
+       dnf-3 code 0 en 41 s ; 883 lignes de journal
+       résumé de la transaction : Install  199 Packages
+       paquets installés : 201, dont gpg-pubkey 2
+       tmpfs /w : 534 Mo (après dnf)
+       racine passée en 555 ; etc/machine-id : 33 octet(s), exclu de l'archive
+       racine : 343930880 octets, 13332 membres, sha256 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+       racine conforme à la valeur fixée par la pipeline
+       tmpfs /w : 329 Mo (racine archivée, arbre retiré)
+       fichier de configuration etc/containers/storage.conf : 87 octets
+       fichier de configuration etc/mock/poc-rocky-9.7-pret-x86_64.cfg : 1047 octets
+       fichier de configuration etc/mock/poc-rocky-9.7-x86_64.cfg : 1043 octets
+       sha256 0d58dc2b87a8fc12582dd81e39be8f97e238a52f339c2b55a4fa00f813cbed39  etc/containers/storage.conf
+       sha256 0fc0b59ae434303098cb5c2785adf94b2851b93056425ecfa6f1a63aa6a176af  etc/mock/poc-rocky-9.7-pret-x86_64.cfg
+       sha256 a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31  etc/mock/poc-rocky-9.7-x86_64.cfg
+       couche de configuration : 10240 octets, sha256 04f0fe15c7f1594432bcdb10944e197f143b4a8cbd80783be1f3fb594e93953f
+       couches : 2 ; configuration sha256:f4d99de2ad5db30a2b2bec8657e30165713e76ed0d91087f009c48849e4639a8 (294 octets) ; manifeste sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae (553 octets)
+       image.tar : 343951360 octets, sha256 26ce192f90b645aedf3e02ef925d38bbea17a127c3b0707c4aa564764f1dd659, en 4 s
+       pic du tmpfs /w : 862 Mo sur 85 relevés ; memory.peak du cgroup : 1391497216
+### TaskRun m5b-1-o-1-prefetch (tâche prefetch) : True|Succeeded ; début 2026-11-23T17:48:23Z ; fin 2026-11-23T17:49:34Z
+     pod m5b-1-o-1-prefetch-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task prefetch-racine-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-prefetch : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-prefetch : demandes {"cpu":"2","memory":"2Gi"} ; limites {"cpu":"2","memory":"2Gi"}
+     journal de step-prefetch : 13 lignes
+       uid=65532 gid=65532 groups=65532 ; RPM version 4.16.1.3 ; gpgv (GnuPG) 2.3.3 ; curl 7.76.1 ; Python 3.9.25
+       clé RPM-GPG-KEY-Rocky-9 (image) : 1750 octets, sha256 et empreinte conformes
+       clé RPM-GPG-KEY-EPEL-9 (paramètre cle_sup) : 1656 octets, sha256 et empreinte conformes
+       baseos98 : repomd.xml abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163, signature valide (RPM-GPG-KEY-Rocky-9)
+       baseos98 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+       appstream98 : repomd.xml a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b, signature valide (RPM-GPG-KEY-Rocky-9)
+       appstream98 : 7 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+       epel9 : repomd.xml e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61, non signé (ancre : sha256 fixé par la pipeline)
+       epel9 : 5 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+       rpm téléchargés, sha256 égal à la liste et à primary : 199, 113665783 octets
+       rpm -K : rc 0, 199 OK sur 199
+       aucune base : BASE_ARTIFACT_INPUTS non écrit
+       entrées : 224 fichiers, 227117890 octets ; liste des sha256 : 93f2a63ef2e49607d2844e07d7dfc7f793537f350be492c4acf82815ec280535 ; en 62 s
+### TaskRun m5b-1-o-1-publier (tâche publier) : True|Succeeded ; début 2026-11-23T17:51:12Z ; fin 2026-11-23T17:51:20Z
+     résultat IMAGE_DIGEST : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+     résultat IMAGE_URL : sc-stockage.poc.test:5000/builds/builders/mock-rocky9
+     pod m5b-1-o-1-publier-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task publier-image, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-publier : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-publier : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     journal de step-publier : 1 lignes
+       publiée : sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae (relue en lecture anonyme)
+résultat de IMAGE_URL : sc-stockage.poc.test:5000/builds/builders/mock-rocky9
+résultat de IMAGE_DIGEST : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   PipelineRun m5b-1-o-1 : True|Succeeded
+OK   m5b-1-o-1, prefetch : tekton.dev/task|runtimeClassName|nœud : prefetch-racine-rpm||sc-build
+OK   m5b-1-o-1, construire : tekton.dev/task|runtimeClassName|nœud : construire-racine-rpm|kata|sc-build
+OK   m5b-1-o-1, publier : tekton.dev/task|runtimeClassName|nœud : publier-image||sc-build
+OK   prefetch : rpm -K : 1
+OK   prefetch : entrées (nombre, liste des sha256 égale à l'essai de m1bt3) : 224 93f2a63ef2e49607d2844e07d7dfc7f793537f350be492c4acf82815ec280535
+relevé : outillage, BASE_ARTIFACT_INPUTS déclaré : 1 ; ligne « non écrit » : 1
+OK   prefetch (outillage) : BASE_ARTIFACT_INPUTS absent des résultats du TaskRun : 0
+OK   construire : témoins réseau en échec : 3
+OK   construire : entrées en lecture seule : 1
+OK   construire : racine conforme à la valeur fixée par la pipeline : 1
+OK   construire : racine (sha256) : 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+OK   construire : manifeste : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   dépôt publié : sc-stockage.poc.test:5000/builds/builders/mock-rocky9
+OK   construire : DIGEST_CONSTRUIT égal au digest publié : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   publier : ligne de publication : 1
+OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae 2
+OK   digest publié égal au banc et aux essais (m1bt3 et mesure d'un autre jour) : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   PipelineRun m5b-1-o-1 signé par Chains : true
+/ de sc-stockage : 18623516672 octets libres à 17:51:28
+## m5b-1-o-2 (builder-mock-rocky9)
+/ de sc-stockage : 18623516672 octets libres à 17:51:28 (garde : 1073741824 + 343951360)
+OK   m5b-1-o-2 : podTemplate commun sans env ; Kata pour construire seule ; aucun paramètre : [false,["construire:kata"],false]
+OK   m5b-1-o-2 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+m5b-1-o-2 créé à 17:51:28 (sc-stockage.poc.test:5000/tekton/pipelines/builder-mock-rocky9@sha256:1f636c780a95d34e17bee6af26953cd7a9a762ab4c4b4084e09772f6cce3a70a)
+m5b-1-o-2 : condition Succeeded « True|Succeeded », relevée à 17:54:12
+     début 2026-11-23T17:51:28Z ; fin 2026-11-23T17:54:12Z
+### TaskRun m5b-1-o-2-construire (tâche construire) : True|Succeeded ; début 2026-11-23T17:52:28Z ; fin 2026-11-23T17:54:04Z
+     résultat DIGEST_CONSTRUIT : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+     pod m5b-1-o-2-construire-pod : nœud sc-build, runtimeClassName « kata », tekton.dev/task construire-racine-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-construire : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-construire : demandes {"cpu":"2","memory":"6Gi"} ; limites {"cpu":"2","memory":"6Gi"}
+     journal de step-construire : 27 lignes
+       invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+       versions : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 
+       témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+       témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+       témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+       entrées revérifiées : 2 clé(s), 3 dépôt(s), 199 rpm, couche aucune
+       %_install_langs lu par rpm de python, env -i HOME=/m/h : [en_US] ; umask 0022
+       tmpfs /w : 1 Mo (avant dnf)
+       limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 1073741824 / 1073741824
+       dnf-3 code 0 en 40 s ; 883 lignes de journal
+       résumé de la transaction : Install  199 Packages
+       paquets installés : 201, dont gpg-pubkey 2
+       tmpfs /w : 534 Mo (après dnf)
+       racine passée en 555 ; etc/machine-id : 33 octet(s), exclu de l'archive
+       racine : 343930880 octets, 13332 membres, sha256 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+       racine conforme à la valeur fixée par la pipeline
+       tmpfs /w : 329 Mo (racine archivée, arbre retiré)
+       fichier de configuration etc/containers/storage.conf : 87 octets
+       fichier de configuration etc/mock/poc-rocky-9.7-pret-x86_64.cfg : 1047 octets
+       fichier de configuration etc/mock/poc-rocky-9.7-x86_64.cfg : 1043 octets
+       sha256 0d58dc2b87a8fc12582dd81e39be8f97e238a52f339c2b55a4fa00f813cbed39  etc/containers/storage.conf
+       sha256 0fc0b59ae434303098cb5c2785adf94b2851b93056425ecfa6f1a63aa6a176af  etc/mock/poc-rocky-9.7-pret-x86_64.cfg
+       sha256 a8e5f2bc8d2b4a54f6b5fb7fea62ebd55628e3499abd8608014e38285bc6ea31  etc/mock/poc-rocky-9.7-x86_64.cfg
+       couche de configuration : 10240 octets, sha256 04f0fe15c7f1594432bcdb10944e197f143b4a8cbd80783be1f3fb594e93953f
+       couches : 2 ; configuration sha256:f4d99de2ad5db30a2b2bec8657e30165713e76ed0d91087f009c48849e4639a8 (294 octets) ; manifeste sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae (553 octets)
+       image.tar : 343951360 octets, sha256 26ce192f90b645aedf3e02ef925d38bbea17a127c3b0707c4aa564764f1dd659, en 6 s
+       pic du tmpfs /w : 862 Mo sur 85 relevés ; memory.peak du cgroup : 1378328576
+### TaskRun m5b-1-o-2-prefetch (tâche prefetch) : True|Succeeded ; début 2026-11-23T17:51:29Z ; fin 2026-11-23T17:52:28Z
+     pod m5b-1-o-2-prefetch-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task prefetch-racine-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-prefetch : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-prefetch : demandes {"cpu":"2","memory":"2Gi"} ; limites {"cpu":"2","memory":"2Gi"}
+     journal de step-prefetch : 13 lignes
+       uid=65532 gid=65532 groups=65532 ; RPM version 4.16.1.3 ; gpgv (GnuPG) 2.3.3 ; curl 7.76.1 ; Python 3.9.25
+       clé RPM-GPG-KEY-Rocky-9 (image) : 1750 octets, sha256 et empreinte conformes
+       clé RPM-GPG-KEY-EPEL-9 (paramètre cle_sup) : 1656 octets, sha256 et empreinte conformes
+       baseos98 : repomd.xml abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163, signature valide (RPM-GPG-KEY-Rocky-9)
+       baseos98 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+       appstream98 : repomd.xml a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b, signature valide (RPM-GPG-KEY-Rocky-9)
+       appstream98 : 7 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+       epel9 : repomd.xml e86fdcd8122292255cddfe6b9ac46f734cd53df89ba0230abbf62efd8cc71e61, non signé (ancre : sha256 fixé par la pipeline)
+       epel9 : 5 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+       rpm téléchargés, sha256 égal à la liste et à primary : 199, 113665783 octets
+       rpm -K : rc 0, 199 OK sur 199
+       aucune base : BASE_ARTIFACT_INPUTS non écrit
+       entrées : 224 fichiers, 227117890 octets ; liste des sha256 : 93f2a63ef2e49607d2844e07d7dfc7f793537f350be492c4acf82815ec280535 ; en 50 s
+### TaskRun m5b-1-o-2-publier (tâche publier) : True|Succeeded ; début 2026-11-23T17:54:05Z ; fin 2026-11-23T17:54:12Z
+     résultat IMAGE_DIGEST : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+     résultat IMAGE_URL : sc-stockage.poc.test:5000/builds/builders/mock-rocky9
+     pod m5b-1-o-2-publier-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task publier-image, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-publier : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-publier : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     journal de step-publier : 1 lignes
+       publiée : sc-stockage.poc.test:5000/builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae (relue en lecture anonyme)
+résultat de IMAGE_URL : sc-stockage.poc.test:5000/builds/builders/mock-rocky9
+résultat de IMAGE_DIGEST : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   PipelineRun m5b-1-o-2 : True|Succeeded
+OK   m5b-1-o-2, prefetch : tekton.dev/task|runtimeClassName|nœud : prefetch-racine-rpm||sc-build
+OK   m5b-1-o-2, construire : tekton.dev/task|runtimeClassName|nœud : construire-racine-rpm|kata|sc-build
+OK   m5b-1-o-2, publier : tekton.dev/task|runtimeClassName|nœud : publier-image||sc-build
+OK   prefetch : rpm -K : 1
+OK   prefetch : entrées (nombre, liste des sha256 égale à l'essai de m1bt3) : 224 93f2a63ef2e49607d2844e07d7dfc7f793537f350be492c4acf82815ec280535
+relevé : outillage, BASE_ARTIFACT_INPUTS déclaré : 1 ; ligne « non écrit » : 1
+OK   prefetch (outillage) : BASE_ARTIFACT_INPUTS absent des résultats du TaskRun : 0
+OK   construire : témoins réseau en échec : 3
+OK   construire : entrées en lecture seule : 1
+OK   construire : racine conforme à la valeur fixée par la pipeline : 1
+OK   construire : racine (sha256) : 7c07083cd7bee149d391180633ad9cca6c82c7ad0dfa5c6bf248acad0b1ef9b7
+OK   construire : manifeste : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   dépôt publié : sc-stockage.poc.test:5000/builds/builders/mock-rocky9
+OK   construire : DIGEST_CONSTRUIT égal au digest publié : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   publier : ligne de publication : 1
+OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae 2
+OK   digest publié égal au banc et aux essais (m1bt3 et mesure d'un autre jour) : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   PipelineRun m5b-1-o-2 signé par Chains : true
+/ de sc-stockage : 18614697984 octets libres à 17:54:17
+OK   builder-mock-rocky9 : deux exécutions, même digest : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+## m5b-1-b-1 (builder-rocky9-bootstrap)
+/ de sc-stockage : 18614697984 octets libres à 17:54:18 (garde : 1073741824 + 241991680)
+OK   m5b-1-b-1 : podTemplate commun sans env ; Kata pour construire seule ; aucun paramètre : [false,["construire:kata"],false]
+OK   m5b-1-b-1 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+m5b-1-b-1 créé à 17:54:18 (sc-stockage.poc.test:5000/tekton/pipelines/builder-rocky9-bootstrap@sha256:050949a39733ebabe29d7b11d48e7e4327b90cc6f3d370aac018ddd699d955f4)
+m5b-1-b-1 : condition Succeeded « True|Succeeded », relevée à 17:55:38
+     début 2026-11-23T17:54:18Z ; fin 2026-11-23T17:55:37Z
+### TaskRun m5b-1-b-1-construire (tâche construire) : True|Succeeded ; début 2026-11-23T17:54:35Z ; fin 2026-11-23T17:55:28Z
+     résultat DIGEST_CONSTRUIT : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     pod m5b-1-b-1-construire-pod : nœud sc-build, runtimeClassName « kata », tekton.dev/task construire-racine-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-construire : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-construire : demandes {"cpu":"2","memory":"6Gi"} ; limites {"cpu":"2","memory":"6Gi"}
+     journal de step-construire : 22 lignes
+       invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+       versions : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 
+       témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+       témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+       témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+       entrées revérifiées : 1 clé(s), 1 dépôt(s), 10 rpm, couche 812c44127102…
+       %_install_langs lu par rpm de python, env -i HOME=/m/h : [all] ; umask 0022
+       couche extraite par le tar de l'amorce : racine 755 ; rpm -qa avant : 147 lignes
+       tmpfs /w : 238 Mo (avant dnf)
+       limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 1073741824 / 1073741824
+       dnf-3 code 0 en 4 s ; 85 lignes de journal
+       résumé de la transaction : Install  6 Packages
+       résumé de la transaction : Upgrade  4 Packages
+       paquets installés : 153, dont gpg-pubkey 1
+       tmpfs /w : 272 Mo (après dnf)
+       racine passée en 555 ; etc/machine-id : 0 octet(s), exclu de l'archive
+       racine : 241981440 octets, 11472 membres, sha256 b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+       racine conforme à la valeur fixée par la pipeline
+       tmpfs /w : 231 Mo (racine archivée, arbre retiré)
+       couches : 1 ; configuration sha256:ff96017c3f06a35a11d06a454930ec797002708cd0187ac46d7febe0891444a2 (163 octets) ; manifeste sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 (624 octets)
+       image.tar : 241991680 octets, sha256 e574aaa17ed8c4a68b58f2580f762e2e5718f43a7e7734fabfffab95fc3b321b, en 4 s
+       pic du tmpfs /w : 503 Mo sur 44 relevés ; memory.peak du cgroup : 748056576
+### TaskRun m5b-1-b-1-prefetch (tâche prefetch) : True|Succeeded ; début 2026-11-23T17:54:18Z ; fin 2026-11-23T17:54:35Z
+     résultat BASE_ARTIFACT_INPUTS : {"digest":"sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2","uri":"oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux"}
+     pod m5b-1-b-1-prefetch-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task prefetch-racine-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-prefetch : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-prefetch : demandes {"cpu":"2","memory":"2Gi"} ; limites {"cpu":"2","memory":"2Gi"}
+     journal de step-prefetch : 10 lignes
+       uid=65532 gid=65532 groups=65532 ; RPM version 4.16.1.3 ; gpgv (GnuPG) 2.3.3 ; curl 7.76.1 ; Python 3.9.25
+       clé RPM-GPG-KEY-Rocky-9 (image) : 1750 octets, sha256 et empreinte conformes
+       baseos97 : repomd.xml fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258, signature valide (RPM-GPG-KEY-Rocky-9)
+       baseos97 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+       rpm téléchargés, sha256 égal à la liste et à primary : 10, 1984355 octets
+       rpm -K : rc 0, 10 OK sur 10
+       manifeste de base amont/rockylinux/rockylinux@sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 : 573 octets, image OCI à une couche, sha256:812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+       couche amont/rockylinux/rockylinux sha256:812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09 : 87054388 octets, conforme
+       résultat BASE_ARTIFACT_INPUTS : oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+       entrées : 20 fichiers, 115664404 octets ; liste des sha256 : 7af63de76df231b2c106629aff7ce628282053dd5831d50bc157dafcb6ca2325 ; en 8 s
+### TaskRun m5b-1-b-1-publier (tâche publier) : True|Succeeded ; début 2026-11-23T17:55:28Z ; fin 2026-11-23T17:55:37Z
+     résultat IMAGE_DIGEST : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     résultat IMAGE_URL : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap
+     pod m5b-1-b-1-publier-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task publier-image, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-publier : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-publier : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     journal de step-publier : 1 lignes
+       publiée : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 (relue en lecture anonyme)
+résultat de IMAGE_URL : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap
+résultat de IMAGE_DIGEST : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   PipelineRun m5b-1-b-1 : True|Succeeded
+OK   m5b-1-b-1, prefetch : tekton.dev/task|runtimeClassName|nœud : prefetch-racine-rpm||sc-build
+OK   m5b-1-b-1, construire : tekton.dev/task|runtimeClassName|nœud : construire-racine-rpm|kata|sc-build
+OK   m5b-1-b-1, publier : tekton.dev/task|runtimeClassName|nœud : publier-image||sc-build
+OK   prefetch : rpm -K : 1
+OK   prefetch : entrées (nombre, liste des sha256 égale à l'essai de m1bt3) : 20 7af63de76df231b2c106629aff7ce628282053dd5831d50bc157dafcb6ca2325
+OK   prefetch (bootstrap) : BASE_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2","uri":"oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux"}
+OK   construire : témoins réseau en échec : 3
+OK   construire : entrées en lecture seule : 1
+OK   construire : racine conforme à la valeur fixée par la pipeline : 1
+OK   construire : racine (sha256) : b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+OK   construire : manifeste : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   dépôt publié : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap
+OK   construire : DIGEST_CONSTRUIT égal au digest publié : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   publier : ligne de publication : 1
+OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 1
+OK   digest publié égal au banc et aux essais (m1bt3 et mesure d'un autre jour) : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   PipelineRun m5b-1-b-1 signé par Chains : true
+/ de sc-stockage : 18379423744 octets libres à 17:55:45
+## m5b-1-b-2 (builder-rocky9-bootstrap)
+/ de sc-stockage : 18379423744 octets libres à 17:55:45 (garde : 1073741824 + 241991680)
+OK   m5b-1-b-2 : podTemplate commun sans env ; Kata pour construire seule ; aucun paramètre : [false,["construire:kata"],false]
+OK   m5b-1-b-2 admis en dry-run serveur (ni résolveur, ni signatures, ni pods) : code de kubectl : 0
+m5b-1-b-2 créé à 17:55:45 (sc-stockage.poc.test:5000/tekton/pipelines/builder-rocky9-bootstrap@sha256:050949a39733ebabe29d7b11d48e7e4327b90cc6f3d370aac018ddd699d955f4)
+m5b-1-b-2 : condition Succeeded « True|Succeeded », relevée à 17:57:05
+     début 2026-11-23T17:55:45Z ; fin 2026-11-23T17:57:03Z
+### TaskRun m5b-1-b-2-construire (tâche construire) : True|Succeeded ; début 2026-11-23T17:56:03Z ; fin 2026-11-23T17:56:57Z
+     résultat DIGEST_CONSTRUIT : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     pod m5b-1-b-2-construire-pod : nœud sc-build, runtimeClassName « kata », tekton.dev/task construire-racine-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-construire : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-construire : demandes {"cpu":"2","memory":"6Gi"} ; limites {"cpu":"2","memory":"6Gi"}
+     journal de step-construire : 22 lignes
+       invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 0 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+       versions : rpm-4.16.1.3-40.el9.x86_64 dnf-4.14.0-34.el9_8.rocky.0.1.noarch python3-dnf-4.14.0-34.el9_8.rocky.0.1.noarch libsolv-0.7.24-4.el9.x86_64 libdnf-0.69.0-18.el9.rocky.0.1.x86_64 tar-2:1.34-11.el9.x86_64 
+       témoin DNS dl.rockylinux.org : échec, code 124 (attendu)
+       témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+       témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+       entrées revérifiées : 1 clé(s), 1 dépôt(s), 10 rpm, couche 812c44127102…
+       %_install_langs lu par rpm de python, env -i HOME=/m/h : [all] ; umask 0022
+       couche extraite par le tar de l'amorce : racine 755 ; rpm -qa avant : 147 lignes
+       tmpfs /w : 238 Mo (avant dnf)
+       limite de fichiers ouverts dans le sous-shell de dnf : 1024 / 1024 ; limite du shell après : 1073741824 / 1073741824
+       dnf-3 code 0 en 4 s ; 85 lignes de journal
+       résumé de la transaction : Install  6 Packages
+       résumé de la transaction : Upgrade  4 Packages
+       paquets installés : 153, dont gpg-pubkey 1
+       tmpfs /w : 272 Mo (après dnf)
+       racine passée en 555 ; etc/machine-id : 0 octet(s), exclu de l'archive
+       racine : 241981440 octets, 11472 membres, sha256 b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+       racine conforme à la valeur fixée par la pipeline
+       tmpfs /w : 231 Mo (racine archivée, arbre retiré)
+       couches : 1 ; configuration sha256:ff96017c3f06a35a11d06a454930ec797002708cd0187ac46d7febe0891444a2 (163 octets) ; manifeste sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 (624 octets)
+       image.tar : 241991680 octets, sha256 e574aaa17ed8c4a68b58f2580f762e2e5718f43a7e7734fabfffab95fc3b321b, en 3 s
+       pic du tmpfs /w : 503 Mo sur 44 relevés ; memory.peak du cgroup : 749449216
+### TaskRun m5b-1-b-2-prefetch (tâche prefetch) : True|Succeeded ; début 2026-11-23T17:55:45Z ; fin 2026-11-23T17:56:03Z
+     résultat BASE_ARTIFACT_INPUTS : {"digest":"sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2","uri":"oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux"}
+     pod m5b-1-b-2-prefetch-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task prefetch-racine-rpm, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-prefetch : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-prefetch : demandes {"cpu":"2","memory":"2Gi"} ; limites {"cpu":"2","memory":"2Gi"}
+     journal de step-prefetch : 10 lignes
+       uid=65532 gid=65532 groups=65532 ; RPM version 4.16.1.3 ; gpgv (GnuPG) 2.3.3 ; curl 7.76.1 ; Python 3.9.25
+       clé RPM-GPG-KEY-Rocky-9 (image) : 1750 octets, sha256 et empreinte conformes
+       baseos97 : repomd.xml fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258, signature valide (RPM-GPG-KEY-Rocky-9)
+       baseos97 : 6 fichier(s) de métadonnées, sha256 conformes à repomd.xml
+       rpm téléchargés, sha256 égal à la liste et à primary : 10, 1984355 octets
+       rpm -K : rc 0, 10 OK sur 10
+       manifeste de base amont/rockylinux/rockylinux@sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 : 573 octets, image OCI à une couche, sha256:812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09
+       couche amont/rockylinux/rockylinux sha256:812c44127102f257d376d2c571aa5be68fbe4e46316a772cfeb9ac359f1adf09 : 87054388 octets, conforme
+       résultat BASE_ARTIFACT_INPUTS : oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2
+       entrées : 20 fichiers, 115664404 octets ; liste des sha256 : 7af63de76df231b2c106629aff7ce628282053dd5831d50bc157dafcb6ca2325 ; en 9 s
+### TaskRun m5b-1-b-2-publier (tâche publier) : True|Succeeded ; début 2026-11-23T17:56:57Z ; fin 2026-11-23T17:57:03Z
+     résultat IMAGE_DIGEST : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+     résultat IMAGE_URL : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap
+     pod m5b-1-b-2-publier-pod : nœud sc-build, runtimeClassName «  », tekton.dev/task publier-image, phase Succeeded
+     conteneur prepare : terminated code 0 raison Completed
+     conteneur place-scripts : terminated code 0 raison Completed
+     conteneur step-publier : terminated code 0 raison Completed
+     ressources prepare : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources place-scripts : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     ressources step-publier : demandes {"cpu":"50m","memory":"64Mi"} ; limites {"cpu":"1","memory":"512Mi"}
+     journal de step-publier : 1 lignes
+       publiée : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 (relue en lecture anonyme)
+résultat de IMAGE_URL : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap
+résultat de IMAGE_DIGEST : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   PipelineRun m5b-1-b-2 : True|Succeeded
+OK   m5b-1-b-2, prefetch : tekton.dev/task|runtimeClassName|nœud : prefetch-racine-rpm||sc-build
+OK   m5b-1-b-2, construire : tekton.dev/task|runtimeClassName|nœud : construire-racine-rpm|kata|sc-build
+OK   m5b-1-b-2, publier : tekton.dev/task|runtimeClassName|nœud : publier-image||sc-build
+OK   prefetch : rpm -K : 1
+OK   prefetch : entrées (nombre, liste des sha256 égale à l'essai de m1bt3) : 20 7af63de76df231b2c106629aff7ce628282053dd5831d50bc157dafcb6ca2325
+OK   prefetch (bootstrap) : BASE_ARTIFACT_INPUTS (clés triées) : {"digest":"sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2","uri":"oci://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux"}
+OK   construire : témoins réseau en échec : 3
+OK   construire : entrées en lecture seule : 1
+OK   construire : racine conforme à la valeur fixée par la pipeline : 1
+OK   construire : racine (sha256) : b063feb3206deb3f1c0ad4eb7b497d683693967d194c7fdd366a2b0094823348
+OK   construire : manifeste : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   dépôt publié : sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap
+OK   construire : DIGEST_CONSTRUIT égal au digest publié : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   publier : ligne de publication : 1
+OK   manifeste relu dans Zot (lecture anonyme) : digest du descripteur, couches : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 1
+OK   digest publié égal au banc et aux essais (m1bt3 et mesure d'un autre jour) : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   PipelineRun m5b-1-b-2 signé par Chains : true
+/ de sc-stockage : 18372616192 octets libres à 17:57:10
+OK   builder-rocky9-bootstrap : deux exécutions, même digest : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+écarts : 0

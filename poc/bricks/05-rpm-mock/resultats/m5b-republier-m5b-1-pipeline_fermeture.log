@@ -1,0 +1,20 @@
+# m5b-republier.sh pipeline_fermeture, 2026-11-23T17:57:19Z
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 192.168.161.13:5000 ; tag : m5b-1 ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## fermeture/prefetch-rpm-sample-app.m1b.signee.yaml
+OK   sha256 du fichier : be99c8f946849d92fa92b7db354138bee1880ee123186406107d012f18215ffd
+OK   annotation de signature : true
+OK   digest attendu égal à PIPELINE_REF de m1b-fermeture.sh : sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+OK   référence du contenu signé présente dans Zot : builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3 : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   référence du contenu signé présente dans Zot : tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc : sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+OK   référence du contenu signé présente dans Zot : tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135 : sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+références par digest du contenu signé : 3
+OK   tekton/pipelines/prefetch-rpm-sample-app:m5b-1 avant la poussée : absent
+relevé : octets libres sur / de sc-stockage (porte /var/lib/zot) avant les poussées : 18372096000
+## poussées (tag m5b-1, tkn 0.46.2, TZ=Europe/Paris)
+poussée 1 : tekton/pipelines/prefetch-rpm-sample-app:m5b-1
+OK   fermeture/prefetch-rpm-sample-app.m1b.signee.yaml poussé, digest : sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+OK   tekton/pipelines/prefetch-rpm-sample-app:m5b-1 relu (lecture anonyme) : sha256:61814acd6f15f0fde07f9f701f2e8cfd4324218caf2df9e1befcf182495ca60c
+poussées : 1
