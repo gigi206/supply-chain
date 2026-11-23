@@ -1,0 +1,27 @@
+heure : 2026-11-23T08:34:54Z
+audit-k8s, 15 min jusqu'à 06:00 : 6849
+audit-k8s, 15 min jusqu'à 06:30 : 6416
+audit-k8s, 15 min jusqu'à 06:45 : 5192
+audit-k8s, 15 min jusqu'à 07:00 : aucune
+audit-k8s, 15 min jusqu'à 07:30 : aucune
+audit-k8s, 15 min jusqu'à 08:00 : aucune
+audit-k8s, 15 min jusqu'à 08:15 : aucune
+audit-k8s, 15 min jusqu'à 08:30 : 3705
+audit-k8s, 2 dernières min : 33679
+audit-k8s configmaps scan, 2 dernières min : 22
+audit-k8s avec objectRef_resource, 2 dernières min : 30218
+audit-k8s verbe patch, 24 h : 22191
+écritures de scan-config, 3 h : 1
+écritures de scan-config, 5 min jusqu'à 08:16 : aucune
+écritures de scan-config, 5 min jusqu'à 08:20 : aucune
+écritures de scan-config, 5 min jusqu'à 08:25 : aucune
+écritures de scan-config, 5 min jusqu'à 08:30 : aucune
+écritures de scan-config, 5 min jusqu'à 08:34 : 1
+écritures de scan-config, 2 dernières min : 1
+audit-k8s, 3 min jusqu'à 08:18 : aucune
+audit-k8s, 3 min jusqu'à 08:21 : 289
+audit-k8s, 3 min jusqu'à 08:24 : aucune
+audit-k8s, 3 min jusqu'à 08:27 : 3416
+audit-k8s, 3 min jusqu'à 08:30 : aucune
+audit-k8s, 3 min jusqu'à 08:33 : aucune
+écriture de scan-config sur 3 h, par heure de réception/verbe/utilisateur/code : 2026-11-23T08:16:01.112541Z/patch/system:admin/200 1

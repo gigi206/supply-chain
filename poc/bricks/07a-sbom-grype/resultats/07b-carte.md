@@ -1525,3 +1525,45 @@ Rien n'a été fait sur la VM. Toute action (redémarrage, connexion à la conso
 - **mesures datées touchées** : G7 (balayages de Zot, tâche du 29/11), M5b (pas avant le 28/11) et le suivi `df` de sc-stockage. Réserve : leurs séries auront un trou à partir de 06:40 UTC.
 
 **Heures** : ces relevés, de 08:18:16 UTC à 08:21:41 UTC, sont comptés hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
+
+## Redémarrage propre de sc-stockage : prédiction (date -u de 08:33:00 UTC, le 2026-11-23, avant le lancement)
+
+**Décision du propriétaire** (verbatim) : « Redémarrage propre ». La décision couvre `virsh reboot` (ACPI) seul, sans `reset` ni `destroy`. Lancement avant 09:00 UTC, hors des passages de 09:30 et 11:15.
+
+| Contrôle | Prédit | Confiance |
+|---|---|---|
+| `virsh reboot sc-stockage` | rend 0 | haute |
+| arrêt par ACPI | fait en moins de 5 min | moyenne (l'espace utilisateur de la VM répond peut-être mal) |
+| bail DHCP de .13, port 22 joignable | dans les 5 min qui suivent le redémarrage | moyenne |
+| nœud `sc-stockage` | `Ready` | moyenne |
+| Zot (`/v2/`), Grafana (`/api/health`) | joignables | moyenne |
+| écriture de `scan-config` de 08:16 dans Loki (audit de l'API, plage absolue) | trouvée, si l'agent de collecte de sc-confiance a gardé la ligne en tampon | basse |
+
+Si l'arrêt par ACPI n'aboutit pas, rien de plus n'est fait : `reset` ou `destroy` demanderait un nouvel accord.
+
+## Redémarrage propre de sc-stockage : résultat (note de 2026-11-23T08:35:34Z)
+
+| Contrôle | Prédit | Mesuré |
+|---|---|---|
+| `virsh reboot sc-stockage`, 08:33:00 UTC | rend 0 | rend 0 |
+| arrêt par ACPI | moins de 5 min | fait : bail DHCP de nouveau à 08:33:32, port 22 joignable à 08:33:43 (relevé toutes les 10 s, depuis l'hôte) |
+| nœud `sc-stockage` | `Ready` | `Ready` depuis 08:33:42Z |
+| Zot (`/v2/`), Grafana (`/api/health`) | joignables | 200 et 200 à 08:33:53 |
+| écriture de `scan-config` de 08:16 dans Loki | trouvée, confiance basse | **trouvée, mais pas à son heure** (ci-dessous) |
+
+Seule action sur la VM : `virsh reboot`. Aucune connexion ni lecture dans la VM. La cause de la panne n'est donc toujours pas établie. Un pod `rke2-coredns` du nœud reste `Terminating` depuis 9 jours ; il est antérieur à la panne et n'a pas été touché.
+
+**Relecture de la pose dans Grafana** :
+- [`grafana_plage`](vex-pub-grafana_plage.log), étape datée ajoutée au script (plage fixe de 08:15:00 à 08:21:00 UTC) : aucune série, KO ;
+- [relevé de reprise](vex-pub-loki-reprise.log) ([script](vex-pub-loki-reprise.sh), comptes seuls, 08:34:54 UTC) :
+  - une seule écriture de `scan-config` sur 3 h, `patch` par `system:admin`, code 200, reçue par l'API à **2026-11-23T08:16:01.112541Z** (champ `requestReceivedTimestamp` de la ligne d'audit) : c'est la pose ;
+  - Loki la range pourtant dans les 2 dernières minutes, et non à 08:16. Les lignes rattrapées après le redémarrage portent l'heure de leur collecte, pas celle de l'événement ;
+  - audit de l'API par tranches de 15 min : 5192 lignes jusqu'à 06:45, aucune de 06:45 à 08:15, puis 33679 sur les 2 dernières minutes. Les tranches de 3 min de 08:18 à 08:33 montrent aussi des comptes isolés (289, 3416) alors que Loki était injoignable. Ce rangement n'est pas expliqué.
+
+**Conséquence pour l'audit**, à écrire comme réserve : après une panne de Loki, une recherche par heure d'événement dans Grafana ne trouve pas les lignes rattrapées. Il faut filtrer sur `requestReceivedTimestamp` (audit de l'API) ou sur l'heure portée par la ligne. Ce n'est vérifié que pour `audit-k8s`. On ne sait pas non plus si toutes les lignes de 06:40 à 08:33 ont été rattrapées : le compte global n'a pas été rapproché du fichier d'audit de sc-confiance (lecture sudo, sur accord).
+
+**Reste ouvert** :
+- la cause de la panne ;
+- l'effet de `vex.pub` sur le scan de 09:30 UTC (prédit : aucun).
+
+**Heures** : de 08:33:00 UTC à 08:35:34 UTC, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.

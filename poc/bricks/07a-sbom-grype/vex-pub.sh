@@ -12,6 +12,8 @@
 #            touchés
 #   grafana  l'auditeur relit dans Loki, à travers Grafana, l'audit de l'API (source audit-k8s) : écritures de scan-config sur
 #            15 min, comptées par verbe et par utilisateur ; comptes seuls, aucune ligne brute
+#   grafana_plage  (ajout du 23/11/2026, après la panne de sc-stockage de 06:40 à la relance) même relecture sur une plage
+#            fixe, de 08:15:00 à 08:21:00 UTC le 23/11 (pose à 08:16:00), au lieu des 15 dernières minutes
 # Usage (racine du dépôt) : poc/bricks/07a-sbom-grype/vex-pub.sh <étape>   (journal : resultats/vex-pub-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
@@ -23,7 +25,7 @@ export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
 CLE=$R/vex-cle-publique.pem
 SPKI_ATTENDU=2b81df72314a72e85276ce55aa6625306b47ab37e2c9e2a28878ce374b9df1a9
 e=${1:-}
-case $e in releve|pose|grafana) ;; *) echo "usage : $0 releve | pose | grafana" >&2; exit 64 ;; esac
+case $e in releve|pose|grafana|grafana_plage) ;; *) echo "usage : $0 releve | pose | grafana | grafana_plage" >&2; exit 64 ;; esac
 L=$R/vex-pub-$e.log
 [ ! -e "$L" ] || { echo "journal déjà présent : $L (les journaux ne sont jamais réécrits)" >&2; exit 1; }
 ko=0
@@ -75,19 +77,22 @@ case $e in
     else
       attendu "vex.pub absente de scan-config" "$(cm_cle vex.pub | wc -c)" 0
     fi ;;
-  grafana)
+  grafana|grafana_plage)
     GRAF=https://192.168.161.13:3001
+    t0=""; [ "$e" != grafana_plage ] || t0=$(date -ud 2026-11-23T08:21:00Z +%s)
     q() {
       local t body
       t=$(date -u +%s)000
+      [ "$e" != grafana_plage ] || t=$(date -ud 2026-11-23T08:21:00Z +%s)000
       body=$(jq -nc --arg q "$1" --arg t "$t" '{from:$t,to:$t,queries:[{refId:"A",datasource:{uid:"loki"},expr:$q,queryType:"instant",maxLines:1}]}')
       printf 'user = "auditeur:%s"\n' "$(cat "$O/08/secrets/grafana-auditeur.password")" \
         | curl -sS -K - --cacert "$P/ca-poc.crt" -H 'Content-Type: application/json' -X POST "$GRAF/api/ds/query" -d "$body" \
         | jq -r '[.results.A.frames[]? | select((.data.values | length) > 1) | "\(.schema.fields[1].labels | [.verb // "-", .user_username // "-", .responseStatus_code // "-"] | join("/")) \(.data.values[1][0])"] | if length == 0 then "aucune série" else sort | join(",") end'
     }
     A='{noeud="sc-confiance", source="audit-k8s"} |= "scan-config" | json | objectRef_resource="configmaps" | objectRef_namespace="scan" | objectRef_name="scan-config"'
-    echo "fenêtre : 15 min"
-    n=$(q "sum by (verb, user_username, responseStatus_code) (count_over_time($A | verb=~\"create|update|patch|delete\" [15m]))")
+    w=15m; [ "$e" != grafana_plage ] || w=6m
+    echo "fenêtre : $w, jusqu'à $(date -ud "@${t0:-$(date -u +%s)}" +%Y-%m-%dT%H:%M:%SZ)"
+    n=$(q "sum by (verb, user_username, responseStatus_code) (count_over_time($A | verb=~\"create|update|patch|delete\" [$w]))")
     echo "écritures de scan-config, par verbe/utilisateur/code : $n"
     case $n in "aucune série") echo "KO   aucune écriture de scan-config dans Grafana"; ko=1 ;; *) ok "écriture de scan-config présente dans Grafana" ;; esac ;;
 esac
