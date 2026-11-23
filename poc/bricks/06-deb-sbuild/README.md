@@ -2141,3 +2141,8 @@ Question posée : « Je clos la 06 maintenant, avec la réserve du rejeu de zér
 
 **Additif du 23/11/2026 (note de 2026-11-23T19:32:17Z) : reprise du bloc 06 après le rejeu de zéro** : carte et prédictions R1 à R7 écrites avant tout lancement ([`reprise-06-rejeu-23-11-predictions.md`](resultats/reprise-06-rejeu-23-11-predictions.md)) ; S1 et S2 ne sont pas à refaire (archives lues par S4a `comparaison` seule, hors rejeu) ; deb de S3 `f66bbeb2…` replacé depuis une copie de l'hôte ; trois lancements (S4a et S4b ; `s4d.sh prealables` ; S4d à S6a `grafana`), sans VSA poussée.
 - 2026-11-23T20:14:03Z : reprise du bloc 06 terminée, **R1 à R6 tenues, aucun KO** ([résultat](resultats/reprise-06-rejeu-23-11-predictions.md)). Image de build `749d746c`, fermetures `bb7599a2` et `50dc73f7`, artefact `60f25f5c`, chacun deux fois ; S4d3 sans la porte ; S6a avec `vex.pub` ; `entrees-scan` posé. `rejeu-entrees.sh` (banc : 0 écart) est branché dans `rejeu.sh`, non rejoué. Restent sur accord : `pousser_vsa`, `lire_vsa` et les portes.
+- 2026-11-23T20:23:36Z : VSA du deb et portes (accord « Oui, POUSSER_VSA=1 ») :
+  - `s4d3.sh porte` : 11 OK et l'écart d'ordre prévu (scan du deb `ok`, déjà présent) ;
+  - `pousser_vsa` : manifeste `97b4100d`, identique au 16/11 ; `lire_vsa` tout OK ;
+  - S6a `porte` : VSA et scan `ok`, Job `1/`.
+  - **Bloc 06 rejoué en entier** ([résultat](resultats/reprise-06-rejeu-23-11-predictions.md)).

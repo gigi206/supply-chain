@@ -1,4 +1,4 @@
-# s6b.sh pousser_vsa, 2026-11-16T20:56:02Z
+# s6b.sh pousser_vsa, 2026-11-23T20:22:33Z
 ## bundle archivé, revérifié sur l'hôte
 verify-blob-attestation, clé de VSA (hôte) : code 0 ; Verified OK
 OK   verify-blob-attestation (hôte) : aucune connexion hors de Zot (0 connect())
@@ -6,7 +6,7 @@ OK   énoncé du bundle identique à s6b-vsa-enonce.json ; sujet sc-stockage.poc
 ## sujet dans Zot (lecture anonyme)
 sujet : {"mediaType": "application/vnd.oci.image.manifest.v1+json", "digest": "sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e", "size": 400}
 referrers du deb dans builds/sample-app-deb, avant : 0
-étiquettes de builds/sample-app-deb, avant : {"name":"builds/sample-app-deb","tags":["sha256-039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e.att","sha256-039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e.sig","sha256-60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e.att","sha256-60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e.sig"]}
+étiquettes de builds/sample-app-deb, avant : {"name":"builds/sample-app-deb","tags":["sha256-60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e.att","sha256-60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e.sig"]}
 ## push (poc-replay, par digest, dans builds/vsa/sample-app-deb)
 blob du bundle poussé
 config vide poussée

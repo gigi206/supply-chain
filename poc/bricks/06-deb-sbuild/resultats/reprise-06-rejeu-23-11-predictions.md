@@ -134,3 +134,23 @@ Ce que ce document ne règle pas : le prochain rejeu de zéro effacera de nouvea
   - `lire_vsa` : tout OK. La VSA est acceptée par la clé du domaine seule, et la provenance par la clé de Chains seule.
   - S6a `porte` : `ec` en succès, horodatage `ok`, VSA `ok`, scan `ok`, Job de la porte `1/`.
   - Confiance moyenne : la porte a changé avec la pièce 6 et n'a jamais jugé le deb depuis.
+
+## VSA du deb et portes : résultat (note de 2026-11-23T20:23:36Z)
+
+**La prédiction tient en entier, écart d'ordre compris.**
+
+- **V1** ([journal](s4d3-porte.log)) :
+  - 11 mesures OK : deb `ec` en succès, sans violation ; avertissement `trusted_task.tagged` ; horodatage `ok`, 8 enveloppes sur 8 ; VSA `refus` ; les cinq règles du PoC ; sample-app `true||trusted_task.tagged`, 6 enveloppes sur 6, VSA et scan `ok|ok`.
+  - **Le seul écart est celui qui était prévu** : `ÉCART deb : scan : ok (attendu : refus)`. Le script sort en code 1 sur cet écart d'ordre.
+  - La porte de la pièce 6 accepte donc le scan du deb (67 vulnérabilités, 0 KEV, aucun VEX).
+- **V2**, lancé à 20:22 UTC, 47 s ([journal](../../08-trust-plane/resultats/rejeu-06-vsa.log)), code 0 :
+  - `garder` relit la copie (3 OK) ;
+  - `pousser_vsa` revérifie le bundle sans connexion hors de Zot et pousse le **manifeste `sha256:97b4100d…`, identique à celui du 16/11** ; referrers et étiquettes du deb sont inchangés ;
+  - `lire_vsa` : tout OK. La VSA est acceptée par la clé du domaine seule ; la provenance est acceptée par la clé de Chains seule (8 vérifiées) ;
+  - S6a `porte` : `ec` en succès, horodatage `ok`, **VSA `ok`, scan `ok`**, Job de la porte `1/`.
+
+**Bilan du bloc 06 rejoué** : tout le bloc est passé, de S4a à S6a `porte`, sur la plateforme recréée de zéro le 23/11. Cela vaut aussi pour la VSA du deb et les deux portes.
+
+Réserves :
+- l'ordre n'est pas celui du rejeu complet : M5b est passé avant, et S4d3 `porte` après S6a `periodique` ;
+- aucun rejeu de zéro d'un seul trait n'a tourné avec ce câblage.

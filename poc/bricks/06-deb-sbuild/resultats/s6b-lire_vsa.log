@@ -1,4 +1,4 @@
-# s6b.sh lire_vsa, 2026-11-16T20:59:25Z
+# s6b.sh lire_vsa, 2026-11-23T20:22:38Z
 OK   VSA par COSIGN_REPOSITORY, clé de VSA : accepte (1 vérifiée(s) ; )
 OK   VSA par COSIGN_REPOSITORY, clé de VSA : aucune connexion hors de Zot (1 connect())
 OK   VSA par COSIGN_REPOSITORY, clé de Chains : refus (0 vérifiée(s) ; Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0)

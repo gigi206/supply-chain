@@ -1,0 +1,132 @@
+# rejeu.sh 06-vsa, 2026-11-23T20:22:33Z
+réseau : cilium ; reprise à 06 (S6b, pousser_vsa) ; arrêt après 06 (S6a, porte)
+# rejeu-entrees.sh garder, 2026-11-23T20:22:33Z
+copie présente, relue : ~/.cache/supply-chain-poc/06/rejeu-entrees
+OK   copie s1-06/hote/InRelease : 0584fba32e13e0ab…
+OK   copie s1-06/hote/Packages.xz : 7778d3e3f303b7dd…
+OK   copie s3-06/build-1/sample-app_1.0.0-2_amd64.deb : f66bbeb2aba31e52…
+bilan : tenu
+## démontage : sautée (reprise à 06 (S6b, pousser_vsa))
+## VM : sautée (reprise à 06 (S6b, pousser_vsa))
+## RKE2 : sautée (reprise à 06 (S6b, pousser_vsa))
+## Cilium : sautée (reprise à 06 (S6b, pousser_vsa))
+## J2 : sautée (reprise à 06 (S6b, pousser_vsa))
+## J3 : sautée (reprise à 06 (S6b, pousser_vsa))
+## J4 : sautée (reprise à 06 (S6b, pousser_vsa))
+## J5 : sautée (reprise à 06 (S6b, pousser_vsa))
+## J6 : sautée (reprise à 06 (S6b, pousser_vsa))
+## test 5 (J6) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J6 (suite) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J7 : sautée (reprise à 06 (S6b, pousser_vsa))
+## J7 (admission) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J7 (BuildKit) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J7 (voie D) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J7 (voie A, sample-app) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J7 (sans réseau) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J7 (construction, entrées) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J7 (fermeture, F2 de la 03) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J7 (construction) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J7 (réseau) : sautée (reprise à 06 (S6b, pousser_vsa))
+## reserve_c : sautée (non rejouable : dépôts d'essai du test 8 du 01/11 nommés en dur ; mesure du 01/11 gardée, ADR 0000)
+## J8 (tests) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J8 (bascule) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J8 (helm-cilium) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J8 (contrôleurs) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 01 (S2, S4) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 01 (S3) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 01 (S4, négatifs) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 01 S5 : sautée (déduit du code, non mesuré : D6 refuserait l'image du fork, sans fermeture propre ; porte en dur sur 3a7ca1b1)
+## 01 reverification, retrait, refspec, niveaux : sautées (mesures ponctuelles du 02/11/2026)
+## 01 (S6) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 19 telecharger : sautée (archives en cache, sha256 revérifiés par installer) ; reference, O4 et correctifs : sautés (mesures)
+## 19 (O2) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 19b (L2) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 19b (L3) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 19b (L5) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 19 (O2, suite) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 19 (O3) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 19b L1, avant_grpc, grpc_tls, pertes_grpc : sautées (L2 et L3 posent déjà la configuration finale) ; muette, L7 : sautées
+## 19b (L6, contrôle) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 19b (L4) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 07a (G1) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 07a (G2) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 07a (G3) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 07b (clé VEX) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 07b (accès VEX) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 07a (G4) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 07a (passage périodique) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 07a (G8) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 10 (VSA) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J8 (contrôle 6) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J8 (contrôle 7) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 07a (G6) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 08c (H1) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 08c (H4) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 08c (S1) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 08c (H5, limites) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 08c (H5, Deny) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 08c (H5, rôles) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 08c (sortie des builds) : sautée (reprise à 06 (S6b, pousser_vsa))
+## J8 (résolveurs) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (S1, amorce) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (entrées de l'hôte) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (S4c) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (S4a) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (S4b) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (S4d, prealables) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (S4d) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (S4d3) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (S6a, periodique) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (S6a, fraicheur) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 07b (entrees-scan, pose) : sautée (reprise à 06 (S6b, pousser_vsa))
+## 06 (S6a, grafana) : sautée (reprise à 06 (S6b, pousser_vsa))
+# s6b.sh pousser_vsa, 2026-11-23T20:22:33Z
+## bundle archivé, revérifié sur l'hôte
+verify-blob-attestation, clé de VSA (hôte) : code 0 ; Verified OK
+OK   verify-blob-attestation (hôte) : aucune connexion hors de Zot (0 connect())
+OK   énoncé du bundle identique à s6b-vsa-enonce.json ; sujet sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:60f25f5c3fb5… ; PASSED ; ['POC_REPLAY_BIT_IDENTIQUE'] ; timeVerified 2026-11-16T20:43:07Z
+## sujet dans Zot (lecture anonyme)
+sujet : {"mediaType": "application/vnd.oci.image.manifest.v1+json", "digest": "sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e", "size": 400}
+referrers du deb dans builds/sample-app-deb, avant : 0
+étiquettes de builds/sample-app-deb, avant : {"name":"builds/sample-app-deb","tags":["sha256-60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e.att","sha256-60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e.sig"]}
+## push (poc-replay, par digest, dans builds/vsa/sample-app-deb)
+blob du bundle poussé
+config vide poussée
+Digest: sha256:97b4100d0f151241a8bedb1e116bd1ebe39165aeeed717e96da7bcf8320b531c
+## relecture anonyme
+referrers du deb dans builds/vsa/sample-app-deb : [('application/vnd.dev.sigstore.bundle.v0.3+json', 'sha256:97b4100d0f151241a8bedb1e116bd1ebe39165aeeed717e96da7bcf8320b531c')]
+étiquettes de builds/vsa/sample-app-deb : {"name":"builds/vsa/sample-app-deb","tags":[]}
+OK   referrers du deb dans builds/sample-app-deb inchangés (0)
+OK   étiquettes de builds/sample-app-deb inchangées
+manifeste poussé : sha256:97b4100d0f151241a8bedb1e116bd1ebe39165aeeed717e96da7bcf8320b531c (copie : resultats/s6b-vsa-manifeste.json)
+bilan : tout OK
+## durée 06 (S6b, pousser_vsa) : 5 s
+# s6b.sh lire_vsa, 2026-11-23T20:22:38Z
+OK   VSA par COSIGN_REPOSITORY, clé de VSA : accepte (1 vérifiée(s) ; )
+OK   VSA par COSIGN_REPOSITORY, clé de VSA : aucune connexion hors de Zot (1 connect())
+OK   VSA par COSIGN_REPOSITORY, clé de Chains : refus (0 vérifiée(s) ; Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0)
+OK   VSA par COSIGN_REPOSITORY, clé de Chains : aucune connexion hors de Zot (1 connect())
+OK   provenance (tag .att), clé de VSA : refus (0 vérifiée(s) ; Error: no matching attestations: accepted signatures do not match threshold, Found: 0, Expected 1)
+OK   provenance (tag .att), clé de VSA : aucune connexion hors de Zot (1 connect())
+OK   témoin : provenance (tag .att), clé de Chains : accepte (8 vérifiée(s) ; )
+OK   témoin : provenance (tag .att), clé de Chains : aucune connexion hors de Zot (1 connect())
+bilan : tout OK
+## durée 06 (S6b, lire_vsa) : 0 s
+# s6a.sh porte, 2026-11-23T20:22:38Z
+## préalables (lectures anonymes)
+OK   builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e présent dans Zot
+referrers du deb dans builds/vsa/sample-app-deb : 1, VSA attendue : ok
+## porte sur le deb (comme l'étape porte de s4d3.sh)
+OK   PipelineRuns en cours dans builds : 0
+passage d'horodatage horodatage-29924423
+provenance de PipelineRun la plus récente du deb (seule jugée) : 98213251-cd37-4d03-bef8-8f0dfee7f810
+VERDICT|s6a-deb|true||trusted_task.tagged|2|ok|8/8 enveloppe(s) couverte(s), 8 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app-deb|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app-deb
+OK   deb : succès de ec : true
+OK   deb : violations : 
+OK   deb : horodatage : ok
+OK   deb : VSA : ok
+OK   deb : scan : ok
+OK   Job de la porte : 1/
+bilan : tout OK
+## durée 06 (S6a, porte) : 42 s
+## arrêt après 06 (S6a, porte) (JUSQUA), 47 s
