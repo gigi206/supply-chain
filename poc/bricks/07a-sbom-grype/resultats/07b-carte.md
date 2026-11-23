@@ -2110,3 +2110,13 @@ Contrôles faits à 14:41 UTC (session, sans journal) : `bash -n` des trois scri
 - `pose` : `entrees-scan.py` installé identique à celui du dépôt, premier passage `success`, timer actif, **44 séries écrites** (22 par dépôt) ; aucun redémarrage de Zot (lu dans le code) ;
 - `verif` : 44 séries `scan_entrees*` et `scan_vex*` dans Prometheus, égales à jq sur le dernier scan de chaque dépôt ; pour `sample-app` (scan manuel de la pièce 5, bloc `vex` vide) comme pour le deb (scan de 11:15, ancien scanner, sans bloc `vex`), toutes les séries `scan_vex*` valent 0 ;
 - confiance moyenne : 44 séries mesurées au banc (passage 18 et suivants), jamais sur la VM ; la `pose` relance un passage qui peut réémettre dans Loki les lignes d'un scan déjà listé (non vérifié, noté le 22/11).
+
+## Pièces 6 et 7 posées (note de 2026-11-23T14:45:28Z ; accords du propriétaire)
+
+**Pièce 6** : [`pose`](piece6-pose-pose.log) de 14:43:28 à 14:43:29 UTC, **bilan : tenue**, conforme à la prédiction : clés changées `policy-scan.yaml` (`25a5acec…`), `scan.rego` (`1a08ff56…`) et `taches.yml` (`cb2d78ff…`), les empreintes du rendu à sec ; service = rendu clé par clé ; politique servie : `vex_age_max_jours` 30, statuts `[not_affected]`. [`grafana`](piece6-pose-grafana.log) : `porte` patch 1 dans l'audit. La porte en service accepte désormais un VEX `not_affected` signé par la clé `vex` (âge de 30 jours au plus) ; aucun VEX n'existe encore. Non mesuré ici : un jugement de la porte sur une image réelle (un Job `porte` signe un VSA, donc écrit dans Zot).
+
+**Pièce 7** : [`pose`](piece7-pose.log) de 14:43:35 à 14:43:37 UTC, **bilan : tenu** : `entrees-scan.py` neuf installé identique (`9a43286a…`), passage `success`, timer actif, **44 séries** ; la liste n'est réémise que pour le scan neuf de sample-app. [`verif`](piece7-verif.log) de 14:44:58 à 14:44:59 UTC (après 75 s de collecte), **bilan : tenu, 7 OK** : 44 séries dans Prometheus, égales à jq pour les deux dépôts ; dans Loki, 6 lignes pour le scan de sample-app et **67 pour celui du deb, pas le double** : la réémission crainte le 22/11 n'a pas lieu ; 0 document VEX.
+
+**État de la 07b** : pièces 1 à 7 et 9 posées ; reste la **pièce 8** (premier VEX réel, contenu au propriétaire) et l'intégration au rejeu de zéro (à vérifier avant M5b).
+
+**Heures** : de 14:38:33 UTC à 14:45:28 UTC, dans l'enveloppe de la 07b.

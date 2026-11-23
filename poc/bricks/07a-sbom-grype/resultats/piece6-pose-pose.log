@@ -1,0 +1,22 @@
+# piece6-pose.sh pose, 2026-11-23T14:43:28Z ; HEAD a725fe3cf2b7
+## préalables
+OK   HEAD : vex_age_max_jours : 30
+OK   HEAD : patch 07b-t3 déjà reporté (git apply --reverse --check) : oui
+OK   aucun pod actif dans porte
+## rendu depuis une copie de HEAD (apply remplacé par cat)
+  texte de cm_porte : e50fb5b5035030a8
+OK   cm_porte : une seule substitution apply -> cat : 1/0
+OK   rendu de la ConfigMap porte, code : 0
+OK   clés présentes, service et rendu : ca-poc.crt,chains.pub,horodatage.sh,policy-scan.yaml,policy-trusted-task.yaml,policy.yaml,porte.rego,scan-verifier.sh,scan.rego,scanner.pub,taches.yml,tsa-racine-confiance.json,vsa.pub,vsa.sh
+OK   clés dont le contenu change : policy-scan.yaml,scan.rego,taches.yml
+  policy-scan.yaml : service 9683068ab3a73eee, rendu 25a5acecf9960487
+  scan.rego : service a928fdc03ca50bc3, rendu 1a08ff56f3461bb3
+  taches.yml : service cdac17f17549350b, rendu cb2d78ff9a5321e2
+## pose (14:43:29 UTC)
+OK   cm_porte, code : 0
+## après (14:43:29 UTC)
+OK   service = rendu, clé par clé : e8ee073bdf61ac39
+OK   politique servie : vex_age_max_jours : 30
+OK   politique servie : statuts acceptés : ["not_affected"]
+# fin 2026-11-23T14:43:29Z
+bilan : tenue

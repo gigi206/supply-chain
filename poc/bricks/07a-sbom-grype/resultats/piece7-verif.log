@@ -1,0 +1,13 @@
+début : 2026-11-23T14:44:58Z, étape verif, entrees-scan.py 9a43286a7bc87c0b…
+## Prometheus, lu par l'auditeur
+OK   séries scan_entrees* et scan_vex* dans Prometheus : 44
+OK   builds/scan/sample-app : séries de Prometheus = jq (g=Medium 4, g=Unknown 2, correctif 6, scanne 1795444943)
+## Loki, lu par l'auditeur, en comptes : builds/scan/sample-app
+OK   lignes de builds/scan/sample-app dans Loki pour ce scan (clé scanne), sur 24 h : 6
+OK   documents VEX de builds/scan/sample-app dans Loki pour ce scan, sur 24 h : 0
+OK   builds/scan/sample-app-deb : séries de Prometheus = jq (g=Critical 3, g=High 33, g=Medium 28, g=Low 1, g=Unknown 2, correctif 67, scanne 1795432621)
+## Loki, lu par l'auditeur, en comptes : builds/scan/sample-app-deb
+OK   lignes de builds/scan/sample-app-deb dans Loki pour ce scan (clé scanne), sur 24 h : 67
+OK   documents VEX de builds/scan/sample-app-deb dans Loki pour ce scan, sur 24 h : 0
+lignes de résumé dans Loki sur 24 h : 90
+fin : 2026-11-23T14:44:59Z, bilan : tenu
