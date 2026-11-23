@@ -2157,3 +2157,14 @@ Le propriétaire a choisi : clé VEX recréée automatiquement par le rejeu (com
 **Non mesuré avant le rejeu** : les étapes du rejeu elles-mêmes (dont 07a, 08c, 06 et 05, jamais rejouées depuis leurs ajouts) ; la porte garde l'ancienne `scanner.pub` jusqu'au contrôle 7 (`POUSSER_VSA=1`), comportement antérieur à la 07b. Un arrêt se reprend par `DEPUIS=<étape>`.
 
 **Heures** : de 14:53:21 UTC à 14:59:26 UTC, dans l'enveloppe de la 07b.
+
+## Rejeu m5b-1 : prédiction (date -u de 15:02:23 UTC, le 2026-11-23, avant le lancement ; accords du propriétaire « Oui, lance » et « Oui, POUSSER_VSA=1 »)
+
+**Commande** : `POUSSER_VSA=1 TAG_05=m5b-1 mise run confiance:rejeu -- m5b-1` (journal `poc/bricks/08-trust-plane/resultats/rejeu-m5b-1.log`), depuis HEAD `884968db`.
+
+**Prédiction** :
+- étapes 07b : « 07b (clé VEX) » et « 07b (accès VEX) » passent (banc : 0 écart) ; `vex-cle-publique.pem` change (SPKI neuve, différente de `2b81df72…`) ; G4 pose `scan-config` avec `vex.pub` ; « 06 (S6a, periodique) » passe `applique s6a-scanner-deb.patch` et garde `vex.pub` ; « 07b (entrees-scan, pose) » écrit 44 séries ;
+- compte `poc-vex` recréé par J2 (ligne htpasswd du cache) ;
+- `g2_image` redonne `b799feda…` sous le tag `-vex` (confiance haute : `scan-outil` reconstruit = `7dde1a8e…`, couches mesurées) ;
+- **arrêts probables ailleurs** (confiance basse que le rejeu passe d'un trait) : 07a, 08c, 06 et 05 n'ont jamais été rejouées depuis leurs ajouts ; chaque arrêt est relevé, corrigé dans le dépôt si la cause est dans le code, et repris par `DEPUIS=` ;
+- durée : plusieurs heures, non estimée plus finement (le rejeu complet du 03/11 couvrait moins d'étapes).
