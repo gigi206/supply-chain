@@ -97,6 +97,11 @@ etape() { # libellé commande…
 }
 echo "réseau : $RESEAU${DEPUIS:+ ; reprise à $DEPUIS}${JUSQUA:+ ; arrêt après $JUSQUA}"
 b05=$here/../05-rpm-mock
+# Additif du 2026-11-23T15:06:42Z (incident du rejeu m5b-1) : TAG_05 posé hors RKE2 et Cilium sautait entree en silence, puis le démontage
+# effaçait $W et les entrées de M5b. Refus net, avant tout démontage.
+if [ -n "${TAG_05:-}" ] && { [ "$DISTRO" != rke2 ] || [ "$RESEAU" != cilium ]; }; then
+  echo "KO   TAG_05=$TAG_05 exige DISTRO=rke2 et RESEAU=cilium (DISTRO=$DISTRO, RESEAU=$RESEAU) : rien n'est démonté" >&2; exit 1
+fi
 if [ -n "${TAG_05:-}" ] && [ "$DISTRO" = rke2 ] && [ "$RESEAU" = cilium ]; then   # M5b de la 05 : contrôle avant tout démontage
   env TAG="$TAG_05" mise exec -- "$b05/m5b-rejeu.sh" entree
 fi

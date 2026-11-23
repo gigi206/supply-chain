@@ -149,6 +149,8 @@ detruire() {
     if actif net "$NET"; then v net-destroy "$NET"; fi
     v net-undefine "$NET"
   fi
+  # additif du 2026-11-23T15:06:42Z (incident du rejeu m5b-1) : un cache de modules Go (fichiers en lecture seule) arrêtait rm -rf
+  if [ -d "$W" ]; then chmod -R u+w -- "$W"; fi
   rm -rf -- "$W"
   rm -f -- "$HOME/.kube/supply-chain-poc.yaml"
   chrono "VM, pool et réseau détruits"
