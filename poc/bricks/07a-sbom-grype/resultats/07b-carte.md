@@ -1502,3 +1502,26 @@ Rien n'a été fait sur la VM. Toute action (redémarrage, connexion à la conso
 **Heures mesurées** :
 - Segment : de 08:03:34 UTC à 08:18:16 UTC, compté d'un seul tenant, diagnostic de la panne compris.
 - Somme des enveloppes de la 07b : au plus 11 h 58 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Additif sur la panne de sc-stockage (note de 2026-11-23T08:21:41Z ; la note de 08:18:16Z n'est pas réécrite ; relevés hôte en lecture seule, relus par le conseiller)
+
+**Heure de la ré-exécution de systemd**, recalculée sur une ancre mesurée et non plus sur la condition Cilium :
+- la console montre l'agrandissement du disque à 630160,287 s de démarrage ;
+- le journal [sc-stockage-agrandir.log](../../05-rpm-mock/resultats/sc-stockage-agrandir.log) le date de 2026-11-20T16:04:22Z à 16:04:23Z ;
+- la ré-exécution (853271,613 s) tombe donc vers **2026-11-23T06:02:53Z** (à une seconde près, si l'horloge de la VM n'a pas été suspendue), la dernière ligne de console vers 06:02:58Z ;
+- le dernier battement du nœud est à 06:40:07Z, 37 minutes plus tard. Le lien entre les deux n'est pas établi.
+
+**Bail DHCP** (`virsh net-dhcp-leases supply-chain-poc`, réservations par MAC dans le réseau) :
+- sc-confiance (fin de bail 10:08:55 locale) et sc-build (09:57:14 locale) ont un bail actif ;
+- **sc-stockage n'en a plus**, bien que sa réservation (.13) existe ; `domifaddr` est vide pour elle seule.
+- Piste, non vérifiée : le client DHCP de la VM ne renouvelle plus, ou son réseau est tombé. Si une mise à jour de systemd en est la cause, sc-confiance et sc-build pourraient la recevoir aussi ; rien n'a été relevé dans ces VM.
+
+**Tâches planifiées de la session** : aucune n'a tourné le 23/11. La prochaine est celle de G7, le 29/11 à 05:40 UTC.
+
+**Conséquences** :
+- **supervision** : Prometheus, Loki et Grafana sont sur la VM en panne ; aucune alerte n'a pu partir ;
+- **relecture de la pose dans Grafana** : la fenêtre de 15 min de `vex-pub.sh grafana` ne servira plus. Il faudra une plage absolue autour de 08:16:00Z. La ligne d'audit n'a peut-être jamais atteint Loki : relecture peut-être impossible par Loki. Le repli est le fichier d'audit de l'API sur sc-confiance, en lecture sudo, sur accord ;
+- **scan de 09:30 UTC** : il ne prouvera rien sur la clé. L'effet de `vex.pub` reste non vérifié jusqu'au premier scan après le retour de Zot. Les CronJob ne sont pas suspendus ;
+- **mesures datées touchées** : G7 (balayages de Zot, tâche du 29/11), M5b (pas avant le 28/11) et le suivi `df` de sc-stockage. Réserve : leurs séries auront un trou à partir de 06:40 UTC.
+
+**Heures** : ces relevés, de 08:18:16 UTC à 08:21:41 UTC, sont comptés hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
