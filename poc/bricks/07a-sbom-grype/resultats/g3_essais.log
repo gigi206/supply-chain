@@ -1,8 +1,8 @@
-# plateforme.sh g3_essais, 2026-11-13T12:42:43Z
+# plateforme.sh g3_essais, 2026-11-23T16:37:06Z
 ## rôle scanner, compte scan:scanner
 CONNEXION_ACCEPTEE|"token_policies":["scanner-signature"]
 ACCEPTE|lecture de transit/keys/scanner
-SIGNATURE_SCANNER|vault:v1:MEQCIFGIl1H/nGZnxTCium9vdKELGbKQrE9ifsdyZtPdQT/lAiA4mGJNzAxZe2xjirJ55RWvpM0yZmj6kSkZ+LDhCUs6aA==
+SIGNATURE_SCANNER|vault:v1:MEYCIQCZixmVvRLKdTsj3GRKtVM6n6zJfT1Y4CmI2qyiXb/P2wIhAOL8g2THJLKu7cZKDJnUINIw0rCMHro0sXx29GbqEmzX
 REFUSE|signature avec la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
 REFUSE|signature avec la clé tsa|Code: 403. Errors: * 1 error occurred: * permission denied 
 REFUSE|lecture de transit/keys/chains|Code: 403. Errors: * 1 error occurred: * permission denied 
@@ -39,8 +39,7 @@ OK   connexions croisées refusées : 8/8
 ## signature Transit vérifiée sur l'hôte
 OK   signature Transit (prehashed sha2-256) vérifiée par openssl avec resultats/scanner-cle-publique.pem
 OK   contre-épreuve : même signature refusée avec la clé publique de Chains
-## audit d'OpenBao depuis 2026-11-13T12:42:43Z
-{"chemin":"kv/scan/zot","op":"read","role":null,"politiques":["root"],"erreur":null}
+## audit d'OpenBao depuis 2026-11-23T16:37:06Z
 {"chemin":"transit/keys/scanner","op":"read","role":null,"politiques":["root"],"erreur":null}
 {"chemin":"auth/jwt/login","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
 {"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null}
@@ -65,5 +64,5 @@ OK   contre-épreuve : même signature refusée avec la clé publique de Chains
 {"chemin":"kv/horodatage/zot","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
 {"chemin":"auth/token/revoke-self","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
 {"chemin":"kv/scan/zot","op":"read","role":null,"politiques":null,"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"chemin":"auth/jwt/login","op":"update","role":null,"politiques":null,"erreur":"hmac-sha256:0c1029ad1b726f781199143689c300edec4141a3783187f03142df04e361e0e1"} ×8
-# fin 2026-11-13T12:42:47Z, code 0
+{"chemin":"auth/jwt/login","op":"update","role":null,"politiques":null,"erreur":"hmac-sha256:98d1a6b9dbbb64e82922dfa9a9a1b6610ec746ba5dd528e0d09937c7f506f8ba"} ×8
+# fin 2026-11-23T16:37:09Z, code 0

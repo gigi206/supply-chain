@@ -1,4 +1,4 @@
-# prefetch.sh image, 2026-11-13T11:23:37Z
+# prefetch.sh image, 2026-11-23T15:55:48Z
 warning: Git tree '~/Documents/git/github/gigi206/supply-chain' is dirty
 warning: Git tree '~/Documents/git/github/gigi206/supply-chain' is dirty
 warning: Git tree '~/Documents/git/github/gigi206/supply-chain' is dirty
@@ -22,15 +22,15 @@ clôture nix : 45 chemins, 263 Mo ; empreinte 66de99598aa176a1
 a : image sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc (198 Mo)
 b : image sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc (198 Mo)
 essai hors réseau (cible essai) :
-     #10 6.750 Successfully installed hermeto-0.64.0
-     #17 1.712 hermeto 0.64.0
-     #17 1.793 git version 2.51.2
-     #17 1.795 go version go1.26.10 linux/amd64
-     #17 1.797 Python 3.13.12
-     #17 1.798 /etc/ssl/certs/ca-certificates.crt
+     #10 6.965 Successfully installed hermeto-0.64.0
+     #17 1.603 hermeto 0.64.0
+     #17 1.681 git version 2.51.2
+     #17 1.683 go version go1.26.10 linux/amd64
+     #17 1.685 Python 3.13.12
+     #17 1.685 /etc/ssl/certs/ca-certificates.crt
 OK   image d'outils identique sur deux constructions : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
 ## copie dans Zot (poc-ecriture, par digest)
 OK   relue en lecture anonyme : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
 {"couches":6,"octets":207092292}
 OK   image d'outils (digest épinglé) : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
-# fin 2026-11-13T11:25:41Z
+# fin 2026-11-23T15:57:53Z

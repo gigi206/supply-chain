@@ -1,28 +1,28 @@
-# executeur.sh installer, 2026-11-13T12:31:59Z
+# executeur.sh installer, 2026-11-23T16:26:19Z
 Python 3.13.5
 git version 2.47.3
 état de S2 (hôte) copié dans la VM ; copie de l'hôte renommée, plus jamais synchronisée
 /etc/synchro:
 total 16
--rw-r--r-- 1 root root  765 Nov 13 12:31 ca-poc.crt
--rw-r--r-- 1 root root  138 Nov 13 12:31 refs-propres.json
--rw-r--r-- 1 root root  469 Nov 13 12:31 sample-app-sync.env
-drwx------ 2 root root 4096 Nov 13 12:31 secrets
+-rw-r--r-- 1 root root  765 Nov 23 16:26 ca-poc.crt
+-rw-r--r-- 1 root root  138 Nov 23 16:26 refs-propres.json
+-rw-r--r-- 1 root root  469 Nov 23 16:26 sample-app-sync.env
+drwx------ 2 root root 4096 Nov 23 16:26 secrets
 
 /etc/synchro/secrets:
 total 4
--rw------- 1 root root 41 Nov 13 12:31 poc-sync.token
+-rw------- 1 root root 41 Nov 23 16:26 poc-sync.token
 
 /usr/local/lib/synchro:
 total 20
--rw-r--r-- 1 root root 15865 Nov 13 12:31 sync.py
--rwxr-xr-x 1 root root  1329 Nov 13 12:31 synchro.sh
+-rw-r--r-- 1 root root 15865 Nov 23 16:26 sync.py
+-rwxr-xr-x 1 root root  1329 Nov 23 16:26 synchro.sh
 
 /var/lib/synchro/sample-app-sync:
 total 12
-drwxrwxr-x 2 synchro synchro 4096 Nov 13 12:31 bundles
-drwxrwxr-x 7 synchro synchro 4096 Nov 13 12:31 miroir.git
-drwxrwxr-x 2 synchro synchro 4096 Nov 13 12:31 rapports
+drwxrwxr-x 2 synchro synchro 4096 Nov 23 16:26 bundles
+drwxrwxr-x 7 synchro synchro 4096 Nov 23 16:26 miroir.git
+drwxrwxr-x 2 synchro synchro 4096 Nov 23 16:26 rapports
 OK   sync.py installé identique à celui du dépôt
 127.0.1.1       sc-stockage.poc.test sc-stockage
 OK   Forgejo joignable depuis la VM : https://192.168.161.13:3000/mirror/sample-app.git

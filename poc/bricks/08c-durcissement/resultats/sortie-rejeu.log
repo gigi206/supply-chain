@@ -1,13 +1,23 @@
-# sortie-builds.sh rejeu, 2026-11-13T12:58:08Z
+# sortie-builds.sh rejeu, 2026-11-23T16:52:40Z
 kubectl : ciliumnetworkpolicy.cilium.io/prefetch-deb-sortie created
 OK   prefetch-deb-sortie valide pour Cilium : True
+kubectl : ciliumnetworkpolicy.cilium.io/prefetch-rpm-sortie created
+OK   prefetch-rpm-sortie valide pour Cilium : True
+kubectl : ciliumnetworkpolicy.cilium.io/prefetch-racine-rpm-sortie created
+OK   prefetch-racine-rpm-sortie valide pour Cilium : True
 kubectl : ciliumnetworkpolicy.cilium.io/builds-sans-internet created
 OK   builds-sans-internet valide pour Cilium : True
-OK   NotIn de builds-sans-internet : ["prefetch-gomod","prefetch-deb"]
-politiques de builds : NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-sortie
+kubectl : networkpolicy.networking.k8s.io/construction-racine-rpm-sans-sortie created
+OK   NotIn de builds-sans-internet : ["prefetch-gomod","prefetch-deb","prefetch-rpm","prefetch-racine-rpm"]
+politiques de builds : NetworkPolicy construction-racine-rpm-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-racine-rpm-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
 OK   politiques qui sélectionnent un pod de prefetch-gomod : CiliumNetworkPolicy prefetch-sortie
 OK   politiques qui autorisent du trafic à un pod de construire-image : 
 OK   politiques à sortie CIDR dont les pods seraient aussi sous un refus : 
 OK   labels exclus d'un refus sans politique de sortie dédiée : 
 OK   politiques qui sélectionnent un pod de prefetch-deb : CiliumNetworkPolicy prefetch-deb-sortie
 OK   politiques qui sélectionnent un pod de builds sans label : CiliumNetworkPolicy builds-sans-internet
+OK   politiques qui sélectionnent un pod de prefetch-rpm : CiliumNetworkPolicy prefetch-rpm-sortie
+OK   politiques qui sélectionnent un pod de prefetch-racine-rpm : CiliumNetworkPolicy prefetch-racine-rpm-sortie
+OK   politiques qui sélectionnent un pod de construire-racine-rpm : CiliumNetworkPolicy builds-sans-internet, NetworkPolicy construction-racine-rpm-sans-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-racine-rpm : 
+OK   types des NetworkPolicy qui sélectionnent un pod de construire-racine-rpm : Egress+Ingress

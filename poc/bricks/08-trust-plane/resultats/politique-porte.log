@@ -1,4 +1,4 @@
-# politique.sh porte, 2026-11-13T09:27:45Z
+# politique.sh porte, 2026-11-23T15:32:44Z
 ## bibliothèque conforma/policy v1.0.28 (Apache-2.0)
 OK   tag v1.0.28 (annoté, non signé) → commit ebd3fbd270297c15f590f4023360465ffb41d4fe, signé (vérifié par GitHub), arbre 0fd26021bb08582553f392565ca0faf316c51229 dans le contenu signé
 OK   commit récupéré par git (objets vérifiés), même arbre
@@ -12,14 +12,14 @@ chains-config : builddefinition.buildtype=https://tekton.dev/chains/v2/slsa-tekt
 ## tâche en service : PipelineRun du gabarit ; la provenance jugée (la plus récente de builds/essai-webhook) doit venir de lui
 PipelineRun j6-porte-en-service exécuté, Chains : signé=true
 OK   TaskRun créé par ce PipelineRun ; tâche sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849 dans la liste revue
-OK   la plus récente des 9 : début 2026-11-13T09:27:52Z, 11929 octets, buildType https://tekton.dev/chains/v2/slsa-tekton, entrées pipelineTask avec contenu : 1
+OK   la plus récente des 9 : début 2026-11-23T15:32:51Z, 11929 octets, buildType https://tekton.dev/chains/v2/slsa-tekton, entrées pipelineTask avec contenu : 1
 internalParameters : annotations, labels, tekton-pipelines-feature-flags ; labels du PipelineRun : tekton.dev/pipeline
 ## images d'essai : une par cas (la bibliothèque ne juge que la provenance la plus récente d'un digest)
 mesure en buildType slsa (J4, J5) : Chains basculé le temps d'une image, puis rétabli en slsa-tekton
-slsa : tâche tekton/tasks/publier-essai@sha256:adb6c7fd134b81eeec57e2c06635e5acca6507ade630ad4cecba14b577c82a91, image builds/essai-porte@sha256:9cc3954b81ad5732134b8cd94233a4fecdd0204f2c2e4a47be24dde2a8f54620 ; PipelineRun exécuté, Chains : signé=true
+slsa : tâche tekton/tasks/publier-essai@sha256:7d857941813c709bb50e87de66c8f8f12272765e6428fdc86ff87698f5b0cb7f, image builds/essai-porte@sha256:9cc3954b81ad5732134b8cd94233a4fecdd0204f2c2e4a47be24dde2a8f54620 ; PipelineRun exécuté, Chains : signé=true
 chains-config rétabli : https://tekton.dev/chains/v2/slsa-tekton
-hors-liste : tâche tekton/tasks/publier-hors-liste@sha256:b1dcf96717b46ae7e4d8367832633ce9a8ea17f17537eb7dca058760066bd60f, image builds/essai-porte@sha256:4903e152227424f52b70a6ffda319f54b52eabdfd445a674a254a7530a73360c ; PipelineRun exécuté, Chains : signé=true
-version-non-listee : tâche tekton/tasks/publier-essai@sha256:d261fcbd32355ad7db665963e42a330db7fb69862aec25a507bab24e4e078416, image builds/essai-porte@sha256:d648eaba258307bac6957705b6f111220cfca8d9b8f16f71ab6aeb81e8270f62 ; PipelineRun exécuté, Chains : signé=true
+hors-liste : tâche tekton/tasks/publier-hors-liste@sha256:2583cf00c2f297aeace8e440ddaf634f17a143d940b1f26b54b4e86b48cc5fe0, image builds/essai-porte@sha256:4903e152227424f52b70a6ffda319f54b52eabdfd445a674a254a7530a73360c ; PipelineRun exécuté, Chains : signé=true
+version-non-listee : tâche tekton/tasks/publier-essai@sha256:dae5368a7f3fa134e6aa88fe6aee6125fd213b554a8b94a90ba1a391e2ae34a4, image builds/essai-porte@sha256:d648eaba258307bac6957705b6f111220cfca8d9b8f16f71ab6aeb81e8270f62 ; PipelineRun exécuté, Chains : signé=true
 non-signee : image builds/essai-porte@sha256:4f2f963d3d201e7b9997e5141c9c4db9991f42644d5f80ac833f4aca6fbf4f01, jamais présentée à Chains
 slsa : 2519 octets, buildType https://tekton.dev/chains/v2/slsa, entrées pipelineTask avec contenu : 0
 hors-liste : 11936 octets, buildType https://tekton.dev/chains/v2/slsa-tekton, entrées pipelineTask avec contenu : 1
@@ -48,14 +48,26 @@ version-non-listee : 11987 octets, buildType https://tekton.dev/chains/v2/slsa-t
       - ref: sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
     oci://sc-stockage.poc.test:5000/tekton/tasks/construire-deb:
       - ref: sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+    oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-rpm:
+      - ref: sha256:9afe09db6d97d065c29245417a44e54a147b5f32a7e37b7ff5f9616c8110893a
+      - ref: sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+    oci://sc-stockage.poc.test:5000/tekton/tasks/preparer-rpm:
+      - ref: sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+    oci://sc-stockage.poc.test:5000/tekton/tasks/construire-rpm:
+      - ref: sha256:d7f01398f188931c124273c8b5fb60e2a66c22e9d0a2dfcd229ecadee1e62164
+      - ref: sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+    oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm:
+      - ref: sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+    oci://sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm:
+      - ref: sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
 OK   aucune liste de tâches requises (required-tasks, pipeline-required-tasks) : les labels qui la choisiraient sont sans effet
 ## verdicts de la porte (Job de l'espace porte, sorties DNS et Zot) ; prédiction : codes des règles en violation
 règles de source (slsa_source_*) en échec attendu jusqu'à J7 : aucune source git dans la provenance de l'essai, aucune source attendue fournie
-  VERDICT|slsa|false|porte.taches_vues,slsa_build_scripted_build.build_task_image_results_found,slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay,tasks.pipeline_has_tasks||1|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-porte ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-porte ; cosign : no matching attestations: 
+  VERDICT|slsa|false|porte.taches_vues,slsa_build_scripted_build.build_task_image_results_found,slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay,tasks.pipeline_has_tasks||2|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-porte ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-porte ; cosign : no matching attestations: 
 OK   slsa : refus, violations prédites
-  VERDICT|slsa-trusted-task-seul|true|||1|ok|2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-porte ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-porte ; cosign : no matching attestations: 
+  VERDICT|slsa-trusted-task-seul|true|||1|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-porte ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-porte ; cosign : no matching attestations: 
 OK   slsa-trusted-task-seul : admis, comme prédit
-  VERDICT|en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|1|refus|17/18 enveloppe(s) couverte(s), 18 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-webhook ; cosign : no matching attestations: 
+  VERDICT|en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|2|refus|17/18 enveloppe(s) couverte(s), 18 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-webhook ; cosign : no matching attestations: 
 OK   en-service : refus, violations prédites
   VERDICT|hors-liste|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay,trusted_task.trusted|trusted_task.tagged|1|ok|2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-porte ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-porte ; cosign : no matching attestations: 
 OK   hors-liste : refus, violations prédites
@@ -68,10 +80,10 @@ OK   autre-cle : refus, violations prédites
 OK   en-service : trusted_task.trusted et porte.taches_vues parmi les succès
 CONSTAT  slsa : trusted_task.trusted compté parmi les succès alors qu'aucune tâche n'est vue (succès à vide) ; seuls tasks.pipeline_has_tasks (collection slsa3) et le témoin porte.taches_vues refusent ; avec trusted_task seul, l'image est admise
 provenances de PipelineRun de builds/essai-webhook (image de la tâche en service) : 9 ; listées : 6, non listées : 1, sans tâche : 2 ; les trois plus récentes :
-  2026-11-13T09:27:15Z slsa-tekton listée
-  2026-11-13T09:27:28Z slsa-tekton listée
-  2026-11-13T09:27:57Z slsa-tekton listée
+  2026-11-23T15:32:13Z slsa-tekton listée
+  2026-11-23T15:32:27Z slsa-tekton listée
+  2026-11-23T15:32:56Z slsa-tekton listée
 CONSTAT  la bibliothèque ne juge que la provenance la plus récente d'un digest (max de finishedOn) : 1 provenance(s) plus ancienne(s), signée(s) par Chains avec une tâche non listée, n'empêche(nt) pas trusted_task.trusted
-  motif hors-liste : PipelineTask "publier" uses an untrusted task reference: oci://sc-stockage.poc.test:5000/tekton/tasks/publier-hors-liste@sha256:b1dcf96717b46ae7e4d8367832633ce9a8ea17f17537eb7dca058760066bd60f
+  motif hors-liste : PipelineTask "publier" uses an untrusted task reference: oci://sc-stockage.poc.test:5000/tekton/tasks/publier-hors-liste@sha256:2583cf00c2f297aeace8e440ddaf634f17a143d940b1f26b54b4e86b48cc5fe0
   motif non-signee : builtin.attestation.signature_check : No image attestations found matching the given public key. Verify the correct public key was provided, and one or more a
   motif non-signee : builtin.image.signature_check : Image signature check failed: no signatures found

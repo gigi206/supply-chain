@@ -1,4 +1,4 @@
-# journalisation.sh openbao_sortie, 2026-11-13T12:36:58Z
+# journalisation.sh openbao_sortie, 2026-11-23T16:31:08Z
 ["fichier/","sortie/"]
 configmap/openbao-config serverside-applied
 config.hcl vue par le pod, mentions de "sortie" : 1

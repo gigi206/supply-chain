@@ -2192,3 +2192,12 @@ Le propriétaire a choisi : clé VEX recréée automatiquement par le rejeu (com
 - 07a et 07b : `g2_image` redonne `b799feda` sous le tag `-vex` ; « 07b (clé VEX) » et « 07b (accès VEX) » passent ; `vex-cle-publique.pem` change ; G4 pose `vex.pub` ; S6a garde `vex.pub` ; `entrees-scan` écrit 44 séries ;
 - 08c, 06 : jamais rejouées sous RKE2 depuis leurs ajouts : arrêts possibles, repris par `DEPUIS=` après correction ;
 - durée : plusieurs heures, non estimée plus finement.
+
+## Rejeu plateforme-1 : arrêt à « 06 (S4c) » (note de 2026-11-23T16:53:47Z)
+
+[Journal](../../08-trust-plane/resultats/rejeu-plateforme-1.log) : lancé à 15:07 UTC ; **toutes les étapes passent jusqu'à « 06 (S1, amorce) »** (démontage, VM, RKE2, Cilium, J2 à J8, 01, 19, 19b, 07a, 07b, 10, contrôles 6 et 7, G6, 08c, résolveurs) ; **arrêt dans « 06 (S4c) »** (16:52:56 UTC, code 1) : `s4c.sh verrou` lit `$W/s1-06/hote/InRelease`, absent.
+
+**Pour la 07b, la prédiction de 15:07:32Z tient** : `g2_image` redonne `b799feda…` sous le tag `-vex` ; « 07b (clé VEX) » et « 07b (accès VEX) » tenues ([clé](vex-openbao-cle_vex-rejeu-plateforme-1.log), [accès](vex-openbao-acces_vex-rejeu-plateforme-1.log)) ; `vex-cle-publique.pem` réécrite (SPKI `2b81df72…` vers `d0a12faa…`, fichier `04967fbe…`) ; G4 : `scan-config` porte `vex.pub` égale à la clé neuve, premier scan avec ligne `VEX|` (6 vulnérabilités, 0 KEV, 0 écartée) ; `poc-vex` recréé par J2 ; G6 sans KO. Non atteint : S6a (`vex.pub` gardée) et « 07b (entrees-scan, pose) ».
+
+**Cause de l'arrêt, défaut de conception du rejeu** : les étapes S4 de la 06 lisent des entrées de l'hôte sous `$W` que le rejeu ne produit pas (`s1-06/hote`, `s1-06/Packages`, `s1-06/racine.tar`, `s2-06/chroot.tar`, `s3-06/build-1/…deb`, produits par S1 à S3) ; `vm.sh detruire` efface `$W` : la 06 ne pouvait pas se rejouer telle quelle (déjà effacées à l'incident `m5b-1`). Reconstruction : S1 `prealables` (instantané Debian épinglé, gpgv), S1 `racine`, S2, S3 (pods Kata), à décider.
+

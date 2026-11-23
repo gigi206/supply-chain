@@ -1,7 +1,7 @@
-# tsa.sh chemins, 2026-11-13T09:15:57Z
+# tsa.sh chemins, 2026-11-23T15:21:06Z
 ## cas falsifiés, construits à partir des bundles du job (publiés par poc-ecriture dans essais-j5/*)
-jeton altéré : dernier octet (signature ECDSA du TSA) inversé, 1 octet modifié sur 1183
-jeton d'une autre signature : jeton valide du TSA, porté par l'enveloppe MEUCIQCcRSpt… et non MEYCIQCi6pcB…
+jeton altéré : dernier octet (signature ECDSA du TSA) inversé, 1 octet modifié sur 1181
+jeton d'une autre signature : jeton valide du TSA, porté par l'enveloppe MEUCIC8WKNkL… et non MEQCIEhxVe20…
 TSA étrangère : jeton valide pour sa propre racine (même CN « TSA du PoC », autre clé)
 ## cosign v3.1.4 : bundle dans un dépôt séparé, --use-signed-timestamps et racine de confiance du TSA
 OK   valide : accepté

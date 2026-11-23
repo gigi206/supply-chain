@@ -1,14 +1,19 @@
 {
   "malicious": [],
-  "scannedAt": "2026-11-13T12:45:02.197941275Z",
+  "scannedAt": "2026-11-23T16:39:31.427624351Z",
   "scanner": {
     "db": {
-      "built": "2026-11-13T06:20:21Z",
-      "ref": "sc-stockage.poc.test:5000/vulndb/grype@sha256:c35d469a442164d1d4688fd6cae6f4e5cf377bfe11928d7af8e64452ada151ec",
+      "built": "2026-11-23T06:28:32Z",
+      "ref": "sc-stockage.poc.test:5000/vulndb/grype@sha256:3be413f60b71060d38823140161d75718d4ab58e22e1dce0a3634b6b61f9bc78",
       "schema": "v6.1.10"
     },
     "id": "grype",
     "version": "0.104.1"
+  },
+  "vex": {
+    "documents": [],
+    "ecarteesSansExemption": 0,
+    "rejetes": 0
   },
   "vulnerabilities": [
     {
@@ -41,7 +46,7 @@
       "aliases": [
         "CVE-2025-69725"
       ],
-      "epss": 0.00258,
+      "epss": 0.00264,
       "fixedIn": [
         "5.2.4"
       ],
@@ -83,7 +88,7 @@
       "aliases": [
         "CVE-2026-97054"
       ],
-      "epss": 0.00171,
+      "epss": 0.00479,
       "fixedIn": [
         "1.26.11",
         "1.27.4"
@@ -92,7 +97,7 @@
       "kev": false,
       "kevCves": [],
       "package": "pkg:golang/stdlib@1.26.10",
-      "severity": "Unknown"
+      "severity": "Medium"
     }
   ]
 }

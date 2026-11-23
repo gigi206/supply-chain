@@ -1,0 +1,47 @@
+étape cle_vex commencée : 2026-11-23T16:37:33Z ; vex-openbao.sh df2ffb9dd8ad5b63…
+OpenBao : version 2.7.2, initialisé true, scellé false
+OK   OpenBao initialisé et descellé
+     rejeu : resultats/vex-cle-publique.pem existant (SPKI sha256 2b81df72314a72e85276ce55aa6625306b47ab37e2c9e2a28878ce374b9df1a9) remplacé par la clé neuve
+avant :
+     chains ecdsa-p256 1 false
+     scanner ecdsa-p256 1 false
+     tsa ecdsa-p256 1 false
+### création (seule écriture de l'étape)
+     | Key                       Value
+     | ---                       -----
+     | allow_plaintext_backup    false
+     | auto_rotate_period        0s
+     | deletion_allowed          false
+     | derived                   false
+     | exportable                false
+     | imported_key              false
+     | keys                      map[1:map[certificate_chain: creation_time:2026-11-23T16:37:34.326491097Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+     | MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEgDy33eahQY/SshxVdVi7zZMVatUg
+     | Ut8sQkJe6tSITEYlsWz6/7Z6wbRxi+rcW7saKA2y6zPHvNSIt3YxO+aAjQ==
+     | -----END PUBLIC KEY-----
+     | ]]
+     | latest_version            1
+     | min_available_version     0
+     | min_decryption_version    1
+     | min_encryption_version    0
+     | name                      vex
+     | soft_deleted              false
+     | supports_decryption       false
+     | supports_derivation       false
+     | supports_encryption       false
+     | supports_signing          true
+     | type                      ecdsa-p256
+OK   bao write -f transit/keys/vex : code 0
+### relecture
+OK   clé vex (type, exportable, sauvegarde en clair, suppression, version, signature) : ecdsa-p256,false,false,false,1,true
+     Public-Key: (256 bit field, 128 bit security level);NIST CURVE: P-256
+OK   clé publique exportée : resultats/vex-cle-publique.pem (fichier sha256 04967fbeda953920ea16d6881c79a8fdc70e8999db451d19a40949dca19c9ae2 ; SPKI sha256 d0a12faa25fe2376d89b846aab78e16ebfdd5ed6bc774468087a2e4f24910cce)
+après :
+     chains ecdsa-p256 1 false
+     scanner ecdsa-p256 1 false
+     tsa ecdsa-p256 1 false
+     vex ecdsa-p256 1 false
+OK   seule différence : transit/keys/vex ajoutée ; les autres clés Transit sont inchangées (type, version, exportable)
+étape cle_vex finie : 2026-11-23T16:37:35Z
+OK   K3 : aucune ligne de bloc privé dans le journal
+OK   K4 : valeur du jeton root absente du journal
