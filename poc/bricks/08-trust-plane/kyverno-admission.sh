@@ -393,7 +393,9 @@ etape_passage() {
 }
 
 e=${1:?usage : $0 construire|image|temoins|passage}
-L=$R/kyverno-admission-$e.log
+# Additif du 2026-11-23T15:34:47Z (Kyverno corrigé en service, décision « Image + politique ») : KA_SUFFIXE=<mot> donne un journal neuf
+# (resultats/kyverno-admission-<étape>-<mot>.log) ; ceux du 09/11 ne sont jamais réécrits.
+L=$R/kyverno-admission-$e${KA_SUFFIXE:+-$KA_SUFFIXE}.log
 [ ! -e "$L" ] || { echo "$L existe déjà, rien lancé"; exit 2; }
 { date -u "+# kyverno-admission.sh $e, %Y-%m-%dT%H:%M:%SZ"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$L"
 exit "${PIPESTATUS[0]}"
