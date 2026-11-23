@@ -1,0 +1,14 @@
+# vex-pub.sh scan_1115, 2026-11-23T11:18:04Z
+job du 23/11 : scan-sample-app-deb-29923875 ; job du 22/11 : scan-sample-app-deb-29922435
+OK   job du 23/11 (réussi/échoué/actif) : 1/0/0
+  durée : 2026-11-23T11:15:00Z -> 2026-11-23T11:17:10Z
+OK   volume config du pod : scan-config entière (sans items) : ["entière"]
+OK   resourceVersion de scan-config (celle de la pose) : 8257360
+OK   clé vex.pub dans scan-config (empreinte) : 79f7eece2f98f442
+  préfixes du 23/11 : ARTEFACT,ATTESTATION,BASE,DEB,EXTRAIT,IMPORT,PREDICAT,PUBLIE,SBOM,SCAN,SOURCE,masquée,masquée,masquée
+OK   préfixes des lignes du journal, triés (23/11 = 22/11) : ARTEFACT,ATTESTATION,BASE,DEB,EXTRAIT,IMPORT,PREDICAT,PUBLIE,SBOM,SCAN,SOURCE,masquée,masquée,masquée
+  scan-sample-app-deb-29922435 : BASE|2026-11-22, sc-stockage.poc.test:5000/vulndb/grype SCAN|sc-stockage.poc.test:5000/builds/sample-app-deb, 67 vulnérabilités, 0 KEV, 1 s
+  scan-sample-app-deb-29923875 : BASE|2026-11-22, sc-stockage.poc.test:5000/vulndb/grype SCAN|sc-stockage.poc.test:5000/builds/sample-app-deb, 67 vulnérabilités, 0 KEV, 1 s
+OK   lignes du pod scan-sample-app-deb-29923875-mbwhg dans Grafana (Loki) = kubectl logs : 14
+# fin 2026-11-23T11:18:05Z
+bilan : tenue

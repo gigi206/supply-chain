@@ -1671,3 +1671,21 @@ Premier passage de `scan-sample-app-deb` depuis la pose de 08:16. Le CronJob mon
 Effet attendu de la clé : **aucun**, pour la même raison qu'à 09:30.
 
 **Écart de l'étape, avant le passage** : un premier lancement à 09:54:02 UTC, pour éprouver le garde-fou d'heure, a bien refusé. Mais le journal `vex-pub-scan_1115.log` est écrit avant le contrôle d'heure. Ce journal d'essai (deux lignes, jamais commité) a été effacé pour laisser le nom au vrai passage. `scan_0930` a le même défaut, sans effet puisqu'il n'a tourné qu'après l'heure.
+
+## Scan deb de 11:15 avec `vex.pub` montée : résultat (note de 2026-11-23T11:18:29Z)
+
+[Journal](vex-pub-scan_1115.log) de l'étape `scan_1115`, de 11:18:04 à 11:18:05 UTC : **bilan : tenue**. Toutes les prédictions sont vérifiées.
+
+| Contrôle | Prédit | Mesuré |
+|---|---|---|
+| job du 23/11 à 11:15 | réussi (1/0/0) | 1/0/0, de 11:15:00 à 11:17:10Z |
+| volume `config` du pod | `scan-config` entière | entière (sans `items`) |
+| `scan-config` | resourceVersion 8257360 | 8257360 ; `vex.pub` d'empreinte 79f7eece2f98f442 |
+| préfixes des lignes du journal, triés | égaux au 22/11 | égaux (14 lignes, dont 3 masquées) |
+| base | même base que le 22/11 | `BASE\|2026-11-22`, les deux jours |
+| vulnérabilités | relevées seulement | 67, 0 KEV, comme le 22/11 |
+| lignes du pod dans Grafana (Loki) | égales à `kubectl logs` | 14 et 14 |
+
+Les deux CronJob de scan ont donc passé un cycle avec la clé montée, sans changement. L'effet de `vex.pub` reste nul tant que l'ancien `scanner.sh` est en place. La suite de la pièce 5 attend la pièce 3, pas avant le 29/11.
+
+**Heures** : de 09:53:16 UTC à 11:18:29 UTC, attente comprise, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
