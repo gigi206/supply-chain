@@ -1,0 +1,36 @@
+# base-grype-24.sh fins_23, 2026-11-23T12:25:01Z
+dernier échantillon de chaque alerte déclenchée, vu à 08:37 :
+  ChainsEchecSignature 2026-11-23T08:36:37Z
+  KyvernoRefusAnormaux 2026-11-23T08:36:37Z
+  CollecteEnPanne 2026-11-23T08:32:37Z
+  LokiInjoignable 2026-11-23T08:32:37Z
+  EvenementsMuets 2026-11-23T08:32:37Z
+  SourceMuette 2026-11-23T08:32:37Z
+dernier échantillon de chaque alerte déclenchée, vu à 08:40 :
+  ChainsEchecSignature 2026-11-23T08:39:37Z
+dernier échantillon de chaque alerte déclenchée, vu à 08:45 :
+  aucune
+count(watcher_taskrun_signing_failures_total) à 08:25 : aucune série
+count(watcher_pipelinerun_signing_failures_total) à 08:25 : aucune série
+count(kyverno_admission_requests_total{request_allowed="false"}) à 08:25 : aucune série
+count(watcher_taskrun_signing_failures_total) à 08:30 : aucune série
+count(watcher_pipelinerun_signing_failures_total) à 08:30 : aucune série
+count(kyverno_admission_requests_total{request_allowed="false"}) à 08:30 : aucune série
+count(watcher_taskrun_signing_failures_total) à 08:33 : aucune série
+count(watcher_pipelinerun_signing_failures_total) à 08:33 : aucune série
+count(kyverno_admission_requests_total{request_allowed="false"}) à 08:33 : aucune série
+count(watcher_taskrun_signing_failures_total) à 08:35 : 1
+count(watcher_pipelinerun_signing_failures_total) à 08:35 : aucune série
+count(kyverno_admission_requests_total{request_allowed="false"}) à 08:35 : 4
+count(watcher_taskrun_signing_failures_total) à 08:36 : 1
+count(watcher_pipelinerun_signing_failures_total) à 08:36 : aucune série
+count(kyverno_admission_requests_total{request_allowed="false"}) à 08:36 : 4
+cibles de CollecteEnPanne, vues à 07:30 :
+  chains 192.168.161.11:6443
+  kyverno 192.168.161.11:6443
+  forgejo 192.168.161.13:3000
+  zot 192.168.161.13:5000
+dernier échantillon de up (toutes cibles), vu à 08:34 : 2026-11-23T08:33:59Z
+dernier échantillon de up{job="prometheus"}, vu à 08:37 : 2026-11-23T08:36:41Z
+# fin 2026-11-23T12:25:01Z
+bilan : relevé fait

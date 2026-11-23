@@ -11,6 +11,10 @@
 #   compteurs_23  (ajout du 23/11/2026, après alertes_23) ChainsEchecSignature (A2) et KyvernoRefusAnormaux (A5) déclenchées
 #               à la reprise de la collecte : compteurs qu elles lisent, sommés, avant la panne (06:40), à la reprise (08:36) et
 #               après (08:50 et 09:30) ; égaux, ils excluent un nouvel échec de signature ou un nouveau refus
+#   fins_23     (ajout du 23/11/2026, après compteurs_23, sur relecture du conseiller) : la requête par plage d alertes_23 prolonge
+#               le dernier échantillon d une série arrêtée sans marqueur de fin (fenêtre de 5 min) ; horodatage réel du dernier
+#               échantillon de chaque alerte déclenchée (timestamp) à 08:37, 08:40 et 08:45 ; présence des séries lues par A2 et
+#               A5 de 08:25 à 08:36 ; cibles (job, instance) de CollecteEnPanne ; dernier échantillon avant la reprise
 # Usage (racine du dépôt) : poc/bricks/07a-sbom-grype/resultats/base-grype-24.sh <étape>  (journal : base-grype-24-<étape>.log)
 set -uo pipefail
 export LC_ALL=C
@@ -18,7 +22,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 O8=$HOME/.cache/supply-chain-poc/08
 export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
 e=${1:-}
-case $e in alertes_23|releve_24|compteurs_23) ;; *) echo "usage : $0 alertes_23 | releve_24 | compteurs_23" >&2; exit 64 ;; esac
+case $e in alertes_23|releve_24|compteurs_23|fins_23) ;; *) echo "usage : $0 alertes_23 | releve_24 | compteurs_23 | fins_23" >&2; exit 64 ;; esac
 if [ "$e" = releve_24 ] && [ "$(date -u +%Y%m%d%H%M)" -lt 202611240933 ]; then echo "avant le 24/11 à 09:33 UTC : rien relevé, aucun journal" >&2; exit 1; fi
 L=$here/base-grype-24-$e.log
 [ ! -e "$L" ] || { echo "journal déjà présent : $L (les journaux ne sont jamais réécrits)" >&2; exit 1; }
@@ -95,9 +99,29 @@ case $e in
       v0=$(pi "$x" 2026-11-23T06:40:00Z); echo "$x : 06:40 $v0"
       for t in 08:36 08:50 09:30; do attendu "$x, $t = 06:40" "$(pi "$x" "2026-11-23T${t}:00Z")" "$v0"; done
     done ;;
+  fins_23)
+    pj() { # expr PromQL, heure ISO, filtre jq sur [{l, v}]
+      g "$(jq -nc --arg q "$1" --arg t "$(date -ud "$2" +%s)000" '{from:$t,to:$t,queries:[{refId:"A",datasource:{uid:"prometheus"},expr:$q,instant:true}]}')" \
+        | jq -r "[.results.A.frames[]? | select((.data.values | length) > 1) | {l: (.schema.fields[1].labels // {}), v: .data.values[1][0]}] | $3"
+    }
+    for t in 08:37 08:40 08:45; do
+      echo "dernier échantillon de chaque alerte déclenchée, vu à $t :"
+      pj 'max by (alertname) (timestamp(ALERTS{alertstate="firing"}))' "2026-11-23T${t}:00Z" \
+        'if length == 0 then "  aucune" else .[] | "  \(.l.alertname) \(.v | floor | todate)" end'
+    done
+    for t in 08:25 08:30 08:33 08:35 08:36; do
+      for x in 'count(watcher_taskrun_signing_failures_total)' 'count(watcher_pipelinerun_signing_failures_total)' \
+               'count(kyverno_admission_requests_total{request_allowed="false"})'; do
+        echo "$x à $t : $(pj "$x" "2026-11-23T${t}:00Z" 'if length == 0 then "aucune série" else map(.v | tostring) | join(",") end')"
+      done
+    done
+    echo "cibles de CollecteEnPanne, vues à 07:30 :"
+    pj 'ALERTS{alertname="CollecteEnPanne"}' 2026-11-23T07:30:00Z '.[] | "  \(.l.job) \(.l.instance)"'
+    echo "dernier échantillon de up (toutes cibles), vu à 08:34 : $(pj 'max(timestamp(up))' 2026-11-23T08:34:00Z '.[0].v | floor | todate')"
+    echo "dernier échantillon de up{job=\"prometheus\"}, vu à 08:37 : $(pj 'timestamp(up{job="prometheus"})' 2026-11-23T08:37:00Z '.[0].v | floor | todate')" ;;
 esac
 echo "# fin $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-if [ "$e" = alertes_23 ]; then echo "bilan : relevé fait"; elif [ "$ko" = 0 ]; then echo "bilan : tenue"; else echo "bilan : KO"; fi
+if [ "$e" = alertes_23 ] || [ "$e" = fins_23 ]; then echo "bilan : relevé fait"; elif [ "$ko" = 0 ]; then echo "bilan : tenue"; else echo "bilan : KO"; fi
 exit "$ko"
 } 2>&1 | tee "$L"
 exit "${PIPESTATUS[0]}"

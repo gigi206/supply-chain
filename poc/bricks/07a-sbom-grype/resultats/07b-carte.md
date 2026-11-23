@@ -1738,3 +1738,23 @@ Aucun nouvel échec de signature et aucun nouveau refus. Les durées de déclenc
 Si le passage échoue : alerte toujours déclenchée à 09:33, ligne `BASE|2026-11-22`, et refus de la porte pour les scans faits après le 25/11 à 06:19:59Z.
 
 **Heures** : de 12:18:12 UTC à 12:22:03 UTC, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
+
+## Additif sur les alertes de la panne du 23/11 : fins réelles et cause mesurée (note de 2026-11-23T12:25:48Z ; la note de 12:22:03Z n'est pas réécrite)
+
+Sur relecture du conseiller. [Journal](base-grype-24-fins_23.log) de l'étape datée `fins_23` de [base-grype-24.sh](base-grype-24.sh), lecture seule à travers Grafana.
+
+**Correction : les fins à 08:37:30 de la note de 12:22:03Z sont un artefact de la requête.** Une requête par plage prolonge de 5 min le dernier échantillon d'une série arrêtée sans marqueur de fin. Horodatage réel du dernier échantillon (`timestamp`), vu à 08:37 :
+- `CollecteEnPanne`, `LokiInjoignable`, `SourceMuette` et `EvenementsMuets` : **08:32:37**, dernière évaluation avant l'arrêt de la VM (démarrage à 08:33:27). Premier échantillon de `up` après la reprise : 08:33:59. Ces quatre alertes ne sont pas revenues ensuite ;
+- `ChainsEchecSignature` et `KyvernoRefusAnormaux` : 08:36:37, après la reprise. Vue à 08:40, seule A2 est encore déclenchée (08:39:37) ; à 08:45, aucune alerte. Leurs fins (08:44:00 et 08:39:30) suivent une résolution normale, et A2 et A5 ne recouvrent pas la panne.
+
+Les débuts (06:43:00 en attente, 06:48:00 déclenchée pour `CollecteEnPanne`) ne sont pas touchés. Une plage d'alertes lue dans Grafana après une panne de Prometheus doit donc être bornée par `timestamp()`, pas par la fin apparente de la courbe.
+
+**Cible de `CollecteEnPanne`** (4 séries) : `chains` et `kyverno` (192.168.161.11:6443, par le mandataire de l'API), `forgejo` (192.168.161.13:3000) et `zot` (192.168.161.13:5000). Prometheus, lui-même sur sc-stockage, ne joignait plus ni l'API ni les services de sa propre adresse. C'est cohérent avec la perte du réseau déjà notée ; la cause de la panne reste non établie.
+
+**Cause des faux positifs A2 et A5, mesurée** : les séries qu'elles lisent sont **absentes** à 08:25, 08:30 et 08:33, puis **présentes** à 08:35 (1 série d'échecs de TaskRun, 4 séries de refus de Kyverno ; aucune série d'échecs de PipelineRun). La clause « série apparue » (`unless … offset`) les voit donc comme nouvelles. Avec les compteurs égaux de `compteurs_23`, la réserve de la note de 12:22:03Z est mesurée, plus seulement déduite. Le [README de la 19](../../19-observabilite/README.md) justifiait cette clause par le redémarrage du contrôleur (« compteur ancien stable sans alerte ») ; le cas d'un trou de collecte n'y figurait pas.
+
+Pour une éventuelle correction (configuration de la brique 19, sur accord) : commencer à sec par un cas `promtool` qui rejoue un trou de 2 h, puis vérifier que les règles déployées sont égales à celles du dépôt.
+
+**Fenêtre utile de `releve_24`** : de 09:33 à environ 12:30 UTC le 24/11. Le compte Loki du pod porte sur les 3 h qui précèdent le lancement. Avant de lancer, vérifier à la main que le job de 09:30 est terminé (`1/0/0` sinon en KO). Aucune tâche planifiée n'est posée.
+
+**Heures** : de 12:22:03 UTC à 12:25:48 UTC, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
