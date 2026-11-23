@@ -2120,3 +2120,23 @@ Contrôles faits à 14:41 UTC (session, sans journal) : `bash -n` des trois scri
 **État de la 07b** : pièces 1 à 7 et 9 posées ; reste la **pièce 8** (premier VEX réel, contenu au propriétaire) et l'intégration au rejeu de zéro (à vérifier avant M5b).
 
 **Heures** : de 14:38:33 UTC à 14:45:28 UTC, dans l'enveloppe de la 07b.
+
+## La 07b et le rejeu de zéro : constat avant M5b (note de 2026-11-23T14:53:21Z ; lecture du code et mesures en lecture seule)
+
+Lecture de `rejeu.sh` et des scripts qu'il appelle (par un agent de lecture, puis vérifiée ici point par point). **Le rejeu de zéro, tel qu'il est, ne recrée pas la 07b et s'arrêterait à S6a.**
+
+| Point | Constat | Comment |
+|---|---|---|
+| S6a (`s6a.sh periodique`, `applique s6a-scanner-deb.patch`) | **KO** : la réciproque du correctif ne s'applique plus au `scanner.sh` neuf (contexte de la l. 4) ; le rejeu s'arrête là (`set -e`) | mesuré : `git apply -R --check` en échec ; `s6a-alertes-deb` et `s6a-fraicheur-deb` passent |
+| `vex.pub` dans `scan-config` | **retirée** par `s6a.sh periodique`, qui réapplique `scan-config` sans elle (même gestionnaire de champs) | mesuré à 14:52:24 UTC, dry-run serveur (rien écrit) : clés rendues `ca-poc.crt`, `scanner.pub`, `scanner.sh` |
+| clé Transit `vex`, politique `vex-signature`, `userpass` (pièce 2) | **absentes** : `rejeu.sh` ne contient pas « vex » (0 occurrence) et recrée OpenBao ; `cle_vex` refuse si `vex-cle-publique.pem` existe ; `vex-pub.sh` épingle la SPKI `2b81df72…` | lu dans le code ; le mot de passe du propriétaire est un fichier de l'hôte (présent), qui survit au rejeu |
+| image `outils-scan` (`g2_image`) | compare bien à `OUTILS_SCAN_DIGEST` (`b799feda`), mais pousse sous l'ancien tag `grype-0.104.1-syft-1.38.0` | lu ; `scan-outil` reconstruit = celui de l'image (mesuré à 14:41) |
+| compte `poc-vex` (pièce 4) | recréé si sa ligne htpasswd est dans le cache de la 07a : présente (`test -s`) | lu dans `stockage.sh` |
+| porte (pièce 6), `entrees-scan` (pièce 7) | recréées par `cm_porte` et l'étape « 07b (entrees-scan, pose) », si le rejeu passe S6a | lu |
+| `s6a.sh` `essai` | épingle encore l'ancienne image `7eb4f26e` (hors chemin du rejeu) | lu |
+
+**À faire avant M5b, à sec, dans l'enveloppe de la 07b** (estimation : 2 h 30) : correctif `s6a-scanner-deb.patch` régénéré (mêmes lignes `+`/`-` que l'ancien, réciproque applicable) ; `vex.pub` ajoutée au rendu de `scan-config` de `s6a.sh` ; tag `-vex` dans `g2_image` ; étape « 07b (clé VEX) » dans `rejeu.sh`, selon le choix du propriétaire ; `vex-pub.sh` sans SPKI en dur ; contrôle à sec de chaque étape touchée avant de demander le lancement (`rejeu.sh` sait reprendre par `DEPUIS=`). Le rejeu lui-même est compté dans M5b (brique 05).
+
+**Conséquences d'ordre** : un VEX signé avant le rejeu (pièce 8) serait perdu (Zot et OpenBao recréés) : la pièce 8 passe après. Un rejeu avant le 24/11 à 09:33 efface `releve_24` et l'observation de la reprise de la base Grype. Le mode deb du scanner neuf n'a pas encore tourné dans le cluster (premier passage planifié : 24/11 à 11:15). L'ADR 0004 est toujours « À rédiger » : à écrire avant de clore la 07b.
+
+**Heures** : de 14:45:28 UTC à 14:53:21 UTC, dans l'enveloppe de la 07b (au plus 14 h 03 min 37 s à 14:52:36 UTC).
