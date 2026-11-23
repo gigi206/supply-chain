@@ -1,0 +1,20 @@
+# banc de secrets_ctrl_juge, 2026-11-23T22:12:58Z, 13b0b51c, preuves.sh 34ddf4972a243e1f
+## cas témoins (démarrage 2026-11-23T21:21:07Z)
+OK   1. watch 403 dans builds à +2 s, puis 200 : écarté, compté 0, témoin vrai : 0|true
+OK   1. ligne ECARTE affichée : 1
+OK   2. watch 403 dans builds à +61 s : compté : 1|true
+OK   3. get 403 dans builds dans la fenêtre : compté (seuls les watch) : 1|true
+OK   4. watch 403 hors de builds dans la fenêtre : compté : 1|true
+OK   5. lecture 200 hors de builds : comptée : 1|true
+OK   6. watch écarté sans 200 après lui : témoin faux : 0|false
+OK   7. aucun démarrage connu ([], k3s) : le cas 1 est compté : 1|true
+OK   7b. deux démarrages, refus dans la fenêtre du premier : écarté : 0|true
+## cas 8 : vraies lignes d'audit (lecture seule, sc-confiance)
+lignes : 40 ; démarrages : [1795468867,1795468866]
+  ECARTE|2026-11-23T21:21:09.219027Z tekton-pipelines-controller watch builds 403 ResponseComplete
+  ECARTE|2026-11-23T21:21:09.219027Z tekton-pipelines-controller watch builds 403 ResponseStarted
+  BILAN|0|true
+OK   8. audit réel du rejeu : compté 0, témoin vrai : 0|true
+OK   8. audit réel : lignes écartées : 2
+OK   8. audit réel, sans l'exception (ancien contrôle) : 2 comptées : 2
+## bilan : 12 cas, 0 écart(s)
