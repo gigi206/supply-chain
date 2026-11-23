@@ -16,6 +16,7 @@ APP=192.168.161.13:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460
 DEB=192.168.161.13:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
 PA=$R/g4-scan-predicat.json                     # scan de sample-app du rejeu plateforme-1 (16:39:31Z), 6 entrées, bloc vex
 PD=$R/07b-t1-predicat-sample-app-deb.json       # scan du deb du 21/11 (11:16:56Z), énoncé in-toto, 67 entrées, sans bloc vex
+GO=$(mise which go)   # passage 2 (21:54 UTC) : le shim go de mise ne trouve pas de version dans la copie extraite (sans mise.toml)
 mkdir -p "$B/src" "$B/bin" "$B/vex" "$B/cache"
 N=0; KO=0
 attendu() { # libellé obtenu attendu
@@ -30,10 +31,10 @@ juge() { # gabarit hex : « retenus rejetés exemptant raison » de scan-outil v
 }
 {
 echo "# banc de vex-gabarit.sh, $(date -u +%FT%TZ), $(git rev-parse --short=8 HEAD), script $(sha256sum < "$S" | cut -c1-16)"
-echo "## juge : scan-outil depuis une copie de HEAD"
+echo "## juge : scan-outil depuis une copie de HEAD ($("$GO" version | cut -d' ' -f3))"
 git archive HEAD poc/bricks/07a-sbom-grype/outil | tar -x -C "$B/src"
 (cd "$B/src/poc/bricks/07a-sbom-grype/outil" && CGO_ENABLED=0 GOPROXY=off GOCACHE=$B/cache GOFLAGS=-mod=mod \
-  go build -trimpath -buildvcs=false -ldflags "-s -w -buildid=" -o "$B/bin/scan-outil" .) > "$B/build.err" 2>&1 \
+  "$GO" build -trimpath -buildvcs=false -ldflags "-s -w -buildid=" -o "$B/bin/scan-outil" .) > "$B/build.err" 2>&1 \
   || { echo "construction en échec : $(tail -3 "$B/build.err")"; }
 attendu "empreinte de scan-outil (celle de l'image b799feda)" "$(sha256sum < "$B/bin/scan-outil" 2>/dev/null | cut -c1-16)" 7dde1a8ed457f254
 echo "## tableau seul"

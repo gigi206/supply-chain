@@ -1,0 +1,51 @@
+# banc de vex-gabarit.sh, 2026-11-23T21:53:43Z, 66d987c2, script aaa6b3099fff9968
+## juge : scan-outil depuis une copie de HEAD
+construction en échec : mise ERROR No version is set for shim: go. Run `mise use -g go@1.24.7` to set a default, or `mise x go@1.24.7 -- go` to run it once.
+mise ERROR Version: 2026.11.12 linux-x64 (2026-11-21)
+mise ERROR Run with --verbose or MISE_VERBOSE=1 for more information
+poc/bricks/07a-sbom-grype/resultats/vex-gabarit-banc.sh: line 38: ~/.cache/supply-chain-poc/07a/banc-vex-gabarit/bin/scan-outil: No such file or directory
+KO   empreinte de scan-outil (celle de l'image b799feda) :  (attendu 7dde1a8ed457f254)
+## tableau seul
+OK   sample-app : code : 0
+OK   sample-app : lignes du tableau : 6
+OK   sample-app : comptes : comptes : 6 entrée(s), 6 identifiant(s) 
+OK   sample-app : origine dite non vérifiée : 1
+     # vex-gabarit.sh, 2026-11-23T21:53:43Z ; sujet sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; scan du 2026-11-23T16:39:31.427624351Z ; PREDICAT=g4-scan-predicat.json (banc : NON VÉRIFIÉ)
+     
+     | # | Identifiant | Alias | Gravité | KEV | EPSS | Paquet | Corrigé dans | VEX appliqué |
+     |---|---|---|---|---|---|---|---|---|
+     | 1 | GHSA-3fxj-6jh8-hvhx |  | Medium | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+     | 2 | GHSA-j6qf-3m9c-vwj3 | CVE-2026-114437 | Medium | non | 0.00129 | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.4.0 | - |
+     | 3 | GHSA-mqqf-5wvp-8fh8 | CVE-2025-69725 | Medium | non | 0.00264 | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.2.4 | - |
+     | 4 | GO-2026-5775 | GHSA-9g5q-2w5x-hmxf | Unknown | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+     | 5 | GO-2026-5777 | GHSA-rjr7-jggh-pgcp | Unknown | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+     | 6 | GO-2026-6859 | CVE-2026-97054 | Medium | non | 0.00479 | `pkg:golang/stdlib@1.26.10` | 1.26.11, 1.27.4 | - |
+     
+     comptes : 6 entrée(s), 6 identifiant(s) ; KEV 0 ; avec correctif 6 ; écartées par un VEX 0 ; gravités : Medium 4, Unknown 2
+OK   deb (énoncé in-toto) : code : 0
+OK   deb : lignes du tableau : 67
+OK   deb : alias CVE-2026-114437 dans le tableau : 1
+     comptes : 67 entrée(s), 67 identifiant(s) ; KEV 0 ; avec correctif 67 ; écartées par un VEX 0 ; gravités : Critical 3, High 33, Low 1, Medium 28, Unknown 2
+## gabarit
+OK   gabarit sample-app : code : 0
+OK   gabarit : un énoncé : 1
+OK   gabarit : produit : pkg:oci/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   gabarit : sous-composant = paquet du prédicat, octet près : pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+OK   gabarit : champs laissés vides : ["","","","",""]
+OK   gabarit : mode 0600 : 600
+KO   gabarit brut jugé par scan-outil vex : rejeté : erreur poc/bricks/07a-sbom-grype/resultats/vex-gabarit-banc.sh: (attendu 0 1)
+KO   témoin rempli jugé par scan-outil vex : retenu, exemptant : erreur poc/bricks/07a-sbom-grype/resultats/vex-gabarit-banc.sh: line (attendu 1 0 true)
+KO   témoin rempli, autre digest : rejeté : erreur poc/bricks/07a-sbom-grype/resultats/vex-gabarit-banc.sh: (attendu 0 1)
+OK   gabarit deb : code : 0
+OK   gabarit deb : alias repris : {"name":"GHSA-j6qf-3m9c-vwj3","aliases":["CVE-2026-114437"]}
+## refus
+OK   identifiant absent du scan : code : 1
+OK   identifiant absent : aucun fichier écrit : absent
+OK   gabarit existant : code (jamais réécrit) : 2
+OK   identifiant sans chemin de gabarit : code : 2
+OK   chemin sans identifiant : code : 2
+OK   image sans digest : code : 2
+OK   sans PREDICAT ni CA : code (rien lu dans un registre) : 1
+## dépôt intact
+OK   outil/ du dépôt inchangé (git status) : 0
+## bilan : 27 cas, 4 écart(s)
