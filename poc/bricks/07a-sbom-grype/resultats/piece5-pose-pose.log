@@ -1,0 +1,44 @@
+# piece5-pose.sh pose, 2026-11-23T14:38:55Z ; HEAD 60b5c7e2726d
+## préalables
+OK   décision du propriétaire : pose avant le relevé du 24/11
+OK   pod d'essai tenu
+OK   1438 UTC, aucun pod actif dans scan
+OK   HEAD : scanner.sh : 7251df1567c1cfdd
+OK   HEAD : OUTILS_SCAN_DIGEST : sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+  scan-config avant : ca-poc.crt 35d99c165852251b
+  scan-config avant : scanner.pub ff39a16d2e9e412e
+  scan-config avant : scanner.sh 88e7bfe80df12ae4
+  scan-config avant : vex.pub 79f7eece2f98f442
+OK   service : scanner.sh : 88e7bfe80df12ae4
+OK   service : images de scan-sample-app : source=ace6811c,analyser=7eb4f26e,jetons=50469110,attester=7eb4f26e,publier=7eb4f26e,revocation=50469110
+OK   service : images de scan-sample-app-deb : source=ace6811c,analyser=7eb4f26e,jetons=50469110,attester=7eb4f26e,publier=7eb4f26e,revocation=50469110
+## rendu depuis une copie de HEAD
+OK   journal de plateforme.sh de la copie hors de resultats/ : 1
+  # plateforme.sh g7_periodique, 2026-11-23T14:38:56Z
+  Warning: resource cronjobs/scan-sample-app is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+  cronjob.batch/scan-sample-app configured (server dry run)
+  # fin 2026-11-23T14:38:56Z, code 0
+OK   g7_periodique (G7_SEC=1), code : 0
+  limites de revocation (limites.tsv) : requêtes 10m et 32Mi, limites 500m et 256Mi
+OK   rendu de scan-sample-app : conteneurs sur l'image neuve : analyser,attester,publier
+OK   rendu de scan-sample-app-deb : conteneurs sur l'image neuve : analyser,attester,publier
+## pose (14:38:56 UTC)
+  texte de cm_scan : bc7d3417e7cf1ce7
+  configmap/scan-config serverside-applied
+  cronjob.batch/scan-sample-app serverside-applied
+  cronjob.batch/scan-sample-app-deb serverside-applied
+## après (14:38:56 UTC)
+  scan-config après : ca-poc.crt 35d99c165852251b
+  scan-config après : scanner.pub ff39a16d2e9e412e
+  scan-config après : scanner.sh 7251df1567c1cfdd
+  scan-config après : vex.pub 79f7eece2f98f442
+OK   scan-config : scanner.sh : 7251df1567c1cfdd
+OK   scan-config : autres clés inchangées : ca-poc.crt 35d99c165852251b
+scanner.pub ff39a16d2e9e412e
+vex.pub 79f7eece2f98f442
+OK   images de scan-sample-app : source=ace6811c,analyser=b799feda,jetons=50469110,attester=b799feda,publier=b799feda,revocation=50469110
+OK   scan-sample-app : spec, image ramenée = spec d'avant
+OK   images de scan-sample-app-deb : source=ace6811c,analyser=b799feda,jetons=50469110,attester=b799feda,publier=b799feda,revocation=50469110
+OK   scan-sample-app-deb : spec, image ramenée = spec d'avant
+# fin 2026-11-23T14:38:56Z
+bilan : tenue

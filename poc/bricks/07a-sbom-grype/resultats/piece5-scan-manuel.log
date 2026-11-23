@@ -1,0 +1,32 @@
+# piece5-scan.sh manuel, 2026-11-23T14:40:19Z ; HEAD 60b5c7e2726d
+OK   hors des fenêtres de scan (1440 UTC), aucun pod actif dans scan
+OK   scan-config : scanner.sh (pièce 5 posée) : 7251df1567c1cfdd
+  refus Kyverno avant : 10
+  referrers de builds/scan/sample-app avant : 12
+  job planifié du 23/11 (référence des préfixes) : scan-sample-app-29923770
+OK   Job scan-sample-app-manuel-144019 créé (14:40:19 UTC)
+  durée : 137 s
+OK   Job (réussi/échoué/actif) : 1/0/0
+### journal du Job (préfixes VEX, REPLI, SCAN, ATTESTATION, PUBLIE, BASE)
+  BASE|2026-11-22, sc-stockage.poc.test:5000/vulndb/grype@sha256:8e9abb2e53d6b599213e4e56c5fcf2a2778f972a72f0dd84b966e612c3d98ed6, empreinte sha256:baa591108fd0fafa273503769dea65bf0334ad337e84aeb7f08197849cea9f87, 1 s
+  VEX|0 énoncé(s) vérifié(s), 0 retenu(s), 0 rejeté(s)|sc-stockage.poc.test:5000/builds/vex/sample-app|cosign code 1 : no matching attestations: 
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 6 vulnérabilités, 0 KEV, 0 écartée(s) par un VEX, 1 s
+  ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 8fc72c733ce3c720d2d37f10bfd699f9b0644560da8b0f0a7e516f6d22b52e25, vérifié avec la clé publique
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:4e4512189c3da818a5343623ec99850d9c6650a6e31d31bb4bdba34552f8dfeb, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   ligne VEX| : 1
+OK   lignes REPLI| : 0
+OK   ligne SCAN| : aucune entrée écartée par un VEX : 1
+OK   ligne ATTESTATION| : 1
+OK   ligne PUBLIE| : 1
+OK   préfixes triés = ceux du 23/11 à 09:30 plus VEX : ARTEFACT,ATTESTATION,BASE,IMPORT,PREDICAT,PUBLIE,SBOM,SCAN,SOURCE,VEX,masquée,masquée,masquée
+## Zot (anonyme)
+OK   referrers de builds/scan/sample-app après = avant + 1 : 13
+OK   referrer de PUBLIE| listé : 1
+OK   bundle publié vérifié par la clé du scanner, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+  prédicat publié : {"scannedAt":"2026-11-23T14:42:23.699800631Z","base":{"built":"2026-11-22T06:19:59Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:8e9abb2e53d6b599213e4e56c5fcf2a2778f972a72f0dd84b966e612c3d98ed6","schema":"v6.1.10"},"vulnerabilites":6,"kev":0,"vex":{"documents":[],"ecarteesSansExemption":0,"rejetes":0}}
+OK   bloc vex du prédicat publié : {"documents":[],"ecarteesSansExemption":0,"rejetes":0}
+## lignes du pod dans Grafana (Loki), comptes seuls
+OK   lignes du pod scan-sample-app-manuel-144019-5zlfm dans Grafana (Loki) = kubectl logs : 13
+OK   refus Kyverno après = avant : 10
+# fin 2026-11-23T14:42:42Z
+bilan : tenue

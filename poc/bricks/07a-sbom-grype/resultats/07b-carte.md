@@ -2063,3 +2063,50 @@ Le dépôt et sc-stockage sont de nouveau alignés pour `zot.json`. Aucune écri
 - confiance haute (mêmes fonctions de rendu qu'à sec, `kubectl diff` mesuré à sec).
 
 **Heures** : de 14:32:34 UTC à 14:38:33 UTC, dans l'enveloppe de la 07b (au plus 13 h 46 min 07 s à 14:35:06 UTC, mesure de session).
+
+## Pièce 5 posée : scanner neuf dans les deux CronJob (note de 2026-11-23T14:40:16Z ; accord du propriétaire, « Aujourd'hui »)
+
+[`pose`](piece5-pose-pose.log) de 14:38:55 à 14:38:56 UTC, **bilan : tenue**, conforme à la prédiction de 14:38:33Z : `scan-config` n'a changé que sa clé `scanner.sh` (`88e7bfe8…` vers `7251df15…`) ; `analyser`, `attester` et `publier` des deux CronJob sur `b799feda…` ; spec, image ramenée, égale à celle d'avant. [`grafana`](piece5-pose-grafana.log) (14:39:00) : dans l'audit de l'API, `scan-config` patch 1, `scan-sample-app` patch 2 (le dry-run serveur de `g7_periodique` plus la pose), `scan-sample-app-deb` patch 1 ; la création de `scan-config-essai` (essai de 14:11) est dans la fenêtre de 30 min.
+
+## Scan lancé à la main : prédiction (date -u de 14:40:16 UTC, le 2026-11-23, avant le lancement ; accord du propriétaire, « Scan lancé à la main »)
+
+**Mesure** : [`piece5-scan.sh`](../piece5-scan.sh) `manuel` (`kubectl create job --from=cronjob/scan-sample-app`). Le Job signe et publie dans le vrai Zot, comme un passage planifié. Effet sur les alertes, lu dans `alertes.yml` de la 19 : `ScanEnRetard` et `ScanBientotRefuse` ne lisent que l'âge du dernier scan, qui rajeunit ; aucune autre règle ne lit les scans.
+
+**Prédiction** :
+- Job admis et réussi (1/0/0) en moins de 10 min (essai : 128 s pour `analyser`, plus `jetons`, `attester`, `publier`, `revocation`) ;
+- une ligne `VEX|0 énoncé(s) vérifié(s), 0 retenu(s), 0 rejeté(s)|…/builds/vex/sample-app|` (dépôt absent), aucune `REPLI|`, `SCAN|` avec 0 entrée écartée, une `ATTESTATION|`, une `PUBLIE|` ;
+- préfixes triés = ceux du job planifié de 09:30 plus `VEX` (le contrôle ajusté de `releve_24`, essayé ici la veille) ;
+- un referrer de plus dans `builds/scan/sample-app`, celui de `PUBLIE|` ; bundle vérifié par la clé du scanner ; bloc `vex` du prédicat publié vide (`documents` vide, 0, 0) ; 6 vulnérabilités, 0 KEV ;
+- lignes du pod dans Grafana (Loki) = `kubectl logs` ; refus Kyverno inchangés ;
+- confiance haute (même chemin que l'essai, plus `attester` et `publier`, dont code et binaires sont inchangés).
+
+## Scan lancé à la main : résultat (note de 2026-11-23T14:43:12Z)
+
+[Journal](piece5-scan-manuel.log), de 14:40:19 à 14:42:42 UTC : **bilan : tenue, 16 OK**. **La prédiction tient** : premier scan réel du scanner neuf, signé et publié.
+
+- Job `scan-sample-app-manuel-144019` réussi (1/0/0) en 137 s ; base Grype du 22/11 (celle du jour, la panne du 23/11 n'a pas renouvelé la base).
+- `VEX|0 énoncé(s)…|…/builds/vex/sample-app|cosign code 1 : no matching attestations` (dépôt absent), aucune `REPLI|`, `SCAN|… 6 vulnérabilités, 0 KEV, 0 écartée(s) par un VEX`, une `ATTESTATION|`, une `PUBLIE|` (`builds/scan/sample-app@sha256:4e451218…`).
+- **Préfixes triés = ceux du job de 09:30 plus `VEX`** : le contrôle ajusté de `releve_24` tient déjà sur ce Job.
+- Referrers de `builds/scan/sample-app` : 12 à 13, le nouveau est celui de `PUBLIE|` ; bundle vérifié par la clé du scanner ; bloc `vex` vide.
+- 13 lignes du pod dans Grafana (Loki), autant que `kubectl logs` ; refus Kyverno inchangés (10).
+
+**Conséquence** : `attester` et `publier` ont tourné sur `b799feda` sans écart ; le scan de 09:30 du 24/11 n'est plus le premier du scanner neuf.
+
+## Pièce 9 : patch `07b-t3` reporté dans le dépôt (note de 2026-11-23T14:43:12Z ; dépôt seul, rien posé)
+
+`git apply` du patch (`git apply --check` passait) : `entrees-scan.sh`, `outil/main.go`, `plateforme.sh`, `politique/porte/policy-scan.yaml`, `scan.rego`, `scan_test.rego`, `systemd/entrees-scan.py` changent ; `signer-vex.sh` est neuf (mode 755). Le patch reste dans le dépôt pour l'historique : il ne s'applique plus (`git apply --reverse --check` passe), donc `piece6-porte.sh sec` et `piece5-scanner.sh sec` ne se relancent plus tels quels, et leurs journaux restent la mesure.
+
+Contrôles faits à 14:41 UTC (session, sans journal) : `bash -n` des trois scripts et `py_compile` d'`entrees-scan.py` passent ; `ec opa test` des règles : **PASS 41/41** ; `go vet` de `outil/` passe ; **`scan-outil` reconstruit depuis le dépôt** (mêmes options que la pièce 3) : `7dde1a8ed457f254…`, l'empreinte du binaire de l'image `b799feda` en service ([couches](piece5-couches.log)). La limite « rejeu de zéro KO à `g2_image` jusqu'au report de `main.go` » est donc levée par le code ; non mesurée par `g2_image` lui-même.
+
+## Pièces 6 et 7 : prédictions (date -u de 14:43:12 UTC, le 2026-11-23, avant les lancements ; accords du propriétaire, « Pièce 6 (porte) » et « Pièce 7 (sudo VM) »)
+
+**Pièce 6** : [`piece6-pose.sh`](../piece6-pose.sh) `pose` puis `grafana`. Rendu par `cm_porte` d'une copie de HEAD (apply remplacé par `cat`), puis `cm_porte` tel quel.
+- préalables : `politique/` et la 08 propres, `vex_age_max_jours` 30 dans HEAD, patch déjà reporté, aucun pod actif dans `porte` ;
+- **clés qui changent : `policy-scan.yaml`, `scan.rego`, `taches.yml`** (les mêmes qu'à sec, 13:56 ; `taches.yml` ajoute les tâches de la 05 des 18 et 20/11, accepté par le propriétaire) ; empreintes rendues égales à celles de `piece6-porte-sec.log` pour `policy-scan.yaml` et `scan.rego` ;
+- après : service = rendu clé par clé ; politique servie : `vex_age_max_jours` 30, statuts `[not_affected]` ; **bilan : tenue** ; `grafana` : un patch de `porte/porte` dans l'audit ;
+- confiance haute pour les clés (mesuré à sec), moyenne pour `taches.yml` (empreinte rendue à sec `cb2d78ff…` ; le rendu dépend des journaux de la 05 de HEAD, inchangés depuis).
+
+**Pièce 7** : `entrees-scan.sh pose` (sudo sur sc-stockage) puis `verif`, journaux `piece7-pose.log` et `piece7-verif.log`.
+- `pose` : `entrees-scan.py` installé identique à celui du dépôt, premier passage `success`, timer actif, **44 séries écrites** (22 par dépôt) ; aucun redémarrage de Zot (lu dans le code) ;
+- `verif` : 44 séries `scan_entrees*` et `scan_vex*` dans Prometheus, égales à jq sur le dernier scan de chaque dépôt ; pour `sample-app` (scan manuel de la pièce 5, bloc `vex` vide) comme pour le deb (scan de 11:15, ancien scanner, sans bloc `vex`), toutes les séries `scan_vex*` valent 0 ;
+- confiance moyenne : 44 séries mesurées au banc (passage 18 et suivants), jamais sur la VM ; la `pose` relance un passage qui peut réémettre dans Loki les lignes d'un scan déjà listé (non vérifié, noté le 22/11).

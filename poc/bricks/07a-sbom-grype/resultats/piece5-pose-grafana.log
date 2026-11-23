@@ -1,0 +1,7 @@
+# piece5-pose.sh grafana, 2026-11-23T14:39:00Z ; HEAD 60b5c7e2726d
+  configmaps/scan-config patch : 1
+  configmaps/scan-config-essai create : 1
+  cronjobs/scan-sample-app patch : 2
+  cronjobs/scan-sample-app-deb patch : 1
+# fin 2026-11-23T14:39:00Z
+bilan : tenue

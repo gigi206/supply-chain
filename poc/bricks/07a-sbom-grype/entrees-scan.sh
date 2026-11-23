@@ -103,7 +103,8 @@ EOF
   sur "sudo journalctl -u entrees-scan.service -o cat --no-pager | grep -v '^{' | tail -n 3; echo \"lignes d'entrée : \$(sudo journalctl -u entrees-scan.service -o cat --no-pager | grep -c '^{')\"" | masque
   echo "## séries écrites"
   sur "cat /etc/fichiers-metriques/entrees-scan.prom" | masque | sed 's/^/  /'
-  attendu "séries écrites" "$(sur "wc -l < /etc/fichiers-metriques/entrees-scan.prom")" 20
+  # 07b, tranche 3 : 22 séries par dépôt, deux dépôts (20 avant la tranche 3 ; 42 avant le repli, passage 18)
+  attendu "séries écrites" "$(sur "wc -l < /etc/fichiers-metriques/entrees-scan.prom")" 44
   sur "systemd-analyze security entrees-scan.service 2>/dev/null | tail -n 1; systemd-analyze security fraicheur-scan.service 2>/dev/null | tail -n 1 | sed 's/^/fraicheur-scan, pour comparer : /'"
   return $ko
 }
@@ -113,8 +114,8 @@ etape_verif() {
   s=$(scans_en_place)
   echo "## Prometheus, lu par l'auditeur"
   # sélecteur sur __name__ : « a or b » écarte les séries de b dont les étiquettes, nom exclu, sont déjà dans a (journal verif 1)
-  graf prometheus '{__name__=~"scan_entrees|scan_entrees_kev|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds"}' > "$T/p.json"
-  attendu "séries scan_entrees* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 20
+  graf prometheus '{__name__=~"scan_entrees|scan_entrees_vex|scan_entrees_kev|scan_entrees_kev_vex|scan_entrees_avec_correctif|scan_entrees_scanne_timestamp_seconds|scan_vex_documents|scan_vex_rejetes|scan_vex_ecartees_sans_exemption|scan_vex_repli"}' > "$T/p.json"
+  attendu "séries scan_entrees* et scan_vex* dans Prometheus" "$(valeurs < "$T/p.json" | wc -l)" 44
   for d in $s; do
     digest=${d#*@}; d=${d%@*}
     m=$(curl -fsS --cacert "$CA" "https://$REG/v2/$d/referrers/$digest" | jq -r '.manifests
@@ -124,18 +125,31 @@ etape_verif() {
     curl -fsS --cacert "$CA" "https://$REG/v2/$d/blobs/$l" | jq -r '.dsseEnvelope.payload | @base64d' > "$T/e.json"
     att=$(jq -r --argjson t "$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)" '.predicate.vulnerabilities as $v
       | (["Critical","High","Medium","Low","Negligible","Unknown","autre"] | map(. as $g | "g=\($g) \($v | map(select(.severity == $g)) | length)")[]),
-        "kev \($v | map(select(.kev)) | length)", "correctif \($v | map(select((.fixedIn | length) > 0)) | length)", "scanne \($t)"' "$T/e.json")
+        (["Critical","High","Medium","Low","Negligible","Unknown","autre"] | map(. as $g | "vex g=\($g) \($v | map(select(.severity == $g and .vex)) | length)")[]),
+        "kev \($v | map(select(.kev)) | length)", "kev_vex \($v | map(select(.kev and .vex)) | length)",
+        "correctif \($v | map(select((.fixedIn | length) > 0)) | length)", "scanne \($t)",
+        "vex_documents \(.predicate.vex.documents // [] | length)", "vex_rejetes \(.predicate.vex.rejetes // 0)",
+        "vex_sans_exemption \(.predicate.vex.ecarteesSansExemption // 0)", "vex_repli \(.predicate.vex.repli // 0)"' "$T/e.json")
     obt=$(jq -r --arg d "$d" '[.results.A.frames[]? | select((.data.values | length) > 1) | select(.schema.fields[1].labels.depot == $d)
       | {n: .schema.fields[1].labels.__name__, g: (.schema.fields[1].labels.gravite // ""), v: .data.values[1][0]}] as $s
       | (["Critical","High","Medium","Low","Negligible","Unknown","autre"][] as $g | $s[] | select(.n == "scan_entrees" and .g == $g) | "g=\($g) \(.v)"),
-        ($s[] | select(.n == "scan_entrees_kev") | "kev \(.v)"), ($s[] | select(.n == "scan_entrees_avec_correctif") | "correctif \(.v)"),
-        ($s[] | select(.n == "scan_entrees_scanne_timestamp_seconds") | "scanne \(.v)")' "$T/p.json")
+        (["Critical","High","Medium","Low","Negligible","Unknown","autre"][] as $g | $s[] | select(.n == "scan_entrees_vex" and .g == $g) | "vex g=\($g) \(.v)"),
+        ($s[] | select(.n == "scan_entrees_kev") | "kev \(.v)"), ($s[] | select(.n == "scan_entrees_kev_vex") | "kev_vex \(.v)"),
+        ($s[] | select(.n == "scan_entrees_avec_correctif") | "correctif \(.v)"),
+        ($s[] | select(.n == "scan_entrees_scanne_timestamp_seconds") | "scanne \(.v)"),
+        ($s[] | select(.n == "scan_vex_documents") | "vex_documents \(.v)"), ($s[] | select(.n == "scan_vex_rejetes") | "vex_rejetes \(.v)"),
+        ($s[] | select(.n == "scan_vex_ecartees_sans_exemption") | "vex_sans_exemption \(.v)"),
+        ($s[] | select(.n == "scan_vex_repli") | "vex_repli \(.v)")' "$T/p.json")
     if [ "$att" = "$obt" ]; then ok "$d : séries de Prometheus = jq ($(printf '%s\n' "$att" | grep -v ' 0$' | paste -sd',' | sed 's/,/, /g'))"
     else echo "KO   $d : séries de Prometheus différentes de jq"; diff <(printf '%s\n' "$att") <(printf '%s\n' "$obt") || true; ko=1; fi
     echo "## Loki, lu par l'auditeur, en comptes : $d"
     n=$(jq '.predicate.vulnerabilities | length' "$T/e.json")
-    graf loki "sum(count_over_time({source=\"journal\", unite=\"entrees-scan.service\"} | json | depot=\"$d\" | scanne=\"$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)\" [24h]))" > "$T/l.json"
+    # 07b, tranche 3 : les lignes de document VEX portent vexDocument et sont comptées à part ; une réponse vide vaut 0
+    graf loki "sum(count_over_time({source=\"journal\", unite=\"entrees-scan.service\"} | json | depot=\"$d\" | scanne=\"$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)\" | vexDocument=\"\" [24h]))" > "$T/l.json"
     attendu "lignes de $d dans Loki pour ce scan (clé scanne), sur 24 h" "$(valeurs < "$T/l.json" | sed 's/^{} //')" "$n"
+    graf loki "sum(count_over_time({source=\"journal\", unite=\"entrees-scan.service\"} | json | depot=\"$d\" | scanne=\"$(date -ud "$(jq -r .predicate.scannedAt "$T/e.json")" +%s)\" | vexDocument!=\"\" [24h]))" > "$T/l.json"
+    obt=$(valeurs < "$T/l.json" | sed 's/^{} //')
+    attendu "documents VEX de $d dans Loki pour ce scan, sur 24 h" "${obt:-0}" "$(jq '.predicate.vex.documents // [] | length' "$T/e.json")"
   done
   graf loki 'sum(count_over_time({source="journal", unite="entrees-scan.service"} |= "entrées " [24h]))' > "$T/r.json"
   echo "lignes de résumé dans Loki sur 24 h : $(valeurs < "$T/r.json" | sed 's/^{} //')"

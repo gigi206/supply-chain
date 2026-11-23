@@ -60,6 +60,7 @@ _defauts(p) := {m |
 		"malicious": is_array(object.get(p, "malicious", null)),
 		"scanner.db.built": _date(object.get(p, ["scanner", "db", "built"], "")),
 		"kev": _kev_lisibles(p),
+		"vex": _vex_lisibles(p),
 	}
 	not ok
 }
@@ -73,6 +74,20 @@ _kev_lisibles(p) := true if {
 		is_boolean(v.kev)
 	}
 } else := false
+
+# Brique 07b, tranche 3 : vex est facultatif (prédicats signés avant elle) ; présent, il porte un statut et un horodatage lisibles.
+_vex_lisibles(p) := true if {
+	every v in p.vulnerabilities {
+		_vex_lisible(v)
+	}
+} else := false
+
+_vex_lisible(v) if not "vex" in object.keys(v)
+
+_vex_lisible(v) if {
+	is_string(v.vex.status)
+	_date(v.vex.timestamp)
+}
 
 # METADATA
 # title: Scan récent
@@ -109,19 +124,27 @@ deny contains {"code": "scan.base_recente", "msg": msg} if {
 _ecart_admis(ecart) if ecart <= _seuil("base_age_max_jours") * _jour
 
 # METADATA
-# title: Pas de KEV sans VEX valide (exceptions datées)
+# title: Pas de KEV sans VEX valide (durée de validité dans la politique)
+# description: >-
+#   Brique 07b, choix 3 et 5 du propriétaire (21/11/2026). Le scanner applique les VEX et écrit, pour chaque entrée écartée, le
+#   statut donné par Grype et l'horodatage de l'énoncé gagnant (remplacement du 21/11 : le plus récent qui nomme l'entrée, quel que
+#   soit son statut). Un VEX vaut vex_age_max_jours à partir de cet
+#   horodatage ; un horodatage postérieur au scan, au-delà de l'écart d'horloge toléré, est refusé (pas de validité prolongée en
+#   datant dans le futur). Seuls les statuts de vex_statuts_acceptes comptent (not_affected).
 # custom:
 #   short_name: kev_without_vex
 deny contains {"code": "scan.kev_without_vex", "msg": sprintf("KEV sans VEX valide : %s", [v.id])} if {
 	some s in _retenus
 	some v in s.p.vulnerabilities
 	v.kev == true
-	not _vex_valide(v)
+	not _vex_valide(s, v)
 }
 
-_vex_valide(v) if {
+_vex_valide(s, v) if {
 	v.vex.status in _seuil("vex_statuts_acceptes")
-	time.parse_rfc3339_ns(v.vex.expires) > time.now_ns()
+	t := time.parse_rfc3339_ns(v.vex.timestamp)
+	t <= s.t + _derive
+	time.now_ns() - t <= _seuil("vex_age_max_jours") * _jour
 }
 
 # METADATA

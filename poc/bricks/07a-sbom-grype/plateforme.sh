@@ -968,15 +968,20 @@ count(_scans) == 0
 "malicious": is_array(object.get(p, "malicious", null)),
 "scanner.db.built": _date(object.get(p, ["scanner", "db", "built"], "")),
 "kev": _kev_lisibles(p),
+"vex": _vex_lisibles(p),
+_vex_lisible(v) if not "vex" in object.keys(v)
+is_string(v.vex.status)
+_date(v.vex.timestamp)
 not ok
 not _age_admis(age)
 age >= 0 - _derive
 age <= _seuil("scan_age_max_jours") * _jour
 not _ecart_admis(ecart)
 v.kev == true
-not _vex_valide(v)
+not _vex_valide(s, v)
 v.vex.status in _seuil("vex_statuts_acceptes")
-time.parse_rfc3339_ns(v.vex.expires) > time.now_ns()
+t <= s.t + _derive
+time.now_ns() - t <= _seuil("vex_age_max_jours") * _jour
 FIN
   [ "$k" = 0 ] || { echo "KO   $k condition(s) non couverte(s)" >&2; exit 1; }
 }
@@ -1049,10 +1054,16 @@ etape_g5_sec() {
   echo "## contre-épreuves du jugement, ec de l'image de la porte, entrée modifiée après la lecture (la signature n'est plus en jeu : rôle de G6)"
   entree_modifiee '.statements[0].predicate.vulnerabilities[0].kev = true'
   juger_entree "KEV" 1 scan.kev_without_vex
-  entree_modifiee '.statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", expires: "2020-01-01T00:00:00Z"}}'
+  entree_modifiee '.statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", timestamp: "2020-01-01T00:00:00Z"}}'
   juger_entree "VEX expiré" 1 scan.kev_without_vex
+  entree_modifiee '.statements[0].predicate as $p | .statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", timestamp: $p.scannedAt}}'
+  juger_entree "VEX valide (daté du scan)" 0 ""
+  entree_modifiee '.statements[0].predicate as $p | .statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "fixed", timestamp: $p.scannedAt}}'
+  juger_entree "VEX fixed (choix 5)" 1 scan.kev_without_vex
+  entree_modifiee '.statements[0].predicate as $p | .statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", timestamp: ($p.scannedAt | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601 + 86400 | todateiso8601)}}'
+  juger_entree "VEX postérieur au scan" 1 scan.kev_without_vex
   entree_modifiee '.statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", expires: "2099-01-01T00:00:00Z"}}'
-  juger_entree "VEX valide" 0 ""
+  juger_entree "VEX à l'ancienne forme (expires)" 1 scan.forme,scan.kev_without_vex
   entree_modifiee '.statements[0].predicate.malicious = ["MAL-2026-1"]'
   juger_entree "MAL-" 1 scan.malicious
   entree_modifiee '.statements[0].predicate.scannedAt = "2026-10-01T00:00:00Z" | .statements[0].predicate.scanner.db.built = "2026-09-30T00:00:00Z"'
@@ -1158,12 +1169,14 @@ temoins() { # registre image-de-base tableau : une image par cas, à digest prop
   # Prédicats du scan réel de G4 et du cas log4j de G0, passé par scan-outil : mêmes champs, dates du passage
   propre() { jq --arg n "$n" --arg b "$b" '.scannedAt = $n | .scanner.db.built = $b' "$R/g4-scan-predicat.json"; }
   kev() { jq --arg n "$n" --arg b "$b" '.scannedAt = $n | .scanner.db.built = $b' "$R/g6-predicat-kev.json"; }
-  vex() { kev | jq --arg s "$1" --arg e "$2" '.vulnerabilities |= map(if .kev then . + {vex: {status: $s, expires: $e}} else . end)'; }
+  vex() { kev | jq --arg s "$1" --arg e "$2" '.vulnerabilities |= map(if .kev then . + {vex: {status: $s, timestamp: $e}} else . end)'; }
   dater() { jq --arg n "$(date -ud "$1" +%FT%TZ)" --arg b "$(date -ud "$2" +%FT%TZ)" '.scannedAt = $n | .scanner.db.built = $b'; }
   propre > "$j/propre.json"; kev > "$j/kev.json"
   propre | jq '.malicious = ["MAL-2026-0001"]' > "$j/mal.json"
-  vex not_affected "$(date -ud '1 day ago' +%FT%TZ)" > "$j/vex-expire.json"
-  vex not_affected "$(date -ud '30 days' +%FT%TZ)" > "$j/vex-valide.json"
+  a=$(sed -n 's/^ *vex_age_max_jours: *\([0-9][0-9]*\) *\(#.*\)\{0,1\}$/\1/p' "$here/politique/porte/policy-scan.yaml")
+  [ -n "$a" ] || { echo "KO   vex_age_max_jours non fixé dans policy-scan.yaml (choix du propriétaire)" >&2; exit 1; }
+  vex not_affected "$(date -ud "$((a + 1)) days ago" +%FT%TZ)" > "$j/vex-expire.json"
+  vex not_affected "$(date -ud '1 day ago' +%FT%TZ)" > "$j/vex-valide.json"
   propre | dater '8 days ago' '8 days ago 1 hour ago' > "$j/vieux.json"
   propre | dater '1 hour' 'now' > "$j/futur.json"
   propre | dater 'now' '4 days ago' > "$j/base-vieille.json"

@@ -8,9 +8,13 @@ sources:
       # D4 du propriétaire (04/11/2026) : scan de 7 jours au plus, base construite 3 jours au plus avant lui
       scan_age_max_jours: 7
       base_age_max_jours: 3
+      # 07b, choix 5 du propriétaire (21/11/2026) : fixed retiré, un fixed écrit à la main exempterait une KEV sans preuve
       vex_statuts_acceptes:
         - not_affected
-        - fixed
+      # 07b, choix 3 (21/11/2026) : durée de validité d'un VEX, en jours, depuis l'horodatage de l'énoncé gagnant (remplacement :
+      # le plus récent qui nomme l'entrée, quel que soit son statut). 30 : choix du propriétaire du 21/11/2026 (recommandation du conseiller, jugement sans mesure). Sans la clé,
+      # aucune KEV n'est exemptée (échec fermé, test_seuil_vex_absent_refus)
+      vex_age_max_jours: 30
     config:
       include:
         - scan
