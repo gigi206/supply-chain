@@ -1,0 +1,72 @@
+# relevé de l'arrêt du rejeu un-trait-1 à « J8 (contrôleurs) », 2026-11-23T22:11:01Z, e3b2d4b1
+audit de l'API lu : 53618 lignes, de 2026-11-23T20:36:41.342401Z à 2026-11-23T22:11:02.148362Z
+## démarrages de kube-apiserver (pod statique de sc-confiance)
+courant : 2026-11-23T21:21:07Z ; précédent : 2026-11-23T21:21:06Z à 2026-11-23T21:21:06Z ; redémarrages : 1
+## 403 sur les Secrets, par les deux contrôleurs (filtre d'etape_controleurs, sans --as)
+{"t":"2026-11-23T21:21:09.219027Z","stage":"ResponseStarted","user":"tekton-pipelines-controller","verb":"watch","ns":"builds","raison":"Forbidden","autorisation":{"authorization.k8s.io/decision":"forbid","authorization.k8s.io/reason":"RBAC: [clusterrole.rbac.authorization.k8s.io \"system:service-account-issuer-discovery\" not found, clusterrole.rbac.authorization.k8s.io \"system:public-info-viewer\" not found, clusterrole.rbac.authorization.k8s.io \"tekton-pipelines-controller-cluster-access\" not found, clusterrole.rbac.authorization.k8s.io \"system:discovery\" not found, clusterrole.rbac.authorization.k8s.io \"system:basic-user\" not found]"}}
+{"t":"2026-11-23T21:21:09.219027Z","stage":"ResponseComplete","user":"tekton-pipelines-controller","verb":"watch","ns":"builds","raison":"Forbidden","autorisation":{"authorization.k8s.io/decision":"forbid","authorization.k8s.io/reason":"RBAC: [clusterrole.rbac.authorization.k8s.io \"system:service-account-issuer-discovery\" not found, clusterrole.rbac.authorization.k8s.io \"system:public-info-viewer\" not found, clusterrole.rbac.authorization.k8s.io \"tekton-pipelines-controller-cluster-access\" not found, clusterrole.rbac.authorization.k8s.io \"system:discovery\" not found, clusterrole.rbac.authorization.k8s.io \"system:basic-user\" not found]"}}
+## 403 de tout le cluster dans la fenêtre [démarrage - 30 s, démarrage + 120 s] (ResponseComplete, par utilisateur)
+     18 system:node:sc-confiance watch configmaps
+      7 system:node:sc-confiance watch secrets
+      4 system:node:sc-stockage watch secrets
+      4 system:node:sc-confiance get pods
+      4 system:node:sc-build watch secrets
+      4 system:kube-controller-manager watch configmaps
+      3 system:serviceaccount:kube-system:rke2-metrics-server watch configmaps
+      3 system:kube-scheduler watch configmaps
+      3 rke2-cloud-controller-manager watch configmaps
+      2 system:node:sc-stockage watch configmaps
+      2 system:node:sc-confiance list secrets
+      1 system:serviceaccount:tekton-pipelines:tekton-triggers-webhook watch configmaps
+      1 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets
+      1 system:serviceaccount:tekton-pipelines:tekton-triggers-controller watch configmaps
+      1 system:serviceaccount:tekton-pipelines:tekton-pipelines-controller watch secrets
+      1 system:serviceaccount:tekton-pipelines:tekton-pipelines-controller watch configmaps
+      1 system:serviceaccount:kyverno:kyverno-reports-controller watch configmaps
+      1 system:serviceaccount:kyverno:kyverno-cleanup-controller watch configmaps
+      1 system:serviceaccount:kyverno:kyverno-background-controller watch configmaps
+      1 system:serviceaccount:kyverno:kyverno-background-controller get null
+      1 system:serviceaccount:kyverno:kyverno-admission-controller watch configmaps
+      1 system:serviceaccount:kyverno:kyverno-admission-controller get null
+      1 system:serviceaccount:kube-system:rke2-metrics-server create subjectaccessreviews
+      1 system:serviceaccount:kube-system:rke2-coredns-rke2-coredns-autoscaler get configmaps
+      1 system:serviceaccount:kube-system:cilium-operator watch secrets
+      1 system:node:sc-confiance get persistentvolumeclaims
+      1 system:node:sc-build watch configmaps
+      1 system:node:sc-build get pods
+      1 system:kube-controller-manager watch secrets
+      1 system:kube-controller-manager watch certificatesigningrequests
+      1 system:admin create pods
+## étendue de la rafale : 403 des comptes system: et des comptes de service, de part et d'autre du démarrage (2026-11-23T21:21:07Z)
+403 dans ±300 s : 72, premier 2026-11-23T21:20:25.486029Z, dernier 2026-11-23T21:22:20.225650Z
+## première surveillance des Secrets de builds en 200 par le contrôleur de Pipelines après le refus
+2026-11-23T21:21:12.858406Z watch ResponseComplete
+2026-11-23T21:21:12.858406Z watch ResponseStarted
+2026-11-23T21:30:03.862052Z watch ResponseComplete
+## écritures sur les liaisons et rôles *-tenant-access (création de builds : 2026-11-23T20:47:00Z)
+2026-11-23T20:47:02.789433Z system:admin patch clusterroles -/tekton-pipelines-controller-tenant-access 201 dryRun=false
+2026-11-23T20:47:02.833444Z system:admin patch rolebindings builds/tekton-pipelines-controller-tenant-access 201 dryRun=false
+2026-11-23T20:47:24.204945Z system:admin patch clusterroles -/tekton-chains-controller-tenant-access 201 dryRun=false
+2026-11-23T20:47:24.218480Z system:admin patch rolebindings builds/tekton-chains-controller-tenant-access 201 dryRun=false
+2026-11-23T20:47:41.487414Z system:admin delete clusterrolebindings -/tekton-pipelines-controller-tenant-access 404 dryRun=false
+2026-11-23T20:47:41.492143Z system:admin delete clusterrolebindings -/tekton-chains-controller-tenant-access 404 dryRun=false
+## refus des droits dans les journaux des contrôleurs (refus_droits de preuves.sh ; watch écartés dans la minute du démarrage)
+tekton-pipelines-controller : 0
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.692Z cannot watch resource "pods" in API group "" in the namespace "builds": RBAC: [clusterrole.rbac.authorization.k8s.io "system:basic-user
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.735Z cannot watch resource "secrets" in API group "" in the namespace "builds": RBAC: [clusterrole.rbac.authorization.k8s.io "system:service
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.735Z cannot watch resource "limitranges" in API group "" in the namespace "builds": RBAC: [clusterrole.rbac.authorization.k8s.io "system:ser
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.738Z cannot watch resource "configmaps" in API group "" in the namespace "tekton-pipelines": RBAC: [clusterrole.rbac.authorization.k8s.io "s
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.856Z cannot watch resource "customruns" in API group "tekton.dev" in the namespace "builds": RBAC: [clusterrole.rbac.authorization.k8s.io "s
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.856Z cannot watch resource "pipelineruns" in API group "tekton.dev" in the namespace "builds": RBAC: [clusterrole.rbac.authorization.k8s.io 
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.856Z cannot watch resource "taskruns" in API group "tekton.dev" in the namespace "builds": RBAC: [clusterrole.rbac.authorization.k8s.io "sys
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.857Z cannot watch resource "verificationpolicies" in API group "tekton.dev" in the namespace "builds": RBAC: [clusterrole.rbac.authorization
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.858Z cannot watch resource "resolutionrequests" in API group "resolution.tekton.dev" in the namespace "builds": RBAC: [clusterrole.rbac.auth
+tekton-chains-controller : 0
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.726Z cannot watch resource "taskruns" in API group "tekton.dev" at the cluster scope: RBAC: [clusterrole.rbac.authorization.k8s.io "system:d
+  écarté : CONSTAT  écarté, kube-apiserver démarrant : 2026-11-23T21:21:09.764Z cannot watch resource "pipelineruns" in API group "tekton.dev" at the cluster scope: RBAC: [clusterrole.rbac.authorization.k8s.io "syst
+## restes de l'étape interrompue
+espace preuve-controleurs : 0 (1 = présent)
+liaisons de tout le cluster vers les deux contrôleurs (ClusterRoleBinding) :
+  tekton-chains-controller-cluster-access → ClusterRole/tekton-chains-controller-cluster-access
+  tekton-pipelines-controller-cluster-access → ClusterRole/tekton-pipelines-controller-cluster-access
+# fin 2026-11-23T22:11:08Z

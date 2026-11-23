@@ -1,46 +1,46 @@
-# prefetch.sh prefetch, 2026-11-23T15:58:48Z
+# prefetch.sh prefetch, 2026-11-23T21:38:31Z
 ## f2-prefetch-1 créé (commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git)
 ### TaskRun f2-prefetch-1-prefetch (Succeeded), pod f2-prefetch-1-prefetch-pod sur sc-build, tekton.dev/task prefetch-gomod
-     2026/11/23 15:58:54 Entrypoint initialization
-     2026/11/23 15:58:55 Decoded script /tekton/scripts/script-0-d2crm
+     2026/11/23 21:38:37 Entrypoint initialization
+     2026/11/23 21:38:38 Decoded script /tekton/scripts/script-0-9znzg
      hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f
-     2026-11-23 15:58:59,602 INFO Fetching the gomod dependencies at subpath .
-     2026-11-23 15:58:59,610 INFO Using registry proxy https://proxy.golang.org for registry dependencies
-     2026-11-23 15:58:59,890 INFO All dependencies fetched successfully \o/
+     2026-11-23 21:38:42,557 INFO Fetching the gomod dependencies at subpath .
+     2026-11-23 21:38:42,564 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-23 21:38:42,812 INFO All dependencies fetched successfully \o/
      fermeture : 6 fichiers, 172 Kio
 ### TaskRun f2-prefetch-1-publier (Succeeded), pod f2-prefetch-1-publier-pod sur sc-build, tekton.dev/task publier-fermeture
-     2026/11/23 15:59:02 Decoded script /tekton/scripts/script-0-zkl6s
-     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd (7 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : ec81ca537c8297e0762fcdebd439db8aa8d80c7d9dbe6e55cb1e399808b59d35
-     2026/11/23 15:59:01 Entrypoint initialization
+     2026/11/23 21:38:44 Entrypoint initialization
+     2026/11/23 21:38:45 Decoded script /tekton/scripts/script-0-sn9fv
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd (7 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : aaa93bf309b3f3127ebc0cd080432690862736e17a1181c04656c1ba41968ff1
 OK   PipelineRun f2-prefetch-1 : True|Succeeded
 fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
 OK   PipelineRun f2-prefetch-1 signé par Chains : true
 Hubble, pod de prefetch f2-prefetch-1-prefetch-pod (IP relevée dans le TaskRun) :
-          28 FORWARDED 10.42.2.33:53 
-          20 FORWARDED 10.42.0.203:53 
+          24 FORWARDED 10.42.2.100:53 
+          24 FORWARDED 10.42.0.192:53 
           15 FORWARDED 192.168.161.13:3000 
-           6 FORWARDED 172.217.20.49:443 
+           6 FORWARDED 142.251.39.113:443 
 ## f2-prefetch-2 créé (commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git)
 ### TaskRun f2-prefetch-2-prefetch (Succeeded), pod f2-prefetch-2-prefetch-pod sur sc-build, tekton.dev/task prefetch-gomod
-     2026/11/23 15:59:23 Entrypoint initialization
-     2026/11/23 15:59:24 Decoded script /tekton/scripts/script-0-bscfl
+     2026/11/23 21:39:08 Entrypoint initialization
+     2026/11/23 21:39:09 Decoded script /tekton/scripts/script-0-l9lxm
      hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f
-     2026-11-23 15:59:28,738 INFO Fetching the gomod dependencies at subpath .
-     2026-11-23 15:59:28,746 INFO Using registry proxy https://proxy.golang.org for registry dependencies
-     2026-11-23 15:59:29,046 INFO All dependencies fetched successfully \o/
+     2026-11-23 21:39:13,648 INFO Fetching the gomod dependencies at subpath .
+     2026-11-23 21:39:13,654 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-23 21:39:13,916 INFO All dependencies fetched successfully \o/
      fermeture : 6 fichiers, 172 Kio
 ### TaskRun f2-prefetch-2-publier (Succeeded), pod f2-prefetch-2-publier-pod sur sc-build, tekton.dev/task publier-fermeture
-     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd (7 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : e3828add0b24a15050eeef777422bba079d77bf032cb62aa8bb40d4f5542d2ab
-     2026/11/23 15:59:30 Entrypoint initialization
-     2026/11/23 15:59:31 Decoded script /tekton/scripts/script-0-wfx8h
+     2026/11/23 21:39:15 Entrypoint initialization
+     2026/11/23 21:39:16 Decoded script /tekton/scripts/script-0-nhstd
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd (7 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : b17902dfaf65e0f7e0e41401db40e6bff463eb94641f6fe2f76cea8dcb701bba
 OK   PipelineRun f2-prefetch-2 : True|Succeeded
 fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
 OK   PipelineRun f2-prefetch-2 signé par Chains : true
 Hubble, pod de prefetch f2-prefetch-2-prefetch-pod (IP relevée dans le TaskRun) :
-          28 FORWARDED 10.42.0.203:53 
-          20 FORWARDED 10.42.2.33:53 
-          12 FORWARDED 192.168.161.13:3000 
-           6 FORWARDED 172.217.20.49:443 
+          34 FORWARDED 10.42.2.100:53 
+          14 FORWARDED 192.168.161.13:3000 
+          14 FORWARDED 10.42.0.192:53 
+           6 FORWARDED 142.251.39.113:443 
 ## comparaisons
 fermeture 1 : 7 fichiers, contenu 35b42fa951d251ee1eab32866a5a805142704897a6519990fcfc0a5f2e2a49bd
 fermeture 2 : 7 fichiers, contenu 35b42fa951d251ee1eab32866a5a805142704897a6519990fcfc0a5f2e2a49bd
@@ -52,4 +52,4 @@ fermeture de l'hôte (sha256:0ab5a507…) : 8 fichiers, contenu 1852dbbd7863300e
      7a8
      > 9144f0e2a4cea7837a698aaf84291cb89a796ef2495b28cb339c90ae78c48751  ./deps/npm/marked-16.4.1.tgz
 OK   deux prefetch du même commit : même fermeture
-# fin 2026-11-23T15:59:44Z
+# fin 2026-11-23T21:39:27Z

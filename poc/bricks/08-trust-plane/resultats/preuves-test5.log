@@ -1,5 +1,5 @@
-# preuves.sh test5, 2026-11-23T16:09:02Z
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : c67956ac-64ad-448f-8afc-1450f73ce112 (2026-11-23T16:01:35Z)
+# preuves.sh test5, 2026-11-23T21:48:46Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 5017b95b-0647-4213-84b1-377d2558ed87 (2026-11-23T21:41:20Z)
 ## prédiction (écrite le 30/10/2026, avant le premier passage)
 - l'EventListener répond HTTP 202 à chaque livraison, avant les intercepteurs : l'émetteur n'apprend rien du refus
 - commit 1111111111111111111111111111111111111111 : livraison non signée, signée avec un autre secret, et corps modifié sous la signature valide d'un
@@ -7,40 +7,40 @@ builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e71
   fois « payload signature check failed ») ; aucun PipelineRun. L'EventListener ne journalise ces refus qu'au niveau debug
   (« interceptor stopped trigger processing », pkg/sink/sink.go de Triggers v0.37.2), absent au niveau info en service : leur
   trace est le journal des intercepteurs, pas celui de l'EventListener
-- témoin : livraison valide du commit a4bc9251b5f0e3e6a41ef43e5c1a207a6b433a81 (propre à ce passage) : PipelineRun sample-app-<commit> créé par
+- témoin : livraison valide du commit f9f25d46daef9c8e9b073fb5a16a422bd5f77872 (propre à ce passage) : PipelineRun sample-app-<commit> créé par
   l'EventListener, terminé, signé par Chains (TaskRun et PipelineRun)
 - rejeu à l'identique du témoin (même corps, même signature), et nouvelle livraison de Forgejo pour la tête de main (6391fd437f26696847041be3226bbbf633f55a2f,
   dont le PipelineRun existe) : acceptés par les intercepteurs, puis refusés à la création (« already exists » dans le journal
   de l'EventListener, avec l'eventID de la livraison rejouée) ; un seul PipelineRun par commit
 - limite connue, non éprouvée ici : l'anti-rejeu dure tant que le PipelineRun existe (J4)
 ## livraisons refusées (commit 1111111111111111111111111111111111111111)
-non signée : HTTP 202 {"eventID":"e4d0d07a-f661-45d5-a7dc-f8e6e8f5f24b"}
-autre secret : HTTP 202 {"eventID":"86980e87-6677-4ef2-a400-e3dcf9cc83cc"}
-corps modifié (signature valide du corps du témoin) : HTTP 202 {"eventID":"b8e42ce1-ee36-4e0c-b024-94fd7fe7ccb1"}
-## témoin : livraison valide (commit a4bc9251b5f0e3e6a41ef43e5c1a207a6b433a81)
-valide : HTTP 202 {"eventID":"97c25e49-8dd8-44eb-9f25-d3b6f88a8c2c"}
-OK   TaskRun sample-app-a4bc9251b5f0e3e6a41ef43e5c1a207a6b433a81-publier créé par ce PipelineRun (propriétaire 8eab2360-29aa-4373-98f7-b52e3caaaf99)
-OK   PipelineRun sample-app-a4bc9251b5f0e3e6a41ef43e5c1a207a6b433a81 créé par l'EventListener, Succeeded
-OK   taskrun/sample-app-a4bc9251b5f0e3e6a41ef43e5c1a207a6b433a81-publier signé par Chains
-OK   pipelinerun/sample-app-a4bc9251b5f0e3e6a41ef43e5c1a207a6b433a81 signé par Chains
+non signée : HTTP 202 {"eventID":"e89007d6-eb05-4126-82a8-bcb39bb1ca6d"}
+autre secret : HTTP 202 {"eventID":"78ba309a-3ac8-48f7-b5fa-7016b75e4e38"}
+corps modifié (signature valide du corps du témoin) : HTTP 202 {"eventID":"8dc6a801-03ad-4857-ac2a-3e64f115baec"}
+## témoin : livraison valide (commit f9f25d46daef9c8e9b073fb5a16a422bd5f77872)
+valide : HTTP 202 {"eventID":"14e3f81d-a733-4f63-a7c4-49530018aa8e"}
+OK   TaskRun sample-app-f9f25d46daef9c8e9b073fb5a16a422bd5f77872-publier créé par ce PipelineRun (propriétaire 321be8ff-15b2-446d-9e61-01b9eba25de6)
+OK   PipelineRun sample-app-f9f25d46daef9c8e9b073fb5a16a422bd5f77872 créé par l'EventListener, Succeeded
+OK   taskrun/sample-app-f9f25d46daef9c8e9b073fb5a16a422bd5f77872-publier signé par Chains
+OK   pipelinerun/sample-app-f9f25d46daef9c8e9b073fb5a16a422bd5f77872 signé par Chains
 ## rejeux
-rejeu à l'identique du témoin : HTTP 202 {"eventID":"ec797d97-5560-421f-95f4-0ebaa8f21d5f"}
+rejeu à l'identique du témoin : HTTP 202 {"eventID":"b3d4de88-0730-44fd-ae1e-4509191386c3"}
 Forgejo, nouvelle livraison pour la tête de main : HTTP 204
 ## bilan (PipelineRuns par commit)
-commit 1111111111111111111111111111111111111111 : 0 ; témoin a4bc9251b5f0e3e6a41ef43e5c1a207a6b433a81 : 1 ; tête de main 6391fd437f26696847041be3226bbbf633f55a2f : 1
+commit 1111111111111111111111111111111111111111 : 0 ; témoin f9f25d46daef9c8e9b073fb5a16a422bd5f77872 : 1 ; tête de main 6391fd437f26696847041be3226bbbf633f55a2f : 1
 OK   livraisons non signée, d'un autre secret, à corps modifié : aucun PipelineRun
 OK   rejeux sans effet : un seul PipelineRun par commit
-## trace : refus des intercepteurs (service tekton-triggers-core-interceptors) depuis 2026-11-23T16:09:02Z
-{"t":"16:09:03","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
-{"t":"16:09:03","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
-{"t":"16:09:03","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+## trace : refus des intercepteurs (service tekton-triggers-core-interceptors) depuis 2026-11-23T21:48:46Z
+{"t":"21:48:47","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"21:48:47","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"21:48:47","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
 OK   livraison non signée refusée par l'intercepteur github
 OK   autre secret et corps modifié refusés par l'intercepteur github
 OK   3 refus des intercepteurs, aucun autre (rejeux acceptés par les intercepteurs)
-## trace : EventListener, créations refusées (already exists) depuis 2026-11-23T16:09:02Z
-{"t":"16:09:19","eventID":"ec797d97-5560-421f-95f4-0ebaa8f21d5f","erreur":"pipelineruns.tekton.dev \"sample-app-a4bc9251b5f0e3e6a41ef43e5c1a207a6b433a81\" already exists"}
-{"t":"16:09:19","eventID":"ae3f69b3-ad86-4fb9-9d08-6cb13ceb75bb","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
-OK   rejeu du témoin (eventID ec797d97-5560-421f-95f4-0ebaa8f21d5f) : PipelineRun sample-app-a4bc9251b5f0e3e6a41ef43e5c1a207a6b433a81 déjà présent
+## trace : EventListener, créations refusées (already exists) depuis 2026-11-23T21:48:46Z
+{"t":"21:49:06","eventID":"b3d4de88-0730-44fd-ae1e-4509191386c3","erreur":"pipelineruns.tekton.dev \"sample-app-f9f25d46daef9c8e9b073fb5a16a422bd5f77872\" already exists"}
+{"t":"21:49:07","eventID":"8333f73a-e928-485c-ba3a-d8bf490a1ff6","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+OK   rejeu du témoin (eventID b3d4de88-0730-44fd-ae1e-4509191386c3) : PipelineRun sample-app-f9f25d46daef9c8e9b073fb5a16a422bd5f77872 déjà présent
 OK   nouvelle livraison de Forgejo : PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f déjà présent
 OK   EventListener : aucune ligne « interceptor stopped trigger processing » (niveau debug, non journalisé en service)
-OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : c67956ac-64ad-448f-8afc-1450f73ce112 (2026-11-23T16:01:35Z)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 5017b95b-0647-4213-84b1-377d2558ed87 (2026-11-23T21:41:20Z)

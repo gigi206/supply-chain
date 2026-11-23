@@ -1,4 +1,4 @@
-# openbao.sh initialiser, 2026-11-23T15:14:36Z
+# openbao.sh initialiser, 2026-11-23T20:44:00Z
 état : {"initialized":false,"sealed":true}
 initialisé : 1 part, seuil 1 ; 1 clé de descellement et jeton root en 0600 sur l'hôte
 {"sealed":false,"t":1,"n":1,"progress":0}
@@ -7,6 +7,6 @@ initialisé : 1 part, seuil 1 ; 1 clé de descellement et jeton root en 0600 sur
 {"chemin":"sortie/","type":"file","fichier":"stdout"}
 OK   audit actif avant la configuration
 total 68
--rw-------    1 openbao  openbao       9383 Nov 23 15:14 audit.log
-drwx------    3 openbao  openbao       4096 Nov 23 15:14 raft
--rw-------    1 openbao  openbao   16801792 Nov 23 15:14 vault.db
+-rw-------    1 openbao  openbao       9386 Nov 23 20:44 audit.log
+drwx------    3 openbao  openbao       4096 Nov 23 20:43 raft
+-rw-------    1 openbao  openbao   16801792 Nov 23 20:44 vault.db

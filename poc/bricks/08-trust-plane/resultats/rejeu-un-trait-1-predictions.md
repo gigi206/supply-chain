@@ -40,3 +40,29 @@ Journal : [`rejeu-un-trait-1.log`](rejeu-un-trait-1.log). `TAG_05=m5b-3` est neu
 **Conséquences attendues** : toutes les clés de la plateforme sont neuves (Chains, scanner, TSA, VEX) ; `vex-cle-publique.pem` est à relire et à commiter ; les états posés à la main après `plateforme-1` (l'export Hubble posé à la main le 20/11 n'est pas dans `rejeu.sh`, qui ne nomme Hubble qu'en commentaire ; son état depuis `plateforme-1` n'est pas relevé) sont perdus. Un arrêt se reprend par `DEPUIS=<étape>` sous un `TAG_05` neuf si l'arrêt est dans le bloc 05 ou avant.
 
 **Résultat** : à écrire après la fin, sous ce titre, sans réécrire la prédiction.
+
+## Résultat : arrêt à « J8 (contrôleurs) » (note de 2026-11-23T22:11:46Z)
+
+[Journal](rejeu-un-trait-1.log) : lancé à 20:35:05 UTC, **arrêt à 22:07:01 UTC (code 1)** dans « J8 (contrôleurs) », après « J8 (tests) » (802 s), « J8 (bascule) » (265 s) et « J8 (helm-cilium) » (21 s). Un seul KO : « lectures de Secrets hors de builds ou refusées (403), par l'un ou l'autre : 2 (attendu : 0) ».
+
+| # | Résultat |
+|---|---|
+| U1 | **tenue** : copies de la 05 et de la 06 relues, contrôles tenus ; démontage en 6 s |
+| U2 | **non tenue** : arrêt à « J8 (contrôleurs) » ; toutes les étapes d'avant passent (démontage, VM, RKE2, Cilium, J2 à J7, J8 tests, bascule, helm-cilium) |
+| U3 à U13 | non atteintes |
+
+**Cause, mesurée en lecture seule** ([relevé](rejeu-un-trait-1-audit-403.log), script [`rejeu-un-trait-1-audit-403.sh`](rejeu-un-trait-1-audit-403.sh), de 22:11:01 à 22:11:08 UTC) :
+- les 2 lignes sont **un seul watch** des Secrets de `builds` par le contrôleur de Pipelines (étapes `ResponseStarted` et `ResponseComplete`), refusé à **21:21:09.219Z**, **2 s après le démarrage de kube-apiserver** (21:21:07Z), redémarré par J7 (pose de la configuration de Kata sur sc-confiance et redémarrage du serveur RKE2) ; raison : RBAC, le compte n'avait plus que les rôles de base ;
+- le même watch repasse en 200 à **21:21:12.858Z** (3,6 s après) ;
+- **rafale de 72 refus 403** des comptes `system:` et des comptes de service de 21:20:25 à 21:22:20 UTC (nœuds, `kube-controller-manager`, `kube-scheduler`, Triggers, Kyverno, Cilium) : les caches d'autorisation du serveur d'API ne sont pas encore chargés ;
+- **aucune écriture** sur les liaisons et rôles `*-tenant-access` après leur pose (20:47:02 à 20:47:41 UTC) ;
+- `refus_droits` (journaux des contrôleurs) écarte déjà ces refus depuis le 06/11 (« dans la minute qui suit son démarrage (kata.sh exemption) ») : 0 refus réel, 9 et 2 watch écartés à 21:21:09 ;
+- aucun reste de l'étape interrompue (espace `preuve-controleurs` absent).
+
+**Défaut du contrôle, pas des droits** : le contrôle de l'audit compte les 403 « depuis l'installation » sans l'exception que `refus_droits` applique aux journaux. `plateforme-1` a passé le même redémarrage sans ce refus : c'est une course. Seul ce contrôle est concerné : celui des résolveurs (`preuves.sh`, l. 2765) ne compte que les lectures hors de `builds` ; `essais-h5-controleurs.sh` (08c) n'est pas dans le rejeu.
+
+## Correction du contrôle : prédiction (date -u de 22:11:46 UTC, le 2026-11-23, avant l'écriture)
+
+**Correction** (`preuves.sh`, `etape_controleurs`) : le jugement passe dans une fonction `secrets_ctrl_juge` (fichier d'audit, démarrages de kube-apiserver). Un **watch** refusé (403) **dans `builds`**, dans les **60 s** qui suivent un démarrage de kube-apiserver (démarrage courant et précédent du conteneur du pod statique, sous RKE2 seulement ; même fenêtre que `refus_droits`), est écarté et affiché (`CONSTAT`). Tout autre 403, et toute lecture hors de `builds`, comptent comme avant. Témoin ajouté : après chaque watch écarté, une lecture en 200 du même compte dans `builds`.
+
+**Banc hors ligne** (lignes d'audit témoins, fonction lue dans `preuves.sh`) : (1) watch 403 dans `builds` 2 s après un démarrage, suivi d'un 200 : écarté, KO 0, témoin vrai ; (2) le même à 61 s : compté, KO 1 ; (3) un `get` 403 dans `builds` dans la fenêtre : compté (seuls les watch) ; (4) un watch 403 hors de `builds` dans la fenêtre : compté ; (5) une lecture 200 hors de `builds` : comptée ; (6) watch écarté sans 200 après : témoin faux ; (7) aucun démarrage connu (`[]`, k3s) : le cas 1 compte ; (8) les vraies lignes d'audit du rejeu, relevées sur sc-confiance : KO 0, témoin vrai, 2 lignes écartées. **Bilan attendu : 0 écart.**
