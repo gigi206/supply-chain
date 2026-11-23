@@ -1912,3 +1912,34 @@ Le dépôt et sc-stockage sont de nouveau alignés pour `zot.json`. Aucune écri
 **Conséquence** : la pièce 5 peut passer avant la 6 et la 7. Entre les deux, une KEV écartée par un VEX reste refusée par la porte (échec fermé, comme sans VEX) et comptée dans `scan_entrees_kev`. C'est sans effet avant le premier VEX (pièce 8). Hors mesure : la valeur de `scan_entrees_kev` n'est pas lue proprement dans le journal (découpage du script, sans effet sur les contrôles d'égalité) ; `entrees-scan.py` installé sur sc-stockage n'est pas comparé à HEAD (lecture sur la VM, non faite).
 
 **Heures** : de 13:26:19 UTC à 13:31:37 UTC, dans l'enveloppe de la 07b.
+
+## Pièce 5 à sec : prédiction (date -u de 13:41:13 UTC, le 2026-11-23, avant le lancement ; ordre relu par le conseiller)
+
+**Ordre** : la pose de la pièce 5 attend `releve_24` (24/11, après 09:33 UTC), qui exige des préfixes de journal égaux au 23/11 : un `scanner.sh` neuf ajoute la ligne `VEX|` et rendrait ce relevé KO par construction. C'est une précaution de session, pas une règle du propriétaire. Ce qui se prépare avant : cette étape à sec, puis un pod d'essai sans publication, après la fin du balayage de démarrage de Zot.
+
+**Mesure** : [`piece5-scanner.sh`](../piece5-scanner.sh) `sec`. Copie de HEAD (`git archive`) hors du dépôt, patch `07b-t3` appliqué, `OUTILS_SCAN_DIGEST` = `b799feda…`. Les deux CronJob sont rendus par le code même de la pose (`g7_periodique` avec `G7_SEC=1` ; `rendre_deb` et `cronjob_deb` de `s6a.sh`), puis comparés au service par dry-run serveur et `kubectl diff --server-side`. `scan-config` est rendue par le texte de `cm_scan`. Rien n'est écrit dans le cluster, dans Zot ni sur la VM. La pose n'appellera que `cm_scan` et l'application des deux CronJob, jamais `etape_g2_image`.
+
+**Prédiction** :
+- le patch s'applique à la copie ; `scan-job.yaml` et `cm_scan` sont ceux de HEAD ;
+- dans chaque CronJob, les conteneurs passés sur `b799feda` sont exactement ceux qui sont aujourd'hui sur `7eb4f26e` (`analyser`, `attester`, `publier`) ; spec du dry-run, image ramenée, égale à la spec en service ; `kubectl diff` ne change que des lignes `image:` ;
+- `scan-config` : mêmes clés (`ca-poc.crt`, `scanner.pub`, `scanner.sh`, `vex.pub`), seule `scanner.sh` change ; celle du service est celle de HEAD.
+- Confiance moyenne : le rendu du deb par `eval` des fonctions de `s6a.sh` n'a jamais servi, et une dérive entre le rendu et le service (passages de la 08c, par exemple) n'a pas été relue depuis le 21/11.
+
+## Pièce 5 à sec : résultat (note de 2026-11-23T13:41:40Z)
+
+[`piece5-scanner.sh`](../piece5-scanner.sh) `sec`, de 13:41:13 à 13:41:15 UTC : **tenue**, 22 OK, 0 KO ([journal](piece5-scanner-sec.log)). La prédiction tient en entier. Dossiers de travail effacés.
+
+| Objet | Ce que la pose changera (mesuré par dry-run serveur et `kubectl diff --server-side`) |
+|---|---|
+| CronJob `scan-sample-app` | `image:` de `analyser`, `attester` et `publier`, de `7eb4f26e…` à `b799feda…` ; rien d'autre dans la spec |
+| CronJob `scan-sample-app-deb` | les mêmes trois lignes ; rien d'autre (limites de `revocation` relues dans `limites.tsv` : inchangées) |
+| ConfigMap `scan-config` | la clé `scanner.sh` seule (`88e7bfe8…`, celle de HEAD, vers `7251df15…`, celle du patch) ; `ca-poc.crt`, `scanner.pub` et `vex.pub` inchangées |
+
+**À retenir pour la pose** :
+- `g7_periodique` rend le CronJob de l'image, mais il lance aussi un Job manuel qui publie dans `builds/scan/**`. La pose appliquera donc le CronJob rendu directement (`kubectl apply --server-side`), sans passer par cette étape.
+- Le dry-run de `g7_periodique` (`kubectl apply --dry-run=server`, sans `--server-side`) affiche un avertissement sur l'annotation `last-applied-configuration` absente. Rien n'est écrit en dry-run ; la pose utilisera `--server-side`, comme `g7_periodique` et `s6a.sh periodique` en vrai.
+- Le patch doit être appliqué au dépôt (`scanner.sh`, et `OUTILS_SCAN_DIGEST` de `plateforme.sh`) avant la pose, puis régénéré sans ces deux fichiers.
+
+**Reste avant la pose** : le pod d'essai (`source` et `analyser` seuls, image par digest, `scanner.sh` du patch dans une ConfigMap au nom distinct, rien publié), après la fin du balayage de démarrage de Zot ; puis `releve_24`.
+
+**Heures** : de 13:39:45 UTC à 13:41:40 UTC, dans l'enveloppe de la 07b.

@@ -1,0 +1,59 @@
+# piece5-scanner.sh sec, 2026-11-23T13:41:13Z ; HEAD fe13b93f37bd
+## copie de HEAD, patch appliqué
+OK   patch 07b-t3 appliqué à la copie (b5a5e8d85760855c)
+OK   scanner.sh de la copie = scanner.sh du patch, mode vex présent : 1
+OK   OUTILS_SCAN_DIGEST de la copie : sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+OK   copie : scan-job.yaml = HEAD (le patch n'y touche pas) : c5fe17fc974a6c2a
+## CronJob scan-sample-app : rendu par g7_periodique (G7_SEC=1 : dry-run serveur seul)
+OK   journal de plateforme.sh de la copie hors de resultats/ : 1
+  # plateforme.sh g7_periodique, 2026-11-23T13:41:13Z
+  Warning: resource cronjobs/scan-sample-app is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+  cronjob.batch/scan-sample-app configured (server dry run)
+  # fin 2026-11-23T13:41:14Z, code 0
+OK   g7_periodique (G7_SEC=1), code : 0
+## CronJob scan-sample-app-deb : rendu par rendre_deb et cronjob_deb de s6a.sh (copie)
+OK   constantes du deb relues dans s6a.sh : 3
+  limites de revocation (limites.tsv) : requêtes 10m et 32Mi, limites 500m et 256Mi
+## comparaison au service : dry-run serveur, image d'outils ramenée à l'ancienne
+OK   scan-sample-app : conteneurs passés sur l'image neuve (rendu) : analyser,attester,publier
+OK   scan-sample-app : plus aucun conteneur sur l'ancienne image (rendu) : 0
+OK   scan-sample-app : spec du dry-run, image ramenée = spec en service
+  kubectl diff --server-side scan-sample-app : code 1 ; lignes changées (hors en-têtes et generation) :
+    -            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+    +            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+    -            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+    +            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+    -            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+    +            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+OK   scan-sample-app : lignes changées par kubectl diff, hors generation, toutes des lignes image : 0
+OK   scan-sample-app-deb : conteneurs passés sur l'image neuve (rendu) : analyser,attester,publier
+OK   scan-sample-app-deb : plus aucun conteneur sur l'ancienne image (rendu) : 0
+OK   scan-sample-app-deb : spec du dry-run, image ramenée = spec en service
+  kubectl diff --server-side scan-sample-app-deb : code 1 ; lignes changées (hors en-têtes et generation) :
+    -            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+    +            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+    -            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+    +            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+    -            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+    +            image: sc-stockage.poc.test:5000/plateforme/outils-scan@sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+OK   scan-sample-app-deb : lignes changées par kubectl diff, hors generation, toutes des lignes image : 0
+## scan-config : texte de cm_scan de la copie, apply remplacé par diff
+OK   cm_scan de la copie = cm_scan de HEAD (le patch n'y touche pas) : bc7d3417e7cf1ce7
+OK   cm_scan : une seule substitution apply -> cat (rendu seul) : 1/0
+OK   rendu de scan-config, code : 0
+  service : ca-poc.crt 35d99c165852251b
+  service : scanner.pub ff39a16d2e9e412e
+  service : scanner.sh 88e7bfe80df12ae4
+  service : vex.pub 79f7eece2f98f442
+  rendu   : ca-poc.crt 35d99c165852251b
+  rendu   : scanner.pub ff39a16d2e9e412e
+  rendu   : scanner.sh 7251df1567c1cfdd
+  rendu   : vex.pub 79f7eece2f98f442
+OK   scan-config : clés présentes, service et rendu : ca-poc.crt,scanner.pub,scanner.sh,vex.pub
+OK   scan-config : clés dont le contenu change : scanner.sh
+OK   scan-config : scanner.sh rendu = scanner.sh du patch : 7251df1567c1cfdd
+  kubectl diff --server-side scan-config : code 1, 56 lignes changées
+  empreintes de scanner.sh : service 88e7bfe80df12ae4, HEAD 88e7bfe80df12ae4, patch 7251df1567c1cfdd
+OK   scan-config en service : scanner.sh = HEAD : 88e7bfe80df12ae4
+# fin 2026-11-23T13:41:15Z
+bilan : tenue
