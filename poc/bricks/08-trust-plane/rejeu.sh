@@ -168,6 +168,13 @@ plateforme() { mise exec -- "$here/../07a-sbom-grype/plateforme.sh" "$@"; }
 etape "07a (G1)" plateforme g1_oras g1_droits g1_base g1_essai g1_grafana
 etape "07a (G2)" plateforme g2_image
 etape "07a (G3)" plateforme g3_cluster g3_openbao g3_essais g3_cosign g3_grafana
+# Additif du 23/11/2026 (07b, intégration au rejeu ; choix du propriétaire « Automatique au rejeu ») : clé Transit vex, politique
+# vex-signature et accès userpass du propriétaire dans l'OpenBao recréé ; vex-cle-publique.pem réécrite (à relire et commiter),
+# prise par cm_scan dès G4 et par s6a.sh periodique. Compte poc-vex : J2 (stockage.sh, ligne htpasswd du cache de la 07a).
+vex07b() { env REJEU="$lib" MDP_FICHIER="$HOME/.cache/supply-chain-poc/07a/secrets/openbao-proprietaire.password" \
+  "$here/../07a-sbom-grype/vex-openbao.sh" "$1" | tail -n 3; }
+etape "07b (clé VEX)" vex07b cle_vex
+etape "07b (accès VEX)" vex07b acces_vex
 etape "07a (G4)" plateforme g4_scan g4_verifier g4_grafana
 etape "07a (passage périodique)" plateforme g7_periodique g7_grafana
 # Additif du 05/11/2026 : G8, à sec, PAS ENCORE REJOUÉ. Les règles sont déployées en O3, avant le scan : ScanEnRetard et BaseGrypeVieillie

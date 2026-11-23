@@ -494,13 +494,13 @@ etape_g2_image() {
   tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -cf "$T/couche.tar" -C "$T/racine" usr
   echo "couche : $(sha256sum < "$T/couche.tar" | cut -c1-64), $(stat -c %s "$T/couche.tar") octets"
   d1=$(DOCKER_CONFIG=$T/docker SSL_CERT_FILE=$P/ca-poc.crt crane append -b "$REG_HOTE/$COSIGN_BASE" -f "$T/couche.tar" \
-    -t "$REG_HOTE/$OUTILS_SCAN:grype-0.104.1-syft-1.38.0" 2>/dev/null)
+    -t "$REG_HOTE/$OUTILS_SCAN:grype-0.104.1-syft-1.38.0-vex" 2>/dev/null)
   echo "image d'outils du scanner : $d1"
   d2=$(DOCKER_CONFIG=$T/docker SSL_CERT_FILE=$P/ca-poc.crt crane append -b "$REG_HOTE/$COSIGN_BASE" -f "$T/couche.tar" \
-    -t "$REG_HOTE/$OUTILS_SCAN:grype-0.104.1-syft-1.38.0" 2>/dev/null)
+    -t "$REG_HOTE/$OUTILS_SCAN:grype-0.104.1-syft-1.38.0-vex" 2>/dev/null)
   attendu "second assemblage (même digest)" "${d2##*@}" "${d1##*@}"
-  attendu "digest épinglé (G2 du 04/11/2026)" "${d1##*@}" "$OUTILS_SCAN_DIGEST"
-  attendu "relue en lecture anonyme" "$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$OUTILS_SCAN:grype-0.104.1-syft-1.38.0")" "${d1##*@}"
+  attendu "digest épinglé (G2 du 04/11/2026 ; 07b, pièce 3, tag -vex, 23/11/2026)" "${d1##*@}" "$OUTILS_SCAN_DIGEST"
+  attendu "relue en lecture anonyme" "$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$OUTILS_SCAN:grype-0.104.1-syft-1.38.0-vex")" "${d1##*@}"
   rm -rf -- "${T:?}"
   return $ko
 }

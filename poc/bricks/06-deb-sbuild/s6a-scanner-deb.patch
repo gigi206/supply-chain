@@ -1,6 +1,5 @@
-diff -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/07a-sbom-grype/politique/scanner.sh
---- a/poc/bricks/07a-sbom-grype/politique/scanner.sh
-+++ b/poc/bricks/07a-sbom-grype/politique/scanner.sh
+--- a/poc/bricks/07a-sbom-grype/politique/scanner.sh	2026-11-23 15:55:30.148547631 +0100
++++ b/poc/bricks/07a-sbom-grype/politique/scanner.sh	2026-11-23 15:55:15.601616722 +0100
 @@ -4,6 +4,11 @@
  #   analyser    (outils-scan) base la plus récente de vulndb/grype, résolue en digest et vérifiée par son empreinte, importée
  #               hors de tout service Anchore ; image lue par digest ; SBOM de l'image et de la source fusionnés ; scan ; prédicat.
@@ -10,10 +9,10 @@ diff -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/07a-sbom
 +#               layout du deb (une couche tar qui contient le .deb seul), data.tar extrait par busybox (ar, unxz ou gunzip, tar),
 +#               syft dir: sur le contenu extrait. Dans les deux cas, plancher : au moins une PURL versionnée dans le SBOM de
 +#               l'artefact seul, sans quoi refus (relevé 1 de S6a : un artefact vide passe sans erreur, et la fusion le masque).
- #   jetons      (openbao) rôle scan-zot : identifiants de poc-scan lus, jeton révoqué ; puis rôle scanner : jeton de 5 min, pris
- #               juste avant la signature (D9 a), après le scan
- #   attester    (outils-scan) cosign attest-blob --key hashivault://scanner, sans service Sigstore, sujet = digest de l'image ;
-@@ -44,6 +49,44 @@
+ #   vex         (outils-scan) la lecture des VEX d'analyser seule, pour le banc de la 07b (tranche 3). Choix 1, 2 et 5 du propriétaire
+ #               (21/11/2026) : VEX attestés sur le digest scanné, clé VEX distincte de celle du scanner ($CLE_VEX), lus dans
+ #               builds/vex/<nom> en anonyme ; énoncé et sujet revérifiés par scan-outil vex ; seul not_affected avec justification et
+@@ -50,6 +55,44 @@
    rm -rf depot .gitconfig
  }
  
@@ -55,10 +54,10 @@ diff -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/07a-sbom
 +  echo "ARTEFACT|${NATURE:-image}, $n PURL versionnées dans l'artefact seul"
 +}
 +
- analyser() {
-   debut=$(date +%s)
-   export GRYPE_DB_CACHE_DIR=$TRAVAIL/dbcache GRYPE_DB_AUTO_UPDATE=false GRYPE_DB_VALIDATE_AGE=false GRYPE_CHECK_FOR_APP_UPDATE=false \
-@@ -65,9 +108,7 @@
+ lire_vex() { # VEX attestés sur $IMAGE par la clé VEX : documents recevables dans vex/, résumé dans vex-retenus.json
+   r=${IMAGE%@sha256:*} n=${r#*/}
+   depot_vex=${r%%/*}/builds/vex/${n#builds/}
+@@ -94,9 +137,7 @@
    rm -rf base import.out
  
    t=$(date +%s)
@@ -67,22 +66,22 @@ diff -ruN a/poc/bricks/07a-sbom-grype/politique/scanner.sh b/poc/bricks/07a-sbom
 -  syft scan oci-dir:image -o cyclonedx-json=sbom-image.json -q
 +  artefact
    syft scan dir:source -o cyclonedx-json=sbom-source.json -q
-   scan-outil fusion sbom-source.json sbom-image.json source image > sbom.json
+   scan-outil fusion sbom-source.json sbom-image.json source image "$IMAGE" > sbom.json
    echo "SBOM|$(grep -c '"purl"' sbom.json) composants avec PURL (D1 a), $(( $(date +%s) - t )) s"
-@@ -75,7 +116,7 @@
-   grype sbom:sbom.json -o json --file grype.json -q
-   scan-outil predicat grype.json "$ref" > scan.json
-   echo "SCAN|$IMAGE, $(grep -c '"kev":' scan.json) vulnérabilités, $(grep -c '"kev": true' scan.json) KEV, $(( $(date +%s) - t )) s"
--  rm -rf dbcache image source sbom-image.json sbom-source.json sbom.json grype.json .cache
-+  rm -rf dbcache image artefact source sbom-image.json sbom-source.json sbom.json grype.json .cache
+@@ -121,7 +162,7 @@
+   rm -f grype.err
+   scan-outil predicat grype.json "$ref" vex-retenus.json $repli > scan.json
+   echo "SCAN|$IMAGE, $(grep -c '"kev":' scan.json) vulnérabilités, $(grep -c '"kev": true' scan.json) KEV, $(grep -c '"status":' scan.json) écartée(s) par un VEX, $(( $(date +%s) - t )) s"
+-  rm -rf dbcache image source sbom-image.json sbom-source.json sbom.json grype.json vex vex-retenus.json .cache
++  rm -rf dbcache image artefact source sbom-image.json sbom-source.json sbom.json grype.json vex vex-retenus.json .cache
    echo "PREDICAT|sha256 $(sha256sum < scan.json | cut -c1-64), $(( $(date +%s) - debut )) s en tout"
  }
  
-@@ -137,6 +178,7 @@
+@@ -183,6 +224,7 @@
  case $MODE in
    source) source_commit ;;
    analyser) analyser ;;
 +  artefact) artefact ;;
+   vex) lire_vex ;;
    jetons) jetons ;;
    attester) attester ;;
-   publier) publier ;;

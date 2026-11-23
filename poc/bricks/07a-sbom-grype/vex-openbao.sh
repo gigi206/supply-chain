@@ -29,6 +29,11 @@
 # Banc : BANC=<dossier> remplace kubectl, le jeton root, la CA et le nom TLS par ceux du banc ; journal dans ce dossier. Seulement
 # avec BANC, BANC_MDP (deux lignes : saisies d'acces_vex) et BANC_MDP_CONNEXION (mot de passe de la connexion d'essai, sans saut
 # de ligne) remplacent le terminal ; sans elles, le banc pilote le terminal par un pty.
+# Additif du 23/11/2026 (2026-11-23T14:56:29Z, intégration au rejeu de zéro ; choix du propriétaire « Automatique au rejeu ») : avec
+# REJEU=<libellé du rejeu>, journal resultats/vex-openbao-<étape>-rejeu-<libellé>.log (refus s'il existe ; les journaux de la
+# pose du 22/11 ne sont jamais réécrits) ; cle_vex remplace resultats/vex-cle-publique.pem (OpenBao recréé : l'ancienne clé
+# n'existe plus ; le changement se voit dans git et se relit au commit) ; acces_vex lit le mot de passe dans MDP_FICHIER
+# (fichier 0600 généré pour le PoC le 22/11, une lecture, sans terminal). Hors REJEU, rien ne change.
 # Usage (racine du dépôt) : poc/bricks/07a-sbom-grype/vex-openbao.sh <étape>   (journal : resultats/vex-openbao-<étape>.log)
 # Les lignes de journal évitent les mots « jeton » et « token », que le masquage remplace (le jeton y est dit « secret »).
 set -euo pipefail
@@ -106,6 +111,13 @@ util_vu() { # politiques, sans default, durée, durée maximale de l'utilisateur
 
 lire_mdp() { # MDP ← mot de passe saisi deux fois ; code 1 et motif (sans la valeur) si refus
   local src n m2=''
+  if [ -n "${REJEU:-}" ] && [ -n "${MDP_FICHIER:-}" ]; then   # rejeu de zéro : mot de passe du PoC, lu une fois, jamais affiché
+    [ -f "$MDP_FICHIER" ] && [ "$(stat -c %a "$MDP_FICHIER")" = 600 ] || { echo "REFUS : MDP_FICHIER absent ou pas en 0600"; return 1; }
+    IFS= read -r MDP < "$MDP_FICHIER" || [ -n "$MDP" ] || { MDP=; echo "REFUS : MDP_FICHIER vide"; return 1; }
+    n=$(printf '%s' "$MDP" | LC_ALL=C.UTF-8 wc -m)
+    if [ "$n" -lt 12 ]; then MDP=; echo "REFUS : mot de passe de moins de 12 caractères ; rien n'est écrit"; return 1; fi
+    echo "OK   mot de passe lu dans MDP_FICHIER (rejeu), $n caractères (valeur jamais affichée)"; return 0
+  fi
   if [ -n "${BANC:-}" ] && [ -n "${BANC_MDP:-}" ]; then src=$BANC_MDP; else src=/dev/tty; fi
   if ! (: < "$src") 2>/dev/null; then
     echo "REFUS : $src illisible : acces_vex se lance dans le terminal du propriétaire, pas depuis une session sans terminal"; return 1
@@ -175,7 +187,11 @@ etape_cle_vex() {
   set +e
   local avant apres cle w rc pub vu
   etat_bao && echo "OK   OpenBao initialisé et descellé" || { ko "OpenBao scellé, non initialisé ou illisible"; return 1; }
-  [ ! -e "$PEM" ] || { ko "${PEM#"$here"/} existe déjà : rien n'est écrasé"; return 1; }
+  if [ -n "${REJEU:-}" ]; then
+    [ ! -e "$PEM" ] || echo "     rejeu : ${PEM#"$here"/} existant (SPKI sha256 $(spki "$PEM")) remplacé par la clé neuve"
+  else
+    [ ! -e "$PEM" ] || { ko "${PEM#"$here"/} existe déjà : rien n'est écrasé"; return 1; }
+  fi
   avant=$(cles) || { ko "liste des clés Transit illisible (avant)"; return 1; }
   echo "avant :"; sed 's/^/     /' <<<"$avant"
   if grep -q "^$CLE " <<<"$avant"; then ko "transit/keys/$CLE existe déjà : aucune écriture"; return 1; fi
@@ -346,6 +362,11 @@ case "$e" in
     fi
     mkdir -p "$R"
     L=$R/vex-openbao-$e.log
+    if [ -n "${REJEU:-}" ]; then
+      [ "$e" != essai ] || { echo "REFUS : essai hors du rejeu (terminal du propriétaire)"; exit 1; }
+      L=$R/vex-openbao-$e-rejeu-$REJEU.log
+      [ ! -e "$L" ] || { echo "REFUS : journal déjà présent : ${L#"$here"/}"; exit 1; }
+    fi
     set +e
     # Journal écrit d'abord sans affichage (0600), contrôlé par K3 à K6, puis seulement affiché : une valeur secrète n'atteint
     # jamais la sortie standard (calque d'o5-openbao.sh).

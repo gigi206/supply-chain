@@ -331,8 +331,15 @@ etape_periodique() { # ACCORD NOMMÉ, après S5b et le relevé du 21/11 : écrit
   fi
 
   echo "## ConfigMap scan-config (comme cm_scan de la 07a), scanner.sh corrigé"
+  # Additif du 23/11/2026 (07b, intégration au rejeu) : vex.pub, comme cm_scan, dès que la clé VEX a été prise ; sans elle,
+  # cet apply (même gestionnaire de champs) retirait vex.pub posée par cm_scan (mesuré par dry-run serveur, 23/11 14:52:24 UTC)
+  vex_s6a=()
+  [ ! -s "$R07/vex-cle-publique.pem" ] || vex_s6a=(--from-file=vex.pub="$R07/vex-cle-publique.pem")
   kubectl create configmap scan-config -n scan --from-file=ca-poc.crt="$CA" --from-file=scanner.sh="$P07/politique/scanner.sh" \
-    --from-file=scanner.pub="$R07/scanner-cle-publique.pem" --dry-run=client -o yaml </dev/null | kubectl apply --server-side -f -
+    --from-file=scanner.pub="$R07/scanner-cle-publique.pem" "${vex_s6a[@]}" --dry-run=client -o yaml </dev/null | kubectl apply --server-side -f -
+  mesure "vex.pub de scan-config égale à la clé publique VEX archivée (ou absente des deux côtés)" \
+    "$(kubectl get configmap -n scan scan-config -o json </dev/null | jq -j '.data["vex.pub"] // ""' | sha256sum | cut -c1-64)" \
+    "$(if [ -s "$R07/vex-cle-publique.pem" ]; then sha256sum < "$R07/vex-cle-publique.pem"; else printf '' | sha256sum; fi | cut -c1-64)"
   mesure "scanner.sh de scan-config égal à l'arbre" "$(kubectl get configmap -n scan scan-config -o json </dev/null | jq -j '.data["scanner.sh"]' | sha256sum | cut -c1-64)" \
     "$(sha256sum < "$P07/politique/scanner.sh" | cut -c1-64)"
 
