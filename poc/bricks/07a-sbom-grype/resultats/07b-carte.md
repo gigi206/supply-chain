@@ -1567,3 +1567,20 @@ Seule action sur la VM : `virsh reboot`. Aucune connexion ni lecture dans la VM.
 - l'effet de `vex.pub` sur le scan de 09:30 UTC (prédit : aucun).
 
 **Heures** : de 08:33:00 UTC à 08:35:34 UTC, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
+
+## Scan de 09:30 avec `vex.pub` montée : prédiction (date -u de 08:41:13 UTC, le 2026-11-23, avant le passage)
+
+Premier passage de `scan-sample-app` depuis la pose de 08:16. Relevé en lecture seule par l'étape datée `scan_0930` de [vex-pub.sh](../vex-pub.sh), lancée après 09:33 UTC. Le `scanner.sh` monté est l'ancien : il ne lit pas `vex.pub`.
+
+| Contrôle | Prédit | Confiance |
+|---|---|---|
+| job du 23/11 à 09:30 | réussi (1/0/0) | moyenne (premier passage après la panne de Zot de 06:40 à 08:33) |
+| volume `config` du pod | `scan-config` entière, donc `vex.pub` dans /etc/scan | haute |
+| `scan-config` | resourceVersion 8257360, celle de la pose | haute |
+| préfixes des lignes du journal, triés | égaux à ceux du 22/11 (12 lignes, dont 3 masquées) | haute |
+| vulnérabilités et date de base | relevées seulement : la base change chaque jour, l'écart éventuel ne vient pas de la clé | sans objet |
+| lignes du pod dans Grafana (Loki) | égales à celles de `kubectl logs` | moyenne (rangement de Loki après la panne, vu à 08:34) |
+
+Effet attendu de la clé : **aucun**. Un écart sur les préfixes ou un échec du job serait à expliquer avant la suite de la pièce 5.
+
+**Constat en passant** (relevé de 08:40 UTC, lecture seule) : les CronJob minute `horodatage/horodatage`, `declencheurs/rattrapage` et `declencheurs/rattrapage-deb` ont des jobs en échec de 08:31 à 08:33, puis réussis dès 08:37. Les jobs plus anciens de la panne ne sont plus listés (historique borné). À relier à la panne de sc-stockage ; non analysé.
