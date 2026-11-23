@@ -1,0 +1,15 @@
+# téléchargement du CLI Kyverno v1.20.0, 2026-11-23T15:28:31Z ; cosign v3.1.4
+téléchargé : kyverno-cli_v1.20.0_linux_x86_64.tar.gz (46829650 octets)
+téléchargé : kyverno-cli_v1.20.0_linux_x86_64.tar.gz.sigstore.json (8389 octets)
+téléchargé : checksums.txt (834 octets)
+téléchargé : checksums.txt.sigstore.json (8389 octets)
+OK   sha256 de kyverno-cli_v1.20.0_linux_x86_64.tar.gz = checksums.txt : 06b8f3ca7b5626473be8fb4d343ad54ab84e317142766f72420e7d44b80942e2
+OK   signature Sigstore de kyverno-cli_v1.20.0_linux_x86_64.tar.gz : identité https://github.com/kyverno/kyverno/.github/workflows/release-publish.yaml@refs/tags/v1.20.0
+OK   signature Sigstore de checksums.txt : identité https://github.com/kyverno/kyverno/.github/workflows/release-publish.yaml@refs/tags/v1.20.0
+OK   identité voisine (tag v1.19.2) refusée
+binaire : ~/.cache/supply-chain-poc/08/kyverno-1.20.0/bin/kyverno, sha256 26054ccd42f4f1ed0b0cc3187c0907148884f2f30b93e69849a782e6714ef488
+  Version: v1.20.0
+  Time: 2026-11-11T12:42:56Z
+  Git commit ID: f666af06e9bd310c7e730f1523c0430e90371a89
+# fin 2026-11-23T15:28:37Z
+bilan : tenu

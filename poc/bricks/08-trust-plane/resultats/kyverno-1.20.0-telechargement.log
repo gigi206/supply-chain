@@ -1,0 +1,7 @@
+# téléchargement du CLI Kyverno v1.20.0, 2026-11-23T15:28:01Z ; cosign v3.1.4
+téléchargé : kyverno-cli_v1.20.0_linux_x86_64.tar.gz (46829650 octets)
+téléchargé : kyverno-cli_v1.20.0_linux_x86_64.tar.gz.sigstore.json (8389 octets)
+téléchargé : checksums.txt (834 octets)
+téléchargé : checksums.txt.sigstore.json (8389 octets)
+OK   sha256 de kyverno-cli_v1.20.0_linux_x86_64.tar.gz = checksums.txt : 06b8f3ca7b5626473be8fb4d343ad54ab84e317142766f72420e7d44b80942e2
+KO   signature de kyverno-cli_v1.20.0_linux_x86_64.tar.gz : error during command execution: none of the expected identities matched what was in the certificate, got subjects [https://github.com/kyverno/kyverno/.github/workflows/release-publish.yaml@refs/tags/v1.20.0] with issuer https://token.actions.githubusercontent.com

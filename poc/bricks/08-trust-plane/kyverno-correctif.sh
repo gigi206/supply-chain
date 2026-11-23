@@ -116,8 +116,64 @@ EOF
   return "$ko"
 }
 
-e=${1:?usage : $0 construire|cli}
-L=$R/kyverno-correctif-$e.log
+etape_cli_autre() { # ajout du 2026-11-23T15:29:13Z : un autre CLI (KYVERNO_AUTRE, chemin ; KYVERNO_AUTRE_NOM, libellé) sur les huit cas de
+  # J5, à côté du CLI officiel 1.19.2 (témoin) ; chaque cas classé : comme le correctif (attendu des CLI corrigés), comme le bug
+  # (attendu de l'officiel 1.19.2), ou autre. Mêmes préalables et témoins bloquants que cli ; lecture seule de Zot.
+  local d r v e1 e2 x n s ko=0 nc=0 nb=0 officiel cosign
+  officiel=$(cd "$repo" && mise which kyverno 2>/dev/null) || officiel=
+  cosign=$(cd "$repo" && mise which cosign 2>/dev/null) || cosign=
+  x=${KYVERNO_AUTRE:?KYVERNO_AUTRE=<chemin du CLI>}; n=${KYVERNO_AUTRE_NOM:-autre}
+  [ -x "$officiel" ] && [ -x "$cosign" ] && [ -x "$x" ] || { echo "NON JUGÉ : kyverno ($officiel), cosign ($cosign) ou $x introuvable"; exit 3; }
+  echo "## préalables (lecture anonyme de Zot)"
+  for d in "$DEPOT_BUNDLES" essais-j5/sans-jeton essais-j5/jeton-altere essais-j5/autre-signature essais-j5/tsa-etrangere essais-j5/aucun; do
+    s=$(curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$d/referrers/$APP_DIGEST" 2>/dev/null | jq '.manifests | length' 2>/dev/null) || s="illisible"
+    echo "$d : ${s:-illisible} referrer(s)"
+    case "$d" in essais-j5/aucun) ;; *) [ "$s" != illisible ] && [ "$s" -ge 1 ] 2>/dev/null || { echo "NON JUGÉ : $d sans bundle, rien évalué"; exit 3; } ;; esac
+  done
+  for d in "$R/chains-cle-publique.pem" "$P/tsa-chaine.pem" "$P/ca-poc.crt" "$P/tsa-racine-confiance.json"; do [ -s "$d" ] || { echo "NON JUGÉ : $d absent"; exit 3; }; done
+  cat > "$T/pod.yaml" <<FIN
+apiVersion: v1
+kind: Pod
+metadata: {name: essai-j5, namespace: default}
+spec:
+  containers:
+    - name: app
+      image: $REG_HOTE/builds/essai-signature@$APP_DIGEST
+FIN
+  printf '%s\n' "j5-temoin|horodatage/bundles||PASS|PASS" "j5-jeton-valide|horodatage/bundles|$P/tsa-chaine.pem|ERREUR|PASS" \
+    "j5-sans-jeton|essais-j5/sans-jeton|$P/tsa-chaine.pem|FAIL|FAIL" "j5-aucun-bundle|essais-j5/aucun|$P/tsa-chaine.pem|FAIL|FAIL" \
+    "j5-jeton-altere|essais-j5/jeton-altere|$P/tsa-chaine.pem|ERREUR|FAIL" "j5-autre-signature|essais-j5/autre-signature|$P/tsa-chaine.pem|ERREUR|FAIL" \
+    "j5-tsa-etrangere|essais-j5/tsa-etrangere|$P/tsa-chaine.pem|ERREUR|FAIL" "j5-att-historique|||FAIL|FAIL" > "$T/cas.txt"
+  echo "## témoins bloquants"
+  if COSIGN_REPOSITORY=$REG_HOTE/$DEPOT_BUNDLES "$cosign" verify-attestation --key "$R/chains-cle-publique.pem" --insecure-ignore-tlog \
+      --use-signed-timestamps --trusted-root "$P/tsa-racine-confiance.json" --type slsaprovenance1 --registry-cacert "$P/ca-poc.crt" \
+      "$REG_HOTE/builds/essai-signature@$APP_DIGEST" < /dev/null > "$T/cosign.out" 2>&1; then
+    echo "OK   cosign accepte le bundle valide de $DEPOT_BUNDLES avec son jeton (référence de J5)"
+  else echo "NON JUGÉ : cosign refuse le bundle valide ($(grep -m1 '^Error: ' "$T/cosign.out" | cut -c1-160))"; exit 3; fi
+  echo "## CLI officiel 1.19.2 (témoin : le bug doit se montrer)"
+  while IFS='|' read -r d r v e1 e2; do
+    ivpol "$r" "$v" "$d" > "$T/$d.yaml"
+    s=$(cli "$officiel" "$T/$d.yaml" "$T/pod.yaml"); s=${s%%$'\t'*}
+    [ "$s" = "$e1" ] && echo "OK   officiel, $d : $s" || { echo "NON JUGÉ : officiel, $d : $s, attendu $e1"; ko=1; }
+  done < "$T/cas.txt"
+  [ "$ko" = 0 ] || { echo "bilan : NON JUGÉ (témoin officiel hors de ses attendus)"; exit 3; }
+  echo "## CLI $n : $x (sha256 $(sha256sum "$x" | cut -c1-16), $("$x" version 2>/dev/null | grep -m1 'Git commit' | cut -c1-60))"
+  while IFS='|' read -r d r v e1 e2; do
+    s=$(cli "$x" "$T/$d.yaml" "$T/pod.yaml"); s=${s%%$'\t'*}
+    if [ "$s" = "$e2" ] && [ "$s" != "$e1" ]; then echo "CORRIGÉ   $d : $s (officiel 1.19.2 : $e1)"; nc=$((nc + 1))
+    elif [ "$s" = "$e1" ] && [ "$s" != "$e2" ]; then echo "BUG       $d : $s (corrigé attendu : $e2)"; nb=$((nb + 1))
+    elif [ "$s" = "$e2" ]; then echo "IDENTIQUE $d : $s"
+    else echo "AUTRE     $d : $s (officiel $e1, corrigé $e2)"; ko=1; fi
+    motif "$x" "$T/$d.yaml" "$T/pod.yaml" | sed 's/^/     /'
+  done < "$T/cas.txt"
+  echo "cas qui distinguent le correctif : comme le correctif $nc, comme le bug $nb (sur 4)"
+  if [ "$ko" = 0 ] && [ "$nc" = 4 ]; then echo "bilan : $n porte le comportement corrigé"
+  elif [ "$ko" = 0 ] && [ "$nb" = 4 ]; then echo "bilan : $n garde le bug"
+  else echo "bilan : mixte ou autre"; fi
+}
+
+e=${1:?usage : $0 construire|cli|cli_autre}
+L=$R/kyverno-correctif-$e${KYVERNO_AUTRE_NOM:+-$KYVERNO_AUTRE_NOM}.log
 [ ! -e "$L" ] || { echo "$L existe déjà, rien lancé"; exit 2; }
 { date -u "+# kyverno-correctif.sh $e, %Y-%m-%dT%H:%M:%SZ"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$L"
 exit "${PIPESTATUS[0]}"
