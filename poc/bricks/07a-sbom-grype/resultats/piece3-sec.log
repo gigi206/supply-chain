@@ -1,0 +1,25 @@
+# piece3-outils-scan.sh sec, 2026-11-23T13:00:03Z ; dépôt fdd08d25
+OK   empreinte du patch (passage 24 du banc) : b5a5e8d85760855c
+OK   archive d'oras 1.3.6
+OK   archives de grype 0.104.1 et syft 1.38.0
+go : go version go1.24.7 linux/amd64
+OK   outil/ sans modification locale
+fichiers changés par le patch dans outil/ : 1
+OK   scan-outil ancienne, deux constructions : 3d442df7c0fedb11f5d5d8680b97c6305547aadc58737a6fe5bcb0e5ee63f1b2
+OK   couche ancienne, deux assemblages : 5f2c05ab674e32c881831814c232db6875c3e3ff04c1efb7d08a898930e076c9
+  scan-outil ancienne : 3d442df7c0fedb11f5d5d8680b97c6305547aadc58737a6fe5bcb0e5ee63f1b2 ; couche : 5f2c05ab674e32c881831814c232db6875c3e3ff04c1efb7d08a898930e076c9, 162611200 octets
+OK   scan-outil neuve, deux constructions : 7dde1a8ed457f25422ee94eb1b1b1306af7f447edbee29000a86ef4f31e18dc2
+OK   couche neuve, deux assemblages : eddae750b88c9e4b3040968a2ca19ceede9f9bb5e2e11c86d16a5728b00eeafa
+  scan-outil neuve : 7dde1a8ed457f25422ee94eb1b1b1306af7f447edbee29000a86ef4f31e18dc2 ; couche : eddae750b88c9e4b3040968a2ca19ceede9f9bb5e2e11c86d16a5728b00eeafa, 162846720 octets
+OK   usage du scan-outil neuf : mode vex présent
+OK   grype de la couche = grype de mise : c833472c3d590cfc6861f948c21fd9f87350c663e0943ba0b35e278a88f94049
+OK   syft de la couche = syft de mise : 6d380157a79f5e9114c98df5a2ea22cb06e04d8b37343a6f638f12f4775ac180
+OK   base copiée (digest) : sha256:c142f6bc0c6d8e5e4a3d31b941200a12502ad90bb5ce93b78c875c868905619d
+OK   témoin : ancienne image réassemblée = digest épinglé de G2 : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+OK   image neuve, deux assemblages (même digest) : sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+DIGEST_NEUF=sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+OK   image neuve différente de l'ancienne : oui
+OK   vrai Zot : ancien tag sur le digest épinglé (lecture anonyme) : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+OK   vrai Zot : nouveau tag absent : 0
+# fin 2026-11-23T13:00:25Z
+bilan : tenue

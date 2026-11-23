@@ -1762,3 +1762,43 @@ Pour une éventuelle correction (configuration de la brique 19, sur accord) : co
 ## G7 recalée par le redémarrage du 23/11 : réserve sur `releve_24` (note de 2026-11-23T12:55:48Z)
 
 Détail : [g7-replanification.md](g7-replanification.md), note de 2026-11-23T12:55:48Z. Le balayage de Zot du 24/11 commencerait vers 09:16 UTC et recouvrirait le scan de 09:30 (calcul, jamais mesuré ici). La confiance « haute » de la prédiction de `releve_24` pour le job de 09:30 (réussi, préfixes égaux) baisse donc à **moyenne** ; la note de 12:22:03Z n'est pas réécrite. La règle « rien dans le vrai Zot avant le n°9 » (couplages, plus haut) est une précaution de session, à confirmer ou à lever par le propriétaire.
+
+## Décision du propriétaire : règle « rien dans le vrai Zot avant le n°9 » levée (note de 2026-11-23T13:00:00Z)
+
+Question posée : « Je lève la règle pour avancer la 07b cette semaine, ou je la garde et la 07b attend la lecture de G7, vers le 29/11 après-midi ? ». Réponse, verbatim : « Oui ». La règle des couplages (plus haut) est levée. Chaque pièce garde son propre accord. G7 n'est pas abandonné : `g7-etat.sh` compare les digests qui disparaissent, et un redémarrage de Zot (pièce 4) recalerait encore la chaîne, à relire avant de replanifier la tâche du 29/11.
+
+## Pièce 3 : prédiction de l'étape `sec` (date -u de 13:00:00 UTC, le 2026-11-23, avant le lancement)
+
+Script neuf [`piece3-outils-scan.sh`](../piece3-outils-scan.sh). L'étape `sec` n'écrit rien dans le vrai Zot (GET anonymes) : registre en mémoire de crane sur 127.0.0.1, base cosign copiée du vrai Zot.
+
+| Contrôle | Prédit | Confiance |
+|---|---|---|
+| empreinte du patch | `b5a5e8d85760855c` (passage 24 du banc) | haute |
+| archives d'oras, grype, syft | empreintes de G2 | haute |
+| scan-outil et couche, deux constructions, ancienne et neuve | identiques deux à deux | haute (G2 l'a mesuré) |
+| **témoin** : ancienne image réassemblée en local | **`7eb4f26e…`**, digest épinglé de G2 | moyenne : même Go (1.24.7, `mise.toml`) et même méthode ; un écart dirait qu'`outil/` ou la chaîne a bougé depuis le 04/11, et la pose serait suspendue |
+| image neuve, deux assemblages | même digest, différent de `7eb4f26e…` | haute |
+| usage du scan-outil neuf | mode `vex` présent | haute |
+| vrai Zot | ancien tag sur `7eb4f26e…`, tag `grype-0.104.1-syft-1.38.0-vex` absent | haute |
+
+**Écart au tableau des pièces** : `OUTILS_SCAN_DIGEST` de `plateforme.sh` ne change pas à la pièce 3 mais avec `scanner.sh` (reste de la pièce 5). Sinon, un rendu des CronJob mettrait l'ancien `scanner.sh` sur la nouvelle image (`fusion` à 5 arguments). La pose pousse sous un nouveau tag ; l'ancien tag et les CronJob restent sur `7eb4f26e…`.
+
+## Pièce 3 : résultat de l'étape `sec` (note de 2026-11-23T13:00:53Z)
+
+[Journal](piece3-sec.log), de 13:00:03 à 13:00:25 UTC : **bilan : tenue**. Toutes les prédictions sont vérifiées.
+
+| Contrôle | Mesuré |
+|---|---|
+| patch, archives, Go | `b5a5e8d85760855c` ; oras, grype et syft aux empreintes de G2 ; go 1.24.7 ; un seul fichier changé dans `outil/` (`main.go`) |
+| scan-outil ancien, deux constructions | `3d442df7…`, **égal à celui de G2** ([g2_image.log](g2_image.log)) |
+| scan-outil neuf, deux constructions | `7dde1a8e…` ; mode `vex` présent |
+| couche neuve, deux assemblages | `eddae750…`, 162 846 720 octets |
+| **témoin** : ancienne image réassemblée dans le registre en mémoire | **`7eb4f26e…`**, le digest épinglé de G2 : la méthode redonne l'image en service |
+| image neuve, deux assemblages | **`b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649`** |
+| vrai Zot (anonyme) | ancien tag sur `7eb4f26e…` ; tag `grype-0.104.1-syft-1.38.0-vex` absent |
+
+Limite : le grand banc construit `scan-outil` depuis la même source (patch `b5a5e8d8`), mais sans `-s -w -buildid=` et sans archiver son empreinte. L'équivalence avec le binaire éprouvé au passage 24 tient par la source, pas par l'empreinte.
+
+**Pose** (étape `pose`, sur accord) : la même couche poussée sur le vrai Zot par `poc-ecriture`, sous le tag `grype-0.104.1-syft-1.38.0-vex` ; digest attendu `b799feda…`. Les CronJob et l'ancien tag restent sur `7eb4f26e…` : aucun scan ne change avant le reste de la pièce 5.
+
+**Heures** : de 12:47:04 UTC (lecture du plan) à 13:00:53 UTC pour la préparation de la pièce 3, hors du relevé G7 ; à compter dans l'enveloppe de la 07b, qui reste au plus à 11 h 58 avant ce segment (somme à refaire à la prochaine note d'heures).
