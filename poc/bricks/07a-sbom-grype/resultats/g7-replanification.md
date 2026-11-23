@@ -754,3 +754,38 @@ Le mode du fichier n'est pas changé par la copie. `bash -n` et shellcheck sont 
 **Conséquence pour la suite** (calcul, loi B, même marge de 2 à 19 s) : le n°3 doit commencer entre le 22/11 22:29:43 et le 22/11 22:30:00 UTC.
 
 **Tâche du 29/11** : sa consigne fera lire le n°2 dans `g7-balayage-21-11.log`, qui existe déjà. Le script le refusera (code 2), et la consigne dit déjà : « Un journal déjà présent est refusé par le script : dis-le, ne le contourne pas. » La tâche n'est donc pas modifiée, et le journal de cette note reste la mesure du n°2.
+
+## Note de 2026-11-23T12:55:48Z : redémarrage de sc-stockage du 23/11, chaîne des balayages recalée (rien n'est réécrit)
+
+[Relevé](g7-redemarrage-23-11.log) par [g7-redemarrage-23-11.sh](g7-redemarrage-23-11.sh), en lecture seule à travers Grafana (Loki, comptes par tranches de 10 s). Rien sur la VM ni dans Zot.
+
+| Balayage | Lignes « executing gc » | Rétention |
+|---|---|---|
+| n°3, 22/11 | de 22:30:00 à 23:08:30 (166 lignes) | 10 lignes à 23:08:20 |
+| au démarrage de Zot, 23/11 | de 08:33:40 à **09:16:20** (166 lignes) | 1 ligne à 08:33:40, 10 à 09:15:50 |
+
+- **n°3** : début dans la plage prédite (22:29:43 à 22:30:00), à la précision de la tranche ;
+- les lignes de `zot.service` s'arrêtent à 06:41:50 et reprennent à 08:33:10 (démarrage de Zot avec la VM). **L'hypothèse « Zot non redémarré » de la projection est réfutée une seconde fois** : les heures prédites des n°4 à n°9 sont caduques ;
+- un balayage part au démarrage, comme le 19/11 (fin à 21:03:47, puis n°1 le 20/11 à 21:04:02, soit 24 h et environ 15 s : loi B après un redémarrage, mesurée une fois). Seule la **fin** de celui du 23/11 sert de base (09:16:20, à 10 s près) : les heures proches de 08:33 peuvent être des heures de collecte.
+
+**Projection** (calcul, loi B, durée d'un balayage entre 36 min 39 s et 42 min 40 s, les deux mesurées ; marge cumulée) :
+
+| Jour | Début | Fin |
+|---|---|---|
+| 24/11 | 24/11 09:16 à 24/11 09:16 | 24/11 09:53 à 24/11 09:59 |
+| 25/11 | 25/11 09:53 à 25/11 09:59 | 25/11 10:29 à 25/11 10:41 |
+| 26/11 | 26/11 10:29 à 26/11 10:41 | 26/11 11:06 à 26/11 11:24 |
+| 27/11 | 27/11 11:06 à 27/11 11:24 | 27/11 11:43 à 27/11 12:07 |
+| 28/11 | 28/11 11:43 à 28/11 12:07 | 28/11 12:20 à 28/11 12:50 |
+| 29/11 | 29/11 12:20 à 29/11 12:50 | 29/11 12:56 à 29/11 13:32 |
+
+Conséquences (calcul) :
+- **les balayages passent désormais le matin** et glissent d'environ 40 min par jour. Celui du 24/11 (vers 09:16) recouvre le scan de 09:30 ; ceux du 26/11 et du 27/11, le scan du deb de 11:15. Un scan poussé pendant un balayage n'a jamais été mesuré ici (`gcDelay` 1 h protège en principe les blobs neufs) ;
+- **premières suppressions de `builds/scan/sample-app`** (plus ancien referrer du 13/11 à 12:45:07, éligible le 27/11 à 12:45:07) : pas au balayage du 27/11, fini au plus tard vers 12:07, mais à celui du **28/11** (11:43 à 12:50) ;
+- **premières suppressions des scans du deb** (premier scan le 14/11 vers 21:01, seconde non relue, éligible le 28/11 vers 21:01) : au balayage du **29/11** (12:20 à 13:32), **après** le lancement de la tâche du 29/11 à 05:40 UTC ;
+- **retrait au compte dans `vulndb/grype`** (11 tags) : la base du 23/11 manque, le 12e tag arrive donc un jour plus tard que dans N5, le 25/11 si le passage du 24/11 réussit ;
+- **tâche du 29/11 telle qu'elle est** : fenêtres fixes de J 12:00 à J+1 12:00. Celle du 22 contient deux balayages (n°3 et démarrage), celle du 27 risque de couper le balayage du 28/11 en deux, et la lecture manquerait les suppressions du deb. La replanifier (heure et fenêtres) demande l'accord du propriétaire ; **non modifiée**. Le rejeu de M5b, « après le n°9 », se décale avec elle.
+
+**Couplage avec la 07b** : la règle « rien dans le vrai Zot avant le n°9 » vient des couplages de la [carte de la 07b](07b-carte.md) (précaution de session ; aucune décision du propriétaire retrouvée). `g7-etat.sh` compare les digests qui **disparaissent** ; une écriture hors de `builds/scan/**` et de `vulndb/grype` ne les touche pas, mais un redémarrage de Zot (`stockage.sh zot`, comme le 19/11) recalerait encore la chaîne. Non vérifié : l'effet d'une nouvelle image `outils-scan` sur les referrers des scans quotidiens. Lever ou garder la règle est un choix du propriétaire.
+
+**Heures** : de 12:47:04 UTC à 12:55:48 UTC, hors enveloppe.

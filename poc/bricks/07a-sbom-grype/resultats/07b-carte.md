@@ -1758,3 +1758,7 @@ Pour une éventuelle correction (configuration de la brique 19, sur accord) : co
 **Fenêtre utile de `releve_24`** : de 09:33 à environ 12:30 UTC le 24/11. Le compte Loki du pod porte sur les 3 h qui précèdent le lancement. Avant de lancer, vérifier à la main que le job de 09:30 est terminé (`1/0/0` sinon en KO). Aucune tâche planifiée n'est posée.
 
 **Heures** : de 12:22:03 UTC à 12:25:48 UTC, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
+
+## G7 recalée par le redémarrage du 23/11 : réserve sur `releve_24` (note de 2026-11-23T12:55:48Z)
+
+Détail : [g7-replanification.md](g7-replanification.md), note de 2026-11-23T12:55:48Z. Le balayage de Zot du 24/11 commencerait vers 09:16 UTC et recouvrirait le scan de 09:30 (calcul, jamais mesuré ici). La confiance « haute » de la prédiction de `releve_24` pour le job de 09:30 (réussi, préfixes égaux) baisse donc à **moyenne** ; la note de 12:22:03Z n'est pas réécrite. La règle « rien dans le vrai Zot avant le n°9 » (couplages, plus haut) est une précaution de session, à confirmer ou à lever par le propriétaire.

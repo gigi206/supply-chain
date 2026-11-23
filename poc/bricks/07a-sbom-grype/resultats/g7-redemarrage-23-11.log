@@ -1,0 +1,23 @@
+# g7-redemarrage-23-11.sh, 2026-11-23T12:51:02Z ; Loki à travers Grafana, tranches de 10 s (heure de la tranche)
+== fenêtre 2026-11-22T21:30:00Z -> 2026-11-23T00:30:00Z
+  gc (executing gc of orphaned blobs) : de 2026-11-22T22:30:00Z à 2026-11-22T23:08:30Z, 166 lignes, 132 tranches de 10 s
+  rétention (retention, sans casse)   : de 2026-11-22T23:08:20Z à 2026-11-22T23:08:20Z, 10 lignes, 1 tranches de 10 s
+  démarrage (starting|listening|config) : aucune
+  toutes les lignes de zot.service    : de 2026-11-22T21:30:10Z à 2026-11-23T00:29:50Z, 74318 lignes, 612 tranches de 10 s
+== fenêtre 2026-11-23T06:00:00Z -> 2026-11-23T08:30:00Z
+  gc (executing gc of orphaned blobs) : aucune
+  rétention (retention, sans casse)   : aucune
+  démarrage (starting|listening|config) : aucune
+  toutes les lignes de zot.service    : de 2026-11-23T06:00:10Z à 2026-11-23T06:41:50Z, 17223 lignes, 126 tranches de 10 s
+== fenêtre 2026-11-23T08:30:00Z -> 2026-11-23T10:30:00Z
+  gc (executing gc of orphaned blobs) : de 2026-11-23T08:33:40Z à 2026-11-23T09:16:20Z, 166 lignes, 138 tranches de 10 s
+  rétention (retention, sans casse)   : de 2026-11-23T08:33:40Z à 2026-11-23T09:15:50Z, 11 lignes, 2 tranches de 10 s
+  démarrage (starting|listening|config) : de 2026-11-23T08:33:10Z à 2026-11-23T08:33:40Z, 16 lignes, 2 tranches de 10 s
+  toutes les lignes de zot.service    : de 2026-11-23T08:33:10Z à 2026-11-23T10:29:50Z, 52639 lignes, 420 tranches de 10 s
+== fenêtre 2026-11-23T10:30:00Z -> 2026-11-23T12:51:00Z
+  gc (executing gc of orphaned blobs) : aucune
+  rétention (retention, sans casse)   : aucune
+  démarrage (starting|listening|config) : aucune
+  toutes les lignes de zot.service    : de 2026-11-23T10:30:10Z à 2026-11-23T12:50:50Z, 57837 lignes, 433 tranches de 10 s
+# fin 2026-11-23T12:51:03Z
+bilan : relevé fait
