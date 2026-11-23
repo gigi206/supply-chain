@@ -2494,8 +2494,25 @@ ct_refus() { # motif libellé commande… : la commande (au nom d'un contrôleur
   fi
 }
 
+secrets_ctrl_juge() { # fichier (lignes d'audit des deux contrôleurs, une par ligne) démarrages (tableau JSON d'époques de
+  # kube-apiserver) : lignes ECARTE|… puis BILAN|<comptées>|<témoin>. Additif du 2026-11-23 (rejeu un-trait-1) : comme refus_droits,
+  # un watch refusé (403) dans builds dans les 60 s qui suivent un démarrage de kube-apiserver (caches RBAC non chargés) est écarté ;
+  # tout autre 403 et toute lecture hors de builds comptent. Témoin : après chaque watch écarté, une lecture en 200 du même compte
+  # dans builds.
+  jq -s -r --argjson d "$2" '
+    def t: .requestReceivedTimestamp | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601;
+    def excuse: .verb == "watch" and .objectRef.namespace == "builds" and .responseStatus.code == 403
+      and (t as $t | any($d[]; $t >= . and $t <= . + 60));
+    . as $tout
+    | [.[] | select(excuse)] as $ex
+    | ([.[] | select((.objectRef.namespace != "builds" or .responseStatus.code == 403) and (excuse | not))] | length) as $ko
+    | ([$ex[] | . as $e | ($e | t) as $te | any($tout[]; .user.username == $e.user.username and .objectRef.namespace == "builds"
+        and .responseStatus.code == 200 and t > $te)] | all) as $tem
+    | ($ex[] | "ECARTE|\(.requestReceivedTimestamp) \(.user.username | split(":") | last) watch builds 403 \(.stage)"), "BILAN|\($ko)|\($tem)"' "$1"
+}
+
 etape_controleurs() {
-  local k=0 u n p img t0 lp c ns sa
+  local k=0 u n p img t0 lp c ns sa dem
   echo "Prédiction (écrite le 01/11/2026 avant le premier passage ; règle tekton/controleurs-builds.yaml, décision du propriétaire) :"
   echo "- ValidatingAdmissionPolicy $REGLE_CTRL et sa liaison (Deny) présentes, posées par tekton.sh installer (J4)"
   echo "- aucun des deux contrôleurs ne peut créer, modifier ou supprimer la règle ni sa liaison (can-i)"
@@ -2638,8 +2655,16 @@ etape_controleurs() {
   jq -r '"  \(.user.username | split(":") | last) \(.verb) \(.objectRef.namespace // "(tout le cluster)") \(.responseStatus.code) \(.stage)"' "$T/ct-secrets.json" | sort | uniq -c
   ba_attendu "lectures de Secrets du contrôleur de Pipelines dans builds (au moins une : informer)" \
     "$(jq -s --arg u "$CONTROLEUR" '[.[] | select(.user.username == $u and .objectRef.namespace == "builds")] | length > 0' "$T/ct-secrets.json")" true
-  ba_attendu "lectures de Secrets hors de builds ou refusées (403), par l'un ou l'autre" \
-    "$(jq -s '[.[] | select(.objectRef.namespace != "builds" or .responseStatus.code == 403)] | length' "$T/ct-secrets.json")" 0
+  # Additif du 2026-11-23 (rejeu un-trait-1, arrêt à 22:07:01 UTC) : jugement par secrets_ctrl_juge, avec l'exception de refus_droits
+  dem='[]'
+  [ "$DISTRO" != rke2 ] || dem=$(kubectl get pod -n kube-system -l component=kube-apiserver -o json | jq -c '[.items[0].status.containerStatuses[0]
+    | (.state.running.startedAt, .lastState.terminated.startedAt) | select(. != null) | fromdateiso8601]')
+  echo "démarrages connus de kube-apiserver (époques) : $dem"
+  secrets_ctrl_juge "$T/ct-secrets.json" "$dem" > "$T/ct-juge"
+  sed -n 's/^ECARTE|/CONSTAT  écarté, kube-apiserver démarrant : /p' "$T/ct-juge"
+  ba_attendu "lectures de Secrets hors de builds ou refusées (403), par l'un ou l'autre, hors watch de builds écartés au démarrage de kube-apiserver" \
+    "$(sed -n 's/^BILAN|\([0-9]*\)|.*/\1/p' "$T/ct-juge")" 0
+  ba_attendu "après chaque watch écarté, une lecture en 200 du même compte dans builds" "$(sed -n 's/^BILAN|[0-9]*|//p' "$T/ct-juge")" true
   echo "## journaux des contrôleurs (depuis leur démarrage)"
   for c in tekton-pipelines/tekton-pipelines-controller tekton-chains/tekton-chains-controller; do
     ba_attendu "${c#*/} : redémarrages" "$(kubectl get pods -n "${c%/*}" -l "app=${c#*/}" -o jsonpath='{range .items[*]}{.status.containerStatuses[0].restartCount}{"\n"}{end}' | sort -u | paste -sd,)" 0
