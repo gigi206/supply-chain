@@ -1584,3 +1584,28 @@ Premier passage de `scan-sample-app` depuis la pose de 08:16. Relevé en lecture
 Effet attendu de la clé : **aucun**. Un écart sur les préfixes ou un échec du job serait à expliquer avant la suite de la pièce 5.
 
 **Constat en passant** (relevé de 08:40 UTC, lecture seule) : les CronJob minute `horodatage/horodatage`, `declencheurs/rattrapage` et `declencheurs/rattrapage-deb` ont des jobs en échec de 08:31 à 08:33, puis réussis dès 08:37. Les jobs plus anciens de la panne ne sont plus listés (historique borné). À relier à la panne de sc-stockage ; non analysé.
+
+## Scan de 09:30 avec `vex.pub` montée : résultat (note de 2026-11-23T09:34:49Z)
+
+[Journal](vex-pub-scan_0930.log) de l'étape `scan_0930`, de 09:33:43 à 09:33:44 UTC : **bilan : tenue**.
+
+| Contrôle | Prédit | Mesuré |
+|---|---|---|
+| job du 23/11 à 09:30 | réussi (1/0/0) | 1/0/0, de 09:30:00 à 09:32:10Z |
+| volume `config` du pod | `scan-config` entière | entière (sans `items`) |
+| `scan-config` | resourceVersion 8257360 | 8257360 ; `vex.pub` d'empreinte 79f7eece2f98f442 |
+| préfixes des lignes du journal, triés | égaux au 22/11 (12 lignes, 3 masquées) | égaux |
+| vulnérabilités et base | relevées seulement | 6 vulnérabilités, 0 KEV, comme le 22/11 ; base datée du 2026-11-22 les deux jours (ci-dessous) |
+| lignes du pod dans Grafana (Loki) | égales à `kubectl logs` | 12 et 12 |
+
+L'effet de `vex.pub` est mesuré **nul**, comme prédit : la clé est montée, l'ancien `scanner.sh` ne la lit pas. Ce passage ne prouve rien sur le VEX lui-même : la preuve viendra du `scanner.sh` neuf (reste de la pièce 5, après la pièce 3).
+
+**Écart de l'étape** : avec `kubectl logs --all-containers`, l'ordre des conteneurs a changé d'une lecture à l'autre. La comparaison porte donc sur les préfixes triés (correction faite avant le passage, dans le commit de la prédiction).
+
+**Base Grype non renouvelée le 23/11** (relevé de 09:34:10 UTC, comptes seuls à travers Grafana) :
+- les scans du 21/11 utilisaient la base du 2026-11-21 (`sha256:c638665e…`), ceux du 22/11 et du 23/11 celle du 2026-11-22 (`sha256:8e9abb2e…`, même empreinte) ;
+- `base-grype.service` sur sc-stockage (timer à 08:00 UTC, délai aléatoire de 15 min, `Persistent=true`) : une ligne de journal par jour dans Loki (1 sur 26 h, 2 sur 50 h), **aucune sur les 2 dernières heures**, alors que le journal de sc-stockage arrive (30113 lignes sur 1 h) ;
+- lecture : le passage de 08:00 est tombé pendant la panne (06:40 à 08:33), et le rattrapage par `Persistent=true` ne s'est pas vu après le redémarrage. **Non vérifié** : l'état du timer demande une connexion à la VM, sur accord ;
+- conséquence : la base du 22/11 reste sous le seuil de 3 jours de D4 jusqu'au 25/11. Le passage du 24/11 à 08:00 devrait la renouveler, à vérifier au scan du 24/11 à 09:30.
+
+**Heures** : de 08:39:48 UTC à 09:34:49 UTC, attente comprise, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
