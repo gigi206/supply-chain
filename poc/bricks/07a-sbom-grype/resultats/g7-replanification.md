@@ -793,3 +793,11 @@ Conséquences (calcul) :
 ## Note de 2026-11-23T13:22:44Z : nouveau redémarrage de Zot (pièce 4 de la 07b), rien n'est réécrit
 
 Zot a redémarré le 23/11 à 13:21:33 UTC (passage de `stockage.sh zot`, accord du propriétaire). La projection de la note de 12:55:48Z est **caduque**. Un balayage de démarrage est attendu ; sa fin, mesurée dans Loki, servira de base à la nouvelle projection (balayage du 24/11 vers 14 h si la loi B tient). La tâche du 29/11 reste non modifiée.
+
+## Prédiction de 2026-11-23T13:27:12Z : balayage de démarrage du 23/11 à 13:21 (après la pièce 4 de la 07b), avant la mesure de sa fin
+
+[Relevé de début](g7-pose4-debut.log) par [g7-pose4.sh](g7-pose4.sh) `debut` (lecture seule, Loki à travers Grafana, tranches de 10 s) : Zot redémarré à 13:21:33 UTC par `stockage.sh zot` ; lignes de démarrage et premières lignes « executing gc » dans la tranche de **13:21:40** ; 17 lignes de gc jusqu'à 13:26:00. Un balayage part au démarrage, comme le 19/11 et le 23/11 à 08:33 (troisième observation).
+
+**Prédiction** (calcul, durée d'un balayage entre 36 min 39 s et 42 min 40 s, les deux mesurées) : dernière tranche « executing gc » entre **13:58:19 et 14:04:30 UTC** (10 s de tranche comprises). Confiance moyenne : deux durées mesurées seulement pour un balayage complet, et la charge du démarrage n'a pas été comparée.
+
+**Conséquence attendue si elle tient** (loi B) : balayage du 24/11 vers 14:00 UTC, après le scan de 09:30 et le relevé `releve_24` ; la réserve de la note de 12:55:48Z tomberait. Mesure de la fin par `g7-pose4.sh fin`, qui refuse tant que la dernière tranche a moins de 5 min.

@@ -1,0 +1,39 @@
+# piece5-croisements.sh sec, 2026-11-23T13:31:07Z
+outils : v0.10.42, Python 3.13.12, HEAD ff984ec64850
+## 0. porte de HEAD = porte déployée
+OK   scan.rego : ConfigMap porte/porte = HEAD : a928fdc03ca50bc3
+OK   policy-scan.yaml : ConfigMap porte/porte = HEAD : 9683068ab3a73eee
+OK   porte de HEAD : exemption par v.vex.expires (champ absent du prédicat neuf)
+OK   politique de HEAD : fixed encore accepté (retiré par la pièce 6)
+## 1. ancienne porte + prédicat neuf (ec validate input)
+OK   complet-sans-kev : kev booléen sur toutes les entrées du prédicat neuf (règle forme) : boolean
+OK   complet-sans-kev : verdict, prédicat neuf avec vex = sans vex : 0 
+OK   complet-sans-kev : verdict de l'ancienne porte : 0 
+OK   complet-kev-ecartee : kev booléen sur toutes les entrées du prédicat neuf (règle forme) : boolean
+OK   complet-kev-ecartee : verdict, prédicat neuf avec vex = sans vex : 1 scan.kev_without_vex
+OK   complet-kev-ecartee : verdict de l'ancienne porte : 1 scan.kev_without_vex
+OK   deb-complet-sans-kev : kev booléen sur toutes les entrées du prédicat neuf (règle forme) : boolean
+OK   deb-complet-sans-kev : verdict, prédicat neuf avec vex = sans vex : 0 
+OK   deb-complet-sans-kev : verdict de l'ancienne porte : 0 
+OK   deb-complet-kev-ecartee : kev booléen sur toutes les entrées du prédicat neuf (règle forme) : boolean
+OK   deb-complet-kev-ecartee : verdict, prédicat neuf avec vex = sans vex : 1 scan.kev_without_vex
+OK   deb-complet-kev-ecartee : verdict de l'ancienne porte : 1 scan.kev_without_vex
+OK   repli-sans-kev : kev booléen sur toutes les entrées du prédicat neuf (règle forme) : boolean
+OK   repli-sans-kev : verdict, prédicat neuf avec vex = sans vex : 0 
+OK   repli-sans-kev : verdict de l'ancienne porte : 0 
+OK   compat-image : bloc vex vide, aucune entrée écartée : [[],0]
+OK   compat-image (prédicat neuf sans VEX) = avant-t3, ancienne porte : 0 
+OK   avant-t3, ancienne porte : 0 
+## 2. ancien entrees-scan.py + prédicat neuf (comptes et entrees de HEAD)
+OK   complet : séries de HEAD, prédicat neuf avec vex = sans vex : True
+OK   complet : lignes de HEAD, prédicat neuf avec vex = sans vex : True
+     complet : 10 séries, 5 lignes d'entrée, scan_entrees_kev{depot="builds/x"}
+OK   deb-complet : séries de HEAD, prédicat neuf avec vex = sans vex : True
+OK   deb-complet : lignes de HEAD, prédicat neuf avec vex = sans vex : True
+     deb-complet : 10 séries, 66 lignes d'entrée, scan_entrees_kev{depot="builds/x"}
+OK   repli : séries de HEAD, prédicat neuf avec vex = sans vex : True
+OK   repli : lignes de HEAD, prédicat neuf avec vex = sans vex : True
+     repli : 10 séries, 5 lignes d'entrée, scan_entrees_kev{depot="builds/x"}
+     limite (lue dans le code, non mesurée) : une KEV écartée par un VEX resterait comptée dans scan_entrees_kev jusqu'à la pièce 7
+# fin 2026-11-23T13:31:09Z
+bilan : tenue

@@ -1873,3 +1873,42 @@ Le dépôt et sc-stockage sont de nouveau alignés pour `zot.json`. Aucune écri
 **G7** : Zot a redémarré à 13:21:33 UTC. Un balayage de démarrage est attendu, et la chaîne repartira de sa fin ; la projection de 12:55:48Z est caduque. Si la loi B tient, le balayage du 24/11 tombera vers 14 h, et non plus sur le scan de 09:30 : la réserve sur `releve_24` (note de 12:55:48Z) tombe avec elle, à vérifier. La fin du balayage de démarrage est à mesurer avant de replanifier la tâche du 29/11 (sur accord).
 
 **Heures** : de 13:20:25 UTC à 13:22:44 UTC, dans l'enveloppe de la 07b.
+
+## Avant la pièce 5 : croisements « ancienne porte + prédicat neuf » et « ancien `entrees-scan.py` + prédicat neuf », prédiction (date -u de 13:31:07 UTC, le 2026-11-23, avant le lancement ; approche relue par le conseiller)
+
+**Pourquoi** : entre la pièce 5 (scanner neuf) et les pièces 6 (porte) et 7 (`entrees-scan.py`), la porte et le service de séries déployés restent ceux de HEAD, et les scans quotidiens portent le prédicat neuf. S'ils le refusaient, ou s'ils comptaient autrement, la 6 et la 7 devraient passer avant la 5.
+
+**Lu avant** (sans mesure) :
+- la ConfigMap `porte/porte` a les mêmes `scan.rego`, `policy-scan.yaml` et `scan-verifier.sh` que HEAD (empreintes `a928fdc0…`, `9683068a…`, `c851a12f…`, relues juste avant cette note) ;
+- dans les CronJob de scan, `analyser` n'a ni `DOCKER_CONFIG` ni `/var/run/bao` (`HOME=/travail`, `jetons` passe après) : `lire_vex` lit `builds/vex/**` en anonyme, cas déjà mesuré à la pièce 4 sur le Zot jetable (référents d'un dépôt absent : 200 ; lecture anonyme après publication) ;
+- un dépôt `builds/vex/…` sans document : passage 24 du grand banc, cas `sans-vex-panne`, sur un Zot 2.1.22 jetable : « 0 énoncé(s) vérifié(s) », cosign code 1, et le script continue jusqu'à Grype. Le cas « sans VEX, Grype réussi » n'y est mesuré que par la compatibilité (prédicat neuf sans VEX = prédicat d'avant + bloc `vex` vide).
+
+**Mesure** : [`piece5-croisements.sh`](../piece5-croisements.sh) `sec`, sur l'hôte, sans cluster en écriture, sans Zot, sans VM. Porte et `entrees-scan.py` tirés de HEAD par `git show` ; prédicats du passage 24 du banc ; différentiel « même prédicat avec et sans champs `vex` », jugé par `ec validate input` avec le `policy-scan.yaml` de HEAD.
+
+**Prédiction** :
+- ancienne porte : verdicts égaux avec et sans `vex` dans tous les cas ; admis sans KEV ; refus `scan.kev_without_vex` quand l'entrée écartée par un VEX est passée en KEV (la porte de HEAD cherche `vex.expires`, absent du prédicat neuf : **échec fermé**, aucun refus nouveau) ; `kev` booléen partout, donc pas de `scan.forme` ; prédicat neuf sans VEX jugé comme celui d'avant la tranche 3 (admis) ;
+- ancien `entrees-scan.py` : séries et lignes égales avec et sans `vex` ;
+- confiance haute (lecture du code des deux côtés) ; risque principal : un champ du prédicat neuf que la porte de HEAD lirait autrement que prévu.
+
+**Conséquence si elle tient** : la pièce 5 peut passer avant la 6 et la 7. Limite qui resterait : une KEV écartée par un VEX serait refusée par la porte et comptée dans `scan_entrees_kev` jusqu'à la pose des pièces 6 et 7 ; sans effet avant le premier VEX (pièce 8).
+
+## Avant la pièce 5 : résultat des croisements (note de 2026-11-23T13:31:37Z)
+
+[`piece5-croisements.sh`](../piece5-croisements.sh) `sec`, de 13:31:07 à 13:31:09 UTC : **tenue**, 28 OK, 0 KO ([journal](piece5-croisements-sec.log)). La prédiction tient en entier.
+
+| Cas (prédicat du passage 24) | Ancienne porte, avec `vex` | Sans `vex` |
+|---|---|---|
+| `complet`, sans KEV | admis | admis |
+| `complet`, entrée écartée passée en KEV | `scan.kev_without_vex` | `scan.kev_without_vex` |
+| `deb-complet`, sans KEV | admis | admis |
+| `deb-complet`, entrée écartée passée en KEV | `scan.kev_without_vex` | `scan.kev_without_vex` |
+| `repli`, sans KEV | admis | admis |
+| prédicat neuf sans VEX (`compat-image`) | admis, comme le prédicat d'avant la tranche 3 | |
+
+- la ConfigMap `porte/porte` est égale à HEAD pour `scan.rego` et `policy-scan.yaml` (contrôlé dans le script) ;
+- `kev` est booléen sur toutes les entrées des prédicats neufs : la règle `scan.forme` de HEAD ne se déclenche pas ;
+- `entrees-scan.py` de HEAD : séries et lignes d'entrée égales avec et sans `vex`, pour `complet`, `deb-complet` et `repli` (10 séries par dépôt, 5 ou 66 lignes).
+
+**Conséquence** : la pièce 5 peut passer avant la 6 et la 7. Entre les deux, une KEV écartée par un VEX reste refusée par la porte (échec fermé, comme sans VEX) et comptée dans `scan_entrees_kev`. C'est sans effet avant le premier VEX (pièce 8). Hors mesure : la valeur de `scan_entrees_kev` n'est pas lue proprement dans le journal (découpage du script, sans effet sur les contrôles d'égalité) ; `entrees-scan.py` installé sur sc-stockage n'est pas comparé à HEAD (lecture sur la VM, non faite).
+
+**Heures** : de 13:26:19 UTC à 13:31:37 UTC, dans l'enveloppe de la 07b.

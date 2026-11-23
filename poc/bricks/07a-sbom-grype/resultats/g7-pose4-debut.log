@@ -1,0 +1,8 @@
+# g7-pose4.sh debut, 2026-11-23T13:26:54Z ; Loki à travers Grafana, tranches de 10 s (heure de la tranche)
+== fenêtre 2026-11-23T13:15:00Z -> 2026-11-23T13:26:00Z
+  gc (executing gc of orphaned blobs) : de 2026-11-23T13:21:40Z à 2026-11-23T13:26:00Z, 17 lignes, 14 tranches de 10 s
+  rétention (retention, sans casse)   : de 2026-11-23T13:21:40Z à 2026-11-23T13:21:40Z, 2 lignes, 1 tranches de 10 s
+  démarrage (starting|listening|config) : de 2026-11-23T13:21:40Z à 2026-11-23T13:21:40Z, 30 lignes, 1 tranches de 10 s
+  toutes les lignes de zot.service    : de 2026-11-23T13:15:10Z à 2026-11-23T13:26:00Z, 9149 lignes, 41 tranches de 10 s
+# fin 2026-11-23T13:26:54Z
+bilan : relevé fait
