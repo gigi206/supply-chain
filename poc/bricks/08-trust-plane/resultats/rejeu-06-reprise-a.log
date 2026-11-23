@@ -1,0 +1,475 @@
+# rejeu.sh 06-reprise-a, 2026-11-23T19:32:29Z
+réseau : cilium ; reprise à 06 (S4a) ; arrêt après 06 (S4b)
+## démontage : sautée (reprise à 06 (S4a))
+## VM : sautée (reprise à 06 (S4a))
+## RKE2 : sautée (reprise à 06 (S4a))
+## Cilium : sautée (reprise à 06 (S4a))
+## J2 : sautée (reprise à 06 (S4a))
+## J3 : sautée (reprise à 06 (S4a))
+## J4 : sautée (reprise à 06 (S4a))
+## J5 : sautée (reprise à 06 (S4a))
+## J6 : sautée (reprise à 06 (S4a))
+## test 5 (J6) : sautée (reprise à 06 (S4a))
+## J6 (suite) : sautée (reprise à 06 (S4a))
+## J7 : sautée (reprise à 06 (S4a))
+## J7 (admission) : sautée (reprise à 06 (S4a))
+## J7 (BuildKit) : sautée (reprise à 06 (S4a))
+## J7 (voie D) : sautée (reprise à 06 (S4a))
+## J7 (voie A, sample-app) : sautée (reprise à 06 (S4a))
+## J7 (sans réseau) : sautée (reprise à 06 (S4a))
+## J7 (construction, entrées) : sautée (reprise à 06 (S4a))
+## J7 (fermeture, F2 de la 03) : sautée (reprise à 06 (S4a))
+## J7 (construction) : sautée (reprise à 06 (S4a))
+## J7 (réseau) : sautée (reprise à 06 (S4a))
+## reserve_c : sautée (non rejouable : dépôts d'essai du test 8 du 01/11 nommés en dur ; mesure du 01/11 gardée, ADR 0000)
+## J8 (tests) : sautée (reprise à 06 (S4a))
+## J8 (bascule) : sautée (reprise à 06 (S4a))
+## J8 (helm-cilium) : sautée (reprise à 06 (S4a))
+## J8 (contrôleurs) : sautée (reprise à 06 (S4a))
+## 01 (S2, S4) : sautée (reprise à 06 (S4a))
+## 01 (S3) : sautée (reprise à 06 (S4a))
+## 01 (S4, négatifs) : sautée (reprise à 06 (S4a))
+## 01 S5 : sautée (déduit du code, non mesuré : D6 refuserait l'image du fork, sans fermeture propre ; porte en dur sur 3a7ca1b1)
+## 01 reverification, retrait, refspec, niveaux : sautées (mesures ponctuelles du 02/11/2026)
+## 01 (S6) : sautée (reprise à 06 (S4a))
+## 19 telecharger : sautée (archives en cache, sha256 revérifiés par installer) ; reference, O4 et correctifs : sautés (mesures)
+## 19 (O2) : sautée (reprise à 06 (S4a))
+## 19b (L2) : sautée (reprise à 06 (S4a))
+## 19b (L3) : sautée (reprise à 06 (S4a))
+## 19b (L5) : sautée (reprise à 06 (S4a))
+## 19 (O2, suite) : sautée (reprise à 06 (S4a))
+## 19 (O3) : sautée (reprise à 06 (S4a))
+## 19b L1, avant_grpc, grpc_tls, pertes_grpc : sautées (L2 et L3 posent déjà la configuration finale) ; muette, L7 : sautées
+## 19b (L6, contrôle) : sautée (reprise à 06 (S4a))
+## 19b (L4) : sautée (reprise à 06 (S4a))
+## 07a (G1) : sautée (reprise à 06 (S4a))
+## 07a (G2) : sautée (reprise à 06 (S4a))
+## 07a (G3) : sautée (reprise à 06 (S4a))
+## 07b (clé VEX) : sautée (reprise à 06 (S4a))
+## 07b (accès VEX) : sautée (reprise à 06 (S4a))
+## 07a (G4) : sautée (reprise à 06 (S4a))
+## 07a (passage périodique) : sautée (reprise à 06 (S4a))
+## 07a (G8) : sautée (reprise à 06 (S4a))
+## 10 pousser_vsa, J8 controle6, controle7 et 07a g6_temoins : sautés (POUSSER_VSA=1 absent : accord du propriétaire à chaque push de VSA)
+## 08c (H1) : sautée (reprise à 06 (S4a))
+## 08c (H4) : sautée (reprise à 06 (S4a))
+## 08c (S1) : sautée (reprise à 06 (S4a))
+## 08c (H5, limites) : sautée (reprise à 06 (S4a))
+## 08c (H5, Deny) : sautée (reprise à 06 (S4a))
+## 08c (H5, rôles) : sautée (reprise à 06 (S4a))
+## 08c (sortie des builds) : sautée (reprise à 06 (S4a))
+## J8 (résolveurs) : sautée (reprise à 06 (S4a))
+## 06 (S1, amorce) : sautée (reprise à 06 (S4a))
+## 06 (S4c) : sautée (reprise à 06 (S4a))
+# s4a.sh prealables, 2026-11-23T19:32:29Z
+OK   Packages égal à xz -dc Packages.xz : égal
+OK   liste rapprochée de Packages : 199 paquets, 0 écart(s)
+OK   paquets dans la liste : 199
+OK   octets de la liste : 133065812
+OK   paquets de l'amorce retrouvés dans la liste : 20
+OK   gabarits rendus sans variable restante (refs factices) : 58116 octets pour la pipeline
+OK   construire-builder : syntaxe bash du script : OK
+OK   prefetch-deb : syntaxe sh du script : OK
+OK   construire-builder : variables Tekton restantes : 0
+## arguments de mmdebstrap (racine)
+     --mode=root
+     --variant=minbase
+     --format=tar
+     --hook-dir=/usr/share/mmdebstrap/hooks/file-mirror-automount
+     --include=sbuild=0.89.3+deb13u4,libsbuild-perl=0.89.3+deb13u4,mmdebstrap=1.5.7-1+deb13u1,uidmap=1:4.17.4-2,iproute2=6.15.0-1
+     --customize-hook=chroot "$1" useradd -m -u 1000 -U -s /bin/sh constructeur
+     --customize-hook=echo constructeur:100000:65536 > "$1/etc/subuid"
+     --customize-hook=echo constructeur:100000:65536 > "$1/etc/subgid"
+     --customize-hook=echo sbuild > "$1/etc/hostname"
+     --customize-hook=: > "$1/etc/resolv.conf"
+     --customize-hook=echo 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20261105T000000Z trixie main' > "$1/etc/apt/sources.list"
+     --customize-hook=cd "$1" && { rmdir -p 'home/gigi/.cache/supply-chain-poc/08/travail/s4a-06/essais/e' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }
+     trixie
+     ~/.cache/supply-chain-poc/08/travail/s4a-06/essais/w/racine.tar
+     deb [check-valid-until=no] file://~/.cache/supply-chain-poc/08/travail/s4a-06/essais/e trixie main
+## arguments de mmdebstrap (chroot)
+     --mode=root
+     --variant=buildd
+     --format=tar
+     --hook-dir=/usr/share/mmdebstrap/hooks/file-mirror-automount
+     --customize-hook=echo sbuild > "$1/etc/hostname"
+     --customize-hook=: > "$1/etc/resolv.conf"
+     --customize-hook=echo 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20261105T000000Z trixie main' > "$1/etc/apt/sources.list"
+     --customize-hook=cd "$1" && { rmdir -p 'home/gigi/.cache/supply-chain-poc/08/travail/s4a-06/essais/e' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }
+     trixie
+     ~/.cache/supply-chain-poc/08/travail/s4a-06/essais/w/chroot.tar
+     deb [check-valid-until=no] file://~/.cache/supply-chain-poc/08/travail/s4a-06/essais/e trixie main
+OK   racine : --hook-dir avant les crochets : --hook-dir
+OK   racine : retrait des points de montage en dernier crochet : 1
+OK   racine : crochet sources.list : 1
+OK   racine : source du miroir : deb [check-valid-until=no] file://~/.cache/supply-chain-poc/08/travail/s4a-06/essais/e trixie main
+     couche racine sha256:09ae2d48e55918ddd6601a2bd2bd7dfd37d018d7760c06a3c2108dfa747a6b17 (10240 octets) ; couche du chroot sha256:3144f7db061ed7ae4d193b30b98560e99053a953295683d10dfaae3f953949b8 (20480 octets), chroot intérieur sha256 6e0440741f9338c3072f7bfb7080898fad707f4115e6694fc525565c39e298ed ; configuration sha256:6a5db00f64cc4682198b58c9b4f97a2dc174cf63cd25748405e3bd61fb205ac0 ; manifeste sha256:36e53653ad66e17ba771e0192a0372464c83bdfbd66a02b2263f92093535aa7d
+     image.tar : 40960 octets en 0 s
+     pic du tmpfs ~/.cache/supply-chain-poc/08/travail/s4a-06/essais/w :  Mo sur 0 relevés ; memory.peak du cgroup : absent
+OK   index.json lu comme publier-image : une ligne, égale au résultat : 1 sha256:36e53653ad66e17ba771e0192a0372464c83bdfbd66a02b2263f92093535aa7d
+OK   chaque blob a pour nom son sha256 (4 blobs)
+OK   manifeste et configuration lisibles par jq : oui
+OK   diff_ids égaux aux digests des couches : ["sha256:09ae2d48e55918ddd6601a2bd2bd7dfd37d018d7760c06a3c2108dfa747a6b17","sha256:3144f7db061ed7ae4d193b30b98560e99053a953295683d10dfaae3f953949b8"]
+OK   tailles exactes : 0
+OK   couche 1 = archive racine factice, telle quelle : sha256:09ae2d48e55918ddd6601a2bd2bd7dfd37d018d7760c06a3c2108dfa747a6b17
+OK   couche 2 : chroot sous opt/sbuild/trixie-amd64.tar : 1
+OK   prefetch-deb : YAML lisible par yq, nom : prefetch-deb
+OK   construire-builder : YAML lisible par yq, nom : construire-builder
+OK   builder-sbuild : YAML lisible par yq, nom : builder-sbuild
+OK   liste rendue dans la pipeline (prefetch, puis construire) : 199 199
+OK   liste rendue identique à la liste : identique
+     instantane = http://snapshot.debian.org/archive/debian/20261105T000000Z
+     inrelease = 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+     amorce = pool/main/e/expat/libexpat1_2.8.3-1~deb13u1_amd64.deb pool/main/libf/libffi/libffi8_3.4.8-2_amd64.deb pool/main/g/gdbm/libgdbm-compat4t64_1.24-2_amd64.deb pool/main/g/gdbm/libgdbm6t64_1.
+     sde = 1789199741
+     inclure = sbuild=0.89.3+deb13u4,libsbuild-perl=0.89.3+deb13u4,mmdebstrap=1.5.7-1+deb13u1,uidmap=1:4.17.4-2,iproute2=6.15.0-1
+# s4a.sh taches, 2026-11-23T19:32:30Z
+## tâches (tkn 0.46.2)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   prefetch-deb : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   prefetch-deb dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-deb@sha256:4dac0609a5d1d980501f4f08cdeb0916912b4f3accd9cf56fea456a399e793a5
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   construire-builder : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   construire-builder dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-builder@sha256:746c2e11858d37ae9a449e22dbd085986ddcdba7c01f3b2708d9b6d70d1198ce
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:88937dfa817ee146b559e0687c4c2516be3afb3cf8439cb6806da363c231f0e6
+# s4a.sh reseau, 2026-11-23T19:32:34Z
+NetworkPolicy de builds : builder-sans-sortie, construction-racine-rpm-sans-sortie, construction-rpm-sans-sortie, construction-sans-sortie
+OK   politiques qui sélectionnent construire-builder, sans entrée ni sortie : 1
+OK   politiques de builds qui autorisent du trafic : 0
+OK   CiliumNetworkPolicy de builds qui sélectionnent construire-builder et autorisent du trafic : 
+# s4a.sh pipeline, 2026-11-23T19:32:34Z
+## s4a-builder-1 créé à 19:32:34 (sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:88937dfa817ee146b559e0687c4c2516be3afb3cf8439cb6806da363c231f0e6)
+### TaskRun s4a-builder-1-construire (Succeeded), pod s4a-builder-1-construire-pod sur sc-build, runtimeClassName kata, tekton.dev/task construire-builder
+     mmdebstrap racine : rc 0 en 24 s, 287874560 octets, sha256 999a0ae4593639e7a46e9290911151704588b9086a625d1659f0d35c397bd242
+     W: gpg --version failed: cannot infer signed-by value
+     bind-mounting /workspace/entrees/ into the chroot
+     unmounting the following mountpoints:
+     I: running --customize-hook in shell: sh -c 'cd "$1" && { rmdir -p 'workspace/entrees' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }' exec /w/mmdebstrap.78aNSpwVk7
+     tmpfs /w : 275 Mo (après racine)
+     mmdebstrap chroot : rc 0 en 20 s, 451786240 octets, sha256 aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086
+     W: gpg --version failed: cannot infer signed-by value
+     bind-mounting /workspace/entrees/ into the chroot
+     unmounting the following mountpoints:
+     I: running --customize-hook in shell: sh -c 'cd "$1" && { rmdir -p 'workspace/entrees' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }' exec /w/mmdebstrap.QAYaNTK7pm
+     tmpfs /w : 706 Mo (après chroot)
+     tmpfs /w : 1137 Mo (couche du chroot écrite)
+     couche racine sha256:999a0ae4593639e7a46e9290911151704588b9086a625d1659f0d35c397bd242 (287874560 octets) ; couche du chroot sha256:1029232ead0c2c3d09d3c3fa7caab99ac7907857a88dc73f78ed6ae385a9d064 (451788800 octets), chroot intérieur sha256 aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086 ; configuration sha256:e08eaf6c4935552d3c82c7eb45b29223f8dc29c4044c2ee35a994221d5976893 ; manifeste sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+     image.tar : 739676160 octets en 10 s
+     pic du tmpfs /w : 394 Mo sur 63 relevés ; memory.peak du cgroup : 1802235904
+OK   A12 s4a-builder-1-construire : runtimeClassName : kata
+OK   A12 s4a-builder-1-construire : nœud : sc-build
+### TaskRun s4a-builder-1-prefetch (Succeeded), pod s4a-builder-1-prefetch-pod sur sc-build, runtimeClassName , tekton.dev/task prefetch-deb
+     2026/11/23 19:32:40 Entrypoint initialization
+     2026/11/23 19:32:40 Decoded script /tekton/scripts/script-0-znqm4
+     uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
+     index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
+     index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
+     miroir : 199 paquets, 133065812 octets, en 69 s
+OK   A12 s4a-builder-1-prefetch : runtimeClassName : 
+OK   A12 s4a-builder-1-prefetch : nœud : sc-build
+### TaskRun s4a-builder-1-publier (Succeeded), pod s4a-builder-1-publier-pod sur sc-build, runtimeClassName , tekton.dev/task publier-image
+     2026/11/23 19:35:59 Decoded script /tekton/scripts/script-0-9qczm
+     publiée : sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590 (relue en lecture anonyme)
+     2026/11/23 19:35:58 Entrypoint initialization
+OK   A12 s4a-builder-1-publier : runtimeClassName : 
+OK   A12 s4a-builder-1-publier : nœud : sc-build
+OK   PipelineRun s4a-builder-1 : True|Succeeded
+image publiée : sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+OK   PipelineRun s4a-builder-1 signé par Chains : true
+## s4a-builder-2 créé à 19:36:17 (sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:88937dfa817ee146b559e0687c4c2516be3afb3cf8439cb6806da363c231f0e6)
+### TaskRun s4a-builder-2-construire (Succeeded), pod s4a-builder-2-construire-pod sur sc-build, runtimeClassName kata, tekton.dev/task construire-builder
+     mmdebstrap racine : rc 0 en 22 s, 287874560 octets, sha256 999a0ae4593639e7a46e9290911151704588b9086a625d1659f0d35c397bd242
+     W: gpg --version failed: cannot infer signed-by value
+     bind-mounting /workspace/entrees/ into the chroot
+     unmounting the following mountpoints:
+     I: running --customize-hook in shell: sh -c 'cd "$1" && { rmdir -p 'workspace/entrees' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }' exec /w/mmdebstrap.AcgNxVKJzT
+     tmpfs /w : 275 Mo (après racine)
+     mmdebstrap chroot : rc 0 en 20 s, 451786240 octets, sha256 aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086
+     W: gpg --version failed: cannot infer signed-by value
+     bind-mounting /workspace/entrees/ into the chroot
+     unmounting the following mountpoints:
+     I: running --customize-hook in shell: sh -c 'cd "$1" && { rmdir -p 'workspace/entrees' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }' exec /w/mmdebstrap.kJvU1qeWej
+     tmpfs /w : 706 Mo (après chroot)
+     tmpfs /w : 1137 Mo (couche du chroot écrite)
+     couche racine sha256:999a0ae4593639e7a46e9290911151704588b9086a625d1659f0d35c397bd242 (287874560 octets) ; couche du chroot sha256:1029232ead0c2c3d09d3c3fa7caab99ac7907857a88dc73f78ed6ae385a9d064 (451788800 octets), chroot intérieur sha256 aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086 ; configuration sha256:e08eaf6c4935552d3c82c7eb45b29223f8dc29c4044c2ee35a994221d5976893 ; manifeste sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+     image.tar : 739676160 octets en 10 s
+     pic du tmpfs /w : 395 Mo sur 68 relevés ; memory.peak du cgroup : 1799577600
+OK   A12 s4a-builder-2-construire : runtimeClassName : kata
+OK   A12 s4a-builder-2-construire : nœud : sc-build
+### TaskRun s4a-builder-2-prefetch (Succeeded), pod s4a-builder-2-prefetch-pod sur sc-build, runtimeClassName , tekton.dev/task prefetch-deb
+     2026/11/23 19:36:22 Entrypoint initialization
+     2026/11/23 19:36:22 Decoded script /tekton/scripts/script-0-kwzks
+     uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
+     index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
+     index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
+     miroir : 199 paquets, 133065812 octets, en 22 s
+OK   A12 s4a-builder-2-prefetch : runtimeClassName : 
+OK   A12 s4a-builder-2-prefetch : nœud : sc-build
+### TaskRun s4a-builder-2-publier (Succeeded), pod s4a-builder-2-publier-pod sur sc-build, runtimeClassName , tekton.dev/task publier-image
+     2026/11/23 19:38:56 Entrypoint initialization
+     2026/11/23 19:38:57 Decoded script /tekton/scripts/script-0-4mbgm
+     publiée : sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590 (relue en lecture anonyme)
+OK   A12 s4a-builder-2-publier : runtimeClassName : 
+OK   A12 s4a-builder-2-publier : nœud : sc-build
+OK   PipelineRun s4a-builder-2 : True|Succeeded
+image publiée : sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+OK   PipelineRun s4a-builder-2 signé par Chains : true
+OK   même digest pour les deux exécutions : sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+## durée 06 (S4a) : 401 s
+# s4b.sh prealables, 2026-11-23T19:39:10Z
+## artefact de packaging (layout local de S4c, tiré par digest)
+OK   verrou tiré égal au verrou du dépôt : égal
+OK   liste : lignes, octets : 162 193978008
+## gabarits rendus (refs factices)
+OK   liste rendue dans la pipeline deb, identique à la liste : identique
+OK   pipeline deb : subPath de prefetch, racine pour publier : ["fermeture",null]
+OK   demande Hermeto rendue dans la pipeline sources : [{"type": "gomod"}, {"type": "npm", "path": "web"}]
+OK   prefetch-gomod : YAML lisible par yq, nom : prefetch-gomod
+OK   prefetch-deb-sample-app : YAML lisible par yq, nom : prefetch-deb-sample-app
+OK   prefetch-sources-sample-app : YAML lisible par yq, nom : prefetch-sources-sample-app
+OK   prefetch-gomod v2 : paramètre paquets sans valeur par défaut : false
+## prefetch-gomod : version 2 et version 1 (script)
+OK   v2 : syntaxe sh du script : OK
+     < echo "$(hermeto --version | head -1) ; $(go version) ; $(git --version) ; commit $COMMIT"
+     < hermeto fetch-deps --source /tmp/depot --output "$f" '{"type": "gomod"}'
+     > python3 -I - /tmp/depot "$PAQUETS" <<'FIN'
+     > import json, os, sys
+     > src, demande = sys.argv[1:]
+     > def refus(m):
+     >     print('refusé : ' + m, file=sys.stderr); sys.exit(1)
+     > try:
+     >     d = json.loads(demande)
+     > except ValueError:
+     >     refus('demande Hermeto illisible')
+     > if not isinstance(d, list) or not d:
+     >     refus('demande Hermeto : liste non vide attendue')
+     > vus = set()
+     > for p in d:
+     >     if not isinstance(p, dict) or not set(p) <= {'type', 'path'}:
+     >         refus(f'entrée non admise : {p!r}')
+     >     t, c = p.get('type'), p.get('path', '.')
+     >     if t not in ('gomod', 'npm'):
+     >         refus(f'type non admis : {t!r}')
+     >     if not isinstance(c, str) or not c or c.startswith('/') or '..' in c.split('/'):
+     >         refus(f'chemin non admis : {c!r}')
+     >     if (t, os.path.normpath(c)) in vus:
+     >         refus(f'entrée en double : {p!r}')
+     >     vus.add((t, os.path.normpath(c)))
+     >     if t != 'npm':
+     >         print(f'{t} {c} : admis')
+     >         continue
+     >     r = os.path.join(src, c)
+     >     if os.path.islink(r) or not os.path.isdir(r):
+     >         refus(f'npm {c} : répertoire absent ou lien')
+     >     for nom in ('npm-shrinkwrap.json', 'package-lock.json'):   # ordre d'Hermeto 0.64.0 (npm/resolver.py)
+     >         v = os.path.join(r, nom)
+     >         if os.path.lexists(v):
+     >             break
+     >     else:
+     >         refus(f'npm {c} : aucun lockfile')
+     >     if os.path.islink(v):
+     >         refus(f'npm {c} : {nom} est un lien')
+     >     try:
+     >         l = json.load(open(v, encoding='utf-8'))
+     >     except ValueError:
+     >         refus(f'npm {c} : {nom} illisible')
+     >     if l.get('lockfileVersion') not in (2, 3):
+     >         refus(f'npm {c} : lockfileVersion {l.get("lockfileVersion")!r}, 2 ou 3 attendu')
+     >     paquets = l.get('packages')
+     >     if not isinstance(paquets, dict) or '' not in paquets:
+     >         refus(f'npm {c} : section packages absente ou sans racine')
+     >     n = 0
+     >     for k, e in paquets.items():
+     >         if k == '':
+     >             continue
+     >         if not isinstance(e, dict) or e.get('link'):
+     >             refus(f'npm {c} : entrée {k} : lien ou forme inattendue')
+     >         u, i = e.get('resolved'), e.get('integrity')
+     >         if not isinstance(u, str) or not u.startswith('https://registry.npmjs.org/'):
+     >             refus(f'npm {c} : entrée {k} : resolved {u!r} hors de https://registry.npmjs.org/')
+     >         if not isinstance(i, str) or not i.startswith('sha512-'):
+     >             refus(f'npm {c} : entrée {k} : integrity sha512 absente')
+     >         n += 1
+     >     print(f'npm {c} : {nom}, lockfileVersion {l["lockfileVersion"]}, {n} paquet(s), tous de https://registry.npmjs.org/ avec integrity sha512')
+     > FIN
+     > echo "$(hermeto --version | head -1) ; $(go version) ; $(git --version) ; commit $COMMIT ; demande $PAQUETS"
+     > hermeto fetch-deps --source /tmp/depot --output "$f" "$PAQUETS"
+OK   v1 et v2 : lignes de v1 changées (version des outils, appel d'Hermeto) : 2
+## contrôle npm de la v2 (tiré du gabarit rendu), sur l'arbre de sample-app et sur des cas altérés
+OK   contrôle : syntaxe Python
+OK   arbre de sample-app (celui du commit 6391fd437f26696847041be3226bbbf633f55a2f) : 30e808ffa327288c656ddda7b6fafe4005234b77
+OK   cas positif (demande de la pipeline) : npm web : package-lock.json, lockfileVersion 3, 1 paquet(s), tous de https://registry.npmjs.org/ avec integrity sha512
+OK   cas positif (gomod seul) : gomod . : admis
+OK   refusé : autre hôte en https (npm web : entrée node_modules/marked : resolved 'https://evil.example/marked/-/marked-16.4.1.tgz' hors de htt
+admis)
+OK   refusé : registry.yarnpkg.com (admis par Hermeto) (npm web : entrée node_modules/marked : resolved 'https://registry.yarnpkg.com/marked/-/marked-16.4.1.tgz' hor
+admis)
+OK   refusé : hôte préfixe (registry.npmjs.org.evil.example) (npm web : entrée node_modules/marked : resolved 'https://registry.npmjs.org.evil.example/marked/-/marked-16.4
+admis)
+OK   refusé : dépendance git (npm web : entrée node_modules/marked : resolved 'git+https://github.com/markedjs/marked.git#abc' hors de http
+admis)
+OK   refusé : integrity absente (npm web : entrée node_modules/marked : integrity sha512 absente
+admis)
+OK   refusé : integrity sha1 (npm web : entrée node_modules/marked : integrity sha512 absente
+admis)
+OK   refusé : resolved absent (paquet groupé) (npm web : entrée node_modules/marked : resolved None hors de https://registry.npmjs.org/
+admis)
+OK   refusé : entrée link (npm web : entrée node_modules/x : lien ou forme inattendue
+admis)
+OK   refusé : lockfileVersion 1 (npm web : lockfileVersion 1, 2 ou 3 attendu
+admis)
+OK   refusé : npm-shrinkwrap.json lu avant package-lock.json (npm web : entrée node_modules/marked : resolved 'https://evil.example/m.tgz' hors de https://registry.npmjs.o
+admis)
+OK   refusé : chemin ../ (chemin non admis : '../web')
+OK   refusé : chemin absolu (chemin non admis : '/tmp')
+OK   refusé : type pip (type non admis : 'pip')
+OK   refusé : forme objet (packages et flags) (demande Hermeto : liste non vide attendue)
+OK   refusé : clé en plus (entrée non admise : {'type': 'gomod', 'flags': ['x']})
+OK   refusé : entrée en double (entrée en double : {'type': 'gomod', 'path': './'}
+admis)
+OK   refusé : demande vide (demande Hermeto : liste non vide attendue)
+## publier-fermeture : section oras push --oci-layout sur un faux miroir
+OK   section extraite : cd, boucle find, oras push : 3
+OK   digest du manifeste : sha256:81291ea48f828c617a28d9a222a678ceed9c2736a4fa7051479d5276b4ab3aff
+     miroir/dists/trixie/InRelease 5e95c0c40be9
+     miroir/dists/trixie/main/binary-amd64/Packages.xz f816b480f871
+     miroir/dists/trixie/main/binary-amd64/by-hash/SHA256/f816b480f87144ec4de5862adf028ff66cc6964250325d53fd22bf8922824b6f f816b480f871
+     miroir/dists/trixie/main/i18n/Translation-en.xz e40405cd8ba0
+     miroir/dists/trixie/main/i18n/by-hash/SHA256/e40405cd8ba072e3532032ea440e0308947bb52420f0011b23919842e9528fd6 e40405cd8ba0
+     miroir/pool/main/a/a/golang-go_1.24~2_amd64.deb 456232c3c874
+     miroir/pool/main/g/gcc/g++-14_14.2.0-19_amd64.deb bfe99fdf3c4e
+OK   couches : nombre, titres distincts (7 fichiers hors bom.json) : 7 7
+OK   couches de même contenu sous deux titres (index et by-hash) : 2
+OK   seconde poussée, autre copie : même digest : sha256:81291ea48f828c617a28d9a222a678ceed9c2736a4fa7051479d5276b4ab3aff
+# s4b.sh taches_deb, 2026-11-23T19:39:11Z
+tâches de la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-deb@sha256:4dac0609a5d1d980501f4f08cdeb0916912b4f3accd9cf56fea456a399e793a5 ; sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+artefact de packaging relu dans Zot (lecture anonyme) : sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
+OK   verrou tiré égal au verrou du dépôt : égal
+OK   liste : lignes, octets : 162 193978008
+## pipeline prefetch-deb-sample-app (tkn 0.46.2)
+OK   liste rendue dans la pipeline deb, identique à la liste : identique
+OK   pipeline deb : subPath de prefetch, racine pour publier : ["fermeture",null]
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/prefetch-deb-sample-app@sha256:85cc4053fad0ac7f331d9c3ca0a1b3463595659bc0b734f73828a35cff56fd93
+# s4b.sh taches_sources, 2026-11-23T19:39:13Z
+## prefetch-gomod v2 (tkn 0.46.2)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   prefetch-gomod : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   prefetch-gomod dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod@sha256:170bef538a89e585326a64618a443460e88d663b2d3a761b535daf531bafa00f
+OK   v2 distincte de la version 1 de la voie image (5e7e5662)
+## pipeline prefetch-sources-sample-app
+OK   demande Hermeto rendue dans la pipeline sources : [{"type": "gomod"}, {"type": "npm", "path": "web"}]
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app@sha256:463bd3f69cb29ab83923f195cafadee6fb76c7a5c18abe37fa881df8248b4495
+# s4b.sh deb, 2026-11-23T19:39:14Z
+## s4b-deb-1 créé à 19:39:14 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-deb-sample-app@sha256:85cc4053fad0ac7f331d9c3ca0a1b3463595659bc0b734f73828a35cff56fd93)
+### TaskRun s4b-deb-1-prefetch (Succeeded), pod s4b-deb-1-prefetch-pod sur sc-build, runtimeClassName «  », tekton.dev/task prefetch-deb
+     2026/11/23 19:39:20 Entrypoint initialization
+     2026/11/23 19:39:20 Decoded script /tekton/scripts/script-0-662jh
+     uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
+     index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
+     index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
+     miroir : 162 paquets, 193978008 octets, en 24 s
+### TaskRun s4b-deb-1-publier (Succeeded), pod s4b-deb-1-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture
+     2026/11/23 19:39:48 Entrypoint initialization
+     2026/11/23 19:39:49 Decoded script /tekton/scripts/script-0-42768
+     /tekton/scripts/script-0-42768: line 17: can't open bom.json: no such file
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 (167 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 
+OK   PipelineRun s4b-deb-1 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+OK   PipelineRun s4b-deb-1 signé par Chains : true
+## s4b-deb-2 créé à 19:41:00 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-deb-sample-app@sha256:85cc4053fad0ac7f331d9c3ca0a1b3463595659bc0b734f73828a35cff56fd93)
+### TaskRun s4b-deb-2-prefetch (Succeeded), pod s4b-deb-2-prefetch-pod sur sc-build, runtimeClassName «  », tekton.dev/task prefetch-deb
+     2026/11/23 19:41:05 Entrypoint initialization
+     2026/11/23 19:41:06 Decoded script /tekton/scripts/script-0-9bk4f
+     uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
+     index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
+     index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
+     miroir : 162 paquets, 193978008 octets, en 132 s
+### TaskRun s4b-deb-2-publier (Succeeded), pod s4b-deb-2-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture
+     2026/11/23 19:43:22 Entrypoint initialization
+     2026/11/23 19:43:24 Decoded script /tekton/scripts/script-0-rjfzj
+     /tekton/scripts/script-0-rjfzj: line 17: can't open bom.json: no such file
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 (167 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 
+OK   PipelineRun s4b-deb-2 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+OK   PipelineRun s4b-deb-2 signé par Chains : true
+OK   deux exécutions, même fermeture : sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+# s4b.sh sources, 2026-11-23T19:43:38Z
+## s4b-sources-1 créé à 19:43:38 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app@sha256:463bd3f69cb29ab83923f195cafadee6fb76c7a5c18abe37fa881df8248b4495)
+### TaskRun s4b-sources-1-prefetch (Succeeded), pod s4b-sources-1-prefetch-pod sur sc-build, runtimeClassName «  », tekton.dev/task prefetch-gomod
+     2026/11/23 19:43:42 Entrypoint initialization
+     2026/11/23 19:43:43 Decoded script /tekton/scripts/script-0-h5brx
+     gomod . : admis
+     npm web : package-lock.json, lockfileVersion 3, 1 paquet(s), tous de https://registry.npmjs.org/ avec integrity sha512
+     hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f ; demande [{"type": "gomod"}, {"type": "npm", "path": "web"}]
+     2026-11-23 19:43:47,444 INFO Fetching the gomod dependencies at subpath .
+     2026-11-23 19:43:47,451 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-23 19:43:49,867 INFO Verifying checksums of marked-16.4.1.tgz
+     2026-11-23 19:43:49,885 INFO All dependencies fetched successfully \o/
+     fermeture : 7 fichiers, 284 Kio
+### TaskRun s4b-sources-1-publier (Succeeded), pod s4b-sources-1-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture
+     2026/11/23 19:43:51 Entrypoint initialization
+     2026/11/23 19:43:52 Decoded script /tekton/scripts/script-0-zrtlc
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 (8 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 0799
+OK   PipelineRun s4b-sources-1 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+OK   PipelineRun s4b-sources-1 signé par Chains : true
+## s4b-sources-2 créé à 19:44:04 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app@sha256:463bd3f69cb29ab83923f195cafadee6fb76c7a5c18abe37fa881df8248b4495)
+### TaskRun s4b-sources-2-prefetch (Succeeded), pod s4b-sources-2-prefetch-pod sur sc-build, runtimeClassName «  », tekton.dev/task prefetch-gomod
+     gomod . : admis
+     npm web : package-lock.json, lockfileVersion 3, 1 paquet(s), tous de https://registry.npmjs.org/ avec integrity sha512
+     hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f ; demande [{"type": "gomod"}, {"type": "npm", "path": "web"}]
+     2026-11-23 19:44:13,625 INFO Fetching the gomod dependencies at subpath .
+     2026-11-23 19:44:13,631 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-23 19:44:15,329 INFO Verifying checksums of marked-16.4.1.tgz
+     2026-11-23 19:44:15,339 INFO All dependencies fetched successfully \o/
+     fermeture : 7 fichiers, 284 Kio
+     2026/11/23 19:44:09 Entrypoint initialization
+     2026/11/23 19:44:10 Decoded script /tekton/scripts/script-0-h5b4c
+### TaskRun s4b-sources-2-publier (Succeeded), pod s4b-sources-2-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture
+     2026/11/23 19:44:17 Entrypoint initialization
+     2026/11/23 19:44:18 Decoded script /tekton/scripts/script-0-cm8dg
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 (8 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 6f7a
+OK   PipelineRun s4b-sources-2 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+OK   PipelineRun s4b-sources-2 signé par Chains : true
+OK   deux exécutions, même fermeture : sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+# s4b.sh comparaison, 2026-11-23T19:44:29Z
+## fermeture deb
+OK   fichiers (162 .deb, InRelease, 2 index, 2 copies by-hash) : 167 162
+OK   InRelease : 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+OK   main/binary-amd64/Packages.xz selon l'InRelease (sha256 taille) : 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498 9678380
+OK   main/binary-amd64/Packages.xz : copie by-hash : 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498
+OK   main/i18n/Translation-en.xz selon l'InRelease (sha256 taille) : 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251 6485704
+OK   main/i18n/Translation-en.xz : copie by-hash : 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251
+OK   pool égal à la liste (sha256 taille chemin), octets : 5685ffcd773fc9d1ca0322f47e138e8cb31c82ace4c67934f62948c1208b0adc 193978008
+## fermeture applicative (sources)
+     8ccac6fe17a3497c 1736 .build-config.json
+     f55b521b30ea1133 7 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/list
+     bf888f335d726619 186 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.info
+     e3b0c44298fc1c14 0 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.lock
+     a8921a2ecd771d34 149 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.mod
+     4d7cceff13549438 111305 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.zip
+     dc3399fcb9d6e23d 47 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.ziphash
+     9144f0e2a4cea783 107451 deps/npm/marked-16.4.1.tgz
+OK   fichiers (6 gomod, 1 npm, .build-config.json) : 8 6 1
+OK   fichiers gomod égaux à ceux de F2 (même commit) : e310dd4e46826c5e05c8a6b18e8112e1a8e9cc354b2b96ff520ff42525026cba
+OK   archive npm : sha512 égal à l'integrity du lockfile : sha512-ntROs7RaN3EvWfy3EZi14H4YxmT6A5YvywfhO+0pm+cH/dnSQRmdAmoFIc3B9aiwTehyk7pESH4ofyBY+V5hZg==
+## .build-config.json : fermeture applicative et F2 (gomod seul)
+     24c24,33
+     <   "project_files": []
+     ---
+     >   "project_files": [
+     >     {
+     >       "abspath": "/tmp/depot/web/package-lock.json",
+     >       "template": "{\n  \"name\": \"sample-app-web\",\n  \"version\": \"1.0.0\",\n  \"lockfileVersion\": 3,\n  \"requires\": true,\n  \"packages\": {\n    \"\": {\n      \"name\": \"sample-app-web\",\n      \"version\": \"1.0.0\",\n      \"license\": \"Apache-2.0\",\n      \"dependencies\": {\n        \"marked\": \"16.4.1\"\n      }\n    },\n    \"node_modules/marked\": {\n      \"version\": \"16.4.1\",\n      \"resolved\": \"file://${output_dir}/deps/npm/marked-16.4.1.tgz\",\n      \"integrity\": \"sha512-ntROs7RaN3EvWfy3EZi14H4YxmT6A5YvywfhO+0pm+cH/dnSQRmdAmoFIc3B9aiwTehyk7pESH4ofyBY+V5hZg==\",\n      \"license\": \"MIT\",\n      \"bin\": {\n        \"marked\": \"bin/marked.js\"\n      },\n      \"engines\": {\n        \"node\": \">= 20\"\n      }\n    }\n  }\n}\n"
+     >     },
+     >     {
+     >       "abspath": "/tmp/depot/web/package.json",
+     >       "template": "{\n  \"name\": \"sample-app-web\",\n  \"version\": \"1.0.0\",\n  \"private\": true,\n  \"description\": \"Interface web de sample-app (construite sans bundler natif pour rester herm\\u00e9tique).\",\n  \"license\": \"Apache-2.0\",\n  \"scripts\": {\n    \"build\": \"node build.mjs\"\n  },\n  \"dependencies\": {\n    \"marked\": \"16.4.1\"\n  }\n}\n"
+     >     }
+     >   ]
+## durée 06 (S4b) : 320 s
+## arrêt après 06 (S4b) (JUSQUA), 721 s

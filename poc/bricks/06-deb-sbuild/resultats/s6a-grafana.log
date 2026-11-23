@@ -1,9 +1,9 @@
-# s6a.sh grafana, 2026-11-16T16:10:31Z
+# s6a.sh grafana, 2026-11-23T20:12:18Z
 ## préalables
-periodique à partir de 2026-11-16T16:06:34Z, fraicheur à partir de 2026-11-16T16:09:22Z
+periodique à partir de 2026-11-23T20:09:52Z, fraicheur à partir de 2026-11-23T20:12:04Z
 OK   aucun passage planifié depuis periodique (scan-sample-app, scan-sample-app-deb)
 ## journaux du passage s6a-manuel, lus par l'auditeur (Loki ingère avec quelques secondes de retard)
-14 ligne(s) après 1 essai(s), non affichées
+15 ligne(s) après 1 essai(s), non affichées
 OK   visible dans Grafana : ^SOURCE| : oui
 OK   visible dans Grafana : ^BASE| : oui
 OK   visible dans Grafana : ^DEB|sample-app_1.0.0-2_amd64.deb : oui
@@ -12,13 +12,13 @@ OK   visible dans Grafana : ^SCAN| : oui
 OK   visible dans Grafana : ^ATTESTATION| : oui
 OK   visible dans Grafana : ^PUBLIE| : oui
 OK   visible dans Grafana : jeton du rôle scanner révoqué : oui
-OK   PUBLIE dans Grafana égal au journal de periodique : sc-stockage.poc.test:5000/builds/scan/sample-app-deb@sha256:ca8946f41c7e9a12303be362425e33e9e7359117b6ec171b0331fe307ea5a986, referrer de sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+OK   PUBLIE dans Grafana égal au journal de periodique : sc-stockage.poc.test:5000/builds/scan/sample-app-deb@sha256:4b9fe6e2288cc3d43e0d503d0a6ece2ac952617eb4029eb2e7d65f2ee6a1ef26, referrer de sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
 ## audit d'OpenBao et de Zot, lus par l'auditeur
 OK   signature du scanner dans l'audit d'OpenBao, visible dans Grafana : oui
   2 ligne(s) d'audit (non affichées)
 OK   poussage par poc-scan dans builds/scan/sample-app-deb, visible dans Grafana : oui
 ## journal de fraicheur-scan, lu par l'auditeur
-  scan builds/scan/sample-app=1794821512 builds/scan/sample-app-deb=1794845309, base 1794810654
+  scan builds/scan/sample-app=1795452105 builds/scan/sample-app-deb=1795464715, base 1795415312
 OK   mesures des deux dépôts visibles dans Grafana : oui
 ## identifiants de poc-scan absents des réponses
 OK   mot de passe de poc-scan ou son encodage docker dans les réponses de Grafana : non

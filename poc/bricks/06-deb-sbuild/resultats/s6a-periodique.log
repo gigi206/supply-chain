@@ -1,39 +1,40 @@
-# s6a.sh periodique, 2026-11-16T16:06:34Z
+# s6a.sh periodique, 2026-11-23T20:09:52Z
 ## préalables
 OK   s6a-scanner-deb.patch appliqué et commité
 OK   builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e présent dans Zot
 ## rendu, dry-run serveur, comparaison au CronJob de l'image
 limites de revocation (limites.tsv) : requêtes 10m et 32Mi, limites 500m et 256Mi
-Warning: resource cronjobs/scan-sample-app-deb is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
 OK   gabarit du Job du deb égal à celui de scan-sample-app, hors image, nom, dépôt et NATURE
 OK   NATURE dans analyser : deb
 OK   horaire, fuseau, concurrence : 15 11 * * * Etc/UTC Forbid
 OK   horaire de scan-sample-app (inchangé) : 30 9 * * *
-OK   hors des fenêtres planifiées (16 h UTC), aucun pod actif dans scan
+OK   hors des fenêtres planifiées (20 h UTC), aucun pod actif dans scan
 ## ConfigMap scan-config (comme cm_scan de la 07a), scanner.sh corrigé
 configmap/scan-config serverside-applied
-OK   scanner.sh de scan-config égal à l'arbre : 88e7bfe80df12ae4dae3bdb643e53c510603682a0b5a335f935994771b0c03c6
+OK   vex.pub de scan-config égale à la clé publique VEX archivée (ou absente des deux côtés) : 04967fbeda953920ea16d6881c79a8fdc70e8999db451d19a40949dca19c9ae2
+OK   scanner.sh de scan-config égal à l'arbre : 7251df1567c1cfdd5585b837411b40b4c816c911436dc554079325ab7ff2965c
 ## CronJob scan-sample-app-deb et un passage lancé depuis lui
 cronjob.batch/scan-sample-app-deb serverside-applied
 referrers du deb dans builds/scan/sample-app-deb avant : 0
 job.batch/s6a-manuel created
-job 1/ après 121 s ; place libre la plus basse sur sc-confiance pendant le job : 8702 Mo
+job 1/ après 132 s ; place libre la plus basse sur sc-confiance pendant le job : 10108 Mo
 ### source (0 ligne(s) filtrée(s), jeton|token)
   SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
 ### analyser (0 ligne(s) filtrée(s), jeton|token)
-  BASE|2026-11-16, sc-stockage.poc.test:5000/vulndb/grype@sha256:e6aa5a3ca01055dd90723cbe0ab427632e691c2e3a60bcb58d91f9715c733411, empreinte sha256:dd51add686f29657dd7d71af8dc61d33cbb3e99772e263d2949b7adec4ce4102, 2 s
-  IMPORT|3281 Mo, 103 s ; 3474 Mo dans le volume, au plus haut
+  BASE|2026-11-23, sc-stockage.poc.test:5000/vulndb/grype@sha256:3be413f60b71060d38823140161d75718d4ab58e22e1dce0a3634b6b61f9bc78, empreinte sha256:3d24f57cd3587e2c73f686decc7ad04b213d1f3575bcf1dd847e42df94560f14, 1 s
+  IMPORT|3397 Mo, 111 s ; 3594 Mo dans le volume, au plus haut
   DEB|sample-app_1.0.0-2_amd64.deb, sha256 f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b, 1953492 octets
   EXTRAIT|3 fichiers dans data.tar
   ARTEFACT|deb, 2 PURL versionnées dans l'artefact seul
-  SBOM|4 composants avec PURL (D1 a), 2 s
-  SCAN|sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, 67 vulnérabilités, 0 KEV, 1 s
-  PREDICAT|sha256 7f12cfcd4ed8b11ed1d1b63c299ff57e4aaccf2fb96a575a86f23eb47e659453, 109 s en tout
+  SBOM|5 composants avec PURL (D1 a), 2 s
+  VEX|0 énoncé(s) vérifié(s), 0 retenu(s), 0 rejeté(s)|sc-stockage.poc.test:5000/builds/vex/sample-app-deb|cosign code 1 : no matching attestations: 
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, 67 vulnérabilités, 0 KEV, 0 écartée(s) par un VEX, 1 s
+  PREDICAT|sha256 88fd44c1feca9fafde9556cd493dd72f81117b4ba7d6c92b925a380631d80d02, 116 s en tout
 ### jetons (2 ligne(s) filtrée(s), jeton|token)
 ### attester (0 ligne(s) filtrée(s), jeton|token)
-  ATTESTATION|sujet sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, prédicat https://supply-chain.example/scan/v1, bundle sha256 8ffe5ea99b3fa780b32956fbbf406eeb82f450f7b780cdb8bcf1ca4be0754022, vérifié avec la clé publique
+  ATTESTATION|sujet sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, prédicat https://supply-chain.example/scan/v1, bundle sha256 661ed91a4a239184a4362e2fee4954ed549dcfc0071bc8db37d42e74a730a541, vérifié avec la clé publique
 ### publier (0 ligne(s) filtrée(s), jeton|token)
-  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app-deb@sha256:ca8946f41c7e9a12303be362425e33e9e7359117b6ec171b0331fe307ea5a986, referrer de sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app-deb@sha256:4b9fe6e2288cc3d43e0d503d0a6ece2ac952617eb4029eb2e7d65f2ee6a1ef26, referrer de sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
 ### revocation (1 ligne(s) filtrée(s), jeton|token)
 OK   job : 1
 OK   deb extrait dans analyser : 1
@@ -41,6 +42,6 @@ OK   plancher de l'artefact seul tenu (PURL versionnées > 0) : oui
 OK   referrers du deb dans builds/scan/sample-app-deb : 1
 OK   sujet du referrer publié : sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
 OK   bundle vérifié sur l'hôte : clé du scanner, sujet sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
-{"sujet":["sample-app-deb"],"scannedAt":"2026-11-16T16:08:24.785318495Z","base":{"built":"2026-11-16T06:30:54Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:e6aa5a3ca01055dd90723cbe0ab427632e691c2e3a60bcb58d91f9715c733411","schema":"v6.1.10"},"vulnerabilites":67,"kev":0}
+{"sujet":["sample-app-deb"],"scannedAt":"2026-11-23T20:11:49.848700773Z","base":{"built":"2026-11-23T06:28:32Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:3be413f60b71060d38823140161d75718d4ab58e22e1dce0a3634b6b61f9bc78","schema":"v6.1.10"},"vulnerabilites":67,"kev":0}
 job s6a-manuel supprimé (journaux archivés ici et dans Loki)
 bilan : tout OK

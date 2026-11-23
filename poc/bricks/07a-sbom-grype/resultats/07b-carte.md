@@ -2204,3 +2204,12 @@ Le propriétaire a choisi : clé VEX recréée automatiquement par le rejeu (com
 ## Correction (note de 2026-11-23T19:32:17Z) : `racine.tar` et `chroot.tar` ne sont pas des entrées du rejeu
 
 La note de 16:53:47Z ci-dessus range `s1-06/racine.tar` et `s2-06/chroot.tar` parmi les entrées perdues du bloc 06 et conclut à une reconstruction par S1 `racine` et S2. **C'est faux pour le rejeu** : `s4a.sh` ne les lit qu'à la ligne 324, dans `etape_comparaison`, que le rejeu ne lance pas (`rejeu.sh`, l. 217 : `prealables taches reseau pipeline`). Les entrées réellement manquantes étaient le deb de S3 (`f66bbeb2…`, copie retrouvée sur l'hôte et replacée à 19:31:27Z) et `s4d-06/digest-attendu` (refait par `s4d.sh prealables`). Carte et prédictions de la reprise : [`reprise-06-rejeu-23-11-predictions.md`](../../06-deb-sbuild/resultats/reprise-06-rejeu-23-11-predictions.md).
+
+## Reprise du bloc 06 : la 07b dans S6a (note de 2026-11-23T20:14:03Z)
+
+Mesuré à la reprise du bloc 06 ([résultat](../../06-deb-sbuild/resultats/reprise-06-rejeu-23-11-predictions.md)) :
+- S6a `periodique` garde `vex.pub` dans `scan-config`, égale à la clé neuve (SPKI `d0a12faa…`) ;
+- le scan du deb porte la ligne `VEX|`, avec 0 énoncé : aucun VEX n'existe ;
+- « 07b (entrees-scan, pose) » a écrit 44 séries.
+
+Ce qui était « non atteint » le 23/11 à 16:53:47Z est donc fait. Reste la pièce 8.

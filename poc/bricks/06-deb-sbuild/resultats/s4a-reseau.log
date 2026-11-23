@@ -1,5 +1,5 @@
-# s4a.sh reseau, 2026-11-13T14:52:43Z
-NetworkPolicy de builds : builder-sans-sortie, construction-sans-sortie
+# s4a.sh reseau, 2026-11-23T19:32:34Z
+NetworkPolicy de builds : builder-sans-sortie, construction-racine-rpm-sans-sortie, construction-rpm-sans-sortie, construction-sans-sortie
 OK   politiques qui sélectionnent construire-builder, sans entrée ni sortie : 1
 OK   politiques de builds qui autorisent du trafic : 0
 OK   CiliumNetworkPolicy de builds qui sélectionnent construire-builder et autorisent du trafic : 

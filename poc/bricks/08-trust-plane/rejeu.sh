@@ -105,6 +105,12 @@ fi
 if [ -n "${TAG_05:-}" ] && [ "$DISTRO" = rke2 ] && [ "$RESEAU" = cilium ]; then   # M5b de la 05 : contrôle avant tout démontage
   env TAG="$TAG_05" mise exec -- "$b05/m5b-rejeu.sh" entree
 fi
+# Additif du 2026-11-23 (arrêt du rejeu plateforme-1 dans « 06 (S4c) ») : le bloc 06 lit sous $W des entrées de l'hôte que le rejeu
+# ne produit pas (InRelease et Packages.xz de S1, deb de S3) ; vm.sh detruire efface $W. Copie hors de $W, empreintes épinglées,
+# avant tout démontage (06-deb-sbuild/rejeu-entrees.sh garder) ; recopie par l'étape « 06 (entrées de l'hôte) ».
+if [ "$DISTRO" = rke2 ] && [ "$RESEAU" = cilium ]; then
+  "$here/../06-deb-sbuild/rejeu-entrees.sh" garder || { echo "KO   entrées de l'hôte du bloc 06 : rien n'est démonté" >&2; exit 1; }
+fi
 etape démontage mise run confiance:vm -- detruire
 etape VM mise run confiance:vm -- creer
 if [ "$DISTRO" = k3s ]; then etape k3s mise run confiance:k3s; else etape RKE2 mise exec -- "$here/../08b-rke2/rke2.sh" installer; fi
@@ -209,13 +215,15 @@ if [ "$DISTRO" = rke2 ] && [ "$RESEAU" = cilium ]; then
   etape "08c (sortie des builds)" mise exec -- "$b08c/sortie-builds.sh" rejeu
   # Résolveurs bornés à builds (02/11/2026) : après la bascule et après H4 (tls.secretSync coupé : 4 lecteurs de Secrets)
   etape "J8 (résolveurs)" mise run confiance:preuves -- resolveurs
-  # Exclues : S1 sauf amorce, S2, S3 (mesures ; leurs fichiers de l'hôte, $W/s1-06 à s3-06, sont gardés et relus), s4a
-  # comparaison, s4b provenance, s4d prealables (digest-attendu gardé dans $W), essais, provenance, comparaison, S4d2, S5a,
-  # diag-exec-kata.sh.
+  # Exclues : S1 sauf amorce, S2, S3 (mesures ; leurs fichiers de l'hôte lus ici sont gardés hors de $W par rejeu-entrees.sh,
+  # corrigé le 23/11/2026 : $W est effacé au démontage), s4a comparaison (seule à lire racine.tar et chroot.tar), s4b provenance,
+  # essais, provenance, comparaison, S4d2, S5a, diag-exec-kata.sh. s4d prealables est rejouée depuis le 23/11/2026.
   etape "06 (S1, amorce)" mise exec -- "$b06/s1.sh" amorce
+  etape "06 (entrées de l'hôte)" "$b06/rejeu-entrees.sh" replacer   # additif du 23/11/2026 (voir garder, avant le démontage)
   etape "06 (S4c)" mise exec -- "$b06/s4c.sh" verrou publier
   etape "06 (S4a)" mise exec -- "$b06/s4a.sh" prealables taches reseau pipeline
   etape "06 (S4b)" mise exec -- "$b06/s4b.sh" prealables taches_deb taches_sources deb sources comparaison
+  etape "06 (S4d, prealables)" mise exec -- "$b06/s4d.sh" prealables   # additif du 23/11/2026 : digest-attendu, effacé avec $W
   etape "06 (S4d)" mise exec -- "$b06/s4d.sh" reseau taches pipeline
   if [ "${POUSSER_VSA:-}" = 1 ]; then
     etape "06 (S4d3)" mise exec -- "$b06/s4d3.sh" retirer prealables deployer chemins porte

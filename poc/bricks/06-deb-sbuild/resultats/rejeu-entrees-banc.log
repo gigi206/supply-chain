@@ -1,0 +1,12 @@
+# banc de rejeu-entrees.sh, 2026-11-23T19:33:34Z, 9c6df815, script 37cf610a95f22117
+OK   garder : copie depuis le vrai $W (code 0)
+OK   garder : copie relue, jamais réécrite (code 0)
+OK   replacer : dossier de travail vide, fichiers créés et Packages régénéré (code 0)
+OK   replacer : relancé, fichiers présents comparés (code 0)
+OK   replacer : deb altéré sous $W, refusé (code 1)
+OK   garder : copie altérée, refusée (code 1)
+OK   garder : ni $W ni copie, refusé, rien n'est démonté (code 1)
+OK   replacer : sans copie, refusé (code 1)
+OK   usage : étape inconnue (code 2)
+OK   vrai $W intact (deb) (code 0)
+## bilan : 10 cas, 0 écart(s)

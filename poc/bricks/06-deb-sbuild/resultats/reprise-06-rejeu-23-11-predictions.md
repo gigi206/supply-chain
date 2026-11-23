@@ -54,3 +54,37 @@ Les journaux propres aux scripts sont réécrits, comme à chaque rejeu ; les ve
 
 Arrêt : relevé, corrigé dans le dépôt si la cause est dans le code, repris par `DEPUIS=` sous un libellé neuf.
 Ce que ce document ne règle pas : le prochain rejeu de zéro effacera de nouveau `$W`. La correction structurelle, sur le modèle de `m5b-rejeu.sh entree` (copies hors de `$W`, empreintes épinglées, contrôle avant le démontage, recopie avant « 06 (S4c) »), sera écrite après C, `rejeu.sh` n'étant jamais modifié pendant qu'il tourne.
+
+## Résultat (note de 2026-11-23T20:14:03Z)
+
+**Les trois lancements tiennent, aucun KO** : A, B et C finissent en code 0 ; les journaux réécrits de S4a, S4b, S4d, S4d3 et S6a ont 0 ligne `KO`.
+
+- **A**, de 19:32:29 à 19:44:30 UTC ([journal](../../08-trust-plane/resultats/rejeu-06-reprise-a.log)) :
+  - **R1 tient** : image de build `749d746c…` deux fois.
+  - **R2 tient** : fermeture deb `bb7599a2…` deux fois ; fermeture des sources `50dc73f7…` deux fois ; `comparaison` passe.
+- **B**, à 19:44:42 UTC ([journal](s4d-prealables.log)) : **R3 tient**, `digest-attendu` vaut `sha256:60f25f5c…`.
+- **C**, de 19:44:55 à 20:12:18 UTC ([journal](../../08-trust-plane/resultats/rejeu-06-reprise-c.log)) :
+  - **R4 tient** : artefact `builds/sample-app-deb@60f25f5c…` deux fois, égal à `digest-attendu`.
+  - **R5 tient** : S4d3 `retirer prealables deployer chemins` passe ; la porte est sautée.
+  - **R6 tient** :
+    - S6a `periodique` applique `s6a-scanner-deb.patch` ;
+    - `vex.pub` de `scan-config` est égale à la clé VEX archivée (fichier `04967fbe…`, SPKI `d0a12faa…`) ;
+    - le scan du deb donne `VEX|0 énoncé(s)` (dépôt `builds/vex/sample-app-deb` absent) et `SCAN|… 67 vulnérabilités, 0 KEV, 0 écartée(s) par un VEX` ;
+    - `fraicheur` passe ;
+    - « 07b (entrees-scan, pose) » écrit 44 séries ;
+    - `grafana` voit les huit préfixes du scan dans Grafana.
+- **R7** n'est pas mesurée directement : l'état de l'alerte `ScanEnRetard` n'a pas été lu. `fraicheur` lit dans Prometheus un dernier referrer du scan du deb à 20:11:55 UTC.
+
+**Correction structurelle, écrite après C** (`rejeu.sh` ne tournait plus) :
+- **`rejeu-entrees.sh`**, script neuf de la 06 :
+  - `garder` s'exécute avant le démontage. Il copie l'InRelease, `Packages.xz` et le deb de S3 dans `~/.cache/supply-chain-poc/06/rejeu-entrees`, avec leurs empreintes épinglées. Une copie déjà présente est relue, jamais réécrite. En cas d'échec, rien n'est démonté.
+  - `replacer` s'exécute avant « 06 (S4c) ». Il recopie ces fichiers et régénère `Packages` par `xz -dc`.
+  - [Banc](rejeu-entrees-banc.log) jetable : 10 cas, 0 écart. La vraie copie a été faite à 20:13:03Z ([garder](rejeu-entrees-garder.log), [replacer](rejeu-entrees-replacer.log)).
+- **`rejeu.sh`** :
+  - `garder` passe avant le démontage, sous RKE2 et Cilium ;
+  - nouvelle étape « 06 (entrées de l'hôte) » avant « 06 (S4c) » ;
+  - nouvelle étape « 06 (S4d, prealables) » avant « 06 (S4d) » ;
+  - le commentaire des exclusions est corrigé.
+  - **Pas encore rejoué de zéro** : seule la syntaxe est contrôlée (`bash -n`).
+
+**Reste, sur accord nommé** : avec `POUSSER_VSA=1`, les étapes S6b `pousser_vsa` et `lire_vsa`, puis S6a `porte` et `s4d3.sh porte`. La CA lue par `pousser_vsa` est identique à celle de la 08 (`cmp`).

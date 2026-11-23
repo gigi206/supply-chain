@@ -1,6 +1,6 @@
 # ADR 0004 : vulnérabilités et VEX (OpenVEX ou CSAF)
 
-- **Statut** : **À rédiger**. Seules les décisions du propriétaire du 21/11/2026 (brique 07b, choix 1 à 5) et leurs limites sont écrites. Restent la projection Dependency-Track, le score et les KPI de couverture VEX. `vex_age_max_jours` est fixé à 30 jours (2026-11-21T20:13:42Z).
+- **Statut** : **À rédiger**. *Mise à jour du 2026-11-23T19:33:55Z* : pièces 1 à 7 et 9 posées le 23/11, clé VEX recréée par le rejeu de zéro (SPKI `d0a12faa…`) ; reste la pièce 8 (premier VEX réel, contenu au propriétaire) ; voir l'additif du 23/11. Seules les décisions du propriétaire du 21/11/2026 (brique 07b, choix 1 à 5) et leurs limites sont écrites. Restent la projection Dependency-Track, le score et les KPI de couverture VEX. `vex_age_max_jours` est fixé à 30 jours (2026-11-21T20:13:42Z).
 - **Date** : 2026-11-21
 - **Décideurs** : propriétaire du projet
 
@@ -43,3 +43,20 @@ Format **OpenVEX** (spécification v0.2.0). Le VEX est une attestation in-toto s
 - Renouvellement : *jusqu'au patch `e063abd2aedf18af…`*, la durée partait de l'horodatage le plus ancien des documents retenus. Un VEX neuf ne renouvelait donc rien tant que l'ancien restait publié dans `builds/vex/`, et `cosign attest` v3.1.4 n'a pas d'option de remplacement. Le retrait de l'ancien référent est mesuré au banc jetable (2026-11-21T20:24:29Z, passage 6). `oras manifest delete` sur le digest du manifeste référent le retire de l'API referrers ; l'échéance suit alors le document restant. Rien n'est outillé dans la plateforme : le vrai Zot demanderait un droit de suppression sur `builds/vex/**`, c'est-à-dire un changement de configuration, sur accord. **Choix du propriétaire (2026-11-21T20:39:16Z) : remplacement dans `scan-outil`** (recommandation du conseiller, jugement). Pour un même couple vulnérabilité et produit, l'énoncé le plus récent l'emporte, quel que soit son statut ; le filtre de recevabilité s'applique ensuite. Le registre reste en ajout seul. Le retrait mesuré au banc n'est pas retenu. Le patch est écrit et mesuré (2026-11-21T20:56:05Z, `f38347ad37379efa…`, passage 8 du banc : 107 OK, 0 KO).
 - Écart avec Dependency-Track : d'après `docs/00` (ligne 277, non revérifié), il ne lit que le VEX de CycloneDX. La projection est hors de la 07b.
 - Score « vulnérabilités après VEX » et KPI de couverture VEX (`docs/02`).
+
+## Additif du 23/11/2026 (note de 2026-11-23T19:33:55Z) : pose et rejeu de zéro
+
+Sources : la [carte de la 07b](../../poc/bricks/07a-sbom-grype/resultats/07b-carte.md), sections du 23/11.
+
+- **Posé** (décision du propriétaire « Ne plus attendre », 14:38:33Z) :
+  - pièce 5 : scanner neuf dans les deux CronJob (`b799feda…`), puis un scan lancé à la main, signé et publié, avec la ligne `VEX|` et 0 document ;
+  - pièce 6 : la porte en service accepte un `not_affected` signé par la clé `vex`, âgé de 30 jours au plus ;
+  - pièce 7 : `entrees-scan.py` neuf ; 44 séries dans Prometheus ; dans Loki, une ligne par document passé ;
+  - pièce 9 : patch `07b-t3` reporté dans le dépôt.
+  - Aucun jugement de la porte sur une image réelle n'est mesuré : un Job `porte` signe une VSA, donc écrit dans Zot.
+- **Rejeu de zéro** (choix du propriétaire « Automatique au rejeu ») :
+  - la clé Transit `vex` est recréée à chaque rejeu par `vex-openbao.sh` en mode `REJEU`, et l'accès du propriétaire est reposé depuis le fichier du mot de passe (0600) ;
+  - au rejeu `plateforme-1`, la SPKI est passée de `2b81df72…` à `d0a12faa…` (`resultats/vex-cle-publique.pem` réécrit et commité) ;
+  - **un VEX signé avant un rejeu n'est plus accepté après** : la porte et le scanner ne connaissent que la clé neuve. C'est cohérent avec « tout perdre » en démonstration (Zot est neuf aussi), mais c'est une limite pour une plateforme durable, où la clé devrait survivre au rejeu.
+- **Mesuré à la reprise du bloc 06** (note de 2026-11-23T20:14:03Z) : S6a du rejeu garde `vex.pub` dans `scan-config`, égale à la clé neuve, et le scan du deb porte la ligne `VEX|` (0 énoncé) ; « 07b (entrees-scan, pose) » écrit 44 séries.
+- **Le statut reste « À rédiger »** : la projection Dependency-Track, le score « vulnérabilités après VEX » et les KPI de couverture VEX sont des besoins à définir avec le propriétaire ; la pièce 8 lui revient.
