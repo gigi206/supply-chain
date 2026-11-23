@@ -830,3 +830,7 @@ Conséquences (calcul, si la loi B tient et si Zot n'est pas redémarré) :
 - `vulndb/grype` : non recalculé ici (retrait au compte, indépendant de l'heure du balayage).
 
 **Heures** : de 14:00:32 UTC à l'heure de cette note, dans l'enveloppe de la 07b.
+
+## Note de 2026-11-23T14:26:18Z : pièces 7 et 9 de la 07b et redémarrage de Zot (lu dans le code)
+
+Ni la pièce 7 (`entrees-scan.sh`, unités `entrees-scan.*` seules) ni la pièce 9 (`plateforme.sh` dans le dépôt) ne redémarrent Zot : aucune ligne du patch `07b-t3` ne mentionne `systemctl`, `restart`, `daemon-reload` ni `zot` ([carte](07b-carte.md), additif après le pod d'essai). La projection de 14:10:43Z reste valable pour elles. **Tâche du 29/11 à 05:40 UTC non modifiée** : sa replanification attend l'accord du propriétaire.

@@ -1,0 +1,5 @@
+# état du dépôt builds/vex/sample-app dans le vrai Zot, lecture anonyme seule (curl GET), 2026-11-23T14:24:25Z
+tags/list : HTTP 404
+referrers du digest de sample-app : HTTP 200, manifestes : 0
+_catalog, dépôts sous builds/vex/ : []
+# fin 2026-11-23T14:24:25Z

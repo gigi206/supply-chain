@@ -2019,3 +2019,13 @@ Le dépôt et sc-stockage sont de nouveau alignés pour `zot.json`. Aucune écri
 **Suite** : la pose de la pièce 5 (`piece5-pose.sh pose`) a ses deux préalables de session, dont l'un reste à venir : le pod d'essai (tenu) et `releve_24` le 24/11. Elle se fera sur accord du propriétaire.
 
 **Heures** : de 14:10:43 UTC à 14:13:50 UTC, dans l'enveloppe de la 07b.
+
+## Additif après le pod d'essai (note de 2026-11-23T14:26:18Z) : trois vérifications en lecture seule (rien n'est réécrit)
+
+1. **Dépôt `builds/vex/sample-app` du vrai Zot : absent, pas vide** ([relevé](vex-depot-etat.log), lecture anonyme, 14:24:25 UTC) : liste des tags 404, référents du digest de sample-app 200 avec 0 manifeste, aucun dépôt sous `builds/vex/` dans `_catalog`. La note de résultat de 14:13:50Z écrit « dépôt VEX vide » : **libellé inexact**, la prédiction (« absent ») était juste. Pour `lire_vex`, les deux cas donnent la même ligne (0 énoncé, cosign code 1, le script continue).
+2. **`attester` et `publier` sur l'image neuve** : jamais exécutés (le pod d'essai les excluait). Lus dans `scanner.sh` : ils n'appellent que cosign, oras et des commandes du shell, jamais `scan-outil`. **Mesuré** ([comparaison des couches](piece5-couches.log), lecture anonyme, 14:25:52 UTC) : les 15 couches de base (image cosign) sont les mêmes dans `7eb4f26e…` et `b799feda…` ; dans la dernière couche, 7 entrées de part et d'autre, **seul `scan-outil` diffère** (`3d442df7…` vers `7dde1a8e…`, les empreintes de la pièce 3) ; oras, grype et syft sont identiques. Les binaires que ces deux conteneurs exécutent ne changent donc pas. Leur première exécution sur `b799feda` sera le premier scan planifié après la pose.
+3. **Pièces 7 et 9 et redémarrage de Zot** (lu dans le code, non mesuré) : aucune ligne ajoutée ou retirée du patch `07b-t3` ne mentionne `systemctl`, `restart`, `daemon-reload` ni `zot` ; `entrees-scan.sh` ne touche qu'à `entrees-scan.service` et `entrees-scan.timer` ; la pièce 9 ne change que `plateforme.sh` dans le dépôt. Ni l'une ni l'autre ne redémarre Zot : la projection G7 de 14:10:43Z tient pour elles (hors redémarrage d'une autre cause).
+
+**Suite** : la tâche planifiée du 29/11 à 05:40 UTC lirait avant les premières suppressions du deb (balayage du 29/11, de 17:07 à 18:20 selon la projection) ; sa replanification attend l'accord du propriétaire, **non modifiée**.
+
+**Heures** : de 14:24:01 UTC à 14:26:18 UTC, dans l'enveloppe de la 07b.

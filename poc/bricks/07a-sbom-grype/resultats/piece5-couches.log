@@ -1,0 +1,14 @@
+# couches de outils-scan, lecture anonyme du vrai Zot (crane), 2026-11-23T14:25:52Z
+ancienne sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f : 16 couches ; dernière sha256:104b615a1b217d66796ba31720946715e8b1fb5dbd3958a2eb736309b264a9cc
+ancienne : couches de base = ["a5789fc40e82","990a9c434e5e","39dc083afc39","bf7a4185f015","2780920e5dbf","7c12895b777b","3214acf345c0","52630fc75a18","dd64bf2dd177","b839dfae01f6","dcaa5a89b0cc","96ed2737ae31","61ea958ebee1","250c06f7c38e","39bda24bc0a9"]
+ancienne : blob relu, sha256 104b615a1b217d66796ba31720946715e8b1fb5dbd3958a2eb736309b264a9cc
+neuve sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649 : 16 couches ; dernière sha256:d36738492717ae8a6bde87200e41f943d4a1694faaa750d902c6281da19c0460
+neuve : couches de base = ["a5789fc40e82","990a9c434e5e","39dc083afc39","bf7a4185f015","2780920e5dbf","7c12895b777b","3214acf345c0","52630fc75a18","dd64bf2dd177","b839dfae01f6","dcaa5a89b0cc","96ed2737ae31","61ea958ebee1","250c06f7c38e","39bda24bc0a9"]
+neuve : blob relu, sha256 d36738492717ae8a6bde87200e41f943d4a1694faaa750d902c6281da19c0460
+entrées : ancienne 7, neuve 7
+diffère : usr/local/bin/scan-outil : ('f', '0o755', 2257044, '3d442df7c0fedb11') -> ('f', '0o755', 2490516, '7dde1a8ed457f254')
+fichiers égaux : 3
+  égal : usr/local/bin/grype c833472c3d590cfc
+  égal : usr/local/bin/oras 2be7e2b668fc3232
+  égal : usr/local/bin/syft 6d380157a79f5e91
+# fin 2026-11-23T14:25:54Z
