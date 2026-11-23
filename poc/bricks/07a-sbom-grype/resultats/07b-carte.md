@@ -2140,3 +2140,20 @@ Lecture de `rejeu.sh` et des scripts qu'il appelle (par un agent de lecture, pui
 **Conséquences d'ordre** : un VEX signé avant le rejeu (pièce 8) serait perdu (Zot et OpenBao recréés) : la pièce 8 passe après. Un rejeu avant le 24/11 à 09:33 efface `releve_24` et l'observation de la reprise de la base Grype. Le mode deb du scanner neuf n'a pas encore tourné dans le cluster (premier passage planifié : 24/11 à 11:15). L'ADR 0004 est toujours « À rédiger » : à écrire avant de clore la 07b.
 
 **Heures** : de 14:45:28 UTC à 14:53:21 UTC, dans l'enveloppe de la 07b (au plus 14 h 03 min 37 s à 14:52:36 UTC).
+
+## Intégration de la 07b au rejeu, à sec (note de 2026-11-23T14:59:26Z ; choix du propriétaire « Automatique au rejeu » et « Dès que prêt, ce soir »)
+
+Le propriétaire a choisi : clé VEX recréée automatiquement par le rejeu (comme la clé du scanner) ; rejeu de M5b dès que l'intégration est prête, ce soir, en acceptant la perte de `releve_24` et de l'observation de la panne Grype.
+
+**Changements** (commit `c73abe6e`, rien rejoué) :
+- `s6a-scanner-deb.patch` régénéré contre le `scanner.sh` courant : mêmes lignes `+`/`-` que l'ancien, sauf la ligne `rm` que la 07b a élargie (`vex vex-retenus.json`, des deux côtés) ; réciproque applicable (`git apply -R --check`) ; aucune empreinte de l'ancien épinglée ailleurs.
+- `s6a.sh periodique` : `vex.pub` dans `scan-config`, comme `cm_scan`, et mesurée après l'apply ; dry-run serveur à 14:55:50 UTC : clés `ca-poc.crt`, `scanner.pub`, `scanner.sh`, `vex.pub`.
+- `vex-openbao.sh`, mode `REJEU=<libellé>` : journal `vex-openbao-<étape>-rejeu-<libellé>.log` (refus s'il existe ; journaux de la pose intacts) ; `cle_vex` remplace `vex-cle-publique.pem` (à relire et commiter après le rejeu) ; `acces_vex` lit le mot de passe dans `MDP_FICHIER` (0600 exigé, une lecture, jamais affiché) ; `essai` refusé. Hors `REJEU`, rien ne change.
+- `rejeu.sh` : étapes « 07b (clé VEX) » et « 07b (accès VEX) » après « 07a (G3) » (OpenBao et clé du scanner), avant G4 (`cm_scan` avec `vex.pub`).
+- `g2_image` : tag `grype-0.104.1-syft-1.38.0-vex` (celui de la pièce 3).
+
+**Banc du mode REJEU** ([`07b-rejeu-vex-banc.sh`](07b-rejeu-vex-banc.sh), OpenBao 2.7.2 jetable, réseau vide, scripts lus dans HEAD) : [passage 1](07b-rejeu-vex-banc.log) (14:57:49) : 1 écart, **du banc** (l'annonce de lecture du mot de passe est sur la sortie, pas au journal, comme la saisie au terminal) ; [passage 2](07b-rejeu-vex-banc-2.log) (14:58:11 à 14:58:18 UTC) : **0 écart, 24 OK** : `.pem` remplacé par la clé de `transit/keys/vex`, journal de pose intact, relance et clé présente refusées, `MDP_FICHIER` en 0644 refusé, en 0600 accepté (utilisateur `proprietaire` à `vex-signature`, connexion par le fichier, mot de passe absent du journal), refus sans `REJEU` ni terminal, `essai` refusé, échec propagé par la fonction de `rejeu.sh`.
+
+**Non mesuré avant le rejeu** : les étapes du rejeu elles-mêmes (dont 07a, 08c, 06 et 05, jamais rejouées depuis leurs ajouts) ; la porte garde l'ancienne `scanner.pub` jusqu'au contrôle 7 (`POUSSER_VSA=1`), comportement antérieur à la 07b. Un arrêt se reprend par `DEPUIS=<étape>`.
+
+**Heures** : de 14:53:21 UTC à 14:59:26 UTC, dans l'enveloppe de la 07b.
