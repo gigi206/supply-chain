@@ -1,0 +1,48 @@
+# kyverno-permanent.sh sec, 2026-11-23T15:38:06Z
+image en service : sc-stockage.poc.test:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955
+politique rendue : d131791f7642f9bf ; espace : c38f50abce385dcc
+  | apiVersion: policies.kyverno.io/v1
+  | kind: ImageValidatingPolicy
+  | metadata:
+  |   name: horodatage-livraison
+  | spec:
+  |   validationActions: [Deny]
+  |   evaluation:
+  |     background:
+  |       enabled: false
+  |   matchConstraints:
+  |     namespaceSelector:
+  |       matchExpressions:
+  |       - {key: kubernetes.io/metadata.name, operator: In, values: [livraison]}
+  |     resourceRules:
+  |       - apiGroups: [""]
+  |         apiVersions: ["v1"]
+  |         operations: ["CREATE"]
+  |         resources: ["pods"]
+  |   matchImageReferences:
+  |     - glob: "*"
+  |   attestors:
+  |     - name: chains
+  |       cosign:
+  |         key:
+  |           data: |
+  |             
+  |         source:
+  |           repository: sc-stockage.poc.test:5000/horodatage/bundles
+  |         ctlog:
+  |           insecureIgnoreTlog: true
+  |           tsaCertChain: |
+  |   attestations:
+  |     - name: prov
+  |       intoto:
+  |         type: https://slsa.dev/provenance/v1
+  |   validations:
+  |     - expression: >-
+  |         images.containers.map(i, verifyAttestationSignatures(i, attestations.prov, [attestors.chains])).all(e, e > 0)
+  |       message: "C9 : provenance sans horodatage RFC 3161 valide"
+OK   espace livraison : dry-run serveur accepté
+OK   politique horodatage-livraison : dry-run serveur accepté
+image corrigée absente de Zot (kyverno-admission.sh image à lancer, sur accord)
+OK   chaîne TSA et clé de Chains présentes
+# fin 2026-11-23T15:38:06Z
+bilan : tenue
