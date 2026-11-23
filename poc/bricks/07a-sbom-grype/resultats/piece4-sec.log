@@ -1,0 +1,35 @@
+# piece4-vex-zot.sh sec, 2026-11-23T13:18:25Z ; dépôt af634c5c ; zot.json eb3496c7b1ba2d23
+OK   binaire zot (mise.lock) : 33b9b5bfe05d6788c076de951a01920477dbd6395c330146e23cc2340073e52e
+OK   zot verify sur le zot.json du dépôt : 1
+OK   entrée builds/vex/** du dépôt : [["read"],[[["poc-vex"],["read"],[]],[["poc-vex"],["create"],["req.referenceType != \"tag\""]]]]
+jq: error (at <unknown>): Path must be specified as an array
+configuration jetable : zot.json du dépôt, seuls changent 
+OK   accessControl jetable = dépôt : bd0822417b577628
+OK   zot verify sur la configuration jetable : 1
+OK   Zot jetable : /v2/ en anonyme : 200
+OK   sujet poussé dans builds/sample-app (poc-ecriture)
+sujet : sha256:6a12d8696a087080074e9dd4d1196db642739dd0daf356d831829b2ef537cda9
+  référents d'un dépôt absent : HTTP 200 ; liste des tags : HTTP 404
+poc-vex, builds/vex/sample-app, par digest : publié sha256:24dd1b45f4d0291bc010669f54339d6e6e40edb26b5459e1bbb87a7e856efa09
+OK   poc-vex publie un referrer par digest dans builds/vex/sample-app
+OK   anonyme : référents de builds/vex/sample-app après publication : 1
+OK   anonyme : manifeste du referrer lisible : 200
+OK   poc-ecriture refusé dans builds/vex/sample-app : refus blob denied
+OK   poc-build refusé dans builds/vex/sample-app : refus blob denied
+OK   poc-images refusé dans builds/vex/sample-app : refus blob denied
+OK   poc-scan refusé dans builds/vex/sample-app : refus blob denied
+OK   poc-vex, mauvais mot de passe refusé dans builds/vex/sample-app : refus blob 401
+OK   anonyme refusé dans builds/vex/sample-app : refus blob 
+OK   référents de builds/vex/sample-app après les refus : 1
+OK   poc-vex refusé pour un tag : denied
+OK   poc-vex refusé dans builds/scan/sample-app : refus blob denied
+OK   poc-vex refusé dans builds/autre : refus blob denied
+OK   poc-vex refusé dans signes/essai : refus blob denied
+OK   poc-vex refusé dans vulndb/grype : refus blob denied
+OK   poc-vex : suppression du referrer refusée (code HTTP) : 403
+OK   poc-build publie toujours dans builds/autre
+OK   poc-scan publie toujours dans builds/scan/sample-app
+OK   poc-ecriture publie toujours dans builds/autre
+OK   mot de passe de poc-vex absent des sorties de Zot : 0
+# fin 2026-11-23T13:19:08Z
+bilan : tenue

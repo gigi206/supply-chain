@@ -291,6 +291,35 @@
               ]
             }
           ]
+        },
+        "builds/vex/**": {
+          "anonymousPolicy": [
+            "read"
+          ],
+          "policies": [
+            {
+              "users": [
+                "poc-vex"
+              ],
+              "actions": [
+                "read"
+              ]
+            },
+            {
+              "users": [
+                "poc-vex"
+              ],
+              "actions": [
+                "create"
+              ],
+              "conditions": [
+                {
+                  "expression": "req.referenceType != \"tag\"",
+                  "message": "poc-vex : documents VEX du propriétaire (brique 07b, pièce 4), écriture par digest seulement, aucun tag ; seul compte autorisé (motif le plus long, qui remplace builds/** : ni poc-ecriture, ni poc-build, ni poc-images, ni poc-replay)"
+                }
+              ]
+            }
+          ]
         }
       },
       "metrics": {

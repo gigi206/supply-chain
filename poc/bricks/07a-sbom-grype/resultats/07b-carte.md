@@ -1816,3 +1816,44 @@ Limite : le grand banc construit `scan-outil` depuis la même source (patch `b5a
 **Défaut du script, pour la suite** : pas de `sleep` dans une étape lancée par la session (l'environnement le bloque et tue la commande), et pas de sortie retenue par un filtre avant `tee`. `pose_releve` et `pose_releve_2` écrivent directement leur journal puis le masquent.
 
 **Heures** : de 13:01:00 UTC à 13:03:48 UTC, dans l'enveloppe de la 07b.
+
+## Pièce 4 : choix du propriétaire et prédiction de `compte` et `sec` (date -u de 13:18:01 UTC, le 2026-11-23, avant le lancement)
+
+Question posée : « Pour `builds/vex/**`, je crée un compte d'écriture réservé au propriétaire et seul autorisé (`poc-build` et `poc-ecriture` exclus par une règle plus précise), ou ce compte en plus des comptes actuels ? ». Réponse, verbatim : « Oui, compte seul ».
+
+**Dans le dépôt** (non posé) :
+- `08-trust-plane/stockage/zot.json` : entrée `builds/vex/**`, calquée sur `signes/**` (brique 09) : lecture anonyme ; `poc-vex` en lecture et en création par digest seulement (`req.referenceType != "tag"`) ; aucun autre compte. Motif le plus long : il remplace `builds/**` pour ces dépôts. Aucun droit de suppression (le renouvellement se fait par remplacement dans `scan-outil`, choix du 21/11). `zot verify` 2.1.22 : valide ;
+- `08-trust-plane/stockage.sh` : bloc htpasswd de `poc-vex`, calqué sur `poc-lien` : seule la ligne bcrypt est lue, dans `07a/secrets`.
+
+Script neuf [`piece4-vex-zot.sh`](../piece4-vex-zot.sh). `compte` génère le mot de passe de `poc-vex` (comme celui d'OpenBao du propriétaire : généré par la session, mode 600, jamais affiché). `sec` lance un Zot 2.1.22 jetable sur 127.0.0.1, avec le `zot.json` du dépôt (seuls les chemins, l'adresse et le certificat changent). Aucun accès au vrai Zot ni à la VM.
+
+| Contrôle | Prédit | Confiance |
+|---|---|---|
+| `compte` : mot de passe et ligne htpasswd | 48 hexadécimaux et `poc-vex:$2b$12$…`, mode 600, hash revérifié | haute |
+| `poc-vex` publie un referrer par digest dans `builds/vex/sample-app` | accepté ; 1 référent lu en anonyme | moyenne : premier contrôle d'accès de Zot éprouvé sur une instance jetable dans le PoC |
+| `poc-ecriture`, `poc-build`, `poc-images`, `poc-scan`, mauvais mot de passe, anonyme | refusés dans `builds/vex/sample-app` | moyenne (même raison) |
+| `poc-vex` : tag, autres dépôts (`builds/scan`, `builds/autre`, `signes`, `vulndb`), suppression | refusés (suppression : 403) | moyenne |
+| non-régression : `poc-build` et `poc-ecriture` dans `builds/autre`, `poc-scan` dans `builds/scan/sample-app` | acceptés | haute |
+| référents d'un dépôt `builds/vex/<nom>` absent, en anonyme | relevé seulement (code HTTP) ; à confronter à `lire_vex` du patch avant la pièce 5 | sans objet |
+
+**Pose** (sur accord, plus tard) : un seul passage de `stockage.sh zot`, qui réinstalle la configuration et redémarre Zot une fois. Elle recale encore les balayages de G7 : la projection de 12:55:48Z et la réserve sur `releve_24` deviendront caduques.
+
+## Pièce 4 : résultat de `compte` et `sec` (note de 2026-11-23T13:19:44Z)
+
+- [`compte`](piece4-compte.log), 13:18:01 UTC : **tenue**. Mot de passe de `poc-vex` et ligne htpasswd dans `07a/secrets`, mode 600, hash revérifié ; rien affiché.
+- [`sec`](piece4-sec.log), de 13:18:25 à 13:19:08 UTC : **bilan : tenue**. Toutes les prédictions sont vérifiées, sur un Zot 2.1.22 jetable dont l'`accessControl` est celui du dépôt (empreinte égale) :
+  - `poc-vex` publie un referrer par digest dans `builds/vex/sample-app` (comme `publier` de `scanner.sh`) ; 1 référent et le manifeste lisibles en anonyme ;
+  - refusés dans `builds/vex/sample-app`, dès le premier blob : `poc-ecriture`, `poc-build`, `poc-images`, `poc-scan` (« denied »), `poc-vex` avec un mauvais mot de passe (401), l'anonyme ; toujours 1 référent ensuite ;
+  - `poc-vex` refusé pour un tag, dans `builds/scan/sample-app`, `builds/autre`, `signes/essai` et `vulndb/grype`, et pour la suppression (403) ;
+  - non-régression : `poc-build` et `poc-ecriture` publient toujours dans `builds/autre`, `poc-scan` dans `builds/scan/sample-app` ;
+  - le mot de passe de `poc-vex` n'apparaît pas dans les sorties de Zot.
+- **Référents d'un dépôt `builds/vex/<nom>` absent, en anonyme : HTTP 200** (la liste des tags répond 404). À confronter à `lire_vex` du patch avant la pièce 5 : une liste vide doit donner « aucun VEX », pas une erreur de lecture.
+- Ligne d'information « seuls changent » vide (erreur `jq` dans le script, sans effet sur les contrôles) : les champs changés le sont par construction (chemins, adresse, port, certificat), et l'`accessControl` est comparé à part.
+
+**Écart de l'étape `sec`** : un premier passage, à 13:18:09 UTC, s'est arrêté sur une erreur du script (`local … n=$3 f=$T/pub-$n` développe `$n` avant de l'affecter). Ce journal d'essai, jamais commité, a été effacé ; le script a été corrigé et l'étape relancée à 13:18:25. Le dossier de travail jetable est effacé par le script, dans les deux passages.
+
+**Pose** (sur accord) : un seul passage de `stockage.sh zot` (sudo sur sc-stockage) ; il réinstalle la configuration et redémarre Zot une fois. Elle recalera les balayages de G7.
+
+**Divergence** : jusqu'à la pose, le `zot.json` du dépôt et celui de sc-stockage diffèrent (entrée `builds/vex/**`). Un passage de `stockage.sh zot` ou un rejeu poserait l'entrée et le compte `poc-vex` sans décision, et redémarrerait Zot.
+
+**Heures** : de 13:03:48 UTC à 13:19:44 UTC, dans l'enveloppe de la 07b.

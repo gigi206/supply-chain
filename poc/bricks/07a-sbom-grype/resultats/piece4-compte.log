@@ -1,0 +1,7 @@
+# piece4-vex-zot.sh compte, 2026-11-23T13:18:01Z ; dépôt af634c5c ; zot.json eb3496c7b1ba2d23
+OK   mot de passe : 48 hexadécimaux, mode 600 : 1 600
+OK   ligne htpasswd : motif de stockage.sh, mode 600 : 1 600
+OK   hash vérifié indépendamment (mkpasswd avec le sel) : oui
+OK   un autre mot de passe ne donne pas ce hash : oui
+# fin 2026-11-23T13:18:01Z
+bilan : tenue

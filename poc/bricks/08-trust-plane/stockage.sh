@@ -10,6 +10,7 @@
 #              ; poc-vulndb (brique 07a, D2 : base Grype du jour, vulndb/**, création seulement, tags datés) et poc-scan
 #              (brique 07a, D2 : attestations du scanner, builds/scan/** par digest seulement)
 #              ; poc-lien (brique 09, O5 : attestations de lien, rpm et dépôts signés, signes/** par digest seulement ; hash lu dans le dossier de la brique)
+#              ; poc-vex (brique 07b, pièce 4 : documents VEX du propriétaire, builds/vex/** par digest seulement, seul écrivain ; hash lu dans le dossier de la 07a)
 #   registre   push par digest de l'image sample-app de la brique 04 depuis l'hôte, relecture anonyme ;
 #              refus attendus : push anonyme, mauvais mot de passe, suppression
 #   containerd pull refusé sans la CA, puis CA et registries.yaml sur les trois nœuds (redémarrés un par un) ;
@@ -103,6 +104,16 @@ etape_zot() {
     (umask 077 && cat "$h09" >> "$d/htpasswd") && echo "htpasswd : poc-lien, bcrypt, coût 12 (hash fourni par la brique 09)"
   else
     echo "htpasswd : poc-lien absent (brique 09, O5 non appliqué)"
+  fi
+  # poc-vex (brique 07b, pièce 4, choix du propriétaire du 23/11/2026 « Oui, compte seul ») : documents VEX du propriétaire,
+  # builds/vex/** seulement, création par digest seulement, seul compte autorisé à y écrire. Seule sa ligne htpasswd (hash
+  # bcrypt) est lue, dans le dossier de la 07a ; le mot de passe n'est jamais lu ici. Absente : compte non créé.
+  local h07=$HOME/.cache/supply-chain-poc/07a/secrets/zot-poc-vex.htpasswd
+  if [ -s "$h07" ]; then
+    grep -qxE 'poc-vex:\$2b\$12\$[./A-Za-z0-9]{53}' "$h07" || { echo "KO   ligne htpasswd de poc-vex inattendue" >&2; exit 1; }
+    (umask 077 && cat "$h07" >> "$d/htpasswd") && echo "htpasswd : poc-vex, bcrypt, coût 12 (hash fourni par la brique 07a)"
+  else
+    echo "htpasswd : poc-vex absent (brique 07b, pièce 4 non appliquée)"
   fi
   cp "$z" "$here/stockage/zot.json" "$here/stockage/zot.service" "$P/zot.crt" "$S/zot.key" "$d/"
   copier sc-stockage /tmp/zot-installation "$d"/*
