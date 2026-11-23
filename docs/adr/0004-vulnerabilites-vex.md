@@ -1,6 +1,6 @@
 # ADR 0004 : vulnérabilités et VEX (OpenVEX ou CSAF)
 
-- **Statut** : **À rédiger**. *Mise à jour du 2026-11-23T19:33:55Z* : pièces 1 à 7 et 9 posées le 23/11, clé VEX recréée par le rejeu de zéro (SPKI `d0a12faa…`) ; reste la pièce 8 (premier VEX réel, contenu au propriétaire) ; voir l'additif du 23/11. Seules les décisions du propriétaire du 21/11/2026 (brique 07b, choix 1 à 5) et leurs limites sont écrites. Restent la projection Dependency-Track, le score et les KPI de couverture VEX. `vex_age_max_jours` est fixé à 30 jours (2026-11-21T20:13:42Z).
+- **Statut** : **À rédiger**. *Mise à jour du 2026-11-23T19:33:55Z* : pièces 1 à 7 et 9 posées le 23/11, clé VEX recréée par le rejeu de zéro (SPKI `d0a12faa…`) ; reste la pièce 8 (premier VEX réel, contenu au propriétaire) ; voir l'additif du 23/11. *Mise à jour du 2026-11-23T23:40:07Z* : clé VEX recréée par le rejeu `un-trait-1` (SPKI `aeef0a8c…`) ; entrées des scans relevées sur le vrai Zot en lecture seule ; pièce 8 toujours au propriétaire (additif du 23/11, 23:40). Seules les décisions du propriétaire du 21/11/2026 (brique 07b, choix 1 à 5) et leurs limites sont écrites. Restent la projection Dependency-Track, le score et les KPI de couverture VEX. `vex_age_max_jours` est fixé à 30 jours (2026-11-21T20:13:42Z).
 - **Date** : 2026-11-21
 - **Décideurs** : propriétaire du projet
 
@@ -69,3 +69,9 @@ Sources : la [carte de la 07b](../../poc/bricks/07a-sbom-grype/resultats/07b-car
 - **Décision du propriétaire** (verbatim, 21:55:43Z) : « Dans le dépôt » pour les VEX non signés (`poc/bricks/07a-sbom-grype/vex/`). La justification n'est donc plus seulement dans le document signé : elle reste dans l'historique de git.
 - **Besoins à définir** (projection Dependency-Track, part « vulnérabilités après VEX » du score, KPI de couverture VEX) : options dans la fiche, aucune décision. Deux faits mesurés : le prédicat ne porte pas de CVSS (le score « CVSS × EPSS » de `docs/02` n'est pas calculable tel quel) ; l'EPSS manque exactement pour les entrées sans identifiant CVE.
 - **Le statut reste « À rédiger ».**
+
+## Additif du 23/11/2026 (note de 2026-11-23T23:40:07Z) : clé VEX après le rejeu `un-trait-1`
+
+- La reprise du rejeu `un-trait-1` (fin à 23:34:39Z, aucun KO) a recréé la clé Transit `vex` : SPKI **`aeef0a8c482be447…`** (au lieu de `d0a12faa…`). C’est la troisième SPKI VEX archivée (`2b81df72…`, `d0a12faa…`, `aeef0a8c…`) : la limite « un VEX signé avant un rejeu n'est plus accepté après » est confirmée, sans VEX perdu, puisqu'aucun n'a été signé.
+- Relevé en lecture seule sur le vrai Zot ([journal](../../poc/bricks/07a-sbom-grype/resultats/vex-gabarit-zot.log)) : sample-app, 6 entrées ; deb, 67 entrées ; 0 KEV ; aucun VEX publié. Un témoin non signé passe `signer-vex.sh verifier`.
+- Le statut reste « À rédiger » : les trois questions de la [fiche](../../poc/bricks/07a-sbom-grype/resultats/adr0004-besoins.md) (Dependency-Track, score, KPI) attendent le propriétaire.

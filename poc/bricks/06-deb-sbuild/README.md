@@ -2146,3 +2146,4 @@ Question posée : « Je clos la 06 maintenant, avec la réserve du rejeu de zér
   - `pousser_vsa` : manifeste `97b4100d`, identique au 16/11 ; `lire_vsa` tout OK ;
   - S6a `porte` : VSA et scan `ok`, Job `1/`.
   - **Bloc 06 rejoué en entier** ([résultat](resultats/reprise-06-rejeu-23-11-predictions.md)).
+- 2026-11-23T23:40:07Z : **bloc 06 rejoué de nouveau** dans la reprise du rejeu `un-trait-1` ([résultat](../08-trust-plane/resultats/rejeu-un-trait-1-predictions.md)) : `replacer` après l'effacement de `$W` par le démontage de 20:35, image de build `749d746c…`, fermetures `bb7599a2…` et `50dc73f7…`, artefact `60f25f5c…`, `s4d3.sh porte` 12 OK, VSA du deb `97b4100d…` inchangée, S6a `porte` tenue.

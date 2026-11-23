@@ -2754,3 +2754,12 @@ Accord du propriétaire, « Maintenant », donné à la demande de la brique 09 
   - reprise du bloc 06 : R1 à R7, F1 à F3 tenues ([carte et résultats](../06-deb-sbuild/resultats/reprise-06-rejeu-23-11-predictions.md)) ;
   - câblage exercé par `DEPUIS` et `JUSQUA`, sans démontage.
 - **Non mesuré** : un rejeu de zéro d'un seul trait avec ce câblage.
+
+### Additif du 23/11/2026 (note de 2026-11-23T23:40:07Z) : rejeu `un-trait-1` et sa reprise
+
+- **Passage de 20:35:05Z** ([journal](resultats/rejeu-un-trait-1.log)) : gardes d'avant démontage tenues, démontage, VM, RKE2, Cilium, J2 à « J8 (helm-cilium) » passés ; **arrêt à « J8 (contrôleurs) »** (22:07:01Z) sur un watch des Secrets de `builds` refusé 2 s après le redémarrage de kube-apiserver par J7 ([relevé](resultats/rejeu-un-trait-1-audit-403.log)). Défaut du contrôle de l'audit, pas des droits : corrigé par `secrets_ctrl_juge` dans `preuves.sh` ([banc](resultats/controleurs-juge-banc.log), 12 cas, 0 écart).
+- **Reprise à « J8 (contrôleurs) »** ([journal](resultats/rejeu-un-trait-1-reprise.log), `TAG_05=m5b-4`, `POUSSER_VSA=1`) : fin à 23:34:39Z, code 0, 4805 s, aucun KO ; **R0, R1 et U3 à U13 tenues** ([prédictions et résultat](resultats/rejeu-un-trait-1-predictions.md)).
+- **Premier rejeu du bloc « 08 (Kyverno corrigé) »** : image `eec37159…` reconstruite à l'identique, `horodate` PASS, `sans-provenance` FAIL, `hors-livraison` PASS ; l'image corrigée est en service.
+- **Câblage des entrées de l'hôte du bloc 06** : `garder` avant le démontage (passage de 20:35) puis `replacer` après l'effacement de `$W` (reprise) : tenu. Le « non mesuré » de l'additif de 20:18:03Z est levé, en deux passages et non d'un seul trait.
+- **État** : toutes les clés publiques archivées sont neuves (scanner `007f233f…`, VEX `aeef0a8c…`) ; l’export Hubble posé à la main le 20/11 n’est pas dans `rejeu.sh` : il est perdu (relevé en lecture seule à 23:41:20 UTC : `cilium-config` à 163 clés, sans `hubble-flowlogs-config-path` ; ConfigMap `cilium-flowlog-config` absent).
+- **Non mesuré** : un rejeu de zéro entier d'un seul trait avec `secrets_ctrl_juge`.

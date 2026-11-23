@@ -2272,3 +2272,15 @@ Demande du propriétaire : « Pièce 8 d'abord » (préparer la pièce 8 pendant
 [Fiche des besoins](adr0004-besoins.md) écrite à sec (22:01:31Z), corrigée après relecture du conseiller (22:05:07Z : comptes d'EPSS inversés, options 2a, 2b et 3c précisées, unité de compte mesurée, Dependency-Track non revérifié). Reportée dans `docs/03` (ligne 07a) et l'ADR 0004 (additif). Aucune décision.
 
 **Heures** (bornes hautes, par enveloppes ; du travail sur d'autres briques s'y intercale) : au plus 14 h 03 min 37 s à 14:52:36 UTC (note de 14:53:21Z) ; plus 14:52:36 à 14:59:26 UTC (6 min 50 s, intégration au rejeu) ; plus 20:24:21 à 20:34:16 UTC (9 min 55 s, additif du README de la 07a) ; plus 21:45:08 à 22:05:19 UTC (20 min 11 s, pièce 8 préparée et fiche). **Total : au plus 14 h 40 min 33 s**, pour 10 h estimées et un seuil de décision à 20 h. Le seuil n'est pas atteint. Le travail sur le bloc 06 et le rejeu est compté aux briques 06, 05 et 08.
+
+## Après le rejeu `un-trait-1` : clé VEX neuve et relevé sur le vrai Zot (note de 2026-11-23T23:40:07Z)
+
+- **Clé VEX** recréée par la reprise du rejeu (« 07b (clé VEX) », 22:26:04Z) : SPKI `aeef0a8c482be447cfee461f80660b7941f10f03ec09a55acf4af9bdafeea710` (fichier `d40d41a0…`), gardée par S6a dans `scan-config`.
+- **Relevé** ([journal](vex-gabarit-zot.log), [script](vex-gabarit-zot.sh)), de 23:39:51 UTC, 10 cas, 0 écart :
+  - juge : scan-outil reconstruit depuis HEAD, empreinte `7dde1a8ed457f254` ;
+  - sample-app `3a7ca1b1…` : 6 entrées (Medium 4, Unknown 2 ; 0 KEV ; 6 avec correctif), scan du 22:30:42Z ;
+  - deb `60f25f5c…` : 67 entrées (Critical 3, High 33, Medium 28, Low 1, Unknown 2 ; 0 KEV ; 67 avec correctif), scan du 23:19:20Z ;
+  - gabarit de `GHSA-3fxj-6jh8-hvhx` : refusé brut par `signer-vex.sh verifier` ; rempli en témoin (« témoin, aucune analyse »), accepté ; jamais signé, effacé ;
+  - `PUBLIES|0` : aucun VEX publié sur sample-app.
+- **Écart d'adresse** : `sc-stockage.poc.test` ne se résout pas sur l'hôte (premier essai : REFUS, puis attente, arrêté) ; le relevé lit le registre par `192.168.161.13:5000`, comme le banc.
+- **Pièce 8** : rien signé, rien publié. Le contenu (entrées, justification, impact) et l'accord nommé pour signer par `hashivault://vex` restent au propriétaire.

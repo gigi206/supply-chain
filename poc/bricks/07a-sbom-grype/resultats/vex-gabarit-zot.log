@@ -1,0 +1,109 @@
+# vex-gabarit.sh sur le vrai Zot, 2026-11-23T23:39:51Z, 0836894a, script aaa6b3099fff9968
+clés archivées : scanner SPKI 007f233f403279dd ; VEX SPKI aeef0a8c482be447
+## juge : scan-outil depuis une copie de HEAD (go1.24.7)
+OK   empreinte de scan-outil (celle de l'image b799feda) : 7dde1a8ed457f254
+## 1. tableaux (scans signés, vérifiés par la clé du scanner)
+### 192.168.161.13:5000/builds/sample-app
+# vex-gabarit.sh, 2026-11-23T23:39:54Z ; sujet sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; scan du 2026-11-23T22:30:42.263123586Z ; 2 scan(s) vérifié(s) par CLE_SCANNER (empreinte de la clé 09708ff49e5e4d6d) dans 192.168.161.13:5000/builds/scan/sample-app
+
+| # | Identifiant | Alias | Gravité | KEV | EPSS | Paquet | Corrigé dans | VEX appliqué |
+|---|---|---|---|---|---|---|---|---|
+| 1 | GHSA-3fxj-6jh8-hvhx |  | Medium | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+| 2 | GHSA-j6qf-3m9c-vwj3 | CVE-2026-114437 | Medium | non | 0.00129 | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.4.0 | - |
+| 3 | GHSA-mqqf-5wvp-8fh8 | CVE-2025-69725 | Medium | non | 0.00264 | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.2.4 | - |
+| 4 | GO-2026-5775 | GHSA-9g5q-2w5x-hmxf | Unknown | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+| 5 | GO-2026-5777 | GHSA-rjr7-jggh-pgcp | Unknown | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+| 6 | GO-2026-6859 | CVE-2026-97054 | Medium | non | 0.00479 | `pkg:golang/stdlib@1.26.10` | 1.26.11, 1.27.4 | - |
+
+comptes : 6 entrée(s), 6 identifiant(s) ; KEV 0 ; avec correctif 6 ; écartées par un VEX 0 ; gravités : Medium 4, Unknown 2
+OK   code : 0
+OK   scan vérifié, jamais « NON VÉRIFIÉ » : 0
+### 192.168.161.13:5000/builds/sample-app-deb
+# vex-gabarit.sh, 2026-11-23T23:39:54Z ; sujet sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e ; scan du 2026-11-23T23:19:20.104162242Z ; 1 scan(s) vérifié(s) par CLE_SCANNER (empreinte de la clé 09708ff49e5e4d6d) dans 192.168.161.13:5000/builds/scan/sample-app-deb
+
+| # | Identifiant | Alias | Gravité | KEV | EPSS | Paquet | Corrigé dans | VEX appliqué |
+|---|---|---|---|---|---|---|---|---|
+| 1 | GHSA-3fxj-6jh8-hvhx |  | Medium | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+| 2 | GHSA-j6qf-3m9c-vwj3 | CVE-2026-114437 | Medium | non | 0.00129 | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.4.0 | - |
+| 3 | GHSA-mqqf-5wvp-8fh8 | CVE-2025-69725 | Medium | non | 0.00264 | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.2.4 | - |
+| 4 | GO-2025-3849 | CVE-2025-47907 | High | non | 0.00437 | `pkg:golang/stdlib@1.24.4` | 1.23.12, 1.24.6 | - |
+| 5 | GO-2025-3956 | CVE-2025-47906 | Medium | non | 0.00572 | `pkg:golang/stdlib@1.24.4` | 1.23.12, 1.24.6 | - |
+| 6 | GO-2025-4006 | CVE-2025-61725 | High | non | 0.00647 | `pkg:golang/stdlib@1.24.4` | 1.24.8, 1.25.2 | - |
+| 7 | GO-2025-4007 | CVE-2025-58187 | High | non | 0.00406 | `pkg:golang/stdlib@1.24.4` | 1.24.9, 1.25.3 | - |
+| 8 | GO-2025-4008 | CVE-2025-58189 | Medium | non | 0.00468 | `pkg:golang/stdlib@1.24.4` | 1.24.8, 1.25.2 | - |
+| 9 | GO-2025-4009 | CVE-2025-61723 | High | non | 0.00661 | `pkg:golang/stdlib@1.24.4` | 1.24.8, 1.25.2 | - |
+| 10 | GO-2025-4010 | CVE-2025-47912 | Medium | non | 0.00468 | `pkg:golang/stdlib@1.24.4` | 1.24.8, 1.25.2 | - |
+| 11 | GO-2025-4011 | CVE-2025-58185 | Medium | non | 0.00556 | `pkg:golang/stdlib@1.24.4` | 1.24.8, 1.25.2 | - |
+| 12 | GO-2025-4012 | CVE-2025-58186 | Medium | non | 0.00565 | `pkg:golang/stdlib@1.24.4` | 1.24.8, 1.25.2 | - |
+| 13 | GO-2025-4013 | CVE-2025-58188 | High | non | 0.00381 | `pkg:golang/stdlib@1.24.4` | 1.24.8, 1.25.2 | - |
+| 14 | GO-2025-4014 | CVE-2025-58183 | Medium | non | 0.00443 | `pkg:golang/stdlib@1.24.4` | 1.24.8, 1.25.2 | - |
+| 15 | GO-2025-4015 | CVE-2025-61724 | Medium | non | 0.00556 | `pkg:golang/stdlib@1.24.4` | 1.24.8, 1.25.2 | - |
+| 16 | GO-2025-4155 | CVE-2025-61729 | High | non | 0.0049 | `pkg:golang/stdlib@1.24.4` | 1.24.11, 1.25.5 | - |
+| 17 | GO-2025-4175 | CVE-2025-61727 | Medium | non | 0.00304 | `pkg:golang/stdlib@1.24.4` | 1.24.11, 1.25.5 | - |
+| 18 | GO-2026-4337 | CVE-2025-68121 | Critical | non | 0.00902 | `pkg:golang/stdlib@1.24.4` | 1.24.13, 1.25.7, 1.26.0-rc.3 | - |
+| 19 | GO-2026-4340 | CVE-2025-61730 | Medium | non | 0.00324 | `pkg:golang/stdlib@1.24.4` | 1.24.12, 1.25.6 | - |
+| 20 | GO-2026-4341 | CVE-2025-61726 | High | non | 0.02292 | `pkg:golang/stdlib@1.24.4` | 1.24.12, 1.25.6 | - |
+| 21 | GO-2026-4342 | CVE-2025-61728 | Medium | non | 0.00738 | `pkg:golang/stdlib@1.24.4` | 1.24.12, 1.25.6 | - |
+| 22 | GO-2026-4601 | CVE-2026-25679 | High | non | 0.00827 | `pkg:golang/stdlib@1.24.4` | 1.25.8, 1.26.1 | - |
+| 23 | GO-2026-4602 | CVE-2026-27139 | Low | non | 0.00219 | `pkg:golang/stdlib@1.24.4` | 1.25.8, 1.26.1 | - |
+| 24 | GO-2026-4603 | CVE-2026-27142 | Medium | non | 0.00374 | `pkg:golang/stdlib@1.24.4` | 1.25.8, 1.26.1 | - |
+| 25 | GO-2026-4864 | CVE-2026-32282 | Medium | non | 0.00297 | `pkg:golang/stdlib@1.24.4` | 1.25.9, 1.26.2 | - |
+| 26 | GO-2026-4865 | CVE-2026-32289 | Medium | non | 0.00295 | `pkg:golang/stdlib@1.24.4` | 1.25.9, 1.26.2 | - |
+| 27 | GO-2026-4869 | CVE-2026-32288 | Medium | non | 0.00295 | `pkg:golang/stdlib@1.24.4` | 1.25.9, 1.26.2 | - |
+| 28 | GO-2026-4870 | CVE-2026-32283 | High | non | 0.00609 | `pkg:golang/stdlib@1.24.4` | 1.25.9, 1.26.2 | - |
+| 29 | GO-2026-4918 | CVE-2026-33814 | High | non | 0.0084 | `pkg:golang/stdlib@1.24.4` | 1.25.10, 1.26.3 | - |
+| 30 | GO-2026-4946 | CVE-2026-32281 | High | non | 0.00361 | `pkg:golang/stdlib@1.24.4` | 1.25.9, 1.26.2 | - |
+| 31 | GO-2026-4947 | CVE-2026-32280 | High | non | 0.00626 | `pkg:golang/stdlib@1.24.4` | 1.25.9, 1.26.2 | - |
+| 32 | GO-2026-4970 | CVE-2026-39822 | High | non | 0.00232 | `pkg:golang/stdlib@1.24.4` | 1.25.12, 1.26.5, 1.27.0-rc.2 | - |
+| 33 | GO-2026-4971 | CVE-2026-39836 | High | non | 0.00633 | `pkg:golang/stdlib@1.24.4` | 1.25.10, 1.26.3 | - |
+| 34 | GO-2026-4976 | CVE-2026-39825 | Medium | non | 0.0039 | `pkg:golang/stdlib@1.24.4` | 1.25.10, 1.26.3 | - |
+| 35 | GO-2026-4977 | CVE-2026-42499 | High | non | 0.00798 | `pkg:golang/stdlib@1.24.4` | 1.25.10, 1.26.3 | - |
+| 36 | GO-2026-4980 | CVE-2026-39826 | Medium | non | 0.00371 | `pkg:golang/stdlib@1.24.4` | 1.25.10, 1.26.3 | - |
+| 37 | GO-2026-4981 | CVE-2026-33811 | High | non | 0.00875 | `pkg:golang/stdlib@1.24.4` | 1.25.10, 1.26.3 | - |
+| 38 | GO-2026-4982 | CVE-2026-39823 | Medium | non | 0.00314 | `pkg:golang/stdlib@1.24.4` | 1.25.10, 1.26.3 | - |
+| 39 | GO-2026-4986 | CVE-2026-39820 | High | non | 0.00784 | `pkg:golang/stdlib@1.24.4` | 1.25.10, 1.26.3 | - |
+| 40 | GO-2026-5026 | CVE-2026-39821 | High | non | 0.01834 | `pkg:golang/stdlib@1.24.4` | 1.25.13, 1.26.6, 1.27.0-rc.3 | - |
+| 41 | GO-2026-5037 | CVE-2026-27145 | High | non | 0.00523 | `pkg:golang/stdlib@1.24.4` | 1.25.11, 1.26.4 | - |
+| 42 | GO-2026-5038 | CVE-2026-42504 | High | non | 0.0054 | `pkg:golang/stdlib@1.24.4` | 1.25.11, 1.26.4 | - |
+| 43 | GO-2026-5039 | CVE-2026-42507 | Medium | non | 0.0037 | `pkg:golang/stdlib@1.24.4` | 1.25.11, 1.26.4 | - |
+| 44 | GO-2026-5775 | GHSA-9g5q-2w5x-hmxf | Unknown | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+| 45 | GO-2026-5777 | GHSA-rjr7-jggh-pgcp | Unknown | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+| 46 | GO-2026-5856 | CVE-2026-42505 | Medium | non | 0.00382 | `pkg:golang/stdlib@1.24.4` | 1.25.12, 1.26.5, 1.27.0-rc.2 | - |
+| 47 | GO-2026-5972 | CVE-2026-33818 | High | non | 0.00568 | `pkg:golang/stdlib@1.24.4` | 1.25.13, 1.26.6, 1.27.0-rc.3 | - |
+| 48 | GO-2026-6088 | CVE-2026-56859 | High | non | 0.00568 | `pkg:golang/stdlib@1.24.4` | 1.25.13, 1.26.6, 1.27.0-rc.3 | - |
+| 49 | GO-2026-6089 | CVE-2026-56853 | High | non | 0.00568 | `pkg:golang/stdlib@1.24.4` | 1.25.13, 1.26.6, 1.27.0-rc.3 | - |
+| 50 | GO-2026-6090 | CVE-2026-56862 | High | non | 0.00568 | `pkg:golang/stdlib@1.24.4` | 1.25.13, 1.26.6, 1.27.0-rc.3 | - |
+| 51 | GO-2026-6091 | CVE-2026-56858 | Medium | non | 0.0031 | `pkg:golang/stdlib@1.24.4` | 1.25.13, 1.26.6, 1.27.0-rc.3 | - |
+| 52 | GO-2026-6218 | CVE-2026-56860 | Medium | non | 0.0055 | `pkg:golang/stdlib@1.24.4` | 1.25.13, 1.26.6, 1.27.0-rc.3 | - |
+| 53 | GO-2026-6599 | CVE-2026-94448 | Medium | non | 0.00289 | `pkg:golang/stdlib@1.24.4` | 1.26.9, 1.27.2 | - |
+| 54 | GO-2026-6600 | CVE-2026-97030 | Medium | non | 0.00289 | `pkg:golang/stdlib@1.24.4` | 1.26.9, 1.27.2 | - |
+| 55 | GO-2026-6603 | CVE-2026-78659 | High | non | 0.00851 | `pkg:golang/stdlib@1.24.4` | 1.26.9 | - |
+| 56 | GO-2026-6604 | CVE-2026-56857 | Critical | non | 0.00553 | `pkg:golang/stdlib@1.24.4` | 1.26.9, 1.27.2 | - |
+| 57 | GO-2026-6605 | CVE-2026-56866 | High | non | 0.00604 | `pkg:golang/stdlib@1.24.4` | 1.26.9, 1.27.2 | - |
+| 58 | GO-2026-6607 | CVE-2026-97031 | High | non | 0.00716 | `pkg:golang/stdlib@1.24.4` | 1.26.9, 1.27.2 | - |
+| 59 | GO-2026-6608 | CVE-2026-94440 | High | non | 0.00706 | `pkg:golang/stdlib@1.24.4` | 1.26.9, 1.27.2 | - |
+| 60 | GO-2026-6609 | CVE-2026-78667 | High | non | 0.00663 | `pkg:golang/stdlib@1.24.4` | 1.26.9, 1.27.2 | - |
+| 61 | GO-2026-6610 | CVE-2026-78660 | High | non | 0.00523 | `pkg:golang/stdlib@1.24.4` | 1.26.9 | - |
+| 62 | GO-2026-6611 | CVE-2026-78669 | High | non | 0.00817 | `pkg:golang/stdlib@1.24.4` | 1.26.9 | - |
+| 63 | GO-2026-6612 | CVE-2026-78663 | Critical | non | 0.00827 | `pkg:golang/stdlib@1.24.4` | 1.26.9 | - |
+| 64 | GO-2026-6613 | CVE-2026-94439 | High | non | 0.00616 | `pkg:golang/stdlib@1.24.4` | 1.26.9, 1.27.2 | - |
+| 65 | GO-2026-6617 | CVE-2026-97032 | High | non | 0.00651 | `pkg:golang/stdlib@1.24.4` | 1.26.9 | - |
+| 66 | GO-2026-6809 | CVE-2026-111943 | Medium | non | 0.00501 | `pkg:golang/stdlib@1.24.4` | 1.26.10, 1.27.3 | - |
+| 67 | GO-2026-6859 | CVE-2026-97054 | Medium | non | 0.00479 | `pkg:golang/stdlib@1.24.4` | 1.26.11, 1.27.4 | - |
+
+comptes : 67 entrée(s), 67 identifiant(s) ; KEV 0 ; avec correctif 67 ; écartées par un VEX 0 ; gravités : Critical 3, High 33, Low 1, Medium 28, Unknown 2
+OK   code : 0
+OK   scan vérifié, jamais « NON VÉRIFIÉ » : 0
+## 2. témoin jamais signé, jugé par signer-vex.sh verifier
+OK   gabarit GHSA-3fxj-6jh8-hvhx : code : 0
+{"produit":"pkg:oci/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","sous":["pkg:golang/github.com/go-chi/chi@v5.2.3#v5"],"vuln":{"name":"GHSA-3fxj-6jh8-hvhx"}}
+OK   gabarit brut (champs vides) : refusé par verifier : 1
+REFUS|énoncés non classables par scan-outil vex (horodatage illisible ou nom absent) : 0/1
+JUGE|exemption, 1 énoncé(s) dont 0 large(s), document sha256 87df84df697b54ad0d39f9d79880ea19bad7078b7cde39c8f34f58fbcd1ec847, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, VEX vers 192
+PUBLIES|0 énoncé(s) publié(s) vérifié(s) dans 192.168.161.13:5000/builds/vex/sample-app (CLE_PUBLIQUE), cosign code 1 : no matching attestations: 
+ECHEANCE|énoncé 0 : 2026-12-23T23:39:55Z (30 jours après 2026-11-23T23:39:55Z)
+OK   témoin rempli : accepté par verifier (rien signé) : 0
+OK   VEX publiés sur sample-app (ligne PUBLIES) : 1
+## dépôt et registre
+OK   outil/ du dépôt inchangé (git status) : 0
+## bilan : 10 cas, 0 écart(s)
