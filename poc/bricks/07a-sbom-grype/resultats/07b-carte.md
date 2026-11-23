@@ -1984,3 +1984,38 @@ Le dépôt et sc-stockage sont de nouveau alignés pour `zot.json`. Aucune écri
 **Conséquence pour la pièce 6** : `cm_porte` est la seule source de la ConfigMap. La poser ajouterait donc aussi ces tâches à la liste revue de la porte déployée, c'est-à-dire un changement de politique de la porte hors de la 07b. **À trancher par le propriétaire au moment de la pièce 6** : poser la ConfigMap entière (liste revue comprise), ou attendre le rejeu. La pose de la pièce 5 n'en dépend pas.
 
 **Heures** : de 13:55:36 UTC à 13:57:10 UTC, dans l'enveloppe de la 07b.
+
+## Pod d'essai du scanner neuf : prédiction (date -u de 14:11:02 UTC, le 2026-11-23, avant le lancement)
+
+**Pourquoi maintenant** : le balayage de démarrage de Zot est fini (relevé `g7-pose4.sh fin`) ; hors des fenêtres de scan. Rien n'est signé ni publié : le pod n'a ni `jetons`, ni `attester`, ni `publier`, ni `revocation`.
+
+**Référence** ([relevé `avant`](piece5-essai-avant.log), tenu) : `{"scannedAt":"2026-11-23T09:32:01.297830878Z","base":{"built":"2026-11-22T06:19:59Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:8e9abb2e53d6b599213e4e56c5fcf2a2778f972a72f0dd84b966e612c3d98ed6","schema":"v6.1.10"},"vulnerabilites":6,"kev":0,"vex":false}`.
+
+**Mesure** : [`piece5-essai.sh`](../piece5-essai.sh) `essai`. Pod `p5-essai` (conteneurs `source` et `analyser` du gabarit du CronJob, `analyser` sur l'image `b799feda…` et le `scanner.sh` de HEAD) ; ConfigMap `scan-config-essai`.
+
+**Prédiction** :
+- le pod passe Kyverno (gabarit du CronJob, limites et `nodeSelector` gardés) et finit en `Succeeded` en moins de 25 min ;
+- `analyser` écrit une ligne `VEX|0 énoncé(s) vérifié(s), 0 retenu(s), 0 rejeté(s)|…/builds/vex/sample-app|` (dépôt VEX absent, comme au passage 24 du banc), aucune ligne `REPLI|`, et une ligne `SCAN|` avec 0 entrée écartée ;
+- le prédicat porte le bloc `vex` vide et, hors `scannedAt` et `vex`, il est égal à la référence (même base Grype du jour, même image) ;
+- les lignes du pod sont dans Grafana (Loki) en même nombre que `kubectl logs` ;
+- refus Kyverno et referrers de `builds/scan/sample-app` inchangés après l'effacement.
+- **Inconnue relevée** : la version de cosign de l'image neuve (v3.1.4 au banc) ; si elle diffère, la pièce 8 est bloquée jusqu'à une décision.
+- Confiance moyenne pour l'égalité à la référence (le champ `scanner` du prédicat pourrait porter des versions ou une empreinte de l'image), haute pour le reste (mesuré au banc).
+
+## Pod d'essai du scanner neuf : résultat (note de 2026-11-23T14:13:50Z)
+
+[`piece5-essai.sh`](../piece5-essai.sh) : `avant` de 14:10:48 UTC ([journal](piece5-essai-avant.log), tenue, 3 OK) ; `essai` de 14:11:04 à 14:13:24 UTC ([journal](piece5-essai-essai.log), **tenue, 18 OK**). **La prédiction tient.**
+
+- Référence : scan de 09:32:01 UTC du 23/11 (bundle vérifié par la clé du scanner), base Grype du 22/11, 6 vulnérabilités, aucune KEV, sans bloc `vex`.
+- Pod `p5-essai` admis par Kyverno, `Succeeded` en 128 s (import de la base : 3392 Mo, 113 s).
+- `analyser` : `VEX|0 énoncé(s) vérifié(s), 0 retenu(s), 0 rejeté(s)|…/builds/vex/sample-app|cosign code 1 : no matching attestations` (dépôt VEX vide, comme au passage 24 du banc ; le script continue) ; aucune ligne `REPLI|` ; `SCAN|… 6 vulnérabilités, 0 KEV, 0 écartée(s) par un VEX`.
+- Prédicat : bloc `vex` vide (`documents` vide, 0 rejeté, 0 écartée sans exemption) ; **hors `scannedAt` et `vex`, égal à la référence** (même base, même `scanner`, mêmes 6 entrées).
+- **cosign de l'image neuve : v3.1.4** (commit `0e48502c…`), la version du banc : l'inconnue levée ne bloque pas la pièce 8.
+- 114 lignes du pod dans Grafana (Loki), autant que `kubectl logs`.
+- Après effacement du pod et de la ConfigMap : refus Kyverno inchangés (10), referrers de `builds/scan/sample-app` inchangés (12) : rien n'est publié.
+
+**G7** : balayage de démarrage fini à 14:03:50 UTC, dans la plage prédite ([note](g7-replanification.md)) ; celui du 24/11 est attendu vers 14:04, après `releve_24` : la réserve sur le relevé tombe (si Zot n'est pas redémarré).
+
+**Suite** : la pose de la pièce 5 (`piece5-pose.sh pose`) a ses deux préalables de session, dont l'un reste à venir : le pod d'essai (tenu) et `releve_24` le 24/11. Elle se fera sur accord du propriétaire.
+
+**Heures** : de 14:10:43 UTC à 14:13:50 UTC, dans l'enveloppe de la 07b.

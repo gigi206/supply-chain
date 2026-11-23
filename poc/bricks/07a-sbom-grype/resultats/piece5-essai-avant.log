@@ -1,0 +1,13 @@
+# piece5-essai.sh avant, 2026-11-23T14:10:48Z ; HEAD 09cdcca8641d
+OK   objets d'essai absents (pod, ConfigMap) : 0
+## scan retenu de builds/sample-app (referrers en anonyme, bundle vérifié)
+  referrers : 12
+  retenu : sha256:2bd8f05f645445eb697b17f46a77f9f6202fd7bbd574bbc69cab1d195997e0fa, scannedAt 2026-11-23T09:32:01Z
+OK   bundle retenu vérifié par la clé du scanner, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   référence : jour du scan retenu : 2026-11-23
+  référence : {"scannedAt":"2026-11-23T09:32:01.297830878Z","base":{"built":"2026-11-22T06:19:59Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:8e9abb2e53d6b599213e4e56c5fcf2a2778f972a72f0dd84b966e612c3d98ed6","schema":"v6.1.10"},"vulnerabilites":6,"kev":0,"vex":false}
+  empreinte du prédicat de référence : 69ae2cfb3930fb3d
+## refus Kyverno
+  sum(kyverno_admission_requests_total{request_allowed="false"}) : 10
+# fin 2026-11-23T14:10:48Z
+bilan : tenue

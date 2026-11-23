@@ -1,0 +1,146 @@
+# piece5-essai.sh essai, 2026-11-23T14:11:04Z ; HEAD 09cdcca8641d
+OK   objets d'essai absents (pod, ConfigMap) : 0
+OK   hors des fenêtres de scan (1411 UTC), aucun pod actif dans scan
+  refus Kyverno avant : 10
+  referrers de builds/sample-app avant : 12
+OK   scanner.sh de HEAD = rendu de la pièce 5 à sec : 7251df1567c1cfdd
+OK   ConfigMap scan-config-essai créée
+  pod : {"init":[{"name":"source","image":"ace6811c","cmd":"sh /etc/scan/scanner.sh source"},{"name":"analyser","image":"b799feda","cmd":"sh /etc/scan/scanner.sh analyser"}],"main":["lire"],"volumes":["travail:emptyDir","config:scan-config-essai"],"sa":"scanner","jeton":false}
+OK   pod : aucun conteneur qui signe ou publie : 0
+OK   pod p5-essai créé (14:11:05 UTC)
+  phase : Succeeded, 128 s
+OK   phase du pod : Succeeded
+### source
+  SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+### analyser
+  BASE|2026-11-22, sc-stockage.poc.test:5000/vulndb/grype@sha256:8e9abb2e53d6b599213e4e56c5fcf2a2778f972a72f0dd84b966e612c3d98ed6, empreinte sha256:baa591108fd0fafa273503769dea65bf0334ad337e84aeb7f08197849cea9f87, 2 s
+  IMPORT|3392 Mo, 113 s ; 3589 Mo dans le volume, au plus haut
+  ARTEFACT|image, 2 PURL versionnées dans l'artefact seul
+  SBOM|5 composants avec PURL (D1 a), 2 s
+  VEX|0 énoncé(s) vérifié(s), 0 retenu(s), 0 rejeté(s)|sc-stockage.poc.test:5000/builds/vex/sample-app|cosign code 1 : no matching attestations: 
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 6 vulnérabilités, 0 KEV, 0 écartée(s) par un VEX, 2 s
+  PREDICAT|sha256 fa9144695bce2a92c2517a8957e12e2f4944aeaf00c22469d7de58a0a655cea0, 119 s en tout
+### lire (sans le prédicat)
+  GitVersion:    v3.1.4
+  GitCommit:     0e48502cf5ef34e2e60bbd3617aa19945712f705
+  PREDICAT_SHA256|fa9144695bce2a92c2517a8957e12e2f4944aeaf00c22469d7de58a0a655cea0
+  {
+    "malicious": [],
+    "scannedAt": "2026-11-23T14:13:07.344163563Z",
+    "scanner": {
+      "db": {
+        "built": "2026-11-22T06:19:59Z",
+        "ref": "sc-stockage.poc.test:5000/vulndb/grype@sha256:8e9abb2e53d6b599213e4e56c5fcf2a2778f972a72f0dd84b966e612c3d98ed6",
+        "schema": "v6.1.10"
+      },
+      "id": "grype",
+      "version": "0.104.1"
+    },
+    "vex": {
+      "documents": [],
+      "ecarteesSansExemption": 0,
+      "rejetes": 0
+    },
+    "vulnerabilities": [
+      {
+        "id": "GHSA-3fxj-6jh8-hvhx",
+        "aliases": [],
+        "severity": "Medium",
+        "kev": false,
+        "kevCves": [],
+        "epss": null,
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "fixedIn": [
+          "5.3.0"
+        ]
+      },
+      {
+        "id": "GHSA-j6qf-3m9c-vwj3",
+        "aliases": [
+          "CVE-2026-114437"
+        ],
+        "severity": "Medium",
+        "kev": false,
+        "kevCves": [],
+        "epss": 0.00129,
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "fixedIn": [
+          "5.4.0"
+        ]
+      },
+      {
+        "id": "GHSA-mqqf-5wvp-8fh8",
+        "aliases": [
+          "CVE-2025-69725"
+        ],
+        "severity": "Medium",
+        "kev": false,
+        "kevCves": [],
+        "epss": 0.00264,
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "fixedIn": [
+          "5.2.4"
+        ]
+      },
+      {
+        "id": "GO-2026-5775",
+        "aliases": [
+          "GHSA-9g5q-2w5x-hmxf"
+        ],
+        "severity": "Unknown",
+        "kev": false,
+        "kevCves": [],
+        "epss": null,
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "fixedIn": [
+          "5.3.0"
+        ]
+      },
+      {
+        "id": "GO-2026-5777",
+        "aliases": [
+          "GHSA-rjr7-jggh-pgcp"
+        ],
+        "severity": "Unknown",
+        "kev": false,
+        "kevCves": [],
+        "epss": null,
+        "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+        "fixedIn": [
+          "5.3.0"
+        ]
+      },
+      {
+        "id": "GO-2026-6859",
+        "aliases": [
+          "CVE-2026-97054"
+        ],
+        "severity": "Medium",
+        "kev": false,
+        "kevCves": [],
+        "epss": 0.00479,
+        "package": "pkg:golang/stdlib@1.26.10",
+        "fixedIn": [
+          "1.26.11",
+          "1.27.4"
+        ]
+      }
+    ]
+  }
+OK   ligne VEX| d'analyser : 1
+OK   lignes REPLI| d'analyser : 0
+OK   ligne SCAN| : aucune entrée écartée par un VEX : 1
+  cosign de l'image neuve : GitVersion:    v3.1.4 GitCommit:     0e48502cf5ef34e2e60bbd3617aa19945712f705
+OK   prédicat lu = empreinte affichée par le pod : fa9144695bce2a92c2517a8957e12e2f4944aeaf00c22469d7de58a0a655cea0
+  prédicat de l'essai : {"scannedAt":"2026-11-23T14:13:07.344163563Z","base":{"built":"2026-11-22T06:19:59Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:8e9abb2e53d6b599213e4e56c5fcf2a2778f972a72f0dd84b966e612c3d98ed6","schema":"v6.1.10"},"vulnerabilites":6,"kev":0,"vex":{"documents":[],"ecarteesSansExemption":0,"rejetes":0}}
+OK   bloc vex de l'essai : {"documents":[],"ecarteesSansExemption":0,"rejetes":0}
+OK   prédicat de l'essai = référence, hors scannedAt et bloc vex : 57df8efab0781c23
+## lignes du pod dans Grafana (Loki), comptes seuls
+OK   lignes du pod p5-essai dans Grafana (Loki) = kubectl logs : 114
+## effacement
+OK   pod p5-essai effacé
+OK   ConfigMap scan-config-essai effacée
+OK   refus Kyverno après = avant : 10
+OK   Zot : referrers de builds/sample-app après = avant (rien publié) : 12
+# fin 2026-11-23T14:13:24Z
+bilan : tenue

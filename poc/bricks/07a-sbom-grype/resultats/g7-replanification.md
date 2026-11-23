@@ -801,3 +801,32 @@ Zot a redémarré le 23/11 à 13:21:33 UTC (passage de `stockage.sh zot`, accord
 **Prédiction** (calcul, durée d'un balayage entre 36 min 39 s et 42 min 40 s, les deux mesurées) : dernière tranche « executing gc » entre **13:58:19 et 14:04:30 UTC** (10 s de tranche comprises). Confiance moyenne : deux durées mesurées seulement pour un balayage complet, et la charge du démarrage n'a pas été comparée.
 
 **Conséquence attendue si elle tient** (loi B) : balayage du 24/11 vers 14:00 UTC, après le scan de 09:30 et le relevé `releve_24` ; la réserve de la note de 12:55:48Z tomberait. Mesure de la fin par `g7-pose4.sh fin`, qui refuse tant que la dernière tranche a moins de 5 min.
+
+## Note de 2026-11-23T14:10:43Z : fin du balayage de démarrage du 23/11 à 13:21 (après la pièce 4 de la 07b), projection recalculée (rien n'est réécrit)
+
+[Relevé de fin](g7-pose4-fin.log) par [g7-pose4.sh](g7-pose4.sh) `fin` (lecture seule, Loki à travers Grafana, tranches de 10 s ; entête : `g7-pose4.sh fin, 2026-11-23T14:10:21Z ; Loki à travers Grafana, tranches de 10 s (heure de la tranche)`) :
+- « executing gc » de 13:21:40 à **14:03:50** UTC (heures de tranche), 167 lignes ; dernière tranche 392 s avant la mesure ;
+- rétention : de 2026-11-23T13:21:40Z à 2026-11-23T14:03:20Z, 12 lignes, 2 tranches de 10 s.
+
+**Contre la prédiction de 13:27:12Z** (dernière tranche entre 13:58:19 et 14:04:30) : **dans la plage prédite**. Durée du balayage (calcul, à la tranche près) : 42 min 20 s.
+
+**Projection** (calcul, loi B à partir de cette fin, durée entre 36 min 39 s et 42 min 40 s, marge cumulée ; hypothèse : Zot non redémarré) :
+
+| Jour | Début | Fin |
+|---|---|---|
+| 24/11 | 24/11 14:04 à 24/11 14:04 | 24/11 14:40 à 24/11 14:46 |
+| 25/11 | 25/11 14:40 à 25/11 14:46 | 25/11 15:17 à 25/11 15:29 |
+| 26/11 | 26/11 15:17 à 26/11 15:29 | 26/11 15:53 à 26/11 16:12 |
+| 27/11 | 27/11 15:53 à 27/11 16:12 | 27/11 16:30 à 27/11 16:54 |
+| 28/11 | 28/11 16:30 à 28/11 16:54 | 28/11 17:07 à 28/11 17:37 |
+| 29/11 | 29/11 17:07 à 29/11 17:37 | 29/11 17:43 à 29/11 18:20 |
+
+Conséquences (calcul, si la loi B tient et si Zot n'est pas redémarré) :
+- **le balayage du 24/11 passe vers 14:04 UTC**, après le scan de 09:30, le scan du deb de 11:15 et la plage du relevé `releve_24` (de 09:33 à ~12:30) : **la réserve de la note de 12:55:48Z sur `releve_24` tombe**. La pose de la pièce 5 (CronJob et ConfigMap, sans toucher à Zot) ne recale pas la chaîne ;
+- les balayages glissent d'environ 40 min par jour et restent l'après-midi jusqu'au 29/11 ; aucun ne recouvre un scan de 09:30 ou de 11:15 ;
+- **premières suppressions de `builds/scan/sample-app`** (plus ancien referrer du 13/11 à 12:45:07, éligible le 27/11 à 12:45:07) : au balayage du **27/11** (début de 15:53 à 16:12), un jour plus tôt que dans la projection de 12:55:48Z ;
+- **premières suppressions des scans du deb** (éligibles le 28/11 vers 21:01, seconde non relue) : pas au balayage du 28/11, fini au plus tard vers 17:37, mais à celui du **29/11** (de 17:07 à 18:20), **après** le lancement de la tâche du 29/11 à 05:40 UTC ;
+- **tâche du 29/11 telle qu'elle est** : la lecture à 05:40 manquerait encore les suppressions du deb. La replanifier (heure et fenêtres) demande l'accord du propriétaire ; **non modifiée**.
+- `vulndb/grype` : non recalculé ici (retrait au compte, indépendant de l'heure du balayage).
+
+**Heures** : de 14:00:32 UTC à l'heure de cette note, dans l'enveloppe de la 07b.
