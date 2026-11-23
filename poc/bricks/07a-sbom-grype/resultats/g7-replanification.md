@@ -834,3 +834,7 @@ Conséquences (calcul, si la loi B tient et si Zot n'est pas redémarré) :
 ## Note de 2026-11-23T14:26:18Z : pièces 7 et 9 de la 07b et redémarrage de Zot (lu dans le code)
 
 Ni la pièce 7 (`entrees-scan.sh`, unités `entrees-scan.*` seules) ni la pièce 9 (`plateforme.sh` dans le dépôt) ne redémarrent Zot : aucune ligne du patch `07b-t3` ne mentionne `systemctl`, `restart`, `daemon-reload` ni `zot` ([carte](07b-carte.md), additif après le pod d'essai). La projection de 14:10:43Z reste valable pour elles. **Tâche du 29/11 à 05:40 UTC non modifiée** : sa replanification attend l'accord du propriétaire.
+
+## Note de 2026-11-23T14:38:33Z : observation des suppressions réelles abandonnée (décision du propriétaire, « Ne plus attendre »)
+
+Le rejeu de M5b se fera dès la fin de la 07b, sans attendre le balayage du 29/11. Il recrée Zot et Loki : les premières suppressions réelles du Zot actuel (sample-app le 27/11, deb le 29/11 d'après la projection de 14:10:43Z) ne seront pas observées. Les décisions de rétention restent mesurées par `g7_sec` (05/11, copie du vrai store). La tâche planifiée `supply-chain-g7-premiere-suppression` (29/11 à 05:40 UTC) est désactivée sur cette décision. Détail : [carte de la 07b](07b-carte.md).

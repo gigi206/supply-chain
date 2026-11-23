@@ -2038,3 +2038,28 @@ Le dépôt et sc-stockage sont de nouveau alignés pour `zot.json`. Aucune écri
 - **Relevés précédents** : [`vex-depot-etat.log`](vex-depot-etat.log) et [`piece5-couches.log`](piece5-couches.log) viennent de commandes de session (curl anonyme ; `crane manifest`, `crane blob` et comparaison des membres tar), sans script dans le dépôt ; leur entête dit ce qu'ils lisent.
 
 **Heures** : de 14:26:18 UTC à 14:28:53 UTC, dans l'enveloppe de la 07b.
+
+## Décisions du propriétaire : ne plus attendre le calendrier (note de 2026-11-23T14:38:33Z)
+
+À la question sur la tâche du 29/11, le propriétaire répond (verbatim) : « pourquoi se bloquer aussi longtemps ? il faut absoluement qu'on arrive à avancer sur le projet sans devoir attendre des lustres ! ». Après relecture des attentes (une précaution de session, sa décision du 20/11, un délai physique de Zot) et avis du conseiller, trois réponses :
+
+| Question | Réponse du propriétaire |
+|---|---|
+| M5b attend-il encore le balayage du 29/11 (« Après le n°9 », décision du 20/11) ? | **« Ne plus attendre »** : finir la 07b, puis lancer le rejeu de M5b aussitôt après. L'observation des premières suppressions réelles du Zot actuel est abandonnée ; les règles de rétention restent mesurées par `g7_sec` le 05/11 sur une copie du vrai store. La tâche du 29/11 devient sans objet. |
+| Pièce 5 : avant ou après `releve_24` ? | **« Aujourd'hui »** : la garde « après `releve_24` » était une précaution de session, pas une règle du propriétaire. |
+| Accords nommés | **pièce 6** (ConfigMap de la porte, avec les tâches de la 05 que le rendu ajoute à `taches.yml`), **pièce 7** (sudo sur sc-stockage), **scan lancé à la main** après la pose (écrit dans le vrai Zot). La pièce 9 ne touche que le dépôt. |
+
+**Changements faits avant la pose, dans ce commit** :
+- [`base-grype-24.sh`](base-grype-24.sh) `releve_24` : le contrôle « préfixes du 24/11 = 23/11 » devient « préfixes du 23/11 plus `VEX` » (le scanner neuf écrit une ligne `VEX|`). Seul ce contrôle change.
+- [`piece5-pose.sh`](../piece5-pose.sh) `pose` : la garde lit cette décision dans la carte au lieu du journal de `releve_24`. Les autres gardes restent (essai tenu, aucun pod actif, hors des 10 min avant un passage, HEAD et service attendus).
+
+**Prédiction ajustée de `releve_24`** (24/11, après 09:33 UTC ; le tableau de la note de 12:22:03Z n'est pas réécrit) : job de 09:30 réussi (1/0/0) ; **préfixes : ceux du 23/11 plus `VEX`**, aucune ligne `REPLI` ; ligne `BASE` du 24/11 inchangée dans sa prédiction. Les autres lignes du tableau sont inchangées. Le premier scan planifié du scanner neuf et la vérification de la panne Grype se font dans le même job : un KO sur le job dirait seulement qu'il faut séparer les deux causes.
+
+**Prédiction de la pose** (`piece5-pose.sh pose`, maintenant, hors des fenêtres de 09:20 et 11:05) :
+- préalables tenus : décision lue, essai tenu, aucun pod actif, HEAD (`scanner.sh` `7251df15`, `OUTILS_SCAN_DIGEST` `b799feda`), service (ancien `scanner.sh` `88e7bfe8`, ancienne image sur `analyser`, `attester`, `publier`) ;
+- rendu de la copie de HEAD : `g7_periodique` (`G7_SEC=1`) code 0, les deux CronJob rendus avec `analyser`, `attester` et `publier` sur `b799feda` ;
+- après : `scan-config` a seulement sa clé `scanner.sh` changée (`7251df15`) ; images des deux CronJob : `analyser`, `attester`, `publier` sur `b799feda`, `source` et `jetons`/`revocation` inchangés ; spec, image ramenée, égale à celle d'avant ; **bilan : tenue** ;
+- `grafana` : écritures de `scan-config` et des deux CronJob dans l'audit de l'API (comptes seuls) ;
+- confiance haute (mêmes fonctions de rendu qu'à sec, `kubectl diff` mesuré à sec).
+
+**Heures** : de 14:32:34 UTC à 14:38:33 UTC, dans l'enveloppe de la 07b (au plus 13 h 46 min 07 s à 14:35:06 UTC, mesure de session).

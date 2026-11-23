@@ -7,7 +7,7 @@
 #   releve_24   refuse avant le 24/11 à 09:33 UTC, avant d ouvrir son journal : état de la règle BaseGrypeVieillie ; historique
 #               de cette alerte le 24/11 de 05:00 à 10:00 UTC ; date de construction de la base la plus récente (métrique
 #               base_grype_construite_timestamp_seconds) ; messages de systemd et du service base-grype dans Loki (comptes) ;
-#               job de scan-sample-app du 24/11 à 09:30 : réussi, ligne BASE, préfixes égaux au 23/11, lignes dans Grafana
+#               job de scan-sample-app du 24/11 à 09:30 : réussi, ligne BASE, préfixes du 23/11 plus VEX, lignes dans Grafana
 #   compteurs_23  (ajout du 23/11/2026, après alertes_23) ChainsEchecSignature (A2) et KyvernoRefusAnormaux (A5) déclenchées
 #               à la reprise de la collecte : compteurs qu elles lisent, sommés, avant la panne (06:40), à la reprise (08:36) et
 #               après (08:50 et 09:30) ; égaux, ils excluent un nouvel échec de signature ou un nouveau refus
@@ -83,7 +83,9 @@ case $e in
       echo "  durée : $(kubectl get job "$j" -n scan -o json | jq -r '"\(.status.startTime) -> \(.status.completionTime)"')"
       jl() { kubectl logs -n scan "job/$1" --all-containers 2>&1; }
       pref() { jl "$1" | awk '{ if (tolower($0) ~ /jeton|token/) print "masquée"; else { split($0, a, "|"); print a[1] } }' | sort | paste -sd,; }
-      attendu "préfixes des lignes du journal, triés (24/11 = 23/11)" "$(pref "$j")" "$(pref "$j0")"
+      # modifié le 23/11/2026 (note de 2026-11-23T14:38:33Z de 07b-carte.md, avant le relevé) : pièce 5 posée avant le relevé, sur décision
+      # du propriétaire ; le scanner neuf ajoute une ligne VEX| : préfixes du 24/11 = ceux du 23/11 plus VEX
+      attendu "préfixes des lignes du journal, triés (24/11 = 23/11 plus VEX)" "$(pref "$j")" "$( { pref "$j0" | tr , '\n'; echo VEX; } | sort | paste -sd,)"
       for x in "$j0" "$j"; do echo "  $x : $(jl "$x" | grep -E '^(BASE|SCAN)\|' | sed 's/@sha256:[0-9a-f]*//; s/, empreinte .*//' | paste -sd' ')"; done
       attendu "date de la base dans la ligne BASE du 24/11" "$(jl "$j" | sed -n 's/^BASE|\([0-9-]*\).*/\1/p')" 2026-11-24
       pod=$(kubectl get pods -n scan -l job-name="$j" -o jsonpath='{.items[0].metadata.name}')

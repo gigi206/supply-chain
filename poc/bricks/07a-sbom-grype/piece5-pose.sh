@@ -5,7 +5,7 @@
 # lancé dans le dépôt (son journal resultats/g7_periodique.log serait réécrit), et g7_periodique n'est lancé qu'avec G7_SEC=1 (sinon
 # il lance un Job qui publie). Jamais etape_g2_image.
 # Étapes (une par journal, jamais réécrit) :
-#   pose    ACCORD DU PROPRIÉTAIRE. Refuse avant le relevé du 24/11 (journal base-grype-24-releve_24.log au bilan « tenue »), sans
+#   pose    ACCORD DU PROPRIÉTAIRE. Refuse sans sa décision du 23/11 dans 07b-carte.md (pose avant le relevé du 24/11), sans
 #           essai tenu (piece5-essai-essai.log), si un pod de scan est actif, et dans les 10 min qui précèdent un passage planifié
 #           (09:20 à 09:30, 11:05 à 11:15 UTC). Avant : HEAD porte scanner.sh 7251df15 et le digest b799feda ; le service, l'ancien
 #           scanner.sh et l'ancienne image. Pose : cm_scan de la copie, puis kubectl apply --server-side des deux CronJob rendus.
@@ -38,9 +38,9 @@ echo "# piece5-pose.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ) ; HEAD $(git -C "$raci
 case $e in
 pose)
   echo "## préalables"
-  R24=$here/resultats/base-grype-24-releve_24.log
-  [ -s "$R24" ] && grep -q '^bilan : tenue' "$R24" || arret "relevé du 24/11 absent ou non tenu ($R24) : la pose l'attend"
-  ok "relevé du 24/11 tenu"
+  # modifié le 23/11/2026 (note de 2026-11-23T14:38:33Z) : décision du propriétaire, pièce 5 posée avant le relevé du 24/11
+  grep -q '^## Décisions du propriétaire : ne plus attendre le calendrier (note de' "$here/resultats/07b-carte.md" || arret "décision du propriétaire absente de la carte"
+  ok "décision du propriétaire : pose avant le relevé du 24/11"
   grep -q '^bilan : tenue' "$here/resultats/piece5-essai-essai.log" 2> /dev/null || arret "pod d'essai absent ou non tenu"
   ok "pod d'essai tenu"
   hm=$(date -u +%H%M)
