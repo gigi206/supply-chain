@@ -252,4 +252,8 @@ etape_publier() {
   echo "PACKAGING_RPM=$REG/$DEPOT@$d1"
 }
 
+# Additif du 2026-11-23T15:08:33Z (reconstruction des entrées de M5b après l'incident du rejeu m5b-1) : M4A_JOURNAUX=<dossier> écrit
+# le journal de lancer ailleurs que dans resultats/ (un journal archivé n'est jamais réécrit) ; les entrées lues restent dans resultats/.
+R=${M4A_JOURNAUX:-$R}
+
 lancer m4a "05 M4a" "$@"
