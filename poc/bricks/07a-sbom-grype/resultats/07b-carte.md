@@ -1609,3 +1609,23 @@ L'effet de `vex.pub` est mesuré **nul**, comme prédit : la clé est montée, l
 - conséquence : la base du 22/11 reste sous le seuil de 3 jours de D4 jusqu'au 25/11. Le passage du 24/11 à 08:00 devrait la renouveler, à vérifier au scan du 24/11 à 09:30.
 
 **Heures** : de 08:39:48 UTC à 09:34:49 UTC, attente comprise, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
+
+## Base Grype non renouvelée le 23/11 : relevé (note de 2026-11-23T09:42:09Z)
+
+[Relevé](base-grype-trou.log) par [base-grype-trou.sh](base-grype-trou.sh), à 09:41:43 UTC, en lecture seule à travers Grafana (comptes Loki seuls, une métrique). Rien sur la VM.
+
+Messages de systemd (`init.scope`) qui citent `base-grype` sur sc-stockage :
+- le 22/11, le passage normal : 4 lignes de 08:00 à 08:30 UTC (`Starting`, `Finished`, `Deactivated`…) ;
+- depuis le redémarrage : 3 lignes sur `base-grype.timer`, toutes rangées de 08:30 à 08:35 (`Stopped`, `Deactivated`, `Started`), puis plus rien jusqu'à 09:41 ;
+- **aucune ligne sur `base-grype.service` sur 2 h**, donc aucun lancement du service après le démarrage.
+
+Lecture : le timer a été arrêté puis relancé avec la VM, mais `Persistent=true` n'a pas rattrapé le passage de 08:00. Le rangement de Loki après la panne (heure de collecte) empêche de dire si ces 3 lignes viennent de l'arrêt et du démarrage ou d'avant. **Non vérifié** : la raison de l'absence de rattrapage (horodatage du dernier passage gardé par systemd, ou passage commencé pendant la panne) demande une lecture dans la VM, sur accord.
+
+Échéances mesurées, si rien n'est fait :
+- base la plus récente construite le **2026-11-22T06:19:59Z** (métrique `base_grype_construite_timestamp_seconds`) ;
+- l'alerte critique `BaseGrypeVieillie` (plus de 2 jours, pendant 5 min) se déclenche le **24/11 à 06:24:59 UTC**, avant le passage de 08:00. Elle doit s'éteindre si ce passage renouvelle la base ;
+- la porte (D4, `base_age_max_jours: 3`, écart entre le scan et la construction de la base) refuse **tout scan fait après le 2026-11-25T06:19:59Z** avec cette base. Le scan du 24/11 à 09:30 passe encore ; celui du 25/11 à 09:30 serait refusé si le passage du 24/11 manque aussi.
+
+La phrase « le passage du 24/11 devrait la renouveler » de la note précédente reste une attente : le timer est relancé, mais rien ne prouve qu'il soit armé pour 08:00.
+
+**Heures** : de 09:39:18 UTC à 09:42:09 UTC, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.

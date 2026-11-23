@@ -1,0 +1,28 @@
+heure : 2026-11-23T09:41:43Z
+init.scope base-grype |= base-grype.timer, 2h : 3
+init.scope base-grype |= base-grype.timer, 26h : 3
+init.scope base-grype |= base-grype.service, 2h : aucune
+init.scope base-grype |= base-grype.service, 26h : 4
+init.scope base-grype |= Starting, 2h : aucune
+init.scope base-grype |= Starting, 26h : 1
+init.scope base-grype |= Started, 2h : 1
+init.scope base-grype |= Started, 26h : 1
+init.scope base-grype |= Finished, 2h : aucune
+init.scope base-grype |= Finished, 26h : 1
+init.scope base-grype |= Stopped, 2h : 1
+init.scope base-grype |= Stopped, 26h : 1
+init.scope base-grype |= Deactivated, 2h : 1
+init.scope base-grype |= Deactivated, 26h : 2
+init.scope base-grype.timer, 5 min jusqu'à 08:30 : aucune
+init.scope base-grype.timer, 5 min jusqu'à 08:35 : 3
+init.scope base-grype.timer, 5 min jusqu'à 08:40 : aucune
+init.scope base-grype.timer, 5 min jusqu'à 09:00 : aucune
+init.scope base-grype.timer, 5 min jusqu'à 09:30 : aucune
+init.scope base-grype, 30 min jusqu'au 22/11 08:30 : 4
+unite base-grype.service, 26 h : 1
+base_grype_construite_timestamp_seconds : 1795328399
+base la plus récente construite le : 2026-11-22T06:19:59Z
+base_age_max_jours (policy-scan.yaml) : 3
+refus D4 pour tout scan après : 2026-11-25T06:19:59Z
+alerte BaseGrypeVieillie (plus de 2 jours, for 5m) à partir de : 2026-11-24T06:24:59Z
+bilan : relevé fait
