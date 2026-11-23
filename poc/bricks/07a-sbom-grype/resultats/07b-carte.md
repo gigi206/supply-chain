@@ -2181,3 +2181,14 @@ Le propriétaire a choisi : clé VEX recréée automatiquement par le rejeu (com
 **Conséquences** : M5b ne peut pas repartir tel quel (son `entree` exige ces entrées) ; leur reconstruction est à étudier. Rien n'a été relancé ni effacé depuis.
 
 **Deux défauts du code relevés** : la commande du rejeu documentée n'impose pas `DISTRO=rke2` (défaut `k3s`) ; `vm.sh detruire` ne sait pas effacer un cache de modules Go (fichiers en lecture seule).
+
+## Rejeu plateforme-1 : prédiction (date -u de 15:07:32 UTC, le 2026-11-23, avant le lancement ; accord du propriétaire « Oui, remonte »)
+
+**Commande** : `DISTRO=rke2 POUSSER_VSA=1 mise run confiance:rejeu -- plateforme-1`, depuis le début, sans `TAG_05` (bloc 05 sauté : les entrées de M5b sont à reconstruire). Journal `poc/bricks/08-trust-plane/resultats/rejeu-plateforme-1.log`.
+
+**Prédiction** :
+- démontage : domaines, pool et réseau déjà absents (gardes `existe`), restes du dossier de travail rendus inscriptibles puis effacés, kubeconfig périmé retiré ;
+- RKE2 et Cilium, puis J2 à J8, 01, 19, 19b : comme le rejeu RKE2 du 06/11 (confiance moyenne : ajouts postérieurs, dont l'export Hubble posé à la main le 20/11, absent du rejeu) ;
+- 07a et 07b : `g2_image` redonne `b799feda` sous le tag `-vex` ; « 07b (clé VEX) » et « 07b (accès VEX) » passent ; `vex-cle-publique.pem` change ; G4 pose `vex.pub` ; S6a garde `vex.pub` ; `entrees-scan` écrit 44 séries ;
+- 08c, 06 : jamais rejouées sous RKE2 depuis leurs ajouts : arrêts possibles, repris par `DEPUIS=` après correction ;
+- durée : plusieurs heures, non estimée plus finement.
