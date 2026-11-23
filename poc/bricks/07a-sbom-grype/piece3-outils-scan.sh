@@ -14,7 +14,15 @@
 #          resourceVersion) ; écritures de plateforme/outils-scan relues dans Loki, à travers Grafana (comptes seuls).
 #          OUTILS_SCAN_DIGEST de plateforme.sh n'est PAS changé ici : il change avec scanner.sh (reste de la pièce 5), sans quoi un
 #          rendu des CronJob mettrait l'ancien scanner.sh sur la nouvelle image (fusion à 5 arguments).
-# Usage (racine du dépôt) : mise exec -- poc/bricks/07a-sbom-grype/piece3-outils-scan.sh sec | pose   (journal : resultats/piece3-<étape>.log)
+#   pose_releve  (ajout du 23/11/2026, après la pose de 13:01:35 UTC, tuée par l'environnement sur « sleep 20 », code 144, journal
+#          vide car la sortie était retenue par sed) : lecture seule, sans attente, des contrôles de la pose : nouveau tag = digest
+#          du sec, ancien tag inchangé, CronJob de scan sur l'ancienne image, aucun Job actif, écritures de plateforme/outils-scan
+#          depuis 13:01:00 UTC dans Loki à travers Grafana (comptes seuls), dossier de travail sans identifiant
+#   pose_releve_2  (ajout du 23/11/2026, après pose_releve, dont deux contrôles étaient faux : empreinte du tar non compressé
+#          comparée au digest de la couche compressée ; image lue dans containers[] alors que le scanner tourne en initContainers)
+#          lecture seule : dernier diff_id de la config de l'image poussée = couche du sec ; images de tous les conteneurs
+#          (initContainers compris) des CronJob de scan : analyser, attester et publier sur l'ancienne image
+# Usage (racine du dépôt) : mise exec -- poc/bricks/07a-sbom-grype/piece3-outils-scan.sh sec | pose | pose_releve | pose_releve_2   (journal : resultats/piece3-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
@@ -38,7 +46,7 @@ TAG_ANCIEN=grype-0.104.1-syft-1.38.0
 DIGEST_ANCIEN=sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
 TAG_NEUF=grype-0.104.1-syft-1.38.0-vex
 e=${1:-}
-case $e in sec|pose) ;; *) echo "usage : $0 sec | pose" >&2; exit 64 ;; esac
+case $e in sec|pose|pose_releve|pose_releve_2) ;; *) echo "usage : $0 sec | pose | pose_releve | pose_releve_2" >&2; exit 64 ;; esac
 L=$R/piece3-$e.log
 [ ! -e "$L" ] || { echo "journal déjà présent : $L (les journaux ne sont jamais réécrits)" >&2; exit 1; }
 if [ "$e" = pose ]; then
@@ -65,6 +73,52 @@ couche() { # source d'outil/ (dossier), dossier de sortie : construit scan-outil
   tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -cf "$out/couche.tar" -C "$out/racine" usr
 }
 
+if [ "$e" = pose_releve_2 ]; then
+{
+echo "# piece3-outils-scan.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ) ; dépôt $(git -C "$here" rev-parse --short=8 HEAD)"
+DN=$(sed -n 's/^DIGEST_NEUF=//p' "$R/piece3-sec.log")
+attendu "nouveau tag relu en anonyme" "$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$OUTILS_SCAN:$TAG_NEUF")" "$DN"
+attendu "dernier diff_id de l'image poussée = couche du sec (tar non compressé)" "$(SSL_CERT_FILE=$P/ca-poc.crt crane config "$REG_HOTE/$OUTILS_SCAN@$DN" | jq -r '.rootfs.diff_ids[-1]')" "sha256:$(sed -n 's/^OK   couche neuve, deux assemblages : //p' "$R/piece3-sec.log")"
+attendu "autres couches = celles de l'ancienne image (base cosign)" "$(SSL_CERT_FILE=$P/ca-poc.crt crane config "$REG_HOTE/$OUTILS_SCAN@$DN" | jq -c '.rootfs.diff_ids[:-1]')" "$(SSL_CERT_FILE=$P/ca-poc.crt crane config "$REG_HOTE/$OUTILS_SCAN@$DIGEST_ANCIEN" | jq -c '.rootfs.diff_ids[:-1]')"
+kubectl get cronjob -n scan -o json | jq -r '.items[] | .metadata.name as $n | .spec.jobTemplate.spec.template.spec | ((.initContainers // [])[], .containers[]) | "  \($n) \(.name) \(.image | sub(".*@"; ""))"'
+attendu "conteneurs analyser, attester, publier des CronJob de scan : ancienne image" "$(kubectl get cronjob -n scan -o json | jq -r '[.items[].spec.jobTemplate.spec.template.spec | ((.initContainers // [])[], .containers[]) | select(.name == "analyser" or .name == "attester" or .name == "publier") | .image | sub(".*@"; "")] | "\(length) \(unique | join(","))"')" "6 $DIGEST_ANCIEN"
+attendu "aucun conteneur des CronJob sur la nouvelle image" "$(kubectl get cronjob -n scan -o json | jq -r --arg d "$DN" '[.items[].spec.jobTemplate.spec.template.spec | ((.initContainers // [])[], .containers[]) | select(.image | endswith($d))] | length')" 0
+echo "# fin $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+[ "$ko" = 0 ] && echo "bilan : tenue" || echo "bilan : KO"
+exit "$ko"
+} > "$L" 2>&1
+k=$?; sed '/jeton\|token/I c\[ligne masquée : motif jeton|token]' -i "$L"; cat "$L"; exit "$k"
+fi
+if [ "$e" = pose_releve ]; then
+{
+echo "# piece3-outils-scan.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ) ; dépôt $(git -C "$here" rev-parse --short=8 HEAD)"
+DN=$(sed -n 's/^DIGEST_NEUF=//p' "$R/piece3-sec.log")
+echo "digest attendu (journal sec) : $DN"
+echo "journal de la pose : $(stat -c '%s octets, modifié %y' "$R/piece3-pose.log")"
+attendu "nouveau tag relu en anonyme" "$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$OUTILS_SCAN:$TAG_NEUF")" "$DN"
+attendu "ancien tag inchangé (anonyme)" "$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$OUTILS_SCAN:$TAG_ANCIEN")" "$DIGEST_ANCIEN"
+echo "tags : $(SSL_CERT_FILE=$P/ca-poc.crt crane ls "$REG_HOTE/$OUTILS_SCAN" | paste -sd' ')"
+attendu "couche de l'image poussée = couche du sec (dernière couche)" "$(SSL_CERT_FILE=$P/ca-poc.crt crane manifest "$REG_HOTE/$OUTILS_SCAN@$DN" | jq -r '.layers[-1].digest')" "sha256:$(sed -n 's/^OK   couche neuve, deux assemblages : //p' "$R/piece3-sec.log")"
+kubectl get cronjob -n scan -o json | jq -r '.items[] | "CronJob \(.metadata.name) : resourceVersion \(.metadata.resourceVersion), image \(.spec.jobTemplate.spec.template.spec.containers[0].image | sub(".*@"; ""))"'
+attendu "CronJob de scan sur l'ancienne image" "$(kubectl get cronjob -n scan -o json | jq -r '[.items[].spec.jobTemplate.spec.template.spec.containers[].image | sub(".*@"; "")] | unique | join(",")')" "$DIGEST_ANCIEN"
+attendu "Jobs de scan actifs" "$(kubectl get jobs -n scan -o json | jq '[.items[] | select((.status.active // 0) > 0)] | length')" 0
+attendu "dossier de travail de la pose sans identifiant (docker/)" "$(find "$W/piece3-pose" -name config.json | wc -l)" 0
+q() { printf 'user = "auditeur:%s"\n' "$(cat "$O/08/secrets/grafana-auditeur.password")" \
+  | curl -sS -K - --cacert "$P/ca-poc.crt" -H 'Content-Type: application/json' -X POST https://192.168.161.13:3001/api/ds/query \
+    -d "$(jq -nc --arg q "$1" --arg t "$(date -u +%s)000" '{from:$t,to:$t,queries:[{refId:"A",datasource:{uid:"loki"},expr:$q,queryType:"instant",maxLines:1}]}')" \
+  | jq -r '[.results.A.frames[]? | select((.data.values | length) > 1) | .data.values[1][0]] | if length == 0 then "aucune" else join(",") end'; }
+r=$(( $(date -u +%s) - $(date -ud 2026-11-23T13:01:00Z +%s) ))
+Z='{noeud="sc-stockage", source="journal", unite="zot.service"} |= "plateforme/outils-scan"'
+echo "Loki, zot.service, plateforme/outils-scan depuis 13:01:00 UTC (${r} s) : $(q "sum(count_over_time($Z [${r}s]))")"
+for m in PUT POST PATCH HEAD GET; do echo "  méthode $m : $(q "sum(count_over_time($Z |= \"\\\"method\\\":\\\"$m\\\"\" [${r}s]))")"; done
+n=$(q "sum(count_over_time($Z |= \"\\\"method\\\":\\\"PUT\\\"\" [${r}s]))")
+case $n in aucune|0) echo "KO   aucune écriture de plateforme/outils-scan dans Grafana (Loki)"; ko=1 ;; *) ok "écritures (PUT) de plateforme/outils-scan visibles dans Grafana (Loki) : $n" ;; esac
+echo "# fin $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+[ "$ko" = 0 ] && echo "bilan : tenue" || echo "bilan : KO"
+exit "$ko"
+} > "$L" 2>&1
+k=$?; sed '/jeton\|token/I c\[ligne masquée : motif jeton|token]' -i "$L"; cat "$L"; exit "$k"
+fi
 {
 echo "# piece3-outils-scan.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ) ; dépôt $(git -C "$here" rev-parse --short=8 HEAD)"
 rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")

@@ -1,0 +1,21 @@
+# piece3-outils-scan.sh pose_releve, 2026-11-23T13:02:53Z ; dépôt 418cf7e0
+digest attendu (journal sec) : sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+journal de la pose : 0 octets, modifié 2026-11-23 14:01:35.157257098 +0100
+OK   nouveau tag relu en anonyme : sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+OK   ancien tag inchangé (anonyme) : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+tags : grype-0.104.1-syft-1.38.0 grype-0.104.1-syft-1.38.0-vex
+KO   couche de l'image poussée = couche du sec (dernière couche) : sha256:d36738492717ae8a6bde87200e41f943d4a1694faaa750d902c6281da19c0460 (attendu : sha256:eddae750b88c9e4b3040968a2ca19ceede9f9bb5e2e11c86d16a5728b00eeafa)
+CronJob scan-sample-app : resourceVersion 8301269, image sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+CronJob scan-sample-app-deb : resourceVersion 8361649, image sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+KO   CronJob de scan sur l'ancienne image : sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f (attendu : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f)
+OK   Jobs de scan actifs : 0
+OK   dossier de travail de la pose sans identifiant (docker/) : 0
+Loki, zot.service, plateforme/outils-scan depuis 13:01:00 UTC (113 s) : 28
+  méthode PUT : 3
+  méthode POST : 2
+  méthode PATCH : 2
+  méthode HEAD : 20
+  méthode GET : 1
+OK   écritures (PUT) de plateforme/outils-scan visibles dans Grafana (Loki) : 3
+# fin 2026-11-23T13:02:54Z
+bilan : KO

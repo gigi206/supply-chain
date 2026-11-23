@@ -1802,3 +1802,17 @@ Limite : le grand banc construit `scan-outil` depuis la même source (patch `b5a
 **Pose** (étape `pose`, sur accord) : la même couche poussée sur le vrai Zot par `poc-ecriture`, sous le tag `grype-0.104.1-syft-1.38.0-vex` ; digest attendu `b799feda…`. Les CronJob et l'ancien tag restent sur `7eb4f26e…` : aucun scan ne change avant le reste de la pièce 5.
 
 **Heures** : de 12:47:04 UTC (lecture du plan) à 13:00:53 UTC pour la préparation de la pièce 3, hors du relevé G7 ; à compter dans l'enveloppe de la 07b, qui reste au plus à 11 h 58 avant ce segment (somme à refaire à la prochaine note d'heures).
+
+## Pièce 3 posée : image `outils-scan` neuve dans le vrai Zot (note de 2026-11-23T13:03:48Z ; accord du propriétaire, « Oui »)
+
+**Pose** : étape `pose` lancée à 13:01:35 UTC. L'image est poussée, mais **l'étape a été tuée** par l'environnement d'exécution sur son `sleep 20` (code 144), avant la relecture dans Grafana. Sa sortie, retenue par le tampon de `sed`, est perdue : [`piece3-pose.log`](piece3-pose.log) est **vide** et n'est pas réécrit (il empêche aussi une seconde poussée). Le dossier `docker/`, qui portait l'identifiant de `poc-ecriture`, avait déjà été effacé par l'étape ; le reste du dossier de travail (sources et couche, sans secret) a été effacé ensuite par `find … -delete`.
+
+**Contrôles refaits en lecture seule**, par deux étapes datées ajoutées au script :
+- [`pose_releve`](piece3-pose_releve.log), 13:02:53 UTC, bilan KO, **à cause de deux contrôles faux** (pas de la pose) : l'empreinte du tar non compressé était comparée au digest de la couche compressée, et l'image était lue dans `containers[]`, alors que le scanner tourne en `initContainers` (`containers[]` ne porte que `revocation`, image d'OpenBao). Le reste tient : nouveau tag sur `b799feda…`, ancien tag sur `7eb4f26e…`, aucun Job actif, aucun identifiant restant ; dans Loki, à travers Grafana, 28 lignes de `zot.service` sur `plateforme/outils-scan` depuis 13:01:00, dont 3 PUT, 2 POST et 2 PATCH (la poussée) ;
+- [`pose_releve_2`](piece3-pose_releve_2.log), 13:03:24 UTC, **bilan : tenue** : dernier `diff_id` de l'image poussée = couche du `sec` (`eddae750…`) ; les 15 autres couches sont celles de l'ancienne image ; dans les deux CronJob, `analyser`, `attester` et `publier` (6 conteneurs) restent sur `7eb4f26e…`, aucun conteneur sur la nouvelle image.
+
+**État** : `plateforme/outils-scan:grype-0.104.1-syft-1.38.0-vex` = `b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649`, dans le vrai Zot. Rien ne l'utilise encore ; les scans de demain tournent sur l'ancienne image. `OUTILS_SCAN_DIGEST` de `plateforme.sh` ne change qu'avec `scanner.sh` (reste de la pièce 5).
+
+**Défaut du script, pour la suite** : pas de `sleep` dans une étape lancée par la session (l'environnement le bloque et tue la commande), et pas de sortie retenue par un filtre avant `tee`. `pose_releve` et `pose_releve_2` écrivent directement leur journal puis le masquent.
+
+**Heures** : de 13:01:00 UTC à 13:03:48 UTC, dans l'enveloppe de la 07b.

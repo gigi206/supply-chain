@@ -1,0 +1,20 @@
+# piece3-outils-scan.sh pose_releve_2, 2026-11-23T13:03:24Z ; dépôt 418cf7e0
+OK   nouveau tag relu en anonyme : sha256:b799feda12153cc35c76d951b8b3d51d963e82c17cc80de3563f221657e84649
+OK   dernier diff_id de l'image poussée = couche du sec (tar non compressé) : sha256:eddae750b88c9e4b3040968a2ca19ceede9f9bb5e2e11c86d16a5728b00eeafa
+OK   autres couches = celles de l'ancienne image (base cosign) : ["sha256:7223ea1323e8c1159ec17f07d35acc27bdd1cc2bc3ed425b44ef21dac9915db0","sha256:8fa10c0194df9b7c054c90dbe482585f768a54428fc90a5b78a0066a123b1bba","sha256:35b5ba6e08cdd034b8d1920f9c7203e5d66f258e1915f164a01de0af14f34710","sha256:114dde0fefebbca13165d0da9c500a66190e497a82a53dcaabc3172d630be1e9","sha256:4d049f83d9cf21d1f5cc0e11deaf36df02790d0e60c1a3829538fb4b61685368","sha256:af5aa97ebe6ce1604747ec1e21af7136ded391bcabe4acef882e718a87c86bcc","sha256:6f1cdceb6a3146f0ccb986521156bef8a422cdbb0863396f7f751f575ba308f4","sha256:bd3cdfae1d3fdd83a2231d608969b38b82349777c2fff9a7c12d54f8ac5c9b38","sha256:4cde6b0bb6f50a5f255eef7b2a42162c661cf776b803225dcac9a659e396bb6b","sha256:ad51d0769d16ba578106a177987dfe3d2e02c1668c852b795b2f6b024068242a","sha256:6e7fbcf090d09b73a4aa85f9dce690d0ace73877c150b7c56955487b6e7a822a","sha256:5904c32f457c96a16c8c68f5ccdf518c8138cd9e5971de9ce6d564fc481af222","sha256:233df71936e4f6ff30b88434fc6d6ee92944635984166d81daa44fd94e94e3a2","sha256:ffe56a1c5f3878e9b5f803842adb9e2ce81584b6bd027e8599582aefe14a975b","sha256:a556ecb7cdb1d462dbb5e60310cb67f7fc067a365859b28f9beadf318c3d897e"]
+  scan-sample-app source sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+  scan-sample-app analyser sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+  scan-sample-app jetons sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+  scan-sample-app attester sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+  scan-sample-app publier sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+  scan-sample-app revocation sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+  scan-sample-app-deb source sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+  scan-sample-app-deb analyser sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+  scan-sample-app-deb jetons sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+  scan-sample-app-deb attester sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+  scan-sample-app-deb publier sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+  scan-sample-app-deb revocation sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+OK   conteneurs analyser, attester, publier des CronJob de scan : ancienne image : 6 sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+OK   aucun conteneur des CronJob sur la nouvelle image : 0
+# fin 2026-11-23T13:03:24Z
+bilan : tenue
