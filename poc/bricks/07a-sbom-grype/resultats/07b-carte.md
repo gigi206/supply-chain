@@ -1629,3 +1629,27 @@ Lecture : le timer a été arrêté puis relancé avec la VM, mais `Persistent=t
 La phrase « le passage du 24/11 devrait la renouveler » de la note précédente reste une attente : le timer est relancé, mais rien ne prouve qu'il soit armé pour 08:00.
 
 **Heures** : de 09:39:18 UTC à 09:42:09 UTC, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
+
+## Base Grype non renouvelée le 23/11 : état du timer dans la VM (note de 2026-11-23T09:43:56Z)
+
+Sur accord du propriétaire (« Oui, lis le timer »). [Relevé](base-grype-timer.log) par [base-grype-timer.sh](base-grype-timer.sh), à 09:43:25 UTC : SSH avec l'utilisateur `poc`, sans sudo ni lecture du journal, `systemctl show` sur des propriétés choisies une à une. Rien n'est écrit ni relancé.
+
+| Propriété | Valeur |
+|---|---|
+| démarrage de la VM | 2026-11-23 08:33:27 UTC |
+| `base-grype.timer` | `enabled`, `active (waiting)` depuis 08:33:32, `Persistent=yes` |
+| dernier déclenchement (`LastTriggerUSec`, et date du fichier `stamp-base-grype.timer`) | **2026-11-23 08:07:53 UTC** |
+| prochain déclenchement | **2026-11-24 08:04:02 UTC** (08:00 plus un délai aléatoire) |
+| `base-grype.service` depuis le démarrage | `inactive (dead)`, jamais lancé (`ExecMainStartTimestamp` vide) |
+
+Lecture :
+- le timer s'est déclenché à 08:07:53, **pendant la panne** (06:40 à 08:33), et systemd a écrit l'horodatage du passage. Au démarrage, `Persistent=true` n'avait donc rien à rattraper. C'est la raison de l'absence de rattrapage, notée « non vérifiée » dans la note précédente ;
+- systemd tournait encore dans la VM pendant la panne, ce qui va avec la ré-exécution de 06:02 et la perte du réseau déjà notées ;
+- ce que le service a fait à 08:07:53 reste **inconnu** : aucune ligne dans Loki (journal de la VM perdu ou pas encore envoyé), aucune base du 23/11 dans Zot. Zot tourne sur la même VM, injoignable à ce moment-là : une poussée ne pouvait pas aboutir. Le journal de l'amorçage précédent demande une lecture sudo, sur accord ;
+- le timer est **armé** pour le 24/11 à 08:04:02 UTC.
+
+Conséquence, si ce passage réussit : l'alerte `BaseGrypeVieillie` sera active d'environ 06:25 à 08:05 UTC le 24/11, puis s'éteindra. La porte ne refusera rien. À vérifier au scan du 24/11 à 09:30 (base datée du 2026-11-24 attendue).
+
+**Leçon pour la supervision** : `Persistent=true` ne couvre pas une VM qui reste à moitié vivante. Le timer peut se déclencher alors que le service ne peut pas aboutir. Seules l'alerte `BaseGrypeVieillie` et la porte voient le trou, avec un jour de marge.
+
+**Heures** : de 09:43:25 UTC (heure du relevé, première mesurée de ce tour) à 09:43:56 UTC, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
