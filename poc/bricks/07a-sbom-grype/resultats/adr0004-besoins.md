@@ -64,3 +64,13 @@ Les réponses seront écrites dans l'ADR 0004, verbatim, avec la date ; l'ADR ne
 - **Unité de compte** : une entrée est un couple (identifiant, PURL), pas une CVE. Mesuré à 22:04:40 UTC sur les deux prédicats archivés : **aucun identifiant n'est l'alias d'une autre entrée, et aucun alias n'est partagé** par deux entrées. Pas de double compte visible aujourd'hui pour 2a et 3a ; à recontrôler à chaque base Grype (le témoin G6 du 04/11 avait `GO-2026-5774` avec l'alias `GHSA-3fxj-6jh8-hvhx`, que le scan du 23/11 liste seul).
 - **« Aucun tableau de bord »** : à lire « aucun fichier hors de `resultats/` ne nomme ces séries, hors de la 07a » (la recherche excluait `resultats/`).
 - **Dependency-Track** : « ni OpenVEX ni CSAF » reste **non revérifié** dans la documentation publique de la v5 ; c'est ce point qui fixe le prix de l'option 1b. À relire avant de trancher 1b.
+
+## Dependency-Track : formats VEX revérifiés dans la documentation publique (note de 2026-11-23T23:02:02Z ; lecture publique seule, pendant la reprise du rejeu)
+
+Lu le 23/11 entre 23:00 et 23:02 UTC (une recherche, puis quatre pages lues par un agent de lecture, toutes en HTTP 200) :
+- **v5 (« next »)**, [VEX and VDR documents](https://dependencytrack.github.io/docs/next/reference/vex-and-vdr/) : Dependency-Track « imports CycloneDX VEX documents to apply analysis decisions to existing findings » ; `POST /api/v1/vex` ou `PUT /api/v1/vex` ; le document est validé contre le schéma CycloneDX, un écart donne un 400 ; l'import ne crée ni composant ni finding, il applique des décisions d'analyse aux findings existants. **OpenVEX et CSAF ne sont pas mentionnés.**
+- **v5**, [File formats](https://dependencytrack.github.io/docs/next/reference/file-formats/) : CycloneDX est le seul format accepté pour les SBOM ; le VEX y figure en export (`GET /api/v1/vex/cyclonedx/project/{uuid}`). OpenVEX et CSAF non mentionnés.
+- **v4**, [Executive Order 14028](https://docs.dependencytrack.org/usage/executive-order-14028/) : « Supports the OWASP CycloneDX VEX format ». OpenVEX et CSAF non mentionnés.
+- L'issue [DependencyTrack/dependency-track#3584](https://github.com/DependencyTrack/dependency-track/issues/3584) porte sur l'import des SBOM CycloneDX 1.6 (fermée le 15/05/2024), pas sur OpenVEX ni CSAF.
+
+**Conclusion, avec sa limite** : la documentation de la v5 ne décrit que l'import de VEX CycloneDX ; l'affirmation de `docs/00` (« ni CSAF ni OpenVEX ») est **cohérente avec la documentation**, sans preuve d'absence dans le code (notes de version et code non lus). Pour l'option 1b, une conversion OpenVEX → VEX CycloneDX reste donc nécessaire, et l'import n'agit que sur des findings que Dependency-Track a déjà calculés lui-même (à partir du SBOM), pas sur ceux de Grype.
