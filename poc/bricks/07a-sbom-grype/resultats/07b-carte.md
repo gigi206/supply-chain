@@ -2230,3 +2230,9 @@ Demande du propriétaire : « Pièce 8 d'abord » (préparer la pièce 8 pendant
 - **bilan : 0 écart**. Confiance : haute pour le tableau et les refus, moyenne pour le jugement (premier passage de `scan-outil vex` sur un document produit par ce script).
 
 **Non couvert par ce banc** : la lecture du scan signé dans le vrai Zot (après le rejeu, en lecture seule, recoupée par `signer-vex.sh verifier`) ; toute signature.
+
+## Pièce 8, banc de `vex-gabarit.sh` : passages 1 et 2, prédiction du passage 3 (note de 2026-11-23T21:54:17Z ; la note de 21:53:23Z n'est pas réécrite)
+
+- [Passage 1](vex-gabarit-banc.log) (21:53:43Z) : 23 OK, **4 écarts du banc** : le shim `go` de mise ne trouve pas de version dans la copie extraite (sans `mise.toml`), le juge n'est pas construit. Banc corrigé (`GO=$(mise which go)`).
+- [Passage 2](vex-gabarit-banc-2.log) (21:53:55Z) : **26 OK, 1 écart**. Juge construit à l'empreinte `7dde1a8ed457f254` (celle de l'image `b799feda`) ; tableau, gabarit, refus et juge sur gabarit brut (rejeté) et témoin rempli (retenu, exemptant) conformes. **Écart, de la prédiction** : le témoin jugé sur un autre digest est **retenu** (1 0), pas rejeté. Lu dans le code (`outil/main.go`, l. 494-508) : un produit qui ne cite pas le digest rend l'énoncé **non exemptant**, sans rejeter le document ; c'est `signer-vex.sh` qui refuse avant signature (« énoncé non exemptant selon scan-outil vex », et plus tôt « énoncé sans produit dont l'@id cite le digest »). Le script n'est pas en cause.
+- **Prédiction du passage 3** (attente corrigée : « retenu, non exemptant », `1 0 false`) : 27 OK, 0 écart.

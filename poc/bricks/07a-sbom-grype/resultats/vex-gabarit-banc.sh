@@ -65,7 +65,8 @@ jq '.author = "témoin, aucune analyse" | .timestamp = "2026-11-23T00:00:00Z" | 
   | .statements[0].justification = "vulnerable_code_not_in_execute_path" | .statements[0].impact_statement = "témoin, aucune analyse"
   | .statements[0].timestamp = "2026-11-23T00:00:00Z"' "$G" > "$T"
 attendu "témoin rempli jugé par scan-outil vex : retenu, exemptant" "$(juge "$T" "${APP##*:}" | cut -d' ' -f1-3)" "1 0 true"
-attendu "témoin rempli, autre digest : rejeté" "$(juge "$T" "${DEB##*:}" | cut -d' ' -f1,2)" "0 1"
+# passage 3 : retenu mais non exemptant (main.go l. 494-508) ; signer-vex.sh le refuse avant signature (« énoncé non exemptant »)
+attendu "témoin rempli, autre digest : retenu, non exemptant" "$(juge "$T" "${DEB##*:}" | cut -d' ' -f1-3)" "1 0 false"
 G2=$B/g-deb.json
 o=$(PREDICAT=$PD bash "$S" "$DEB" "$G2" GHSA-j6qf-3m9c-vwj3 2>&1); c=$?
 attendu "gabarit deb : code" "$c" 0
