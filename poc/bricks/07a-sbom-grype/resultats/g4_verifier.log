@@ -1,16 +1,16 @@
-# plateforme.sh g4_verifier, 2026-11-23T16:39:44Z
+# plateforme.sh g4_verifier, 2026-11-23T22:28:36Z
 ## referrers de l'image dans builds/scan/sample-app, en lecture anonyme
-{"digest":"sha256:13dc2fff15a775560cfec1a2a8d1ee5024417947d4b563812ad9eea13e2c78c8","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","annotations":{"dev.sigstore.bundle.content":"dsse-envelope","dev.sigstore.bundle.predicateType":"https://supply-chain.example/scan/v1","org.opencontainers.image.created":"2026-11-23T16:39:36Z"}}
-OK   empreinte du manifeste : sha256:13dc2fff15a775560cfec1a2a8d1ee5024417947d4b563812ad9eea13e2c78c8
+{"digest":"sha256:4e19e8aaa20884586e4e54e225bacab77cdde6b63a9354f4f6c732fd96492241","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","annotations":{"dev.sigstore.bundle.content":"dsse-envelope","dev.sigstore.bundle.predicateType":"https://supply-chain.example/scan/v1","org.opencontainers.image.created":"2026-11-23T22:28:30Z"}}
+OK   empreinte du manifeste : sha256:4e19e8aaa20884586e4e54e225bacab77cdde6b63a9354f4f6c732fd96492241
 OK   sujet du manifeste : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
-OK   empreinte du bundle : sha256:080077696aebda6317eb70b3abc5774c115a69f92a99796be5ce72d0ac27f88a
+OK   empreinte du bundle : sha256:7440f393693aabb8760dcd8f242abe8b61335c84a05a2931c1bd62729990f689
 ## bundle vérifié sur l'hôte
 OK   bundle vérifié : clé du scanner, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1 (Verified OK)
 OK   contre-épreuve, autre digest refusé : provided artifact digest does not match any digest in statement
 OK   contre-épreuve, autre prédicat refusé : invalid predicate type
 OK   contre-épreuve, clé de Chains refusée : failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, E
 ## prédicat signé
-{"sujet":[{"name":"sample-app","digest":{"sha256":"3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"}}],"predicat":"https://supply-chain.example/scan/v1","scanner":{"db":{"built":"2026-11-23T06:28:32Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:3be413f60b71060d38823140161d75718d4ab58e22e1dce0a3634b6b61f9bc78","schema":"v6.1.10"},"id":"grype","version":"0.104.1"},"scannedAt":"2026-11-23T16:39:31.427624351Z","malveillants":[]}
+{"sujet":[{"name":"sample-app","digest":{"sha256":"3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"}}],"predicat":"https://supply-chain.example/scan/v1","scanner":{"db":{"built":"2026-11-23T06:28:32Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:3be413f60b71060d38823140161d75718d4ab58e22e1dce0a3634b6b61f9bc78","schema":"v6.1.10"},"id":"grype","version":"0.104.1"},"scannedAt":"2026-11-23T22:28:25.126701296Z","malveillants":[]}
   GHSA-3fxj-6jh8-hvhx Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
   GHSA-j6qf-3m9c-vwj3 Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
   GHSA-mqqf-5wvp-8fh8 Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
@@ -26,7 +26,6 @@ vulnérabilités : 6
 ## aucun Secret dans l'espace scan
 OK   Secrets de l'espace scan : 0
 ## audit d'OpenBao depuis le début du job
-{"chemin":"transit/keys/vex","op":"read","role":null,"politiques":["root"],"erreur":null}
 {"chemin":"auth/jwt/login","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
 {"chemin":"kv/horodatage/zot","op":"read","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
 {"chemin":"auth/token/revoke-self","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
@@ -37,4 +36,4 @@ OK   Secrets de l'espace scan : 0
 {"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null}
 {"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
 {"chemin":"auth/token/revoke-self","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
-# fin 2026-11-23T16:39:44Z, code 0
+# fin 2026-11-23T22:28:37Z, code 0

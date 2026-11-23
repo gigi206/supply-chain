@@ -1,0 +1,46 @@
+# m5b-rejeu.sh signature, 2026-11-23T23:20:20Z
+OK   publier-image, lue dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+rendu lu : ~/.cache/supply-chain-poc/05/rejeu-entrees/m1bt-20-05
+OK   prefetch-racine-rpm.yaml rendu égal à celui validé par Tekton (TD1, sha256) : b0fdff3895df59897ebc30333689b24f748124ed98e1f610cb4405a170534a05
+OK   construire-racine-rpm.yaml rendu égal à celui validé par Tekton (TD1, sha256) : de77ba0a70b4cee401448e7f6dc161094c71b2594204425a838d7dc45bf97b08
+OK   pipeline-o.yaml rendu égal à celui validé par Tekton (TD1, sha256) : 13836c388b47fe701360631db59239f67b8d787568d2af3491707422d78bfda0
+OK   pipeline-b.yaml rendu égal à celui validé par Tekton (TD1, sha256) : b2443188125b63b71539cb61c73d314dd21f11aaba3a673ab263a644794870f7
+## admission en dry-run serveur, rien n'est créé
+OK   prefetch-racine-rpm admis (code de kubectl) : 0
+OK   construire-racine-rpm admis (code de kubectl) : 0
+OK   pipeline-o admis (code de kubectl) : 0
+OK   pipeline-b admis (code de kubectl) : 0
+## signatures des tâches (tkn 0.46.2) ; relues avant tout versionnement et toute poussée
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   prefetch-racine-rpm signée : annotation de signature : true
+OK   prefetch-racine-rpm signée : égale à la tâche rendue (TD1), signature exceptée (normalisées) : égale
+OK   prefetch-racine-rpm signée : images des pas : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+OK   construire-racine-rpm signée : annotation de signature : true
+OK   construire-racine-rpm signée : égale à la tâche rendue (TD1), signature exceptée (normalisées) : égale
+OK   construire-racine-rpm signée : images des pas : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+relevé : octets libres sur / de sc-stockage (porte /var/lib/zot) avant les poussées : 18018222080
+OK   prefetch-racine-rpm : signature versionnée conforme à la tâche rendue, signature exceptée : conforme
+builders/prefetch-racine-rpm.signee.yaml : sha256 14e83b3dd3c66c12f878653ff638cdcf0413ceed363876944afa38dcc2d39262
+OK   construire-racine-rpm : signature versionnée conforme à la tâche rendue, signature exceptée : conforme
+builders/construire-racine-rpm.signee.yaml : sha256 9069ad2613a8a1270d02f7dec685f48f41e0698a0ad4648eb77dfb4c973ef058
+OK   prefetch-racine-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251
+OK   construire-racine-rpm dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f
+## pipeline builder-mock-rocky9, tâches de la liste revue
+OK   builder-mock-rocky9 rendue : références factices des trois tâches : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:0000000000000000000000000000000000000000000000000000000000000000 sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:0000000000000000000000000000000000000000000000000000000000000000 sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:0000000000000000000000000000000000000000000000000000000000000000
+OK   builder-mock-rocky9 : références des tâches : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251 sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   builder-mock-rocky9 : seul changement, les trois références (normalisées, références remises à factice) : égale
+OK   builder-mock-rocky9 (références réelles) admise (code de kubectl) : 0
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   builder-mock-rocky9 signée : annotation de signature : true
+OK   builder-mock-rocky9 signée : égale à la pipeline relue, signature exceptée : égale
+sc-stockage.poc.test:5000/tekton/pipelines/builder-mock-rocky9@sha256:efa07d1049dfbddbe65680539bf457c54fb832f4dce1847dd9711c7d875b5b20
+## pipeline builder-rocky9-bootstrap, tâches de la liste revue
+OK   builder-rocky9-bootstrap rendue : références factices des trois tâches : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:0000000000000000000000000000000000000000000000000000000000000000 sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:0000000000000000000000000000000000000000000000000000000000000000 sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:0000000000000000000000000000000000000000000000000000000000000000
+OK   builder-rocky9-bootstrap : références des tâches : sc-stockage.poc.test:5000/tekton/tasks/prefetch-racine-rpm@sha256:16a32993160ae0f6f8e766658b3d594403f6734c295baa5048dcb05c674bf251 sc-stockage.poc.test:5000/tekton/tasks/construire-racine-rpm@sha256:bdde08ed7c2b58dcad95b091892988243953b0381cac7cc690dcc29529b32f0f sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   builder-rocky9-bootstrap : seul changement, les trois références (normalisées, références remises à factice) : égale
+OK   builder-rocky9-bootstrap (références réelles) admise (code de kubectl) : 0
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   builder-rocky9-bootstrap signée : annotation de signature : true
+OK   builder-rocky9-bootstrap signée : égale à la pipeline relue, signature exceptée : égale
+sc-stockage.poc.test:5000/tekton/pipelines/builder-rocky9-bootstrap@sha256:3889faad84fe0b66aa60b67bfa5fdbc14fd81f72913c2e446c6e59a1e021bf8b

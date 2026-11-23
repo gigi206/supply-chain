@@ -1,0 +1,21 @@
+étape acces_vex commencée : 2026-11-23T22:26:05Z ; vex-openbao.sh df2ffb9dd8ad5b63…
+OpenBao : version 2.7.2, initialisé true, scellé false
+OK   OpenBao initialisé et descellé
+OK   clé vex présente et conforme : ecdsa-p256,false,false,false,1,true
+avant : politiques chains-signature default horodatage-zot root scan-zot scanner-signature tsa-signature ; méthodes (hors la méthode native) jwt/ jwt
+### écriture 1 : politique vex-signature
+     | Success! Uploaded policy: vex-signature
+OK   politique vex-signature relue = politique/vex-signature.hcl (hors commentaires et lignes vides : c304cbd05ec856cb)
+### écriture 2 : montage userpass/
+     | Success! Enabled userpass auth method at: userpass/
+### écriture 3 : utilisateur proprietaire (mot de passe sur l'entrée standard, sans saut de ligne)
+     | Success! Data written to: auth/userpass/users/proprietaire
+OK   utilisateur proprietaire écrit : code 0
+OK   utilisateur proprietaire (politiques, sans default, durée, durée maximale) : vex-signature,true,900,900
+OK   politiques : seule vex-signature ajoutée (ou déjà là)
+OK   méthodes d'authentification : seul userpass/ ajouté (ou déjà là)
+clés Transit après : chains ecdsa-p256 1 false;scanner ecdsa-p256 1 false;tsa ecdsa-p256 1 false;vex ecdsa-p256 1 false
+étape acces_vex finie : 2026-11-23T22:26:08Z
+OK   K3 : aucune ligne de bloc privé dans le journal
+OK   K4 : valeur du jeton root absente du journal
+OK   K6 : valeur du mot de passe absente du journal

@@ -1,0 +1,5 @@
+# s1.sh amorce, 2026-11-23T23:20:15Z
+copié dans Zot : 192.168.161.13:5000/amont/rockylinux/rockylinux@sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d (cache telechargements/oci/amont/rockylinux/rockylinux)
+copié dans Zot : 192.168.161.13:5000/amont/rockylinux/rockylinux@sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2 (cache telechargements/oci/amont/rockylinux/rockylinux)
+OK   digest de l'amorce 9.8 dans Zot : sha256:ed654c694190a670bb5c33f68995b862214fc96ffbdca95e07a8935ba0a3717d
+OK   digest du bootstrap 9.7 dans Zot : sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2

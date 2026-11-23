@@ -5,7 +5,7 @@ témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
 témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
 fermeture revérifiée contre le verrou : 162 paquets, copiés dans /w/fermeture
 paquet source sample-app 1.0.0-2 (SOURCE_DATE_EPOCH 1794693332) : sample-app_1.0.0.orig.tar.gz 1591a05bd1d42241ec4ad501e0c01af61368c4de0e3e374c8df0a7e7ad5b2ffa ; sample-app_1.0.0-2.dsc b284bd608b53295ed49890374ff5c165d0a31cda6ec4cef5d0074d0079e659d1 ; sample-app_1.0.0-2.debian.tar.xz 22cfff1d61bad913abb20670f90a7ef35e327e37fec0b78241822c893a76aeb6 ; 
-sbuild : rc 0 en 289 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
+sbuild : rc 0 en 297 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
 deb produit : sample-app_1.0.0-2_amd64.deb f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)
 ----- sample-app_1.0.0-2_amd64.buildinfo -----
 Format: 1.0
@@ -21,7 +21,7 @@ Checksums-Sha256:
  f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b 1953492 sample-app_1.0.0-2_amd64.deb
 Build-Origin: Debian
 Build-Architecture: amd64
-Build-Date: Mon, 23 Nov 2026 19:50:54 +0000
+Build-Date: Mon, 23 Nov 2026 22:57:08 +0000
 Build-Path: /build/reproducible-path/sample-app-1.0.0
 Installed-Build-Depends:
  autoconf (= 2.72-3.1),
@@ -195,5 +195,5 @@ Environment:
 ----- fin du .buildinfo -----
 couche sha256:d8f9685c8962286e3fdeba09788df7396dd62dc05ed166868778694a1e065637 (1955840 octets) ; configuration sha256:344f9108f2ded783de0d471bfbb8f61ca2b255972ae8e7963677ccb0819fbe45 ; manifeste sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
 image.tar : 1966080 octets
-2026/11/23 19:45:20 Entrypoint initialization
-2026/11/23 19:45:22 Decoded script /tekton/scripts/script-0-292w2
+2026/11/23 22:51:23 Entrypoint initialization
+2026/11/23 22:51:25 Decoded script /tekton/scripts/script-0-2c9pq

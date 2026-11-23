@@ -1,10 +1,10 @@
-# cilium.sh appliquer, 2026-11-23T16:48:27Z
+# cilium.sh appliquer, 2026-11-23T22:37:27Z
 ## valeurs (cilium/valeurs.yaml, digests amd64)
 OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
 ## release cilium (helm v4.3.1+gc0d08d0, depuis l'hôte)
 Release "cilium" has been upgraded. Happy Helming!
 NAME: cilium
-LAST DEPLOYED: Mon Nov 23 17:48:28 2026
+LAST DEPLOYED: Mon Nov 23 23:37:27 2026
 NAMESPACE: kube-system
 STATUS: deployed
 REVISION: 2
@@ -13,5 +13,5 @@ TEST SUITE: None
 OK   release cilium : statut et version : deployed cilium-1.20.4
 cilium-config : policy-cidr-match-mode=nodes
 OK   DaemonSet cilium prêt : 3/3
-agents recréés après 2026-11-23T15:08:56Z : sc-stockage=2026-11-23T16:48:29Z sc-build=2026-11-23T16:48:40Z sc-confiance=2026-11-23T16:48:29Z 
+agents recréés après 2026-11-23T20:40:00Z : sc-confiance=2026-11-23T22:37:29Z sc-build=2026-11-23T22:37:41Z sc-stockage=2026-11-23T22:37:29Z 
 OK   policy-cidr-match-mode lu par l'agent de sc-confiance : [nodes]

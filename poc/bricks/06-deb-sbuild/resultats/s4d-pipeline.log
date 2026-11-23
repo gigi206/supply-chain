@@ -1,11 +1,11 @@
-# s4d.sh pipeline, 2026-11-23T19:45:00Z
-## s4d-deb-1 créé à 19:45:00 (sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:7abfe6a24489ac6e3c84af9918aab6680808b699c59dc6cb0f2be4f3b1bf17ec)
+# s4d.sh pipeline, 2026-11-23T22:51:03Z
+## s4d-deb-1 créé à 22:51:04 (sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:ed471138e467430295079b4cbbafbc9213626d0c4804f34c6e329763122ccda6)
 ### TaskRun s4d-deb-1-construire (Succeeded), pod s4d-deb-1-construire-pod sur sc-build, runtimeClassName « kata », tekton.dev/task construire-deb
      témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
      témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
      fermeture revérifiée contre le verrou : 162 paquets, copiés dans /w/fermeture
      paquet source sample-app 1.0.0-2 (SOURCE_DATE_EPOCH 1794693332) : sample-app_1.0.0.orig.tar.gz 1591a05bd1d42241ec4ad501e0c01af61368c4de0e3e374c8df0a7e7ad5b2ffa ; sample-app_1.0.0-2.dsc b284bd608b53295ed49890374ff5c165d0a
-     sbuild : rc 0 en 289 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
+     sbuild : rc 0 en 297 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
      deb produit : sample-app_1.0.0-2_amd64.deb f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)
      ----- sample-app_1.0.0-2_amd64.buildinfo -----
      Format: 1.0
@@ -18,7 +18,7 @@
      Checksums-Sha256:
      Build-Origin: Debian
      Build-Architecture: amd64
-     Build-Date: Mon, 23 Nov 2026 19:50:54 +0000
+     Build-Date: Mon, 23 Nov 2026 22:57:08 +0000
      Build-Path: /build/reproducible-path/sample-app-1.0.0
      Environment:
       DEB_BUILD_OPTIONS="parallel=3"
@@ -29,15 +29,15 @@
      ----- fin du .buildinfo -----
      couche sha256:d8f9685c8962286e3fdeba09788df7396dd62dc05ed166868778694a1e065637 (1955840 octets) ; configuration sha256:344f9108f2ded783de0d471bfbb8f61ca2b255972ae8e7963677ccb0819fbe45 ; manifeste sha256:60f25f5c3fb58b7c4
      image.tar : 1966080 octets
-     2026/11/23 19:45:20 Entrypoint initialization
-     2026/11/23 19:45:22 Decoded script /tekton/scripts/script-0-292w2
+     2026/11/23 22:51:23 Entrypoint initialization
+     2026/11/23 22:51:25 Decoded script /tekton/scripts/script-0-2c9pq
 OK   s4d-deb-1-construire : runtimeClassName : kata
 OK   s4d-deb-1-construire : nœud : sc-build
 ### TaskRun s4d-deb-1-preparer (Succeeded), pod s4d-deb-1-preparer-pod sur sc-build, runtimeClassName «  », tekton.dev/task preparer-deb
-     2026/11/23 19:45:05 Entrypoint initialization
-     2026/11/23 19:45:06 Decoded script /tekton/scripts/script-0-d5bxm
-     2026/11/23 19:45:06 Decoded script /tekton/scripts/script-1-tzz9s
-     2026/11/23 19:45:06 Decoded script /tekton/scripts/script-2-2bzk4
+     2026/11/23 22:51:09 Entrypoint initialization
+     2026/11/23 22:51:10 Decoded script /tekton/scripts/script-0-ftk5l
+     2026/11/23 22:51:10 Decoded script /tekton/scripts/script-1-87kzc
+     2026/11/23 22:51:10 Decoded script /tekton/scripts/script-2-5grcc
      git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
      fermeture deb : 167 fichiers ; fermeture applicative : 8 fichiers ; packaging : 6 fichiers
      fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
@@ -48,15 +48,15 @@ OK   s4d-deb-1-construire : nœud : sc-build
 OK   s4d-deb-1-preparer : runtimeClassName : 
 OK   s4d-deb-1-preparer : nœud : sc-build
 ### TaskRun s4d-deb-1-publier (Succeeded), pod s4d-deb-1-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-image
-     2026/11/23 19:51:07 Entrypoint initialization
-     2026/11/23 19:51:09 Decoded script /tekton/scripts/script-0-r8lcf
+     2026/11/23 22:57:22 Decoded script /tekton/scripts/script-0-xq8xs
      publiée : sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e (relue en lecture anonyme)
+     2026/11/23 22:57:21 Entrypoint initialization
 OK   s4d-deb-1-publier : runtimeClassName : 
 OK   s4d-deb-1-publier : nœud : sc-build
 OK   PipelineRun s4d-deb-1 : True|Succeeded
 artefact publié : sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
 OK   PipelineRun s4d-deb-1 signé par Chains : true
-## s4d-deb-2 créé à 19:51:21 (sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:7abfe6a24489ac6e3c84af9918aab6680808b699c59dc6cb0f2be4f3b1bf17ec)
+## s4d-deb-2 créé à 22:57:36 (sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:ed471138e467430295079b4cbbafbc9213626d0c4804f34c6e329763122ccda6)
 ### TaskRun s4d-deb-2-construire (Succeeded), pod s4d-deb-2-construire-pod sur sc-build, runtimeClassName « kata », tekton.dev/task construire-deb
      témoin DNS snapshot.debian.org : échec, code 124 (attendu)
      témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
@@ -64,7 +64,7 @@ OK   PipelineRun s4d-deb-1 signé par Chains : true
      témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
      fermeture revérifiée contre le verrou : 162 paquets, copiés dans /w/fermeture
      paquet source sample-app 1.0.0-2 (SOURCE_DATE_EPOCH 1794693332) : sample-app_1.0.0.orig.tar.gz 1591a05bd1d42241ec4ad501e0c01af61368c4de0e3e374c8df0a7e7ad5b2ffa ; sample-app_1.0.0-2.dsc b284bd608b53295ed49890374ff5c165d0a
-     sbuild : rc 0 en 267 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
+     sbuild : rc 0 en 301 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
      deb produit : sample-app_1.0.0-2_amd64.deb f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)
      ----- sample-app_1.0.0-2_amd64.buildinfo -----
      Format: 1.0
@@ -77,7 +77,7 @@ OK   PipelineRun s4d-deb-1 signé par Chains : true
      Checksums-Sha256:
      Build-Origin: Debian
      Build-Architecture: amd64
-     Build-Date: Mon, 23 Nov 2026 19:56:49 +0000
+     Build-Date: Mon, 23 Nov 2026 23:03:37 +0000
      Build-Path: /build/reproducible-path/sample-app-1.0.0
      Environment:
       DEB_BUILD_OPTIONS="parallel=3"
@@ -91,10 +91,9 @@ OK   PipelineRun s4d-deb-1 signé par Chains : true
 OK   s4d-deb-2-construire : runtimeClassName : kata
 OK   s4d-deb-2-construire : nœud : sc-build
 ### TaskRun s4d-deb-2-preparer (Succeeded), pod s4d-deb-2-preparer-pod sur sc-build, runtimeClassName «  », tekton.dev/task preparer-deb
-     2026/11/23 19:51:26 Entrypoint initialization
-     2026/11/23 19:51:28 Decoded script /tekton/scripts/script-0-q89ls
-     2026/11/23 19:51:28 Decoded script /tekton/scripts/script-1-dzj8c
-     2026/11/23 19:51:28 Decoded script /tekton/scripts/script-2-ndm46
+     2026/11/23 22:57:43 Decoded script /tekton/scripts/script-0-g2wb8
+     2026/11/23 22:57:43 Decoded script /tekton/scripts/script-1-nklkh
+     2026/11/23 22:57:43 Decoded script /tekton/scripts/script-2-tcgf8
      git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
      fermeture deb : 167 fichiers ; fermeture applicative : 8 fichiers ; packaging : 6 fichiers
      fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
@@ -102,12 +101,13 @@ OK   s4d-deb-2-construire : nœud : sc-build
      go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
      marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
      entrées prêtes : src (41 fichiers), debian (5 fichiers), fermeture deb, verrou
+     2026/11/23 22:57:41 Entrypoint initialization
 OK   s4d-deb-2-preparer : runtimeClassName : 
 OK   s4d-deb-2-preparer : nœud : sc-build
 ### TaskRun s4d-deb-2-publier (Succeeded), pod s4d-deb-2-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-image
-     2026/11/23 19:57:02 Entrypoint initialization
-     2026/11/23 19:57:03 Decoded script /tekton/scripts/script-0-k4pbg
+     2026/11/23 23:03:49 Decoded script /tekton/scripts/script-0-jrdmd
      publiée : sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e (relue en lecture anonyme)
+     2026/11/23 23:03:48 Entrypoint initialization
 OK   s4d-deb-2-publier : runtimeClassName : 
 OK   s4d-deb-2-publier : nœud : sc-build
 OK   PipelineRun s4d-deb-2 : True|Succeeded

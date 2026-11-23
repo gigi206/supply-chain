@@ -1,0 +1,39 @@
+# m5b-republier.sh taches, 2026-11-23T23:29:11Z
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+registre (hôte) : 192.168.161.13:5000 ; tag : m5b-4 ; liste revue : sha256 cb2d78ff9a5321e2f0316ce20f4f077b32f12fd561ef8af6f3af6487ae228237
+## fermeture/prefetch-rpm.m1b.signee.yaml
+OK   sha256 du fichier : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   annotation de signature : true
+OK   tekton/tasks/prefetch-rpm@sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+références par digest du contenu signé : 1
+OK   tekton/tasks/prefetch-rpm:m5b-4 avant la poussée : absent
+## construction/construire-rpm.m1b.signee.yaml
+OK   sha256 du fichier : 90151d43270fc2fa1a77765f4c6acdacdc2ecd2033d9bc0aa8494c5517f0a31b
+OK   annotation de signature : true
+OK   tekton/tasks/construire-rpm@sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5 dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : builds/builders/mock-rocky9@sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+références par digest du contenu signé : 1
+OK   tekton/tasks/construire-rpm:m5b-4 avant la poussée : absent
+## construction/preparer-rpm.signee.yaml
+OK   sha256 du fichier : b32d073f75ca03aa48100f7052a23316297b8d5e318e7796ebc8a729b1d7acf9
+OK   annotation de signature : true
+OK   tekton/tasks/preparer-rpm@sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f dans la liste revue : listée
+OK   référence du contenu signé présente dans Zot : plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0 : sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+OK   référence du contenu signé présente dans Zot : plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+références par digest du contenu signé : 2
+OK   tekton/tasks/preparer-rpm:m5b-4 avant la poussée : absent
+relevé : octets libres sur / de sc-stockage (porte /var/lib/zot) avant les poussées : 17398599680
+## poussées (tag m5b-4, tkn 0.46.2, TZ=Europe/Paris)
+poussée 1 : tekton/tasks/prefetch-rpm:m5b-4
+OK   fermeture/prefetch-rpm.m1b.signee.yaml poussé, digest : sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+OK   tekton/tasks/prefetch-rpm:m5b-4 relu (lecture anonyme) : sha256:b9bbeba3e8c62113431cdb88aa74afe76bab13a28ab548a5b5ae6ffed22675dc
+poussée 2 : tekton/tasks/construire-rpm:m5b-4
+OK   construction/construire-rpm.m1b.signee.yaml poussé, digest : sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+OK   tekton/tasks/construire-rpm:m5b-4 relu (lecture anonyme) : sha256:ca03f18908d0b5e73edc57ecf9610513e2907267ce1da2d9f41fd36b969289c5
+poussée 3 : tekton/tasks/preparer-rpm:m5b-4
+OK   construction/preparer-rpm.signee.yaml poussé, digest : sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+OK   tekton/tasks/preparer-rpm:m5b-4 relu (lecture anonyme) : sha256:2f65f3903e98caa9944ab3fee4b67585b15d67ad477ff48a8487e8e86af5526f
+poussées : 3

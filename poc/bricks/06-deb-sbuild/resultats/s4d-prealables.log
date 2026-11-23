@@ -1,4 +1,4 @@
-# s4d.sh prealables, 2026-11-23T19:44:42Z
+# s4d.sh prealables, 2026-11-23T22:50:50Z
 ## gabarits rendus (refs factices)
 OK   pipeline : subPath des workspaces (preparer, construire, publier) : [null,"entrees","image","image"]
 OK   pipeline : entrées fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
@@ -68,4 +68,4 @@ OK   couche : le deb seul, en 0644, propriétaire 0 : -rw-r--r-- 0/0 sample-app_
 OK   deb de la couche égal au deb de S3 : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
 digest attendu de l'artefact, si le deb est f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b et le tar de l'image de build écrit la même couche : sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
 ## entrées du pod d'essai
-entrees.tar : 227266560 octets, sha256 b9f253fbb292ed3dfd4c477246d988505941ce1a3aa24b5d801cd7532bbf630a
+entrees.tar : 227266560 octets, sha256 5d5230a0a3ef0f7c9ef2b4406125b337f8172968340467119bb55fc11f949220

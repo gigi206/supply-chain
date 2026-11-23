@@ -1,12 +1,12 @@
-# preuves.sh controle7, 2026-11-23T16:42:48Z
+# preuves.sh controle7, 2026-11-23T22:31:44Z
 ## ConfigMap porte : contrôle 7 ajouté (scan-verifier.sh, scan.rego, policy-scan.yaml, clé publique du scanner)
-clé du scanner : e2cd31722d9b6d9469e303b9c142d375caaef14137223991abf082e4b226bfa3 (empreinte DER ; depuis le rejeu RKE2, 1f66a3c : 1656a3fa… ; G3 du 05/11 : 8cbcbb4e…)
+clé du scanner : 007f233f403279dd23ca077fb42db2f77c137e5655a3e1863fd13fb2dad43586 (empreinte DER ; depuis le rejeu RKE2, 1f66a3c : 1656a3fa… ; G3 du 05/11 : 8cbcbb4e…)
 OK   ConfigMap porte : scan-verifier.sh, scan.rego, policy-scan.yaml et scanner.pub identiques aux fichiers versionnés
 referrers de l'image : builds/sample-app 0 ; builds/scan/sample-app 2 ; builds/vsa/sample-app 1
 ## C1 image réelle, source attendue : admise, contrôles 6 et 9 inchangés
 VERDICT|c7-reelle|true||trusted_task.tagged|1|ok|6/6 enveloppe(s) couverte(s), 37 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
-    LU|énoncé 17668038ec0f9679|2026-11-23T16:39:31.427624351Z
-    LU|énoncé 0f61f22cadcbefdc|2026-11-23T16:41:40.557688508Z
+    LU|énoncé 71d657b8f66409d9|2026-11-23T22:28:25.126701296Z
+    LU|énoncé 2c3a466300455b13|2026-11-23T22:30:42.263123586Z
     LECTURE|2|sc-stockage.poc.test:5000/builds/scan/sample-app|
 OK   C1 ec (success, violations, avertissements) : true||trusted_task.tagged
 OK   C1 contrôle 9 : ok

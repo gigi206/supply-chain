@@ -1,4 +1,4 @@
-# preuves.sh temoins_scan, 2026-11-23T16:44:27Z
+# preuves.sh temoins_scan, 2026-11-23T22:33:24Z
 ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle du scanner
 VERDICT|g6-propre|false|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
 OK   propre (porte-temoin) : ok, 1 énoncé(s)

@@ -1,4 +1,4 @@
-# journalisation.sh certificats, 2026-11-23T16:30:43Z
+# journalisation.sh certificats, 2026-11-23T22:19:42Z
 loki : certificat existant
 ~/.cache/supply-chain-poc/08/pki/loki.crt: OK
 grafana : certificat existant

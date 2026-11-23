@@ -87,3 +87,25 @@ Journal : [`rejeu-un-trait-1.log`](rejeu-un-trait-1.log). `TAG_05=m5b-3` est neu
 **Durée** : à partir des mesures de `un-trait-1` et `plateforme-1`, environ 2 h (calcul, non garanti) ; fin attendue avant 01:00 UTC, loin de la fenêtre de 09:00.
 
 **Réserve** : ce n'est plus un rejeu « d'un trait » : le démontage et les étapes jusqu'à « J8 (helm-cilium) » viennent du passage de 20:35:05Z.
+
+## Reprise à « J8 (contrôleurs) » : résultat (note de 2026-11-23T23:35:45Z)
+
+[Journal](rejeu-un-trait-1-reprise.log) : lancé à 22:14:34 UTC, **fin à 23:34:39 UTC, code 0**, durée totale mesurée **4805 s** (80 min ; calcul de la prédiction : environ 2 h). **Aucun KO** dans la sortie (`grep -c KO` : 0).
+
+| # | Résultat |
+|---|---|
+| R0 | **tenue** : `m5b-rejeu.sh entree` sous `m5b-4` (TAG libre, copie relue, 4 rendus et 5 fichiers signés contrôlés, rien écrit) ; `rejeu-entrees.sh garder` : copie relue, 3 OK, « bilan : tenu » ; démontage à « J8 (helm-cilium) » : « sautée » |
+| R1 | **tenue** : « J8 (contrôleurs) » en 22 s ; 2 lignes `CONSTAT  écarté, kube-apiserver démarrant` pour le watch de 21:21:09.219027Z (`ResponseStarted` et `ResponseComplete`), plus les refus écartés des journaux par `refus_droits` (9 et 2 lignes, comme dans le relevé de 22:11) |
+| U3 | **tenue** : `g2_image` redonne `b799feda…` (second assemblage, épingle et lecture anonyme) ; « 07b (clé VEX) » et « 07b (accès VEX) » tenues ; `vex-cle-publique.pem` réécrite, **SPKI neuve `aeef0a8c482be447cfee461f80660b7941f10f03ec09a55acf4af9bdafeea710`** (≠ `d0a12faa…`, relue par `openssl pkey` à 23:35 UTC) ; seule différence dans Transit : `transit/keys/vex` ajoutée |
+| U4 | **tenue** : 10 (VSA) 5 s ; contrôles 6 et 7 : « 0 écart(s) aux prédictions » ; G6 183 s, 0 écart |
+| U5 | **tenue** : 08c (H1, H4, S1, H5, sortie des builds), J8 (résolveurs) 10 s, 06 (S1, amorce) 3 s |
+| U6 | **tenue** : `replacer` : 3 fichiers, `Packages` `4f2c68d6…`, « bilan : tenu » |
+| U7 | **tenue** : S4c, S4a (339 s), S4b (189 s), S4d (783 s) ; image de build `749d746c…`, fermetures `bb7599a2…` et `50dc73f7…`, artefact deb `60f25f5c…` (« deux exécutions, même artefact ») |
+| U8 | **tenue** : « 06 (S4d3) » 810 s ; `porte` : 12 OK, « deb : VSA » et « deb : scan » à `refus` |
+| U9 | **tenue** : `periodique` et `fraicheur` « tout OK » ; `vex.pub` de scan-config égale à la clé archivée (fichier `d40d41a0…`, soit la SPKI `aeef0a8c…`) ; 44 séries écrites ; `grafana` « tout OK » |
+| U10 | **tenue** : `pousser_vsa` et `lire_vsa` « tout OK » ; manifeste de la VSA du deb **`97b4100d…`**, le même que le 16/11 et le 23/11 ; `porte` : VSA ok, scan ok, Job 1/ |
+| U11 | **tenue** : images `70f8c412…` et `6de899ac…`, artefact `333b7322…`, fermeture rpm `09838980…`, rpm `07b7bd6f…` (égal à celui de la cascade) ; bloc 05 en 808 s |
+| U12 | **tenue** : `construire` OK (binaire `2b36652a…`) ; `image` : **`eec37159…`** (fichier `kyverno-admission-image.digest` inchangé) ; `pose` : témoin officiel FAIL avec erreur interne, puis image corrigée : `horodate` PASS, `sans-provenance` FAIL, `hors-livraison` PASS, sans erreur interne ; « bilan : tenue ». **Premier rejeu du bloc** |
+| U13 | **tenue** : `fuites` : aucun secret dans les journaux des trois VM ; CIS : `rke2-cis.log` identique au précédent à la ligne d'en-tête près (sc-confiance 80 PASS, 5 FAIL, 38 WARN ; sc-build 20 PASS, 61 FAIL, 42 WARN) |
+
+**Conséquences** : clés publiques archivées réécrites (scanner `007f233f…`, VEX `aeef0a8c…`, témoin de G6) ; les clés Transit `chains`, `scanner` et `tsa` sont en version 1 dans l’OpenBao du passage de 20:35 ; l’image corrigée de Kyverno est en service ; l’export Hubble posé à la main le 20/11 n’est pas dans `rejeu.sh` : perdu avec les VM (non relevé dans Cilium). **Non mesuré** : un rejeu entier d'un seul trait avec la correction de `secrets_ctrl_juge` (le démontage et J2 à « J8 (helm-cilium) » viennent du passage de 20:35:05Z).

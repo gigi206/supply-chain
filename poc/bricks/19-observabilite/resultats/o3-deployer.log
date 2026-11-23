@@ -1,4 +1,4 @@
-# observabilite.sh deployer, 2026-11-23T16:32:41Z
+# observabilite.sh deployer, 2026-11-23T22:21:44Z
 active
   /etc/prometheus/regles/alertes.yml	OpenBaoScelle	unknown	unknown
   /etc/prometheus/regles/alertes.yml	ChainsEchecSignature	unknown	unknown

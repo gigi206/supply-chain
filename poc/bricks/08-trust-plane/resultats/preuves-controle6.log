@@ -1,4 +1,4 @@
-# preuves.sh controle6, 2026-11-23T16:42:22Z
+# preuves.sh controle6, 2026-11-23T22:31:20Z
 ## ConfigMap porte : contrôle 6 ajouté (vsa.sh, clé publique du domaine de replay)
 clé de VSA : 578dd771bcedd5829267820e8cad77182e91184692843cf423b4942250d1e96a (empreinte DER ; R2 : 578dd771…)
 OK   ConfigMap porte : vsa.sh, vsa.pub et horodatage.sh identiques aux fichiers versionnés

@@ -1,4 +1,4 @@
-# plateforme.sh g7_periodique, 2026-11-23T16:39:49Z
+# plateforme.sh g7_periodique, 2026-11-23T22:28:41Z
 configmap/scan-config serverside-applied
 cronjob.batch/scan-sample-app serverside-applied
 OK   horaire : 30 9 * * * Etc/UTC Forbid
@@ -7,25 +7,25 @@ job.batch/g7-manuel created
   SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
 ### analyser
   BASE|2026-11-23, sc-stockage.poc.test:5000/vulndb/grype@sha256:3be413f60b71060d38823140161d75718d4ab58e22e1dce0a3634b6b61f9bc78, empreinte sha256:3d24f57cd3587e2c73f686decc7ad04b213d1f3575bcf1dd847e42df94560f14, 2 s
-  IMPORT|3397 Mo, 105 s ; 3594 Mo dans le volume, au plus haut
+  IMPORT|3397 Mo, 114 s ; 3594 Mo dans le volume, au plus haut
   ARTEFACT|image, 2 PURL versionnées dans l'artefact seul
-  SBOM|5 composants avec PURL (D1 a), 2 s
+  SBOM|5 composants avec PURL (D1 a), 1 s
   VEX|0 énoncé(s) vérifié(s), 0 retenu(s), 0 rejeté(s)|sc-stockage.poc.test:5000/builds/vex/sample-app|cosign code 1 : no matching attestations: 
-  SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 6 vulnérabilités, 0 KEV, 0 écartée(s) par un VEX, 1 s
-  PREDICAT|sha256 0641c3a5ec0f8b1a87974a8a37e64f14ec81056355b7e69c7b3da4184a484acf, 110 s en tout
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 6 vulnérabilités, 0 KEV, 0 écartée(s) par un VEX, 2 s
+  PREDICAT|sha256 d467023831f9054aaf63ce4e892d725f7032b7ca7f033e54dc4eb343ca664832, 119 s en tout
 ### jetons
   identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
   jeton du rôle scanner obtenu
 ### attester
-  ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 a0796c64fa17c3b0ce0f63c1a004654e4c326bba0a3b55dd0fc593bb70e817d5, vérifié avec la clé publique
+  ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 fe9d84126e65c15049051ba02ee0e2f6ba04665cbbd56e2654d866b445e43302, vérifié avec la clé publique
 ### publier
-  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:1cdb830d604a421e249854897da6ab5fb3ba6feef036e967189aeedc51169b48, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:3537b9d7bfca76cc0a0b978b9b18d19e9ffa6ac63e41c226b27a11912de6323e, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 ### revocation
   jeton du rôle scanner révoqué ; identifiants et jeton effacés
-place libre la plus basse sur sc-confiance pendant le job : 10711 Mo
+place libre la plus basse sur sc-confiance pendant le job : 10699 Mo
 OK   job : 1
 OK   referrers de l'image : 2
 OK   sujet du referrer publié : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 OK   bundle vérifié sur l'hôte : clé du scanner, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
-{"scannedAt":"2026-11-23T16:41:40.557688508Z","base":{"built":"2026-11-23T06:28:32Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:3be413f60b71060d38823140161d75718d4ab58e22e1dce0a3634b6b61f9bc78","schema":"v6.1.10"},"vulnerabilites":6,"kev":0}
-# fin 2026-11-23T16:41:55Z, code 0
+{"scannedAt":"2026-11-23T22:30:42.263123586Z","base":{"built":"2026-11-23T06:28:32Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:3be413f60b71060d38823140161d75718d4ab58e22e1dce0a3634b6b61f9bc78","schema":"v6.1.10"},"vulnerabilites":6,"kev":0}
+# fin 2026-11-23T22:30:53Z, code 0

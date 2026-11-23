@@ -1,4 +1,4 @@
-# plateforme.sh g3_openbao, 2026-11-23T16:37:04Z
+# plateforme.sh g3_openbao, 2026-11-23T22:25:33Z
 identifiants Zot du job : compte poc-scan, registre sc-stockage.poc.test:5000
 Key                       Value
 ---                       -----
@@ -8,9 +8,9 @@ deletion_allowed          false
 derived                   false
 exportable                false
 imported_key              false
-keys                      map[1:map[certificate_chain: creation_time:2026-11-23T16:37:04.674731548Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEZbZGFKwqdzz7N1E5n45mNg62ApzW
-52823u811LYEBxoFspzfEGukMOFLp29QWRTkj6EM0dpCGR9M8GvP5LtlYw==
+keys                      map[1:map[certificate_chain: creation_time:2026-11-23T22:25:34.217349237Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE5QRgO75uvmVMOwg2UbsQr6Kn/Iz7
+nUCnrS1pdbJnk3OE8cnTGzfGKoo+kiKnytfuWWqY0hBtCla2LeXJP/JYmA==
 -----END PUBLIC KEY-----
 ]]
 latest_version            1
@@ -40,5 +40,5 @@ OK   politique scan-zot = fichier versionné (hors commentaires et lignes vides)
 OK   kv/scan/zot = identifiants de poc-scan (empreinte du JSON compact) : 951318c01a892f5c
 Public-Key: (256 bit field, 128 bit security level)
 NIST CURVE: P-256
-clé publique exportée : resultats/scanner-cle-publique.pem (SPKI sha256 e2cd31722d9b6d9469e303b9c142d375caaef14137223991abf082e4b226bfa3)
-# fin 2026-11-23T16:37:06Z, code 0
+clé publique exportée : resultats/scanner-cle-publique.pem (SPKI sha256 007f233f403279dd23ca077fb42db2f77c137e5655a3e1863fd13fb2dad43586)
+# fin 2026-11-23T22:25:35Z, code 0

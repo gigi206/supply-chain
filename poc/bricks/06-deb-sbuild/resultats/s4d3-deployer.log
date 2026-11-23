@@ -1,7 +1,7 @@
-# s4d3.sh deployer, 2026-11-23T19:57:16Z
+# s4d3.sh deployer, 2026-11-23T23:04:02Z
 ## départ
 OK   objets Trigger de declencheurs : 0
-pod de l'EventListener : el-forgejo-76596b99b8-vbtl9
+pod de l'EventListener : el-forgejo-76596b99b8-mbwz4
 ## EventListener : labelSelector (document EventListener de declencheurs.yaml de la 08, seul)
 OK   labelSelector en service : {"matchLabels":{"poc.test/ecouteur":"forgejo"}}
 ## declencheur.yaml
@@ -13,7 +13,7 @@ rolebinding.rbac.authorization.k8s.io/rattrapage-deb serverside-applied
 role.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns serverside-applied
 rolebinding.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns serverside-applied
 cronjob.batch/rattrapage-deb serverside-applied
-OK   pod de l'EventListener inchangé (aucun redémarrage) : el-forgejo-76596b99b8-vbtl9
+OK   pod de l'EventListener inchangé (aucun redémarrage) : el-forgejo-76596b99b8-mbwz4
 OK   CronJob rattrapage-deb suspendu : true
 OK   CronJob rattrapage repris (inchangé) : false
 ## droits (kubectl auth can-i)
@@ -30,15 +30,15 @@ OK   spec admise identique à celle de s4d-deb-1
 OK   au nom de rattrapage-deb : admis à blanc
 OK   spec admise identique à celle de s4d-deb-1
 ## livraisons refusées (commit fictif 1111111111111111111111111111111111111111), adressées directement à l'EventListener
-non signée : HTTP 202 {"eventID":"a4b62b7b-8ef5-4c76-99b3-7bf45525bf1e"}
-autre secret : HTTP 202 {"eventID":"8c465f86-7bae-47f1-b5b4-880ca958482a"}
-corps modifié (signature valide d'un autre corps) : HTTP 202 {"eventID":"d068981b-bdfd-4a3a-b05c-6129a9b6959f"}
-{"t":"19:57:28","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
-{"t":"19:57:28","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
-{"t":"19:57:28","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
-{"t":"19:57:28","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
-{"t":"19:57:28","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
-{"t":"19:57:28","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+non signée : HTTP 202 {"eventID":"0c64b2cd-6a4c-4f86-8a58-f312053c872f"}
+autre secret : HTTP 202 {"eventID":"33b7ed1f-dc50-4d3b-842c-3841b99d6523"}
+corps modifié (signature valide d'un autre corps) : HTTP 202 {"eventID":"5b6406e8-21a6-472e-ad16-829d52d1803f"}
+{"t":"23:04:13","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"23:04:13","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"23:04:13","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"23:04:13","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"23:04:13","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"23:04:13","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
 OK   refus « no X-Hub-Signature-256 header set » (un par trigger) : 2
 OK   refus « payload signature check failed » (deux livraisons, deux triggers) : 4
 OK   refus des intercepteurs, en tout : 6

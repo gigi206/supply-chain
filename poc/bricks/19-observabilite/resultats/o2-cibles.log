@@ -1,4 +1,4 @@
-# observabilite.sh cibles, 2026-11-23T16:31:55Z
+# observabilite.sh cibles, 2026-11-23T22:20:58Z
 alertmanager	up	
 alloy	up	
 chains	up	
@@ -28,6 +28,10 @@ zot	up
   kyverno_http_requests_duration_seconds_count
   kyverno_http_requests_duration_seconds_sum
   kyverno_http_requests_total
+  kyverno_image_validating_policy_execution_duration_seconds_bucket
+  kyverno_image_validating_policy_execution_duration_seconds_count
+  kyverno_image_validating_policy_execution_duration_seconds_sum
+  kyverno_image_validating_policy_results_total
   kyverno_info
   kyverno_updaterequest_total
   kyverno_validating_policy_execution_duration_seconds_bucket

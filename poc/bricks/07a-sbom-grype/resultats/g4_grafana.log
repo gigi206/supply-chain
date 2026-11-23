@@ -1,16 +1,16 @@
-# plateforme.sh g4_grafana, 2026-11-23T16:39:44Z
+# plateforme.sh g4_grafana, 2026-11-23T22:28:37Z
 ## journaux du job, lus par l'auditeur
 BASE|2026-11-23, sc-stockage.poc.test:5000/vulndb/grype@sha256:3be413f60b71060d38823140161d75718d4ab58e22e1dce0a3634b6b61f9bc78, empreinte sha256:3d24f57cd3587e2c73f686de
-IMPORT|3397 Mo, 105 s ; 3594 Mo dans le volume, au plus haut
+IMPORT|3397 Mo, 125 s ; 3594 Mo dans le volume, au plus haut
 ARTEFACT|image, 2 PURL versionnées dans l'artefact seul
-SBOM|5 composants avec PURL (D1 a), 2 s
+SBOM|5 composants avec PURL (D1 a), 1 s
 VEX|0 énoncé(s) vérifié(s), 0 retenu(s), 0 rejeté(s)|sc-stockage.poc.test:5000/builds/vex/sample-app|cosign code 1 : no matching attestations: 
 SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 6 vulnérabilités, 0 KEV, 0 écartée(s) par un
-PREDICAT|sha256 63cf1be7d6a931609f05d097a7acc5cb86f76dc01c07316d52196adbd36cafd9, 109 s en tout
-ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 080077696aebda631
+PREDICAT|sha256 368116dcda53840a84b4ca8f4419a0da20e97174e3780012217c001bfb141e1a, 131 s en tout
+ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 7440f393693aabb87
 identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
 jeton du rôle scanner obtenu
-PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:13dc2fff15a775560cfec1a2a8d1ee5024417947d4b563812ad9eea13e2c78c8, referrer de sha256:3a7ca1b14dbf13c6655c50
+PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:4e19e8aaa20884586e4e54e225bacab77cdde6b63a9354f4f6c732fd96492241, referrer de sha256:3a7ca1b14dbf13c6655c50
 jeton du rôle scanner révoqué ; identifiants et jeton effacés
 SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
 OK   visible dans Grafana : ^SOURCE|
@@ -27,4 +27,4 @@ lignes d'audit de Zot : 5
 OK   poussage du manifeste par poc-scan visible dans Grafana
 ## identifiants de poc-scan absents des réponses
 OK   ni le mot de passe ni son encodage docker dans les réponses de Grafana
-# fin 2026-11-23T16:39:49Z, code 0
+# fin 2026-11-23T22:28:41Z, code 0

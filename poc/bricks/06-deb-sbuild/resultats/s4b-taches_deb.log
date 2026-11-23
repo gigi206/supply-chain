@@ -1,4 +1,4 @@
-# s4b.sh taches_deb, 2026-11-23T19:39:11Z
+# s4b.sh taches_deb, 2026-11-23T22:47:42Z
 tâches de la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-deb@sha256:4dac0609a5d1d980501f4f08cdeb0916912b4f3accd9cf56fea456a399e793a5 ; sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
 artefact de packaging relu dans Zot (lecture anonyme) : sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
 OK   verrou tiré égal au verrou du dépôt : égal
@@ -7,4 +7,4 @@ OK   liste : lignes, octets : 162 193978008
 OK   liste rendue dans la pipeline deb, identique à la liste : identique
 OK   pipeline deb : subPath de prefetch, racine pour publier : ["fermeture",null]
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-sc-stockage.poc.test:5000/tekton/pipelines/prefetch-deb-sample-app@sha256:85cc4053fad0ac7f331d9c3ca0a1b3463595659bc0b734f73828a35cff56fd93
+sc-stockage.poc.test:5000/tekton/pipelines/prefetch-deb-sample-app@sha256:bb18243b3e6e802df9475ac7d550356c5127fd8f8c340cc5bf1085ce78bb6712

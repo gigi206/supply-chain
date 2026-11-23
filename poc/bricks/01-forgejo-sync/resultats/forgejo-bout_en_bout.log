@@ -1,8 +1,8 @@
-# forgejo.sh bout_en_bout, 2026-11-23T16:26:17Z
+# forgejo.sh bout_en_bout, 2026-11-23T22:15:08Z
 OK   avance de main et branche custom/essai (collision) dans l'amont par poc-amont : accepté
-branch-created           heads/custom/essai  - -> 16f48b565cc7
-collision                heads/custom/essai  - -> 16f48b565cc7
-fast-forward             heads/main  1907c19815fd -> 16f48b565cc7
+branch-created           heads/custom/essai  - -> ccc4179f0b88
+collision                heads/custom/essai  - -> ccc4179f0b88
+fast-forward             heads/main  1907c19815fd -> ccc4179f0b88
 sync.py : code 2
 {"status":"rewrite-detected","events":[{"type":"branch-created","ref":"heads/custom/essai"},{"type":"collision","ref":"heads/custom/essai"},{"type":"fast-forward","ref":"heads/main"}]}
 OK   collision : code 2

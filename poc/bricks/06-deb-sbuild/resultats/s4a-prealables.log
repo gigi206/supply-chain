@@ -1,4 +1,4 @@
-# s4a.sh prealables, 2026-11-23T19:32:29Z
+# s4a.sh prealables, 2026-11-23T22:42:02Z
 OK   Packages égal à xz -dc Packages.xz : égal
 OK   liste rapprochée de Packages : 199 paquets, 0 écart(s)
 OK   paquets dans la liste : 199
@@ -40,15 +40,15 @@ OK   racine : --hook-dir avant les crochets : --hook-dir
 OK   racine : retrait des points de montage en dernier crochet : 1
 OK   racine : crochet sources.list : 1
 OK   racine : source du miroir : deb [check-valid-until=no] file://~/.cache/supply-chain-poc/08/travail/s4a-06/essais/e trixie main
-     couche racine sha256:09ae2d48e55918ddd6601a2bd2bd7dfd37d018d7760c06a3c2108dfa747a6b17 (10240 octets) ; couche du chroot sha256:3144f7db061ed7ae4d193b30b98560e99053a953295683d10dfaae3f953949b8 (20480 octets), chroot intérieur sha256 6e0440741f9338c3072f7bfb7080898fad707f4115e6694fc525565c39e298ed ; configuration sha256:6a5db00f64cc4682198b58c9b4f97a2dc174cf63cd25748405e3bd61fb205ac0 ; manifeste sha256:36e53653ad66e17ba771e0192a0372464c83bdfbd66a02b2263f92093535aa7d
-     image.tar : 40960 octets en 0 s
+     couche racine sha256:39b0a0f6da37e9e7c898fd9820d2f2dae7e775910f38fe1523f9fb07d1c63fff (10240 octets) ; couche du chroot sha256:a3c13e06d8a6dae1bb9bd2d64abc5c38c82c1fbf32e12910c036041bc7c6aab5 (20480 octets), chroot intérieur sha256 d4f37d3eaf784b7761894c73170a102c847bae0fd66d0706c82dbde90a70c448 ; configuration sha256:e5a66ba36c8b9b8e281667e55e52411fa409c91830eba1d714a3abf8b8520b2b ; manifeste sha256:c2f77cd60c2d55fe0e4830245b5fa0bb14002c90706469429bdbd04121bdbf80
+     image.tar : 40960 octets en 1 s
      pic du tmpfs ~/.cache/supply-chain-poc/08/travail/s4a-06/essais/w :  Mo sur 0 relevés ; memory.peak du cgroup : absent
-OK   index.json lu comme publier-image : une ligne, égale au résultat : 1 sha256:36e53653ad66e17ba771e0192a0372464c83bdfbd66a02b2263f92093535aa7d
+OK   index.json lu comme publier-image : une ligne, égale au résultat : 1 sha256:c2f77cd60c2d55fe0e4830245b5fa0bb14002c90706469429bdbd04121bdbf80
 OK   chaque blob a pour nom son sha256 (4 blobs)
 OK   manifeste et configuration lisibles par jq : oui
-OK   diff_ids égaux aux digests des couches : ["sha256:09ae2d48e55918ddd6601a2bd2bd7dfd37d018d7760c06a3c2108dfa747a6b17","sha256:3144f7db061ed7ae4d193b30b98560e99053a953295683d10dfaae3f953949b8"]
+OK   diff_ids égaux aux digests des couches : ["sha256:39b0a0f6da37e9e7c898fd9820d2f2dae7e775910f38fe1523f9fb07d1c63fff","sha256:a3c13e06d8a6dae1bb9bd2d64abc5c38c82c1fbf32e12910c036041bc7c6aab5"]
 OK   tailles exactes : 0
-OK   couche 1 = archive racine factice, telle quelle : sha256:09ae2d48e55918ddd6601a2bd2bd7dfd37d018d7760c06a3c2108dfa747a6b17
+OK   couche 1 = archive racine factice, telle quelle : sha256:39b0a0f6da37e9e7c898fd9820d2f2dae7e775910f38fe1523f9fb07d1c63fff
 OK   couche 2 : chroot sous opt/sbuild/trixie-amd64.tar : 1
 OK   prefetch-deb : YAML lisible par yq, nom : prefetch-deb
 OK   construire-builder : YAML lisible par yq, nom : construire-builder

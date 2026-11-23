@@ -1,0 +1,35 @@
+# m5b-rejeu.sh entree, 2026-11-23T22:14:34Z
+## TAG m5b-4 : journaux et dossiers absents
+OK   journaux de ce TAG présents (un journal n'est jamais réécrit) : 0
+OK   dossiers de ce TAG présents sous $W : 0
+## outils et environnement
+OK   fuseau : décalage de l'époque 0 (TZ=Europe/Paris) : +01:00
+OK   SOURCE_DATE_EPOCH : absente
+OK   tkn (client) : 0.46.2
+OK   clé des tâches présente (test -s, jamais lue ici) : présente
+## entrées de l'hôte, gardées hors de $W (vm.sh detruire l'efface)
+copie présente, relue : ~/.cache/supply-chain-poc/05/rejeu-entrees
+OK   copie : rendu de prealables prefetch-racine-rpm.yaml (sha256, RENDUS_SHA de m1b-signature.sh) : b0fdff3895df59897ebc30333689b24f748124ed98e1f610cb4405a170534a05
+OK   copie : rendu de prealables construire-racine-rpm.yaml (sha256, RENDUS_SHA de m1b-signature.sh) : de77ba0a70b4cee401448e7f6dc161094c71b2594204425a838d7dc45bf97b08
+OK   copie : rendu de prealables pipeline-o.yaml (sha256, RENDUS_SHA de m1b-signature.sh) : 13836c388b47fe701360631db59239f67b8d787568d2af3491707422d78bfda0
+OK   copie : rendu de prealables pipeline-b.yaml (sha256, RENDUS_SHA de m1b-signature.sh) : b2443188125b63b71539cb61c73d314dd21f11aaba3a673ab263a644794870f7
+OK   rendus contrôlés : 4
+## mesure d'un autre jour : m1bt-20 (~/.cache/supply-chain-poc/05/rejeu-entrees/m1bt-20-05)
+OK   o : digest du banc de m1bt-20 égal à celui de m1bt3 : sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae
+OK   o : DIGEST_CONSTRUIT de l'essai m1bt-20-co égal au banc : 1
+o : image.tar de l'essai m1bt-20-co : 343951360 octets
+OK   b : digest du banc de m1bt-20 égal à celui de m1bt3 : sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3
+OK   b : DIGEST_CONSTRUIT de l'essai m1bt-20-cb égal au banc : 1
+b : image.tar de l'essai m1bt-20-cb : 241991680 octets
+OK   copie : layout de M4a, manifeste sha256:41c639b7f0f2… (sha256 du blob) : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+## fichiers du dépôt
+OK   arbre de l'essai de la cascade (sha256) : a731fbce8ba11021508ff700e2ba6f72d976a92c5c835ba8e419b4ff88db014a
+OK   arbre de l'essai de la cascade : fichiers : 230
+OK   verrou de la cascade (sha256) : c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   fermeture/prefetch-rpm.m1b.signee.yaml (sha256, m5b-republier.sh) : d28acd2283bdf9648619c22055001b2436ddf228e1c1350d107cbe9af0a142e2
+OK   construction/construire-rpm.m1b.signee.yaml (sha256, m5b-republier.sh) : 90151d43270fc2fa1a77765f4c6acdacdc2ecd2033d9bc0aa8494c5517f0a31b
+OK   construction/preparer-rpm.signee.yaml (sha256, m5b-republier.sh) : b32d073f75ca03aa48100f7052a23316297b8d5e318e7796ebc8a729b1d7acf9
+OK   fermeture/prefetch-rpm-sample-app.m1b.signee.yaml (sha256, m5b-republier.sh) : be99c8f946849d92fa92b7db354138bee1880ee123186406107d012f18215ffd
+OK   construction/sample-app-rpm.m1b.signee.yaml (sha256, m5b-republier.sh) : 8b96852f970da6e1bccab3491587705cff16cafdf3649e312f9d6b87208e66e8
+OK   fichiers signés contrôlés : 5
+entrée : rien n'a été écrit dans Zot ni dans le cluster

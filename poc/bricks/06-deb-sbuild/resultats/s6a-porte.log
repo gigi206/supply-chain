@@ -1,12 +1,12 @@
-# s6a.sh porte, 2026-11-23T20:22:38Z
+# s6a.sh porte, 2026-11-23T23:19:51Z
 ## préalables (lectures anonymes)
 OK   builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e présent dans Zot
 referrers du deb dans builds/vsa/sample-app-deb : 1, VSA attendue : ok
 ## porte sur le deb (comme l'étape porte de s4d3.sh)
 OK   PipelineRuns en cours dans builds : 0
-passage d'horodatage horodatage-29924423
-provenance de PipelineRun la plus récente du deb (seule jugée) : 98213251-cd37-4d03-bef8-8f0dfee7f810
-VERDICT|s6a-deb|true||trusted_task.tagged|2|ok|8/8 enveloppe(s) couverte(s), 8 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app-deb|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app-deb
+passage d'horodatage horodatage-29924600
+provenance de PipelineRun la plus récente du deb (seule jugée) : 180ff2fd-0789-448f-b1a3-185f1a3af2a0
+VERDICT|s6a-deb|true||trusted_task.tagged|1|ok|8/8 enveloppe(s) couverte(s), 8 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app-deb|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app-deb
 OK   deb : succès de ec : true
 OK   deb : violations : 
 OK   deb : horodatage : ok

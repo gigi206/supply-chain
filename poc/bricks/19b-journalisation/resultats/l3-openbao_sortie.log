@@ -1,10 +1,10 @@
-# journalisation.sh openbao_sortie, 2026-11-23T16:31:08Z
+# journalisation.sh openbao_sortie, 2026-11-23T22:20:08Z
 ["fichier/","sortie/"]
 configmap/openbao-config serverside-applied
 config.hcl vue par le pod, mentions de "sortie" : 1
 {"chemin":"fichier/","type":"file","fichier":"/openbao/data/audit.log"}
 {"chemin":"sortie/","type":"file","fichier":"stdout"}
 OK   deux devices d'audit actifs
-lignes d'audit (request) sur la sortie standard du pod dans les 30 dernières secondes : 6
+lignes d'audit (request) sur la sortie standard du pod dans les 30 dernières secondes : 7
 OK   audit sur la sortie standard
 état : {"sealed":false,"initialized":true}

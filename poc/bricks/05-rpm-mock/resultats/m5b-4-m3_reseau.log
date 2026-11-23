@@ -1,0 +1,7 @@
+# s1.sh m3_reseau, 2026-11-23T23:20:20Z
+OK   politique du dépôt : nom, sélecteur, types, règles : ["builds","construction-rpm-sans-sortie",{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]
+OK   politique admise en dry-run serveur
+networkpolicy.networking.k8s.io/construction-rpm-sans-sortie created
+politiques de builds : NetworkPolicy builder-sans-sortie, NetworkPolicy construction-deb-sans-sortie, NetworkPolicy construction-racine-rpm-sans-sortie, NetworkPolicy construction-rpm-sans-sortie, NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-racine-rpm-sortie, CiliumNetworkPolicy prefetch-rpm-sortie, CiliumNetworkPolicy prefetch-sortie
+OK   construction-rpm-sans-sortie : sélecteur, types, règles d'entrée et de sortie : [[{"matchLabels":{"tekton.dev/task":"construire-rpm"}},["Egress","Ingress"],[],[]]]
+OK   politiques de builds qui sélectionnent construire-rpm et autorisent du trafic : 

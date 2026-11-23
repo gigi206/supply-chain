@@ -1,4 +1,4 @@
-# journalisation.sh certificats_l3, 2026-11-23T16:31:07Z
+# journalisation.sh certificats_l3, 2026-11-23T22:20:08Z
 relais : certificat existant
 ~/.cache/supply-chain-poc/08/pki/relais.crt: OK
 alloy-stockage : certificat existant

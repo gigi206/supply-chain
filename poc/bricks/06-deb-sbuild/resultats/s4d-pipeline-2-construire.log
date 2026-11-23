@@ -1,5 +1,5 @@
-2026/11/23 19:51:42 Entrypoint initialization
-2026/11/23 19:51:43 Decoded script /tekton/scripts/script-0-lf8s5
+2026/11/23 22:57:56 Entrypoint initialization
+2026/11/23 22:57:57 Decoded script /tekton/scripts/script-0-ghrkx
 invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 1000, gid 1000 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
 témoin DNS snapshot.debian.org : échec, code 124 (attendu)
 témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
@@ -7,7 +7,7 @@ témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
 témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
 fermeture revérifiée contre le verrou : 162 paquets, copiés dans /w/fermeture
 paquet source sample-app 1.0.0-2 (SOURCE_DATE_EPOCH 1794693332) : sample-app_1.0.0.orig.tar.gz 1591a05bd1d42241ec4ad501e0c01af61368c4de0e3e374c8df0a7e7ad5b2ffa ; sample-app_1.0.0-2.dsc b284bd608b53295ed49890374ff5c165d0a31cda6ec4cef5d0074d0079e659d1 ; sample-app_1.0.0-2.debian.tar.xz 22cfff1d61bad913abb20670f90a7ef35e327e37fec0b78241822c893a76aeb6 ; 
-sbuild : rc 0 en 267 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
+sbuild : rc 0 en 301 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
 deb produit : sample-app_1.0.0-2_amd64.deb f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)
 ----- sample-app_1.0.0-2_amd64.buildinfo -----
 Format: 1.0
@@ -23,7 +23,7 @@ Checksums-Sha256:
  f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b 1953492 sample-app_1.0.0-2_amd64.deb
 Build-Origin: Debian
 Build-Architecture: amd64
-Build-Date: Mon, 23 Nov 2026 19:56:49 +0000
+Build-Date: Mon, 23 Nov 2026 23:03:37 +0000
 Build-Path: /build/reproducible-path/sample-app-1.0.0
 Installed-Build-Depends:
  autoconf (= 2.72-3.1),

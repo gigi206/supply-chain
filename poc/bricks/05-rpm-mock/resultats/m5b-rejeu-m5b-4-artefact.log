@@ -1,0 +1,37 @@
+# m5b-rejeu.sh artefact, 2026-11-23T23:29:16Z
+## A1 sources (sha256)
+OK   A1 poc/packaging/sample-app.spec : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6
+OK   A1 resultats/m1b-verrou.json : c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   A1 poc/packaging/verrou-rpm.json (verrou de M4a, inchangé) : b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f
+## A2 verrou neuf contre des sources indépendantes
+OK   A2 verrou neuf : version 1.1.0, 222 rpm (222 nom.arch distincts), égaux à ceux du verrou de M4a : True, 0 URL hors de vault 9.7, bootstrap_image sc-stockage.poc.test:5000/builds/builders/rocky9-bootstrap@sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3, id ff96017c3f06…, ready True, amd64
+OK   A2 image_digest, forme seule (prédiction de M4b, non contrôlée ici) : 77cff1767fea08670831a740051c2cc0c4025e74b48ed1c96d59cf06824e89ca
+## A3 témoin de méthode : verrou de M4a, tag m5b-4, zone neuve
+OK   zone temoin : fichiers : sample-app.spec f verrou-rpm.json f
+OK   zone temoin : copies égales aux sources : égales
+OK   A3 digest du témoin égal à celui de M4a : sha256:41c639b7f0f283cb245c61b315cc6f7842a00dc5d7a6819d5b96d08b3db3a5b8
+## A4 artefact neuf, deux layouts locaux
+OK   zone paquet : fichiers : sample-app.spec f verrou-rpm.json f
+OK   zone paquet : copies égales aux sources : égales
+artefact : sample-app.spec verrou-rpm.json
+     918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6  sample-app.spec
+     c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83  verrou-rpm.json
+OK   A4 deux poussées locales, même digest : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+## A5 manifeste neuf contre celui de M4a
+     .layers[1].digest : sha256:b6d0f8f15c33c8de68d034dae0525febaefd60143f1d8bc436e5a469f9e8af6f -> sha256:c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+     .layers[1].size : 111561 -> 111567
+OK   A5 manifeste neuf contre celui de M4a : 2 feuille(s) différente(s), prévues : couche 1 (verrou-rpm.json), digest et taille ; titres ['sample-app.spec', 'verrou-rpm.json']
+manifeste neuf : 849 octets ; couches : 118762 octets
+digest attendu dans Zot : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48 (tag m5b-4)
+## publication (etape_publier de m1b-artefact.sh, sans le tag m4a)
+OK   digest local égal à l'artefact cité par la pipeline signée : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   P0 sources inchangées depuis local : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6 c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   P0 zone de préparation inchangée : 918a83f592c31d322a77a4e887c808c61077e2f100442dc98abed5c67ae582a6 c544599aba4b7460f7496066e7c0361c80a59b8e345655553509024a254a6c83
+OK   artefact attendu, avant la poussée : absent
+OK   G1 entrees/sample-app/packaging-rpm:m5b-4, lecture anonyme : absent
+OK   G3 octets libres sur / de sc-stockage (porte /var/lib/zot) : 17397239808 (seuil 1073741824)
+OK   P1 deux poussées dans Zot, même digest : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   P1 digest Zot égal au digest local : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+OK   P2 fichiers tirés par digest égaux à la zone de préparation : de37a2889bceb32428a62efceddf824369bef139223a5eca8679fc4aeedd6ac3
+OK   P3 entrees/sample-app/packaging-rpm:m5b-4, lecture anonyme après : sha256:333b7322290ab5edd85989908fa2e181a48a72facfd4043e181a2962d2bcfe48
+octets libres sur / de sc-stockage après : 17416417280

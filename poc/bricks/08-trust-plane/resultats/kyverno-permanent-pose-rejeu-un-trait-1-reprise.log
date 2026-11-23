@@ -1,0 +1,26 @@
+# kyverno-permanent.sh pose, 2026-11-23T23:33:53Z
+OK   image en service : officielle
+## espace et politique (23:33:53 UTC)
+namespace/livraison created
+imagevalidatingpolicy.policies.kyverno.io/horodatage-livraison created
+OK   politique horodatage-livraison prête
+## témoin : image officielle
+OK   temoin-officiel : FAIL ; erreur interne : oui
+## bascule du contrôleur d'admission
+## bascule : sc-stockage.poc.test:5000/essais/kyverno-correctif@sha256:eec37159789d9ab1cf75adc69db6589e09f0f96d4718a31508c6a3047ca70d8e (23:33:55 UTC)
+Waiting for deployment spec update to be observed...
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 0 out of 1 new replicas have been updated...
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 1 old replicas are pending termination...
+deployment "kyverno-admission-controller" successfully rolled out
+  kyverno-admission-controller-5946f47655-tshdx sc-stockage.poc.test:5000/essais/kyverno-correctif@sha256:eec37159789d9ab1cf75adc69db6589e09f0f96d4718a31508c6a3047ca70d8e
+OK   tous les pods sur sha256:eec37159789d9ab1cf75adc69db6589e09f0f96d4718a31508c6a3047ca70d8e
+OK   webhook à l'écoute (0 s)
+## recette : image corrigée
+OK   horodate : PASS ; erreur interne : non
+OK   sans-provenance : FAIL ; erreur interne : non
+OK   hors-livraison : PASS ; erreur interne : non
+OK   image en service : corrigée (sha256:eec37159789d9ab1cf75adc69db6589e09f0f96d4718a31508c6a3047ca70d8e)
+retour arrière (sur accord) : poc/bricks/08-trust-plane/kyverno-permanent.sh retour
+# fin 2026-11-23T23:34:26Z
+bilan : tenue

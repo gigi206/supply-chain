@@ -1,4 +1,4 @@
-# sortie-builds.sh rejeu, 2026-11-23T16:52:40Z
+# sortie-builds.sh rejeu, 2026-11-23T22:41:43Z
 kubectl : ciliumnetworkpolicy.cilium.io/prefetch-deb-sortie created
 OK   prefetch-deb-sortie valide pour Cilium : True
 kubectl : ciliumnetworkpolicy.cilium.io/prefetch-rpm-sortie created
