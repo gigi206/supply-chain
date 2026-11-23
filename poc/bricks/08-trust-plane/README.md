@@ -2742,3 +2742,15 @@ Accord du propriétaire, « Maintenant », donné à la demande de la brique 09 
 - **Intégration au rejeu** : trois étapes finales dans `rejeu.sh` (après le bloc 05, avant la 08d) : `construire`, `image`, `pose`, journaux suffixés par le libellé ; non rejouées à cette heure. ADR 0000 : additif (aucune note ne change).
 - **Retour arrière** : `kyverno-permanent.sh retour` (image officielle par digest, politique et espace retirés), sur accord.
 
+### Additif du 23/11/2026 (note de 2026-11-23T20:18:03Z) : entrées de l'hôte du bloc 06 gardées hors de `$W`
+
+- **Défaut** : `vm.sh detruire` efface `$W`, or le bloc 06 lit sous `$W` l'InRelease et `Packages.xz` de S1 et le deb de S3 (défaut relevé le 13/11, reproduit le 23/11 au rejeu `plateforme-1`).
+- **Correction** (sur le modèle de `m5b-rejeu.sh entree`) :
+  - `06-deb-sbuild/rejeu-entrees.sh garder` s'exécute avant le démontage, sous RKE2 et Cilium. Il copie ces trois fichiers dans `~/.cache/supply-chain-poc/06/rejeu-entrees`, avec leurs empreintes épinglées, et refuse le démontage si une entrée manque ;
+  - l'étape « 06 (entrées de l'hôte) » (`replacer`) les recopie avant « 06 (S4c) » ;
+  - l'étape « 06 (S4d, prealables) » refait `digest-attendu`.
+- **Mesures** :
+  - banc : 10 cas, 0 écart ;
+  - reprise du bloc 06 : R1 à R7, F1 à F3 tenues ([carte et résultats](../06-deb-sbuild/resultats/reprise-06-rejeu-23-11-predictions.md)) ;
+  - câblage exercé par `DEPUIS` et `JUSQUA`, sans démontage.
+- **Non mesuré** : un rejeu de zéro d'un seul trait avec ce câblage.

@@ -1,0 +1,80 @@
+# rejeu.sh 06-cablage, 2026-11-23T20:17:12Z
+réseau : cilium ; reprise à 06 (entrées de l'hôte) ; arrêt après 06 (entrées de l'hôte)
+# rejeu-entrees.sh garder, 2026-11-23T20:17:12Z
+copie présente, relue : ~/.cache/supply-chain-poc/06/rejeu-entrees
+OK   copie s1-06/hote/InRelease : 0584fba32e13e0ab…
+OK   copie s1-06/hote/Packages.xz : 7778d3e3f303b7dd…
+OK   copie s3-06/build-1/sample-app_1.0.0-2_amd64.deb : f66bbeb2aba31e52…
+bilan : tenu
+## démontage : sautée (reprise à 06 (entrées de l'hôte))
+## VM : sautée (reprise à 06 (entrées de l'hôte))
+## RKE2 : sautée (reprise à 06 (entrées de l'hôte))
+## Cilium : sautée (reprise à 06 (entrées de l'hôte))
+## J2 : sautée (reprise à 06 (entrées de l'hôte))
+## J3 : sautée (reprise à 06 (entrées de l'hôte))
+## J4 : sautée (reprise à 06 (entrées de l'hôte))
+## J5 : sautée (reprise à 06 (entrées de l'hôte))
+## J6 : sautée (reprise à 06 (entrées de l'hôte))
+## test 5 (J6) : sautée (reprise à 06 (entrées de l'hôte))
+## J6 (suite) : sautée (reprise à 06 (entrées de l'hôte))
+## J7 : sautée (reprise à 06 (entrées de l'hôte))
+## J7 (admission) : sautée (reprise à 06 (entrées de l'hôte))
+## J7 (BuildKit) : sautée (reprise à 06 (entrées de l'hôte))
+## J7 (voie D) : sautée (reprise à 06 (entrées de l'hôte))
+## J7 (voie A, sample-app) : sautée (reprise à 06 (entrées de l'hôte))
+## J7 (sans réseau) : sautée (reprise à 06 (entrées de l'hôte))
+## J7 (construction, entrées) : sautée (reprise à 06 (entrées de l'hôte))
+## J7 (fermeture, F2 de la 03) : sautée (reprise à 06 (entrées de l'hôte))
+## J7 (construction) : sautée (reprise à 06 (entrées de l'hôte))
+## J7 (réseau) : sautée (reprise à 06 (entrées de l'hôte))
+## reserve_c : sautée (non rejouable : dépôts d'essai du test 8 du 01/11 nommés en dur ; mesure du 01/11 gardée, ADR 0000)
+## J8 (tests) : sautée (reprise à 06 (entrées de l'hôte))
+## J8 (bascule) : sautée (reprise à 06 (entrées de l'hôte))
+## J8 (helm-cilium) : sautée (reprise à 06 (entrées de l'hôte))
+## J8 (contrôleurs) : sautée (reprise à 06 (entrées de l'hôte))
+## 01 (S2, S4) : sautée (reprise à 06 (entrées de l'hôte))
+## 01 (S3) : sautée (reprise à 06 (entrées de l'hôte))
+## 01 (S4, négatifs) : sautée (reprise à 06 (entrées de l'hôte))
+## 01 S5 : sautée (déduit du code, non mesuré : D6 refuserait l'image du fork, sans fermeture propre ; porte en dur sur 3a7ca1b1)
+## 01 reverification, retrait, refspec, niveaux : sautées (mesures ponctuelles du 02/11/2026)
+## 01 (S6) : sautée (reprise à 06 (entrées de l'hôte))
+## 19 telecharger : sautée (archives en cache, sha256 revérifiés par installer) ; reference, O4 et correctifs : sautés (mesures)
+## 19 (O2) : sautée (reprise à 06 (entrées de l'hôte))
+## 19b (L2) : sautée (reprise à 06 (entrées de l'hôte))
+## 19b (L3) : sautée (reprise à 06 (entrées de l'hôte))
+## 19b (L5) : sautée (reprise à 06 (entrées de l'hôte))
+## 19 (O2, suite) : sautée (reprise à 06 (entrées de l'hôte))
+## 19 (O3) : sautée (reprise à 06 (entrées de l'hôte))
+## 19b L1, avant_grpc, grpc_tls, pertes_grpc : sautées (L2 et L3 posent déjà la configuration finale) ; muette, L7 : sautées
+## 19b (L6, contrôle) : sautée (reprise à 06 (entrées de l'hôte))
+## 19b (L4) : sautée (reprise à 06 (entrées de l'hôte))
+## 07a (G1) : sautée (reprise à 06 (entrées de l'hôte))
+## 07a (G2) : sautée (reprise à 06 (entrées de l'hôte))
+## 07a (G3) : sautée (reprise à 06 (entrées de l'hôte))
+## 07b (clé VEX) : sautée (reprise à 06 (entrées de l'hôte))
+## 07b (accès VEX) : sautée (reprise à 06 (entrées de l'hôte))
+## 07a (G4) : sautée (reprise à 06 (entrées de l'hôte))
+## 07a (passage périodique) : sautée (reprise à 06 (entrées de l'hôte))
+## 07a (G8) : sautée (reprise à 06 (entrées de l'hôte))
+## 10 pousser_vsa, J8 controle6, controle7 et 07a g6_temoins : sautés (POUSSER_VSA=1 absent : accord du propriétaire à chaque push de VSA)
+## 08c (H1) : sautée (reprise à 06 (entrées de l'hôte))
+## 08c (H4) : sautée (reprise à 06 (entrées de l'hôte))
+## 08c (S1) : sautée (reprise à 06 (entrées de l'hôte))
+## 08c (H5, limites) : sautée (reprise à 06 (entrées de l'hôte))
+## 08c (H5, Deny) : sautée (reprise à 06 (entrées de l'hôte))
+## 08c (H5, rôles) : sautée (reprise à 06 (entrées de l'hôte))
+## 08c (sortie des builds) : sautée (reprise à 06 (entrées de l'hôte))
+## J8 (résolveurs) : sautée (reprise à 06 (entrées de l'hôte))
+## 06 (S1, amorce) : sautée (reprise à 06 (entrées de l'hôte))
+# rejeu-entrees.sh replacer, 2026-11-23T20:17:12Z
+déjà présent, comparé : $W/s1-06/hote/InRelease
+OK   $W/s1-06/hote/InRelease : 0584fba32e13e0ab…
+déjà présent, comparé : $W/s1-06/hote/Packages.xz
+OK   $W/s1-06/hote/Packages.xz : 7778d3e3f303b7dd…
+déjà présent, comparé : $W/s3-06/build-1/sample-app_1.0.0-2_amd64.deb
+OK   $W/s3-06/build-1/sample-app_1.0.0-2_amd64.deb : f66bbeb2aba31e52…
+déjà présent, comparé : $W/s1-06/Packages
+OK   $W/s1-06/Packages (xz -dc de Packages.xz) : 4f2c68d67001d595…
+bilan : tenu
+## durée 06 (entrées de l'hôte) : 0 s
+## arrêt après 06 (entrées de l'hôte) (JUSQUA), 0 s

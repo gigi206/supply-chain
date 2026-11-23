@@ -72,7 +72,7 @@ Ce que ce document ne règle pas : le prochain rejeu de zéro effacera de nouvea
     - le scan du deb donne `VEX|0 énoncé(s)` (dépôt `builds/vex/sample-app-deb` absent) et `SCAN|… 67 vulnérabilités, 0 KEV, 0 écartée(s) par un VEX` ;
     - `fraicheur` passe ;
     - « 07b (entrees-scan, pose) » écrit 44 séries ;
-    - `grafana` voit les huit préfixes du scan dans Grafana.
+    - `grafana` voit dans Grafana sept préfixes du scan (`SOURCE`, `BASE`, `DEB`, `ARTEFACT`, `SCAN`, `ATTESTATION`, `PUBLIE`) et la révocation du jeton du rôle scanner *(corrigé à 2026-11-23T20:18:03Z : la note disait « huit préfixes », non compté ; `VEX|` n'est pas dans la liste contrôlée par `s6a.sh grafana`)*.
 - **R7** n'est pas mesurée directement : l'état de l'alerte `ScanEnRetard` n'a pas été lu. `fraicheur` lit dans Prometheus un dernier referrer du scan du deb à 20:11:55 UTC.
 
 **Correction structurelle, écrite après C** (`rejeu.sh` ne tournait plus) :
@@ -101,3 +101,21 @@ Ce que ce document ne règle pas : le prochain rejeu de zéro effacera de nouvea
   - `replacer` dit « déjà présent » quatre fois, bilan tenu ;
   - arrêt après cette étape ; rien d'autre ne tourne, `TAG_05` étant absent.
   - Confiance haute.
+
+## Fin de reprise : résultat (note de 2026-11-23T20:18:03Z)
+
+- **F1 tient** : `fuites` finit en code 0, avec « aucun secret dans les journaux des trois VM » ([journal](../../08-trust-plane/resultats/fuites-06-reprise-fin.log)).
+- **F2 tient** : CIS donne 20 PASS, 61 FAIL, 42 WARN. Le journal `rke2-cis.log` ne diffère de la version de 18:28 UTC que par sa ligne d'en-tête datée (`git diff` : une ligne).
+- **F3 tient**, de 20:17:12 à 20:17:12 UTC ([journal](../../08-trust-plane/resultats/rejeu-06-cablage.log)) :
+  - `garder` tourne avant le démontage sauté et dit « copie présente, relue » (3 OK) ;
+  - `DEPUIS` et `JUSQUA` trouvent l'étape au libellé à apostrophe ;
+  - `replacer` dit « déjà présent » quatre fois, bilan tenu ;
+  - arrêt après cette étape, et rien d'autre ne tourne.
+  - Le câblage est donc exercé, sauf le démontage : la copie qui précède un vrai démontage n'est mesurée qu'au banc.
+- **R7 tient**, lu dans Prometheus à 20:17:29Z :
+  - `ALERTS{alertname=~"Scan.*"}` est vide ;
+  - sur les deux heures précédentes, `ScanEnRetard` du dépôt `builds/scan/sample-app-deb` était `firing` ;
+  - l'alerte a donc cessé après le scan du deb. Son heure de fin n'a pas été lue.
+- **Heures** : de 19:31:27 UTC (deb replacé) à 20:18:03 UTC, soit 46 min 36 s, comptées au rejeu de zéro (la 06 est close).
+  - Les fins de A (19:44:30) et de C (20:12:18) sont calculées : heure de début du journal plus durée affichée par `rejeu.sh`.
+- **Journaux réécrits** par les scripts : leurs versions précédentes sont dans `a32c5689`.
