@@ -205,9 +205,12 @@ audit_openbao() { # instant : réponses d'OpenBao depuis cet instant (connexions
   rm -f "$T/audit.log"
 }
 
-cm_scan() { # ConfigMap scan-config : CA du PoC, script du job, clé publique du scanner (seule source : ne pas en réappliquer une partie)
+cm_scan() { # ConfigMap scan-config : CA du PoC, script du job, clé publique du scanner (seule source : ne pas en réappliquer une partie) ;
+  # clé publique VEX (07b, choix 2) dès qu'elle a été prise : sans elle, scanner.sh scanne sans VEX et le journal le dit
+  local vex=()
+  [ ! -s "$R/vex-cle-publique.pem" ] || vex=(--from-file=vex.pub="$R/vex-cle-publique.pem")
   kubectl create configmap scan-config -n scan --from-file=ca-poc.crt="$P/ca-poc.crt" --from-file=scanner.sh="$here/politique/scanner.sh" \
-    --from-file=scanner.pub="$R/scanner-cle-publique.pem" --dry-run=client -o yaml | kubectl apply --server-side -f -
+    --from-file=scanner.pub="$R/scanner-cle-publique.pem" "${vex[@]}" --dry-run=client -o yaml | kubectl apply --server-side -f -
 }
 
 rendre_scan() { # nom : politique/scan-job.yaml rendu sur l'image

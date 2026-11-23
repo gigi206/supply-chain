@@ -686,3 +686,35 @@ Les autres cas du troisième passage gardent leur prédiction. Le total sera fix
 | base de G0, source, image et deb | inchangés | haute |
 
 Aucun passage entre 21:40 et 21:50 UTC. Rien de partagé : ni le vrai Zot, ni le cluster, ni les VM.
+
+## Ajout avant la pièce 5 réduite et le vingt-quatrième passage du grand banc : patch `b5a5e8d8` (date -u de 08:07:53 UTC, le 2026-11-23, avant tout lancement)
+
+**Accord du propriétaire** (23/11/2026, verbatim) : « Oui », à la question « Je pose la pièce 5 de la 07b (vex.pub dans scan-config) ? ».
+
+**Portée réduite** : la carte fait suivre la pièce 5 de la pièce 3. Un `scanner.sh` neuf sur l'ancienne image `outils-scan` casserait les scans quotidiens. L'accord ne couvre donc que la clé `vex.pub` dans `scan-config`. Le `scanner.sh` neuf, le rendu des deux CronJob et le pod d'essai de cosign attendent la pièce 3 (pas avant le 29/11).
+
+**Contrôles faits avant d'écrire** (lecture seule) :
+- `scan-config` déployée : trois clés, égales aux fichiers du dépôt (`ca-poc.crt` 35d99c16, `scanner.pub` ff39a16d, `scanner.sh` 88e7bfe8) ;
+- les deux CronJob montent la ConfigMap entière (`/etc/scan`), sans `items` ni `subPath` ;
+- le `scanner.sh` du dépôt ne cite ni `vex.pub` ni `CLE_VEX` : la clé sera montée, mais lue par personne ;
+- aucun Job actif ; passages à 09:30 et 11:15 UTC.
+
+**Report dans le dépôt, fait avant cette prédiction** : le seul hunk `cm_scan` sort du patch et entre dans `plateforme.sh`, comme pour la pièce 2. Le patch passe de `c6d4b8a1` à `b5a5e8d8`, toujours 9 fichiers. Le dépôt reporté, avec le nouveau patch, redonne l'arbre de l'ancien dépôt avec l'ancien patch (`diff -r` vide).
+
+**Script neuf `vex-pub.sh`** : étapes `releve`, `pose`, `grafana`. `pose` appelle le texte de `cm_scan` lu dans `plateforme.sh`.
+
+| Étape et contrôle | Prédit | Confiance |
+|---|---|---|
+| passage 24 du grand banc : ligne du patch | `b5a5e8d85760855c…` | haute |
+| passage 24 : comptes | 254 OK, 0 KO, bilan « 0 écart(s) » | haute (même arbre que le passage 23) |
+| passage 24 : lignes OK et KO comparées au passage 23, heures ISO (fraction de seconde comprise) et empreintes de 64 caractères masquées | aucune différence, hors la ligne du patch qui n'est ni OK ni KO | haute |
+| `releve` | scan-config = fichiers ; clé VEX `79f7eece2f98f442`, SPKI `2b81df72…` ; `vex.pub` absente ; 0 Job actif ; bilan tenue | haute |
+| `pose` : clés après | `ca-poc.crt,scanner.pub,scanner.sh,vex.pub` | haute |
+| `pose` : trois anciennes clés, CronJob (resourceVersion) | inchangées, non touchés | haute |
+| `pose` : `vex.pub` | empreinte `79f7eece2f98f442`, SPKI `2b81df72…` | haute |
+| `pose` : gestionnaires de champs | `kubectl` en `Apply` seul, comme avant | moyenne (non relevés avant) |
+| `grafana` : écritures de scan-config sur 15 min, par l'auditeur | une série `patch`, code 200, au nom de l'utilisateur du kubeconfig | moyenne (première requête sur `objectRef` dans cette brique ; les noms de champs du parseur json ne sont pas vérifiés) |
+
+**Non vérifié après la pose** : l'effet sur le prochain scan quotidien (09:30 UTC). Prédit : aucun, puisque `scanner.sh` n'a pas changé.
+
+Aucun passage de banc entre 21:40 et 21:50 UTC. La pose touche le cluster (ConfigMap `scan-config`) ; ni le vrai Zot ni les VM.

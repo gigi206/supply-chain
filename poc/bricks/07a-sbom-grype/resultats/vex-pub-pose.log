@@ -1,0 +1,39 @@
+# vex-pub.sh pose, 2026-11-23T08:16:00Z
+## avant
+  ca-poc.crt 35d99c165852251b
+  scanner.pub ff39a16d2e9e412e
+  scanner.sh 88e7bfe80df12ae4
+  fichiers du dépôt :
+    ca-poc.crt 35d99c165852251b
+    scanner.pub ff39a16d2e9e412e
+    scanner.sh 88e7bfe80df12ae4
+  resourceVersion de scan-config : 1239184
+  CronJob scan-sample-app 7474514 30 9 * * * suspend=false
+  CronJob scan-sample-app-deb 7534902 15 11 * * * suspend=false
+OK   Jobs de scan actifs : 0
+OK   scan-config = fichiers du dépôt (trois clés) : ca-poc.crt 35d99c165852251b
+scanner.pub ff39a16d2e9e412e
+scanner.sh 88e7bfe80df12ae4
+OK   clé publique VEX dans le dépôt (fichier, SPKI) : 79f7eece2f98f442 2b81df72314a72e85276ce55aa6625306b47ab37e2c9e2a28878ce374b9df1a9
+OK   hors des fenêtres de scan (0816 UTC)
+## pose : cm_scan de plateforme.sh
+  texte de cm_scan : bc7d3417e7cf1ce7
+  configmap/scan-config serverside-applied
+## après
+  ca-poc.crt 35d99c165852251b
+  scanner.pub ff39a16d2e9e412e
+  scanner.sh 88e7bfe80df12ae4
+  vex.pub 79f7eece2f98f442
+OK   clés de scan-config : ca-poc.crt,scanner.pub,scanner.sh,vex.pub
+OK   trois anciennes clés inchangées : ca-poc.crt 35d99c165852251b
+scanner.pub ff39a16d2e9e412e
+scanner.sh 88e7bfe80df12ae4
+OK   vex.pub = fichier (empreinte) : 79f7eece2f98f442
+OK   vex.pub, SPKI : 2b81df72314a72e85276ce55aa6625306b47ab37e2c9e2a28878ce374b9df1a9
+OK   resourceVersion de scan-config : 1239184 -> 8257360
+  gestionnaires de champs : ["kubectl/Apply"]
+OK   CronJob non touchés : scan-sample-app 7474514 30 9 * * * suspend=false
+scan-sample-app-deb 7534902 15 11 * * * suspend=false
+OK   Jobs de scan actifs : 0
+# fin 2026-11-23T08:16:01Z
+bilan : tenue

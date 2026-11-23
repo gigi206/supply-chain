@@ -1461,3 +1461,44 @@ La condition posée à la pièce 2 est levée : le grand banc tient sur le patch
 **Heures mesurées** :
 - Segment : de 22:51:51 UTC à 23:01:27 UTC, compté d'un seul tenant.
 - Somme des enveloppes de la 07b : au plus 11 h 43 pour 10 h estimées (demande au propriétaire avant 20 h).
+
+## Pièce 5 réduite posée : `vex.pub` dans `scan-config` ; sc-stockage injoignable depuis 06:40 UTC (note de 2026-11-23T08:18:16Z)
+
+**Accord du propriétaire** (23/11/2026, verbatim) : « Oui », à la question « Je pose la pièce 5 de la 07b (vex.pub dans scan-config) ? ».
+
+**Erreur de ma part, corrigée avant d'agir** : j'avais présenté la pièce 5 comme la seule étape posable aujourd'hui. D'après le tableau des pièces, elle suit la pièce 3 : un `scanner.sh` neuf sur l'ancienne image `outils-scan` casserait les scans quotidiens (`fusion` à 6 arguments). Seule la partie que la question nommait est donc posée : la clé `vex.pub` dans `scan-config`. **La pièce 5 reste ouverte** : `scanner.sh` neuf, rendu des deux CronJob et pod d'essai de cosign viennent après la 3, pas avant le 29/11. C'est le même cas que la pièce 7, pour laquelle j'avais recommandé d'attendre : une pose sans effet immédiat.
+
+**Contrôles avant la pose** (lecture seule) :
+- `scan-config` égale aux fichiers du dépôt ;
+- ConfigMap montée entière par les deux CronJob (`/etc/scan`, ni `items` ni `subPath`) ;
+- le `scanner.sh` actuel ne cite ni `vex.pub` ni `CLE_VEX` ;
+- aucun Job actif ; passages à 09:30 et 11:15 UTC.
+
+**Report dans le dépôt** : le seul hunk `cm_scan` sort du patch et entre dans `plateforme.sh`, comme pour la pièce 2. Le patch passe de `c6d4b8a1` à `b5a5e8d8` (9 fichiers). Le dépôt reporté, avec le nouveau patch, redonne l'arbre de l'ancien dépôt avec l'ancien patch (`diff -r` vide).
+
+**Prédiction** datée avant tout lancement (08:07:53 UTC). Tout a tenu, sauf la relecture dans Grafana, qui n'a pas pu se faire (plus bas).
+
+| Étape | Résultat |
+|---|---|
+| [passage 24](07b-t3-banc-24.log) du grand banc, 08:07:57 à 08:15:53 UTC | 254 OK, 0 KO, bilan « 0 écart(s) » ; patch `b5a5e8d85760855c…` ; lignes OK et KO égales à celles du passage 23 (heures et empreintes masquées) |
+| [`releve`](vex-pub-releve.log), 08:07:59 UTC | scan-config = fichiers ; `vex.pub` absente ; 0 Job actif ; tenue |
+| [`pose`](vex-pub-pose.log), 08:16:00 à 08:16:01 UTC | texte de `cm_scan` `bc7d3417…` ; clés `ca-poc.crt,scanner.pub,scanner.sh,vex.pub` ; les trois anciennes inchangées ; `vex.pub` = fichier (`79f7eece…`, SPKI `2b81df72…`) ; resourceVersion 1239184 vers 8257360 ; gestionnaire `kubectl/Apply` seul ; CronJob non touchés ; tenue |
+| [`grafana`](vex-pub-grafana.log), 08:16:07 UTC | **échec** : Grafana injoignable (`192.168.161.13:3001`, curl : « Could not connect to server » après 3057 ms) |
+
+Script neuf [`vex-pub.sh`](../vex-pub.sh). Sa relecture dans Grafana reste à faire. Le journal `vex-pub-grafana.log` n'est pas réécrit : il faudra une étape datée de plus.
+
+**Panne de sc-stockage, antérieure à la pose** (relevés en lecture seule, de 08:16 à 08:17 UTC) :
+- nœud `sc-stockage` `NotReady` : dernier battement à 2026-11-23T06:40:07Z, passage à `Unknown` à 06:42:51Z ;
+- VM « en cours d'exécution » pour libvirt, mais l'ARP de 192.168.161.13 est en échec. Sur trois pings, les paquets reçus par l'interface augmentent et les paquets émis restent figés (49815464) ;
+- [console](vex-pub-sc-stockage-console.png) (`virsh screenshot`, sha256 `371170b2…`) : à 853271 s de démarrage, systemd 257.13-1~deb13u1 se ré-exécute et journald redémarre. Depuis le démarrage du 13/11 vers 09:05 UTC, cela tombe vers 06:07 UTC le 23/11. Cela évoque une mise à jour automatique de systemd, mais rien ne le vérifie ;
+- touchés : Zot (registre réel), Loki, Grafana et Prometheus de sc-stockage. Le scan de 09:30 UTC échouera tant que Zot sera injoignable (prédit, non vérifié). Le sort des lignes de journal émises depuis 06:40 n'est pas relevé.
+
+Rien n'a été fait sur la VM. Toute action (redémarrage, connexion à la console) attend le propriétaire.
+
+**Non vérifié** :
+- l'effet de la clé sur le prochain scan quotidien (prédit : aucun) ;
+- l'écriture de `scan-config` dans Grafana.
+
+**Heures mesurées** :
+- Segment : de 08:03:34 UTC à 08:18:16 UTC, compté d'un seul tenant, diagnostic de la panne compris.
+- Somme des enveloppes de la 07b : au plus 11 h 58 pour 10 h estimées (demande au propriétaire avant 20 h).
