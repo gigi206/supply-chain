@@ -1689,3 +1689,52 @@ Effet attendu de la clé : **aucun**, pour la même raison qu'à 09:30.
 Les deux CronJob de scan ont donc passé un cycle avec la clé montée, sans changement. L'effet de `vex.pub` reste nul tant que l'ancien `scanner.sh` est en place. La suite de la pièce 5 attend la pièce 3, pas avant le 29/11.
 
 **Heures** : de 09:53:16 UTC à 11:18:29 UTC, attente comprise, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.
+
+## Alertes de la panne du 23/11 et relevé du 24/11 : relevés et prédiction (date -u de 12:22:03 UTC, le 2026-11-23, avant le relevé du 24/11)
+
+Relevés en lecture seule par [base-grype-24.sh](base-grype-24.sh), à travers Grafana (Prometheus ; comptes seuls). Rien sur la VM.
+
+**Alertes pendant la panne** ([journal](base-grype-24-alertes_23.log), étape `alertes_23`, série `ALERTS` du 23/11 de 06:00 à 09:30 UTC, pas de 30 s) :
+
+| Alerte | En attente | Déclenchée |
+|---|---|---|
+| `CollecteEnPanne` (4 séries) | 06:43:00 à 06:47:30 | 06:48:00 à 08:37:30 |
+| `LokiInjoignable` | 06:47:00 à 06:48:30 | 06:49:00 à 08:37:30 |
+| `SourceMuette` (2 séries) | 06:47:00 à 06:48:30 | 06:49:00 à 08:37:30 |
+| `EvenementsMuets` | 06:56:30 à 07:01:00 | 07:01:30 à 08:37:30 |
+| `ChainsEchecSignature` (A2, critique) | aucun point | **08:35:00 à 08:44:00** |
+| `KyvernoRefusAnormaux` (A5, critique) | aucun point | **08:35:00 à 08:39:30** |
+| `BaseGrypeVieillie` | aucune | aucune |
+
+Lecture :
+- Prometheus a continué d'évaluer ses règles pendant la panne : la VM était à moitié vivante, comme le timer de `base-grype` l'avait montré. Cela complète la note de 08:21:41Z (« aucune alerte n'a pu partir ») sans la contredire : les alertes ont été **évaluées et enregistrées**, mais leur envoi par Alertmanager n'est pas relevé ;
+- la collecte est vue en panne dès 06:43:00, en attente, déclenchée à 06:48:00 (`for: 5m`).
+
+**A2 et A5 à la reprise : faux positifs** ([journal](base-grype-24-compteurs_23.log), étape `compteurs_23`, **bilan : tenue**). Les compteurs qu'elles lisent, sommés, sont égaux avant la panne (06:40) et après la reprise (08:36, 08:50, 09:30) :
+- échecs de signature des TaskRun : 19 (cumul antérieur) ;
+- échecs de signature des PipelineRun : aucune série ;
+- refus de Kyverno à l'admission : 10.
+
+Aucun nouvel échec de signature et aucun nouveau refus. Les durées de déclenchement (10 min et 5 min) sont celles des clauses « série apparue » des deux règles (`unless … offset 10m` pour A2, `offset 5m` pour A5). Après 2 h sans collecte, toutes les séries « réapparaissent ».
+
+**Réserve pour la supervision** : tout trou de collecte de plus de 10 min déclenche A2 et A5 à tort, à la reprise. Corriger les règles est un changement de configuration du cluster (brique 19) : sur accord du propriétaire, non fait.
+
+**Écart de l'étape `alertes_23`** : un premier passage, à 12:20:02 UTC, a planté dans jq sur le cas sans série (Grafana renvoie un cadre vide). Ce journal d'essai, jamais commité, a été effacé ; le filtre a été corrigé et l'étape relancée à 12:20:13. Le garde-fou d'heure de `releve_24` passe, lui, **avant** l'ouverture du journal (défaut de `vex-pub.sh` corrigé dans ce script) : essayé à 12:20:00, refus sans journal.
+
+**Prédiction du relevé du 24/11** (étape `releve_24`, lancée après 09:33 UTC) :
+
+| Contrôle | Prédit | Confiance |
+|---|---|---|
+| règle `BaseGrypeVieillie` à l'heure du relevé | `inactive ok` | haute si le passage de 08:04:02 réussit |
+| `BaseGrypeVieillie`, en attente | à partir d'environ 06:20 (base construite le 22/11 à 06:19:59Z, plus 2 jours) | haute |
+| `BaseGrypeVieillie`, déclenchée | d'environ 06:25 (`for: 5m`) jusqu'à la mise à jour de la métrique : `fraicheur-scan` passe toutes les 15 min, après la poussée de `base-grype` (lancée à 08:04:02), donc fin **entre 08:05 et 08:45** | moyenne (durée du service non mesurée) |
+| jour de construction de la base la plus récente | 2026-11-24 (le tag porte la date de `built` de `latest.json`, construit vers 06:20) | haute si le passage réussit |
+| `init.scope` sur `base-grype`, 24/11 de 07:55 à 08:45 | lignes `base-grype.service`, `Starting` et `Finished` présentes ; `Failed` : aucune | moyenne (le 22/11, 4 lignes ; forme non relevée en détail) |
+| job `scan-sample-app` du 24/11 à 09:30 | réussi (1/0/0), préfixes égaux au 23/11 | haute |
+| ligne `BASE` du 24/11 | `BASE\|2026-11-24` | haute si le passage réussit |
+| lignes du pod dans Grafana (Loki) | égales à `kubectl logs` | haute |
+| vulnérabilités | relevées seulement (la base change) | sans objet |
+
+Si le passage échoue : alerte toujours déclenchée à 09:33, ligne `BASE|2026-11-22`, et refus de la porte pour les scans faits après le 25/11 à 06:19:59Z.
+
+**Heures** : de 12:18:12 UTC à 12:22:03 UTC, hors de l'enveloppe de la 07b, qui reste au plus à 11 h 58.

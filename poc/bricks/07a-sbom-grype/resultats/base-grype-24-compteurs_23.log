@@ -1,0 +1,19 @@
+# base-grype-24.sh compteurs_23, 2026-11-23T12:20:57Z
+sum(watcher_pipelinerun_signing_failures_total) : 06:40 aucune série
+OK   sum(watcher_pipelinerun_signing_failures_total), 08:36 = 06:40 : aucune série
+OK   sum(watcher_pipelinerun_signing_failures_total), 08:50 = 06:40 : aucune série
+OK   sum(watcher_pipelinerun_signing_failures_total), 09:30 = 06:40 : aucune série
+sum(watcher_taskrun_signing_failures_total) : 06:40 19
+OK   sum(watcher_taskrun_signing_failures_total), 08:36 = 06:40 : 19
+OK   sum(watcher_taskrun_signing_failures_total), 08:50 = 06:40 : 19
+OK   sum(watcher_taskrun_signing_failures_total), 09:30 = 06:40 : 19
+sum(kyverno_admission_requests_total{request_allowed="false"}) : 06:40 10
+OK   sum(kyverno_admission_requests_total{request_allowed="false"}), 08:36 = 06:40 : 10
+OK   sum(kyverno_admission_requests_total{request_allowed="false"}), 08:50 = 06:40 : 10
+OK   sum(kyverno_admission_requests_total{request_allowed="false"}), 09:30 = 06:40 : 10
+count(up == 1) : 06:40 9
+OK   count(up == 1), 08:36 = 06:40 : 9
+OK   count(up == 1), 08:50 = 06:40 : 9
+OK   count(up == 1), 09:30 = 06:40 : 9
+# fin 2026-11-23T12:20:58Z
+bilan : tenue

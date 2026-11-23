@@ -1,0 +1,16 @@
+# base-grype-24.sh alertes_23, 2026-11-23T12:20:13Z
+ALERTS, 2026-11-23 de 06:00 à 09:30 UTC, pas de 30 s :
+  ChainsEchecSignature firing : 1 série(s), de 2026-11-23T08:35:00Z à 2026-11-23T08:44:00Z
+  CollecteEnPanne firing : 4 série(s), de 2026-11-23T06:48:00Z à 2026-11-23T08:37:30Z
+  CollecteEnPanne pending : 4 série(s), de 2026-11-23T06:43:00Z à 2026-11-23T06:47:30Z
+  EvenementsMuets firing : 1 série(s), de 2026-11-23T07:01:30Z à 2026-11-23T08:37:30Z
+  EvenementsMuets pending : 1 série(s), de 2026-11-23T06:56:30Z à 2026-11-23T07:01:00Z
+  KyvernoRefusAnormaux firing : 1 série(s), de 2026-11-23T08:35:00Z à 2026-11-23T08:39:30Z
+  LokiInjoignable firing : 1 série(s), de 2026-11-23T06:49:00Z à 2026-11-23T08:37:30Z
+  LokiInjoignable pending : 1 série(s), de 2026-11-23T06:47:00Z à 2026-11-23T06:48:30Z
+  SourceMuette firing : 2 série(s), de 2026-11-23T06:49:00Z à 2026-11-23T08:37:30Z
+  SourceMuette pending : 2 série(s), de 2026-11-23T06:47:00Z à 2026-11-23T06:48:30Z
+BaseGrypeVieillie, même plage :
+  aucune
+# fin 2026-11-23T12:20:13Z
+bilan : relevé fait
