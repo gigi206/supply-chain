@@ -88,3 +88,16 @@ Ce que ce document ne règle pas : le prochain rejeu de zéro effacera de nouvea
   - **Pas encore rejoué de zéro** : seule la syntaxe est contrôlée (`bash -n`).
 
 **Reste, sur accord nommé** : avec `POUSSER_VSA=1`, les étapes S6b `pousser_vsa` et `lire_vsa`, puis S6a `porte` et `s4d3.sh porte`. La CA lue par `pousser_vsa` est identique à celle de la 08 (`cmp`).
+
+## Fin de reprise : `fuites`, CIS et câblage (prédiction, `date -u` de 2026-11-23T20:16:49Z, avant les lancements ; relue par le conseiller)
+
+`fuites` et CIS ont tourné à 18:27 UTC, à la fin de M5b, donc **avant** le bloc 06. Le 13/11, la reprise du bloc 06 se terminait par eux. Dans `rejeu.sh`, ils suivent les étapes Kyverno : aucun `JUSQUA` ne les isole. Ils sont donc lancés directement.
+
+- **F1** : `mise run confiance:fuites -- 06-reprise-fin` (journal `08-trust-plane/resultats/fuites-06-reprise-fin.log`). Attendu : aucun secret, comme le `fuites` de 18:27 UTC. Confiance moyenne : le bloc 06 a créé des pods et des journaux neufs.
+- **F2** : `DISTRO=rke2 mise exec -- poc/bricks/08b-rke2/rke2.sh cis` (journal `rke2-cis.log` réécrit ; version de 18:28 dans git). Attendu : 20 PASS, 61 FAIL, 42 WARN, comme à 18:28 UTC. Confiance haute : le bloc 06 ne touche ni aux nœuds ni à leur configuration.
+- **F3**, le câblage de `rejeu.sh` (sans démontage) : `DISTRO=rke2 DEPUIS="06 (entrées de l'hôte)" JUSQUA="06 (entrées de l'hôte)" mise run confiance:rejeu -- 06-cablage`. Attendu :
+  - `garder` tourne avant le démontage sautée et dit « copie présente, relue » ;
+  - l'étape « 06 (entrées de l'hôte) », au libellé à apostrophe, est trouvée par `DEPUIS` et `JUSQUA` ;
+  - `replacer` dit « déjà présent » quatre fois, bilan tenu ;
+  - arrêt après cette étape ; rien d'autre ne tourne, `TAG_05` étant absent.
+  - Confiance haute.
