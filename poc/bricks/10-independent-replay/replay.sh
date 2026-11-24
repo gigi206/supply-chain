@@ -64,11 +64,11 @@ export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
 racine_depot=$(cd "$here/../../.." && pwd)
 R=$here/resultats
-# Additif du 24/11/2026 (brique 07c, VSA de f5e6bcb0) : IMAGE, INVOCATION, FIN_BUILD, GO_ARCHIVE, GO_SHA256 et RESULTATS se
+# Additif du 24/11/2026 (brique 07c, VSA de f5e6bcb0) : IMAGE, INVOCATION, FIN_BUILD, GO_ARCHIVE, GO_SHA256 et RESULTATS_REPLAY se
 # passent par l'environnement ; les défauts restent ceux de 3a7ca1b1 / c4242a11 (rejeu.sh re-pousse cette VSA avec POUSSER_VSA=1)
-# jusqu'au commit qui archive la VSA de f5e6bcb0. RESULTATS (journaux et fichiers r4-/r5- produits) : dossier distinct, pour ne
+# jusqu'au commit qui archive la VSA de f5e6bcb0. RESULTATS_REPLAY (journaux et fichiers r4-/r5- produits) : dossier distinct, pour ne
 # pas réécrire les mesures de la clôture de la 10 ; un journal existant y est refusé. La clé publique de VSA reste lue dans $R.
-RJ=${RESULTATS:-$R}
+RJ=$(realpath -m "${RESULTATS_REPLAY:-$R}")   # nom propre : rejeu.sh de la 08 exporte RESULTATS ; absolu pour preuves.sh
 O=$HOME/.cache/supply-chain-poc/10
 T=$O/telechargements
 E=$O/essais
@@ -106,8 +106,8 @@ lancer() { # jalon étape… : journal resultats/<jalon>-<étape>.log
   [ $# -gt 0 ] || { echo "usage : $0 $(declare -F | awk '$3 ~ /^etape_/ {sub("etape_", "", $3); printf "%s|", $3}' | sed 's/|$//')…" >&2; exit 2; }
   for e in "$@"; do declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }; done
   for e in "$@"; do
-    [ -z "${RESULTATS:-}" ] || [ ! -e "$RJ/$j-$e.log" ] || { echo "REFUS : $RJ/$j-$e.log existe déjà (journaux jamais réécrits)" >&2; exit 1; }
-    { echo "# ${0##*/} $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)${RESULTATS:+, IMAGE ${IMAGE#*@sha256:} INVOCATION $INVOCATION}"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$RJ/$j-$e.log"
+    [ -z "${RESULTATS_REPLAY:-}" ] || [ ! -e "$RJ/$j-$e.log" ] || { echo "REFUS : $RJ/$j-$e.log existe déjà (journaux jamais réécrits)" >&2; exit 1; }
+    { echo "# ${0##*/} $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)${RESULTATS_REPLAY:+, IMAGE ${IMAGE#*@sha256:} INVOCATION $INVOCATION}"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$RJ/$j-$e.log"
   done
 }
 
@@ -555,8 +555,8 @@ EOS
 
 porte() { # avant|apres : étape reelle de preuves.sh de la 08 (Job de la porte, image réelle, source attendue, contrôle 9) ; son
   # journal est copié, puisque la 08 le réécrit à chaque passage
-  # 24/11/2026 : avec RESULTATS, le journal de la 08 va dans $RJ/porte-<passage> (sinon la copie lirait l'ancien)
-  local d=${RESULTATS:+$RJ/porte-$1}
+  # 24/11/2026 : avec RESULTATS_REPLAY, le journal de la 08 va dans $RJ/porte-<passage> (sinon la copie lirait l'ancien)
+  local d=${RESULTATS_REPLAY:+$RJ/porte-$1}
   [ -z "$d" ] || mkdir -p "$d"
   RESULTATS=$d PASSAGE=$1 "$racine_depot/poc/bricks/08-trust-plane/preuves.sh" reelle
   cp "${d:-$racine_depot/poc/bricks/08-trust-plane/resultats}/preuves-reelle.log" "$RJ/r5-porte-$1.copie.log"

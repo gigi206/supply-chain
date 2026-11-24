@@ -276,7 +276,7 @@ Note de 2026-11-24T15:04:46Z. Prédictions datées et commitées avant tout lanc
 - quatre provenances de PipelineRun sur `f5e6bcb0`. La cible est **`9539952b`**, J7 du passage 2, terminé à **13:27:42 UTC**. La règle des 24 h de la 10 place donc R4 au plus tôt le **2026-11-25T13:27:42Z** ;
 - la clé de Chains versionnée valide les enveloppes, et `horodatage/bundles` contient 8 bundles horodatés ;
 - `politique-replay.md` et `outils/` sont inchangés depuis `6c44219`. Aucune valeur n'y est épinglée, donc ni nouvelle politique ni poussée de politique ;
-- le contrôle 6 ne lie une VSA qu'au digest (additif du 03/11, 22:45 UTC, de la 10). Une VSA de `f5e6bcb0` faite sur le cluster en service vaudra donc après un rejeu de zéro, qui reconstruit la même image. L'ordre « VSA puis rejeu » tient ;
+- le contrôle 6 ne lie une VSA qu'au digest (additif du 03/11, 22:45 UTC, de la 10). Après un rejeu de zéro, qui reconstruit la même image, il accepterait donc encore une VSA de `f5e6bcb0` faite sur le cluster en service. Mais elle attesterait une construction d'avant le rejeu : c'est la limite « acceptée en connaissance de cause » du 03/11, après laquelle le propriétaire avait demandé une seconde VSA sur la provenance du rejeu (nouvelle attente de 24 h). L'archive Go et R2 servent dans les deux ordres ;
 - go.dev publie pour `go1.26.11.linux-amd64.tar.gz` le sha256 `9849f4e0…` et une taille de 66 999 944 octets.
 
 **Portage de `replay.sh` de la 10** :
@@ -284,6 +284,15 @@ Note de 2026-11-24T15:04:46Z. Prédictions datées et commitées avant tout lanc
 - le cache `provenance.json` du domaine n'est réutilisé que pour la même invocation (avant, il aurait relu `c4242a11`) ;
 - avec `RESULTATS`, le journal de la porte de la 08 va dans un sous-dossier : sinon la copie aurait lu l'ancien `preuves-reelle.log` ;
 - un journal existant est refusé.
+
+**Corrections après relecture** (note de 2026-11-24T15:08:17Z) :
+- la variable s'appelle `RESULTATS_REPLAY`, pas `RESULTATS`. `rejeu.sh` de la 08 exporte `RESULTATS`, et `replay.sh`, lancé par `pousser_vsa`, en aurait hérité. Le chemin est rendu absolu (`realpath -m`), puisque `porte` le transmet à `preuves.sh`. Les défauts ont été relus par `bash -x` dans trois cas (rien, `RESULTATS` seul, `RESULTATS_REPLAY`) : sans `RESULTATS_REPLAY`, le dossier reste `resultats/` ;
+- R3 transportera **4 entrées**, et non 6 (supposition de la prédiction). C'est mesuré à sec : les couches `.att` passées dans `outils/entrees.py` donnent `construire-image` `4dcbc4b7`, `builder-go-voie-d` `8c11e856`, fermeture `74c265e7` et web-dist `47f72275`. La prédiction est corrigée avant tout lancement de R3.
+
+À relire avant R4 et R5 :
+- `rebuild.sh` et les caches froids (GOCACHE, racine BuildKit) ;
+- le commentaire de `etape_vsa`, « vsa.py de HEAD, poussé » ;
+- les dépendances de `preuves.sh reelle` envers les images d'essai absentes du cluster en service.
 
 **Défaut relevé** : deux fonctions `etape_outils` (R1 l. 191, R2 l. 281). Bash garde la seconde, donc l'archive de Go passe par [`go-domaine.sh`](../go-domaine.sh), sur accord.
 
@@ -297,4 +306,4 @@ Note de 2026-11-24T15:04:46Z. Prédictions datées et commitées avant tout lanc
 
 Les défauts de `replay.sh` et `rejeu.sh` ne passeront à `f5e6bcb0` que dans le commit qui archive la VSA.
 
-**Heures** : de 14:39:31 à 15:04:46 UTC, poussée et reprise comprises : 25 min 15 s. **Total de la 07c : au plus 1 h 39 min 15 s** pour 10 h estimées.
+**Heures** : de 14:39:31 à 15:08:17 UTC, poussée et reprise comprises : 28 min 46 s. **Total de la 07c : au plus 1 h 42 min 46 s** pour 10 h estimées.
