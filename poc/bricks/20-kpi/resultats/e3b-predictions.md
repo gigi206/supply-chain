@@ -51,3 +51,28 @@ Moins sûr : le nombre de signatures d'image. Le recalcul compte ce que `cosign 
 - Témoins, attendus et outils sont de la même session.
 
 Heures : essai compté depuis 19:55:31 UTC.
+
+## Résultat (note de 2026-11-24T20:02:05Z)
+
+Les deux passages sont conformes du premier coup, dépôt `623a477c`.
+
+**Passage 1, banc** ([journal](e3b-banc.log), 2026-11-24 à 20:01:07 UTC) : **26 cas, 0 écart**.
+
+- L'exportateur qui vérifie donne les 187 valeurs attendues, les mêmes que le recalcul signé par cosign. Attestations : 24 vérifiées et 12 refusées, sujet par sujet et famille par famille comme cosign ; signatures d'image : 9 et 4.
+- L'exportateur qui compte s'écarte sur **39 valeurs**, exactement celles prédites : taux L3 4/14 au lieu de 1/14, provenance 12/14 au lieu de 8/14.
+- Une bonne clé dans le mauvais rôle est refusée ; une signature illisible est comptée et n'arrête ni l'exportateur, ni le recalcul : cosign a rendu des motifs que `recalcul.py` connaît, l'incertitude de la prédiction est levée pour ces trois formes.
+- 9 arrêts sur 9 : code 2, motif attendu, fichier inchangé (openssl inutilisable compris).
+
+**Passage 2, vrai Zot** ([journal](e3b-exportateur-zot.log), 20:01:21 UTC, depuis l'hôte) : **8 cas, 0 écart** ; recalcul du même passage : 10 cas, 0 écart.
+
+- Clés du dépôt : **41 signatures vérifiées, 0 refusée** (37 attestations et 4 signatures d'image). Les signatures réelles de Chains, du scanner, des VEX et des VSA se vérifient par openssl seul.
+- Clé étrangère : **0 vérifiée, 41 refusées** ; provenance, L3, replay et VEX à 0, séries de scan absentes.
+- 56 valeurs comparées au recalcul signé : 0 écart.
+
+**Ce que cela établit** : vérifier ne demande pas cosign. `/usr/bin/openssl` et les quatre clés publiques suffisent, sur l'hôte (OpenSSL 3.5.5, Python 3.14.4).
+
+**Ce que cela n'établit pas** : voir « Ce que cela ne montrera pas ». En particulier, `openssl` sur `sc-stockage` n'est pas vérifié (image `debian-13-generic`, lu ; contenu non lu), l'unité durcie n'est pas exercée, et les délais des KEV restent non vérifiés dans les deux modes. L'ordre de grandeur du coût (41 appels d'openssl par passage) n'a pas été mesuré séparément.
+
+Une correction de vocabulaire : en mode compté, les séries gardent les noms `…_verifie`. Si le choix est de ne pas vérifier, il faudra les renommer.
+
+**Heures de l'essai** : de 19:55:31 à 20:02:05 UTC, 6 min 34 s. Total de la brique : 38 min 09 s.
