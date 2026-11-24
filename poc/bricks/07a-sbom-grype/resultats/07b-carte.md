@@ -2593,3 +2593,22 @@ Accord du propriétaire, verbatim : « J'autorise la pose ». Sa question citait
 - tout compte connu avant la création d'un futur dossier provisionné aura le même 403 jusqu'au rechargement de son cache, ou jusqu'à son expiration (durée non mesurée).
 
 **Heures de la 07b** : plus 16:13:49 à 16:15:17 UTC (0 h 01 min 28 s) ; **total : au plus 15 h 59 min 06 s** pour 10 h estimées ; seuil de 20 h non atteint.
+
+## ADR 0004 accepté (note de 2026-11-24T16:28:55Z)
+
+Décision du propriétaire, verbatim : « Oui, Accepté ». L'[ADR 0004](../../../../docs/adr/0004-vulnerabilites-vex.md) passe de « À rédiger » à « Accepté » (statut, note datée, index des ADR, `docs/03`).
+
+**Bilan face à la demande du 20/11** (« les cve trouvées et les failles réelles (VEX) »), lecture retenue en tête de cette carte : « voir dans Grafana, pour chaque artefact, les vulnérabilités trouvées par le scan, puis celles qui restent après application des VEX ». Elle est tenue pour les deux artefacts scannés, par le tableau « Vulnérabilités et VEX » ([contrôle](tableau-pose-controle.log), 7 cas, 0 écart) :
+- sample-app `f5e6bcb0` : 5 trouvées, 5 écartées ;
+- deb `60f25f5c` : 67 trouvées, 23 écartées, 44 restantes.
+
+S'y ajoutent la liste par entrée dans Loki et les VEX signés par la clé `vex` du propriétaire, avec une échéance de 30 jours.
+
+**Hors périmètre ou ouvert** :
+- Dependency-Track est reporté en fin de projet ;
+- pas d'analyse d'atteignabilité : les 44 entrées restantes du deb ne sont pas couvrables par `vulnerable_code_not_present` sans elle, ou sans une reconstruction ;
+- les VEX échoient le 24/12/2026 (renouvellement : accord nommé) ;
+- un rejeu de zéro recrée la clé `vex` et demande de re-signer les 3 VEX ;
+- le deb de la 06 est compilé en Go 1.26.10.
+
+**Heures** : 10 h estimées, au plus 15 h 59 min 06 s avant cette note, plus 16:28:36 à 16:28:55 UTC. Le seuil de décision de 20 h n'est pas atteint. La clôture est une décision du propriétaire.
