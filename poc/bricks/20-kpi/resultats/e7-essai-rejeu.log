@@ -1,0 +1,73 @@
+# essai-rejeu.sh, 2026-11-24T21:59:41Z, dépôt a1c4822c, script 198f7c874f562e52, kpi-pose 8e374bfbd913e183
+## 1 et 2. arbre propre
+  OK   clés publiques de l'arbre différentes de HEAD : 0
+  OK   relevé des dates de git : à jour
+  OK   fichiers à poser : 12
+  OK   aucune clé privée parmi eux : 0
+  code 0
+OK   sec, arbre propre : code 0
+  clés publiques réécrites, pas encore commitées : 0
+  écrit : 5 clés, 27 pins
+  OK   relevé des dates de git : à jour
+  OK   fichiers à poser : 12
+  OK   aucune clé privée parmi eux : 0
+  OK   exportateur sur l'hôte, code : 0
+  OK   signatures refusées : 0 présentes
+  OK   signatures vérifiées : oui
+  OK   clés sans date : 0
+  OK   pins sans date, journal illisible : 0 présentes
+  code 0
+OK   sec_rejeu, arbre propre : code 0, clés sans date : 0
+OK   relevé inchangé : oui
+## 3. deux clés réécrites, relevé périmé
+OK   lignes retirées du relevé : 0 3
+  KO   clés publiques de l'arbre différentes de HEAD : 2 (attendu : 0)
+  KO   relevé des dates de git : périmé (attendu : à jour)
+  OK   fichiers à poser : 12
+  OK   aucune clé privée parmi eux : 0
+  code 1
+OK   sec : clés, relevé : code 1, 2 KO, différentes de HEAD : 2
+  clés publiques réécrites, pas encore commitées : 2
+  écrit : 5 clés, 27 pins
+  OK   relevé des dates de git : à jour
+  OK   fichiers à poser : 12
+  OK   aucune clé privée parmi eux : 0
+  OK   exportateur sur l'hôte, code : 0
+  OK   signatures refusées : 0 présentes
+  OK   signatures vérifiées : oui
+  OK   clés sans date : 2
+  OK   pins sans date, journal illisible : 0 présentes
+  code 0
+OK   sec_rejeu : code 0, clés sans date : 2
+OK   relevé redevenu celui de HEAD : oui
+## témoin de la tolérance exacte : SANS_DATE forcé à 1
+OK   copie modifiée : 1
+  clés publiques réécrites, pas encore commitées : 1
+  écrit : 5 clés, 27 pins
+  OK   relevé des dates de git : à jour
+  OK   fichiers à poser : 12
+  OK   aucune clé privée parmi eux : 0
+  OK   exportateur sur l'hôte, code : 0
+  OK   signatures refusées : 0 présentes
+  OK   signatures vérifiées : oui
+  KO   clés sans date : 2 (attendu : 1)
+  OK   pins sans date, journal illisible : 0 présentes
+  code 1
+OK   sec_rejeu, tolérance trop basse : code 1, clés sans date : 2 (attendu : 1)
+## 4. clé de Chains étrangère
+  clés publiques réécrites, pas encore commitées : 1
+  écrit : 5 clés, 0 pins
+  OK   relevé des dates de git : à jour
+  OK   fichiers à poser : 12
+  OK   aucune clé privée parmi eux : 0
+  OK   exportateur sur l'hôte, code : 0
+  KO   signatures refusées : 28 présentes (attendu : 0 présentes)
+  OK   signatures vérifiées : oui
+  OK   clés sans date : 1
+  KO   pins sans date, journal illisible : 0 absentes (attendu : 0 présentes)
+  code 1
+OK   sec_rejeu, clé étrangère : code 1, signatures refusées 1 KO
+## 5. pose_rejeu sans REJEU
+  code 1
+OK   pose_rejeu refusée, ssh ou scp appelés : refusée, non
+## bilan : 11 cas, 0 écart(s)

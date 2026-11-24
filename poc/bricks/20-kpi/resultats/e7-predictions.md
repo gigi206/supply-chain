@@ -13,3 +13,7 @@ Script [`essai-rejeu.sh`](../essai-rejeu.sh), journal `e7-essai-rejeu.log`. `kpi
 Témoin de la tolérance exacte : au cas 3, `sec_rejeu` refait avec `SANS_DATE` forcé à 1 par une copie modifiée du script doit rendre KO, code 1 (2 au lieu de 1). Bilan attendu : **11 contrôles, 0 écart**.
 
 Non mesurable à sec : l'étape dans `rejeu.sh` (`bash -n` seulement), la pose sur une VM recréée, un Loki sans ligne de `entrees-scan`, la première création du compte dans un Grafana neuf.
+
+## Résultat (note de 2026-11-24T22:01:36Z)
+
+[Journal](e7-essai-rejeu.log), 21:59:41 UTC, dépôt `a1c4822c` : **11 cas, 0 écart**. Au cas 4, 28 signatures refusées et, en plus de ce qui était prédit, les séries de pins absentes (sans provenance vérifiée, `releve-dates.py` n'écrit aucun pin) : un second KO, attendu dans son principe mais pas écrit. Au cas 2, l'exportateur a tourné avec un relevé réécrit identique.
