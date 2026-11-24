@@ -148,3 +148,9 @@ Reprise du chantier : 2026-11-24T13:49:12Z. Déroulé de la pièce 8 de la 07b :
 **En attente du propriétaire** : validation du contenu du brouillon (et auteur à inscrire), puis accord nommé de signature pour ce document seul. Rien n'est signé.
 
 **Heures** : reprise 13:49:12 à 13:51:25 UTC (2 min 13 s) ; **total de la 07c : 0 h 28 min 4 s** pour 10 h estimées.
+
+## Étape 6 : validation et préalables de la signature (note de 2026-11-24T13:59:35Z)
+
+**Validation du propriétaire**, verbatim : « Oui, je valide » (contenu du brouillon `f99026eb22eba7d0` et auteur proposé). Seul champ écrit : `author` = « Ghislain LE MEUR » ; document sha256 `4297ba587b615261`.
+
+**(d) préalables, prédiction** (`mise exec -- bash 07a-sbom-grype/piece8-signer.sh prealables vex/sample-app-f5e6bcb0.json 4297ba587b615261`, lecture seule, journal `07a-sbom-grype/resultats/piece8-signer-prealables-sample-app-f5e6bcb0.log`) : image déduite du document `builds/sample-app@f5e6bcb0…` ; document à l'empreinte attendue, horodatages vides ; `bao` vérifié ; mots de passe présents (`test -s`) ; `poc-vex` authentifié (200) ; juge `7dde1a8e…` ; redirection ouverte puis fermée ; copie horodatée acceptée (exemption de 5 énoncés, 5 échéances) ; aucun VEX publié sur `f5e6bcb0` (celui de `3a7ca1b1` est sur un autre digest) ; **10 cas, 0 écart**. Ensuite seulement : accord nommé de signature.
