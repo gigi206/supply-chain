@@ -368,3 +368,20 @@ Faite sur l'hôte, par lecture du code et des journaux. Seule lecture extérieur
 - Code lu, non lancé.
 
 **Heures** : de 15:13:31 à 15:22:58 UTC, poussée comprise : 9 min 27 s. **Total de la 07c : au plus 1 h 57 min 27 s** pour 10 h estimées.
+
+## Oubli de l'étape 4 : unités de sc-stockage restées sur `3a7ca1b1` (note de 2026-11-24T15:44:44Z)
+
+Relevé en préparant le tableau de bord de l'ADR 0004 (07b) :
+- dans Prometheus, lu par l'auditeur dans Grafana à 15:41:51 UTC, `scan_entrees{depot="builds/scan/sample-app"}` vaut 4 Medium et 2 Unknown, et `scan_entrees_vex` 5. L'horodatage du scan compté est 2026-11-24T09:31:58Z : ce sont les chiffres de `3a7ca1b1`, pas ceux de `f5e6bcb0` (5 entrées, 5 écartées) ;
+- sur sc-stockage, en lecture seule à 15:42:24 UTC, `systemctl show -p Environment` donne `SCANS=builds/scan/sample-app@sha256:3a7ca1b1… builds/scan/sample-app-deb@sha256:60f25f5c…`, pour `fraicheur-scan` (drop-in `s6a-deb.conf` de la 06) comme pour `entrees-scan` (unité rendue par `entrees-scan.sh pose` depuis ce même SCANS).
+
+**Cause** : l'étape 4 a basculé les CronJobs du cluster, et `s6a.sh` a été porté à `f5e6bcb0` pour le rejeu de zéro (commit `e61a4da6`). Les unités déjà posées sur la VM n'ont pas été rebasculées.
+
+**Effets** :
+- Grafana montre l'ancienne image ;
+- la fraîcheur du scan de `f5e6bcb0` n'est pas surveillée ;
+- l'alerte de fraîcheur sonnera à tort sur `3a7ca1b1`, qui n'est plus scannée (date à mesurer).
+
+**Suite** : balayage de l'état en service à la recherche d'autres restes de `3a7ca1b1`, en lecture seule. Ensuite, une bascule étroite préparée à sec, à poser sur accord : drop-in de `fraicheur-scan`, puis `entrees-scan.sh pose` et `verif`.
+
+**Heures de la 07c** : plus 15:41:51 à 15:44:44 UTC ; total donné à la note suivante.

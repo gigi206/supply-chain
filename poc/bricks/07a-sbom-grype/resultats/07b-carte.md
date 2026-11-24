@@ -2518,3 +2518,17 @@ R4 de la 10 (07c) ne peut pas partir avant le 2026-11-25T13:27:42Z (seuil de la 
 - Fiche des besoins complétée par une note datée (chiffres actuels, option 2b mesurée).
 
 **Heures de la 07b** : plus 15:31:00 à 15:33:47 UTC (0 h 02 min 47 s ; reprise de la 07b, la 07c attend R4) ; **total : au plus 15 h 45 min 36 s** pour 10 h estimées ; seuil de 20 h non atteint.
+
+## ADR 0004 : réponses du propriétaire (note de 2026-11-24T15:44:44Z)
+
+Question posée en une fois (quatre questions, options avec leur prix ; recommandations relues par le conseiller). Réponses verbatim :
+1. Dependency-Track : « Reporter en fin (Recommandé) » ;
+2. part « vulnérabilités après VEX » du score : « Des comptes, pas de score (Recommandé) » ;
+3. KPI de couverture VEX : « 3a couverture entrées (Recommandé) », « 3b couverture KEV (Recommandé) » ;
+4. tableau de bord Grafana : « Oui, un tableau (Recommandé) ».
+
+Écrit dans l'[ADR 0004](../../../../docs/adr/0004-vulnerabilites-vex.md) (additif du 24/11), dans l'index des ADR et dans `docs/03`. Le statut reste « À rédiger » jusqu'au tableau posé.
+
+**Constat en préparant le tableau** (lecture par l'auditeur dans Grafana à 15:41:51 UTC, puis lecture seule sur sc-stockage à 15:42:24 UTC) : les séries de sample-app comptent l'image `3a7ca1b1` (6 entrées : 4 Medium, 2 Unknown ; 5 écartées ; scan de 09:31:58 UTC), parce que `fraicheur-scan` et `entrees-scan` visent toujours `builds/scan/sample-app@sha256:3a7ca1b1…`. Oubli de l'étape 4 de la 07c, compté et traité dans la 07c.
+
+**Heures de la 07b** : plus 15:33:47 à 15:41:51 UTC (0 h 08 min 04 s) ; **total : au plus 15 h 53 min 40 s** pour 10 h estimées ; seuil de 20 h non atteint.
