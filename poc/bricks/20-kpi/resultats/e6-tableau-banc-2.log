@@ -1,0 +1,32 @@
+# banc du tableau « KPI supply-chain », Grafana 13.3.0, 2026-11-24T21:53:35Z, 090e27b7
+fournisseur bb875819b0200a17…, tableau 0316fdd2f37f9c0e…
+OK   sha256 de l'archive de Grafana : cec8f98cc59bc1a1945833b652371a073be678c5c159a9b1695ad63c04fae5a7
+OK   Grafana démarré (santé) : 200
+version : 13.3.0
+OK   avant le dépôt : tableau absent : 404
+OK   seule ligne réécrite dans le fournisseur : 1
+OK   premier rechargement : « Vulnérabilités et VEX » seul, comme en service : 200
+OK   « Vulnérabilités et VEX » servi : 200
+OK   KPI toujours absent : 404
+OK   rechargement du provisionnement (administrateur) : 200
+  réponse : {"message":"Dashboards config reloaded"}
+OK   tableau servi après rechargement : 200
+OK   titre : KPI supply-chain
+OK   panneaux : 18
+OK   dossier : PoC
+OK   marqué provisionné : true
+OK   panneaux identiques au fichier : b679e16a01a0b41a
+OK   enregistrement par l'administrateur refusé : 400
+  message : Cannot save provisioned dashboard
+OK   suppression par l'administrateur refusée : 400
+  message : provisioned dashboard cannot be deleted
+OK   compte lecteur créé (Viewer par défaut) : 200
+OK   le lecteur lit le tableau : 200
+OK   rôle du lecteur : 200Viewer
+OK   enregistrement par le lecteur refusé : 403
+OK   titre inchangé après les refus : 200KPI supply-chain
+OK   « Vulnérabilités et VEX » inchangé (contenu, URL) : oui
+OK   les deux tableaux dans le dossier PoC : kpi-supply-chain vulnerabilites-vex
+lignes d'erreur du journal de Grafana sur le provisionnement : 0
+## bilan : 22 cas, 0 écart(s)
+fin : 2026-11-24T21:53:45Z

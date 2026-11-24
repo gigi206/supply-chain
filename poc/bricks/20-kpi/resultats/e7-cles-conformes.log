@@ -1,0 +1,20 @@
+début : 2026-11-24T21:53:47Z, étape sec, dépôt 090e27b7
+OK   clés publiques de l'arbre identiques à HEAD : oui
+OK   relevé des dates de git : à jour
+OK   fichiers à poser : 12
+OK   aucune clé privée parmi eux : 0
+b446c5ffe7b65d3f  ./cles/chains.pub
+09708ff49e5e4d6d  ./cles/scanner.pub
+29fa7cc76f71b782  ./cles/tsa.pem
+4975c03dd2ad43f3  ./cles/vecteur.pub
+d40d41a0283330be  ./cles/vex.pub
+b3e9f64b7d5ea4b1  ./cles/vsa.pub
+282d33fb392c6663  ./dates-git.tsv
+580b53a6bff5fd50  ./kpi-journal.service
+af0ba596bd61c771  ./kpi.service
+803167cc1669b51d  ./kpi.timer
+2a37871827f96592  ./lecteur_loki.py
+98f917abe061b8b1  ./metrics_exporter.py
+mot de passe de kpi-journal : présent
+fin : 2026-11-24T21:53:54Z, bilan : tenu
+code : 0
