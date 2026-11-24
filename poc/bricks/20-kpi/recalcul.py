@@ -30,12 +30,15 @@ from kpi import comptes_scan, delais_kev, rapport  # noqa: E402
 BRIQUES = os.path.dirname(ICI)
 DEPOT = os.path.dirname(os.path.dirname(BRIQUES))
 CACHE = os.path.expanduser("~/.cache/supply-chain-poc")
-CA = f"{CACHE}/08/pki/ca-poc.crt"
-REG = "192.168.161.13:5000"
+# Banc de l'étape 3 (banc.sh) : BANC=1 et les variables ci-dessous ; sans elles, les valeurs de la plateforme, inchangées. Au banc, ce que
+# le banc n'exerce pas (TSA, Prometheus, dates git) est annoncé par une ligne « HORS BANC », jamais sauté en silence.
+BANC = os.environ.get("BANC") == "1"
+CA = os.environ.get("CA", f"{CACHE}/08/pki/ca-poc.crt") if BANC else f"{CACHE}/08/pki/ca-poc.crt"
+REG = os.environ["REG"] if BANC else "192.168.161.13:5000"
 GRAFANA = "https://192.168.161.13:3001"
 TRAVAIL = f"{CACHE}/20/recalcul"
 URL_TSA = "http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp"
-PRODUITS = ("sample-app", "sample-app-deb", "sample-app-rpm")
+PRODUITS = tuple(os.environ["PRODUITS"].split()) if BANC else ("sample-app", "sample-app-deb", "sample-app-rpm")
 BUILDER = "https://supply-chain.example/builders/tekton-chains@v1"
 BUILDTYPE = "https://tekton.dev/chains/v2/slsa-tekton"
 VERIFIEUR = "https://supply-chain.example/verifiers/replay-poc-administrateur-unique@v1"
@@ -46,6 +49,11 @@ CLES = {  # clés publiques versionnées ; « chaine » : certificat, exercé pa
     "vex": "07a-sbom-grype/resultats/vex-cle-publique.pem", "vsa": "10-independent-replay/resultats/vsa-cle-publique.pem",
     "tsa": "08-trust-plane/resultats/tsa-chaine.pem"}
 TEMOIN = "07a-sbom-grype/resultats/g6-temoin-cle-publique.pem"
+if BANC:  # clés publiques jetables du banc : chemins absolus, donc os.path.join ignore BRIQUES
+    CLES = {k: f"{os.environ['CLES_BANC']}/{k}.pub" for k in ("chains", "scanner", "vex", "vsa")}
+    TEMOIN = f"{os.environ['CLES_BANC']}/temoin.pub"
+NON_VERIFIEES = int(os.environ["NON_VERIFIEES"]) if BANC else 0   # attestations à signature fausse posées par le banc
+N_SUJETS = int(os.environ["N_SUJETS"]) if BANC else 4
 FAMILLES = (("scan", T_SCAN, "scanner"), ("vsa", T_VSA, "vsa"), ("vex", T_VEX, "vex"))
 CTX = ssl.create_default_context(cafile=CA)
 ACC = ("application/vnd.oci.image.manifest.v1+json, application/vnd.oci.image.index.v1+json, "
@@ -87,7 +95,7 @@ def cosign(nom, digest, cle, typ, depot_att=None, plus=()):
     env = dict(os.environ)
     if depot_att:
         env["COSIGN_REPOSITORY"] = f"{REG}/{depot_att}"
-    r = subprocess.run(["cosign", "verify-attestation", "--key", f"{BRIQUES}/{cle}", "--type", typ, "--insecure-ignore-tlog=true",
+    r = subprocess.run(["cosign", "verify-attestation", "--key", os.path.join(BRIQUES, cle), "--type", typ, "--insecure-ignore-tlog=true",
                         "--registry-cacert", CA, *plus, f"{REG}/builds/{nom}@{digest}"],
                        capture_output=True, text=True, env=env, timeout=120, stdin=subprocess.DEVNULL)
     if r.returncode and not re.search(r"no matching attestations|no valid bundles|invalid signature", r.stderr):
@@ -158,7 +166,12 @@ def prom(expr, t):
 
 
 def loki(expr, debut, fin):
-    """Lignes brutes [(ns, ligne)]. 5000 lignes au plus : atteint, le résultat serait tronqué, donc arrêt."""
+    """Lignes brutes [(ns, ligne)]. 5000 lignes au plus : atteint, le résultat serait tronqué, donc arrêt.
+    Au banc : lignes de entrees-scan.py dans un fichier (LOKI_BANC), filtrées par les mêmes motifs ; Alloy, Loki et Grafana non exercés."""
+    if BANC:
+        motifs = [m.replace('\\"', '"') for m in re.findall(r'\|= "((?:[^"\\]|\\.)*)"', expr)]
+        with open(os.environ["LOKI_BANC"], encoding="utf-8") as f:
+            return [(i, x.rstrip("\n")) for i, x in enumerate(f) if all(m in x for m in motifs)]
     lignes = []
     for f in grafana("loki", expr, {"from": f"{debut}000", "to": f"{fin}000", "q": {"queryType": "range", "maxLines": 5000,
                                                                               "direction": "forward"}}):
@@ -180,9 +193,11 @@ def main():
     catalogue = set(zot("_catalog")["repositories"])
     os.makedirs(TRAVAIL, exist_ok=True)
     racine = f"{TRAVAIL}/tsa-racine.json"
-    r = subprocess.run(["cosign", "trusted-root", "create", f"--tsa=url={URL_TSA},certificate-chain={BRIQUES}/{CLES['tsa']}",
+    if BANC:
+        print("HORS BANC|horodatage (TSA) ; dates des clés et des pins (git) ; Prometheus et Grafana")
+    r = None if BANC else subprocess.run(["cosign", "trusted-root", "create", f"--tsa=url={URL_TSA},certificate-chain={BRIQUES}/{CLES['tsa']}",
                         "--out", racine], capture_output=True, text=True)
-    if r.returncode:
+    if r is not None and r.returncode:
         arret("racine de confiance du TSA")
 
     print("## 1. sujets : listé, vérifié, vérifié par la clé étrangère (témoin, attendu 0)")
@@ -211,14 +226,14 @@ def main():
                 t = len(cosign(nom, digest, TEMOIN, typ, d)) if n else 0
                 compte[f] = (n, len(s[f]), t)
             # horodatage : bundles réémis dans horodatage/bundles, vérifiés avec horodatage exigé ; couverture par signature
-            nb = len(zot(f"horodatage/bundles/referrers/{digest}").get("manifests") or [])
+            nb = 0 if BANC else len(zot(f"horodatage/bundles/referrers/{digest}").get("manifests") or [])
             h_tsa = cosign(nom, digest, CLES["chains"], T_PROV, "horodatage/bundles",
                            ("--use-signed-timestamps", f"--trusted-root={racine}")) if nb else []
             couvertes = len({x for _, x in s["prov"]} & {x for _, x in h_tsa})
             # signature d'image (.sig, simplesigning) : liste puis vérification, même clé
             sig = 0
             if f"sha256-{h}.sig" in tags:
-                r = subprocess.run(["cosign", "verify", "--key", f"{BRIQUES}/{CLES['chains']}", "--insecure-ignore-tlog=true",
+                r = subprocess.run(["cosign", "verify", "--key", os.path.join(BRIQUES, CLES["chains"]), "--insecure-ignore-tlog=true",
                                     "--registry-cacert", CA, f"{REG}/builds/{nom}@{digest}"], capture_output=True, text=True, timeout=120)
                 if r.returncode and not re.search(r"no matching signatures|invalid signature", r.stderr):
                     arret(f"cosign verify {nom} : code {r.returncode}, motif non reconnu")
@@ -232,7 +247,7 @@ def main():
                 total["temoin"] += c
             print(f"DETAIL|{s['depot']}|{h[:12]}|sig {sig}|" + "|".join(f"{k} {a}/{b}/{c}" for k, (a, b, c) in compte.items())
                   + f"|tsa {nb} listés, {len(h_tsa)} vérifiés, {couvertes}/{len(s['prov'])} provenances couvertes")
-    attendu("attestations listées = vérifiées (toutes les clés en service)", total["verifie"], total["liste"])
+    attendu("attestations listées = vérifiées (toutes les clés en service)", total["verifie"], total["liste"] - NON_VERIFIEES)
     attendu("témoin : attestations vérifiées par la clé étrangère", total["temoin"], 0)
 
     print("## 2. KPI par sujet")
@@ -276,7 +291,7 @@ def main():
     kpi("taux_l3_verifie", "-", "-", rapport(sum(s["l3_vsa"] for s in sujets), n))
     kpi("taux_replay_identique", "-", "-", rapport(sum(s["replay"] for s in sujets), n))
     kpi("violations_licences", "-", "-", "source absente")
-    for k in sorted(CLES):
+    for k in () if BANC else sorted(CLES):
         kpi(f"cle_date:{k}", "-", "-", git("log", "-1", "--format=%ct", "--", f"poc/bricks/{CLES[k]}").strip())
     # délai des KEV : Loki, 720 h, par dépôt (les lignes n'ont pas de digest) ; les scans viennent des résumés « liste émise », qui
     # existent même sans entrée, et les KEV des lignes d'entrées. Jointure des scans avec Zot par scannedAt : contrôle seulement.
@@ -310,7 +325,10 @@ def main():
     print("## 4. comparaisons")
     attendu("Loki : scans dont le nombre d'entrées (couples id et paquet) diffère de leur résumé", ecarts, 0)
     attendu("Loki : lignes d'entrées lues (le zéro KEV n'est pas à vide)", len(toutes) > 0, True)
-    attendu("sujets produits", n, 4)
+    attendu("sujets produits", n, N_SUJETS)
+    if BANC:
+        print(f"## bilan : {cas['n']} cas, {cas['ko']} écart(s)")
+        return 1 if cas["ko"] else 0
     attendu("clé du TSA exercée : toutes les provenances couvertes par un bundle horodaté",
             [s["digest"][7:15] for s in sujets if s["tsa"][2] != len(s["prov"])], [])
     # Prometheus (exportateur entrees-scan, en service) contre le recalcul signé, par dépôt ; le digest est retrouvé par la date
