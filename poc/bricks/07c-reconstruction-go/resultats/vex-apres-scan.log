@@ -1,0 +1,20 @@
+# effet du VEX chi sur le scan de sample-app f5e6bcb0, 2026-11-24T14:10:26Z, c3420a5c
+job scan-sample-app-07c-vex-141026 : code 0
+attente : code 0
+Job : début 2026-11-24T14:10:26Z, fin 2026-11-24T14:12:37Z, réussi 1
+  VEX|1 énoncé(s) vérifié(s), 1 retenu(s), 0 rejeté(s)|sc-stockage.poc.test:5000/builds/vex/sample-app|cosign code 0
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7, 5 vulnérabilités, 0 KEV, 5 écartée(s) par un VEX, 2 s
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:4b7f5a0ce5e592ef520409695feff236dff8286029ea5a241381b1436927c02f, referrer de sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
+OK   Job réussi : 1
+OK   VEX| : 1 document vérifié, retenu : 1
+OK   SCAN| : 5 vulnérabilités, 0 KEV, 5 écartées par un VEX : 1
+OK   PUBLIE| : scan publié : 1
+OK   ligne SCAN| du pod visible dans Grafana : 1
+  comptes : 5 entrée(s), 5 identifiant(s) ; KEV 0 ; avec correctif 5 ; écartées par un VEX 5 ; gravités : Medium 3, Unknown 2
+OK   tableau : écartées par un VEX : écartées par un VEX 5
+  GHSA-3fxj-6jh8-hvhx : not_affected (2026-11-24T14:09:55Z)
+  GHSA-j6qf-3m9c-vwj3 : not_affected (2026-11-24T14:09:55Z)
+  GHSA-mqqf-5wvp-8fh8 : not_affected (2026-11-24T14:09:55Z)
+  GO-2026-5775 : not_affected (2026-11-24T14:09:55Z)
+  GO-2026-5777 : not_affected (2026-11-24T14:09:55Z)
+## bilan : 6 cas, 0 écart(s)
