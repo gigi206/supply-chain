@@ -48,3 +48,7 @@ Corrections, sans changer ni le tableau ni les requêtes :
 - un mutant du tableau ne compte que si le test de base passe **et** si la seule requête en échec est la mutée.
 
 Attendu du troisième passage (`SUFFIXE=-3`) : 28 cas, 0 écart ; les 28 autres requêtes ont déjà été évaluées conformes au second (aucun autre échec affiché), donc seuls 11A et les mutants restent aveugles.
+
+## Résultat du troisième passage (note de 2026-11-24T21:47:59Z)
+
+[Journal](e6-promql-banc-3.log), 21:46:02 UTC, dépôt `07521785` : **28 cas, 0 écart** ; 117 cas de `promtool` passés, 14 mutants du tableau refusés sans qu'une autre requête échoue, 6 mutants de règles refusés. Le cas `NaN` (digest scanné sans entrée) est couvert par deux requêtes dérivées, pas par la requête telle quelle.
