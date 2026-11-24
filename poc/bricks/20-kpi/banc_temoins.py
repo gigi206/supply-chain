@@ -64,8 +64,9 @@ def sujet(nom):
                      artifactType="application/vnd.supply-chain.temoin")
 
 
-def chains(nom, s, refs, cle="chains", sig=True):
-    """Tags .att (une enveloppe par élément de refs : pipelineRef ou taskRef) et .sig, comme Chains."""
+def chains(nom, s, refs, cle="chains", sig=True, cle_sig=None, illisible=False):
+    """Tags .att (une enveloppe par élément de refs : pipelineRef ou taskRef) et .sig, comme Chains. illisible : une couche .att de plus,
+    à signature vide, et une annotation de signature d'image vide."""
     d, h = f"builds/{nom}", s["digest"][7:]
     couches = []
     for i, ref in enumerate(refs):
@@ -77,17 +78,22 @@ def chains(nom, s, refs, cle="chains", sig=True):
                                           "metadata": {"invocationId": f"banc-{i}", "finishedOn": "2026-11-19T00:00:00Z"}}}}
         couches.append({**blob(d, dsse(cle, e), "application/vnd.dsse.envelope.v1+json"),
                         "annotations": {"dev.cosignproject.cosign/signature": ""}})
+    if illisible:
+        d_vide = json.loads(dsse(cle, e))
+        d_vide["signatures"][0]["sig"] = ""
+        couches.append({**blob(d, json.dumps(d_vide).encode(), "application/vnd.dsse.envelope.v1+json"),
+                        "annotations": {"dev.cosignproject.cosign/signature": ""}})
     cfg = "application/vnd.oci.image.config.v1+json"
     manifeste(d, couches, f"sha256-{h}.att", b'{"architecture":"","os":"","rootfs":{"type":"layers","diff_ids":[]}}', cfg)
     if sig:
         p = json.dumps({"critical": {"identity": {"docker-reference": f"{REG}/{d}"}, "image": {"docker-manifest-digest": s["digest"]},
                                      "type": "cosign container image signature"}, "optional": None}).encode()
         c = {**blob(d, p, "application/vnd.dev.cosign.simplesigning.v1+json"), "annotations": {
-            "dev.cosignproject.cosign/signature": signer(cle, p)}}
+            "dev.cosignproject.cosign/signature": "" if illisible else signer(cle_sig or cle, p)}}
         manifeste(d, [c], f"sha256-{h}.sig", b'{"architecture":"","os":"","rootfs":{"type":"layers","diff_ids":[]}}', cfg)
 
 
-def referent(famille, nom, s, typ, predicat, cle, cree="2026-11-20T00:00:00Z"):
+def referent(famille, nom, s, typ, predicat, cle, cree="2026-11-20T00:00:00Z", sig=None):
     w = f"{T}/tmp"
     with open(f"{w}/predicat.json", "w", encoding="utf-8") as f:
         json.dump(predicat, f)
@@ -96,6 +102,10 @@ def referent(famille, nom, s, typ, predicat, cle, cree="2026-11-20T00:00:00Z"):
                    env={**os.environ, "COSIGN_PASSWORD": ""}, check=True, capture_output=True, stdin=subprocess.DEVNULL)
     with open(f"{w}/bundle.json", "rb") as f:
         octets = f.read()
+    if sig is not None:  # signature remplacée : vide, pas du DER, pas du base64
+        b = json.loads(octets)
+        b["dsseEnvelope"]["signatures"][0]["sig"] = sig
+        octets = json.dumps(b).encode()
     d = f"builds/{famille}/{nom}"
     manifeste(d, [blob(d, octets, BUNDLE)], artifactType=BUNDLE, subject=s, annotations={
         "dev.sigstore.bundle.content": "dsse-envelope", "dev.sigstore.bundle.predicateType": typ, "org.opencontainers.image.created": cree})
@@ -107,20 +117,20 @@ def entree(ident, vex=False, kev=False):
     return {**e, "vex": {"status": "not_affected", "timestamp": "2026-11-02T00:00:00Z"}} if vex else e
 
 
-def scan(nom, s, date, entrees, cle="scanner"):
-    referent("scan", nom, s, SCAN, {"scannedAt": date, "vulnerabilities": entrees}, cle, date)
+def scan(nom, s, date, entrees, cle="scanner", sig=None):
+    referent("scan", nom, s, SCAN, {"scannedAt": date, "vulnerabilities": entrees}, cle, date, sig)
 
 
-def vsa(nom, s, resultat, niveaux, cle="vsa"):
+def vsa(nom, s, resultat, niveaux, cle="vsa", sig=None):
     referent("vsa", nom, s, VSA, {"verifier": {"id": "https://supply-chain.example/verifiers/replay-poc-administrateur-unique@v1"},
                                   "timeVerified": "2026-11-20T00:00:00Z", "resourceUri": f"{REG}/builds/{nom}", "slsaVersion": "1.0",
                                   "policy": {"uri": "https://supply-chain.example/banc"}, "inputAttestations": [],
-                                  "verificationResult": resultat, "verifiedLevels": niveaux}, cle)
+                                  "verificationResult": resultat, "verifiedLevels": niveaux}, cle, sig=sig)
 
 
-def vex(nom, s, cle="vex"):
+def vex(nom, s, cle="vex", sig=None):
     referent("vex", nom, s, VEX, {"@context": VEX, "@id": "https://supply-chain.example/vex/banc", "author": "banc de la brique 20",
-                                  "timestamp": "2026-11-02T00:00:00Z", "version": 1, "statements": []}, cle)
+                                  "timestamp": "2026-11-02T00:00:00Z", "version": 1, "statements": []}, cle, sig=sig)
 
 
 def poser():
@@ -140,6 +150,15 @@ def poser():
     s = sujet("banc-prov-seule"); chains("banc-prov-seule", s, [PR])
     s = sujet("banc-prov-tache"); chains("banc-prov-tache", s, [TR])
     s = sujet("banc-sans-sig"); chains("banc-sans-sig", s, [PR], sig=False)
+    # essai openssl (e3b) : clé d'un autre rôle, signature d'image forgée, signatures illisibles
+    s = sujet("banc-mauvais-role"); chains("banc-mauvais-role", s, [PR]); scan("banc-mauvais-role", s, J, [entree("CVE-F", kev=True)], "vsa")
+    vsa("banc-mauvais-role", s, "PASSED", [BIT, L3], "scanner"); vex("banc-mauvais-role", s, "scanner")
+    s = sujet("banc-role-prov"); chains("banc-role-prov", s, [PR], "vex")
+    s = sujet("banc-sig-forgee"); chains("banc-sig-forgee", s, [PR], cle_sig="etrangere")
+    s = sujet("banc-illisible"); chains("banc-illisible", s, [PR]); scan("banc-illisible", s, J, [entree("CVE-G", kev=True)])
+    scan("banc-illisible", s, "2026-11-21T00:00:00Z", [], sig="")
+    vsa("banc-illisible", s, "PASSED", [BIT, L3], sig=base64.b64encode(b"pas une signature").decode()); vex("banc-illisible", s, sig="!!!")
+    s = sujet("banc-att-illisible"); chains("banc-att-illisible", s, [PR], illisible=True)
     s = sujet("banc-kev"); chains("banc-kev", s, [PR])
     print(f"SCANS=builds/scan/banc-kev@{s['digest']}")
 

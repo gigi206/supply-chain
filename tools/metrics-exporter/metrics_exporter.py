@@ -2,8 +2,14 @@
 """Brique 20 : exportateur des KPI supply-chain (docs/02 §7, « tools/metrics-exporter dérive les métriques des attestations »).
 Bibliothèque standard seulement, lectures anonymes de Zot par HTTPS, même motif que entrees-scan.py (07b). Ni git, ni cosign : les dates
 des pins et des clés ne viennent pas d'ici (relevé versionné, étape 4).
-  LES SIGNATURES NE SONT PAS VÉRIFIÉES : les énoncés sont comptés, pas prouvés. Choix du propriétaire à poser (étape 4) ; le banc de
-  l'étape 3 mesure ce que cela change. Le recalcul signé (poc/bricks/20-kpi/recalcul.py) reste la référence.
+  SIGNATURES, obligatoire et sans défaut (choix du propriétaire à poser, étape 4) :
+    - « comptees » : signatures NON vérifiées, les énoncés sont comptés, pas prouvés (comportement de l'étape 3) ;
+    - « verifiees » : /usr/bin/openssl dgst -verify (ECDSA P-256) sur le PAE de l'enveloppe DSSE et, pour la signature d'image, sur les
+      octets de la couche ; une clé par famille (CLES/chains.pub, scanner.pub, vsa.pub, vex.pub), jamais « l'une des quatre ». Une
+      signature fausse, absente ou illisible est comptée (kpi_signatures_refusees) et son énoncé ignoré ; une clé absente, illisible ou
+      qui n'est pas P-256, ou openssl absent, arrête tout : openssl rend le même code 1 pour une mauvaise clé et une mauvaise signature.
+  Le recalcul signé par cosign (poc/bricks/20-kpi/recalcul.py) reste la référence. Horodatage (TSA) non vérifié ; les lignes du JOURNAL
+  (délais des KEV) viennent de entrees-scan, qui ne vérifie pas les signatures : « verifiees » ne les couvre pas.
 Écrit sans kpi.py, pour que la comparaison avec le recalcul ne compare pas un code à lui-même. Mêmes règles :
   - sujets : PRODUITS, tous les digests vus par un tag ;
   - provenance : couches du .att (builder.id et buildType de Chains, pipelineRef), plus une signature d'image (.sig) qui nomme le digest ;
@@ -13,7 +19,8 @@ des pins et des clés ne viennent pas d'ici (relevé versionné, étape 4).
     séries absentes.
 Un énoncé illisible, ou qui ne nomme pas son sujet ou son type, est compté (kpi_enonces_refuses) et ignoré. Une erreur HTTP, un JSON
 de Zot illisible ou une empreinte fausse arrêtent tout, code d'erreur, fichier inchangé.
-Variables : REG, CA, PRODUITS (noms séparés par des espaces), SORTIE (fichier .prom, existant), JOURNAL (facultatif)."""
+Variables : REG, CA, PRODUITS (noms séparés par des espaces), SORTIE (fichier .prom, existant), SIGNATURES, CLES (dossier, si
+verifiees), JOURNAL (facultatif)."""
 import base64
 import binascii
 import datetime
@@ -22,6 +29,7 @@ import json
 import os
 import re
 import ssl
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -32,6 +40,10 @@ VERIFIEUR = "https://supply-chain.example/verifiers/replay-poc-administrateur-un
 PROVENANCE = "https://slsa.dev/provenance/v1"
 FAMILLES = {"scan": "https://supply-chain.example/scan/v1", "vsa": "https://slsa.dev/verification_summary/v1",
             "vex": "https://openvex.dev/ns/v0.2.0"}
+CLE_DE = {"prov": "chains", "sig": "chains", "scan": "scanner", "vsa": "vsa", "vex": "vex"}
+OPENSSL = "/usr/bin/openssl"
+DER_MAX = 72  # plus longue signature ECDSA P-256 en DER ; openssl ne lirait pas au-delà
+ANNOTATION = "dev.cosignproject.cosign/signature"
 INTOTO = "application/vnd.in-toto+json"
 ACC = "application/vnd.oci.image.manifest.v1+json, application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.v2+json"
 TAG = re.compile(r"sha256-([0-9a-f]{64})\.[a-z]+")
@@ -59,17 +71,73 @@ def blob(depot, digest):
     return octets
 
 
-def enonce(octets, typ, digest):
-    """Énoncé in-toto d'une enveloppe DSSE ou d'un bundle sigstore, s'il a ce type et nomme ce sujet ; None sinon."""
+def openssl(args, entree=b"", fds=()):
+    r = subprocess.run([OPENSSL, *args], input=entree, capture_output=True, timeout=20, env={"LC_ALL": "C"}, pass_fds=fds)
+    if r.returncode not in (0, 1):  # signal, ou code jamais vu : ni vérifié ni refusé
+        raise Refus(f"openssl {args[0]} : code {r.returncode}")
+    return r
+
+
+def controler_cles():
+    """Vrai si les signatures doivent être vérifiées ; clés contrôlées une fois, avant toute lecture de Zot."""
+    mode = os.environ.get("SIGNATURES")
+    if mode not in ("comptees", "verifiees"):
+        raise Refus("SIGNATURES : comptees ou verifiees")
+    if mode == "verifiees":
+        for nom in sorted(set(CLE_DE.values())):
+            r = openssl(["pkey", "-pubin", "-in", f"{os.environ['CLES']}/{nom}.pub", "-noout", "-text"])
+            if r.returncode or b"NIST CURVE: P-256" not in r.stdout:
+                raise Refus(f"clé {nom}.pub absente, illisible ou pas P-256")
+    return mode == "verifiees"
+
+
+def signature_bonne(famille, message, sig):
+    """Signature ECDSA en base64 du message, par la clé de cette famille."""
+    try:
+        der = base64.b64decode(sig, validate=True)
+    except (ValueError, TypeError, binascii.Error):
+        return False
+    if not 0 < len(der) <= DER_MAX:
+        return False
+    lu, ecrit = os.pipe()  # pas de fichier : l'unité n'a rien à écrire ; 72 octets tiennent dans le tube
+    try:
+        os.write(ecrit, der)
+        os.close(ecrit)
+        return openssl(["dgst", "-sha256", "-verify", f"{os.environ['CLES']}/{CLE_DE[famille]}.pub", "-signature", f"/proc/self/fd/{lu}"],
+                       message, (lu,)).returncode == 0
+    finally:
+        os.close(lu)
+
+
+def enonce(octets, famille, typ, digest, comptes):
+    """Énoncé in-toto d'une enveloppe DSSE ou d'un bundle sigstore, s'il a ce type, nomme ce sujet et, si les signatures sont vérifiées,
+    porte une seule signature, bonne ; None sinon. La signature est vérifiée avant que l'énoncé soit lu, sur les octets de la charge."""
     try:
         d = json.loads(octets)
         d = d.get("dsseEnvelope", d)
-        e = json.loads(base64.b64decode(d["payload"], validate=True))
-        bon = (d["payloadType"] == INTOTO and e["predicateType"] == typ and isinstance(e["predicate"], dict)
+        charge, typ_charge = base64.b64decode(d["payload"], validate=True), d["payloadType"]
+        if typ_charge != INTOTO:
+            raise ValueError
+        if comptes["verifier"]:
+            t = typ_charge.encode()
+            try:
+                une, = d["signatures"]
+                bonne = signature_bonne(famille, b"DSSEv1 %d %s %d %s" % (len(t), t, len(charge), charge), une["sig"])
+            except (ValueError, KeyError, TypeError):
+                bonne = False
+            if not bonne:
+                comptes["refusees"][famille] += 1
+                return None
+        e = json.loads(charge)
+        bon = (e["predicateType"] == typ and isinstance(e["predicate"], dict)
                and any(s["digest"].get("sha256") == digest[7:] for s in e["subject"]))
     except (ValueError, KeyError, TypeError, AttributeError, binascii.Error):
+        bon = False
+    if not bon:
+        comptes["forme"] += 1
         return None
-    return e if bon else None
+    comptes["verifiees"][famille] += 1
+    return e
 
 
 def epoque(date):
@@ -88,35 +156,39 @@ def digests(depot, tags):
     return sorted(vus)
 
 
-def provenances(depot, digest, tags):
-    """(énoncés de provenance, énoncés refusés, signature d'image présente)."""
-    h, bons, refus, signee = digest[7:], [], 0, False
+def provenances(depot, digest, tags, comptes):
+    """(énoncés de provenance, signature d'image présente)."""
+    h, bons, signee = digest[7:], [], False
     if f"sha256-{h}.att" in tags:
         for c in lire(f"{depot}/manifests/sha256-{h}.att")["layers"]:
-            e = enonce(blob(depot, c["digest"]), PROVENANCE, digest)
-            refus += e is None
+            e = enonce(blob(depot, c["digest"]), "prov", PROVENANCE, digest, comptes)
             bons += [e] if e else []
     if f"sha256-{h}.sig" in tags:
         for c in lire(f"{depot}/manifests/sha256-{h}.sig")["layers"]:
+            octets = blob(depot, c["digest"])
+            if comptes["verifier"] and not signature_bonne("sig", octets, (c.get("annotations") or {}).get(ANNOTATION)):
+                comptes["refusees"]["sig"] += 1
+                continue
             try:
-                critique = json.loads(blob(depot, c["digest"]))["critical"]
-                signee = signee or (critique["type"] == "cosign container image signature"
-                                    and critique["image"]["docker-manifest-digest"] == digest)
+                critique = json.loads(octets)["critical"]
+                bonne = (critique["type"] == "cosign container image signature" and critique["image"]["docker-manifest-digest"] == digest)
             except (ValueError, KeyError, TypeError):
-                refus += 1
-    return bons, refus, signee
+                comptes["forme"] += 1
+                continue
+            comptes["verifiees"]["sig"] += bonne
+            signee = signee or bonne
+    return bons, signee
 
 
-def referents(famille, nom, digest, catalogue):
-    depot, bons, refus = f"builds/{famille}/{nom}", [], 0
+def referents(famille, nom, digest, catalogue, comptes):
+    depot, bons = f"builds/{famille}/{nom}", []
     if depot not in catalogue:
-        return bons, refus
+        return bons
     for m in lire(f"{depot}/referrers/{digest}").get("manifests") or []:
         couches = lire(f"{depot}/manifests/{m['digest']}").get("layers") or []
-        e = enonce(blob(depot, couches[0]["digest"]), FAMILLES[famille], digest) if couches else None
-        refus += e is None
+        e = enonce(blob(depot, couches[0]["digest"]) if couches else b"", famille, FAMILLES[famille], digest, comptes)
         bons += [e] if e else []
-    return bons, refus
+    return bons
 
 
 def de_chains(e):
@@ -128,20 +200,18 @@ def de_chains(e):
         return False
 
 
-def sujet(nom, digest, tags, catalogue):
+def sujet(nom, digest, tags, catalogue, verifier):
     depot = f"builds/{nom}"
-    prov, refus, signee = provenances(depot, digest, tags)
-    trouve = {}
-    for f in FAMILLES:
-        trouve[f], r = referents(f, nom, digest, catalogue)
-        refus += r
+    comptes = {"verifier": verifier, "forme": 0, "verifiees": dict.fromkeys(CLE_DE, 0), "refusees": dict.fromkeys(CLE_DE, 0)}
+    prov, signee = provenances(depot, digest, tags, comptes)
+    trouve = {f: referents(f, nom, digest, catalogue, comptes) for f in FAMILLES}
     pr = sum(1 for e in prov if de_chains(e))
     niveaux = [v["predicate"].get("verifiedLevels") or [] for v in trouve["vsa"]
                if (v["predicate"].get("verifier") or {}).get("id") == VERIFIEUR and v["predicate"].get("verificationResult") == "PASSED"]
     valeurs = {"kpi_provenance_chains_verifiee": int(pr > 0 and signee), "kpi_provenances_pipelinerun": pr,
                "kpi_replay_identique": int(any("POC_REPLAY_BIT_IDENTIQUE" in n for n in niveaux)),
                "kpi_l3_verifie": int(any("SLSA_BUILD_LEVEL_3" in n for n in niveaux)),
-               "kpi_vex_verifies": len(trouve["vex"]), "kpi_enonces_refuses": refus}
+               "kpi_vex_verifies": len(trouve["vex"]), "kpi_enonces_refuses": comptes["forme"]}
     if trouve["scan"]:
         p = max((e["predicate"] for e in trouve["scan"]), key=lambda p: p["scannedAt"])
         v = p.get("vulnerabilities") or []
@@ -150,7 +220,10 @@ def sujet(nom, digest, tags, catalogue):
                         "kpi_scan_kev_ecartees": len([1 for x in v if x.get("kev") and x.get("vex")]),
                         "kpi_scan_timestamp_seconds": epoque(p["scannedAt"])})
     etiquettes = f'depot="{depot}",digest="{digest[7:19]}"'
-    return "".join(f"{k}{{{etiquettes}}} {v}\n" for k, v in sorted(valeurs.items()))
+    texte = "".join(f"{k}{{{etiquettes}}} {v}\n" for k, v in sorted(valeurs.items()))
+    for quoi in ("verifiees", "refusees") if verifier else ():
+        texte += "".join(f'kpi_signatures_{quoi}{{{etiquettes},famille="{f}"}} {n}\n' for f, n in sorted(comptes[quoi].items()))
+    return texte
 
 
 def kev(fichier):
@@ -183,16 +256,17 @@ def kev(fichier):
 def main():
     try:
         # Tout est lu et contrôlé avant d'écrire : un refus ou une lecture impossible laisse le fichier inchangé.
+        verifier = controler_cles()
         catalogue = set(lire("_catalog")["repositories"])
         texte = ""
         for nom in os.environ["PRODUITS"].split():
             if f"builds/{nom}" not in catalogue:
                 raise Refus(f"builds/{nom} absent du catalogue")
             tags = lire(f"builds/{nom}/tags/list").get("tags") or []
-            texte += "".join(sujet(nom, d, tags, catalogue) for d in digests(f"builds/{nom}", tags))
+            texte += "".join(sujet(nom, d, tags, catalogue, verifier) for d in digests(f"builds/{nom}", tags))
         if os.environ.get("JOURNAL"):
             texte += kev(os.environ["JOURNAL"])
-    except (Refus, urllib.error.URLError, OSError, ValueError, KeyError, TypeError) as e:
+    except (Refus, urllib.error.URLError, OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError) as e:
         print(f"refus : {type(e).__name__} : {e}", file=sys.stderr)
         return 2
     donnees = texte.encode()
