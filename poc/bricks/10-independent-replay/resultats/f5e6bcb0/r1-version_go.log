@@ -1,0 +1,9 @@
+# replay.sh version_go, 2026-11-24T15:04:42Z, IMAGE f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 INVOCATION 9539952b-07a7-4a0b-a6e1-084304d0e8af
+provenance 9539952b-07a7-4a0b-a6e1-084304d0e8af : couche sha256:81122d65077a6e810724963b000274d78349545735cb4b726ea4aba6f2648600
+entrée de la provenance : sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+application/vnd.oci.image.manifest.v1+json
+couches : 1
+usr/local/go/VERSION :
+go1.26.11
+time 2026-11-02T20:36:21Z
+version retenue pour le domaine : go1.26.11

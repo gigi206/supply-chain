@@ -267,3 +267,34 @@ Faits pour les deux options (dans ce commit) : `voie-d.sh` (Go 1.26.11 lu dans l
 - hors du chemin, laissés tels quels : `declencheur.sh` de la 01, `bascule.sh` de la 03, `durcissement.sh` l. 886, les bancs et essais historiques.
 
 **Heures** : de 14:27:57 à 14:39:31 UTC, attentes des réponses du propriétaire comprises : 11 min 34 s ; **total de la 07c : au plus 1 h 14 min 00 s** pour 10 h estimées.
+
+## Étape 7, VSA de `f5e6bcb0` (brique 10) : préparée à sec
+
+Note de 2026-11-24T15:04:46Z. Prédictions datées et commitées avant tout lancement (`214b96b5`) : [`predictions.md`](../../10-independent-replay/resultats/f5e6bcb0/predictions.md).
+
+**Relevé** (lectures anonymes de Zot, 14:58 à 15:01 UTC) :
+- quatre provenances de PipelineRun sur `f5e6bcb0`. La cible est **`9539952b`**, J7 du passage 2, terminé à **13:27:42 UTC**. La règle des 24 h de la 10 place donc R4 au plus tôt le **2026-11-25T13:27:42Z** ;
+- la clé de Chains versionnée valide les enveloppes, et `horodatage/bundles` contient 8 bundles horodatés ;
+- `politique-replay.md` et `outils/` sont inchangés depuis `6c44219`. Aucune valeur n'y est épinglée, donc ni nouvelle politique ni poussée de politique ;
+- le contrôle 6 ne lie une VSA qu'au digest (additif du 03/11, 22:45 UTC, de la 10). Une VSA de `f5e6bcb0` faite sur le cluster en service vaudra donc après un rejeu de zéro, qui reconstruit la même image. L'ordre « VSA puis rejeu » tient ;
+- go.dev publie pour `go1.26.11.linux-amd64.tar.gz` le sha256 `9849f4e0…` et une taille de 66 999 944 octets.
+
+**Portage de `replay.sh` de la 10** :
+- `IMAGE`, `INVOCATION`, `FIN_BUILD`, `GO_ARCHIVE`, `GO_SHA256` et `RESULTATS` passent par l'environnement. Sans eux, les valeurs effectives sont identiques à `HEAD~` (relu par `bash -x`) ;
+- le cache `provenance.json` du domaine n'est réutilisé que pour la même invocation (avant, il aurait relu `c4242a11`) ;
+- avec `RESULTATS`, le journal de la porte de la 08 va dans un sous-dossier : sinon la copie aurait lu l'ancien `preuves-reelle.log` ;
+- un journal existant est refusé.
+
+**Défaut relevé** : deux fonctions `etape_outils` (R1 l. 191, R2 l. 281). Bash garde la seconde, donc l'archive de Go passe par [`go-domaine.sh`](../go-domaine.sh), sur accord.
+
+**R1 `version_go`** ([journal](../../10-independent-replay/resultats/f5e6bcb0/r1-version_go.log), 15:04:42 UTC, lecture seule) : **conforme**. Entrée `builder-go-voie-d@8c11e856…`, manifeste OCI, 1 couche, `go1.26.11`, version retenue `go1.26.11`.
+
+**Restent, chacun sur accord** :
+- téléchargement de l'archive (`go-domaine.sh`, 13 cas) ;
+- R2 `outils` et R3 dans `sc-replay` ;
+- R4 au plus tôt le 2026-11-25T13:27:42Z, déclenché à la main ;
+- R5, avec un accord nommé pour le push de la VSA.
+
+Les défauts de `replay.sh` et `rejeu.sh` ne passeront à `f5e6bcb0` que dans le commit qui archive la VSA.
+
+**Heures** : de 14:39:31 à 15:04:46 UTC, poussée et reprise comprises : 25 min 15 s. **Total de la 07c : au plus 1 h 39 min 15 s** pour 10 h estimées.
