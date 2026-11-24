@@ -79,7 +79,7 @@ Détails, alternatives et sources : [`docs/00-etude-existant.md`](docs/00-etude-
 | Domaine | Brique |
 |---|---|
 | Sources | Forgejo (miroir + fork `workspace/` à branches custom) + job de sync (pas de prune, détection des force-push, `git bundle`) |
-| Orchestration et provenance | Tekton Pipelines LTS + Triggers (intercepteur HMAC Forgejo) + **Chains ≥ 0.29** (SLSA v1 ; mode **`dsse`** tant que [chains#2096](https://github.com/tektoncd/chains/pull/2096) n'est pas publiée, puis `sigstore-bundle` en OCI referrers) ; contrôle strict de la signature d'image (`cosign/sign/v1`) |
+| Orchestration et provenance | Tekton Pipelines LTS + Triggers (intercepteur HMAC Forgejo) + **Chains ≥ 0.29** (SLSA v1 ; mode **`dsse`** tant que [chains#2096](https://github.com/tektoncd/chains/pull/2096) n'est pas publiée (elle l'est dans v0.30.0 depuis le 05/11/2026, lu, non mesuré ; changement cassant #2041, voir [docs/04](docs/04-sante-projets.md)), puis `sigstore-bundle` en OCI referrers) ; contrôle strict de la signature d'image (`cosign/sign/v1`) |
 | Dépendances | Hermeto (prefetch + SBOM), verrou natif mock, `.buildinfo` Debian ; snapshots Pulp en 2c |
 | Construction | BuildKit avec démon éphémère par build (repli : Buildah), mock 6.x hermétique, sbuild unshare ; isolation Kata, gVisor ou user namespace |
 | Stockage | Zot + ORAS (artefacts, fermetures, attestations) ; archive WORM en 2c |
