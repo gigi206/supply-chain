@@ -2,7 +2,7 @@
 # Le script appelant pose `here` (son répertoire) avant de charger ce fichier.
 . "${BASH_SOURCE[0]%/*}/distro.sh"
 repo=$(git -C "$here" rev-parse --show-toplevel)
-R=$here/resultats
+R=${RESULTATS:-$here/resultats}   # 07c (24/11/2026) : RESULTATS=<dossier> pour ne réécrire aucun journal existant
 O=${CONFIANCE_DIR:-$HOME/.cache/supply-chain-poc/08}
 S=$O/secrets
 P=$O/pki

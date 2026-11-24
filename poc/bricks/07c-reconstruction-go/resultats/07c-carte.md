@@ -64,3 +64,18 @@ Ce que l'étape 4 changerait :
 Journaux : `lancer` de `commun.sh` réécrit `resultats/<préfixe>-<étape>.log`. Il faut un préfixe propre à la 07c pour ne réécrire aucun journal.
 
 **Heures** : 13:11:04 à 13:21:54 UTC ; **total de la 07c : 0 h 10 min 50 s** pour 10 h estimées.
+
+## Étape 4 (note de 2026-11-24T13:24:16Z)
+
+**Accord** : à la question « Autorisez-vous l'étape 4 (re-signature, liste revue, PipelineRun, cible du scan) ? », réponse verbatim du propriétaire : « J'autorise l'étape 4 ».
+
+**Pipeline en service** (mesuré à 13:22:20Z) : le TriggerTemplate `declencheurs/sample-app` lance `tekton/pipelines/sample-app@b8ff5ebb…`, publiée par `construction.sh taches` et posée par `preuves.sh bascule` (J8). `bascule.sh` de la 03 n'est pas sur ce chemin. `taches.yml` du cluster (ConfigMap `porte/porte`) = dépôt.
+
+**Changements de scripts** (défauts inchangés : le rejeu fait la même chose qu'avant) :
+- `commun.sh` : `R=${RESULTATS:-…}` (journaux de la 07c dans son `resultats/`, aucun journal de la 08 réécrit) ;
+- `construction.sh` : `APP_REF` et `BUILDER` surchargeables ; `SIGNER="<nom>…"` ne re-signe que ces tâches (`SIGNER=1` : toutes, comme avant) ;
+- `preuves.sh` : `APP_REEL` pour l'image réelle (`APP_DIGEST` reste celui des images d'essai de J4).
+
+**Ordre** : (a) `SIGNER=construire-image construction.sh taches` → nouvelle signature versionnée et référence à ajouter ; (b) revue et ajout à `taches.yml` (ancienne référence `66a9f298` gardée : l'image `3a7ca1b1` doit rester jugeable), ConfigMap de la porte mise à jour sur la seule clé `taches.yml` ; (c) `construction.sh taches construire provenance` ; (d) `preuves.sh bascule` ; (e) cible du scan.
+
+**Prédiction de (a)** (journal `signer/construction-taches.log`) : `construire-image` rendue avec `8c11e856`, re-signée, signature versionnée remplacée (le diff ne touche que les deux digests de l'image de build et la signature), nouveau bundle « à ajouter » ; `preparer-entrees` et `publier-image` inchangées et listées (`2070d601…`, `d21931f3…`) ; pipeline `sample-app` re-signée et publiée sous un nouveau digest ; témoin `c7e8b275` conforme ; code 0.

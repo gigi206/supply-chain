@@ -131,7 +131,7 @@ EL=system:serviceaccount:declencheurs:el-forgejo
 CONTROLEUR=system:serviceaccount:tekton-pipelines:tekton-pipelines-controller   # crée les pods des TaskRuns
 CHAINS=system:serviceaccount:tekton-chains:tekton-chains-controller
 REGLE_CTRL=tekton-controleurs-builds   # ValidatingAdmissionPolicy de tekton/controleurs-builds.yaml (posée par tekton.sh installer)
-APP=builds/sample-app@$APP_DIGEST
+APP=builds/sample-app@${APP_REEL:-$APP_DIGEST}   # 07c (24/11/2026) : APP_REEL= image réelle reconstruite (Go 1.26.11) ; APP_DIGEST reste celui des essais
 BUILDKIT=$REG/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b   # construction.sh
 USURPEE=10.42.1.250     # adresse du sous-réseau des pods de sc-build, inutilisée (kata.sh ; contrôlé avant l'essai)
 EXTERNE=203.0.113.10    # adresse de documentation (RFC 5737), hors du cluster (kata.sh)

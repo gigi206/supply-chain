@@ -45,7 +45,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 . "$here/commun.sh"
 B03=${B03:-$HOME/.cache/supply-chain-poc/w/b03}                                   # entrées de la brique 03 (bancs du laptop)
 APP_LAYOUT=${APP_LAYOUT:-$HOME/.cache/supply-chain-poc/w/b04/app-layout}          # image sample-app de la brique 04
-APP_REF=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # sample-app par BuildKit (brique 04, voie A)
+APP_REF=${APP_REF:-sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5}   # sample-app par BuildKit (brique 04, voie A) ; 07c : APP_REF= pour Go 1.26.11
 BIN_REF=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11          # binaire de la brique 03
 ARBRE_DIST=f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a        # voie-d.sh
 ARBRE_DEPS=51ccd0964bea8a2065dfda803dad14b5c6246ad712c55bbccc1005c54cd7b10b        # voie-d.sh
@@ -57,7 +57,7 @@ FERMETURE_F2=$HOME/.cache/supply-chain-poc/03/f2/fermeture-1.digest   # fermetur
 WEB_DIST_DIGEST=sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
 TYPE_WEB_DIST=application/vnd.supply-chain.web-dist.v1
 BUILDKIT=$REG/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b          # buildkit.sh image
-BUILDER=$REG/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67  # voie-d.sh image
+BUILDER=${BUILDER:-$REG/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67}  # voie-d.sh image ; 07c : BUILDER= pour Go 1.26.11
 DOCKERFILE=$repo/poc/bricks/04-hermetic-repro/Dockerfile
 IMAGE=$REG/builds/sample-app
 SAMPLE_APP=workspace/sample-app
@@ -160,7 +160,10 @@ signer_tache() { # nom : tâche rendue $T/<nom>.yaml signée, comparée à sa si
   # bundle ; référence dans $T/<nom>.ref, exigée dans la liste revue
   local n=$1 v=$here/politique/taches/$1.signee.yaml r
   tkn task sign "$T/$n.yaml" -K "$S/taches.key" -f "$T/$n-signee.yaml" > /dev/null
-  if [ -n "${SIGNER:-}" ]; then cp "$T/$n-signee.yaml" "$v"; echo "SIGNER : nouvelle signature dans politique/taches/$n.signee.yaml (liste revue à mettre à jour)"; fi
+  # 07c (24/11/2026) : SIGNER=1 re-signe toutes les tâches ; SIGNER="<nom>…" seulement celles-là (les autres gardent leur bundle)
+  local sg=
+  case " ${SIGNER:-} " in "  ") ;; " 1 "|*" $n "*) sg=1 ;; esac
+  if [ -n "$sg" ]; then cp "$T/$n-signee.yaml" "$v"; echo "SIGNER : nouvelle signature dans politique/taches/$n.signee.yaml (liste revue à mettre à jour)"; fi
   [ -s "$v" ] || { echo "KO   signature versionnée absente : SIGNER=1, puis revue de politique/porte/taches.yml" >&2; exit 1; }
   cmp -s <(grep -v 'tekton.dev/signature:' "$T/$n-signee.yaml") <(grep -v 'tekton.dev/signature:' "$v") \
     && echo "OK   $n : signature versionnée conforme au gabarit rendu, signature exceptée" \
@@ -168,7 +171,7 @@ signer_tache() { # nom : tâche rendue $T/<nom>.yaml signée, comparée à sa si
   r=$REG/tekton/tasks/$n@$(bundle "$v" "tekton/tasks/$n" j7)
   echo "$r" > "$T/$n.ref"
   if listee "$r"; then echo "OK   $n dans la liste revue : $r"
-  elif [ -n "${SIGNER:-}" ]; then echo "SIGNER : à ajouter à politique/porte/taches.yml après revue, puis relancer sans SIGNER : $r"
+  elif [ -n "$sg" ]; then echo "SIGNER : à ajouter à politique/porte/taches.yml après revue, puis relancer sans SIGNER : $r"
   else echo "KO   $n absente de la liste revue politique/porte/taches.yml : $r" >&2; exit 1; fi
 }
 
