@@ -1,0 +1,6 @@
+# stockage-versions.sh, 2026-11-24T20:07:20Z, dépôt f0e1f122, script d407e3dc969e6d44
+OK   openssl de sc-stockage : OpenSSL 3.5.9 29 Sep 2026 (Library: OpenSSL 3.5.9 29 Sep 2026)
+code 0
+OK   python3 de sc-stockage : Python 3.13.5
+code 0
+## bilan : 2 cas, 0 écart(s)
