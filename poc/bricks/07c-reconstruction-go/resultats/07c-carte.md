@@ -42,3 +42,7 @@ Décision du propriétaire, verbatim : « Chantier à part ». Périmètre et ac
 **Accord** : à la question « Autorisez-vous l'écriture de l'image de build 8c11e856 dans le vrai Zot ? », réponse verbatim du propriétaire : « J'autorise ». Portée : ce seul manifeste, dépôt `plateforme/builder-go-voie-d`, compte `poc-ecriture` (droits `create` et `update` sur `**`, relus dans `08-trust-plane/stockage/zot.json`).
 
 **Prédiction** ([`pousser-builder.sh`](../pousser-builder.sh), journal `pousser-builder.log`) : assemblage refait comme `predire-builder.sh` (témoin `d50ae575`, deux assemblages, digest `8c11e856…`) ; tag `go1.26.11` absent avant ; layout OCI tiré du registre jetable puis `crane push` avec vérification TLS (pas de `--insecure` vers le vrai Zot) sous le **tag neuf `go1.26.11`** ; relu en anonyme : tag et digest = `8c11e856…`, couche identique ; tags `a` et `b` toujours `d50ae575`. **Bilan attendu : 9 cas, 0 écart.** Si un cas échoue avant la poussée, rien n'est poussé.
+
+**Étape 3, résultat** ([journal](pousser-builder.log), 13:20:30 à 13:20:56 UTC ; note de 2026-11-24T13:21:05Z) : **9 cas, 0 écart**, conforme. `192.168.161.13:5000/plateforme/builder-go-voie-d@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7`, tag `go1.26.11`, relu en anonyme (Env de la voie D) ; tags `a` et `b` toujours `d50ae575`. Authentification effacée, dossier de travail effacé.
+
+**Heures** : 13:11:04 à 13:21:05 UTC ; **total de la 07c : 0 h 10 min 01 s** pour 10 h estimées.

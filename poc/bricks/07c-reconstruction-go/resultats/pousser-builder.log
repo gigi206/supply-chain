@@ -1,0 +1,20 @@
+# image de build de la voie D, Go 1.26.10 (témoin) et 1.26.11, 2026-11-24T13:20:30Z, ba41d8bc, crane 0.20.6
+1.26.10 a : couche 683ffab60c2ef72f (226570240 octets), image sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+1.26.10 b : couche 683ffab60c2ef72f (226570240 octets), image sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+1.26.11 a : couche ad0e342619a73352 (226785280 octets), image sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+1.26.11 b : couche ad0e342619a73352 (226785280 octets), image sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+OK   témoin 1.26.10 : image épinglée par construction.sh : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+OK   1.26.11 : identique sur deux assemblages : sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+OK   1.26.11 : go de l'image : go version go1.26.11 linux/amd64
+OK   1.26.11 : digest prédit à sec : sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+## vrai Zot
+OK   tag go1.26.11 absent avant : 0
+layout : code 0
+poussée : code 0
+OK   lecture anonyme du tag go1.26.11 : sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+OK   lecture anonyme par digest : sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+OK   couche relue = couche du registre jetable : sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e
+{"architecture":"amd64","os":"linux","Env":["PATH=/usr/local/go/bin:/bin","HOME=/tmp","CGO_ENABLED=0","GOTOOLCHAIN=local","GOFLAGS=-mod=readonly","GOSUMDB=off"]}
+OK   tags a et b inchangés (1.26.10) : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67 sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+IMAGE DE BUILD|192.168.161.13:5000/plateforme/builder-go-voie-d@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+## bilan : 9 cas, 0 écart(s)
