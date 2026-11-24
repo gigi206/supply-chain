@@ -26,3 +26,7 @@ Décision du propriétaire, verbatim : « Chantier à part ». Périmètre et ac
 - **Prédiction pour les étapes suivantes** : l'image construite par la pipeline de la plateforme en Go 1.26.11 sur les mêmes entrées devrait être `f5e6bcb0…` (la voie A de la 08 et la 04 donnaient le même digest, `3a7ca1b1`).
 
 **Heures** : 13:11:04 à 13:17:56 UTC (0 h 06 min 52 s) ; **total de la 07c : 0 h 06 min 52 s** pour 10 h estimées.
+
+## Étape 3 à sec : image de build de la voie D (prédiction, note de 2026-11-24T13:18:30Z)
+
+[`predire-builder.sh`](../predire-builder.sh), journal `predire-builder.log`, registre Zot jetable sur 127.0.0.1:5077, assemblage recopié de `voie-d.sh` : **témoin 1.26.10 = `d50ae575…`** (sinon la recopie est fausse) ; 1.26.11 identique sur deux assemblages, digest non prédit (ligne `BUILDER PRÉDIT|`) ; `go version go1.26.11`. **Bilan attendu : 3 cas, 0 écart.**
