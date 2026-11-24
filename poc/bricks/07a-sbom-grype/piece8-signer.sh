@@ -35,7 +35,10 @@ NOM_TLS=openbao.openbao.svc.cluster.local
 BAO=$HOME/.cache/supply-chain-poc/07a/bao-2.7.2/bao
 BAO_SHA256=9c5f36287c673f386e1533e9c044169a248e4ee50dd54810fa766e95bd41b788
 REG=192.168.161.13:5000
-APP=$REG/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+# Image déduite du document (ajout du 24/11, VEX du deb) : produit pkg:oci/<nom>@sha256:<hex>, le même pour tous les énoncés
+P_OCI=$(jq -r '[.statements[].products[]."@id"] | unique | if length == 1 then .[0] else "plusieurs" end' "$DOC")
+printf '%s' "$P_OCI" | grep -qE '^pkg:oci/[a-z0-9-]+@sha256:[0-9a-f]{64}$' || { echo "produit du document illisible ou multiple : $P_OCI" >&2; exit 2; }
+APP=$REG/builds/${P_OCI#pkg:oci/}
 export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml CA CLE_SCANNER=$R/resultats/scanner-cle-publique.pem \
   CLE_PUBLIQUE=$R/resultats/vex-cle-publique.pem
 GO=$(mise which go)
