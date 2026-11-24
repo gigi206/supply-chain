@@ -1,0 +1,19 @@
+# GO-2026-6859 dans les scans signés, relevé dans Loki, 2026-11-24T17:40:25Z, 25bca624
+## entrées par scan (24 h)
+{"depot":"builds/scan/sample-app","scannedAt":"2026-11-23T22:30:42.263123586Z"} 6
+{"depot":"builds/scan/sample-app","scannedAt":"2026-11-24T09:31:58.802269331Z"} 6
+{"depot":"builds/scan/sample-app","scannedAt":"2026-11-24T14:12:28.516620047Z"} 5
+{"depot":"builds/scan/sample-app-deb","scannedAt":"2026-11-23T23:19:20.104162242Z"} 67
+{"depot":"builds/scan/sample-app-deb","scannedAt":"2026-11-24T11:16:57.457020454Z"} 67
+{"depot":"builds/scan/sample-app-deb","scannedAt":"2026-11-24T13:42:38.730975632Z"} 67
+## entrées GO-2026-6859 par scan (24 h)
+{"depot":"builds/scan/sample-app","id":"GO-2026-6859","kev":"false","package":"pkg:golang/stdlib@1.26.10","scannedAt":"2026-11-23T22:30:42.263123586Z","severity":"Medium"} 1
+{"depot":"builds/scan/sample-app","id":"GO-2026-6859","kev":"false","package":"pkg:golang/stdlib@1.26.10","scannedAt":"2026-11-24T09:31:58.802269331Z","severity":"Medium"} 1
+{"depot":"builds/scan/sample-app-deb","id":"GO-2026-6859","kev":"false","package":"pkg:golang/stdlib@1.24.4","scannedAt":"2026-11-23T23:19:20.104162242Z","severity":"Medium"} 1
+{"depot":"builds/scan/sample-app-deb","id":"GO-2026-6859","kev":"false","package":"pkg:golang/stdlib@1.24.4","scannedAt":"2026-11-24T11:16:57.457020454Z","severity":"Medium"} 1
+{"depot":"builds/scan/sample-app-deb","id":"GO-2026-6859","kev":"false","package":"pkg:golang/stdlib@1.24.4","scannedAt":"2026-11-24T13:42:38.730975632Z","severity":"Medium"} 1
+dernier scan du deb : 2026-11-24T13:42:38.730975632Z ; dernier scan de l'image : 2026-11-24T14:12:28.516620047Z
+OK   GO-2026-6859 dans le dernier scan du deb : 1
+OK   GO-2026-6859 hors KEV dans le dernier scan du deb : 1
+OK   GO-2026-6859 dans le dernier scan de l'image (f5e6bcb0, Go 1.26.11) : 0
+## bilan : 3 cas, 0 écart(s)

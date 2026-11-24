@@ -468,3 +468,13 @@ Le propriétaire a demandé, verbatim : « Il faut qu'on puisse avancer ». R4 a
 - 3 cas, 0 écart.
 
 Rien n'est écrit, ni sur les VM, ni dans Zot, ni dans Grafana. La correction, c'est-à-dire reconstruire le deb en Go 1.26.11 ou poser un VEX, reste un choix du propriétaire.
+
+**Résultat** (2026-11-24T17:40:25Z, [`deb-go-6859.log`](deb-go-6859.log), code de sortie 0) : 3 cas, 0 écart. La prédiction tient. GO-2026-6859 Medium, hors KEV, figure dans chacun des trois scans du deb des dernières 24 h (67 entrées chacun) ; il est absent du scan de `f5e6bcb0` (5 entrées).
+
+**Correction du constat** : le paquet en cause dans le deb est `pkg:golang/stdlib@1.24.4`, pas 1.26.10. La phrase « le deb de la 06 est encore compilé en Go 1.26.10 (`s4d.sh`) » du README était fausse :
+- le Go 1.26.10 de `s4d.sh` (l. 63) ne sert qu'à l'étape d'assemblage `preparer-deb`, jouée sur l'hôte (l. 186-217) ;
+- le binaire du deb est compilé dans sbuild par le Go de Debian 13 : `golang-1.24-go` et `golang-1.24-src` en 1.24.4-1, épinglés dans `poc/packaging/verrou-deb.txt` (l. 43-44) et cités par le journal de construction (`s4d-pipeline-1-construire.log`, l. 69-70).
+
+Reconstruire le deb « en Go 1.26.11 » ne corrigerait donc rien par la voie de la 07c. La correction passerait par un `golang-1.24` corrigé côté Debian (nouvel épinglage du verrou, rejeu de la 06), ou par un VEX si le code n'est pas atteignable. C'est un choix du propriétaire, non traité ici.
+
+**Heures de la 07c** : la tâche est hors du périmètre de la 07c (réserve d'une autre brique). Elle n'est pas comptée.
