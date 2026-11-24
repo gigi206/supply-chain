@@ -206,3 +206,7 @@ Non exercés encore : un passage du timer, `Wants` avec un lecteur en échec, le
 [`e5-seuil.log`](e5-seuil.log) (21:09:33 UTC, dépôt `6ebc7eda`) : **8 cas, 0 écart**. 134 séries dans Prometheus, 105 valeurs comparées au recalcul signé, 41 signatures. **Seuil de docs/02 tenu à cet instant** (« 0 écart avec le recalcul »).
 
 Passage du timer (`OnUnitActiveSec=15min`, premier passage à 21:07:38 UTC) : à partir de 21:24 UTC, `SUFFIXE=-2 seuil.sh` attendu **8 cas, 0 écart**, et âge du passage inférieur à 180 s, donc un passage de 21:22:38 à 21:23:38 environ (`AccuracySec` d'une minute par défaut).
+
+### Correction du résultat de l'étape 5 (note de 2026-11-24T21:13:10Z, relecture du conseiller)
+
+Des 105 valeurs comparées, **102 viennent des séries** ; 3 sont posées par `comparer_zot.py` (`violations_licences`, constante ; deux `kev_delais`, remplis quand aucune série de KEV n'existe). Elles sont égales par construction. À vérifier au passage du timer : à 21:09:33 l'âge de 113 s place un passage vers 21:07:40, la pose relevait 21:07:38 ; l'unité a peut-être tourné deux fois (timer activé juste après le premier passage).

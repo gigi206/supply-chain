@@ -8,7 +8,7 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 ## État
 
-**Posé et seuil tenu le 2026-11-24** (accords « Liste, compte, pose (Recommandé) », [prédiction et résultat](resultats/e4-predictions.md)). Liste du proxy de Grafana : 10 cas, 0 KO (21:07:17 UTC). Compte `kpi-journal` : 5 cas (21:07:28). Exportateur et lecteur sur `sc-stockage` : 16 cas, 0 KO (21:07:28), 134 séries, 41 signatures vérifiées par OpenSSL 3.5.9 sous l'unité durcie. **Étape 5, le seuil : [8 cas, 0 écart](resultats/e5-seuil.log) (21:09:33)**, 105 valeurs de Prometheus, lues par l'auditeur, égales au recalcul signé.
+**Posé et seuil tenu le 2026-11-24** (accords « Liste, compte, pose (Recommandé) », [prédiction et résultat](resultats/e4-predictions.md)). Liste du proxy de Grafana : 10 cas, 0 KO (21:07:17 UTC). Compte `kpi-journal` : 5 cas (21:07:28). Exportateur et lecteur sur `sc-stockage` : 16 cas, 0 KO (21:07:28), 134 séries, 41 signatures vérifiées par OpenSSL 3.5.9 sous l'unité durcie. **Étape 5, le seuil : [8 cas, 0 écart](resultats/e5-seuil.log) (21:09:33)**, 105 valeurs comparées au recalcul signé : 102 issues des séries de Prometheus, lues par l'auditeur, et 3 égales par construction (`violations_licences`, deux `kev_delais`).
 
 Réserves : délais des KEV égaux parce qu'aucune KEV n'est vue ; un journal bien formé mais faux ne serait pas vu ; `Wants` avec un lecteur en échec et les refus réseau non exercés ; aucune alerte sur l'âge du passage ; **pas câblé dans `rejeu.sh`** (étape 7), donc un rejeu efface la pose, et les clés, le relevé et les trois VEX seraient à refaire ; **pas de tableau** (étape 6) ; après R5, `releve-dates.py verifier` puis nouveau seuil.
 
