@@ -78,3 +78,13 @@ Relecture du conseiller : dans la version mesurée ci-dessus, une seule ligne ma
 Attendu, journaux `-3` : banc **62 cas, 0 écart** (59, plus 3 journaux malformés : JSON coupé, dépôt absent, date illisible) ; vrai Zot **10 cas, 0 écart** ; unité **23 cas, 0 écart**.
 
 Écarts « comptées » comptés dans `e4-banc-2.log` : 40 lignes `ECART|comptées`, le nombre prédit.
+
+### Résultat (note de 2026-11-24T20:35:53Z)
+
+Journaux [banc](e4-banc-3.log) (20:35:07 UTC), [vrai Zot](e4-exportateur-zot-3.log) (20:35:22 UTC), [unité](e4-unite-hote-3.log) (20:35:32 UTC), dépôt `c34d91e1` : **62, 10 et 23 cas, 0 écart**, au premier passage de cette version. Un journal malformé laisse les séries vérifiées intactes (0 différence), retire les séries de KEV et met `kpi_exportateur_journal_illisible` à 1.
+
+Limites ajoutées :
+- une ligne **bien formée** mais fausse dans Loki fausse les délais de KEV sans être vue : le journal n'est pas signé ;
+- `unite-hote.sh` reprend le durcissement de `kpi.service`, mais passe ses propres variables et chemins : les `Environment` et `ReadWritePaths` de l'unité n'ont pas tourné.
+
+**Heures** : de 20:18:37 UTC à cette note, 17 min 16 s (remplace le compte de la note précédente). Total de la brique : 59 min 05 s.
