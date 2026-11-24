@@ -65,3 +65,21 @@ Horodatage (TSA), dates des clés et des pins (git), Prometheus et Grafana, cha�
 ## Constat d'orientation (lu, pas mesuré en service)
 
 Dans la configuration **versionnée** de Zot (`08-trust-plane/stockage/zot.json`), les motifs sont `**`, `builds/**`, `builds/fermetures/**`, `builds/scan/**`, `builds/vex/**`, `horodatage/**`, `signes/**` et `vulndb/**`. **`builds/vsa/**` n'a pas de motif propre** : `poc-ecriture`, `poc-build`, `poc-images` et `poc-replay` peuvent y créer un référent. Un exportateur qui ne vérifie pas compterait une VSA posée par la zone de build.
+
+## Résultat (note de 2026-11-24T19:43:10Z)
+
+**Banc** ([journal](e3-banc.log)) : passage 1, 2026-11-24 à 19:42:34 UTC, dépôt `9f97bcad`, scripts `b91d611338972054`, cosign 3.1.4, Zot 2.1.22, exportateur sous Python 3.14.4 de l'hôte (celui de `sc-stockage` n'a pas été exercé). **10 cas, 0 écart**, et le contrôle « Zot arrêté » conforme (code 2, fichier inchangé). Espace de noms sans route ; dossier du banc effacé.
+
+- Recalcul : **19/23** attestations vérifiées, les 4 signatures fausses écartées ; témoin 0 ; 122 valeurs égales aux attendus écrits à la main.
+- Exportateur : 122 valeurs égales à ses propres attendus ; **0 écart avec le recalcul sur les 7 sujets bien signés**.
+- **14 écarts, tous dus aux signatures fausses, exactement la liste prédite.** Le plus parlant : `banc-forge`, KEV ouverte 1 au recalcul et **0 à l'exportateur** ; L3 vérifié 0 et **1**.
+- Les trois points « moins sûrs » se sont bien passés : clés importées, manifestes acceptés, et cosign rend le vrai scan quand un faux du même type est à côté (`scan 2/1/0`). `cosign verify` sur un `.sig` faux donne un motif reconnu par le recalcul.
+- KEV : délais 648 000 s (7,5 j) et 777 600 s (9 j), une ouverte ; les trois lignes égales dans les deux outils, à partir des lignes du vrai `entrees-scan.py` (6 entrées, 3 listes émises, 4 résumés).
+
+**Non-régression** ([journal](e2-recalcul-3.log)) : 19:42:45 UTC, dépôt `9f97bcad`. **10 cas, 0 écart**, 105 lignes `KPI|`, **0 différente** de `e2-recalcul-2.log`.
+
+### Ce que cela ne montre pas
+
+- Les attendus, les témoins et les deux outils viennent de la même session : une erreur commune de lecture d'une règle ne se verrait pas.
+- L'exportateur n'a pas encore lu le vrai Zot, et n'est pas posé.
+- Écrire ces faux dans le vrai Zot demande un compte : le banc n'a ni comptes ni politique. La configuration versionnée le permet à `poc-build` et `poc-images` pour `builds/vsa/**`, pas pour `builds/scan/**` ni `builds/vex/**` (motifs plus précis, donc prioritaires). Pour les provenances, `poc-build` pousse `.att` et `.sig`, puisque c'est le compte de Chains. Donc, sur les faux du banc, la KEV masquée demande `poc-ecriture` ou `poc-scan`, le VEX `poc-vex`, et la VSA ou la provenance un compte de la zone de build.

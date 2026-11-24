@@ -1,0 +1,128 @@
+# recalcul.py, 2026-11-24T19:42:45Z, dépôt 9f97bcad, scripts 694c716e4695407c
+# cosign v3.1.4 ; essais de kpi.py : ## bilan : 16 cas, 0 écart(s)
+## 1. sujets : listé, vérifié, vérifié par la clé étrangère (témoin, attendu 0)
+DETAIL|builds/sample-app|3a7ca1b14dbf|sig 1|prov 6/6/0|scan 3/3/0|vsa 1/1/0|vex 1/1/0|tsa 37 listés, 37 vérifiés, 6/6 provenances couvertes
+DETAIL|builds/sample-app|f5e6bcb0e0fb|sig 1|prov 8/8/0|scan 2/2/0|vsa 0/0/0|vex 1/1/0|tsa 8 listés, 8 vérifiés, 8/8 provenances couvertes
+DETAIL|builds/sample-app-deb|60f25f5c3fb5|sig 1|prov 8/8/0|scan 3/3/0|vsa 1/1/0|vex 1/1/0|tsa 8 listés, 8 vérifiés, 8/8 provenances couvertes
+DETAIL|builds/sample-app-rpm|07b7bd6feb48|sig 1|prov 2/2/0|scan 0/0/0|vsa 0/0/0|vex 0/0/0|tsa 2 listés, 2 vérifiés, 2/2 provenances couvertes
+OK   attestations listées = vérifiées (toutes les clés en service) : 37
+OK   témoin : attestations vérifiées par la clé étrangère : 0
+## 2. KPI par sujet
+## 3. KPI de plateforme
+DETAIL|loki|builds/scan/sample-app|3 scan(s) en 719 h, 3 encore signé(s) dans Zot (jointure par scannedAt)
+DETAIL|loki|builds/scan/sample-app-deb|3 scan(s) en 719 h, 3 encore signé(s) dans Zot (jointure par scannedAt)
+KPI|cle_date:chains|-|-|1795471932
+KPI|cle_date:scanner|-|-|1795476983
+KPI|cle_date:tsa|-|-|1795471932
+KPI|cle_date:vex|-|-|1795476983
+KPI|cle_date:vsa|-|-|1793700136
+KPI|couverture_vex_entrees|builds/sample-app-deb|60f25f5c3fb5|23/67
+KPI|couverture_vex_entrees|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|couverture_vex_entrees|builds/sample-app|3a7ca1b14dbf|5/6
+KPI|couverture_vex_entrees|builds/sample-app|f5e6bcb0e0fb|5/5
+KPI|couverture_vex_kev|builds/sample-app-deb|60f25f5c3fb5|sans objet
+KPI|couverture_vex_kev|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|couverture_vex_kev|builds/sample-app|3a7ca1b14dbf|sans objet
+KPI|couverture_vex_kev|builds/sample-app|f5e6bcb0e0fb|sans objet
+KPI|kev_delais|builds/sample-app-deb|-|sans objet (0 KEV vue)
+KPI|kev_delais|builds/sample-app|-|sans objet (0 KEV vue)
+KPI|kev_ouvertes|builds/sample-app-deb|60f25f5c3fb5|0
+KPI|kev_ouvertes|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|kev_ouvertes|builds/sample-app|3a7ca1b14dbf|0
+KPI|kev_ouvertes|builds/sample-app|f5e6bcb0e0fb|0
+KPI|l3_verifie|builds/sample-app-deb|60f25f5c3fb5|0
+KPI|l3_verifie|builds/sample-app-rpm|07b7bd6feb48|0
+KPI|l3_verifie|builds/sample-app|3a7ca1b14dbf|1
+KPI|l3_verifie|builds/sample-app|f5e6bcb0e0fb|0
+KPI|pin_date:entree:packaging-deb:f0ed7a71cfcc|builds/sample-app-deb|60f25f5c3fb5|1794694829
+KPI|pin_date:entree:packaging-rpm:333b7322290a|builds/sample-app-rpm|07b7bd6feb48|1795180486
+KPI|pin_date:entree:web-dist:47f72275aa78|builds/sample-app|3a7ca1b14dbf|1793376604
+KPI|pin_date:entree:web-dist:47f72275aa78|builds/sample-app|f5e6bcb0e0fb|1793376604
+KPI|pin_date:fermeture:sample-app-deb:bb7599a2e1cd|builds/sample-app-deb|60f25f5c3fb5|1794420322
+KPI|pin_date:fermeture:sample-app-rpm:0983898054a9|builds/sample-app-rpm|07b7bd6feb48|1795173420
+KPI|pin_date:fermeture:sample-app-sources:50dc73f72d04|builds/sample-app-deb|60f25f5c3fb5|1794420322
+KPI|pin_date:fermeture:sample-app-sources:50dc73f72d04|builds/sample-app-rpm|07b7bd6feb48|1794420322
+KPI|pin_date:fermeture:sample-app:74c265e703fb|builds/sample-app|3a7ca1b14dbf|1793732132
+KPI|pin_date:fermeture:sample-app:74c265e703fb|builds/sample-app|f5e6bcb0e0fb|1793732132
+KPI|pin_date:image:builder-go-voie-d:8c11e856b10f|builds/sample-app|f5e6bcb0e0fb|1795526430
+KPI|pin_date:image:builder-go-voie-d:d50ae57551c3|builds/sample-app|3a7ca1b14dbf|1793373433
+KPI|pin_date:image:buildkit:ace6811c2133|builds/sample-app|3a7ca1b14dbf|1793368831
+KPI|pin_date:image:buildkit:ace6811c2133|builds/sample-app|f5e6bcb0e0fb|1793368831
+KPI|pin_date:image:mock-rocky9:70f8c4124532|builds/sample-app-rpm|07b7bd6feb48|1795113732
+KPI|pin_date:image:outils-horodatage:c7bebae2bd33|builds/sample-app-deb|60f25f5c3fb5|1793308207
+KPI|pin_date:image:outils-horodatage:c7bebae2bd33|builds/sample-app-rpm|07b7bd6feb48|1793308207
+KPI|pin_date:image:outils-horodatage:c7bebae2bd33|builds/sample-app|3a7ca1b14dbf|1793308207
+KPI|pin_date:image:outils-horodatage:c7bebae2bd33|builds/sample-app|f5e6bcb0e0fb|1793308207
+KPI|pin_date:image:outils-prefetch:68e0ae705de5|builds/sample-app-deb|60f25f5c3fb5|1793727678
+KPI|pin_date:image:outils-prefetch:68e0ae705de5|builds/sample-app-rpm|07b7bd6feb48|1793727678
+KPI|pin_date:image:sbuild-debian13:749d746cc9e1|builds/sample-app-deb|60f25f5c3fb5|1794420322
+KPI|pin_date:pipeline:sample-app-deb:ed471138e467|builds/sample-app-deb|60f25f5c3fb5|non épinglé dans git
+KPI|pin_date:pipeline:sample-app-rpm:7d361cb1d5ea|builds/sample-app-rpm|07b7bd6feb48|1795181844
+KPI|pin_date:pipeline:sample-app:b8ff5ebb29cf|builds/sample-app|3a7ca1b14dbf|non épinglé dans git
+KPI|pin_date:pipeline:sample-app:da76d95be5af|builds/sample-app|f5e6bcb0e0fb|non épinglé dans git
+KPI|pin_date:source:sample-app.git:6391fd437f26|builds/sample-app-deb|60f25f5c3fb5|1793298058
+KPI|pin_date:source:sample-app.git:6391fd437f26|builds/sample-app-rpm|07b7bd6feb48|1793298058
+KPI|pin_date:source:sample-app.git:6391fd437f26|builds/sample-app|3a7ca1b14dbf|1793298058
+KPI|pin_date:source:sample-app.git:6391fd437f26|builds/sample-app|f5e6bcb0e0fb|1793298058
+KPI|pin_date:tache:construire-deb:3726ff0b116c|builds/sample-app-deb|60f25f5c3fb5|1794425235
+KPI|pin_date:tache:construire-image:4dcbc4b74681|builds/sample-app|f5e6bcb0e0fb|1795526695
+KPI|pin_date:tache:construire-image:66a9f2980a45|builds/sample-app|3a7ca1b14dbf|1793734336
+KPI|pin_date:tache:construire-rpm:ca03f18908d0|builds/sample-app-rpm|07b7bd6feb48|1795172388
+KPI|pin_date:tache:preparer-deb:588617b83825|builds/sample-app-deb|60f25f5c3fb5|1794426056
+KPI|pin_date:tache:preparer-entrees:2070d601ae3c|builds/sample-app|3a7ca1b14dbf|1793385395
+KPI|pin_date:tache:preparer-entrees:2070d601ae3c|builds/sample-app|f5e6bcb0e0fb|1793385395
+KPI|pin_date:tache:preparer-rpm:2f65f3903e98|builds/sample-app-rpm|07b7bd6feb48|1795014970
+KPI|pin_date:tache:publier-image:d21931f3807b|builds/sample-app-deb|60f25f5c3fb5|1793376604
+KPI|pin_date:tache:publier-image:d21931f3807b|builds/sample-app-rpm|07b7bd6feb48|1793376604
+KPI|pin_date:tache:publier-image:d21931f3807b|builds/sample-app|3a7ca1b14dbf|1793376604
+KPI|pin_date:tache:publier-image:d21931f3807b|builds/sample-app|f5e6bcb0e0fb|1793376604
+KPI|provenance_chains_verifiee|builds/sample-app-deb|60f25f5c3fb5|1
+KPI|provenance_chains_verifiee|builds/sample-app-rpm|07b7bd6feb48|1
+KPI|provenance_chains_verifiee|builds/sample-app|3a7ca1b14dbf|1
+KPI|provenance_chains_verifiee|builds/sample-app|f5e6bcb0e0fb|1
+KPI|provenances_pipelinerun|builds/sample-app-deb|60f25f5c3fb5|4
+KPI|provenances_pipelinerun|builds/sample-app-rpm|07b7bd6feb48|1
+KPI|provenances_pipelinerun|builds/sample-app|3a7ca1b14dbf|3
+KPI|provenances_pipelinerun|builds/sample-app|f5e6bcb0e0fb|4
+KPI|replay_identique|builds/sample-app-deb|60f25f5c3fb5|1
+KPI|replay_identique|builds/sample-app-rpm|07b7bd6feb48|0
+KPI|replay_identique|builds/sample-app|3a7ca1b14dbf|1
+KPI|replay_identique|builds/sample-app|f5e6bcb0e0fb|0
+KPI|scan_date|builds/sample-app-deb|60f25f5c3fb5|1795527758
+KPI|scan_date|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|scan_date|builds/sample-app|3a7ca1b14dbf|1795512718
+KPI|scan_date|builds/sample-app|f5e6bcb0e0fb|1795529548
+KPI|scan_ecartees|builds/sample-app-deb|60f25f5c3fb5|23
+KPI|scan_ecartees|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|scan_ecartees|builds/sample-app|3a7ca1b14dbf|5
+KPI|scan_ecartees|builds/sample-app|f5e6bcb0e0fb|5
+KPI|scan_entrees|builds/sample-app-deb|60f25f5c3fb5|67
+KPI|scan_entrees|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|scan_entrees|builds/sample-app|3a7ca1b14dbf|6
+KPI|scan_entrees|builds/sample-app|f5e6bcb0e0fb|5
+KPI|scan_kev_ecartees|builds/sample-app-deb|60f25f5c3fb5|0
+KPI|scan_kev_ecartees|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|scan_kev_ecartees|builds/sample-app|3a7ca1b14dbf|0
+KPI|scan_kev_ecartees|builds/sample-app|f5e6bcb0e0fb|0
+KPI|scan_kev|builds/sample-app-deb|60f25f5c3fb5|0
+KPI|scan_kev|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|scan_kev|builds/sample-app|3a7ca1b14dbf|0
+KPI|scan_kev|builds/sample-app|f5e6bcb0e0fb|0
+KPI|taux_l3_verifie|-|-|1/4
+KPI|taux_provenance_chains_verifiee|-|-|4/4
+KPI|taux_replay_identique|-|-|2/4
+KPI|vex_verifies|builds/sample-app-deb|60f25f5c3fb5|1
+KPI|vex_verifies|builds/sample-app-rpm|07b7bd6feb48|0
+KPI|vex_verifies|builds/sample-app|3a7ca1b14dbf|1
+KPI|vex_verifies|builds/sample-app|f5e6bcb0e0fb|1
+KPI|violations_licences|-|-|source absente
+## 4. comparaisons
+OK   Loki : scans dont le nombre d'entrées (couples id et paquet) diffère de leur résumé : 0
+OK   Loki : lignes d'entrées lues (le zéro KEV n'est pas à vide) : True
+OK   sujets produits : 4
+OK   clé du TSA exercée : toutes les provenances couvertes par un bundle horodaté : []
+OK   Prometheus builds/scan/sample-app : la date désigne le dernier scan signé d'un seul sujet : 1
+OK   Prometheus builds/scan/sample-app (f5e6bcb0) : entrées, écartées, KEV, KEV écartées : [5, 5, 0, 0]
+OK   Prometheus builds/scan/sample-app-deb : la date désigne le dernier scan signé d'un seul sujet : 1
+OK   Prometheus builds/scan/sample-app-deb (60f25f5c) : entrées, écartées, KEV, KEV écartées : [67, 23, 0, 0]
+## bilan : 10 cas, 0 écart(s)

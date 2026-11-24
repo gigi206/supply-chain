@@ -8,13 +8,15 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 ## État
 
+**Étape 3 faite le 2026-11-24 (banc jetable, 19:42:34 UTC).** [Prédiction et résultat](resultats/e3-predictions.md) : **10 cas, 0 écart**, au premier passage. 9 sujets témoins dans un Zot jetable sans réseau. Sur les 7 sujets bien signés, 0 écart entre le recalcul et l'exportateur ; sur les 2 à signature fausse, **14 écarts, exactement ceux prédits** : l'exportateur, qui ne vérifie pas, masque une KEV ouverte et compte une VSA et une provenance fausses. Recalcul paramétré pour le banc, non-régression sur la plateforme à 19:42:45 UTC : 10 cas, 0 écart, 0 ligne `KPI|` différente. Exportateur écrit ([`tools/metrics-exporter`](../../../tools/metrics-exporter/metrics_exporter.py)), **non posé**.
+
 **Étape 2 faite le 2026-11-24 (recalcul de référence, signatures vérifiées, 18:55:04 UTC).** [Prédiction et résultat](resultats/e2-predictions.md) : **10 cas, 0 écart** (second passage à 19:32:02 UTC : 10 cas, 0 écart, 0 ligne de différence) ; 37 attestations listées et vérifiées, 0 par la clé étrangère. Provenance de Chains vérifiée 4/4, VSA `SLSA_BUILD_LEVEL_3` 1/4, replay identique 2/4, 0 KEV ; pour `f5e6bcb0` et le deb, Prometheus est égal au recalcul. Constat : Loki ne voit pas tous les scans (3 sur 5 pour `sample-app`). Rien n'est posé.
 
 **Étape 1 faite le 2026-11-24 (relevé anonyme de Zot, 18:26:24 UTC).** [Prédiction et résultat](resultats/e1-predictions.md) : **12 cas, 2 écarts**, tous deux des fautes de la prédiction. Les 4 énoncés en cause sont des témoins négatifs voulus (J6, G6) qu'elle n'avait pas comptés. Pour les produits, les builders et les fermetures, tous les énoncés sont lisibles et nomment leur sujet. Signatures non vérifiées à cette étape.
 
 Aperçu des produits, énoncés non vérifiés : 4 sujets (`sample-app` `3a7ca1b1` et `f5e6bcb0`, deb `60f25f5c`, rpm `07b7bd6f`). Tous ont une provenance ; 3 ont un scan, 3 un VEX et 2 une VSA. Le digest en service, `f5e6bcb0`, n'a pas encore de VSA. L'historique des scans dans Zot commence au rejeu du 23/11, et celui de Loki aussi (mesuré, `e1-loki-anciennete.log`) : un rejeu de zéro remet les deux à zéro.
 
-**Heures de la 20** (2026-11-24, `date -u`) : 17:45:07 à 17:50:31 (ouverture, carte), 18:23:30 à 18:27:23 (étape 1), 18:27:23 à 18:30:36 (relecture, Loki, corrections), soit 0 h 12 min 30 s ; étape 2 de 18:49:15 à 18:56:03 (6 min 48 s). Corrections et second passage de 19:32:00 à 19:32:27 (0 min 27 s), attente du propriétaire non comptée. Total **19 min 45 s**. Majorant par la méthode de la 05 (écarts d'au plus 1 h entre commits de `poc/bricks/20-kpi`) : 42 min 16 s ; il compte à tort l'écart de 17:50:31 à 18:26:20, qui contient la clôture de la 05 et la 07c. Estimation : 1,5 pw.
+**Heures de la 20** (2026-11-24, `date -u`) : 17:45:07 à 17:50:31 (ouverture, carte), 18:23:30 à 18:27:23 (étape 1), 18:27:23 à 18:30:36 (relecture, Loki, corrections), soit 0 h 12 min 30 s ; étape 2 de 18:49:15 à 18:56:03 (6 min 48 s). Corrections et second passage de 19:32:00 à 19:32:27 (0 min 27 s), attente du propriétaire non comptée. Étape 3 de 19:35:55 à 19:43:23 (7 min 28 s). Total **27 min 13 s**. Majorant par la méthode de la 05 (écarts d'au plus 1 h entre commits de `poc/bricks/20-kpi`) : 42 min 16 s ; il compte à tort l'écart de 17:50:31 à 18:26:20, qui contient la clôture de la 05 et la 07c. Estimation : 1,5 pw.
 
 Les faits des sections suivantes, écrits avant l'étape 1, viennent du dépôt.
 
@@ -58,7 +60,7 @@ Quatre questions posées ensemble, chacune avec la recommandation du conseiller 
 - **Âge des clés** : « Clé publique dans git (Recommandé) », c'est-à-dire le dernier changement de la clé publique versionnée ;
 - **Délai de correction des KEV** : « Loki, 720 h (Recommandé) ». Réserve écrite : l'historique repart de zéro à chaque rejeu (mesuré).
 
-Restent à poser, sans bloquer l'étape 2 : la vérification des signatures par l'exportateur (étape 4) et les licences (le recalcul donne « source absente », 0 prédicat mesuré dans Zot).
+Restent à poser, sans bloquer l'étape 2 : la vérification des signatures par l'exportateur (étape 4 ; l'étape 3 a mesuré ce que change l'absence de vérification) et les licences (le recalcul donne « source absente », 0 prédicat mesuré dans Zot).
 
 ## Après l'étape 2 : décision et limites
 
