@@ -44,3 +44,31 @@ Bilan attendu : **10 cas, 0 écart**. Réellement non lus : les cas 2, 3 et 6.
 - Clés : celle des tâches (Trusted Resources) et celle du lien OpenPGP (09) ne signent aucune attestation de produit, donc non datées ici.
 - La politique de la porte (`ec`, tâches de confiance, Kata, fermetures) n'est pas rejouée.
 - L'exportateur n'a pas git : les dates des pins et des clés devront lui être fournies par un relevé versionné (étape 4).
+
+## Résultat (note de 2026-11-24T18:56:03Z)
+
+[Journal](e2-recalcul.log) : passage du 2026-11-24 à 18:55:04 UTC, dépôt `e6219410`, scripts `e08485330baef30b`, cosign 3.1.4. **10 cas, 0 écart**, code 0.
+
+| KPI | Valeur |
+|---|---|
+| Attestations vérifiées / listées | **37/37** ; clé étrangère : 0 vérifiée |
+| Provenance de Chains vérifiée | **4/4** |
+| VSA qui porte `SLSA_BUILD_LEVEL_3` | **1/4** (`3a7ca1b1`) |
+| Replay identique | **2/4** (`3a7ca1b1`, deb) ; `f5e6bcb0` attend R5, le rpm n'a pas de VSA |
+| KEV ouvertes | 0 pour les trois sujets scannés ; rpm « absent » |
+| Couverture VEX, entrées | `f5e6bcb0` 5/5, `3a7ca1b1` 5/6, deb 23/67, rpm « absent » |
+| Couverture VEX, KEV ; délai de correction | sans objet (0 KEV) |
+| Licences | source absente |
+| Pins | 42 lignes, 39 datées ; 3 « non épinglé dans git » (bundles de pipeline de `3a7ca1b1`, `f5e6bcb0` et du deb) |
+| Clés (dernier changement) | Chains et TSA 2026-11-23T22:12:12Z ; scanner et VEX 23:36:23Z ; VSA 2026-11-03T10:02:16Z |
+
+- **Horodatage** : toutes les provenances sont couvertes (6/6, 8/8, 8/8, 2/2) par un bundle vérifié avec la chaîne du TSA. Une chaîne étrangère n'a pas été essayée ici (J5 l'a fait, `j5-tsa-etrangere`).
+- **Prometheus** : pour `f5e6bcb0` et le deb, les séries de `entrees-scan` sont égales au recalcul signé (5, 5, 0, 0 et 67, 23, 0, 0).
+
+**Constat non prédit : Loki ne voit pas tous les scans.** Zot a 5 scans signés de `sample-app`, Loki 3. Relevé [`e2-loki-scans.log`](e2-loki-scans.log) (18:55:27 UTC, lancé **sans prédiction commitée**, pour expliquer cet écart) :
+- `3a7ca1b1`, scan du 23/11 à 22:28:25Z : absent. Un autre scan a suivi à 22:30:42Z ; or `entrees-scan` passe toutes les 15 min et n'émet que le scan le plus récent ;
+- `f5e6bcb0`, scan du 24/11 à 13:31:32Z : absent. La cible `SCANS` n'a été basculée vers ce digest qu'ensuite (07c).
+
+Conséquence pour le KPI « délai de correction des KEV » (décision « Loki, 720 h ») : une KEV vue seulement dans un scan intermédiaire, ou sur un digest pas encore dans `SCANS`, n'est pas comptée, et le rpm n'est pas suivi. Les dates de scan, elles, sont exactes (`scannedAt`). Aucun effet aujourd'hui (les 8 scans signés des produits ont chacun 0 KEV, relus un par un).
+
+**Heures de l'étape 2** : de 18:49:15 UTC (orientation) à cette note, 6 min 48 s.

@@ -1,0 +1,9 @@
+# loki-scans.py, 2026-11-24T18:55:27Z
+SCAN|builds/sample-app|3a7ca1b14dbf|2026-11-23T22:28:25.126701296Z|ABSENT de Loki
+SCAN|builds/sample-app|3a7ca1b14dbf|2026-11-23T22:30:42.263123586Z|liste dans Loki, 1795475985
+SCAN|builds/sample-app|3a7ca1b14dbf|2026-11-24T09:31:58.802269331Z|liste dans Loki, 1795512896
+SCAN|builds/sample-app|f5e6bcb0e0fb|2026-11-24T13:31:32.890165962Z|ABSENT de Loki
+SCAN|builds/sample-app|f5e6bcb0e0fb|2026-11-24T14:12:28.516620047Z|liste dans Loki, 1795536800
+SCAN|builds/sample-app-deb|60f25f5c3fb5|2026-11-23T23:19:20.104162242Z|liste dans Loki, 1795475985
+SCAN|builds/sample-app-deb|60f25f5c3fb5|2026-11-24T11:16:57.457020454Z|liste dans Loki, 1795519197
+SCAN|builds/sample-app-deb|60f25f5c3fb5|2026-11-24T13:42:38.730975632Z|liste dans Loki, 1795528199
