@@ -76,3 +76,7 @@ Les deux passages sont conformes du premier coup, dépôt `623a477c`.
 Une correction de vocabulaire : en mode compté, les séries gardent les noms `…_verifie`. Si le choix est de ne pas vérifier, il faudra les renommer.
 
 **Heures de l'essai** : de 19:55:31 à 20:02:05 UTC, 6 min 34 s. Total de la brique : 38 min 09 s.
+
+## Relevé de santé d'OpenSSL, prédiction (2026-11-24T20:04:24Z)
+
+Sur relecture du conseiller : openssl deviendrait une dépendance d'exécution de l'exportateur, et docs/04 n'a pas de verdict pour lui. [`sante-openssl.sh`](../sante-openssl.sh), lecture publique seule, commité avant le lancement. Attendu selon les critères de docs/04 : release de moins de 6 mois, au moins 3 auteurs de 2 domaines d'employeurs en 90 jours, SECURITY.md ou politique publiée, releases signées (fichiers `.asc`), Scorecard ≥ 6, corrections de sécurité suivies dans trixie. Verdict attendu : **Sain**. Le moins sûr : le score Scorecard (le plus ancien relevé possible de l'API) et la signature du tag.
