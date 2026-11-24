@@ -62,7 +62,9 @@ Quatre questions posées ensemble, chacune avec la recommandation du conseiller 
 - **Âge des clés** : « Clé publique dans git (Recommandé) », c'est-à-dire le dernier changement de la clé publique versionnée ;
 - **Délai de correction des KEV** : « Loki, 720 h (Recommandé) ». Réserve écrite : l'historique repart de zéro à chaque rejeu (mesuré).
 
-Restent à poser, sans bloquer l'étape 2 : la vérification des signatures par l'exportateur (étape 4 ; l'étape 3 a mesuré ce que change l'absence de vérification, l'essai openssl que vérifier ne demande pas cosign) et les licences (le recalcul donne « source absente », 0 prédicat mesuré dans Zot).
+Décision du 2026-11-24 sur la **vérification des signatures par l'exportateur** (écrite le 2026-11-24T20:07:20Z), verbatim : **« openssl (Recommandé) »**. Option retenue telle que posée : « Paquet openssl de Debian sur sc-stockage, rien à installer s'il y est déjà (à vérifier). Verdict docs/04 proposé « Sain » ; 14 CVE ouvertes dans trixie, aucun titre ne nomme la vérification ECDSA. Prix : 4 clés publiques à poser et à reposer après chaque rejeu. » Options écartées : « cosign épinglé », « Ne pas vérifier ». Donc `SIGNATURES=verifiees` à la pose, et pas de renommage des séries. Cette décision ne vaut pas accord de pose (étape 4).
+
+Reste à poser : les licences (le recalcul donne « source absente », 0 prédicat mesuré dans Zot).
 
 ## Après l'étape 2 : décision et limites
 
