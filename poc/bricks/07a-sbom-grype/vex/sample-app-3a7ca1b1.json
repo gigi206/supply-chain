@@ -1,0 +1,138 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://supply-chain.example/vex/sample-app/A-NOMMER",
+  "author": "",
+  "timestamp": "",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": {
+        "name": "GHSA-3fxj-6jh8-hvhx"
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "",
+      "impact_statement": "",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GHSA-j6qf-3m9c-vwj3",
+        "aliases": [
+          "CVE-2026-114437"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "",
+      "impact_statement": "",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GHSA-mqqf-5wvp-8fh8",
+        "aliases": [
+          "CVE-2025-69725"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "",
+      "impact_statement": "",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-5775",
+        "aliases": [
+          "GHSA-9g5q-2w5x-hmxf"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "",
+      "impact_statement": "",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-5777",
+        "aliases": [
+          "GHSA-rjr7-jggh-pgcp"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "",
+      "impact_statement": "",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-6859",
+        "aliases": [
+          "CVE-2026-97054"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.26.10"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "",
+      "impact_statement": "",
+      "timestamp": ""
+    }
+  ]
+}

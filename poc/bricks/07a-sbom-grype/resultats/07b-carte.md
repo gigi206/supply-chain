@@ -2290,3 +2290,22 @@ Demande du propriétaire : « Pièce 8 d'abord » (préparer la pièce 8 pendant
 - « Aucun VEX publié » n'est mesuré que sur **sample-app** (`PUBLIES|0`). Le deb n'a pas été interrogé.
 - Deb : 62 des 67 entrées portent sur `pkg:golang/stdlib@1.24.4` et 5 sur `go-chi/chi`. Les 3 Critical (`GO-2026-4337`, `GO-2026-6604`, `GO-2026-6612`) portent toutes sur la bibliothèque standard de Go 1.24.4.
 - **Heures** : plus 23:36:45 à 23:43:41 UTC (6 min 56 s : relevé sur le vrai Zot et notes). **Total : au plus 14 h 47 min 29 s**, pour 10 h estimées. Le seuil de 20 h n'est pas atteint.
+
+## Pièce 8 : gabarit de sample-app et faits pour la décision (note de 2026-11-24T08:28:09Z)
+
+Choix du propriétaire (verbatim) : « Pièce 8 maintenant » (plutôt qu'un rejeu de zéro d'un seul trait avant).
+
+**Gabarit** [`vex/sample-app-3a7ca1b1.json`](../vex/sample-app-3a7ca1b1.json) : `vex-gabarit.sh` à 08:28:07Z sur le vrai Zot (lecture seule, par `192.168.161.13:5000`). Il contient les 6 entrées du scan signé de sample-app `3a7ca1b1…` (scan du 22:30:42Z), un énoncé `not_affected` par entrée. `author`, `timestamp`, `@id`, `justification` et `impact_statement` sont vides. Tel quel, il est refusé par `signer-vex.sh verifier`. Rien n'est signé.
+
+**Faits relevés pour le propriétaire** (aucune justification proposée par la session) :
+- Fiches OSV lues par `api.osv.dev` le 24/11 entre 08:19:52 et 08:27:49 UTC (bornes mesurées par les commandes voisines ; fiches non archivées), pour les 6 identifiants :
+  - `GHSA-3fxj-6jh8-hvhx` (alias `GO-2026-5774`), `GO-2026-5775` et `GO-2026-5777` : middleware `RealIP` de chi (en-tête `X-Forwarded-For`) ; symbole touché pour les deux `GO-` : `github.com/go-chi/chi/v5/middleware.RealIP` ;
+  - `GHSA-j6qf-3m9c-vwj3` : `ClientIPFromXFF` et `middleware.GetClientIP` de chi ;
+  - `GHSA-mqqf-5wvp-8fh8` : middleware `RedirectSlashes` de chi (redirection ouverte) ;
+  - `GO-2026-6859` : `net/http`, serveur HTTP/1 qui plante quand `MaxBytesReader` ou `MaxBytesHandler` dépasse sa limite pendant une écriture concurrente d'en-tête.
+- Sources de sample-app dans le dépôt (`poc/sample-app/main.go`, 41 lignes) : seul import de chi, `github.com/go-chi/chi/v5` (jamais `…/middleware`) ; seuls appels, `chi.NewRouter`, `r.Get("/version", …)` et `r.Handle("/*", http.FileServer(…))`. `grep` de `RealIP`, `RedirectSlashes`, `ClientIPFromXFF`, `GetClientIP`, `MaxBytes`, `middleware` et `X-Forwarded` dans les `.go` : aucune occurrence.
+- **Non vérifié** :
+  - que le paquet `chi/v5` lui-même n'importe pas `chi/v5/middleware` : le module chi n'est pas dans le cache de l'hôte (`go list -deps` hors réseau a échoué) ; le lire demande un téléchargement ;
+  - que `http.FileServer` n'utilise pas `MaxBytesReader` ;
+  - qu'un outil d'atteignabilité (`govulncheck`) donnerait le même avis : il n'est pas installé ;
+  - que l'image `3a7ca1b1…` a été construite exactement depuis ces sources.
