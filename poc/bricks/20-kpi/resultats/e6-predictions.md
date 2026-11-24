@@ -52,3 +52,8 @@ Attendu du troisième passage (`SUFFIXE=-3`) : 28 cas, 0 écart ; les 28 autres 
 ## Résultat du troisième passage (note de 2026-11-24T21:47:59Z)
 
 [Journal](e6-promql-banc-3.log), 21:46:02 UTC, dépôt `07521785` : **28 cas, 0 écart** ; 117 cas de `promtool` passés, 14 mutants du tableau refusés sans qu'une autre requête échoue, 6 mutants de règles refusés. Le cas `NaN` (digest scanné sans entrée) est couvert par deux requêtes dérivées, pas par la requête telle quelle.
+
+## Après relecture du conseiller : description du panneau 2, clés non commitées (prédiction de 2026-11-24T21:52:26Z)
+
+- La description du panneau 2 disait « non déployée au 24/11/2026 » : retirée, sinon déployer les règles imposerait une seconde pose du tableau. Aucune requête ne change. Passages refaits : `e6-promql-banc-4.log` (28 cas, 0 écart), `e6-tableau-banc-2.log` (22 cas, 0 écart, même empreinte des panneaux `b679e16a01a0b41a`, qui ne porte pas les descriptions), `e6-tableau-sec-2.log` (31 cas, 0 écart).
+- `kpi-pose.sh` refuse une clé publique de l'arbre différente de HEAD. Essai par l'étape `sec` (hôte, sans ssh), dans un clone jetable : `e7-cles-conformes.log`, arbre propre, **4 cas, 0 KO, code 0** ; `e7-cles-changees.log`, une ligne vide ajoutée à la clé de Chains du clone, **1 KO, celui de ce contrôle**, code 1. Le relevé (`verifier`) doit rester « à jour » dans les deux cas : c'est le défaut corrigé.

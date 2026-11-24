@@ -34,7 +34,7 @@
       "id": 2,
       "type": "stat",
       "title": "Âge du dernier passage",
-      "description": "time() − heure du dernier passage réussi ; rouge au-delà de 45 min (seuil de l'alerte KpiPassageEnRetard, non déployée au 24/11/2026)",
+      "description": "time() − heure du dernier passage réussi ; rouge au-delà de 45 min (seuil de l'alerte KpiPassageEnRetard)",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"

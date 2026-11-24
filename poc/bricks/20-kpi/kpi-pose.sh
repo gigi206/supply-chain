@@ -44,6 +44,10 @@ preparer() { # fichiers à poser, rassemblés dans $T/pose
   python3 -I -c 'import runpy, sys; sys.stdout.buffer.write(runpy.run_path(sys.argv[1])["VECTEUR_PUB"])' "$x/metrics_exporter.py" > "$T/pose/cles/vecteur.pub"
 }
 controles_hote() {
+  # le relevé lit les clés dans HEAD, preparer les copie depuis l'arbre : une clé changée sans commit (rejeu, re-signature) est refusée ici
+  attendu "clés publiques de l'arbre identiques à HEAD" "$(git -C "$RACINE" diff --quiet HEAD -- poc/bricks/08-trust-plane/resultats/chains-cle-publique.pem \
+    poc/bricks/07a-sbom-grype/resultats/scanner-cle-publique.pem poc/bricks/07a-sbom-grype/resultats/vex-cle-publique.pem \
+    poc/bricks/10-independent-replay/resultats/vsa-cle-publique.pem poc/bricks/08-trust-plane/resultats/tsa-chaine.pem && echo oui || echo non)" oui
   attendu "relevé des dates de git" "$(python3 -I "$here/releve-dates.py" verifier > /dev/null 2>&1 && echo "à jour" || echo périmé)" "à jour"
   preparer; attendu "fichiers à poser" "$(find "$T/pose" -type f | wc -l)" 12
   attendu "aucune clé privée parmi eux" "$(grep -rl 'PRIVATE KEY' "$T/pose" | wc -l)" 0
