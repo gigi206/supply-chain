@@ -1,0 +1,82 @@
+# banc-grafana.sh, 2026-11-24T20:56:06Z, dépôt ab327c34, scripts 9c274c0fe9ecc7e6
+loki-linux-amd64.zip: OK
+grafana_13.3.0_40412481033_linux_amd64.tar.gz: OK
+# variante : liste ; grafana.ini : 1 ligne de liste
+# Loki 3.7.9, Grafana 13.3.0
+# routes dans l'espace de noms : 0
+## 1. Loki en direct (témoins)
+OK   sans certificat client : 000
+OK   écriture avec le certificat client : 204
+OK   ligne témoin directe relue : 1
+## 2. compte Viewer
+OK   création : 200
+OK   rôle relu : Viewer
+OK   lecture par /api/ds/query : 200 1
+## 3. écritures par le Viewer : code HTTP, lignes arrivées dans Loki
+OK   kpi-journal, POST /api/datasources/proxy/uid/loki/loki/api/v1/push : 403, 0 ligne(s)
+  réponse : {"message":"Data proxy hostname and ip are not included in whitelist"} {"message":"target URL is not a valid target"} 
+OK   kpi-journal, PUT /api/datasources/proxy/uid/loki/loki/api/v1/push : 403, 0 ligne(s)
+  réponse : {"message":"Data proxy hostname and ip are not included in whitelist"} {"message":"target URL is not a valid target"} 
+OK   kpi-journal, POST /api/datasources/uid/loki/resources/loki/api/v1/push : 404, 0 ligne(s)
+  réponse : {"message":"404 page not found\n"}
+OK   admin, POST /api/datasources/proxy/uid/loki/loki/api/v1/push : 403, 0 ligne(s)
+  réponse : {"message":"Data proxy hostname and ip are not included in whitelist"} {"message":"target URL is not a valid target"} 
+## 4. autres chemins de Loki par le proxy, Viewer (code HTTP)
+MESURE|GET /config|HTTP 403
+MESURE|GET /metrics|HTTP 403
+MESURE|POST /log_level?log_level=debug|HTTP 403
+MESURE|POST /flush|HTTP 403
+MESURE|GET /flush|HTTP 403
+MESURE|GET /log_level?log_level=debug|HTTP 403
+MESURE|GET /ingester/prepare_shutdown|HTTP 403
+MESURE|PUT /ingester/prepare_shutdown|HTTP 403
+MESURE|DELETE /ingester/prepare_shutdown|HTTP 403
+MESURE|GET /services|HTTP 403
+MESURE|POST /loki/api/v1/delete?query=%7Bsource%3D%22essai%22%7D&start=0|HTTP 403
+## 5. lecteur_loki.py, puis kev() : délais du banc
+OK   lignes de entrees-scan poussées : 204
+journal : 9 lignes
+OK   lecteur : code : 0
+OK   lignes lues : résumés, entrées KEV : 3 6
+OK   délais des KEV (valeurs de banc_comparer.py) : conforme
+OK   5000 entrées KEV poussées : 204
+refus : Refus : 5000 lignes, réponse peut-être tronquée
+OK   réponse tronquée : code, fichier inchangé : 2 oui
+## 6. arrêt de Loki par le proxy, Viewer
+## 7. avec la liste : ce qui doit marcher encore, ce qui doit être refusé
+OK   requête normale par /api/ds/query : 200 1
+OK   noms d'étiquettes par les ressources (explorateur) : 200 true
+OK   santé de la source (administrateur) : 200
+OK   proxy vers la source Prometheus (rien n'écoute : 502, donc permis) : 502
+OK   kpi-journal, GET proxy /config : 403
+OK   kpi-journal, GET proxy /flush : 403
+OK   kpi-journal, GET proxy /log_level?log_level=debug : 403
+OK   kpi-journal, GET proxy /loki/api/v1/labels : 403
+OK   admin, GET proxy /config : 403
+OK   admin, GET proxy /flush : 403
+OK   admin, GET proxy /log_level?log_level=debug : 403
+OK   admin, GET proxy /loki/api/v1/labels : 403
+MESURE|GET proxy/uid/loki/ingester/shutdown|HTTP 403|{"message":"Data proxy hostname and ip are not included in whitelist"} {"message":"target 
+OK   après GET proxy/uid/loki/ingester/shutdown : Loki vivant, /ready 200
+MESURE|GET proxy/2/ingester/shutdown|HTTP 404|{"message":"Not found"} 
+OK   après GET proxy/2/ingester/shutdown : Loki vivant, /ready 200
+MESURE|GET proxy/uid/loki//ingester/shutdown|HTTP 403|{"message":"Data proxy hostname and ip are not included in whitelist"} {"message":"target 
+OK   après GET proxy/uid/loki//ingester/shutdown : Loki vivant, /ready 200
+MESURE|GET proxy/uid/loki/%2e%2e/ingester/shutdown|HTTP 403|{"message":"Data proxy hostname and ip are not included in whitelist"} {"message":"target 
+OK   après GET proxy/uid/loki/%2e%2e/ingester/shutdown : Loki vivant, /ready 200
+MESURE|GET proxy/uid/loki/loki/api/v1/../../../ingester/shutdown|HTTP 403|{"message":"Data proxy hostname and ip are not included in whitelist"} {"message":"target 
+OK   après GET proxy/uid/loki/loki/api/v1/../../../ingester/shutdown : Loki vivant, /ready 200
+MESURE|GET resources/ingester/shutdown|HTTP 404
+OK   après GET resources/ingester/shutdown : Loki vivant, /ready 200
+MESURE|GET resources//ingester/shutdown|HTTP 404
+OK   après GET resources//ingester/shutdown : Loki vivant, /ready 200
+MESURE|GET resources/../ingester/shutdown|HTTP 400
+OK   après GET resources/../ingester/shutdown : Loki vivant, /ready 200
+MESURE|GET resources/..%2f..%2f..%2fingester%2fshutdown|HTTP 400
+OK   après GET resources/..%2f..%2f..%2fingester%2fshutdown : Loki vivant, /ready 200
+MESURE|GET resources/labels/../../../../ingester/shutdown|HTTP 400
+OK   après GET resources/labels/../../../../ingester/shutdown : Loki vivant, /ready 200
+## bilan : 38 cas, 0 écart(s)
+## 8. systemd (gestionnaire utilisateur) : programme qui sort avec le code 0, relancé ?
+OK   Restart=on-failure : relancé : non
+OK   Restart=always : relancé : oui

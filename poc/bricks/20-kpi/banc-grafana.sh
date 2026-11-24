@@ -136,7 +136,7 @@ $(sed -n '/^limits_config:/,/^$/p;/^pattern_ingester:/,/^$/p;/^analytics:/,/^$/p
 YAML
   sed -E "s#^http_addr = .*#http_addr = 127.0.0.1#; s#^domain = .*#domain = 127.0.0.1#; s#^cert_file = .*#cert_file = $T/serveur.crt#; s#^cert_key = .*#cert_key = $T/serveur.key#
     s#^data = .*#data = $T/g-data#; s#^logs = .*#logs = $T/g-log#; s#^plugins = .*#plugins = $T/g-plugins#; s#^provisioning = .*#provisioning = $T/prov#
-    s#^admin_password = .*#admin_password = \$__file{$T/admin.mdp}#" "$J19/config/grafana.ini" > "$T/grafana.ini"
+    /^data_source_proxy_whitelist/d; s#^admin_password = .*#admin_password = \$__file{$T/admin.mdp}#" "$J19/config/grafana.ini" > "$T/grafana.ini"
   [ -z "${VARIANTE:-}" ] || sed -i "s/^\[security\]$/[security]\ndata_source_proxy_whitelist = 127.0.0.1:9090/" "$T/grafana.ini"
   echo "# variante : ${VARIANTE:-configuration en service} ; grafana.ini : $(grep -c data_source_proxy_whitelist "$T/grafana.ini") ligne de liste"
   mkdir -p "$T"/prov/{datasources,dashboards,plugins,alerting}

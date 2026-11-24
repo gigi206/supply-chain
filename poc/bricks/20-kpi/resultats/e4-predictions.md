@@ -141,3 +141,15 @@ Candidat lu dans `conf/defaults.ini` de l'archive de Grafana 13.3.0 : `data_sour
 - Loki reste vivant après 5 formes d'arrêt par le proxy (identifiant numérique, double barre, `%2e%2e`, remontées) et 5 par les ressources ;
 
 et 2 sur systemd : un programme qui sort avec le code 0 est relancé par `Restart=always`, pas par `Restart=on-failure`. Les moins sûrs : les remontées de chemin par les ressources, puis la portée de la liste.
+
+### Résultat de la variante « liste », et pose préparée, prédiction (2026-11-24T20:59:41Z)
+
+[`e4-banc-grafana-liste.log`](e4-banc-grafana-liste.log) (20:56:06 UTC, dépôt `ab327c34`) : **40 cas, 0 écart**, au premier passage. Avec `data_source_proxy_whitelist = 127.0.0.1:9090`, tout GET vers Loki par le proxy est refusé (403), administrateur compris ; Loki survit aux 10 formes d'arrêt essayées ; requêtes, étiquettes, santé et lecteur inchangés. `Restart=always` relance après une sortie 0, `on-failure` non.
+Limites : banc ; le suivi en direct de l'explorateur (websocket par le proxy) n'est pas essayé et devrait être perdu ; les porteurs d'un certificat client de la CA gardent l'accès direct à Loki (D16) ; l'interface n'a pas été ouverte.
+
+Écrits à sec : [`kpi-journal.service`](../systemd/kpi-journal.service) ; `kpi.service` (JOURNAL, Wants, groupe du journal) ; [`kpi-pose.sh`](../kpi-pose.sh), qui refuse la pose si le relevé est périmé ou si le proxy mène encore à Loki ; [`liste-proxy.sh`](../../19b-journalisation/liste-proxy.sh). `config/grafana.ini` n'est **pas** modifié : il le sera sur accord.
+
+Attendu, lecture seule :
+- `kpi-pose.sh sec` (`e4-kpi-pose-sec.log`) : 3 cas, 0 KO ; mot de passe absent ;
+- `unite-hote.sh` (`e4-unite-hote-4.log`) : **27 cas, 0 écart** (23, plus le durcissement du lecteur et 3 sur le lecteur durci avec `LoadCredential`). Le moins sûr : `LoadCredential` sous le gestionnaire utilisateur ; s'il est refusé, c'est une réserve pour la pose ;
+- `liste-proxy.sh avant` (19b, `resultats/liste-proxy-avant.log`), auditeur, seul chemin de Loki demandé : `/loki/api/v1/status/buildinfo` : **5 cas, 0 KO**, proxy vers Loki **200** (le défaut existe sur la plateforme pour les GET ; rien d'actif n'est essayé).

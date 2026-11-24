@@ -1,0 +1,42 @@
+# Brique 20, étape 4 : lecteur des lignes de entrees-scan dans Loki, par l'API de Grafana (décision « Compte Grafana Viewer (Recommandé) » du
+# 24/11/2026, reconfirmée avec son prix corrigé). NON POSÉ. Compte système distinct de kpi : l'exportateur ne porte aucun secret. Mot de passe du
+# compte Grafana kpi-journal dans /etc/kpi-journal (root, 0600), remis au seul service par LoadCredential. Pas de timer : kpi.service le lance.
+# lignes est créé par la pose : le lecteur ouvre un fichier existant, et un échec ne change ni son contenu ni sa date.
+[Unit]
+Description=Lignes de entrees-scan lues dans Loki pour les KPI (brique 20)
+After=grafana.service loki.service
+
+[Service]
+Type=oneshot
+User=kpi-journal
+Group=kpi-journal
+LoadCredential=mdp:/etc/kpi-journal/grafana.password
+Environment=GRAFANA=https://192.168.161.13:3001 CA=/etc/base-grype/ca-poc.crt UTILISATEUR=kpi-journal MDP=%d/mdp
+Environment=SORTIE=/var/lib/kpi-journal/lignes
+ExecStart=/usr/local/lib/kpi/lecteur_loki.py
+StateDirectory=kpi-journal
+StateDirectoryMode=0750
+TimeoutStartSec=3min
+IPAddressDeny=any
+IPAddressAllow=192.168.161.13
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_UNIX
+SystemCallArchitectures=native
+UMask=0027
