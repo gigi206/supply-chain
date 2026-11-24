@@ -488,3 +488,16 @@ Choix du propriétaire, verbatim : « Étudier un VEX ». Aucune nouvelle mesure
 - Le VEX du deb publié le 24/11 (`builds/vex/sample-app-deb@44f86e53…`, 23 énoncés) ne couvre pas GO-2026-6859.
 
 **Conclusion** : aucune des justifications `not_affected` n'est mesurée. Comme pour l'image, la seule correction est une stdlib corrigée, donc un `golang-1.24` de Debian corrigé ou une autre toolchain pour le deb. C'est un choix du propriétaire. Rien n'est signé ni publié.
+
+## Deb : la toolchain de Debian, et pas seulement GO-2026-6859 (note de 2026-11-24T17:50:25Z, relevés de 17:48:30 à 17:49:15 UTC)
+
+Sur recommandation du conseiller, deux relevés en lecture seule, non scriptés (sorties lues dans la session, non archivées) :
+- **Loki, par l'auditeur** (17:48:30 UTC), dernier scan du deb (13:42:38 UTC), entrées groupées par paquet et gravité : **62 des 67 entrées portent `pkg:golang/stdlib@1.24.4`** (3 Critical, 33 High, 25 Medium, 1 Low) ; les 5 autres sont celles de chi 5.2.3. GO-2026-6859 n'est qu'une Medium parmi les 62. Rappel de l'ADR 0004 (l. 94) : le VEX du deb en écarte 23, il en reste 44, dont 2 Critical et 28 High.
+- **Debian, pages publiques** (17:48:37 à 17:49:15 UTC ; aucune donnée du propriétaire dans les requêtes) :
+  - security-tracker, `golang-1.24` : trixie en **1.24.4-1**, la version du verrou, avec des CVE marquées « vulnerable (no DSA) ». Debian ne publie pas de `golang-1.24` corrigé pour trixie ;
+  - security-tracker, `golang-1.26` : forky et sid en 1.26.11-1 ;
+  - packages.debian.org : **trixie-backports publie `golang-1.26-go` 1.26.11-1~bpo13+1**. Les pages `golang-1.25-go` et `golang-go` de trixie-backports ont répondu 503, donc rien n'est lu pour elles.
+
+**Conséquence** : un VEX ne corrige pas le deb, puisque 31 entrées sont en classe C. La correction passe par une toolchain corrigée. Il existe une voie dans Debian même : `golang-1.26-go` de trixie-backports, en 1.26.11 comme l'image, dont la stdlib n'a aucune entrée dans la base Grype du 24/11 (ADR 0004, l. 94). Cela changerait les dépendances de construction et le verrou de la 06 (`verrou-deb.txt`, `debian/rules` qui cite `golang-1.24-src` en dur), puis obligerait à rejouer la 06 et à refaire son VEX. C'est un chantier de la taille de la 07c, et un choix du propriétaire. Rien n'est modifié.
+
+*Correction de 17:50:25Z* : `deb-go-6859.sh` écrivait ses fichiers intermédiaires dans `/tmp` et les effaçait par une expansion de variable. Il utilise maintenant le chemin littéral `~/.cache/supply-chain-poc/07c/deb-go-6859`, effacé à la sortie. Le journal `deb-go-6859.log` vient de la version d'avant. Le calcul est le même ; seul le dossier temporaire change.

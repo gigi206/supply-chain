@@ -10,6 +10,10 @@ O8=$HOME/.cache/supply-chain-poc/08
 CA=$O8/pki/ca-poc.crt
 GRAF=https://192.168.161.13:3001
 N=0; KO=0
+T=$HOME/.cache/supply-chain-poc/07c/deb-go-6859   # chemin écrit en entier : effacé à la sortie (correction du 24/11 : plus rien dans /tmp)
+[ ! -e ~/.cache/supply-chain-poc/07c/deb-go-6859 ] || find ~/.cache/supply-chain-poc/07c/deb-go-6859 -delete
+mkdir -p "$T"
+trap 'find ~/.cache/supply-chain-poc/07c/deb-go-6859 -delete' EXIT
 attendu() { N=$((N + 1)); if [ "$2" = "$3" ]; then echo "OK   $1 : $2"; else echo "KO   $1 : $2 (attendu $3)"; KO=$((KO + 1)); fi; }
 loki() { # requête LogQL instantanée, réponse JSON de /api/ds/query ; mot de passe par l'entrée standard de curl
   local t
@@ -22,16 +26,15 @@ lignes() { jq -r '[.results.A.frames[]? | "\(.schema.fields[1].labels // {} | to
 S='{source="journal", unite="entrees-scan.service"}'
 echo "# GO-2026-6859 dans les scans signés, relevé dans Loki, $(date -u +%FT%TZ), $(git rev-parse --short=8 HEAD)"
 echo "## entrées par scan (24 h)"
-loki "sum by (depot, scannedAt) (count_over_time($S | json | id=~\".+\" [24h]))" | lignes | tee "${TMPDIR:-/tmp}/deb-go-6859.$$"
+loki "sum by (depot, scannedAt) (count_over_time($S | json | id=~\".+\" [24h]))" | lignes | tee "$T/scans"
 echo "## entrées GO-2026-6859 par scan (24 h)"
-loki "sum by (depot, scannedAt, id, severity, kev, fixedIn, package) (count_over_time($S |= \"GO-2026-6859\" | json [24h]))" | lignes > "${TMPDIR:-/tmp}/deb-go-6859-id.$$"
-cat "${TMPDIR:-/tmp}/deb-go-6859-id.$$"
-dernier() { grep "\"depot\":\"$1\"" "${TMPDIR:-/tmp}/deb-go-6859.$$" | sed -E 's/.*"scannedAt":"([^"]+)".*/\1/' | sort | tail -1; }
+loki "sum by (depot, scannedAt, id, severity, kev, fixedIn, package) (count_over_time($S |= \"GO-2026-6859\" | json [24h]))" | lignes > "$T/ids"
+cat "$T/ids"
+dernier() { grep "\"depot\":\"$1\"" "$T/scans" | sed -E 's/.*"scannedAt":"([^"]+)".*/\1/' | sort | tail -1; }
 D=$(dernier builds/scan/sample-app-deb); I=$(dernier builds/scan/sample-app)
 echo "dernier scan du deb : $D ; dernier scan de l'image : $I"
-attendu "GO-2026-6859 dans le dernier scan du deb" "$(grep -c "\"depot\":\"builds/scan/sample-app-deb\".*\"scannedAt\":\"$D\"" "${TMPDIR:-/tmp}/deb-go-6859-id.$$")" 1
-attendu "GO-2026-6859 hors KEV dans le dernier scan du deb" "$(grep "\"depot\":\"builds/scan/sample-app-deb\".*\"scannedAt\":\"$D\"" "${TMPDIR:-/tmp}/deb-go-6859-id.$$" | grep -c '"kev":"false"')" 1
-attendu "GO-2026-6859 dans le dernier scan de l'image (f5e6bcb0, Go 1.26.11)" "$(grep -c "\"depot\":\"builds/scan/sample-app\".*\"scannedAt\":\"$I\"" "${TMPDIR:-/tmp}/deb-go-6859-id.$$")" 0
-find "${TMPDIR:-/tmp}" -maxdepth 1 -name "deb-go-6859*.$$" -delete
+attendu "GO-2026-6859 dans le dernier scan du deb" "$(grep -c "\"depot\":\"builds/scan/sample-app-deb\".*\"scannedAt\":\"$D\"" "$T/ids")" 1
+attendu "GO-2026-6859 hors KEV dans le dernier scan du deb" "$(grep "\"depot\":\"builds/scan/sample-app-deb\".*\"scannedAt\":\"$D\"" "$T/ids" | grep -c '"kev":"false"')" 1
+attendu "GO-2026-6859 dans le dernier scan de l'image (f5e6bcb0, Go 1.26.11)" "$(grep -c "\"depot\":\"builds/scan/sample-app\".*\"scannedAt\":\"$I\"" "$T/ids")" 0
 echo "## bilan : $N cas, $KO écart(s)"
 [ "$KO" = 0 ]

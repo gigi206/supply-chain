@@ -14,7 +14,7 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 docs/02, §7 (l. 229) : « `tools/metrics-exporter` dérive les métriques **des attestations** (taux L3 vérifié, taux de replay identique, KEV ouvertes et délai de correction, couverture VEX, violations de licences, âge des pins et des clés). Seuil : 0 écart avec le recalcul. » Le schéma du §5 (l. 189) place `metrics-exporter` après `tools/score`, qui n'existe pas non plus.
 
-Vérifié le 2026-11-24 à 17:45 UTC : `tools/` ne contient que `health/`, `index/` et `secrets-depot.sh`. Il n'y a ni `tools/metrics-exporter` ni `tools/score`.
+Vérifié le 2026-11-24 à 17:50:01 UTC (`date -u` de la même commande) : `tools/` ne contient que `health/`, `index/` et `secrets-depot.sh`. Il n'y a ni `tools/metrics-exporter` ni `tools/score`.
 
 ## Inventaire des KPI
 
@@ -23,7 +23,7 @@ Vérifié le 2026-11-24 à 17:45 UTC : `tools/` ne contient que `health/`, `inde
 | Taux L3 vérifié | provenance `https://slsa.dev/provenance/v1` de Chains, verdict de la porte | oui (`builds/*`, tag `.att` et referrers) | non : la porte juge à l'admission, aucun compte |
 | Taux de replay identique | VSA `https://slsa.dev/verification_summary/v1` du domaine de replay | oui pour l'image (`builds/vsa/sample-app`) ; pour le deb, seulement si `pousser_vsa` de la 06 a tourné | non |
 | KEV ouvertes | scan `https://supply-chain.example/scan/v1` (champs `kev`, `kevCves`) moins les VEX | oui | **oui**, 07b : `scan_entrees_kev - scan_entrees_kev_vex`, panneau 7 du tableau « Vulnérabilités et VEX » |
-| Délai de correction des KEV | historique des scans : première apparition d'une KEV, puis premier scan où elle est absente ou écartée | historique partiel : rétention des referrers dans Zot (G7), listes par scan dans Loki (`entrees-scan`, 720 h) | non ; 0 KEV aujourd'hui, donc il faudra un témoin |
+| Délai de correction des KEV | historique des scans : première apparition d'une KEV, puis premier scan où elle est absente ou écartée | historique partiel : rétention des referrers dans Zot (G7), listes par scan dans Loki (`entrees-scan` ; `retention_period: 720h`, `19b-journalisation/config/loki.yaml` l. 77) | non ; 0 KEV aujourd'hui, donc il faudra un témoin |
 | Couverture VEX | scan et VEX `https://openvex.dev/ns/v0.2.0` | oui | **oui**, 07b : KPI 3a et 3b (panneaux 6 et 8) |
 | Violations de licences | `https://supply-chain.example/licences/v1` (13a, `licences.py`) | **non** : prédicat produit au banc, pas par une tâche de la plateforme (docs/03, ligne Licences) | non |
 | Âge des pins | `resolvedDependencies` des provenances ; verrous `verrou-rpm.json`, `verrou-deb.txt` | partiel | non ; définition à choisir |
@@ -35,7 +35,7 @@ Constat qui pèse sur le seuil : `entrees-scan.py` (07b) **ne vérifie pas les s
 
 1. **Relevé à sec, lecture seule** : par dépôt de `builds/`, lister les attestations présentes dans Zot (anonyme) et leur type de prédicat. Résultat attendu : les dénominateurs (combien d'artefacts, lesquels ont une VSA ou un scan). Aucun accord.
 2. **Recalcul de référence sur l'hôte** : un script qui relit chaque attestation, la vérifie avec la clé publique de son émetteur (cosign, déjà utilisé dans le PoC) et calcule chaque KPI. C'est lui qui définit « le recalcul » du seuil.
-3. **Banc jetable** : Zot local et attestations témoins (un artefact sans VSA, une VSA FAILED, une KEV non écartée puis corrigée, une signature fausse). Le recalcul et l'exportateur doivent donner les mêmes valeurs, et la signature fausse doit être écartée.
+3. **Banc jetable** : Zot local et attestations témoins (un artefact sans VSA, une VSA FAILED, une KEV non écartée puis corrigée, une signature fausse). Le recalcul et l'exportateur doivent donner les mêmes valeurs sur les témoins signés. Pour la signature fausse, l'attendu dépend du premier choix ci-dessous : si l'exportateur vérifie, il l'écarte ; s'il ne vérifie pas, le recalcul doit la détecter comme un écart non nul.
 4. **Pose de l'exportateur** (accord, sudo sur sc-stockage) : un service systemd et un fichier `.prom`, sur le modèle de `entrees-scan`.
 5. **Seuil** : valeurs de Prometheus, lues par l'auditeur dans Grafana, comparées au recalcul de l'étape 2 : 0 écart.
 6. **Tableau « KPI supply-chain »** (accord) : provisionné comme « Vulnérabilités et VEX » (ADR 0004).
@@ -51,7 +51,7 @@ Constat qui pèse sur le seuil : `entrees-scan.py` (07b) **ne vérifie pas les s
 
 ## Outils
 
-Aucun outil nouveau n'est prévu : Python 3 de la distribution (comme `entrees-scan.py`), cosign et crane déjà épinglés et vérifiés dans le PoC. Si un outil s'ajoute, il passera d'abord par le doc 04.
+Aucun outil nouveau n'est prévu : Python 3 de la distribution (comme `entrees-scan.py`), cosign 3.1.4 et crane 0.20.6, épinglés dans `mise.toml` (l. 21-22, `mise.lock`). Si un outil s'ajoute, il passera d'abord par le doc 04.
 
 ## Liens
 
