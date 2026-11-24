@@ -24,7 +24,7 @@ test ! -e "$B" || { echo "existe déjà : $B"; exit 1; }
 test ! -e "$F" || { echo "existe déjà : $F"; exit 1; }
 test ! -e "$J" || { echo "existe déjà : $J"; exit 1; }
 export CA=$HOME/.cache/supply-chain-poc/08/pki/ca-poc.crt CLE_SCANNER=$R/resultats/scanner-cle-publique.pem
-export SSL_CERT_FILE=$CA
+# passage 2 (12:56Z) : SSL_CERT_FILE n'est plus exporté (au passage 1, curl vers api.osv.dev n'avait que la CA du PoC : 0 fiche)
 DEB=192.168.161.13:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
 GO=$(mise which go)
 mkdir -p "$B/oci" "$B/racine" "$F"
@@ -34,11 +34,11 @@ attendu() { N=$((N + 1)); if [ "$2" = "$3" ]; then echo "OK   $1 : $2"; else ech
 echo "# tri des entrées du deb, $(date -u +%FT%TZ), $(git rev-parse --short=8 HEAD), crane $(crane version)"
 echo "## 1. entrées du dernier scan signé (vex-gabarit.sh)"
 o=$(timeout 180 bash "$R/vex-gabarit.sh" "$DEB" - 2>&1); echo "$o" | grep -v '^| [0-9]' | cut -c1-220
-grep '^| [0-9]' <<< "$o" | awk -F'|' '{for (i = 2; i <= NF; i++) gsub(/^ +| +$/, "", $i); print $3 "\t" $5 "\t" $8}' > "$B/entrees.tsv"
+grep '^| [0-9]' <<< "$o" | awk -F'|' '{for (i = 2; i <= NF; i++) gsub(/^ +| +$/, "", $i); gsub(/`/, "", $8); print $3 "\t" $5 "\t" $8}' > "$B/entrees.tsv"
 echo "entrées : $(wc -l < "$B/entrees.tsv") ; stdlib : $(grep -c 'stdlib' "$B/entrees.tsv") ; chi : $(grep -c 'go-chi' "$B/entrees.tsv")"
 echo "## 2. binaire du paquet"
-attendu "digest du manifeste relu" "$(crane digest "$DEB" 2>&1)" "sha256:${DEB##*@sha256:}"
-crane export "$DEB" - | tar -x -C "$B/oci"; deb=$(ls "$B/oci"/*.deb)
+attendu "digest du manifeste relu" "$(SSL_CERT_FILE=$CA crane digest "$DEB" 2>&1)" "sha256:${DEB##*@sha256:}"
+SSL_CERT_FILE=$CA crane export "$DEB" - | tar -x -C "$B/oci"; deb=$(ls "$B/oci"/*.deb)
 echo "paquet : ${deb##*/} ; sha256 $(sha256sum < "$deb" | cut -c1-16)"
 dpkg-deb -x "$deb" "$B/racine"; X=$B/racine/usr/bin/sample-app
 echo "binaire : $(stat -c %s "$X") octets ; sha256 $(sha256sum < "$X" | cut -c1-16)"; file -b "$X" | cut -c1-160
@@ -54,6 +54,7 @@ cut -f1 "$B/entrees.tsv" | sort -u | while read -r id; do
 done
 echo "fiches : $(ls "$F" | wc -l) ; empreinte de l'ensemble (sha256 des sha256 triés) : $(cd "$F" && sha256sum -- *.json | sort | sha256sum | cut -c1-16)"
 (cd "$F" && sha256sum -- *.json | sed 's/^/  /')
+attendu "fiches lues (une par identifiant)" "$(ls "$F" | wc -l)" "$(cut -f1 "$B/entrees.tsv" | sort -u | wc -l)"
 echo "## 4. classes"
 echo "  identifiant | gravité | classe | paquets visés (lié ?) | symboles présents / listés"
 while IFS=$'\t' read -r id grav paq; do
@@ -78,6 +79,7 @@ done < "$B/entrees.tsv" | tee "$B/classes"
 echo "## comptes"
 for c in A B C P X; do echo "  classe $c : $(grep -c " | $c | " "$B/classes")"; done
 for id in GO-2026-4337 GO-2026-6604 GO-2026-6612; do echo "  Critical $id : $(grep " $id | " "$B/classes" | cut -d'|' -f3 | tr -d ' ')"; done
+attendu "aucune entrée non classée (X)" "$(grep -c ' | X | ' "$B/classes")" 0
 attendu "toutes les entrées classées" "$(wc -l < "$B/classes")" "$(wc -l < "$B/entrees.tsv")"
 echo "## bilan : $N cas, $KO écart(s)"
 } > "$J" 2>&1

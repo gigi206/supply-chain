@@ -1,0 +1,581 @@
+# tri des entrées du deb, 2026-11-24T12:55:49Z, b71836e0, crane 0.20.6
+## 1. entrées du dernier scan signé (vex-gabarit.sh)
+# vex-gabarit.sh, 2026-11-24T12:55:50Z ; sujet sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e ; scan du 2026-11-24T11:16:57.457020454Z ; 2 scan(s) vérifié(s) par CLE_SCANNER (emp
+
+| # | Identifiant | Alias | Gravité | KEV | EPSS | Paquet | Corrigé dans | VEX appliqué |
+|---|---|---|---|---|---|---|---|---|
+
+comptes : 67 entrée(s), 67 identifiant(s) ; KEV 0 ; avec correctif 67 ; écartées par un VEX 0 ; gravités : Critical 3, High 33, Low 1, Medium 28, Unknown 2
+entrées : 67 ; stdlib : 62 ; chi : 5
+## 2. binaire du paquet
+OK   digest du manifeste relu : sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+paquet : sample-app_1.0.0-2_amd64.deb ; sha256 f66bbeb2aba31e52
+binaire : 5906320 octets ; sha256 10d475d00dc2a14c
+ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, stripped
+  ~/.cache/supply-chain-poc/07a/deb-tri/racine/usr/bin/sample-app: go1.24.4
+  	path	example.com/supply-chain/sample-app
+  	mod	example.com/supply-chain/sample-app	(devel)	
+  	dep	github.com/go-chi/chi/v5	v5.2.3	
+  	build	-buildmode=exe
+  	build	-compiler=gc
+  	build	-trimpath=true
+  	build	CGO_ENABLED=0
+  	build	GOARCH=amd64
+  	build	GOOS=linux
+  	build	GOAMD64=v1
+noms de fonctions retenus : 8804
+OK   pclntab exploitable : net/http.(*Server).Serve : 1
+OK   pclntab exploitable : chi (*Mux).ServeHTTP : 1
+## 3. fiches OSV (api.osv.dev)
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GHSA-3fxj-6jh8-hvhx
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GHSA-j6qf-3m9c-vwj3
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GHSA-mqqf-5wvp-8fh8
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-3849
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-3956
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4006
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4007
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4008
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4009
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4010
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4011
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4012
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4013
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4014
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4015
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4155
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2025-4175
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4337
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4340
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4341
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4342
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4601
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4602
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4603
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4864
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4865
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4869
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4870
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4918
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4946
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4947
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4970
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4971
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4976
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4977
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4980
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4981
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4982
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-4986
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-5026
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-5037
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-5038
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-5039
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-5775
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-5777
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-5856
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-5972
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6088
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6089
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6090
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6091
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6218
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6599
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6600
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6603
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6604
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6605
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6607
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6608
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6609
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6610
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6611
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6612
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6613
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6617
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6809
+curl: (60) SSL certificate OpenSSL verify result: unable to get local issuer certificate (20)
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+fiche illisible : GO-2026-6859
+sha256sum: '*.json': No such file or directory
+fiches : 0 ; empreinte de l'ensemble (sha256 des sha256 triés) : e3b0c44298fc1c14
+sha256sum: '*.json': No such file or directory
+## 4. classes
+  identifiant | gravité | classe | paquets visés (lié ?) | symboles présents / listés
+  GHSA-3fxj-6jh8-hvhx | Medium | X | (`pkg:golang/github.com/go-chi/chi@v5.2.3#v5`) | -
+  GHSA-j6qf-3m9c-vwj3 | Medium | X | (`pkg:golang/github.com/go-chi/chi@v5.2.3#v5`) | -
+  GHSA-mqqf-5wvp-8fh8 | Medium | X | (`pkg:golang/github.com/go-chi/chi@v5.2.3#v5`) | -
+  GO-2025-3849 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-3956 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4006 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4007 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4008 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4009 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4010 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4011 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4012 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4013 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4014 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4015 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4155 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2025-4175 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4337 | Critical | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4340 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4341 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4342 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4601 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4602 | Low | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4603 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4864 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4865 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4869 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4870 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4918 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4946 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4947 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4970 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4971 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4976 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4977 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4980 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4981 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4982 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-4986 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-5026 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-5037 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-5038 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-5039 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-5775 | Unknown | X | (`pkg:golang/github.com/go-chi/chi@v5.2.3#v5`) | -
+  GO-2026-5777 | Unknown | X | (`pkg:golang/github.com/go-chi/chi@v5.2.3#v5`) | -
+  GO-2026-5856 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-5972 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6088 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6089 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6090 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6091 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6218 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6599 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6600 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6603 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6604 | Critical | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6605 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6607 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6608 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6609 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6610 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6611 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6612 | Critical | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6613 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6617 | High | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6809 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+  GO-2026-6859 | Medium | X | (`pkg:golang/stdlib@1.24.4`) | -
+## comptes
+  classe A : 0
+  classe B : 0
+  classe C : 0
+  classe P : 0
+  classe X : 67
+  Critical GO-2026-4337 : X
+  Critical GO-2026-6604 : X
+  Critical GO-2026-6612 : X
+OK   toutes les entrées classées : 67
+## bilan : 4 cas, 0 écart(s)

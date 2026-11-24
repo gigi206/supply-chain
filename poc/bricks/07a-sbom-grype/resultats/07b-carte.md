@@ -2429,3 +2429,7 @@ Confiance : haute pour le scanner (même chemin qu'au banc t3), moyenne pour le 
 - les 5 entrées chi en classe A (paquet `chi/v5/middleware` non lié, comme dans l'image) ;
 - stdlib : répartition **non prédite** ; au moins une entrée en classe C (net/http est lié) ;
 - bilan attendu : 4 cas, 0 écart.
+
+**Tri du deb, passage 1** ([journal](deb-tri.log), 12:55:49 à 12:55:53 UTC) : **raté, défaut du script**. `SSL_CERT_FILE` exporté pour crane valait aussi pour curl : api.osv.dev refusé (« unable to get local issuer certificate »), **0 fiche**, les 67 entrées en classe X. Le bilan « 4 cas, 0 écart » est trompeur : aucun cas ne contrôlait les fiches. Faits valides de ce passage : dernier scan signé du 2026-11-24T11:16:57Z, 67 entrées (62 stdlib, 5 chi ; Critical 3, High 33, Medium 28, Low 1, Unknown 2 ; 0 KEV) ; paquet `sample-app_1.0.0-2_amd64.deb` (sha256 `f66bbeb2…`), binaire `/usr/bin/sample-app` (5 906 320 octets, sha256 `10d475d0…`, go1.24.4, chi v5.2.3, stripped) ; pclntab exploitable (8 804 noms, deux témoins présents).
+
+**Passage 2** (note de 2026-11-24T12:56:06Z) : CA du PoC limitée à crane ; deux cas ajoutés (une fiche par identifiant ; aucune entrée en classe X) ; accents graves retirés de la colonne paquet. Prédiction inchangée pour le reste ; bilan attendu : **6 cas, 0 écart**.
