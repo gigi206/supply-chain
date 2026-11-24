@@ -1,0 +1,1298 @@
+{
+  "uid": "kpi-supply-chain",
+  "title": "KPI supply-chain",
+  "tags": [
+    "poc",
+    "20"
+  ],
+  "editable": false,
+  "timezone": "utc",
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "Lecture",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 10
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Chiffres **dérivés des attestations de Zot, signatures vérifiées** par l'exportateur de la brique 20 (OpenSSL, une clé par famille), toutes les 15 minutes. Le tableau « Vulnérabilités et VEX » lit les scans **sans vérifier** leurs signatures et ne compte que la cible de `SCANS` : les deux peuvent différer.\n\n- **Dénominateur** : `sample-app`, `sample-app-deb` et `sample-app-rpm`, **tous les digests présents dans Zot**, donc aussi les anciens (décision du 24/11/2026). Un digest = une voix dans un taux.\n- **L3 vérifié** = VSA de replay qui porte `SLSA_BUILD_LEVEL_3` (« VSA seule »). Le deb ne l'aura jamais (décision du 12/11 : « Bit identique seul »). La provenance de Chains est comptée à part : la politique de la porte n'y est pas rejouée.\n- **Licences : source absente.** Aucun prédicat `licences/v1` dans Zot (mesuré le 24/11). Ce n'est pas un zéro.\n- **Délai des KEV** : lignes de `entrees-scan` relues dans Loki sur 30 jours, **non signées** ; l'historique repart de zéro à chaque rejeu. « aucune série » : aucune KEV vue, ou journal illisible (voir les contrôles).\n- **Âges des clés et des pins** : dates de commit d'un relevé versionné ; aucun seuil n'a été décidé.\n\n**Limite** : si l'exportateur s'arrête, les valeurs restent celles du dernier passage. Seul l'âge du dernier passage le montre."
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Âge du dernier passage",
+      "description": "time() − heure du dernier passage réussi ; rouge au-delà de 45 min (seuil de l'alerte KpiPassageEnRetard, non déployée au 24/11/2026)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 6,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "time() - kpi_exportateur_passage_timestamp_seconds",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "exportateur"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "time() - kpi_exportateur_journal_timestamp_seconds",
+          "refId": "B",
+          "instant": true,
+          "range": false,
+          "legendFormat": "lecture du journal"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 1,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 2700
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Contrôles de l'exportateur",
+      "description": "attendu : 0 partout",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 10,
+        "w": 18,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(kpi_signatures_refusees)",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "signatures refusées"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(kpi_enonces_refuses)",
+          "refId": "B",
+          "instant": true,
+          "range": false,
+          "legendFormat": "énoncés refusés"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "kpi_cles_non_relevees",
+          "refId": "C",
+          "instant": true,
+          "range": false,
+          "legendFormat": "clés sans date"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(kpi_pins_non_releves)",
+          "refId": "D",
+          "instant": true,
+          "range": false,
+          "legendFormat": "pins sans date"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "kpi_exportateur_journal_illisible",
+          "refId": "E",
+          "instant": true,
+          "range": false,
+          "legendFormat": "journal illisible"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Taux L3 vérifié",
+      "description": "digests dont une VSA vérifiée porte SLSA_BUILD_LEVEL_3 / digests",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 15,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "avg(kpi_l3_verifie)",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "taux"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(kpi_l3_verifie)",
+          "refId": "B",
+          "instant": true,
+          "range": false,
+          "legendFormat": "digests conformes"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(kpi_l3_verifie)",
+          "refId": "C",
+          "instant": true,
+          "range": false,
+          "legendFormat": "digests"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "taux"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Taux de replay identique",
+      "description": "digests dont une VSA vérifiée porte POC_REPLAY_BIT_IDENTIQUE / digests",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 15,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "avg(kpi_replay_identique)",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "taux"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(kpi_replay_identique)",
+          "refId": "B",
+          "instant": true,
+          "range": false,
+          "legendFormat": "digests conformes"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(kpi_replay_identique)",
+          "refId": "C",
+          "instant": true,
+          "range": false,
+          "legendFormat": "digests"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "taux"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Provenance de Chains vérifiée",
+      "description": "digests avec provenance de PipelineRun et signature d'image vérifiées / digests ; ce n'est pas le L3",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 15,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "avg(kpi_provenance_chains_verifiee)",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "taux"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(kpi_provenance_chains_verifiee)",
+          "refId": "B",
+          "instant": true,
+          "range": false,
+          "legendFormat": "digests conformes"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(kpi_provenance_chains_verifiee)",
+          "refId": "C",
+          "instant": true,
+          "range": false,
+          "legendFormat": "digests"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "taux"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Taux L3 vérifié, par digest",
+      "description": "digests dont une VSA vérifiée porte SLSA_BUILD_LEVEL_3",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "kpi_l3_verifie",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{depot}}@{{digest}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "aucune série",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "non"
+                },
+                "1": {
+                  "text": "oui"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Taux de replay identique, par digest",
+      "description": "digests dont une VSA vérifiée porte POC_REPLAY_BIT_IDENTIQUE",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 19,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "kpi_replay_identique",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{depot}}@{{digest}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "aucune série",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "non"
+                },
+                "1": {
+                  "text": "oui"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "Provenance de Chains vérifiée, par digest",
+      "description": "digests avec provenance de PipelineRun et signature d'image vérifiées",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 19,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "kpi_provenance_chains_verifiee",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{depot}}@{{digest}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "aucune série",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "non"
+                },
+                "1": {
+                  "text": "oui"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 10,
+      "type": "stat",
+      "title": "KEV ouvertes, scan signé le plus récent",
+      "description": "KEV du scan − KEV écartées par un VEX, par digest",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 8,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "kpi_scan_kev - kpi_scan_kev_ecartees",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{depot}}@{{digest}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Couverture VEX, scan signé le plus récent",
+      "description": "entrées écartées par un VEX / entrées, par digest ; un digest sans scan signé n'y figure pas",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 25,
+        "w": 8,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "kpi_scan_ecartees / kpi_scan_entrees",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{depot}}@{{digest}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "noValue": "aucune série",
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "nan",
+                "result": {
+                  "text": "aucune entrée"
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "aucune entrée"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "Digests sans scan signé",
+      "description": "digests comptés dans les taux mais absents des panneaux de scan (le rpm n'est pas scanné)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 25,
+        "w": 8,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count(kpi_l3_verifie unless on (depot, digest) kpi_scan_timestamp_seconds) or (0 * count(kpi_l3_verifie))",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "sans scan"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(kpi_vex_verifies)",
+          "refId": "B",
+          "instant": true,
+          "range": false,
+          "legendFormat": "VEX vérifiés"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "KEV : délai de correction",
+      "description": "fermeture − ouverture, par KEV fermée ; vide tant qu'aucune n'a été vue ouverte puis fermée",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 12,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "kpi_kev_fermeture_timestamp_seconds - on (depot, kev, ouverture) kpi_kev_ouverture_timestamp_seconds",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{depot}} {{kev}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 1,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "KEV : ouvertes depuis",
+      "description": "time() − ouverture, par KEV non fermée",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 30,
+        "w": 12,
+        "h": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "time() - (kpi_kev_ouverture_timestamp_seconds unless on (depot, kev, ouverture) kpi_kev_fermeture_timestamp_seconds)",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{depot}} {{kev}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 1,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 15,
+      "type": "stat",
+      "title": "Âge des clés publiques",
+      "description": "depuis le dernier commit de la clé publique versionnée ; aucun seuil décidé",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 35,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "time() - kpi_cle_timestamp_seconds",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{cle}} {{empreinte}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 1,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 16,
+      "type": "stat",
+      "title": "Pin le plus ancien, par digest",
+      "description": "dépendances de la provenance la plus récente, depuis le commit d'épinglage",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 35,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "time() - min by (depot, digest) (kpi_pin_timestamp_seconds)",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{depot}}@{{digest}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 1,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 17,
+      "type": "stat",
+      "title": "Dépendances non épinglées",
+      "description": "dépendances sans date d'épinglage connue de git (aujourd'hui des pipelines)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 35,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "count by (depot, digest) (kpi_pin_non_epingle) or (0 * sum by (depot, digest) (kpi_l3_verifie))",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{depot}}@{{digest}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 18,
+      "type": "bargauge",
+      "title": "Âge de chaque pin",
+      "description": "une barre par pin, tous digests confondus ; retiré = 1 : le pin n'est plus dans la configuration de HEAD au relevé",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 41,
+        "w": 24,
+        "h": 18
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sort_desc(time() - max by (genre, nom, pin, retire) (kpi_pin_timestamp_seconds))",
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "legendFormat": "{{genre}} {{nom}} {{pin}} (retiré : {{retire}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 1,
+          "noValue": "aucune série",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "displayMode": "basic",
+        "showUnfilled": true
+      }
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  }
+}

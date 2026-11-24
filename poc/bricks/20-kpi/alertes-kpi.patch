@@ -1,0 +1,99 @@
+diff --color -ruN a/poc/bricks/19-observabilite/config/regles/alertes-tests.yml b/poc/bricks/19-observabilite/config/regles/alertes-tests.yml
+--- a/poc/bricks/19-observabilite/config/regles/alertes-tests.yml
++++ b/poc/bricks/19-observabilite/config/regles/alertes-tests.yml
+@@ -499,3 +499,66 @@
+         alertname: CollecteEnPanne
+         exp_alerts:
+           - exp_labels: {alerte: collecte, severite: avertissement, job: alloy, instance: local}
++
++  # KPI (20) : dernier passage à 0, puis plus rien. Plus de 45 min à 46 min, en attente ; déclenchée à 56 min. Passage repris à 60 min : résolue.
++  - interval: 1m
++    input_series:
++      - series: 'kpi_exportateur_passage_timestamp_seconds{job="fichiers", instance="local"}'
++        values: '0x59 3600x20'
++    alert_rule_test:
++      - eval_time: 45m
++        alertname: KpiPassageEnRetard
++        exp_alerts: []
++      - eval_time: 55m
++        alertname: KpiPassageEnRetard
++        exp_alerts: []
++      - eval_time: 56m
++        alertname: KpiPassageEnRetard
++        exp_alerts:
++          - exp_labels: {alerte: kpi, severite: avertissement, job: fichiers, instance: local}
++      - eval_time: 61m
++        alertname: KpiPassageEnRetard
++        exp_alerts: []
++
++  # KPI (20) : un seul passage manqué, 36 min entre deux passages réussis : rien ne sonne.
++  - interval: 1m
++    input_series:
++      - series: 'kpi_exportateur_passage_timestamp_seconds{job="fichiers", instance="local"}'
++        values: '0x35 2160x35 4320x10'
++    alert_rule_test:
++      - eval_time: 35m
++        alertname: KpiPassageEnRetard
++        exp_alerts: []
++      - eval_time: 71m
++        alertname: KpiPassageEnRetard
++        exp_alerts: []
++
++  # KPI (20) : série absente (fichier jamais posé ou disparu) ; en attente, puis déclenchée à 10 min.
++  - interval: 1m
++    input_series:
++      - series: 'up{job="fichiers", instance="local"}'
++        values: '1x20'
++    alert_rule_test:
++      - eval_time: 9m
++        alertname: KpiPassageEnRetard
++        exp_alerts: []
++      - eval_time: 10m
++        alertname: KpiPassageEnRetard
++        exp_alerts:
++          - exp_labels: {alerte: kpi, severite: avertissement}
++
++  # KPI (20) : une signature refusée à 10 min pour une seule famille ; une alerte, qui porte le digest et la famille. Série à 0 : rien.
++  - interval: 1m
++    input_series:
++      - series: 'kpi_signatures_refusees{depot="builds/sample-app", digest="aaaaaaaaaaaa", famille="vsa", job="fichiers", instance="local"}'
++        values: '0x9 1x10'
++      - series: 'kpi_signatures_refusees{depot="builds/sample-app", digest="aaaaaaaaaaaa", famille="prov", job="fichiers", instance="local"}'
++        values: '0x20'
++    alert_rule_test:
++      - eval_time: 9m
++        alertname: KpiSignatureRefusee
++        exp_alerts: []
++      - eval_time: 11m
++        alertname: KpiSignatureRefusee
++        exp_alerts:
++          - exp_labels: {alerte: kpi, severite: critique, depot: builds/sample-app, digest: aaaaaaaaaaaa, famille: vsa, job: fichiers, instance: local}
+diff --color -ruN a/poc/bricks/19-observabilite/config/regles/alertes.yml b/poc/bricks/19-observabilite/config/regles/alertes.yml
+--- a/poc/bricks/19-observabilite/config/regles/alertes.yml
++++ b/poc/bricks/19-observabilite/config/regles/alertes.yml
+@@ -101,6 +101,25 @@
+           alerte: base
+           severite: critique
+ 
++      # KPI en retard (brique 20) : un arrêt de l'exportateur laisse kpi.prom inchangé, donc d'anciennes valeurs dans Grafana ; seule
++      # l'heure du dernier passage réussi le montre. 45 min : un cycle sain a au plus 21 min (timer de 15 min, AccuracySec de 1 min par
++      # défaut, TimeoutStartSec de 3 min du lecteur et de 2 min de l'exportateur), un passage manqué au plus 36 ; l'alerte part donc au deuxième
++      # passage manqué de suite. for: 10m : démarrage de sc-stockage (OnBootSec 5 min, plus un passage de 5 min au plus), et absent() (A4).
++      - alert: KpiPassageEnRetard
++        expr: time() - kpi_exportateur_passage_timestamp_seconds > 45 * 60 or absent(kpi_exportateur_passage_timestamp_seconds)
++        for: 10m
++        labels:
++          alerte: kpi
++          severite: avertissement
++
++      # Signature refusée par l'exportateur (brique 20) : une attestation d'un produit, dans Zot, ne se vérifie pas avec la clé publique de
++      # sa famille. Attestation fausse, ou clé recréée sans que la nouvelle soit posée (rejeu, re-signature) : les deux sont à traiter.
++      - alert: KpiSignatureRefusee
++        expr: kpi_signatures_refusees > 0
++        labels:
++          alerte: kpi
++          severite: critique
++
+       # Disque de sc-stockage occupé à plus de 80 % (brique 19b, D13 a : rétention de 30 jours des journaux dans Loki,
+       # compression réelle à mesurer). Métrique écrite chaque minute par disque-metriques (19b), servie par fichiers.
+       - alert: DisqueStockagePlein
