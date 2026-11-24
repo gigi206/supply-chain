@@ -8,7 +8,11 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 ## État
 
-**Carte écrite à sec, rien n'est lu dans Zot, rien n'est posé.** Les faits ci-dessous viennent du dépôt. Aucun n'est encore relevé sur la plateforme en service.
+**Étape 1 faite le 2026-11-24 (relevé anonyme de Zot, 18:26:24 UTC) ; rien n'est posé.** [Prédiction et résultat](resultats/e1-predictions.md) : **12 cas, 2 écarts**, tous deux des fautes de la prédiction. Les 4 énoncés en cause sont des témoins négatifs voulus (J6, G6) qu'elle n'avait pas comptés. Pour les produits, les builders et les fermetures, tous les énoncés sont lisibles et nomment leur sujet. Signatures non vérifiées : c'est l'étape 2, qui attend les choix ci-dessous.
+
+Aperçu des produits, énoncés non vérifiés : 4 sujets (`sample-app` `3a7ca1b1` et `f5e6bcb0`, deb `60f25f5c`, rpm `07b7bd6f`). Tous ont une provenance ; 3 ont un scan, 3 un VEX et 2 une VSA. Le digest en service, `f5e6bcb0`, n'a pas encore de VSA. L'historique des scans dans Zot commence au rejeu du 23/11.
+
+Les faits des sections suivantes, écrits avant l'étape 1, viennent du dépôt.
 
 ## Ce que demande docs/02
 

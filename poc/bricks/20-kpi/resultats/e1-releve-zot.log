@@ -1,0 +1,230 @@
+# releve-zot.sh, 2026-11-24T18:26:24Z, dépôt 991c0021, script caa8ae0a8f60c7b4
+# lecture seule, anonyme, API de Zot (https://192.168.161.13:5000/v2) ; signatures non vérifiées ; aucun contenu d'énoncé archivé
+OK   catalogue en anonyme : 200
+## 1. dépôts : 156 au catalogue, 31 sous builds/ ; hors builds/ (non relevés) :
+[ligne masquée : motif jeton|token]
+DEPOT|builds/builders/mock-rocky9|builder
+DEPOT|builds/builders/rocky9-bootstrap|builder
+DEPOT|builds/builders/sbuild-debian13|builder
+DEPOT|builds/essai-07a|autre
+DEPOT|builds/essai-compte|autre
+DEPOT|builds/essai-decision3|autre
+DEPOT|builds/essai-enveloppes|autre
+DEPOT|builds/essai-images|autre
+DEPOT|builds/essai-j6-att-illisible|autre
+DEPOT|builds/essai-j6-autre-cle|autre
+DEPOT|builds/essai-j6-autre-sujet|autre
+DEPOT|builds/essai-porte|autre
+DEPOT|builds/essai-scan|autre
+DEPOT|builds/essai-signature|autre
+DEPOT|builds/essai-webhook|autre
+DEPOT|builds/fermetures/essai|fermeture
+DEPOT|builds/fermetures/sample-app|fermeture
+DEPOT|builds/fermetures/sample-app-deb|fermeture
+DEPOT|builds/fermetures/sample-app-rpm|fermeture
+DEPOT|builds/fermetures/sample-app-sources|fermeture
+DEPOT|builds/sample-app|produit
+DEPOT|builds/sample-app-deb|produit
+DEPOT|builds/sample-app-rpm|produit
+DEPOT|builds/scan/essai-07a|attestation
+DEPOT|builds/scan/essai-scan|attestation
+DEPOT|builds/scan/sample-app|attestation
+DEPOT|builds/scan/sample-app-deb|attestation
+DEPOT|builds/vex/sample-app|attestation
+DEPOT|builds/vex/sample-app-deb|attestation
+DEPOT|builds/vsa/sample-app|attestation
+DEPOT|builds/vsa/sample-app-deb|attestation
+## 2. sujets et attestations (tag .att, referrers des familles)
+ATT|builds/builders/mock-rocky9|70f8c4124532|tag .att|builds/builders/mock-rocky9|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/builders/mock-rocky9|70f8c4124532|tag .att|builds/builders/mock-rocky9|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/builders/mock-rocky9|70f8c4124532|tag .att|builds/builders/mock-rocky9|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/builders/mock-rocky9|70f8c4124532|tag .att|builds/builders/mock-rocky9|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/builders/mock-rocky9|builder|sha256:70f8c41245321494bb48ebc423514c72659dfb0f6cbeb8f6d797a41ebaf472ae|manifeste 200|sig 1|att 4
+ATT|builds/builders/rocky9-bootstrap|6de899ac5da4|tag .att|builds/builders/rocky9-bootstrap|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/builders/rocky9-bootstrap|6de899ac5da4|tag .att|builds/builders/rocky9-bootstrap|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/builders/rocky9-bootstrap|6de899ac5da4|tag .att|builds/builders/rocky9-bootstrap|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/builders/rocky9-bootstrap|6de899ac5da4|tag .att|builds/builders/rocky9-bootstrap|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/builders/rocky9-bootstrap|builder|sha256:6de899ac5da41852c5d8518abdb3785eabf41a379bd267ae61bb4db4e8dae6f3|manifeste 200|sig 1|att 4
+ATT|builds/builders/sbuild-debian13|749d746cc9e1|tag .att|builds/builders/sbuild-debian13|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/builders/sbuild-debian13|749d746cc9e1|tag .att|builds/builders/sbuild-debian13|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/builders/sbuild-debian13|749d746cc9e1|tag .att|builds/builders/sbuild-debian13|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/builders/sbuild-debian13|749d746cc9e1|tag .att|builds/builders/sbuild-debian13|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/builders/sbuild-debian13|builder|sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590|manifeste 200|sig 1|att 4
+SUJET|builds/essai-decision3|autre|sha256:06b74ea129e87a09b9dcead832953b0364be1bf7d2d7967aaf73f722e41d8447|manifeste 200|sig 0|att 0
+ATT|builds/essai-decision3|ef856f390495|tag .att|builds/essai-decision3|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/essai-decision3|autre|sha256:ef856f390495ae3887f953a46fdf8f0a7e5a9e691dbc01a3bab2abde53a07a94|manifeste 200|sig 1|att 1
+ATT|builds/essai-enveloppes|2be55cb9700c|tag .att|builds/essai-enveloppes|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-enveloppes|2be55cb9700c|tag .att|builds/essai-enveloppes|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/essai-enveloppes|autre|sha256:2be55cb9700cdfb21569db7e65337d06a2feff34e7a1217c81d6c7dff559d3b4|manifeste 200|sig 1|att 2
+ATT|builds/essai-j6-att-illisible|4eee7d404fb7|tag .att|builds/essai-j6-att-illisible|illisible|-|-
+SUJET|builds/essai-j6-att-illisible|autre|sha256:4eee7d404fb7a1382bb5c23ac1c0de542c3dcb32eb5bcb3ca9298208d3956a72|manifeste 200|sig 0|att 1
+ATT|builds/essai-j6-autre-cle|f214bf05c70c|tag .att|builds/essai-j6-autre-cle|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/essai-j6-autre-cle|autre|sha256:f214bf05c70cc5ca049aba8cd927fbcd246688d044ac52ce15ea43db2ccc309e|manifeste 200|sig 0|att 1
+ATT|builds/essai-j6-autre-sujet|d50a20b12897|tag .att|builds/essai-j6-autre-sujet|https://slsa.dev/provenance/v1|non|-
+SUJET|builds/essai-j6-autre-sujet|autre|sha256:d50a20b1289772091fa0fb01c1fd7d056e5650f1bfad8ec9cc918fa16b6772b1|manifeste 200|sig 0|att 1
+ATT|builds/essai-porte|4903e1522274|tag .att|builds/essai-porte|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-porte|4903e1522274|tag .att|builds/essai-porte|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/essai-porte|autre|sha256:4903e152227424f52b70a6ffda319f54b52eabdfd445a674a254a7530a73360c|manifeste 200|sig 1|att 2
+SUJET|builds/essai-porte|autre|sha256:4f2f963d3d201e7b9997e5141c9c4db9991f42644d5f80ac833f4aca6fbf4f01|manifeste 200|sig 0|att 0
+ATT|builds/essai-porte|9cc3954b81ad|tag .att|builds/essai-porte|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-porte|9cc3954b81ad|tag .att|builds/essai-porte|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/essai-porte|autre|sha256:9cc3954b81ad5732134b8cd94233a4fecdd0204f2c2e4a47be24dde2a8f54620|manifeste 200|sig 1|att 2
+ATT|builds/essai-porte|d648eaba2583|tag .att|builds/essai-porte|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-porte|d648eaba2583|tag .att|builds/essai-porte|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/essai-porte|autre|sha256:d648eaba258307bac6957705b6f111220cfca8d9b8f16f71ab6aeb81e8270f62|manifeste 200|sig 1|att 2
+SUJET|builds/essai-scan|autre|sha256:007d83719d1dfcb3ee2e14d94e1212db4cdbfff80afe091fe30b365cb54cd33b|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|007d83719d1d|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:32:42Z
+SUJET|builds/essai-scan|autre|sha256:09494f452ffb8ab67e7822987ecd99747122c5101ddb3b0789f34563490d0d16|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|09494f452ffb|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:32:39Z
+SUJET|builds/essai-scan|autre|sha256:4392dde957b06652b9921fb930c11a511346f359d43d659a703947dfbe7e17b1|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|4392dde957b0|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:32:54Z
+SUJET|builds/essai-scan|autre|sha256:5320169613a0f424adf5312fcbaaffa874e051df671e4cb2e7c44942d3042e63|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|5320169613a0|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:33:00Z
+SUJET|builds/essai-scan|autre|sha256:632d3b8ef7754382e879f59d86b84a8d8e3fc375928f0c53ced611e781a336d8|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|632d3b8ef775|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:32:48Z
+SUJET|builds/essai-scan|autre|sha256:6eb4f8f319967794d7f71def51442b7718f60c142180a51408539d21e14d5b99|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|6eb4f8f31996|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:32:45Z
+SUJET|builds/essai-scan|autre|sha256:7b7ca3456009069f916fbb236b1813b1d6d1028c48ee183c04a94e1e2ef74ed3|manifeste 200|sig 0|att 0
+SUJET|builds/essai-scan|autre|sha256:841df0ee230af1035ca044bb859e6e406f4c40a4c11e96ee2731709012dd0fc5|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|841df0ee230a|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:33:14Z
+ATT|builds/essai-scan|841df0ee230a|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:33:17Z
+SUJET|builds/essai-scan|autre|sha256:abdae13a7099beeb6a563775bdbd8e5d647bc1d94795542a6e9c0791cd0f0fa9|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|abdae13a7099|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|non|2026-11-23T22:33:05Z
+SUJET|builds/essai-scan|autre|sha256:c1d889008fda93eb712c751e116ba707da752196e3e0b5fcf7bdf8fef7f6ddea|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|c1d889008fda|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:33:20Z
+ATT|builds/essai-scan|c1d889008fda|referrer|builds/scan/essai-scan|illisible|-|2026-11-23T22:33:23Z
+SUJET|builds/essai-scan|autre|sha256:c55374d438ec926531223cd467ab4a3f2045f7b43f61101634aea0f6badaf29f|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|c55374d438ec|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:33:08Z
+ATT|builds/essai-scan|c55374d438ec|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:33:11Z
+SUJET|builds/essai-scan|autre|sha256:d4b89ab1458545bda9a03a20ea02398cfd4eebae23b0e4243750aa8459f9c8c6|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|d4b89ab14585|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:32:51Z
+SUJET|builds/essai-scan|autre|sha256:d6786605e26126b11f90a621f309fa1d3e437b8fdf4fa9dbfb37e50d27708417|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|d6786605e261|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:32:57Z
+SUJET|builds/essai-scan|autre|sha256:e4401857a9230ee93808f3b5341576cf14c40cbd2b2dfa24084aae9e091115f5|manifeste 200|sig 0|att 0
+ATT|builds/essai-scan|e4401857a923|referrer|builds/scan/essai-scan|https://supply-chain.example/scan/v1|oui|2026-11-23T22:33:03Z
+ATT|builds/essai-signature|3a7ca1b14dbf|tag .att|builds/essai-signature|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/essai-signature|autre|sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5|manifeste 200|sig 1|att 1
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/essai-webhook|3a7ca1b14dbf|tag .att|builds/essai-webhook|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/essai-webhook|autre|sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5|manifeste 200|sig 1|att 30
+SUJET|builds/fermetures/essai|fermeture|sha256:8dc5282d1b517245ef59cb08b03d9f93943aed8199aeaccfc4fdeaaf444cc432|manifeste 200|sig 0|att 0
+ATT|builds/fermetures/sample-app|74c265e703fb|tag .att|builds/fermetures/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/fermetures/sample-app|74c265e703fb|tag .att|builds/fermetures/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/fermetures/sample-app|74c265e703fb|tag .att|builds/fermetures/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/fermetures/sample-app|74c265e703fb|tag .att|builds/fermetures/sample-app|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/fermetures/sample-app|fermeture|sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd|manifeste 200|sig 1|att 4
+ATT|builds/fermetures/sample-app-deb|bb7599a2e1cd|tag .att|builds/fermetures/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/fermetures/sample-app-deb|bb7599a2e1cd|tag .att|builds/fermetures/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/fermetures/sample-app-deb|bb7599a2e1cd|tag .att|builds/fermetures/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/fermetures/sample-app-deb|bb7599a2e1cd|tag .att|builds/fermetures/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/fermetures/sample-app-deb|fermeture|sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290|manifeste 200|sig 1|att 4
+ATT|builds/fermetures/sample-app-rpm|0983898054a9|tag .att|builds/fermetures/sample-app-rpm|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/fermetures/sample-app-rpm|0983898054a9|tag .att|builds/fermetures/sample-app-rpm|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/fermetures/sample-app-rpm|fermeture|sha256:0983898054a9b96e51f54a2c13ad5919f999e6bccf61ecade0eb8cab5a30e28f|manifeste 200|sig 1|att 2
+ATT|builds/fermetures/sample-app-sources|50dc73f72d04|tag .att|builds/fermetures/sample-app-sources|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/fermetures/sample-app-sources|50dc73f72d04|tag .att|builds/fermetures/sample-app-sources|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/fermetures/sample-app-sources|50dc73f72d04|tag .att|builds/fermetures/sample-app-sources|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/fermetures/sample-app-sources|50dc73f72d04|tag .att|builds/fermetures/sample-app-sources|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/fermetures/sample-app-sources|fermeture|sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21|manifeste 200|sig 1|att 4
+ATT|builds/sample-app|3a7ca1b14dbf|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|3a7ca1b14dbf|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|3a7ca1b14dbf|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|3a7ca1b14dbf|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|3a7ca1b14dbf|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|3a7ca1b14dbf|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/sample-app|produit|sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5|manifeste 200|sig 1|att 6
+ATT|builds/sample-app|3a7ca1b14dbf|referrer|builds/scan/sample-app|https://supply-chain.example/scan/v1|oui|2026-11-23T22:28:30Z
+ATT|builds/sample-app|3a7ca1b14dbf|referrer|builds/scan/sample-app|https://supply-chain.example/scan/v1|oui|2026-11-23T22:30:47Z
+ATT|builds/sample-app|3a7ca1b14dbf|referrer|builds/scan/sample-app|https://supply-chain.example/scan/v1|oui|2026-11-24T09:32:03Z
+ATT|builds/sample-app|3a7ca1b14dbf|referrer|builds/vsa/sample-app|https://slsa.dev/verification_summary/v1|oui|-
+ATT|builds/sample-app|3a7ca1b14dbf|referrer|builds/vex/sample-app|https://openvex.dev/ns/v0.2.0|oui|2026-11-24T08:49:44Z
+ATT|builds/sample-app|f5e6bcb0e0fb|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|f5e6bcb0e0fb|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|f5e6bcb0e0fb|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|f5e6bcb0e0fb|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|f5e6bcb0e0fb|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|f5e6bcb0e0fb|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|f5e6bcb0e0fb|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app|f5e6bcb0e0fb|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/sample-app|produit|sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7|manifeste 200|sig 1|att 8
+ATT|builds/sample-app|f5e6bcb0e0fb|referrer|builds/scan/sample-app|https://supply-chain.example/scan/v1|oui|2026-11-24T13:31:37Z
+ATT|builds/sample-app|f5e6bcb0e0fb|referrer|builds/scan/sample-app|https://supply-chain.example/scan/v1|oui|2026-11-24T14:12:32Z
+ATT|builds/sample-app|f5e6bcb0e0fb|referrer|builds/vex/sample-app|https://openvex.dev/ns/v0.2.0|oui|2026-11-24T14:09:56Z
+ATT|builds/sample-app-deb|60f25f5c3fb5|tag .att|builds/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app-deb|60f25f5c3fb5|tag .att|builds/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app-deb|60f25f5c3fb5|tag .att|builds/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app-deb|60f25f5c3fb5|tag .att|builds/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app-deb|60f25f5c3fb5|tag .att|builds/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app-deb|60f25f5c3fb5|tag .att|builds/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app-deb|60f25f5c3fb5|tag .att|builds/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app-deb|60f25f5c3fb5|tag .att|builds/sample-app-deb|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/sample-app-deb|produit|sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e|manifeste 200|sig 1|att 8
+ATT|builds/sample-app-deb|60f25f5c3fb5|referrer|builds/scan/sample-app-deb|https://supply-chain.example/scan/v1|oui|2026-11-23T23:19:26Z
+ATT|builds/sample-app-deb|60f25f5c3fb5|referrer|builds/scan/sample-app-deb|https://supply-chain.example/scan/v1|oui|2026-11-24T11:17:02Z
+ATT|builds/sample-app-deb|60f25f5c3fb5|referrer|builds/scan/sample-app-deb|https://supply-chain.example/scan/v1|oui|2026-11-24T13:42:43Z
+ATT|builds/sample-app-deb|60f25f5c3fb5|referrer|builds/vsa/sample-app-deb|https://slsa.dev/verification_summary/v1|oui|-
+ATT|builds/sample-app-deb|60f25f5c3fb5|referrer|builds/vex/sample-app-deb|https://openvex.dev/ns/v0.2.0|oui|2026-11-24T13:40:04Z
+ATT|builds/sample-app-rpm|07b7bd6feb48|tag .att|builds/sample-app-rpm|https://slsa.dev/provenance/v1|oui|-
+ATT|builds/sample-app-rpm|07b7bd6feb48|tag .att|builds/sample-app-rpm|https://slsa.dev/provenance/v1|oui|-
+SUJET|builds/sample-app-rpm|produit|sha256:07b7bd6feb489bff10aa92b7fd632a50a7958e84092ae1802f12b7c259e1d119|manifeste 200|sig 1|att 2
+## 3. dépôts d'attestations sans dépôt de sujets du même nom (referrers non cherchés)
+## 4. synthèse
+sujets par classe : autre 26 ; builder 3 ; fermeture 5 ; produit 4 ; 
+attestations par classe du sujet, forme et type (énoncés non vérifiés) :
+  15 autre|referrer|https://supply-chain.example/scan/v1
+  1 autre|referrer|illisible
+  42 autre|tag .att|https://slsa.dev/provenance/v1
+  1 autre|tag .att|illisible
+  12 builder|tag .att|https://slsa.dev/provenance/v1
+  14 fermeture|tag .att|https://slsa.dev/provenance/v1
+  3 produit|referrer|https://openvex.dev/ns/v0.2.0
+  2 produit|referrer|https://slsa.dev/verification_summary/v1
+  8 produit|referrer|https://supply-chain.example/scan/v1
+  24 produit|tag .att|https://slsa.dev/provenance/v1
+dates de création annotées, par dépôt d'attestations (plus ancienne, plus récente, nombre) :
+  DATES|builds/scan/essai-scan|2026-11-23T22:32:39Z|2026-11-23T22:33:23Z|16
+  DATES|builds/scan/sample-app-deb|2026-11-23T23:19:26Z|2026-11-24T13:42:43Z|3
+  DATES|builds/scan/sample-app|2026-11-23T22:28:30Z|2026-11-24T14:12:32Z|5
+  DATES|builds/vex/sample-app-deb|2026-11-24T13:40:04Z|2026-11-24T13:40:04Z|1
+  DATES|builds/vex/sample-app|2026-11-24T08:49:44Z|2026-11-24T14:09:56Z|2
+## 5. cas prédits (resultats/e1-predictions.md)
+OK   VSA de 3a7ca1b1 (builds/vsa/sample-app) : 1
+OK   VSA de f5e6bcb0 (builds/vsa/sample-app) : 0
+OK   VSA du deb 60f25f5c (builds/vsa/sample-app-deb) : 1
+OK   VEX de 3a7ca1b1 (builds/vex/sample-app) : 1
+OK   VEX de f5e6bcb0 (builds/vex/sample-app) : 1
+OK   VEX du deb 60f25f5c (builds/vex/sample-app-deb) : 1
+OK   au moins un scan de f5e6bcb0 : oui
+OK   provenance SLSA v1 dans le .att de f5e6bcb0 : oui
+OK   prédicats licences/v1 : 0
+KO   referrers dont le type ne suit pas la famille : 1 (attendu 0)
+KO   énoncés qui ne nomment pas leur sujet : 4 (attendu 0)
+## bilan : 12 cas, 2 écart(s)

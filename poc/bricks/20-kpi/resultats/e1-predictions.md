@@ -50,3 +50,39 @@ Bilan attendu : **12 cas, 0 écart**.
 ## Heures
 
 Brique 20 : de 18:23:30 UTC (fin de la dernière note de la 07c) à cette prédiction, puis jusqu'au résultat. Elles sont additionnées au total de la carte avec le résultat.
+
+## Résultat (note de 2026-11-24T18:26:51Z)
+
+[Journal](e1-releve-zot.log) : passage du 2026-11-24 à 18:26:24 UTC, dépôt `991c0021`, script `caa8ae0a8f60c7b4`. **12 cas, 2 écarts.** Les deux écarts sont des fautes de la prédiction, pas des défauts de la plateforme.
+
+**Les 10 premiers cas sont conformes** :
+- VSA : 1 pour `3a7ca1b1`, 0 pour `f5e6bcb0`, 1 pour le deb `60f25f5c` ;
+- VEX : 1 pour chacun des trois ;
+- au moins un scan de `f5e6bcb0` ;
+- provenance SLSA v1 dans le `.att` de `f5e6bcb0` ;
+- aucun prédicat `licences/v1`.
+
+**Écarts 11 et 12** (1 referrer d'un autre type, 4 énoncés qui ne nomment pas leur sujet) : les quatre lignes en cause sont des **témoins négatifs voulus**, que la prédiction aurait dû exclure ou attendre :
+- `builds/essai-j6-att-illisible` : `.att` illisible, témoin de J6 (08, README l. 499) ;
+- `builds/essai-j6-autre-sujet` : provenance authentique de Chains qui nomme un autre sujet, témoin de J6 (08, README l. 518) ;
+- `builds/scan/essai-scan` : un scan qui nomme un autre sujet et un referrer illisible, témoins de G6 (07a, « 15 témoins »).
+
+Pour les dépôts produits, builders et fermetures, **aucun énoncé n'est illisible et tous nomment leur sujet**. Cela vaut aussi pour le deb et le rpm, le cas le moins sûr de la prédiction.
+
+**Consigné** :
+- 156 dépôts au catalogue, dont 31 sous `builds/` : 8 d'attestations, 3 produits, 3 builders, 5 fermetures, 12 autres (essais et témoins). La liste des dépôts hors `builds/`, écrite sur une seule ligne, a été masquée par le filtre `jeton|token` : un nom au moins contient le motif. Le prochain relevé l'écrira une ligne par dépôt ;
+- 38 sujets (produit 4, builder 3, fermeture 5, autre 26) et 122 énoncés ; aucun dépôt d'attestations orphelin.
+- **Produits, par sujet** (énoncés non vérifiés) :
+
+  | Sujet | Provenances (`.att`) | Scans | VEX | VSA |
+  |---|---|---|---|---|
+  | `sample-app@3a7ca1b1` | 6 | 3 | 1 | 1 |
+  | `sample-app@f5e6bcb0` (en service) | 8 | 2 | 1 | 0 |
+  | `sample-app-deb@60f25f5c` | 8 | 3 | 1 | 1 |
+  | `sample-app-rpm@07b7bd6f` | 2 | 0 | 0 | 0 |
+
+- **Historique dans Zot** : les plus anciens scans datent du rejeu du 23/11 (`builds/scan/sample-app` depuis 2026-11-23T22:28:30Z, deb depuis 23:19:26Z). Un rejeu de zéro remet donc l'historique à zéro. Pour le délai de correction des KEV, Zot ne donne pas plus d'un jour aujourd'hui ; Loki (720 h) ne survit pas non plus à un rejeu.
+
+**Premier aperçu des dénominateurs, à ne pas prendre pour des KPI** (énoncés non vérifiés, dénominateur non choisi) : sur les 4 sujets produits, 4 ont une provenance, 3 un scan, 3 un VEX et 2 une VSA. Le seul digest en service de l'image, `f5e6bcb0`, n'a pas encore de VSA (R5).
+
+**Heures de la 20, étape 1** : de 18:23:30 à 18:27:04 UTC, script, prédiction, passage et note compris : 0 h 03 min 34 s.
