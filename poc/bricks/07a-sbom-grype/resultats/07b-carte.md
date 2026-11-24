@@ -2347,3 +2347,13 @@ Choix du propriétaire (verbatim) : « Pièce 8 maintenant » (plutôt qu'un rej
 - `signer` : seulement avec la phrase d'accord du propriétaire (`ACCORD`, recopiée au journal) ; horodatage du document du dépôt (seul champ écrit), `verifier`, connexion `userpass` (`-no-store`, mot de passe lu par bao dans son fichier), `signer-vex.sh signer`, révocation de soi, relecture des énoncés publiés.
 
 **Prédiction de `prealables`** (avant le lancement) : 11 cas, 0 écart ; `poc-vex` répond 200 ; juge `7dde1a8ed457f254` ; copie horodatée acceptée (exemption de 5 énoncés) ; `PUBLIES|0` ; document inchangé. Confiance : haute, sauf l'authentification de `poc-vex` sur le Zot recréé par le rejeu (moyenne : bloc htpasswd de `stockage.sh`, non relu depuis le rejeu).
+
+## Pièce 8 : résultat des préalables (note de 2026-11-24T08:47:33Z)
+
+[Journal](piece8-signer-prealables-sample-app-3a7ca1b1.log), lancé à 08:47:27Z : **10 cas, 0 écart**. `poc-vex` répond 200 sur `/v2/` du vrai Zot ; juge `7dde1a8ed457f254` ; redirection vers `openbao-0` ouverte puis fermée, sans connexion ; copie horodatée (08:47:30Z) acceptée par `verifier` (exemption de 5 énoncés, échéances au 24/12) ; `PUBLIES|0` ; document du dépôt inchangé (`f634c57e7013d108`). Rien signé, rien publié.
+
+**Écart à la prédiction** : 10 cas et non 11 ; erreur de compte dans la prédiction (le script n'en contient que 10), pas un cas manquant. Le reste de la prédiction tient, `poc-vex` compris.
+
+**Heures** : plus 08:44:40 à 08:47:33 UTC (2 min 53 s). **Total : au plus 15 h 07 min 21 s**, pour 10 h estimées ; le seuil de 20 h n'est pas atteint.
+
+**Reste** : la phrase d'accord nommé du propriétaire pour `signer`.
