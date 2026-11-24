@@ -4,6 +4,10 @@ Origine : la 07b relève `GO-2026-6859` (stdlib 1.26.10, Medium) sur l'image `3a
 
 **Estimation : 10 h (non mesurée) ; seuil de décision : 20 h.** Heures comptées ici, pas dans la 07b, à partir de la note de 2026-11-24T13:11:58Z.
 
+## État (2026-11-24T13:36:55Z)
+
+**Étapes 1 à 4 faites**, journaux dans [`resultats/`](resultats/07c-carte.md) : toolchain vérifiée ; image prédite sur l'hôte (`f5e6bcb0`) ; image de build `plateforme/builder-go-voie-d@8c11e856` (tag `go1.26.11`) ; `construire-image` re-signée (`4dcbc4b7`, ajoutée à la liste revue, `66a9f298` gardée) ; construction dans le cluster conforme ; scan : **5 vulnérabilités chi, 0 stdlib, 0 KEV** ; déclencheurs basculés, porte admise. Restent l'étape 6 (VEX chi de `f5e6bcb0`) et l'étape 7 (défauts du rejeu, brique 10).
+
 ## Seuil
 
 L'image sample-app reconstruite en Go 1.26.11 par la pipeline de la plateforme, signée (Chains), admise par la porte, scannée par le CronJob : **0 entrée stdlib**, les 5 entrées chi écartées par un nouveau VEX signé (accord nommé). Le rejeu de zéro attend la nouvelle image.
