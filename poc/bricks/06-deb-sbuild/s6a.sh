@@ -52,7 +52,7 @@ PATCH=$h06/s6a-scanner-deb.patch
 REG=sc-stockage.poc.test:5000                                                    # Zot depuis les pods (plateforme.sh de la 07a)
 OUTILS=$REG/plateforme/outils-scan@sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f   # G2 de la 07a
 DEB_REF=$REG/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e    # S4d1
-APP_REF=$REG/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5        # IMAGE de la 07a
+APP_REF=$REG/builds/sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7        # IMAGE de la 07a
 CA=$HOME/.cache/supply-chain-poc/08/pki/ca-poc.crt
 export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
 

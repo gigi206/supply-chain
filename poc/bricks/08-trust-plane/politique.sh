@@ -87,7 +87,7 @@ kyvernopre sha256:27f3cc52e628559b56d08363b85316819802086c9808606914f7805a244148
 background-controller sha256:c46e124f21ef8a6bb4b48de57106808b1007edcd5ddd4ff7df5d23b9efa60ce2
 cleanup-controller sha256:d7340aa7c9315080c3dafa7b765d090ced37353e89e5cd7a3f9ac69e8fb532b2
 reports-controller sha256:5fb6d3e738050dbce84f60ecabaede7665fbe0578d07c1e8c912443b035e79c3"
-APP_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # images d'essai signées en J4
+APP_DIGEST=sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7   # images d'essai signées en J4
 BANC=$repo/poc/benchmarks/kyverno-seul
 NS_ESSAI=bancc   # espace des pods d'essai (jamais créés : dry-run côté serveur)
 BUSYBOX_AMONT=docker.io/rancher/mirrored-library-busybox:1.37.0   # image d'étape de J4 (copie dans Zot : tekton-images.tsv)

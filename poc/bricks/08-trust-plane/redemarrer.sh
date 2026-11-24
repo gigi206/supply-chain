@@ -24,7 +24,7 @@ export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/commun.sh"
-APP_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+APP_DIGEST=sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
 T=$W/redemarrer
 mkdir -p "$T"
 exec > >(sed -u "s#$HOME#~#g" | tee "$R/redemarrage-vm.log") 2>&1

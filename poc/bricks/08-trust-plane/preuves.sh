@@ -3,7 +3,7 @@
 # de J8 »). Une étape par test : prédiction écrite avant le premier passage, tentative depuis la zone build ou par le compte
 # qu'un attaquant y viserait, témoin positif (l'essai sait voir ce qu'il cherche), trace dans resultats/preuves-<étape>.log.
 # Les fonctions de J6 viennent de politique.sh, sourcé sans lancer ses étapes ; aucune étape existante n'est appelée (leurs
-# journaux sont cités par le README). builds/sample-app@3a7ca1b1, l'image réelle, est relevée avant et après chaque étape :
+# journaux sont cités par le README). builds/sample-app@APP_DIGEST (f5e6bcb0 depuis la 07c, 3a7ca1b1 avant), l'image réelle, est relevée avant et après chaque étape :
 # nombre d'enveloppes de Chains et provenance de PipelineRun la plus récente, seule jugée par les règles de tâches de la porte (Conforma v1.0.28 ; la règle de source lit toutes les provenances).
 #   test2  TaskRun à taskSpec en ligne et PipelineRun à pipelineSpec en ligne, créés pour de vrai (pas en dry-run), par
 #          l'administrateur du cluster et par el-forgejo, seul compte qui crée des PipelineRuns dans builds ; témoins :
@@ -69,7 +69,7 @@
 #          politique/gabarit-sample-app.yaml, bundle de construction.sh taches) : PipelineRun rendu admis à blanc au nom de
 #          el-forgejo et du rattrapage ; chaîne entière sur la tête de main 6391fd43, par les deux chemins de création, l'un après
 #          l'autre : livraison de Forgejo (EventListener), puis rattrapage (CronJob), PipelineRun purgé avant chacun ; construction
-#          sous Kata, image 3a7ca1b1, spec identique à celle de J7 (construction.sh construire), signature de Chains, horodatage,
+#          sous Kata, image f5e6bcb0 (3a7ca1b1 avant la 07c), spec identique à celle de J7 (construction.sh construire), signature de Chains, horodatage,
 #          porte de release (source attendue) sur la nouvelle provenance, contrôle exécutions/enveloppes ; rejeu de la livraison sans
 #          effet ; posture du gabarit, de la pipeline et de ses trois tâches. À lancer après J7 et après les étapes de J6 et de J8 qui
 #          supposent le gabarit d'essai (garde gabarit_essai). Trace : labels et audit de l'API, audit de Zot, verdicts de ec
@@ -131,7 +131,7 @@ EL=system:serviceaccount:declencheurs:el-forgejo
 CONTROLEUR=system:serviceaccount:tekton-pipelines:tekton-pipelines-controller   # crée les pods des TaskRuns
 CHAINS=system:serviceaccount:tekton-chains:tekton-chains-controller
 REGLE_CTRL=tekton-controleurs-builds   # ValidatingAdmissionPolicy de tekton/controleurs-builds.yaml (posée par tekton.sh installer)
-APP=builds/sample-app@${APP_REEL:-$APP_DIGEST}   # 07c (24/11/2026) : APP_REEL= image réelle reconstruite (Go 1.26.11) ; APP_DIGEST reste celui des essais
+APP=builds/sample-app@${APP_REEL:-$APP_DIGEST}   # 07c : APP_DIGEST (politique.sh) = f5e6bcb0 pour l'image réelle et les essais (« Un seul digest ») ; APP_REEL seulement pour une surcharge
 BUILDKIT=$REG/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b   # construction.sh
 USURPEE=10.42.1.250     # adresse du sous-réseau des pods de sc-build, inutilisée (kata.sh ; contrôlé avant l'essai)
 EXTERNE=203.0.113.10    # adresse de documentation (RFC 5737), hors du cluster (kata.sh)

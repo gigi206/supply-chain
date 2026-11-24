@@ -21,7 +21,7 @@ export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/commun.sh"
 KA=$here/kyverno-admission.sh
-APP_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # images d'essai signées en J4
+APP_DIGEST=sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7   # images d'essai signées en J4
 DEP=kyverno-admission-controller
 NS_LIV=livraison NS_HORS=horodatage NOM=horodatage-livraison
 OFF_INDEX=sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955

@@ -30,8 +30,8 @@ export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/commun.sh"
 ZOT_SHA=33b9b5bfe05d6788c076de951a01920477dbd6395c330146e23cc2340073e52e   # mise.lock, zot-linux-amd64 v2.1.22
-APP_LAYOUT=${APP_LAYOUT:-$HOME/.cache/supply-chain-poc/w/b04/app-layout}   # image sample-app de la brique 04
-APP_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+APP_LAYOUT=${APP_LAYOUT:-$HOME/.cache/supply-chain-poc/w/b04-1.26.11/app-layout}   # image sample-app de la brique 04, Go 1.26.11 (07c ; w/b04/app-layout avant)
+APP_DIGEST=sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7   # 07c, étape 7 (« Un seul digest ») : images d'essai et image réelle en Go 1.26.11 ; 3a7ca1b1 avant le 24/11/2026
 DEPOT=workspace/sample-app
 BUSYBOX=docker.io/rancher/mirrored-library-busybox:1.37.0   # images système de k3s (airgap vérifié en J1)
 FORGEJO_SHA=17b59b5f8a8f968126b7a6fcc1d45d9531228dbf293f172cf5565d2e72e999a3   # mise.lock, forgejo-15.0.11-linux-amd64

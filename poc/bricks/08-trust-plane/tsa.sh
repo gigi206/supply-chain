@@ -44,7 +44,7 @@ MIROIR_COSIGN=amont/sigstore/cosign/cosign
 BAO_INDEX=sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f   # openbao.sh
 SUJET=system:serviceaccount:tsa:timestamp-authority
 URL_TSA=http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp
-APP_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # images d'essai signées en J4
+APP_DIGEST=sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7   # images d'essai signées en J4
 DL=$O/telechargements/tsa
 T=$W/tsa
 trap 'rm -rf "$T" "$W/refus.out"' EXIT   # copies de secrets et jetons d'essai, même en cas d'échec

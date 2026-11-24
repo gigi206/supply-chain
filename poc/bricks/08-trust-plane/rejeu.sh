@@ -64,6 +64,11 @@
 # 2026-11-21T16:37:53Z). pose écrit sur sc-stockage (sudo, comme g8_metriques) ; verif est hors du rejeu (« une fois par scan »
 # ne se prouve qu'au scan quotidien suivant).
 #
+# Additif du 2026-11-24 (07c, étape 7, « Un seul digest ») : sample-app reconstruite en Go 1.26.11. Voie D (image de build 8c11e856,
+# toolchain lue dans le cache des modules), voie A, construction, J2 (référence f5e6bcb0 de w/b04-1.26.11), images d'essai de J4
+# à J8 et cibles du scan (07a, 06) portées à f5e6bcb0 ; tâche publier-essai : nouvelle signature exigée (carte de la 07c). PAS ENCORE REJOUÉ. Un rejeu recrée la clé vex :
+# les VEX signés ne se vérifient plus (nouvel accord nommé par document).
+#
 # Usage (racine du dépôt) : [POUSSER_VSA=1] [TAG_05=<tag>] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail
 export LC_ALL=C
@@ -158,7 +163,7 @@ etape "J8 (contrôleurs)" mise run confiance:preuves -- controleurs
 etape "01 (S2, S4)" mise run synchro:forgejo -- comptes organisations amont miroir archives fork protections refus bout_en_bout
 etape "01 (S3)" mise run synchro:executeur -- installer essai planifie fuites
 etape "01 (S4, négatifs)" mise run synchro:forgejo -- negatifs
-echo "## 01 S5 : sautée (déduit du code, non mesuré : D6 refuserait l'image du fork, sans fermeture propre ; porte en dur sur 3a7ca1b1)"
+echo "## 01 S5 : sautée (déduit du code, non mesuré : D6 refuserait l'image du fork, sans fermeture propre ; digest 3a7ca1b1 en dur dans declencheur.sh)"
 echo "## 01 reverification, retrait, refspec, niveaux : sautées (mesures ponctuelles du 02/11/2026)"
 etape "01 (S6)" mise run synchro:forgejo -- traefik
 echo "## 19 telecharger : sautée (archives en cache, sha256 revérifiés par installer) ; reference, O4 et correctifs : sautés (mesures)"
@@ -193,6 +198,8 @@ etape "07a (passage périodique)" plateforme g7_periodique g7_grafana
 etape "07a (G8)" plateforme g8_metriques
 if [ "${POUSSER_VSA:-}" = 1 ]; then
   # VSA de la brique 10 (bundle versionné, lié au seul digest 3a7ca1b1, que J7 vérifie) re-poussée, puis contrôle 6 de la porte
+  # 07c, étape 7 (24/11/2026) : J7 construit désormais f5e6bcb0 ; cette VSA ne la couvre pas, le contrôle 6 refuserait l'image
+  # réelle tant que la brique 10 n'a pas produit de VSA de f5e6bcb0 (déduit du code, non mesuré). Ne pas lancer avec POUSSER_VSA=1 avant.
   etape "10 (VSA)" env JALON=r5 mise run replay -- pousser_vsa
   etape "J8 (contrôle 6)" mise run confiance:preuves -- controle6
   etape "J8 (contrôle 7)" mise run confiance:preuves -- controle7

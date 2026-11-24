@@ -226,11 +226,11 @@ etape_installer() {
 }
 
 etape_signature() {
-  local img=$REG/builds/essai-signature dig=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+  local img=$REG/builds/essai-signature dig=sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7   # 07c, étape 7 (« Un seul digest ») : images d'essai et image réelle en Go 1.26.11 ; 3a7ca1b1 avant le 24/11/2026
   mkdir -p "$T/auth" && chmod 700 "$T/auth"
   # Image d'essai poussée depuis l'hôte (sample-app de la brique 04) ; la tâche ne la construit pas.
   auth_zot "$T/auth/zot.json"
-  oras cp --from-oci-layout "$HOME/.cache/supply-chain-poc/w/b04/app-layout@$dig" "$REG_HOTE/builds/essai-signature@$dig" \
+  oras cp --from-oci-layout "$HOME/.cache/supply-chain-poc/w/b04-1.26.11/app-layout@$dig" "$REG_HOTE/builds/essai-signature@$dig" \
     --to-ca-file "$P/ca-poc.crt" --to-registry-config "$T/auth/zot.json" >/dev/null
   # Zone build : compte Zot poc-build (builds/** seulement), utilisé par Chains pour pousser .sig et .att.
   kubectl apply --server-side -f "$here/tekton/builds.yaml" >/dev/null
@@ -256,7 +256,7 @@ etape_signature() {
 }
 
 etape_verifier() { # signature et attestation de l'essai, vérifiées sur l'hôte avec la clé publique de Transit
-  local ref=$REG_HOTE/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 debut
+  local ref=$REG_HOTE/builds/essai-signature@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 debut
   local cle=$R/chains-cle-publique.pem opts=(--insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt")
   debut=$(kubectl get taskrun -n builds essai-signature -o jsonpath='{.status.startTime}')
   mise run confiance:openbao -- cle | grep 'clé publique'
@@ -278,10 +278,10 @@ etape_verifier() { # signature et attestation de l'essai, vérifiées sur l'hôt
 }
 
 etape_webhook() {
-  local img=$REG/builds/essai-webhook dig=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+  local img=$REG/builds/essai-webhook dig=sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7   # 07c, étape 7 (« Un seul digest ») : images d'essai et image réelle en Go 1.26.11 ; 3a7ca1b1 avant le 24/11/2026
   mkdir -p "$T/auth" && chmod 700 "$T/auth"
   auth_zot "$T/auth/zot.json"
-  oras cp --from-oci-layout "$HOME/.cache/supply-chain-poc/w/b04/app-layout@$dig" "$REG_HOTE/builds/essai-webhook@$dig" \
+  oras cp --from-oci-layout "$HOME/.cache/supply-chain-poc/w/b04-1.26.11/app-layout@$dig" "$REG_HOTE/builds/essai-webhook@$dig" \
     --to-ca-file "$P/ca-poc.crt" --to-registry-config "$T/auth/zot.json" >/dev/null
   [ -s "$S/forgejo-webhook.secret" ] || (umask 077 && openssl rand -hex 32 | tr -d '\n' > "$S/forgejo-webhook.secret")
   kubectl create secret generic forgejo-webhook -n builds --from-file=secret="$S/forgejo-webhook.secret" --dry-run=client -o yaml \
@@ -362,7 +362,7 @@ etape_essais_webhook() {
   rm -f "$T/auth/entete"
   echo "## provenance du PipelineRun déclenché par Forgejo (cosign, clé Transit ; enveloppe de cet essai : startedOn ≥ $debut)"
   cosign verify-attestation --key "$R/chains-cle-publique.pem" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" \
-    "$REG_HOTE/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5" 2>/dev/null \
+    "$REG_HOTE/builds/essai-webhook@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7" 2>/dev/null \
     | jq -c --arg d "$debut" '.payload | @base64d | fromjson | .predicate
       | select(.buildDefinition.externalParameters.runSpec.pipelineRef != null and .runDetails.metadata.startedOn >= $d)
       | {buildType: .buildDefinition.buildType, pipeline: (.buildDefinition.externalParameters.runSpec.pipelineRef | .name // (.params[] | select(.name == "bundle") | .value)),
@@ -372,7 +372,7 @@ etape_essais_webhook() {
     | grep "$reel" | head -1
   echo "## une enveloppe par exécution signée de cet essai (startedOn ≥ $debut)"
   cosign verify-attestation --key "$R/chains-cle-publique.pem" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" \
-    "$REG_HOTE/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5" 2>/dev/null \
+    "$REG_HOTE/builds/essai-webhook@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7" 2>/dev/null \
     | jq -r --arg d "$debut" '.payload | @base64d | fromjson | .predicate | select(.runDetails.metadata.startedOn >= $d)
       | "\(if .buildDefinition.externalParameters.runSpec.pipelineRef then "PipelineRun" else "TaskRun" end) \(.buildDefinition.externalParameters.runSpec.params[] | select(.name == "commit") | .value)"' \
     | sort > "$T/webhook/enveloppes"
