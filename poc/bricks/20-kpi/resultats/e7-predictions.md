@@ -21,3 +21,5 @@ Non mesurable à sec : l'étape dans `rejeu.sh` (`bash -n` seulement), la pose s
 ## Second passage (prédiction de 2026-11-24T22:05:39Z, après relecture du conseiller)
 
 Défaut lu, non mesuré : `SANS_DATE` hérité de l'environnement sautait le contrôle des clés contre HEAD dans `pose`. `unset SANS_DATE` en tête du script ; un cas de plus (`sec` avec `SANS_DATE=2` et deux clés réécrites reste KO, code 1, 2 KO). `SUFFIXE=-2` : **12 cas, 0 écart**.
+
+Résultat (note de 2026-11-24T22:06:48Z) : [journal](e7-essai-rejeu-2.log), **12 cas, 0 écart**. Conforme.
