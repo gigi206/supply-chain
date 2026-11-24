@@ -1,0 +1,47 @@
+# replay.sh verifier_entrees, 2026-11-24T15:13:26Z, IMAGE f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 INVOCATION 9539952b-07a7-4a0b-a6e1-084304d0e8af
+eda0fe010d219cb3819c22f0d8746c33526508ccffa555c3697b000b9245ca7a  verifier_entrees.py
+## ancres de confiance (copiées depuis le dépôt)
+  b446c5ffe7b65d3fc39ff2e0f560c8726a4a90bc5221161ec931dfe8597edd19  chains.pub
+  29fa7cc76f71b78297beb1ee9c512d09be3ffb013bacd5e86aa19bfaf94ad047  tsa-chaine.pem
+OK   racine de confiance de la TSA construite dans la VM
+OK   digest du sujet transporté : f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
+## bundles horodatés : vérifiés hors réseau (clé de Chains, sujet, jeton de la TSA)
+OK   bundle-3642a117c2a49725 : vérifié ; invocationId 9539952b-07a7-4a0b-a6e1-084304d0e8af ; jeton de la TSA : Nov 24 13:28:06 2026 GMT
+OK   bundle-5f46ca74d0bd3b79 : vérifié ; invocationId 84b0b219-b086-4658-a27a-7036c68d1187 ; jeton de la TSA : Nov 24 13:27:10 2026 GMT
+OK   bundle-6265f919f95955a1 : vérifié ; invocationId 7cf33c06-f2f9-4670-a073-e3a210170f99 ; jeton de la TSA : Nov 24 13:28:09 2026 GMT
+OK   bundle-6c63b6bb82cc2d98 : vérifié ; invocationId caa325eb-412a-40ff-9e7d-4c566c3e93c8 ; jeton de la TSA : Nov 24 13:34:08 2026 GMT
+OK   bundle-95c90e0270e43f1a : vérifié ; invocationId 2798bd16-6eb5-48aa-a5a7-7ffc3cee366b ; jeton de la TSA : Nov 24 13:27:07 2026 GMT
+OK   bundle-d0a3035c0be3bda0 : vérifié ; invocationId 1c21329c-865f-4964-80cd-0ef1c4d3fc6f ; jeton de la TSA : Nov 24 13:34:05 2026 GMT
+OK   bundle-f30288edf9919d00 : vérifié ; invocationId 5098f22f-f727-4dd9-9a91-55d775ab4e7b ; jeton de la TSA : Nov 24 13:36:07 2026 GMT
+OK   bundle-f66aeb559b3322c8 : vérifié ; invocationId 464e58b9-c44b-4a86-93ec-d7c234b4f9ed ; jeton de la TSA : Nov 24 13:36:10 2026 GMT
+bundles vérifiés : 8 sur 8
+OK   provenance 9539952b-07a7-4a0b-a6e1-084304d0e8af extraite d'un bundle vérifié
+## politique, section 1 (provenance vérifiée)
+OK   _type https://in-toto.io/Statement/v1
+OK   predicateType https://slsa.dev/provenance/v1
+OK   builder.id https://supply-chain.example/builders/tekton-chains@v1
+OK   buildType https://tekton.dev/chains/v2/slsa-tekton
+OK   sujet = image rejouée
+OK   entrée construire-image déclarée : {'sha256': '4dcbc4b7468137d894bb40085b32b9cc816a37bfece3204ed06466ee4741eb6b'}
+OK   entrée fermeture déclarée : {'sha256': '74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd'}
+OK   entrée web-dist déclarée : {'sha256': '47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb'}
+OK   entrée builder-go-voie-d déclarée : {'sha256': '8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7'}
+OK   entrée sample-app.git déclarée : {'sha1': '6391fd437f26696847041be3226bbbf633f55a2f'}
+## digests des entrées transportées, recalculés
+OK   construire-image : transporté 4dcbc4b7468137d894bb40085b32b9cc816a37bfece3204ed06466ee4741eb6b
+OK   fermeture : transporté 74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   web-dist : transporté 47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
+OK   builder-go-voie-d : transporté 8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+## commit
+OK   bundle git cohérent (git bundle verify, dans le dépôt cloné)
+OK   commit de main 6391fd437f26696847041be3226bbbf633f55a2f
+OK   arbre de travail extrait au commit déclaré, propre
+## recette (bundle construire-image vérifié)
+OK   Dockerfile : sha256 d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619, contrôlé par la tâche : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619
+OK   options de buildctl : buildctl --addr unix:///tmp/run/bk.sock build --frontend dockerfile.v0 --no-cache --opt build-arg:SOURCE_DATE_EPOCH=0 --local context="$e/src" --local dockerfile=/tmp/df --opt filename=Dockerfile --oci-layout magasin="$e/builder" --opt context:builder=oci-layout://magasin@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7 --local deps="$e/deps" --opt context:deps=local:deps --output type=oci,dest=$(workspaces.sortie.path)/image.tar,rewrite-timestamp=true
+RUN : ['RUN --network=none --mount=type=bind,from=deps,target=/deps \\']
+## version de Go de l'image de build déclarée (vérifiée)
+OK   go1.26.11 ; toolchain du domaine : go1.26.11
+## heures du build
+finishedOn signé : 2026-11-24T13:27:42Z ; jeton de la TSA : Nov 24 13:28:06 2026 GMT
+## bilan : 0 KO

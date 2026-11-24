@@ -307,3 +307,24 @@ Note de 2026-11-24T15:04:46Z. Prédictions datées et commitées avant tout lanc
 Les défauts de `replay.sh` et `rejeu.sh` ne passeront à `f5e6bcb0` que dans le commit qui archive la VSA.
 
 **Heures** : de 14:39:31 à 15:08:17 UTC, poussée et reprise comprises : 28 min 46 s. **Total de la 07c : au plus 1 h 42 min 46 s** pour 10 h estimées.
+
+**Accord** : à la question « Autorisez-vous le téléchargement de l'archive Go 1.26.11 et les étapes R2 et R3 dans sc-replay ? », réponse verbatim du propriétaire : « J'autorise ».
+
+**Résultats** (note de 2026-11-24T15:13:31Z), tous conformes aux prédictions :
+- **archive Go** ([journal](go-domaine.log), 15:12:48 UTC) : **13 cas, 0 écart**.
+  - sha256 `9849f4e0…` et taille de 66 999 944 octets identiques sur go.dev et sur l'archive téléchargée ;
+  - ziphash du module = `h1:KyINmJ/…` ;
+  - fichiers : 11 524 communs, tous de contenu identique ; `bin/go`, `gofmt`, `compile`, `link` et `VERSION` identiques ;
+  - seuls 20 `_go.mod` sont propres au module (0 hors `_go.mod`) ;
+  - archive gardée dans `~/.cache/supply-chain-poc/10/telechargements`.
+- **R2 `outils`** ([journal](../../10-independent-replay/resultats/f5e6bcb0/r2-outils.log), 15:13:14 UTC) : 5 empreintes `OK` dans la VM ; `go version go1.26.11 linux/amd64` ; BuildKit 0.25.2, runc 1.3.3, cosign 3.1.4 et oras 1.3.6, inchangés.
+- **R3 `transporter`** ([journal](../../10-independent-replay/resultats/f5e6bcb0/r3-transporter.log), 15:13:22 UTC) : sujet et `.att`, **8 bundles horodatés** et **4 entrées** copiés, bundle git de `main` ; 77 Mo dans la VM.
+- **R3 `verifier_entrees`** ([journal](../../10-independent-replay/resultats/f5e6bcb0/r3-verifier_entrees.log), 15:13:26 UTC) : **0 KO** (31 `OK`).
+  - 8 bundles vérifiés sur 8, hors réseau ; provenance `9539952b` extraite d'un bundle vérifié ; section 1 de la politique tenue ;
+  - entrées `4dcbc4b7`, `74c265e7`, `47f72275`, `8c11e856` et commit `6391fd43`, digests recalculés égaux ;
+  - Dockerfile `d56985c1`, contrôlé par la tâche ; `go1.26.11`, égal à la toolchain du domaine ;
+  - `finishedOn` signé à 13:27:42Z, jeton de la TSA à 13:28:06 UTC.
+
+**Prochaine étape** : R4 `rebuild`, au plus tôt le **2026-11-25T13:27:42Z**, déclenché à la main (action sur la VM, accord à demander). Il faut d'abord relire les trois points notés plus haut.
+
+**Heures** : de 15:08:17 à 15:13:31 UTC : 5 min 14 s. **Total de la 07c : au plus 1 h 48 min 00 s** pour 10 h estimées.

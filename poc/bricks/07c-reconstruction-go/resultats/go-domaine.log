@@ -1,0 +1,23 @@
+# archive go1.26.11.linux-amd64.tar.gz pour le domaine de replay, 2026-11-24T15:12:48Z, ad52223a
+accord du propriétaire (verbatim) : « J'autorise »
+OK   sha256 publié par go.dev : 9849f4e04ee35303714e34fbc3ac8ab44ea3e448a95aa182f91e3b9b79c710ec
+OK   taille publiée par go.dev : 66999944
+OK   sha256 de l'archive téléchargée : 9849f4e04ee35303714e34fbc3ac8ab44ea3e448a95aa182f91e3b9b79c710ec
+OK   taille de l'archive téléchargée : 66999944
+OK   ziphash du module (sum.golang.org) : h1:KyINmJ/FQdKRmDYGuTAAXkumyeR2DyUlSNHZj7XaLFg=
+fichiers : module 11544, archive 15048, communs 11524
+## dans l'archive seulement, par premier répertoire :
+     3460 test
+       29 api
+       21 misc
+       14 doc
+## dans le module seulement : 20, dont hors _go.mod : 0
+OK   fichiers communs de contenu différent : 0
+OK   bin/go identique (module, archive) : 95499375c24b610c
+OK   bin/gofmt identique (module, archive) : cae643e8d7891e50
+OK   pkg/tool/linux_amd64/compile identique (module, archive) : 896a17923b901c95
+OK   pkg/tool/linux_amd64/link identique (module, archive) : f2e750ca33de93ea
+OK   VERSION identique (module, archive) : 489cd0f7bd5ac954
+OK   VERSION (première ligne) : go1.26.11
+OK   archive gardée dans le cache du domaine : 9849f4e04ee35303714e34fbc3ac8ab44ea3e448a95aa182f91e3b9b79c710ec
+## bilan : 13 cas, 0 écart(s)

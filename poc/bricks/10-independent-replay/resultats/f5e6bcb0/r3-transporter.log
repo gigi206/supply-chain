@@ -1,0 +1,22 @@
+# replay.sh transporter, 2026-11-24T15:13:22Z, IMAGE f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 INVOCATION 9539952b-07a7-4a0b-a6e1-084304d0e8af
+copié : builds/sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 -> sujet
+copié : builds/sample-app:sha256-f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7.att -> att
+copié : horodatage/bundles:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7-3642a117c2a49725 -> bundle-3642a117c2a49725
+copié : horodatage/bundles:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7-5f46ca74d0bd3b79 -> bundle-5f46ca74d0bd3b79
+copié : horodatage/bundles:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7-6265f919f95955a1 -> bundle-6265f919f95955a1
+copié : horodatage/bundles:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7-6c63b6bb82cc2d98 -> bundle-6c63b6bb82cc2d98
+copié : horodatage/bundles:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7-95c90e0270e43f1a -> bundle-95c90e0270e43f1a
+copié : horodatage/bundles:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7-d0a3035c0be3bda0 -> bundle-d0a3035c0be3bda0
+copié : horodatage/bundles:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7-f30288edf9919d00 -> bundle-f30288edf9919d00
+copié : horodatage/bundles:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7-f66aeb559b3322c8 -> bundle-f66aeb559b3322c8
+bundles horodatés de l'image : 8
+copié : tekton/tasks/construire-image@sha256:4dcbc4b7468137d894bb40085b32b9cc816a37bfece3204ed06466ee4741eb6b -> construire-image
+copié : plateforme/builder-go-voie-d@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7 -> builder-go-voie-d
+copié : builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd -> fermeture
+copié : entrees/sample-app/web-dist@sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb -> web-dist
+bundle git : 8.0K
+b446c5ffe7b65d3fc39ff2e0f560c8726a4a90bc5221161ec931dfe8597edd19  chains.pub
+29fa7cc76f71b78297beb1ee9c512d09be3ffb013bacd5e86aa19bfaf94ad047  tsa-chaine.pem
+82d32c2783a619046433cf4228f211b89e52d07932414c81ecec048622a7a7af  sample-app.bundle
+eda0fe010d219cb3819c22f0d8746c33526508ccffa555c3697b000b9245ca7a  verifier_entrees.py
+taille dans la VM : 77M
