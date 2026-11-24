@@ -1,0 +1,179 @@
+# tri des entrées du deb, 2026-11-24T12:56:22Z, c73e5cde, crane 0.20.6
+## 1. entrées du dernier scan signé (vex-gabarit.sh)
+# vex-gabarit.sh, 2026-11-24T12:56:22Z ; sujet sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e ; scan du 2026-11-24T11:16:57.457020454Z ; 2 scan(s) vérifié(s) par CLE_SCANNER (emp
+
+| # | Identifiant | Alias | Gravité | KEV | EPSS | Paquet | Corrigé dans | VEX appliqué |
+|---|---|---|---|---|---|---|---|---|
+
+comptes : 67 entrée(s), 67 identifiant(s) ; KEV 0 ; avec correctif 67 ; écartées par un VEX 0 ; gravités : Critical 3, High 33, Low 1, Medium 28, Unknown 2
+entrées : 67 ; stdlib : 62 ; chi : 5
+## 2. binaire du paquet
+OK   digest du manifeste relu : sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+paquet : sample-app_1.0.0-2_amd64.deb ; sha256 f66bbeb2aba31e52
+binaire : 5906320 octets ; sha256 10d475d00dc2a14c
+ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, stripped
+  ~/.cache/supply-chain-poc/07a/deb-tri/racine/usr/bin/sample-app: go1.24.4
+  	path	example.com/supply-chain/sample-app
+  	mod	example.com/supply-chain/sample-app	(devel)	
+  	dep	github.com/go-chi/chi/v5	v5.2.3	
+  	build	-buildmode=exe
+  	build	-compiler=gc
+  	build	-trimpath=true
+  	build	CGO_ENABLED=0
+  	build	GOARCH=amd64
+  	build	GOOS=linux
+  	build	GOAMD64=v1
+noms de fonctions retenus : 8804
+OK   pclntab exploitable : net/http.(*Server).Serve : 1
+OK   pclntab exploitable : chi (*Mux).ServeHTTP : 1
+## 3. fiches OSV (api.osv.dev)
+fiches : 67 ; empreinte de l'ensemble (sha256 des sha256 triés) : e4a7e6876d8929f4
+  ba7182be11e155a6d8e3cd13b5a447cc9bb57cbcddab86f54b7150d2bcb0896a  GHSA-3fxj-6jh8-hvhx.json
+  1651c936ea283d029afc6a6006401cb7557c90c0f19e4aff1d101a3df240981e  GHSA-j6qf-3m9c-vwj3.json
+  88812b87f400b41c99c3f3deb4f661a170b6dcdeacc89f27742b57dc48f39b11  GHSA-mqqf-5wvp-8fh8.json
+  373ab3676e10cff9a932892db6a0ef1e1db8108114b08ca7469ed28498a4cd79  GO-2025-3849.json
+  29e81b1eb0ad7f7407cc8e75395576e0197702da8ce4352722429ffea980d63f  GO-2025-3956.json
+  96286ee6325d61cdfb0578bceb3cc0f15a7d253c0c3e2c48b07ce3e9be490c2f  GO-2025-4006.json
+  1b70d20fd3ee04e0af6b6db188df600cc84f8550c85597756bc6d2baa5010b48  GO-2025-4007.json
+  034cc4962a42511799755c38393f7dff962b34b7a3bc95ec2d9392f00ae0f026  GO-2025-4008.json
+  209c1c5894e5457cf107d6e0a5f545e4f1106d6274be2e4526778ee4bd84e930  GO-2025-4009.json
+  906a32ada03a9be4184aa9c4c045672ce5205e6a81cbf02ce1cd2019cc3579c8  GO-2025-4010.json
+  3bee1ee7ce704a5a7f618658100b524c087dabb30dcdec1e847772c3b5b26824  GO-2025-4011.json
+  bb4ffa30c76dde846b6c65cb5d0fbc24222c70296494ed3b0d4c1525291c7526  GO-2025-4012.json
+  87544ed35c16c95cc67d701fb245de53fb88942664b252b6e81aaca54ec419d6  GO-2025-4013.json
+  0c90e9d2a9f5a345849c42333d90074b4a8ee26292a557b38647fab794b28494  GO-2025-4014.json
+  7101bd5ddd2eefa3c704bbac258a3718dfeba9e63af3f98ed1abdba401f66866  GO-2025-4015.json
+  bd71b4125e520aac0b691532e32239b4a1f145485a474c2da18346d46c877f43  GO-2025-4155.json
+  156738bf245fd44873849118f5503c616b9a6bb062b8e922c40a0912a58eb235  GO-2025-4175.json
+  202643ea3d7b37e1b3a3db4733022507bfb327ed2fb47bf1f9bbba4b16b045ae  GO-2026-4337.json
+  00139c2032763cd82d4b6c732d300b9c5794990ac8173daf11d5f3c38df7efd8  GO-2026-4340.json
+  21468ad40c5133727385ab75b5b8afa521d6423d1ff18a0435d919ed5d86f021  GO-2026-4341.json
+  0a03c63b985c40e71b15e52067f0cb128b96ca1885e1c7e2f0c20076f383a6ac  GO-2026-4342.json
+  1c11cb8fa3209dd44e88157ac22d0ebc556aea05851710040344ac02955af568  GO-2026-4601.json
+  abb41e8feba37e49e945c1549980f1e046e5ee3192e0eec034eb97a29254d0cc  GO-2026-4602.json
+  31124845acbb0a6e338ddb8b9d70656e4df0db8a66676a27896170541b627c71  GO-2026-4603.json
+  b07061b4c4ad55898552784bd9ede61cebed07808b84e44378e75fe2bc48cca8  GO-2026-4864.json
+  4397eedefb66b04022cd38e7e7bc5322a5eeeaee07e283fe7cbde5b3dd7bed5c  GO-2026-4865.json
+  0cd8eaaf669968f10f47db70fdade22886b2a66750de85467cef58b63682061d  GO-2026-4869.json
+  bf0225068edec0ea7875be98484236004b9757e94a38b8818f71d78601124487  GO-2026-4870.json
+  14d70ecfa9572b2421bc2800bca345645f3816254f5a05b2774d278a55d27a3b  GO-2026-4918.json
+  494d11be642e0a506a07160684500d927003278144c343f493415bbf35ada13c  GO-2026-4946.json
+  6fc19ee3285e5fd7914836cab40becc420bd3e93d6c2c52b1a098344d2667fb4  GO-2026-4947.json
+  03223242c5bae3be89549dc85f695b22e6cc56869c2bd0d7513b325dabdf7ca6  GO-2026-4970.json
+  86725dfdc9b548b8de950d552ee76379b42e22bc3ab8f903d20b0d5d14670e16  GO-2026-4971.json
+  a6f2146d98b43ced6e86d7c6d2139f68c164d5752498bf0c30832125e9f760dc  GO-2026-4976.json
+  8208abcefe39391ef7caee698af8bc6c9acc4258a466e2994664c15389bd683a  GO-2026-4977.json
+  10414fb9c7dbda21848c78ae16990f680973c827cda75c5fc8646ae1b88d22b2  GO-2026-4980.json
+  6ac4ce12d263fea6f0f3f5c0e2a4fd202348531e50f5b4abddee6202c9136a20  GO-2026-4981.json
+  a96f7d9cc22e5bc40d62915d5193e248ace7a32ad7185bb7dd15a636fa96e349  GO-2026-4982.json
+  4bf52941d97d288230ee7343c994a1703c1180df5181cee819025e7d7f56c652  GO-2026-4986.json
+  ce860f1c36e1403f5eff5db27369dd58d15133e5d7ac28db22a8187ded5eae0c  GO-2026-5026.json
+  cdd71a1371c99cc95ecbeac22b1cfd5c0a6142b1f516e8b216a7a6cfb7f0bf5e  GO-2026-5037.json
+  e9964a016398940a748b143e241951be322bd6d54f198a04a1809668ab94dadc  GO-2026-5038.json
+  10a8614b5a3369a5536f26220fefb927cc4f2600d5668e0c3a6c3bdae8a992a8  GO-2026-5039.json
+  d67c7c6a0a6ee9e867447fb11d17851ceab3194f7b9d681a1cae35d25ef845f5  GO-2026-5775.json
+  976ec038b160334d71382c272b81d58b62c3f40f01db99b00f3904af62d25488  GO-2026-5777.json
+  469db25a71c3b617bafb0c39c0f04f5332950d404c066133d3a2240648d70690  GO-2026-5856.json
+  3452255035528e060c34f87e63abe5f7e7cefe148589f0e95b6a8a777bd4cd76  GO-2026-5972.json
+  f94b2446b0147f163e2c9496fe797f83f4752fab5a9a3b16d9a15442d0dcea27  GO-2026-6088.json
+  189388e6169601513660fc5114bda0658c213f074e1340c328792fa7c995564d  GO-2026-6089.json
+  14c786b6b79c605b0a8a094581f23130d2931791d4147afcb70819549d476094  GO-2026-6090.json
+  2c409979897eac9829e6582cfbcbd42aa1681c792d2cf1894179b5b8a799f955  GO-2026-6091.json
+  1d600e26be4f56a738436f524c832a9684786f25bd356cf2d8e246884b1d136c  GO-2026-6218.json
+  82a604752307e836264fd9ab3e38de06628e5537165f65a5fb1e4e314e1d7464  GO-2026-6599.json
+  46387343be725f4c466d7d6ef65c50c947e0d8fa230fd06d5f59054700435a93  GO-2026-6600.json
+  9547380d9179b0c516b01e22fc3faf2cf8e9ce963584598bea5e9f2f7960d5d9  GO-2026-6603.json
+  a266037fc72a3022564119b5e0b0329e1b2cef1d0864c9aec0cc394d930d7f45  GO-2026-6604.json
+  6a1a83112f2634bd657d13ab43522c3bcc84de61ea159b2d5c197a94f6b59cc9  GO-2026-6605.json
+  eb051117dcac7dc110a816fe77d5cc76f6662904da6bd037a59cfed84bc17518  GO-2026-6607.json
+  98bd01240949191f941330bc6ae76258b230bc33d400c931049f1e4682ff2e2c  GO-2026-6608.json
+  2de0886aec1a8fa44ef0cdd979f5a575a59ee3854856f5eebac186549ff68e39  GO-2026-6609.json
+  d7b3dedb6a6a3ccef7fe42743fa31a2085fb2faa35e3db6062877a875aaef89d  GO-2026-6610.json
+  90c55c128527e5bb343a1fa6eece0d437ba7281b46ffc1cc2fd173c12917d1c8  GO-2026-6611.json
+  95a913aaa27b16748bee4e19da0feb3ef12a921bf4d9bf16f3bdc4f925e68fff  GO-2026-6612.json
+  da1e6ed0855a2d53deebb02d2d548569dc62d453b5396c4339fd8d6f17243847  GO-2026-6613.json
+  3bcdae584885df689cdb771753d60ae43f2e222ad3bd942d3d68bed93222a766  GO-2026-6617.json
+  7bd7c26b58325c6aac5fad05ff8281a3fbf7b7643898f478e0541cae8dd1e811  GO-2026-6809.json
+  b7850110c0fc24e3764fbdd85b2cda83565e1dc1de4895a82086c7101651524c  GO-2026-6859.json
+OK   fiches lues (une par identifiant) : 67
+## 4. classes
+  identifiant | gravité | classe | paquets visés (lié ?) | symboles présents / listés
+  GHSA-3fxj-6jh8-hvhx | Medium | X | (pkg:golang/github.com/go-chi/chi@v5.2.3#v5) | -
+  GHSA-j6qf-3m9c-vwj3 | Medium | X | (pkg:golang/github.com/go-chi/chi@v5.2.3#v5) | -
+  GHSA-mqqf-5wvp-8fh8 | Medium | X | (pkg:golang/github.com/go-chi/chi@v5.2.3#v5) | -
+  GO-2025-3849 | High | A | database/sql(non) | 0 / 2
+  GO-2025-3956 | Medium | A | os/exec(non) | 0 / 1
+  GO-2025-4006 | High | A | net/mail(non) | 0 / 6
+  GO-2025-4007 | High | C | crypto/x509(oui) | 6 / 33
+  GO-2025-4008 | Medium | C | crypto/tls(oui) | 4 / 10
+  GO-2025-4009 | High | C | encoding/pem(oui) | 2 / 2
+  GO-2025-4010 | Medium | C | net/url(oui) | 4 / 6
+  GO-2025-4011 | Medium | C | encoding/asn1(oui) | 3 / 3
+  GO-2025-4012 | Medium | B | net/http(oui) | 0 / 16
+  GO-2025-4013 | High | C | crypto/x509(oui) | 2 / 2
+  GO-2025-4014 | Medium | A | archive/tar(non) | 0 / 2
+  GO-2025-4015 | Medium | B | net/textproto(oui) | 0 / 1
+  GO-2025-4155 | High | C | crypto/x509(oui) | 2 / 2
+  GO-2025-4175 | Medium | C | crypto/x509(oui) | 1 / 1
+  GO-2026-4337 | Critical | C | crypto/tls(oui) | 5 / 10
+  GO-2026-4340 | Medium | C | crypto/tls(oui) | 10 / 21
+  GO-2026-4341 | High | B | net/url(oui) | 0 / 3
+  GO-2026-4342 | Medium | A | archive/zip(non) | 0 / 2
+  GO-2026-4601 | High | C | net/url(oui) | 4 / 6
+  GO-2026-4602 | Low | B | os(oui) | 0 / 6
+  GO-2026-4603 | Medium | A | html/template(non) | 0 / 4
+  GO-2026-4864 | Medium | B | internal/syscall/unix(oui) | 0 / 1
+  GO-2026-4865 | Medium | A | html/template(non) | 0 / 22
+  GO-2026-4869 | Medium | A | archive/tar(non) | 0 / 3
+  GO-2026-4870 | High | C | crypto/tls(oui) | 7 / 15
+  GO-2026-4918 | High | B | golang.org/x/net/http2(non) net/http(oui) | 0 / 35
+  GO-2026-4946 | High | C | crypto/x509(oui) | 2 / 2
+  GO-2026-4947 | High | C | crypto/x509(oui) | 2 / 2
+  GO-2026-4970 | High | B | os(oui) | 0 / 12
+  GO-2026-4971 | High | C | net(oui) | 5 / 37
+  GO-2026-4976 | Medium | A | net/http/httputil(non) | 0 / 2
+  GO-2026-4977 | High | A | net/mail(non) | 0 / 6
+  GO-2026-4980 | Medium | A | html/template(non) | 0 / 3
+  GO-2026-4981 | High | B | net(oui) | 0 / 3
+  GO-2026-4982 | Medium | A | html/template(non) | 0 / 3
+  GO-2026-4986 | High | A | net/mail(non) | 0 / 8
+  GO-2026-5026 | High | B | golang.org/x/net/idna(non) net/http(oui) net/http/internal/http2(non) | 0 / 29
+  GO-2026-5037 | High | C | crypto/x509(oui) | 4 / 4
+  GO-2026-5038 | High | B | mime(oui) | 0 / 1
+  GO-2026-5039 | Medium | C | net/textproto(oui) | 2 / 6
+  GO-2026-5775 | Unknown | A | github.com/go-chi/chi/v5/middleware(non) | 0 / 1
+  GO-2026-5777 | Unknown | A | github.com/go-chi/chi/v5/middleware(non) | 0 / 1
+  GO-2026-5856 | Medium | C | crypto/tls(oui) | 5 / 12
+  GO-2026-5972 | High | C | encoding/asn1(oui) | 4 / 4
+  GO-2026-6088 | High | A | encoding/xml(non) | 0 / 10
+  GO-2026-6089 | High | C | net/http(oui) | 5 / 10
+  GO-2026-6090 | High | C | crypto/tls(oui) | 5 / 11
+  GO-2026-6091 | Medium | A | html/template(non) | 0 / 3
+  GO-2026-6218 | Medium | B | net/url(oui) | 0 / 3
+  GO-2026-6599 | Medium | A | html/template(non) | 0 / 3
+  GO-2026-6600 | Medium | A | html/template(non) | 0 / 4
+  GO-2026-6603 | High | C | golang.org/x/net/http2(non) net/http(oui) net/http/internal/http2(non) | 87 / 353
+  GO-2026-6604 | Critical | B | internal/syscall/windows(non) os(oui) | 0 / 14
+  GO-2026-6605 | High | B | net/http(oui) net/http/httputil(non) | 0 / 20
+  GO-2026-6607 | High | C | crypto/tls(oui) | 4 / 10
+  GO-2026-6608 | High | C | mime/multipart(oui) net/textproto(oui) | 3 / 10
+  GO-2026-6609 | High | C | net/http(oui) | 2 / 6
+  GO-2026-6610 | High | B | golang.org/x/net/http2(non) net/http(oui) net/http/internal/http2(non) | 0 / 42
+  GO-2026-6611 | High | C | golang.org/x/net/http2(non) net/http(oui) net/http/internal/http2(non) | 96 / 411
+  GO-2026-6612 | Critical | C | golang.org/x/net/http2(non) net/http(oui) net/http/internal/http2(non) | 94 / 324
+  GO-2026-6613 | High | C | net/http(oui) | 42 / 150
+  GO-2026-6617 | High | C | golang.org/x/net/http2(non) net/http(oui) net/http/internal/http2(non) | 88 / 356
+  GO-2026-6809 | Medium | C | crypto/x509(oui) | 1 / 1
+  GO-2026-6859 | Medium | C | net/http(oui) | 41 / 149
+## comptes
+  classe A : 19
+  classe B : 14
+  classe C : 31
+  classe P : 0
+  classe X : 3
+  Critical GO-2026-4337 : C
+  Critical GO-2026-6604 : B
+  Critical GO-2026-6612 : C
+KO   aucune entrée non classée (X) : 3 (attendu 0)
+OK   toutes les entrées classées : 67
+## bilan : 6 cas, 1 écart(s)

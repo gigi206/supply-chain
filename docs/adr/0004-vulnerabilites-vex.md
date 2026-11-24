@@ -85,3 +85,9 @@ Sources : la [carte de la 07b](../../poc/bricks/07a-sbom-grype/resultats/07b-car
 - **Effet mesuré** au scan du calendrier du 24/11 à 09:30 ([journal](../../poc/bricks/07a-sbom-grype/resultats/piece8-apres-scan.log), 8 cas, 0 écart) : `VEX|1 énoncé(s) vérifié(s), 1 retenu(s), 0 rejeté(s)` (le scanner compte les documents), `SCAN|…, 6 vulnérabilités, 0 KEV, 5 écartée(s) par un VEX`, ligne visible dans Grafana ; le tableau du scan signé marque les 5 entrées.
 - **Hors mesure** : aucun VEX sur le deb (67 entrées) ; échéance non éprouvée sur ce VEX (elle l'a été au banc t3) ; un rejeu de zéro rendra ce VEX invalide (clé `vex` recréée).
 - **Le statut reste « À rédiger »** : les trois questions de la [fiche](../../poc/bricks/07a-sbom-grype/resultats/adr0004-besoins.md) (Dependency-Track, score, KPI) attendent le propriétaire.
+
+### Additif du 24/11/2026 (note de 2026-11-24T12:57:26Z) : choix du propriétaire et tri du deb
+
+- **Choix** : le propriétaire répond « oui » à « reconstruire l'image en Go 1.26.11 » et à « Paquet deb : lui faire un VEX ». Le VEX publié ne vaut que pour `3a7ca1b1` : après reconstruction, les 5 entrées chi reviennent tant qu'un nouveau VEX n'est pas signé.
+- **Tri du deb** ([`deb-tri-2.log`](../../poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log), lecture seule) : sur 67 entrées, 23 candidates solides à `vulnerable_code_not_present` (paquet visé non lié au binaire, ou code réservé à Windows), 13 fragiles (paquet lié, symboles listés absents), 31 non couvrables (symbole listé lié), dont les Critical `GO-2026-4337` et `GO-2026-6612`.
+- **Conséquence pour la décision** : un VEX réduit le bruit, il ne remplace pas la mise à jour de la bibliothèque standard ; pour le deb, seule une reconstruction avec un Go corrigé écarte les 31 entrées restantes.

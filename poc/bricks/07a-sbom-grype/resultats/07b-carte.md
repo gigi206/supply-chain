@@ -2433,3 +2433,16 @@ Confiance : haute pour le scanner (même chemin qu'au banc t3), moyenne pour le 
 **Tri du deb, passage 1** ([journal](deb-tri.log), 12:55:49 à 12:55:53 UTC) : **raté, défaut du script**. `SSL_CERT_FILE` exporté pour crane valait aussi pour curl : api.osv.dev refusé (« unable to get local issuer certificate »), **0 fiche**, les 67 entrées en classe X. Le bilan « 4 cas, 0 écart » est trompeur : aucun cas ne contrôlait les fiches. Faits valides de ce passage : dernier scan signé du 2026-11-24T11:16:57Z, 67 entrées (62 stdlib, 5 chi ; Critical 3, High 33, Medium 28, Low 1, Unknown 2 ; 0 KEV) ; paquet `sample-app_1.0.0-2_amd64.deb` (sha256 `f66bbeb2…`), binaire `/usr/bin/sample-app` (5 906 320 octets, sha256 `10d475d0…`, go1.24.4, chi v5.2.3, stripped) ; pclntab exploitable (8 804 noms, deux témoins présents).
 
 **Passage 2** (note de 2026-11-24T12:56:06Z) : CA du PoC limitée à crane ; deux cas ajoutés (une fiche par identifiant ; aucune entrée en classe X) ; accents graves retirés de la colonne paquet. Prédiction inchangée pour le reste ; bilan attendu : **6 cas, 0 écart**.
+
+**Tri du deb, passage 2** ([journal](deb-tri-2.log), 12:56:22 à 12:56:42 UTC ; note de 2026-11-24T12:57:26Z) : **6 cas, 1 écart**, écart de **prédiction** : les 3 entrées chi sous identifiant GHSA (`GHSA-3fxj-6jh8-hvhx`, `GHSA-j6qf-3m9c-vwj3`, `GHSA-mqqf-5wvp-8fh8`) ont des fiches sans `ecosystem_specific.imports` (classe X), alors que la prédiction les mettait en A. Leurs alias Go (`GO-2026-5774`, `GO-2026-4316`) et leurs résumés visent `middleware.RealIP`, `ClientIPFromXFF` et `RedirectSlashes`, du paquet `chi/v5/middleware`, que `GO-2026-5775` et `GO-2026-5777` montrent non lié dans ce binaire (classe A). 67 fiches lues, ensemble `e4a7e687…` (fiches gardées sous `~/.cache/supply-chain-poc/07a/deb-osv`, empreintes au journal).
+
+| Classe | Entrées | Sens |
+|---|---|---|
+| A | 19 (17 stdlib, 2 chi) | aucun paquet visé n'est lié : candidat solide |
+| X | 3 (chi, GHSA) | fiche sans imports ; même paquet que les 2 chi en A : candidat solide après un contrôle ciblé (comme `piece8-binaire.sh`) |
+| B | 14 | paquet lié, aucun symbole listé présent : fragile (inlining) ; **dont `GO-2026-6604` (Critical)**, réservée à Windows d'après sa fiche (`goos: windows`), binaire construit pour `GOOS=linux` : candidat solide |
+| C | 31 | au moins un symbole listé présent : **non couvert** ; dont les Critical `GO-2026-4337` (crypto/tls) et `GO-2026-6612` (HTTP/2 de net/http), et `GO-2026-6859` |
+
+**Forme attendue d'un VEX du deb** (non rédigé) : 23 énoncés solides (A, X, `GO-2026-6604`) ; 13 entrées B à étayer ou à laisser ; 31 entrées restent comptées. Un VEX ne peut pas écarter les entrées C : seule une reconstruction du deb avec une bibliothèque standard corrigée le peut.
+
+**Heures** : plus au plus 12:43:34 à 12:57:26 UTC (0 h 13 min 52 s) ; **total : au plus 15 h 26 min 18 s** pour 10 h estimées ; seuil de 20 h non atteint.
