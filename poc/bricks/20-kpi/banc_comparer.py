@@ -33,16 +33,23 @@ SUJETS = {
     "banc-illisible": (1, 1, 0, 0, 0, 1, 0, 1, 0, 1, "0/1", "0/1", J20),
     "banc-att-illisible": (0, 1, 0, 0, 0) + RIEN,
     "banc-kev": (1, 1, 0, 0, 0, 2, 1, 2, 1, 1, "1/2", "1/2", K3),
+    "banc-pins": (1, 2, 0, 0, 0) + RIEN,
 }
-PLATEFORME = {"taux_provenance_chains_verifiee": "8/14", "taux_l3_verifie": "1/14", "taux_replay_identique": "1/14",
+PLATEFORME = {"taux_provenance_chains_verifiee": "9/15", "taux_l3_verifie": "1/15", "taux_replay_identique": "1/15",
               "violations_licences": "source absente"}
+# étape 4 : séries de dates, écrites à la main (relevé du banc : banc.sh) ; {genre, nom, pin, retire : date} ou {… : "non épinglé"}
+PINS = {("image", "present", "2" * 12, "0"): "1700000002", ("image", "retire", "3" * 12, "1"): "1700000003",
+        ("image", "jamais", "4" * 12, None): "non épinglé", ("image", "illisible", "6" * 12, "0"): "1700000006",
+        ("source", "source.git", "2" * 12, "0"): "1700000002", ("tache", "t", "7" * 12, "0"): "1700000007"}
+PINS_FORGES = {("image", "forge", "2" * 12, "0"): "1700000002"}
+CLES_DATEES = {"chains": "1700000011", "scanner": "1700000012"}   # vsa : empreinte d'un autre fichier ; vex : absente ; tsa.pem : fichier absent
 DELAIS = [("CVE-2026-90001", K1, K2), ("CVE-2026-90002", K1, K3), ("CVE-2026-90003", K3, None)]
-# écarts prédits de l'exportateur, quand il ne vérifie pas : uniquement les sept sujets à signature fausse et les taux qui les comptent
+# écarts prédits de l'exportateur, quand il ne vérifie pas : uniquement les huit sujets à signature fausse et les taux qui les comptent
 FORGES = {"banc-forge": (1, 1, 1, 1, 1, 0, 0, 0, 0, 0, SO, SO, J21), "banc-prov-forgee": (1, 1, 0, 0, 0) + RIEN,
           "banc-mauvais-role": (1, 1, 1, 1, 1, 1, 0, 1, 0, 1, "0/1", "0/1", J20), "banc-role-prov": (1, 1, 0, 0, 0) + RIEN,
           "banc-sig-forgee": (1, 1, 0, 0, 0) + RIEN, "banc-illisible": (1, 1, 1, 1, 1, 0, 0, 0, 0, 0, SO, SO, J21),
-          "banc-att-illisible": (1, 2, 0, 0, 0) + RIEN}
-TAUX_FORGES = {"taux_provenance_chains_verifiee": "12/14", "taux_l3_verifie": "4/14", "taux_replay_identique": "4/14"}
+          "banc-att-illisible": (1, 2, 0, 0, 0) + RIEN, "banc-pins": (1, 3, 0, 0, 0) + RIEN}
+TAUX_FORGES = {"taux_provenance_chains_verifiee": "13/15", "taux_l3_verifie": "4/15", "taux_replay_identique": "4/15"}
 
 
 def attendus(sujets, plateforme):
@@ -55,7 +62,7 @@ def attendus(sujets, plateforme):
 def lire_recalcul(f):
     v = {}
     for ligne in open(f, encoding="utf-8"):
-        if ligne.startswith("KPI|"):
+        if ligne.startswith("KPI|") and not ligne.startswith("KPI|pin_date:"):  # dates git : hors du recalcul au banc
             _, nom, depot, _, valeur = ligne.rstrip("\n").split("|", 4)
             assert (nom, depot) not in v, f"ligne en double : {nom} {depot}"
             v[(nom, depot)] = valeur
@@ -65,7 +72,7 @@ def lire_recalcul(f):
 def lire_prom(f):
     s = {}
     for ligne in open(f, encoding="utf-8"):
-        if ligne.startswith("kpi_signatures_"):
+        if re.match("kpi_(signatures|exportateur|pins?|cles?)_", ligne):
             continue
         nom, etiq, val = re.fullmatch(r"kpi_(\w+)\{(.*)\} (\d+)\n", ligne).groups()
         e = dict(re.findall(r'(\w+)="([^"]*)"', etiq))
@@ -133,6 +140,26 @@ def details(f):
     return s, {k: v for k, v in sig.items() if v}
 
 
+def dates(f):
+    """Séries de l'étape 4 : pins de banc-pins, pins des autres sujets, clés, clés sans date, pins sans date, passage et journal datés."""
+    pins, autres, cles, n = {}, 0, {}, {}
+    for ligne in open(f, encoding="utf-8"):
+        if not re.match("kpi_(exportateur|pins?|cles?)_", ligne):
+            continue
+        nom, etiq, val = re.fullmatch(r"(kpi_\w+)(?:\{(.*)\})? (\d+)\n", ligne).groups()
+        e = dict(re.findall(r'(\w+)="([^"]*)"', etiq or ""))
+        if nom in ("kpi_pin_timestamp_seconds", "kpi_pin_non_epingle"):
+            autres += e["depot"] != "builds/banc-pins"
+            pins[(e["genre"], e["nom"], e["pin"], e.get("retire"))] = val if nom.endswith("seconds") else "non épinglé"
+        elif nom == "kpi_cle_timestamp_seconds":
+            cles[e["cle"]] = val
+        elif nom == "kpi_pins_non_releves":
+            n[e["depot"]] = int(val)
+        else:
+            n[nom] = int(val)
+    return pins, autres, cles, n
+
+
 signe = lire_recalcul(sys.argv[1])
 (nonsigne, refus_c), (verifie, refus_v) = lire_prom(sys.argv[2]), lire_prom(sys.argv[3])
 ref, exp = attendus(SUJETS, PLATEFORME), attendus({**SUJETS, **FORGES}, {**PLATEFORME, **TAUX_FORGES})
@@ -154,11 +181,20 @@ att = {k: v for k, v in s_exp.items() if k[1] != "sig"}
 for k in differences(att, s_rec):
     print(f"ECART|signatures|{k[0]}|{k[1]}|recalcul {s_rec.get(k)}|exportateur {att.get(k)}")
 cas("vérifiées : comptes [vérifiées, refusées] par sujet et famille différents des lignes DETAIL du recalcul", len(differences(att, s_rec)), 0)
-cas("vérifiées : attestations [vérifiées, refusées]", [sum(v[i] for v in att.values()) for i in (0, 1)], [24, 12])
+cas("vérifiées : attestations [vérifiées, refusées]", [sum(v[i] for v in att.values()) for i in (0, 1)], [27, 13])
 sig_exp = {k[0]: v[0] for k, v in s_exp.items() if k[1] == "sig" and v[0]}
 cas("vérifiées : signatures d'image vérifiées, par sujet, différentes du recalcul", len(differences(sig_exp, sig_rec)), 0)
-cas("vérifiées : signatures d'image [vérifiées, refusées]", [sum(v[i] for k, v in s_exp.items() if k[1] == "sig") for i in (0, 1)], [9, 4])
+cas("vérifiées : signatures d'image [vérifiées, refusées]", [sum(v[i] for k, v in s_exp.items() if k[1] == "sig") for i in (0, 1)], [10, 4])
 cas("énoncés refusés pour leur forme [comptées, vérifiées]", [refus_c, refus_v], [0, 0])
+for qui, f, pins, inconnus, cles in (("comptées", sys.argv[2], PINS_FORGES, 0, {}), ("vérifiées", sys.argv[3], PINS, 1, CLES_DATEES)):
+    p, autres, c, n = dates(f)
+    cas(f"{qui} : dates des pins de banc-pins", p, pins)
+    cas(f"{qui} : pins datés d'un autre sujet", autres, 0)
+    cas(f"{qui} : dépendances de banc-pins inconnues du relevé", n.get("builds/banc-pins"), inconnus)
+    cas(f"{qui} : clés datées", c, cles)
+    cas(f"{qui} : clés sans date", n.get("kpi_cles_non_relevees"), 3 if cles else None)
+    cas(f"{qui} : heures du passage et du journal, en ordre", n["kpi_exportateur_journal_timestamp_seconds"]
+        <= n["kpi_exportateur_passage_timestamp_seconds"], True)
 cas("comptées : séries kpi_signatures_*", len(signatures(sys.argv[2])), 0)
 print(f"## bilan : {ko[0]} cas, {ko[1]} écart(s)")
 sys.exit(1 if ko[1] else 0)

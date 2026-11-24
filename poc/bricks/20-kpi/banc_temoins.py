@@ -64,19 +64,21 @@ def sujet(nom):
                      artifactType="application/vnd.supply-chain.temoin")
 
 
-def chains(nom, s, refs, cle="chains", sig=True, cle_sig=None, illisible=False):
-    """Tags .att (une enveloppe par élément de refs : pipelineRef ou taskRef) et .sig, comme Chains. illisible : une couche .att de plus,
+def chains(nom, s, refs, cle="chains", sig=True, cle_sig=None, illisible=False, plus=None):
+    """Tags .att (une enveloppe par élément de refs : pipelineRef ou taskRef) et .sig, comme Chains. plus : par rang dans refs, (dépendances,
+    fin, clé). illisible : une couche .att de plus,
     à signature vide, et une annotation de signature d'image vide."""
     d, h = f"builds/{nom}", s["digest"][7:]
     couches = []
     for i, ref in enumerate(refs):
+        deps, fin, cle_i = (plus or {}).get(i, ([], "2026-11-19T00:00:00Z", cle))
         e = {"_type": "https://in-toto.io/Statement/v1", "predicateType": PROV,
              "subject": [{"name": f"{REG}/{d}", "digest": {"sha256": h}}],
-             "predicate": {"buildDefinition": {"buildType": "https://tekton.dev/chains/v2/slsa-tekton", "resolvedDependencies": [],
+             "predicate": {"buildDefinition": {"buildType": "https://tekton.dev/chains/v2/slsa-tekton", "resolvedDependencies": deps,
                                                "externalParameters": {"runSpec": {ref: {}}}, "internalParameters": {}},
                            "runDetails": {"builder": {"id": "https://supply-chain.example/builders/tekton-chains@v1"},
-                                          "metadata": {"invocationId": f"banc-{i}", "finishedOn": "2026-11-19T00:00:00Z"}}}}
-        couches.append({**blob(d, dsse(cle, e), "application/vnd.dsse.envelope.v1+json"),
+                                          "metadata": {"invocationId": f"banc-{i}", "finishedOn": fin}}}}
+        couches.append({**blob(d, dsse(cle_i, e), "application/vnd.dsse.envelope.v1+json"),
                         "annotations": {"dev.cosignproject.cosign/signature": ""}})
     if illisible:
         d_vide = json.loads(dsse(cle, e))
@@ -133,6 +135,10 @@ def vex(nom, s, cle="vex", sig=None):
                                   "timestamp": "2026-11-02T00:00:00Z", "version": 1, "statements": []}, cle, sig=sig)
 
 
+def dep(nom, chiffre, uri=None):
+    return {"uri": uri or f"oci://{REG}/x/{nom}", "digest": {"sha256": chiffre * 64}}
+
+
 def poser():
     J = "2026-11-20T00:00:00Z"
     PR, TR = "pipelineRef", "taskRef"
@@ -160,6 +166,16 @@ def poser():
     vsa("banc-illisible", s, "PASSED", [BIT, L3], sig=base64.b64encode(b"pas une signature").decode()); vex("banc-illisible", s, sig="!!!")
     s = sujet("banc-att-illisible"); chains("banc-att-illisible", s, [PR], illisible=True)
     s = sujet("banc-kev"); chains("banc-kev", s, [PR])
+    # étape 4 : quatre provenances ; seule compte la plus récente des PipelineRun vérifiées (rang 1). Rang 2 : TaskRun ; rang 3 : clé
+    # étrangère, plus récente
+    s = sujet("banc-pins")
+    chains("banc-pins", s, [PR, PR, TR, PR], plus={
+        0: ([dep("ancien", "1")], "2026-11-18T00:00:00Z", "chains"),
+        1: ([dep("present", "2"), dep("retire", "3"), dep("jamais", "4"), dep("inconnu", "5"), dep('a"} 1', "6"),
+             dep("present", "2", "git+https://forge.test/x/source.git"), {**dep("t", "7"), "name": "pipelineTask"},
+             dep("present", "2")], "2026-11-19T00:00:00Z", "chains"),
+        2: ([dep("tache", "8")], "2026-11-20T00:00:00Z", "chains"),
+        3: ([dep("forge", "2")], "2026-11-21T00:00:00Z", "etrangere")})
     print(f"SCANS=builds/scan/banc-kev@{s['digest']}")
 
 

@@ -1,13 +1,14 @@
 #!/usr/bin/python3 -I
 """Brique 20 : exportateur des KPI supply-chain (docs/02 §7, « tools/metrics-exporter dérive les métriques des attestations »).
-Bibliothèque standard seulement, lectures anonymes de Zot par HTTPS, même motif que entrees-scan.py (07b). Ni git, ni cosign : les dates
-des pins et des clés ne viennent pas d'ici (relevé versionné, étape 4).
-  SIGNATURES, obligatoire et sans défaut (choix du propriétaire à poser, étape 4) :
+Bibliothèque standard seulement, lectures anonymes de Zot par HTTPS, même motif que entrees-scan.py (07b). Ni git, ni cosign, ni secret.
+  SIGNATURES, obligatoire et sans défaut (décision du propriétaire du 24/11 : « openssl (Recommandé) », donc « verifiees » en service) :
     - « comptees » : signatures NON vérifiées, les énoncés sont comptés, pas prouvés (comportement de l'étape 3) ;
     - « verifiees » : /usr/bin/openssl dgst -verify (ECDSA P-256) sur le PAE de l'enveloppe DSSE et, pour la signature d'image, sur les
       octets de la couche ; une clé par famille (CLES/chains.pub, scanner.pub, vsa.pub, vex.pub), jamais « l'une des quatre ». Une
       signature fausse, absente ou illisible est comptée (kpi_signatures_refusees) et son énoncé ignoré ; une clé absente, illisible ou
       qui n'est pas P-256, ou openssl absent, arrête tout : openssl rend le même code 1 pour une mauvaise clé et une mauvaise signature.
+      Avant toute lecture de Zot, un vecteur publié (RFC 6979, A.2.5 ; CLES/vecteur.pub) est vérifié par le même chemin que les vraies
+      signatures : accepté tel quel, refusé avec un octet changé, sinon arrêt.
   Le recalcul signé par cosign (poc/bricks/20-kpi/recalcul.py) reste la référence. Horodatage (TSA) non vérifié ; les lignes du JOURNAL
   (délais des KEV) viennent de entrees-scan, qui ne vérifie pas les signatures : « verifiees » ne les couvre pas.
 Écrit sans kpi.py, pour que la comparaison avec le recalcul ne compare pas un code à lui-même. Mêmes règles :
@@ -15,12 +16,17 @@ des pins et des clés ne viennent pas d'ici (relevé versionné, étape 4).
   - provenance : couches du .att (builder.id et buildType de Chains, pipelineRef), plus une signature d'image (.sig) qui nomme le digest ;
   - VSA : PASSED du vérifieur attendu ; une seule suffit, même si une FAILED est plus récente (même règle que le recalcul) ;
   - scan : le plus récent par scannedAt ; entrées, écartées par un VEX, KEV, KEV écartées. Aucun scan : séries absentes, jamais 0 ;
-  - KEV : ouverture et fermeture, depuis les lignes de entrees-scan (fichier JOURNAL ; en service, la source sera Loki). Sans JOURNAL :
-    séries absentes.
+  - KEV : ouverture et fermeture, depuis les lignes de entrees-scan (fichier JOURNAL, écrit par un lecteur séparé : aucun secret ici).
+    Sans JOURNAL : séries absentes ;
+  - dates (RELEVE, relevé de git versionné, poc/bricks/20-kpi/releve/dates-git.tsv) : clés, liées à l'empreinte du fichier de CLES ; pins,
+    liés au digest de chaque dépendance de la provenance de PipelineRun la plus récente. Une empreinte ou un digest que le relevé ne
+    connaît pas n'a pas de date (série absente) et se compte : kpi_cles_non_relevees, kpi_pins_non_releves. Des dates, jamais des âges.
+kpi_exportateur_passage_timestamp_seconds : heure du dernier passage réussi. Un arrêt laisse le fichier inchangé, donc d'anciennes
+valeurs : seule cette série le montre.
 Un énoncé illisible, ou qui ne nomme pas son sujet ou son type, est compté (kpi_enonces_refuses) et ignoré. Une erreur HTTP, un JSON
 de Zot illisible ou une empreinte fausse arrêtent tout, code d'erreur, fichier inchangé.
 Variables : REG, CA, PRODUITS (noms séparés par des espaces), SORTIE (fichier .prom, existant), SIGNATURES, CLES (dossier, si
-verifiees), JOURNAL (facultatif)."""
+verifiees), JOURNAL (facultatif), RELEVE (facultatif)."""
 import base64
 import binascii
 import datetime
@@ -31,6 +37,7 @@ import re
 import ssl
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -42,6 +49,14 @@ FAMILLES = {"scan": "https://supply-chain.example/scan/v1", "vsa": "https://slsa
             "vex": "https://openvex.dev/ns/v0.2.0"}
 CLE_DE = {"prov": "chains", "sig": "chains", "scan": "scanner", "vsa": "vsa", "vex": "vex"}
 OPENSSL = "/usr/bin/openssl"
+# RFC 6979 (août 2013), A.2.5 « ECDSA, 256 Bits (Prime Field) », SHA-256, message « sample ». La signature fait DER_MAX octets.
+VECTEUR_PUB = b"""-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYP7UuiVanTHJYet0xjVtaMBJuJI7
+Yfps5mliLmDyn7Z5A/4QCLi8maQa6elWKLxk8vGyDC1+n1F3o8KU1EYimQ==
+-----END PUBLIC KEY-----
+"""
+VECTEUR_SIG = "MEYCIQDv1IsqrLao/RFA3ZzUXoHWnSyHe1aq+ZHDTQ6oTq83FgIhAPfLHJQtZXxB1DbHobbin2Xz6QDbua/0Bk3Eqy+EOs2o"
+NOM = re.compile(r"[A-Za-z0-9._:+-]{1,80}")  # valeur d'étiquette qui vient d'un énoncé ou du journal ; toute autre devient « illisible »
 DER_MAX = 72  # plus longue signature ECDSA P-256 en DER ; openssl ne lirait pas au-delà
 ANNOTATION = "dev.cosignproject.cosign/signature"
 INTOTO = "application/vnd.in-toto+json"
@@ -88,11 +103,18 @@ def controler_cles():
             r = openssl(["pkey", "-pubin", "-in", f"{os.environ['CLES']}/{nom}.pub", "-noout", "-text"])
             if r.returncode or b"NIST CURVE: P-256" not in r.stdout:
                 raise Refus(f"clé {nom}.pub absente, illisible ou pas P-256")
+        with open(f"{os.environ['CLES']}/vecteur.pub", "rb") as f:
+            if f.read() != VECTEUR_PUB:
+                raise Refus("vecteur.pub différent du vecteur attendu")
+        if not signature_bonne("vecteur", b"sample", VECTEUR_SIG):
+            raise Refus("vecteur de test : signature bonne refusée par openssl")
+        if signature_bonne("vecteur", b"samplf", VECTEUR_SIG):
+            raise Refus("vecteur de test : signature fausse acceptée par openssl")
     return mode == "verifiees"
 
 
-def signature_bonne(famille, message, sig):
-    """Signature ECDSA en base64 du message, par la clé de cette famille."""
+def signature_bonne(cle, message, sig):
+    """Signature ECDSA en base64 du message, par la clé CLES/<cle>.pub."""
     try:
         der = base64.b64decode(sig, validate=True)
     except (ValueError, TypeError, binascii.Error):
@@ -103,7 +125,7 @@ def signature_bonne(famille, message, sig):
     try:
         os.write(ecrit, der)
         os.close(ecrit)
-        return openssl(["dgst", "-sha256", "-verify", f"{os.environ['CLES']}/{CLE_DE[famille]}.pub", "-signature", f"/proc/self/fd/{lu}"],
+        return openssl(["dgst", "-sha256", "-verify", f"{os.environ['CLES']}/{cle}.pub", "-signature", f"/proc/self/fd/{lu}"],
                        message, (lu,)).returncode == 0
     finally:
         os.close(lu)
@@ -122,7 +144,7 @@ def enonce(octets, famille, typ, digest, comptes):
             t = typ_charge.encode()
             try:
                 une, = d["signatures"]
-                bonne = signature_bonne(famille, b"DSSEv1 %d %s %d %s" % (len(t), t, len(charge), charge), une["sig"])
+                bonne = signature_bonne(CLE_DE[famille], b"DSSEv1 %d %s %d %s" % (len(t), t, len(charge), charge), une["sig"])
             except (ValueError, KeyError, TypeError):
                 bonne = False
             if not bonne:
@@ -166,7 +188,7 @@ def provenances(depot, digest, tags, comptes):
     if f"sha256-{h}.sig" in tags:
         for c in lire(f"{depot}/manifests/sha256-{h}.sig")["layers"]:
             octets = blob(depot, c["digest"])
-            if comptes["verifier"] and not signature_bonne("sig", octets, (c.get("annotations") or {}).get(ANNOTATION)):
+            if comptes["verifier"] and not signature_bonne(CLE_DE["sig"], octets, (c.get("annotations") or {}).get(ANNOTATION)):
                 comptes["refusees"]["sig"] += 1
                 continue
             try:
@@ -200,7 +222,72 @@ def de_chains(e):
         return False
 
 
-def sujet(nom, digest, tags, catalogue, verifier):
+def releve():
+    """Relevé des dates de git : ({empreinte: (fichier, date)}, {digest d'une dépendance: (date ou "", encore présent)}), ou None."""
+    if not os.environ.get("RELEVE"):
+        return None
+    cles, pins = {}, {}
+    with open(os.environ["RELEVE"], encoding="utf-8") as f:
+        for ligne in f:
+            if ligne.startswith("#"):
+                continue
+            quoi, a, b, c = ligne.rstrip("\n").split("\t")
+            if quoi == "cle":
+                cles[a] = (b, int(c))
+            elif quoi == "pin" and c in ("present", "retire", "non-epingle") and (c == "non-epingle") == (b == "-"):
+                pins[a] = ("", False) if b == "-" else (int(b), c == "present")
+            else:
+                raise Refus(f"relevé : ligne {quoi} illisible")
+    return cles, pins
+
+
+def dates_cles(cles):
+    texte, inconnues = "", 0
+    for fichier in sorted({f for f, _ in cles.values()} | {f"{c}.pub" for c in CLE_DE.values()}):
+        try:
+            with open(f"{os.environ['CLES']}/{fichier}", "rb") as f:
+                empreinte = hashlib.sha256(f.read()).hexdigest()
+        except FileNotFoundError:
+            empreinte = ""
+        if cles.get(empreinte, ("",))[0] != fichier:
+            inconnues += 1
+            continue
+        texte += f'kpi_cle_timestamp_seconds{{cle="{fichier.rsplit(".", 1)[0]}",empreinte="{empreinte[:12]}"}} {cles[empreinte][1]}\n'
+    return texte + f"kpi_cles_non_relevees {inconnues}\n"
+
+
+def genre(d):
+    nom, uri = d.get("name"), d["uri"]
+    if nom == "pipeline":
+        return "pipeline"
+    if nom == "pipelineTask":
+        return "tache"
+    if uri.startswith("git+"):
+        return "source"
+    return "fermeture" if "/builds/fermetures/" in uri else "entree" if "/entrees/" in uri else "image"
+
+
+def dates_pins(prov, pins, etiquettes, comptes):
+    """Dates d'épinglage des dépendances de la provenance de PipelineRun la plus récente (fin, puis identifiant)."""
+    try:
+        p = max((e["predicate"] for e in prov if de_chains(e)),
+                key=lambda p: (p["runDetails"]["metadata"]["finishedOn"], p["runDetails"]["metadata"]["invocationId"]))
+        vus = {(genre(d), d["uri"].rsplit("/", 1)[-1], str(next(iter(d["digest"].values())))) for d in p["buildDefinition"]["resolvedDependencies"]}
+    except (KeyError, TypeError, AttributeError, StopIteration):
+        comptes["forme"] += 1
+        return ""
+    texte, inconnus = "", 0
+    for g, nom, digest in sorted(vus):
+        if digest not in pins:
+            inconnus += 1
+            continue
+        date, present = pins[digest]
+        pin = f'{etiquettes},genre="{g}",nom="{nom if NOM.fullmatch(nom) else "illisible"}",pin="{digest[:12]}"'
+        texte += f'kpi_pin_timestamp_seconds{{{pin},retire="{int(not present)}"}} {date}\n' if date != "" else f"kpi_pin_non_epingle{{{pin}}} 1\n"
+    return texte + f"kpi_pins_non_releves{{{etiquettes}}} {inconnus}\n"
+
+
+def sujet(nom, digest, tags, catalogue, verifier, pins):
     depot = f"builds/{nom}"
     comptes = {"verifier": verifier, "forme": 0, "verifiees": dict.fromkeys(CLE_DE, 0), "refusees": dict.fromkeys(CLE_DE, 0)}
     prov, signee = provenances(depot, digest, tags, comptes)
@@ -208,6 +295,8 @@ def sujet(nom, digest, tags, catalogue, verifier):
     pr = sum(1 for e in prov if de_chains(e))
     niveaux = [v["predicate"].get("verifiedLevels") or [] for v in trouve["vsa"]
                if (v["predicate"].get("verifier") or {}).get("id") == VERIFIEUR and v["predicate"].get("verificationResult") == "PASSED"]
+    etiquettes = f'depot="{depot}",digest="{digest[7:19]}"'
+    dates = dates_pins(prov, pins, etiquettes, comptes) if pins is not None and pr else ""
     valeurs = {"kpi_provenance_chains_verifiee": int(pr > 0 and signee), "kpi_provenances_pipelinerun": pr,
                "kpi_replay_identique": int(any("POC_REPLAY_BIT_IDENTIQUE" in n for n in niveaux)),
                "kpi_l3_verifie": int(any("SLSA_BUILD_LEVEL_3" in n for n in niveaux)),
@@ -219,8 +308,7 @@ def sujet(nom, digest, tags, catalogue, verifier):
                         "kpi_scan_kev": len([1 for x in v if x.get("kev")]),
                         "kpi_scan_kev_ecartees": len([1 for x in v if x.get("kev") and x.get("vex")]),
                         "kpi_scan_timestamp_seconds": epoque(p["scannedAt"])})
-    etiquettes = f'depot="{depot}",digest="{digest[7:19]}"'
-    texte = "".join(f"{k}{{{etiquettes}}} {v}\n" for k, v in sorted(valeurs.items()))
+    texte = dates + "".join(f"{k}{{{etiquettes}}} {v}\n" for k, v in sorted(valeurs.items()))
     for quoi in ("verifiees", "refusees") if verifier else ():
         texte += "".join(f'kpi_signatures_{quoi}{{{etiquettes},famille="{f}"}} {n}\n' for f, n in sorted(comptes[quoi].items()))
     return texte
@@ -232,12 +320,13 @@ def kev(fichier):
     scans, vues = {}, {}
     with open(fichier, encoding="utf-8") as f:
         for ligne in f:
-            for depot, date in re.findall(r"(builds/scan/\S+?)=\d+@(\S+) \(liste émise\)", ligne):
+            for depot, date in re.findall(r"(builds/scan/[a-z0-9._-]+)=\d+@(\S+) \(liste émise\)", ligne):
                 scans.setdefault(depot, set()).add(date)
             if ligne.startswith("{") and '"kev":true' in ligne:
                 e = json.loads(ligne)
                 if not e.get("vex"):
-                    vues.setdefault((e["depot"], e["scannedAt"]), set()).update(e.get("kevCves") or [e["id"]])
+                    vues.setdefault((e["depot"], e["scannedAt"]), set()).update(
+                        c if NOM.fullmatch(c) else "illisible" for c in e.get("kevCves") or [e["id"]])
     sortie = []
     for depot in sorted(scans):
         ouverte = {}
@@ -257,15 +346,20 @@ def main():
     try:
         # Tout est lu et contrôlé avant d'écrire : un refus ou une lecture impossible laisse le fichier inchangé.
         verifier = controler_cles()
+        dates = releve()
         catalogue = set(lire("_catalog")["repositories"])
         texte = ""
         for nom in os.environ["PRODUITS"].split():
             if f"builds/{nom}" not in catalogue:
                 raise Refus(f"builds/{nom} absent du catalogue")
             tags = lire(f"builds/{nom}/tags/list").get("tags") or []
-            texte += "".join(sujet(nom, d, tags, catalogue, verifier) for d in digests(f"builds/{nom}", tags))
+            texte += "".join(sujet(nom, d, tags, catalogue, verifier, dates and dates[1]) for d in digests(f"builds/{nom}", tags))
         if os.environ.get("JOURNAL"):
             texte += kev(os.environ["JOURNAL"])
+            texte += f"kpi_exportateur_journal_timestamp_seconds {int(os.stat(os.environ['JOURNAL']).st_mtime)}\n"
+        if dates and verifier:
+            texte += dates_cles(dates[0])
+        texte += f"kpi_exportateur_passage_timestamp_seconds {int(time.time())}\n"
     except (Refus, urllib.error.URLError, OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError) as e:
         print(f"refus : {type(e).__name__} : {e}", file=sys.stderr)
         return 2

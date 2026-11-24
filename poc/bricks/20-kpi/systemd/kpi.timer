@@ -1,0 +1,10 @@
+# Brique 20, étape 4 : un passage toutes les 15 min, décalé de entrees-scan (3 min après le démarrage). NON POSÉ.
+[Unit]
+Description=KPI supply-chain, toutes les 15 min (brique 20)
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+
+[Install]
+WantedBy=timers.target

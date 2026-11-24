@@ -1,0 +1,40 @@
+# Brique 20, étape 4 : KPI dérivés des attestations, signatures vérifiées par openssl (décision « openssl (Recommandé) » du 24/11/2026).
+# NON POSÉ. Seule sortie : Zot, en lecture anonyme. Seule écriture : kpi.prom. Aucun secret : quatre clés publiques, le vecteur de test,
+# la chaîne du TSA et le relevé des dates de git, posés en lecture seule dans /etc/kpi et à reposer après chaque rejeu ou re-signature.
+# Même durcissement que entrees-scan.service. JOURNAL (délais des KEV) : ajouté quand l'accès du lecteur à Loki sera choisi.
+[Unit]
+Description=KPI supply-chain dérivés des attestations (brique 20)
+After=zot.service
+
+[Service]
+Type=oneshot
+User=kpi
+Group=kpi
+Environment=REG=192.168.161.13:5000 CA=/etc/base-grype/ca-poc.crt SIGNATURES=verifiees CLES=/etc/kpi/cles RELEVE=/etc/kpi/dates-git.tsv
+Environment=SORTIE=/etc/fichiers-metriques/kpi.prom "PRODUITS=sample-app sample-app-deb sample-app-rpm"
+ExecStart=/usr/local/lib/kpi/metrics_exporter.py
+TimeoutStartSec=2min
+IPAddressDeny=any
+IPAddressAllow=192.168.161.13
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ReadWritePaths=/etc/fichiers-metriques/kpi.prom
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_UNIX
+SystemCallArchitectures=native
+UMask=0022
