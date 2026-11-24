@@ -2414,3 +2414,18 @@ Confiance : haute pour le scanner (même chemin qu'au banc t3), moyenne pour le 
 **Hors mesure** : le deb (`scan-sample-app-deb`, Go 1.24.4, 67 entrées) n'a aucun VEX ; `GO-2026-6859` n'est pas couverte (sources de Go 1.26.10 ou reconstruction en 1.26.11 : choix du propriétaire) ; l'échéance du 24/12 n'est pas éprouvée sur ce VEX (elle l'a été au banc t3).
 
 **Heures** : plus 08:47:33 à 08:52:04 UTC (4 min 31 s, signature, prédiction et poussée) ; l'attente du Job (08:52 à 09:32) n'est pas comptée, aucun travail n'y a eu lieu ; plus 09:32:31 à 09:33:05 UTC (0 min 34 s). **Total : au plus 15 h 12 min 26 s**, pour 10 h estimées ; le seuil de 20 h n'est pas atteint.
+
+## Choix du propriétaire du 24/11 et tri du deb (note de 2026-11-24T12:55:34Z)
+
+**Choix** (verbatim, en réponse aux deux questions ouvertes) : « reconstruire l'image en Go 1.26.11. » → « oui » ; « Paquet deb : lui faire un VEX » → « oui ». Ces réponses tranchent les choix ; restent à demander nommément : le téléchargement de Go 1.26.11, toute écriture dans le vrai Zot, la re-signature des tâches, le remplacement de la pipeline et de la cible des CronJobs, chaque VEX signé.
+
+**Conséquence de la reconstruction** : l'image reconstruite aura un autre digest ; le VEX publié vaut pour `3a7ca1b1` seul : les 5 entrées chi redeviendront non écartées sur la nouvelle image, jusqu'à un nouveau VEX (mesure du nouveau binaire, nouvel accord nommé).
+
+**Faits relevés** (lecture seule, 12:53:21Z) : `golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64` existe, `h1:KyINmJ/FQdKRmDYGuTAAXkumyeR2DyUlSNHZj7XaLFg=` sur sum.golang.org ; archive go.dev `go1.26.11.linux-amd64.tar.gz`, 66 999 944 octets, sha256 `9849f4e0…`. Les CronJobs `scan/scan-sample-app` et `scan/scan-sample-app-deb` visent des digests fixes (`3a7ca1b1…`, `60f25f5c…`) ; 35 scripts hors `resultats/` citent `3a7ca1b1` ou l'image de build `d50ae575`.
+
+**Prédiction du tri du deb** ([`deb-tri.sh`](deb-tri.sh), lecture seule, journal `deb-tri.log`) :
+- entrées du dernier scan signé : 67 (62 stdlib 1.24.4, 5 chi), sauf si la base Grype a changé depuis le 21/11 (alors le compte relevé fait foi) ;
+- pclntab exploitable (les deux témoins présents) ;
+- les 5 entrées chi en classe A (paquet `chi/v5/middleware` non lié, comme dans l'image) ;
+- stdlib : répartition **non prédite** ; au moins une entrée en classe C (net/http est lié) ;
+- bilan attendu : 4 cas, 0 écart.
