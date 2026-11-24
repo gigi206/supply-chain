@@ -1,0 +1,11 @@
+# Go 1.26.11 déclaré dans mise.toml (tâche outils:go-1.26.11), 2026-11-24T16:55:24Z, cb29490e
+avant : zip 71800213 octets, écrit 2026-11-24 14:12:24.936354707 +0100, ziphash h1:KyINmJ/FQdKRmDYGuTAAXkumyeR2DyUlSNHZj7XaLFg=
+## mise run outils:go-1.26.11
+[outils:go-1.26.11] $ GOMODCACHE="$POC_OUTILS/gomodcache" GOTOOLCHAIN=go1.26.11 GOPROXY=https://proxy.golang.org GOSUMDB=sum.golang.org go version
+go version go1.26.11 linux/amd64
+go version go1.26.11 linux/amd64
+code de sortie : 0
+après : zip 71800213 octets, écrit 2026-11-24 14:12:24.936354707 +0100, ziphash h1:KyINmJ/FQdKRmDYGuTAAXkumyeR2DyUlSNHZj7XaLFg=
+## mise tasks
+1
+fin : 2026-11-24T16:55:24Z

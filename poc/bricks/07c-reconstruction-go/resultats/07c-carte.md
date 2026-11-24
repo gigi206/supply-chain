@@ -446,3 +446,12 @@ Choix du propriétaire, verbatim : « 2 ». Sa question, pendant l'attente de R4
 - `mise tasks` liste `outils:go-1.26.11`.
 
 Rien ne touche au cluster, aux VM ni à Zot.
+
+**Résultat** (2026-11-24T16:55:24Z, [`mise-go-1.26.11.log`](mise-go-1.26.11.log)) : **conforme**.
+- Les deux lignes donnent `go version go1.26.11 linux/amd64`, avec le code de sortie 0.
+- Le zip a la même taille et la même date avant et après le lancement, et le ziphash reste `h1:KyINmJ/…` : il n'y a eu aucun nouveau téléchargement.
+- `mise tasks` liste la tâche une fois.
+
+**Prix** : HEAD a avancé. Il faut une poussée avant `etape_vsa` de R5, comme annoncé au propriétaire.
+
+**Heures de la 07c** : plus 16:54:44 à 16:55:39 UTC, notes comprises, soit 0 h 00 min 55 s ; **total : au plus 2 h 03 min 31 s** pour 10 h estimées.
