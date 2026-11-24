@@ -1,0 +1,15 @@
+# cible du scan de sample-app, 2026-11-24T13:29:20Z, 1e018ff9
+OK   cible avant : 3a7ca1b1,3a7ca1b1,3a7ca1b1
+différences (hors IMAGE) : 0
+replace : code 0
+OK   cible après : f5e6bcb0,f5e6bcb0,f5e6bcb0
+job scan-sample-app-07c-132920 : code 0
+attente : code 0
+Job : début 2026-11-24T13:29:20Z, fin 2026-11-24T13:31:42Z, réussi 1
+  VEX|0 énoncé(s) vérifié(s), 0 retenu(s), 0 rejeté(s)|sc-stockage.poc.test:5000/builds/vex/sample-app|cosign code 1 : no matching attestations: 
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7, 5 vulnérabilités, 0 KEV, 0 écartée(s) par un VEX, 1 s
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:a92cf2330b5fb4e11a872962e96a480744e02442e136f6e87283a6cd97cabd03, referrer de sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
+OK   Job réussi : 1
+OK   SCAN| : image reconstruite, 5 vulnérabilités, 0 KEV : 1
+OK   PUBLIE| : scan publié : 1
+## bilan : 5 cas, 0 écart(s)

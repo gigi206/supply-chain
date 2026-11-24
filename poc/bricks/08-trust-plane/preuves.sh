@@ -2179,7 +2179,7 @@ ba_chemin() { # libellé origine compte t0 : chaîne entière du PipelineRun BA_
   kubectl get pods -n builds -l "tekton.dev/pipelineRun=$BA_PR" -o json | jq -r '.items[] | "pod \(.metadata.labels["tekton.dev/pipelineTask"]) : nœud \(.spec.nodeName), runtimeClassName \(.spec.runtimeClassName // "-")"' | tee "$T/ba-$l.pods"
   ba_attendu "$l : pod construire" "$(grep '^pod construire ' "$T/ba-$l.pods" | cut -d' ' -f4-)" "nœud sc-build, runtimeClassName kata"
   pub=$(kubectl get pipelinerun -n builds "$BA_PR" -o json | jq -r '.status.results | map(.name + "=" + .value) | sort | join(" ")')
-  ba_attendu "$l : résultats" "$pub" "IMAGE_DIGEST=$APP_DIGEST IMAGE_URL=$REG/builds/sample-app"
+  ba_attendu "$l : résultats" "$pub" "IMAGE_DIGEST=${APP_REEL:-$APP_DIGEST} IMAGE_URL=$REG/builds/sample-app"
   ba_spec "$BA_PR" > "$T/ba-$l.spec"
   diff "$T/ba-j7.spec" "$T/ba-$l.spec" > "$T/ba-$l.diff" && echo "OK   $l : spec identique à celle de $BA_J7 (J7), bundle de la pipeline masqué" \
     || { sed 's/^/  /' "$T/ba-$l.diff"; echo "KO   $l : spec différente de celle de $BA_J7" >&2; exit 1; }
