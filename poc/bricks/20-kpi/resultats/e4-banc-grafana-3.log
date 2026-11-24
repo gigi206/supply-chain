@@ -1,0 +1,49 @@
+# banc-grafana.sh, 2026-11-24T20:50:15Z, dépôt a50c31b9, scripts 35103cbb2c984f80
+loki-linux-amd64.zip: OK
+grafana_13.3.0_40412481033_linux_amd64.tar.gz: OK
+# Loki 3.7.9, Grafana 13.3.0
+# routes dans l'espace de noms : 0
+## 1. Loki en direct (témoins)
+OK   sans certificat client : 000
+OK   écriture avec le certificat client : 204
+OK   ligne témoin directe relue : 1
+## 2. compte Viewer
+OK   création : 200
+OK   rôle relu : Viewer
+OK   lecture par /api/ds/query : 200 1
+## 3. écritures par le Viewer : code HTTP, lignes arrivées dans Loki
+OK   kpi-journal, POST /api/datasources/proxy/uid/loki/loki/api/v1/push : 403, 0 ligne(s)
+  réponse : {"message":"non allow-listed POSTs not allowed on proxied loki datasource"} 
+OK   kpi-journal, PUT /api/datasources/proxy/uid/loki/loki/api/v1/push : 403, 0 ligne(s)
+  réponse : {"message":"non allow-listed PUTs not allowed on proxied loki datasource"} 
+OK   kpi-journal, POST /api/datasources/uid/loki/resources/loki/api/v1/push : 404, 0 ligne(s)
+  réponse : {"message":"404 page not found\n"}
+OK   admin, POST /api/datasources/proxy/uid/loki/loki/api/v1/push : 403, 0 ligne(s)
+  réponse : {"message":"non allow-listed POSTs not allowed on proxied loki datasource"} 
+## 4. autres chemins de Loki par le proxy, Viewer (code HTTP)
+MESURE|GET /config|HTTP 200
+MESURE|GET /metrics|HTTP 200
+MESURE|POST /log_level?log_level=debug|HTTP 403
+MESURE|POST /flush|HTTP 403
+MESURE|GET /flush|HTTP 204
+MESURE|GET /log_level?log_level=debug|HTTP 200
+MESURE|GET /ingester/prepare_shutdown|HTTP 200
+MESURE|PUT /ingester/prepare_shutdown|HTTP 403
+MESURE|DELETE /ingester/prepare_shutdown|HTTP 403
+MESURE|GET /services|HTTP 200
+MESURE|POST /loki/api/v1/delete?query=%7Bsource%3D%22essai%22%7D&start=0|HTTP 403
+## 5. lecteur_loki.py, puis kev() : délais du banc
+OK   lignes de entrees-scan poussées : 204
+journal : 9 lignes
+OK   lecteur : code : 0
+OK   lignes lues : résumés, entrées KEV : 3 6
+OK   délais des KEV (valeurs de banc_comparer.py) : conforme
+OK   5000 entrées KEV poussées : 204
+refus : Refus : 5000 lignes, réponse peut-être tronquée
+OK   réponse tronquée : code, fichier inchangé : 2 oui
+## 6. arrêt de Loki par le proxy, Viewer
+MESURE|POST /api/datasources/proxy/uid/loki/ingester/shutdown|HTTP 403|Loki vivant, /ready 200
+MESURE|GET /api/datasources/uid/loki/resources/ingester/shutdown|HTTP 404|Loki vivant, /ready 200
+MESURE|GET /api/datasources/proxy/uid/loki/ingester/shutdown|HTTP 204|Loki arrêté, /ready 000
+OK   code de sortie de Loki (loki.service : Restart=on-failure ; 0 : systemd ne le relance pas) : 0
+## bilan : 17 cas, 0 écart(s)

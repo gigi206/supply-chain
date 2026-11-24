@@ -653,3 +653,13 @@ Revue menée sur « continue », sans validation du propriétaire, rien lu dans 
 **Additif du 20/11/2026 (2026-11-20T22:34:12Z UTC) : J7, étape 2 mesurée, rien n'est posé** ([résultat](resultats/j7-predictions.md), [journal](resultats/j7-mesure.log)). Deux pods Kata d'essai ont été lancés, avec Hubble lu en comptes. Les flux d'un pod Kata portent `builds/<pod>`, et le filtre par pod rend les mêmes flux que le filtre par adresse : la conception de l'export tient. Le pod au label `construire-rpm` n'a eu aucun flux autorisé, et 46 refusés. Écarts : 14 flux par témoin TCP au lieu de 8 au plus ; motif POLICY_DENY sur 14 flux, non prédit.
 
 **Additif du 20/11/2026 (2026-11-20T22:49:25Z UTC) : J7, 4a, export de Hubble posé et mesuré** ([résultats](resultats/j7-predictions.md), [pose](resultats/j7-pose.log), [export](resultats/j7-export.log)). Accord « Oui il faut mettre rke2 ». Pose de 22:45:30 à 22:46:23 UTC : agents sains, certificats inchangés, configuration égale à celle d'avant plus une clé. Fichier de sc-build : 53 lignes et 67 604 octets pour les deux pods d'essai, aucun flux autorisé pour `construire-rpm`. Le préfixe `builds/` filtre comme prévu. L'export reste posé ; le retour est à demander.
+
+## Constat du 24/11/2026 (brique 20, note de 2026-11-24T20:54:14Z) : un compte Viewer de Grafana peut arrêter Loki
+
+Mesuré au banc jetable seulement (Grafana 13.3.0, Loki 3.7.9, `grafana.ini` de cette brique, source Loki en mTLS ; [`banc-grafana.sh`](../20-kpi/banc-grafana.sh), [résultat](../20-kpi/resultats/e4-predictions.md)). **Aucun essai sur la plateforme, et il ne faut pas y essayer.**
+
+- GET `/api/datasources/proxy/uid/loki/ingester/shutdown` avec un compte Viewer : HTTP 204, Loki s'arrête, code de sortie 0.
+- POST et PUT vers `/loki/api/v1/push` par le même proxy : 403, 0 ligne, administrateur compris. D'autres GET répondent (`/flush` 204, `/log_level` 200, `/config` 200) ; leur effet n'est pas mesuré.
+- Lu, non mesuré : `loki.service` a `Restart=on-failure`, donc systemd ne le relancerait pas. Prometheus ne collecte pas Loki, mais la règle `LokiInjoignable` (critique, aucun envoi réussi d'Alloy vers Loki depuis 5 min, puis `for: 2m`) est faite pour ce cas ; elle n'a pas été exercée sur cet arrêt.
+
+Le compte `auditeur` est Viewer : le défaut existe depuis L2. Il porte sur la disponibilité des journaux, pas sur leur écriture. Aucune correction n'est choisie ; toute correction change la VM et demande un accord.

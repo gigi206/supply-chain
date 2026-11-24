@@ -115,3 +115,16 @@ Second passage (`-2`), attendu **16 cas, 0 écart** : écritures POST et PUT en 
 Le compte `auditeur` de la plateforme a le même rôle Viewer : **défaut existant de la 19b**, indépendant de la 20. Non essayé sur la plateforme, et il ne doit pas l'être.
 
 Troisième passage (`-3`) : `loki.service` a `Restart=on-failure` ; attendu, code de sortie **0** (systemd ne relancerait donc pas Loki). **17 cas, 0 écart**. Le moins sûr : ce code.
+
+### Résultat du banc Grafana (note de 2026-11-24T20:54:14Z)
+
+[Troisième passage](e4-banc-grafana-3.log) (20:50:15 UTC, dépôt `a50c31b9`) : **17 cas, 0 écart**. Loki arrêté par GET `/ingester/shutdown` à travers le proxy, compte Viewer, code de sortie **0**.
+
+- **Mesuré, au banc seulement** : écriture POST et PUT par le proxy refusée (403, 0 ligne) ; par les ressources, POST 404. Loki s'arrête sur le GET, avec le code 0.
+- **Codes seuls, effet non mesuré** : GET `/flush` 204, GET `/log_level` 200, `/ingester/prepare_shutdown` 200 ; GET `/config`, `/services`, `/metrics` 200.
+- **Lu, non mesuré** : `loki.service` a `Restart=on-failure`, donc systemd ne le relancerait pas après une sortie 0. Prometheus ne collecte pas Loki, mais la règle `LokiInjoignable` (critique, aucun envoi réussi d'Alloy vers Loki depuis 5 min, puis `for: 2m`) est faite pour ce cas ; elle n'a pas été exercée sur cet arrêt.
+- **Hors mesure** : la plateforme (rien n'y a été essayé), la source Prometheus, les autres rôles.
+
+La phrase « n'écrit pas dans Loki » tient pour ces chemins ; « lecture seule » était **faux** : le prix posé au propriétaire était incomplet. L'unité du lecteur et le script de pose ne sont pas écrits : ils attendent sa réponse.
+
+**Heures** : de 20:43:08 UTC à cette note, 11 min 06 s. Total de la brique : 1 h 10 min 11 s.
