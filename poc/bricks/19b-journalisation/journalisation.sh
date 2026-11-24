@@ -149,7 +149,8 @@ etape_installer() {
      "$here/config/provisioning/datasources/sources.yaml" "$here"/systemd/* "$D/"
   # 07b, ADR 0004 (« Oui, un tableau », 24/11/2026) : fournisseur et tableau « Vulnérabilités et VEX » (banc : 07a tableau-banc.sh) ;
   # ajouté à sec, non mesuré avant un rejeu de zéro
-  cp "$here/config/provisioning/dashboards/tableaux.yaml" "$here/config/provisioning/dashboards/tableaux/vulnerabilites-vex.json" "$D/"
+  cp "$here/config/provisioning/dashboards/tableaux.yaml" "$here/config/provisioning/dashboards/tableaux/vulnerabilites-vex.json" \
+    "$here/config/provisioning/dashboards/tableaux/kpi-supply-chain.json" "$D/"   # 20, étape 6 (24/11/2026) : idem, non mesuré avant un rejeu
   copier sc-stockage /tmp/journalisation-installation "$D"/*
   rm -rf "${D:?}"
   sur sc-stockage sudo bash -s <<EOS
@@ -174,6 +175,7 @@ install -m 0640 -g grafana sources.yaml /etc/grafana/provisioning/datasources/so
 install -d -m 0750 -g grafana /etc/grafana/provisioning/dashboards/tableaux
 install -m 0640 -g grafana tableaux.yaml /etc/grafana/provisioning/dashboards/tableaux.yaml
 install -m 0640 -g grafana vulnerabilites-vex.json /etc/grafana/provisioning/dashboards/tableaux/vulnerabilites-vex.json
+install -m 0640 -g grafana kpi-supply-chain.json /etc/grafana/provisioning/dashboards/tableaux/kpi-supply-chain.json
 install -m 0644 ca-poc.crt grafana.crt grafana-client.crt /etc/grafana/tls/
 install -m 0640 -g grafana grafana.key grafana-client.key /etc/grafana/tls/
 install -m 0640 -g grafana grafana-admin.password /etc/grafana/secrets/admin.password

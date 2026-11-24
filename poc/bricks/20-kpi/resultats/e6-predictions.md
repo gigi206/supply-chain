@@ -59,3 +59,9 @@ Attendu du troisième passage (`SUFFIXE=-3`) : 28 cas, 0 écart ; les 28 autres 
 - `kpi-pose.sh` refuse une clé publique de l'arbre différente de HEAD. Essai par l'étape `sec` (hôte, sans ssh), dans un clone jetable : `e7-cles-conformes.log`, arbre propre, **4 cas, 0 KO, code 0** ; `e7-cles-changees.log`, une ligne vide ajoutée à la clé de Chains du clone, **1 KO, celui de ce contrôle**, code 1. Le relevé (`verifier`) doit rester « à jour » dans les deux cas : c'est le défaut corrigé.
 
 Résultat (note de 2026-11-24T21:54:26Z) : [`e6-promql-banc-4.log`](e6-promql-banc-4.log) 28 cas, [`e6-tableau-banc-2.log`](e6-tableau-banc-2.log) 22 cas (empreinte `b679e16a01a0b41a`), [`e6-tableau-sec-2.log`](e6-tableau-sec-2.log) 31 cas, **0 écart** ; [`e7-cles-conformes.log`](e7-cles-conformes.log) tenu, [`e7-cles-changees.log`](e7-cles-changees.log) 1 KO, le seul prédit, relevé « à jour » dans les deux cas. Conforme.
+
+## Pose du tableau, prédiction de 2026-11-24T21:57:52Z
+
+Accord du propriétaire (réponse verbatim) : « Tableau seul (Recommandé) ». Les règles d'alerte attendent l'étape 7. Décision sur l'étape 7, verbatim : « Pose au rejeu, sans dates (Recommandé) ».
+
+`ACCORD='Tableau seul (Recommandé)' tableau-pose.sh pose`, journal `e6-tableau-pose.log` : fichier posé identique, rechargement 200, puis contrôle par l'auditeur ; **40 cas, 0 KO**. Retour arrière : `retrait`, sur accord. `journalisation.sh` (19b) copie aussi ce fichier désormais : contrôlé par `bash -n` seulement, non mesuré avant un rejeu.
