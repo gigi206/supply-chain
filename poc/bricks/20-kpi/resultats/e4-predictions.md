@@ -169,3 +169,12 @@ Dernier passage (`-5`), `ProtectHome` retiré pour le lecteur seulement, notes a
 Rien n'est posé : ni la liste, ni le compte, ni l'exportateur. `kpi-pose.sh` (compte, pose, verif, retrait) et `liste-proxy.sh` (pose, apres, retrait) n'ont pas été lancés.
 
 **Heures** : de 20:55:04 UTC (réponses du propriétaire) à cette note, 5 min 32 s. Total de la brique : 1 h 15 min 43 s.
+
+### Réserves et corrections sur relecture du conseiller (note de 2026-11-24T21:03:47Z)
+
+- Les « 40 cas » de `e4-banc-grafana-liste.log` : 38 au bilan du journal, plus 2 cas systemd hors bilan. Le cas `proxy/2/…` (404) ne prouve rien : l'identifiant numérique de la source n'a pas été relu. Il reste 9 formes d'arrêt probantes.
+- Le 200 de `buildinfo` sur la plateforme ne prouve pas qu'un GET non listé y passe : `buildinfo` est une route listée de la source. **La présence du défaut sur la plateforme est déduite du banc**, pas mesurée.
+- `Restart=always` est mesuré sur un `sleep`, pas sur Loki : complément, pas correction.
+- Non exercés : lecture de `lignes` par `kpi` à travers le groupe, `Wants` avec un lecteur en échec, `LoadCredential` avec `ProtectHome=true`, la forme de `IPAddressDeny` relue par la pose. Un journal absent ou illisible pour `kpi` donne le code 2 et fige tout ; la pose le verrait.
+- `liste-proxy.sh` : si Grafana ne revient pas, la copie est remise et le script s'arrête. `kpi-pose.sh` : le dossier qui porte le mot de passe est effacé depuis l'hôte sur tout échec après la copie. Non lancés.
+- Le refus de `kpi-pose.sh pose` tant que le proxy mène à Loki est un choix de session : à poser au propriétaire.

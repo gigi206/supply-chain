@@ -4,7 +4,7 @@
 # JAMAIS de requête vers un chemin qui agit (/ingester/shutdown, /flush, /log_level) sur la plateforme : /loki/api/v1/status/buildinfo seulement.
 #   avant    lecture seule, auditeur : le proxy mène-t-il à Loki et à Prometheus ? (code HTTP)
 #   pose     ACCORD DU PROPRIÉTAIRE (sudo sur sc-stockage) : seule la ligne de liste est ajoutée à /etc/grafana/grafana.ini, copie gardée,
-#            refus si le reste diffère du dépôt ; Grafana redémarré, contrôles.
+#            refus si le reste diffère du dépôt ; Grafana redémarré ; s'il ne revient pas, copie remise et arrêt ; contrôles.
 #   apres    lecture seule, auditeur : proxy vers Loki refusé, vers Prometheus permis, requêtes et explorateur inchangés.
 #   retrait  ACCORD DU PROPRIÉTAIRE (sudo) : copie remise, Grafana redémarré.
 # Usage (racine du dépôt) : bash poc/bricks/19b-journalisation/liste-proxy.sh <étape> > <journal>
@@ -48,10 +48,16 @@ set -euo pipefail
 trap 'find /tmp/grafana-liste.ini -delete' EXIT
 cp -p /etc/grafana/grafana.ini /etc/grafana/grafana.ini.avant-liste
 install -m 0640 -g grafana /tmp/grafana-liste.ini /etc/grafana/grafana.ini
-systemctl restart grafana
-for i in $(seq 60); do curl -s -o /dev/null --cacert /etc/grafana/tls/ca-poc.crt https://192.168.161.13:3001/api/health && break; sleep 2; done
+vivant() { for i in $(seq 30); do curl -fs -o /dev/null --cacert /etc/grafana/tls/ca-poc.crt https://192.168.161.13:3001/api/health && return 0; sleep 2; done; return 1; }
+if ! systemctl restart grafana || ! vivant; then
+  echo "Grafana ne revient pas : copie remise"
+  cp -p /etc/grafana/grafana.ini.avant-liste /etc/grafana/grafana.ini
+  systemctl restart grafana && vivant && echo "Grafana revenu avec la copie"
+  exit 3
+fi
 EOS
   attendu "pose" "$?" 0
+  [ "$ko" = 0 ] || return 1
   attendu "Grafana actif" "$(sur "systemctl is-active grafana")" active
   attendu "grafana.ini en service = dépôt" "$(sur "sudo sha256sum /etc/grafana/grafana.ini" | cut -c1-64)" "$(sha256sum < "$here/config/grafana.ini" | cut -c1-64)"
   controles 403
@@ -63,6 +69,8 @@ set -euo pipefail
 test -e /etc/grafana/grafana.ini.avant-liste
 install -m 0640 -g grafana /etc/grafana/grafana.ini.avant-liste /etc/grafana/grafana.ini
 systemctl restart grafana
+for i in $(seq 30); do curl -fs -o /dev/null --cacert /etc/grafana/tls/ca-poc.crt https://192.168.161.13:3001/api/health && exit 0; sleep 2; done
+exit 3
 EOS
   attendu "retrait" "$?" 0
   return $ko

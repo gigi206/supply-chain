@@ -89,10 +89,12 @@ etape_pose() { # ACCORD DU PROPRIÉTAIRE
   [ "$ko" = 0 ] || return 1
   (umask 077; cp "$MDP" "$T/pose/grafana.password")
   sur "if [ -e /tmp/kpi-installation ]; then find /tmp/kpi-installation -delete; fi; mkdir -m 0700 /tmp/kpi-installation" || return 1
-  env -u SSH_AUTH_SOCK scp -qr "${SSH_OPTS[@]}" "$T/pose/." poc@192.168.161.13:/tmp/kpi-installation/ < /dev/null || return 1
+  # le mot de passe ne doit rester dans /tmp sur aucun échec : le script sudo efface le dossier, l'hôte l'efface s'il n'a pas pu
+  nettoyer() { sur "if [ -e /tmp/kpi-installation ]; then find /tmp/kpi-installation -delete; fi"; }
+  env -u SSH_AUTH_SOCK scp -qr "${SSH_OPTS[@]}" "$T/pose/." poc@192.168.161.13:/tmp/kpi-installation/ < /dev/null || { nettoyer; return 1; }
   sur "sudo bash -s" <<'EOS'
 set -euo pipefail
-trap 'find /tmp/kpi-installation -delete' EXIT
+trap 'if [ -e /tmp/kpi-installation ]; then find /tmp/kpi-installation -delete; fi' EXIT
 cd /tmp/kpi-installation
 for u in kpi kpi-journal; do
   id "$u" > /dev/null 2>&1 || useradd --system --user-group --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin "$u"
@@ -112,7 +114,7 @@ systemctl daemon-reload
 systemctl start kpi.service
 systemctl enable --now kpi.timer 2>&1
 EOS
-  [ "$?" = 0 ] || return 1
+  [ "$?" = 0 ] || { nettoyer; return 1; }
   local f
   for f in metrics_exporter.py lecteur_loki.py; do
     attendu "$f installé identique" "$(sur "sha256sum /usr/local/lib/kpi/$f" | cut -c1-64)" "$(sha256sum < "$RACINE/tools/metrics-exporter/$f" | cut -c1-64)"
