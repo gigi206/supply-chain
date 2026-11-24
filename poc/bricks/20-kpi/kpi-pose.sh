@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Brique 20, étape 4 : pose de l'exportateur des KPI et de son lecteur sur sc-stockage. ÉCRIT À SEC, AUCUNE ÉTAPE LANCÉE sauf sec.
+# Brique 20, étape 4 : pose de l'exportateur des KPI et de son lecteur sur sc-stockage. Posé le 24/11/2026.
 # Étapes :
 #   sec      hôte seulement, sans ssh : relevé des dates à jour, fichiers à poser présents, empreintes. Sans accord.
 #   compte   ACCORD DU PROPRIÉTAIRE : mot de passe généré sur l'hôte (0600, s'il est absent), compte Grafana kpi-journal (Viewer) créé par
@@ -7,6 +7,11 @@
 #   pose     ACCORD DU PROPRIÉTAIRE (sudo sur sc-stockage) : refus si le relevé est périmé ou si le proxy de Grafana mène encore à Loki
 #            (défaut de la 19b, constat du 24/11) ; comptes système kpi et kpi-journal, fichiers, unités, un premier passage, contrôles.
 #   verif    lecture seule, par l'auditeur dans Grafana : séries dans Prometheus.
+#   pose_rejeu  seulement depuis rejeu.sh (REJEU=<libellé>, décision du 24/11/2026 « Pose au rejeu, sans dates (Recommandé) ») : relevé des dates
+#            recalculé et écrit dans l'arbre, puis pose. Le rejeu réécrit des clés publiques sans les commiter : leur date est celle d'un commit
+#            à venir, donc exactement autant de clés sans date que de clés différentes de HEAD, et aucun pin sans ligne. Après relecture et
+#            commit des clés : « releve-dates.py ecrire », commit, puis « pose ». PAS ENCORE REJOUÉ.
+#   sec_rejeu   hôte seulement, sans ssh : les mêmes contrôles, et un passage de l'exportateur sur l'hôte (Zot en anonyme, journal vide).
 #   retrait  ACCORD DU PROPRIÉTAIRE (sudo) : unités, fichiers et comptes système retirés ; le compte Grafana est retiré à part (compte_retrait).
 # Usage (racine du dépôt) : mise exec -- bash poc/bricks/20-kpi/kpi-pose.sh <étape> > <journal>
 set -uo pipefail
@@ -43,11 +48,30 @@ preparer() { # fichiers à poser, rassemblés dans $T/pose
   cp "$b/08-trust-plane/resultats/tsa-chaine.pem" "$T/pose/cles/tsa.pem" || return 1
   python3 -I -c 'import runpy, sys; sys.stdout.buffer.write(runpy.run_path(sys.argv[1])["VECTEUR_PUB"])' "$x/metrics_exporter.py" > "$T/pose/cles/vecteur.pub"
 }
+cles_changees() { # nombre de clés publiques de l'arbre qui ne sont pas celles de HEAD
+  local n=0 f c
+  for f in 08-trust-plane/resultats/chains-cle-publique.pem 07a-sbom-grype/resultats/scanner-cle-publique.pem 07a-sbom-grype/resultats/vex-cle-publique.pem \
+    10-independent-replay/resultats/vsa-cle-publique.pem 08-trust-plane/resultats/tsa-chaine.pem; do
+    git -C "$RACINE" diff --quiet HEAD -- "poc/bricks/$f"; c=$?
+    [ "$c" -le 1 ] || return 1
+    n=$((n + c))
+  done
+  echo "$n"
+}
+controle_prom() { # $T/kpi.prom : signatures, dates manquantes
+  attendu "signatures refusées" "$(awk '/^kpi_signatures_refusees/{s += $2; n++} END {print s + 0, (n > 0) ? "présentes" : "absentes"}' "$T/kpi.prom")" "0 présentes"
+  attendu "signatures vérifiées" "$(awk '/^kpi_signatures_verifiees/{s += $2} END {print (s > 0) ? "oui" : "non"}' "$T/kpi.prom")" oui
+  attendu "clés sans date" "$(awk '$1 == "kpi_cles_non_relevees" {print $2}' "$T/kpi.prom")" "${SANS_DATE:-0}"
+  attendu "pins sans date, journal illisible" "$(awk '/^kpi_(pins_non_releves|exportateur_journal_illisible)/{s += $2; n++} END {print s + 0, (n > 1) ? "présentes" : "absentes"}' "$T/kpi.prom")" "0 présentes"
+}
+au_rejeu() { # SANS_DATE et relevé, pour les étapes du rejeu
+  SANS_DATE=$(cles_changees) || { echo "KO   git diff des clés publiques"; return 1; }
+  echo "clés publiques réécrites, pas encore commitées : $SANS_DATE"
+  python3 -I "$here/releve-dates.py" ecrire || return 1
+}
 controles_hote() {
-  # le relevé lit les clés dans HEAD, preparer les copie depuis l'arbre : une clé changée sans commit (rejeu, re-signature) est refusée ici
-  attendu "clés publiques de l'arbre identiques à HEAD" "$(git -C "$RACINE" diff --quiet HEAD -- poc/bricks/08-trust-plane/resultats/chains-cle-publique.pem \
-    poc/bricks/07a-sbom-grype/resultats/scanner-cle-publique.pem poc/bricks/07a-sbom-grype/resultats/vex-cle-publique.pem \
-    poc/bricks/10-independent-replay/resultats/vsa-cle-publique.pem poc/bricks/08-trust-plane/resultats/tsa-chaine.pem && echo oui || echo non)" oui
+  # le relevé lit les clés dans HEAD, preparer les copie depuis l'arbre : une clé changée sans commit est refusée ici, sauf au rejeu
+  [ -n "${SANS_DATE:-}" ] || attendu "clés publiques de l'arbre différentes de HEAD" "$(cles_changees)" 0
   attendu "relevé des dates de git" "$(python3 -I "$here/releve-dates.py" verifier > /dev/null 2>&1 && echo "à jour" || echo périmé)" "à jour"
   preparer; attendu "fichiers à poser" "$(find "$T/pose" -type f | wc -l)" 12
   attendu "aucune clé privée parmi eux" "$(grep -rl 'PRIVATE KEY' "$T/pose" | wc -l)" 0
@@ -130,10 +154,25 @@ EOS
   attendu "filtre réseau des deux unités" "$(sur "systemctl show -p IPAddressDeny --value kpi.service kpi-journal.service | grep -c '0.0.0.0/0'")" 2
   sur "cat /etc/fichiers-metriques/kpi.prom" > "$T/kpi.prom"
   masque < "$T/kpi.prom" | sed 's/^/  /'
-  attendu "signatures refusées" "$(awk '/^kpi_signatures_refusees/{s += $2} END {print s + 0}' "$T/kpi.prom")" 0
-  attendu "signatures vérifiées" "$(awk '/^kpi_signatures_verifiees/{s += $2} END {print (s > 0) ? "oui" : "non"}' "$T/kpi.prom")" oui
-  attendu "clés et pins sans date, journal illisible" "$(awk '/^kpi_(cles_non_relevees|pins_non_releves|exportateur_journal_illisible)/{s += $2; n++} END {print s + 0, (n > 2) ? "présentes" : "absentes"}' "$T/kpi.prom")" "0 présentes"
+  controle_prom
   sur "systemd-analyze security kpi.service kpi-journal.service entrees-scan.service 2> /dev/null" | masque | cut -c1-140
+  return $ko
+}
+
+etape_pose_rejeu() {
+  : "${REJEU:?étape réservée à rejeu.sh (REJEU=<libellé>)}"
+  au_rejeu || return 1
+  etape_pose
+}
+
+etape_sec_rejeu() {
+  au_rejeu || return 1
+  controles_hote
+  : > "$T/journal"; : > "$T/kpi.prom"
+  REG=192.168.161.13:5000 CA=$CA SIGNATURES=verifiees CLES=$T/pose/cles RELEVE=$T/pose/dates-git.tsv JOURNAL=$T/journal SORTIE=$T/kpi.prom \
+    PRODUITS="sample-app sample-app-deb sample-app-rpm" /usr/bin/python3 -I "$T/pose/metrics_exporter.py"
+  attendu "exportateur sur l'hôte, code" "$?" 0
+  controle_prom
   return $ko
 }
 
@@ -165,8 +204,8 @@ EOS
 }
 
 case ${1:-} in
-  sec|compte|compte_retrait|pose|verif|retrait) ;;
-  *) echo "usage : $0 sec|compte|compte_retrait|pose|verif|retrait" >&2; exit 2 ;;
+  sec|sec_rejeu|compte|compte_retrait|pose|pose_rejeu|verif|retrait) ;;
+  *) echo "usage : $0 sec|sec_rejeu|compte|compte_retrait|pose|pose_rejeu|verif|retrait" >&2; exit 2 ;;
 esac
 rc=0
 "etape_$1" || rc=$?

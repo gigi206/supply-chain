@@ -81,6 +81,11 @@ lib=${1:-j1-j6}
 # après cette étape (point d'arrêt) ; DEPUIS=<étape> reprend à cette étape, les précédentes étant sautées.
 RESEAU=${RESEAU:-cilium}
 export RESEAU   # même réseau pour k3s.sh, lancé par mise
+#
+# Additif du 2026-11-24 (20, étape 7, « Pose au rejeu, sans dates (Recommandé) ») : compte Grafana kpi-journal, puis exportateur des KPI, après
+# les trois produits (le bloc 05 compris : sans builds/sample-app-rpm au catalogue, l'exportateur refuse). pose_rejeu réécrit
+# 20-kpi/releve/dates-git.tsv dans l'arbre, et tolère exactement les clés publiques réécrites et pas encore commitées, sans date jusque-là : clés à
+# relire et commiter, puis « releve-dates.py ecrire », commit, « kpi-pose.sh pose ». fuites ne lit pas le mot de passe de kpi-journal. PAS ENCORE REJOUÉ.
 . "$here/distro.sh"   # DISTRO=rke2 (brique 08b) : rke2.sh à la place de k3s.sh ; préalable sur l'hôte : rke2.sh telecharger
 export DISTRO
 DEPUIS=${DEPUIS:-}
@@ -285,6 +290,12 @@ fi
 etape "08 (Kyverno corrigé, image)" env KA_SUFFIXE="rejeu-$lib" mise exec -- "$here/kyverno-admission.sh" construire
 etape "08 (Kyverno corrigé, image poussée)" env KA_SUFFIXE="rejeu-$lib" mise exec -- "$here/kyverno-admission.sh" image
 etape "08 (Kyverno corrigé, pose)" mise exec -- "$here/kyverno-permanent.sh" pose "rejeu-$lib"
+if [ -n "${TAG_05:-}" ]; then   # posé seulement avec RKE2 et Cilium, voir le refus en tête
+  etape "20 (compte)" mise exec -- bash "$here/../20-kpi/kpi-pose.sh" compte
+  etape "20 (KPI, pose)" env REJEU="$lib" mise exec -- bash "$here/../20-kpi/kpi-pose.sh" pose_rejeu
+else
+  echo "## 20 : sautée (TAG_05 absent : sans le rpm, l'exportateur des KPI refuse)"
+fi
 echo "## 08d : rien à rejouer (relevés seuls, rien installé ; cert-manager lié à l'exposition de services, D7)"
 etape fuites mise run confiance:fuites -- "$lib"
 [ "$DISTRO" = k3s ] || etape "08b (CIS)" mise exec -- "$here/../08b-rke2/rke2.sh" cis

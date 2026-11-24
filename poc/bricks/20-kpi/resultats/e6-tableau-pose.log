@@ -1,0 +1,95 @@
+# tableau « KPI supply-chain », étape pose, 2026-11-24T21:57:56Z, d86d54f9
+tableau 0316fdd2f37f9c0e…, script b5aa711d62f24102
+accord du propriétaire (verbatim) : « Tableau seul (Recommandé) »
+OK   fichier posé identique : 0316fdd2f37f9c0e4929dbe748d7427f711d92c3ca221d48d7df7d0c435153d9
+OK   rechargement du provisionnement (administrateur) : 200
+  réponse : {"message":"Dashboards config reloaded"}
+OK   cache des droits de l'auditeur rechargé : 200
+OK   tableau servi (auditeur) : 200
+OK   titre : KPI supply-chain
+OK   dossier : PoC
+OK   marqué provisionné : true
+OK   panneaux : 18
+OK   panneaux identiques au fichier : b679e16a01a0b41a
+OK   enregistrement par l'auditeur refusé : 403
+OK   « Vulnérabilités et VEX » servi (auditeur) : 200
+## requêtes des panneaux, jouées par l'auditeur (2026-11-24T21:57:58Z)
+OK   panneau 2A : code, séries, erreur : 200 1 aucune
+        = 300
+OK   panneau 2B : code, séries, erreur : 200 1 aucune
+        = 301
+OK   panneau 3A : code, séries, erreur : 200 1 aucune
+        = 0
+OK   panneau 3B : code, séries, erreur : 200 1 aucune
+        = 0
+OK   panneau 3C : code, séries, erreur : 200 1 aucune
+        = 0
+OK   panneau 3D : code, séries, erreur : 200 1 aucune
+        = 0
+OK   panneau 3E : code, séries, erreur : 200 1 aucune
+        = 0
+OK   panneau 4A : code, séries, erreur : 200 1 aucune
+        = 0.25
+OK   panneau 4B : code, séries, erreur : 200 1 aucune
+        = 1
+OK   panneau 4C : code, séries, erreur : 200 1 aucune
+        = 4
+OK   panneau 5A : code, séries, erreur : 200 1 aucune
+        = 0.5
+OK   panneau 5B : code, séries, erreur : 200 1 aucune
+        = 2
+OK   panneau 5C : code, séries, erreur : 200 1 aucune
+        = 4
+OK   panneau 6A : code, séries, erreur : 200 1 aucune
+        = 1
+OK   panneau 6B : code, séries, erreur : 200 1 aucune
+        = 4
+OK   panneau 6C : code, séries, erreur : 200 1 aucune
+        = 4
+OK   panneau 7A : code, séries, erreur : 200 4 aucune
+       builds/sample-app 3a7ca1b14dbf = 1
+       builds/sample-app f5e6bcb0e0fb = 0
+       builds/sample-app-deb 60f25f5c3fb5 = 0
+       builds/sample-app-rpm 07b7bd6feb48 = 0
+OK   panneau 8A : code, séries, erreur : 200 4 aucune
+       builds/sample-app 3a7ca1b14dbf = 1
+       builds/sample-app f5e6bcb0e0fb = 0
+       builds/sample-app-deb 60f25f5c3fb5 = 1
+       builds/sample-app-rpm 07b7bd6feb48 = 0
+OK   panneau 9A : code, séries, erreur : 200 4 aucune
+       builds/sample-app 3a7ca1b14dbf = 1
+       builds/sample-app f5e6bcb0e0fb = 1
+       builds/sample-app-deb 60f25f5c3fb5 = 1
+       builds/sample-app-rpm 07b7bd6feb48 = 1
+OK   panneau 10A : code, séries, erreur : 200 3 aucune
+       builds/sample-app 3a7ca1b14dbf = 0
+       builds/sample-app f5e6bcb0e0fb = 0
+       builds/sample-app-deb 60f25f5c3fb5 = 0
+OK   panneau 11A : code, séries, erreur : 200 3 aucune
+       builds/sample-app 3a7ca1b14dbf = 0.8333333333333334
+       builds/sample-app f5e6bcb0e0fb = 1
+       builds/sample-app-deb 60f25f5c3fb5 = 0.34328358208955223
+OK   panneau 12A : code, séries, erreur : 200 1 aucune
+        = 1
+OK   panneau 12B : code, séries, erreur : 200 1 aucune
+        = 3
+OK   panneau 13A : code, séries, erreur : 200 0 aucune
+OK   panneau 14A : code, séries, erreur : 200 0 aucune
+OK   panneau 15A : code, séries, erreur : 200 5 aucune
+       chains b446c5ffe7b6 = 85548
+       scanner 09708ff49e5e = 80497
+       tsa 29fa7cc76f71 = 85548
+       vex d40d41a02833 = 80497
+       vsa b3e9f64b7d5e = 1857344
+OK   panneau 16A : code, séries, erreur : 200 4 aucune
+       builds/sample-app 3a7ca1b14dbf = 2259422
+       builds/sample-app f5e6bcb0e0fb = 2259422
+       builds/sample-app-deb 60f25f5c3fb5 = 2259422
+       builds/sample-app-rpm 07b7bd6feb48 = 2259422
+OK   panneau 17A : code, séries, erreur : 200 4 aucune
+       builds/sample-app 3a7ca1b14dbf = 1
+       builds/sample-app f5e6bcb0e0fb = 1
+       builds/sample-app-deb 60f25f5c3fb5 = 1
+       builds/sample-app-rpm 07b7bd6feb48 = 0
+OK   panneau 18A : code, séries, erreur : 200 24 aucune
+## bilan : 40 cas, 0 écart(s)

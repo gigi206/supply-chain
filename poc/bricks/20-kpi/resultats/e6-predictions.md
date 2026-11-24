@@ -65,3 +65,5 @@ Résultat (note de 2026-11-24T21:54:26Z) : [`e6-promql-banc-4.log`](e6-promql-ba
 Accord du propriétaire (réponse verbatim) : « Tableau seul (Recommandé) ». Les règles d'alerte attendent l'étape 7. Décision sur l'étape 7, verbatim : « Pose au rejeu, sans dates (Recommandé) ».
 
 `ACCORD='Tableau seul (Recommandé)' tableau-pose.sh pose`, journal `e6-tableau-pose.log` : fichier posé identique, rechargement 200, puis contrôle par l'auditeur ; **40 cas, 0 KO**. Retour arrière : `retrait`, sur accord. `journalisation.sh` (19b) copie aussi ce fichier désormais : contrôlé par `bash -n` seulement, non mesuré avant un rejeu.
+
+**Résultat de la pose** ([`e6-tableau-pose.log`](e6-tableau-pose.log), 21:57:56 UTC) : 40 cas, **0 KO**. Conforme.
