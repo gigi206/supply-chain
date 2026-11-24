@@ -1,0 +1,91 @@
+# binaire de sample-app reconstruite (Go 1.26.11), 2026-11-24T13:50:18Z, 3fb6ac67, crane 0.20.6
+## 1. entrées du scan signé en vigueur (vex-gabarit.sh)
+# vex-gabarit.sh, 2026-11-24T13:50:18Z ; sujet sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 ; scan du 2026-11-24T13:31:32.890165962Z ; 1 scan(s) vérifié(s) par CLE_SCANNER (emprein
+
+| # | Identifiant | Alias | Gravité | KEV | EPSS | Paquet | Corrigé dans | VEX appliqué |
+|---|---|---|---|---|---|---|---|---|
+| 1 | GHSA-3fxj-6jh8-hvhx |  | Medium | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+| 2 | GHSA-j6qf-3m9c-vwj3 | CVE-2026-114437 | Medium | non | 0.00129 | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.4.0 | - |
+| 3 | GHSA-mqqf-5wvp-8fh8 | CVE-2025-69725 | Medium | non | 0.00264 | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.2.4 | - |
+| 4 | GO-2026-5775 | GHSA-9g5q-2w5x-hmxf | Unknown | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+| 5 | GO-2026-5777 | GHSA-rjr7-jggh-pgcp | Unknown | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | - |
+
+comptes : 5 entrée(s), 5 identifiant(s) ; KEV 0 ; avec correctif 5 ; écartées par un VEX 0 ; gravités : Medium 3, Unknown 2
+OK   identifiants du scan = noms du VEX de 3a7ca1b1 : GHSA-3fxj-6jh8-hvhx,GHSA-j6qf-3m9c-vwj3,GHSA-mqqf-5wvp-8fh8,GO-2026-5775,GO-2026-5777
+OK   entrées hors chi : 0
+gabarit : code 0
+OK   gabarit : noms, alias et sous-composants = ceux du VEX de 3a7ca1b1 : 0c222a08dbe1b90c
+OK   gabarit : produit : pkg:oci/sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
+## 2. image (lecture anonyme)
+OK   digest du manifeste relu : sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
+{"Entrypoint":["/sample-app"],"Cmd":null,"User":"65532:65532"}
+tar : code 0 ; 0 ligne(s) d'erreur
+point d'entrée : /sample-app ; 6197374 octets
+OK   binaire : sha256 (celui du banc de l'hôte, étape 2) : 56f3cd7d256562bef660f596de462af4105462356858b11f71cd04761c13b5c2
+ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, stripped
+## 3. modules liés (go version -m)
+  ~/.cache/supply-chain-poc/07c/vex-binaire/fs/sample-app: go1.26.11
+  	path	example.com/supply-chain/sample-app
+  	mod	example.com/supply-chain/sample-app	(devel)	
+  	dep	github.com/go-chi/chi/v5	v5.2.3	h1:WQIt9uxdsAbgIYgid+BpYc+liqQZGMHRaUwp0JUcvdE=
+  	build	-buildmode=exe
+  	build	-compiler=gc
+  	build	-trimpath=true
+  	build	DefaultGODEBUG=containermaxprocs=0,cryptocustomrand=1,decoratemappings=0,httpservecontentmaxranges=1,tlssecpmlkem=0,tlssha1=1,updatemaxprocs=0,urlstrictcolons=0,x509sha256skid=0
+  	build	CGO_ENABLED=0
+  	build	GOARCH=amd64
+  	build	GOOS=linux
+  	build	GOAMD64=v1
+OK   Go du binaire : go1.26.11
+OK   module chi lié : 1
+## 4. noms de fonctions (pclntab, par strings)
+noms retenus : 933 ; dont chi : 55
+### témoins (doivent être présents : le code de main.go)
+OK   chi : (*Mux).ServeHTTP : 1
+OK   chi : (*Mux).routeHTTP : 1
+OK   net/http : (*Server).Serve : 1
+### paquets de chi liés
+       47 github.com/go-chi/chi/v5
+        7 github.com/go-chi/chi/v5@v5
+KO   paquets de chi liés = le seul paquet racine : github.com/go-chi/chi/v5,github.com/go-chi/chi/v5@v5 (attendu github.com/go-chi/chi/v5)
+OK   aucune fonction du paquet chi/v5/middleware liée : 0
+### fichiers sources de chi cités par le binaire
+  github.com/go-chi/chi/v5@v5.2.3/chain.go
+  github.com/go-chi/chi/v5@v5.2.3/chi.go
+  github.com/go-chi/chi/v5@v5.2.3/context.go
+  github.com/go-chi/chi/v5@v5.2.3/mux.go
+  github.com/go-chi/chi/v5@v5.2.3/path_value.go
+  github.com/go-chi/chi/v5@v5.2.3/pattern.go
+  github.com/go-chi/chi/v5@v5.2.3/tree.go
+OK   fichiers sources de chi : les 7 du binaire de 3a7ca1b1 : chain.go,chi.go,context.go,mux.go,path_value.go,pattern.go,tree.go
+OK   chemins de fichiers sources sous middleware/ : 0
+OK   chemin de paquet chi/v5/middleware (toutes les chaînes) : 0
+OK   nom qualifié « middleware. » (toutes les chaînes) : 0
+OK   « middleware » hors de « [Mm]iddlewares » (toutes les chaînes) : 0
+  chaîne : Middlewares
+  chaîne : middlewares
+  chaîne : *chi.Middlewares
+  chaîne : *func() chi.Middlewares
+  chaîne : github.com/go-chi/chi/v5.Middlewares.Handler
+OK   RealIP (toutes les chaînes) : 0
+OK   ClientIPFromXFF (toutes les chaînes) : 0
+OK   GetClientIP (toutes les chaînes) : 0
+OK   RedirectSlashes (toutes les chaînes) : 0
+OK   « realip » ou « strip.go » dans toutes les chaînes : 0
+## 5. fiches OSV (api.osv.dev)
+OK   fiches lues (une par identifiant) : 5
+  GHSA-3fxj-6jh8-hvhx : sha256 85d0f8bbe1692796 ; modifiée 2026-11-04T04:00:03.945179347Z ; alias CVE-2026-72815,GO-2026-5774
+    corrigé github.com/go-chi/chi/v5/middleware@5.3.0
+    corrigé github.com/go-chi/chi/v5@5.3.0
+  GHSA-j6qf-3m9c-vwj3 : sha256 53be872232678e2c ; modifiée 2026-10-23T21:15:03.935320289Z ; alias CVE-2026-114437
+    corrigé github.com/go-chi/chi/v5@5.4.0
+  GHSA-mqqf-5wvp-8fh8 : sha256 88812b87f400b41c ; modifiée 2026-11-05T10:55:55.386587623Z ; alias CVE-2025-69725,CVE-2026-122132,GO-2026-4316
+    corrigé github.com/go-chi/chi/v5@5.2.4
+  GO-2026-5775 : sha256 20f096a67776e6ab ; modifiée 2026-08-15T05:19:13.029024907Z ; alias CVE-2026-72817,GHSA-9g5q-2w5x-hmxf
+    corrigé github.com/go-chi/chi/v5@5.3.0
+    imports github.com/go-chi/chi/v5/middleware : RealIP
+  GO-2026-5777 : sha256 976ec038b160334d ; modifiée 2026-08-15T05:19:15.756579600Z ; alias CVE-2026-72816,GHSA-rjr7-jggh-pgcp
+    corrigé github.com/go-chi/chi/v5@5.3.0
+    imports github.com/go-chi/chi/v5/middleware : RealIP
+OK   imports des fiches : aucun hors chi/v5/middleware : 0
+## bilan : 25 cas, 1 écart(s)

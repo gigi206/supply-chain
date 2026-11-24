@@ -62,7 +62,10 @@ attendu "chi : (*Mux).routeHTTP" "$(compte '^github.com/go-chi/chi/v5\.(\*Mux)\.
 attendu "net/http : (*Server).Serve" "$(compte '^net/http\.(\*Server)\.Serve$')" 1
 echo "### paquets de chi liés"
 sed -n 's#^\(github.com/go-chi/chi/v5[^.(]*\)[.(].*#\1#p' "$B/noms" | sort | uniq -c | sed 's/^/  /'
-attendu "paquets de chi liés = le seul paquet racine" "$(sed -n 's#^\(github.com/go-chi/[^.(]*\)[.(].*#\1#p' "$B/noms" | sort -u | paste -sd,)" github.com/go-chi/chi/v5
+# passage 2 : les lignes « …chi/v5@v5.2.3/<fichier>.go » de noms sont des chemins de fichiers sources, pas des paquets
+# (passage 1 : critère faux, le binaire de 3a7ca1b1 montrait déjà ces 7 lignes) ; elles sont exclues ici
+attendu "paquets de chi liés = le seul paquet racine (chemins de fichiers exclus)" "$(grep -v '@' "$B/noms" | sed -n 's#^\(github.com/go-chi/[^.(]*\)[.(].*#\1#p' | sort -u | paste -sd,)" github.com/go-chi/chi/v5
+attendu "lignes « chi/v5@ » de noms = chemins de fichiers .go" "$(grep -c '^github.com/go-chi/chi/v5@v5.2.3/[a-z_]*\.go$' "$B/noms")" "$(grep -c '^github.com/go-chi/[^ ]*@' "$B/noms")"
 attendu "aucune fonction du paquet chi/v5/middleware liée" "$(compte '^github.com/go-chi/chi/v5/middleware')" 0
 echo "### fichiers sources de chi cités par le binaire"
 strings -n 6 "$X" | grep -o 'github.com/go-chi/chi/v5@v5[^ ]*\.go' | sort -u > "$B/fichiers"; sed 's/^/  /' "$B/fichiers"
