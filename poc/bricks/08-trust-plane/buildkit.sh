@@ -17,12 +17,15 @@
 #           dans un pod Kata privilégié : trois constructions, dont une qui cherche le démon depuis une étape et joint Zot
 #   sample_app voie A sur sample-app : BuildKit en root dans un pod Kata privilégié, racine de BuildKit sur un tmpfs de l'invité,
 #           mêmes entrées que la voie D (tar épinglé), image de build de la voie D, Dockerfile et options de la brique 04, deux
-#           constructions depuis deux chemins, comparées à 3a7ca1b1 (après voie-d.sh image compiler)
+#           constructions depuis deux chemins, comparées à f5e6bcb0 (après voie-d.sh image compiler)
 #   sans_reseau  option 3 du contrôle de sortie (choix du propriétaire du 30/10/2026), prédiction d'abord : NetworkPolicy
 #           politique/construction-sans-sortie.yaml posée (pods tekton.dev/task=construire-image) ; témoins : pod Kata privilégié
 #           sans le label (Zot joignable) et avec (refusé) ; dans un pod Kata privilégié au label, image de build tirée de Zot
 #           (docker-image://, doit échouer) puis livrée en layout OCI (oras cp, blobs contrôlés par sha256 dans le pod,
-#           oci-layout://) : image comparée à 3a7ca1b1 (après sample_app)
+#           oci-layout://) : image comparée à f5e6bcb0 (après sample_app)
+# Brique 07c, étape 7 (2026-11-24) : Go 1.26.11 ; image de build de la voie D 8c11e856 (au lieu de d50ae575), image attendue
+# f5e6bcb0 (au lieu de 3a7ca1b1, même Dockerfile de la 04 : banc de l'hôte de la 07c en BuildKit 0.25.2, PipelineRun du
+# 24/11/2026 en v0.34.1 sous Kata), binaire 56f3cd7d (au lieu de e3749c68).
 #
 # Usage (racine du dépôt) : mise run confiance:buildkit -- <étape>…   (journal : resultats/buildkit-<étape>.log)
 set -euo pipefail
@@ -377,9 +380,9 @@ essai root - ''" "$PRIVILEGIE"
 LIMITES_A='{"cpu": "2", "memory": "6Gi"}'   # tmpfs de BuildKit compté dans la mémoire du pod
 ENTREES=$W/voie-d/entrees.tar
 ENTREES_SHA=3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28   # voie-d.sh compiler
-BUILDER_D=$REG/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67   # voie-d.sh image
-APP_REF=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
-BIN_REF=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+BUILDER_D=$REG/plateforme/builder-go-voie-d@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7   # voie-d.sh image (Go 1.26.11, 07c)
+APP_REF=sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7   # 07c (Go 1.26.11) ; 3a7ca1b1 avant le 24/11/2026
+BIN_REF=56f3cd7d256562bef660f596de462af4105462356858b11f71cd04761c13b5c2          # 07c ; e3749c68 avant
 SAMPLE='printf "%s\n" "$CA_POC" > /tmp/ca.crt
 printf "[registry.\"sc-stockage.poc.test:5000\"]\n  ca = [\"/tmp/ca.crt\"]\n" > /tmp/bk.toml
 mkdir -p /tmp/run /tmp/w/src-1 /tmp/w/autre/src-2
@@ -538,7 +541,7 @@ $(kubectl get netpol -n builds -o name | tr '\n' ' ')"
   m=$T/app-layout/blobs/sha256/${d#sha256:}
   l=$T/app-layout/blobs/sha256/$(jq -r '.layers[0].digest' "$m" | cut -c8-)
   attendu "binaire dans l'image" "$(gzip -dc "$l" | tar -xOf - sample-app | sha256sum | cut -c1-64)" "$BIN_REF"
-  attendu "image construite sans réseau, image de build en layout OCI, face à la voie A (3a7ca1b1)" "$d" "$APP_REF"
+  attendu "image construite sans réseau, image de build en layout OCI, face à la voie A (${APP_REF:7:8})" "$d" "$APP_REF"
 }
 
 lancer buildkit J7 "$@"

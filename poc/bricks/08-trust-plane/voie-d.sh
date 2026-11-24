@@ -2,7 +2,7 @@
 # Brique 08, jalon J7 : voie D, mesure demandée par le propriétaire le 30/10/2026. Construire sample-app sans conteneur
 # imbriqué ni BuildKit : compiler dans le conteneur du pod Kata lui-même, réseau coupé par un espace réseau créé sans
 # privilège, puis assembler l'image sans rien exécuter (tar GNU déterministe et crane, de mise.toml).
-#   image      image de build assemblée sans rien exécuter : toolchain Go 1.26.10 (module vérifié par sum.golang.org),
+#   image      image de build assemblée sans rien exécuter : toolchain Go 1.26.11 (brique 07c ; module vérifié par sum.golang.org),
 #              busybox statique du nixpkgs épinglé et liens de ses applets, /tmp ; environnement du Dockerfile.builder de la
 #              brique 04 ; deux assemblages depuis deux répertoires, même digest attendu ; poussée dans Zot
 #   compiler   pod Kata de builds (contexte de restricted, limites) sur cette image ; entrées de la brique 03 livrées par
@@ -10,7 +10,11 @@
 #              de la brique 04 ; témoins : Zot joignable depuis le pod, injoignable dans l'espace réseau ; fermeture vide ;
 #              proxy réseau ; même spec sans runtimeClassName admise par Pod Security restricted (dry-run serveur)
 #   assembler  image sample-app assemblée sans rien exécuter (tar GNU, crane), deux fois depuis deux répertoires, comparée
-#              champ par champ à 3a7ca1b1 (binaire, en-tête tar, diff_id, configuration, digest)
+#              champ par champ à f5e6bcb0 (binaire, en-tête tar, diff_id, configuration, digest)
+# Brique 07c, étape 7 (2026-11-24) : Go 1.26.11 au lieu de 1.26.10. La toolchain est lue dans le cache des modules (GOROOT_GO),
+# pas dans GOROOT_DIR de mise.toml (toujours 1.26.10, que d'autres étapes utilisent) ; image de build attendue 8c11e856 (celle de
+# la tâche signée construire-image), binaire 56f3cd7d, référence f5e6bcb0 (poussée en J2 par stockage.sh registre). Assemblage
+# mesuré à sec : 07c-reconstruction-go/resultats/predire-builder.log et predire-voie-d.log.
 # Retrait : dépôts Zot plateforme/builder-go-voie-d et essais-j7/sample-app-voie-d (Zot n'autorise pas la suppression).
 #
 # Usage (racine du dépôt) : mise run confiance:voie-d -- <étape>…   (journal : resultats/voie-d-<étape>.log)
@@ -19,13 +23,16 @@ export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/commun.sh"
-: "${GOROOT_DIR:?}" "${BUSYBOX:?}" "${POC_OUTILS:?}"
+: "${BUSYBOX:?}" "${POC_OUTILS:?}"
 B03=${B03:-$HOME/.cache/supply-chain-poc/w/b03}   # entrées de la brique 03 (bancs du laptop)
-GO_MODULE=golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64
+GO_MODULE=golang.org/toolchain@v0.0.1-go1.26.11.linux-amd64   # 07c : 1.26.10 avant le 24/11/2026
+GOROOT_GO=$POC_OUTILS/gomodcache/$GO_MODULE                     # arbre extrait du module (cache de l'hôte, hors de $W)
+test -x "$GOROOT_GO/bin/go" || { echo "KO   toolchain absente : $GOROOT_GO" >&2; exit 1; }
+BUILDER_REF=sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7   # tâche signée construire-image (07c)
 DEPOT_BUILDER=plateforme/builder-go-voie-d
 DEPOT_APP=essais-j7/sample-app-voie-d
-APP_REF=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # sample-app par BuildKit (brique 04)
-BIN_REF=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11          # binaire de la brique 03
+APP_REF=sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7   # sample-app par BuildKit (brique 04, Go 1.26.11 : 07c)
+BIN_REF=56f3cd7d256562bef660f596de462af4105462356858b11f71cd04761c13b5c2          # binaire en Go 1.26.11 (07c ; 03 : e3749c68)
 # Empreintes épinglées des entrées (relevées au premier passage, 30/10/2026) : le répertoire des bancs peut être réécrit
 ARBRE_SRC=24e5e080c90471d67a7e745035b3dbb00c9e975ac21514b3e641cb31217f70b0
 ARBRE_DIST=f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a
@@ -50,7 +57,7 @@ racine_builder() { # répertoire : arborescence de l'image de build (Dockerfile.
   rm -rf -- "${1:?}" && mkdir -p "$1/bin" "$1/usr/local" "$1/tmp"
   install -m 0755 "$BUSYBOX" "$1/bin/busybox"
   for a in $("$BUSYBOX" --list); do [ "$a" = busybox ] || ln -s busybox "$1/bin/$a"; done
-  cp -a "$GOROOT_DIR" "$1/usr/local/go"
+  cp -a "$GOROOT_GO" "$1/usr/local/go"
   chmod -R u+w "$1/usr/local/go"   # comme la brique 04 (chmod -R u+w du contexte)
   chmod 1777 "$1/tmp"
 }
@@ -64,7 +71,7 @@ etape_image() {
   m=${GO_MODULE%@*}
   s=$(cat "$POC_OUTILS/gomodcache/cache/download/$m/@v/${GO_MODULE#*@}.ziphash")
   db=$(curl -fsS --max-time 30 "https://sum.golang.org/lookup/$GO_MODULE" | awk -v v="${GO_MODULE#*@}" '$2 == v {print $3}')
-  [ -n "$s" ] && [ "$s" = "$db" ] && echo "OK   toolchain $GO_MODULE : $s = sum.golang.org ; arbre extrait $(arbre "$GOROOT_DIR")" \
+  [ -n "$s" ] && [ "$s" = "$db" ] && echo "OK   toolchain $GO_MODULE : $s = sum.golang.org ; arbre extrait $(arbre "$GOROOT_GO")" \
     || { echo "KO   toolchain : $s ≠ sum.golang.org $db" >&2; exit 1; }
   echo "busybox : $(readlink -f "$BUSYBOX") ($("$BUSYBOX" | sed -n 1p)), sha256 $(sha256sum < "$BUSYBOX" | cut -c1-64), $("$BUSYBOX" --list | wc -l) applets"
   echo "## assemblage (tar GNU, crane append et mutate), deux fois"
@@ -85,6 +92,8 @@ etape_image() {
     || { echo "KO   image de build : $(cat "$T/builder-a.digest") ≠ $(cat "$T/builder-b.digest")" >&2; exit 1; }
   zot crane config "$REG_HOTE/$DEPOT_BUILDER@$(cat "$T/builder-a.digest")" | jq -c '{architecture, os, config, history}'
   echo "image des pods : $REG/$DEPOT_BUILDER@$(cat "$T/builder-a.digest")"
+  [ "$(cat "$T/builder-a.digest")" = "$BUILDER_REF" ] && echo "OK   image de build = celle de la tâche signée construire-image : $BUILDER_REF" \
+    || { echo "KO   image de build $(cat "$T/builder-a.digest") ≠ $BUILDER_REF (tâche signée construire-image)" >&2; exit 1; }
 }
 
 pod_spec() { # nom runtimeClass|- image : pod de builds au contexte de restricted, limites explicites, qui attend
@@ -132,7 +141,7 @@ etape_compiler() {
   echo "pod Kata (builds, contexte de restricted) : NoNewPrivs 1, CapBnd 0, CapEff 0, Seccomp 0 (disable_guest_seccomp) ; la même"
   echo "  spec sans runtimeClassName est admise par Pod Security restricted (dry-run serveur)"
   echo "Zot joignable depuis le pod ; dans unshare -U -r -n : interface lo seule, Zot injoignable"
-  echo "compilation sous unshare -n, fermeture Hermeto en GOPROXY : réussie, binaire $BIN_REF (brique 03, image 3a7ca1b1)"
+  echo "compilation sous unshare -n, fermeture Hermeto en GOPROXY : réussie, binaire $BIN_REF (Go 1.26.11, image $APP_REF)"
   echo "fermeture vide : échec, module github.com/go-chi/chi/v5@v5.2.3 introuvable ; proxy réseau (Zot) : échec, réseau injoignable"
   echo "## entrées de la compilation (arbre de la brique 04 : canon/source sans .git, plus web/dist)"
   rm -rf -- "${T:?}/entrees" && mkdir -p "$T/entrees/src" "$T/entrees/deps"
@@ -178,7 +187,7 @@ etape_assembler() {
   echo "## prédiction (écart d'en-tête relevé en exploratoire le 30/10/2026, avant cette prédiction ; corrigée après un premier"
   echo "## passage démenti sur created, resultats/voie-d-assembler-premiere-prediction.log)"
   echo "deux assemblages depuis deux répertoires : même couche, même digest"
-  echo "face à 3a7ca1b1 : même binaire, mêmes nom, mode (0755), UID et GID (0), noms vides et date (0), même taille de tar ; en-tête"
+  echo "face à ${APP_REF:7:8} : même binaire, mêmes nom, mode (0755), UID et GID (0), noms vides et date (0), même taille de tar ; en-tête"
   echo "  différent par devmajor et devminor (vides chez GNU tar, zéros octaux chez BuildKit), donc par la somme de contrôle :"
   echo "  diff_id différent ; configuration identique hors historique et created (User, Env, Entrypoint, WorkingDir, plateforme"
   echo "  fixés comme la référence ; created : 0001-01-01, date nulle de Go, chez crane, que crane 0.20.6 ne permet pas de fixer,"

@@ -1,0 +1,26 @@
+# assemblage de la voie D, Go 1.26.10 (témoin) et 1.26.11, 2026-11-24T14:21:45Z, 2b787fe5, crane 0.20.6, tar (GNU tar) 1.35
+## 1.26.10 : binaire e3749c68b6babe6d, référence sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+1.26.10 a : couche f6bdd526c154614c9bb3a6f2d56d2a12fa50171c9c967a25e940826ec7612397, image sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+1.26.10 b : couche f6bdd526c154614c9bb3a6f2d56d2a12fa50171c9c967a25e940826ec7612397, image sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+OK   1.26.10 : image identique sur deux assemblages : sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+OK   1.26.10 : index du layout de référence : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   1.26.10 : binaire extrait de la couche de référence = binaire assemblé : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+OK   1.26.10 : taille du tar (référence, voie D) : 6199296 6199296
+octets différents : 18, aux positions 149 150 151 152 329 330 331 332 333 334 335 337 338 339 340 341 342 343
+OK   1.26.10 : octets différents hors somme de contrôle, devmajor et devminor : 0
+OK   1.26.10 : configuration hors rootfs, historique et created (référence = voie D) : 13f413ea2240d631
+OK   1.26.10 : created (référence, voie D) : 1970-01-01T00:00:00Z 0001-01-01T00:00:00Z
+DIGEST VOIE D|1.26.10|sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+## 1.26.11 : binaire 56f3cd7d256562be, référence sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
+1.26.11 a : couche 523cf831106f8c7ffe1fa3976938db70b6b4ed671e58136e89c978e440ed7212, image sha256:a4223414484792eba58326fa3608d994ddb8ee4d1d0bf4e7db2a0402780d9821
+1.26.11 b : couche 523cf831106f8c7ffe1fa3976938db70b6b4ed671e58136e89c978e440ed7212, image sha256:a4223414484792eba58326fa3608d994ddb8ee4d1d0bf4e7db2a0402780d9821
+OK   1.26.11 : image identique sur deux assemblages : sha256:a4223414484792eba58326fa3608d994ddb8ee4d1d0bf4e7db2a0402780d9821
+OK   1.26.11 : index du layout de référence : sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
+OK   1.26.11 : binaire extrait de la couche de référence = binaire assemblé : 56f3cd7d256562bef660f596de462af4105462356858b11f71cd04761c13b5c2
+OK   1.26.11 : taille du tar (référence, voie D) : 6199296 6199296
+octets différents : 18, aux positions 149 150 151 152 329 330 331 332 333 334 335 337 338 339 340 341 342 343
+OK   1.26.11 : octets différents hors somme de contrôle, devmajor et devminor : 0
+OK   1.26.11 : configuration hors rootfs, historique et created (référence = voie D) : 13f413ea2240d631
+OK   1.26.11 : created (référence, voie D) : 1970-01-01T00:00:00Z 0001-01-01T00:00:00Z
+DIGEST VOIE D|1.26.11|sha256:a4223414484792eba58326fa3608d994ddb8ee4d1d0bf4e7db2a0402780d9821
+## bilan : 14 cas, 0 écart(s)

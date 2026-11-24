@@ -23,7 +23,7 @@
 #   construire  NetworkPolicy construction-sans-sortie posée (politique/construction-sans-sortie.yaml), invariant contrôlé (une
 #               seule politique sélectionne les pods de construire-image, aucune politique de builds n'autorise de trafic) ;
 #               PipelineRun du gabarit en service (pipeline remplacée, commit de main, workspace PVC, runtimeClassName kata pour
-#               la seule tâche construire) : image attendue 3a7ca1b1, poussée par poc-images, signée par Chains ; taille de
+#               la seule tâche construire) : image attendue f5e6bcb0 (3a7ca1b1 avant la 07c), poussée par poc-images, signée par Chains ; taille de
 #               l'invité ; label tekton.dev/task du pod et délai avant l'étape construire ; témoins : label tekton.dev/task
 #               imposé par le créateur (taskRunSpecs, PipelineRun annulé une fois le pod lu), ancienne pipeline (construire-image
 #               qui tire ses entrées elle-même, relue dans l'historique git par taches : échec fermé) ; même PipelineRun sans runtimeClassName : pod de construction
@@ -44,9 +44,9 @@ export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/commun.sh"
 B03=${B03:-$HOME/.cache/supply-chain-poc/w/b03}                                   # entrées de la brique 03 (bancs du laptop)
-APP_LAYOUT=${APP_LAYOUT:-$HOME/.cache/supply-chain-poc/w/b04/app-layout}          # image sample-app de la brique 04
-APP_REF=${APP_REF:-sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5}   # sample-app par BuildKit (brique 04, voie A) ; 07c : APP_REF= pour Go 1.26.11
-BIN_REF=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11          # binaire de la brique 03
+APP_LAYOUT=${APP_LAYOUT:-$HOME/.cache/supply-chain-poc/w/b04-1.26.11/app-layout}  # image sample-app de la brique 04, Go 1.26.11 (07c, étape 7 ; w/b04/app-layout avant)
+APP_REF=${APP_REF:-sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7}   # sample-app par BuildKit (brique 04, voie A), Go 1.26.11 (07c, étape 7 ; 3a7ca1b1 avant)
+BIN_REF=56f3cd7d256562bef660f596de462af4105462356858b11f71cd04761c13b5c2          # binaire en Go 1.26.11 (07c ; e3749c68, brique 03, avant)
 ARBRE_DIST=f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a        # voie-d.sh
 ARBRE_DEPS=51ccd0964bea8a2065dfda803dad14b5c6246ad712c55bbccc1005c54cd7b10b        # voie-d.sh
 DEPOT_FERMETURE=entrees/sample-app/fermeture
@@ -57,7 +57,7 @@ FERMETURE_F2=$HOME/.cache/supply-chain-poc/03/f2/fermeture-1.digest   # fermetur
 WEB_DIST_DIGEST=sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
 TYPE_WEB_DIST=application/vnd.supply-chain.web-dist.v1
 BUILDKIT=$REG/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b          # buildkit.sh image
-BUILDER=${BUILDER:-$REG/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67}  # voie-d.sh image ; 07c : BUILDER= pour Go 1.26.11
+BUILDER=${BUILDER:-$REG/plateforme/builder-go-voie-d@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7}  # voie-d.sh image, Go 1.26.11 (07c, étape 7 ; d50ae575 avant)
 DOCKERFILE=$repo/poc/bricks/04-hermetic-repro/Dockerfile
 IMAGE=$REG/builds/sample-app
 SAMPLE_APP=workspace/sample-app
@@ -331,7 +331,7 @@ politique_sans_sortie() { # construction-sans-sortie posée ; invariant d'union 
 etape_construire() {
   local r q cons pub aa n t0 e
   [ -s "$T/pipeline.ref" ] || { echo "KO   pipeline non publiée (étape taches)" >&2; exit 1; }
-  echo "## prédiction (après buildkit.sh sans_reseau : image 3a7ca1b1 sans réseau, image de build en layout OCI)"
+  echo "## prédiction (après buildkit.sh sans_reseau : image ${APP_REF:7:8} sans réseau, image de build en layout OCI)"
   echo "PipelineRun $PR (gabarit de declencheurs, commit $TETE_J2) : réussi ; Trusted Resources vérifie la pipeline et les trois tâches"
   echo "  pod affinity assistant admis (contexte du gabarit, compte build sans jeton) ; PVC local-path sur sc-build"
   echo "  preparer : pod runc ; arbre $ARBRE_J2 ; fermeture, web/dist et image de build en layout OCI tirés dans le workspace"

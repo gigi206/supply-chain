@@ -198,3 +198,22 @@ Méthode : périmètre tiré de la liste des étapes de `08-trust-plane/rejeu.sh
 - **`mise.toml`** : Go 1.26.11 n'y est déclaré nulle part (promesse de l'étape 1 de ne pas le modifier). `voie-d.sh` lira la toolchain dans le cache des modules, comme `prefetch.sh` de la 03, sans toucher `GOROOT_DIR`.
 
 **Prédiction de la mesure suivante** ([`predire-voie-d.sh`](../predire-voie-d.sh), journal `predire-voie-d.log`) : assemblage de la voie D recopié de `voie-d.sh etape_assembler` sur un Zot jetable (127.0.0.1:5077). Témoin : binaire `e3749c68` face au layout `3a7ca1b1` ; puis binaire `56f3cd7d` face au layout `f5e6bcb0`. Dans les deux cas : deux assemblages identiques, index du layout = digest de référence, binaire de la référence = binaire assemblé, même taille de tar, écarts limités à la somme de contrôle, devmajor et devminor, configuration identique hors rootfs, historique et created, created `1970-01-01T00:00:00Z` face à `0001-01-01T00:00:00Z`. Le digest de la voie D n'est pas prédit (il diffère de la référence par construction) : il est relevé. **Bilan attendu : 14 cas, 0 écart.**
+
+**Mesure, résultat** ([journal](predire-voie-d.log), 2026-11-24T14:21:45Z ; note de 2026-11-24T14:27:25Z) : **14 cas, 0 écart**, conforme. Témoin 1.26.10 : voie D `c9244139…`, **égal au digest du dernier rejeu de la 08** (`08-trust-plane/resultats/voie-d-assembler.log`, l. 28) : la recopie est fidèle. **Go 1.26.11 : voie D `sha256:a4223414484792eba58326fa3608d994ddb8ee4d1d0bf4e7db2a0402780d9821`**, mêmes 18 octets d'écart (somme de contrôle, devmajor, devminor), même configuration, même created que face à `3a7ca1b1`. Registre jetable effacé.
+
+**Constat qui remet en cause le choix « deux digests »** (relevé à sec, même note) : plusieurs témoins des étapes rejouées de `preuves.sh` reposent sur le fait que l'image réelle et les images d'essai ont **le même digest** :
+- test 7, cas C : `builds/essai-images`, « même digest » poussé sans Chains ;
+- test 8, cas « webhook-seul » (l. 1502 à 1504 : cosign doit vérifier les 2 bundles pour le digest jugé) et le CONSTAT de l'ancien contrôle (l. 1515 et 1516 : « accepté » attendu) ;
+- contrôles 6 et 7, cas C2 (« même digest, autre dépôt »).
+
+Avec deux digests, ces cas deviennent triviaux (refus pour cause de digest) ou échouent : ils ne démontreraient plus rien, à chaque rejeu futur. Le choix « deux digests » est **suspendu** jusqu'à la décision du propriétaire ; les modifications de `preuves.sh` et `stockage.sh` faites dans ce sens sont retirées du dépôt (gardées hors du dépôt).
+
+Autres défauts trouvés en chemin : `construction.sh compte` lit `APP_LAYOUT@APP_REF` (défaut `w/b04/app-layout`, qui ne contient que `3a7ca1b1`) ; `s4d3.sh` de la 06 juge `builds/sample-app@$APP_DIGEST`.
+
+**Prix des deux options** :
+- **un seul digest** (images d'essai elles aussi en `f5e6bcb0`) : les témoins gardent leur sens et `preuves.sh` ne change pas de logique. En contrepartie, la tâche signée `publier-essai` porte `3a7ca1b1` en dur et doit être re-signée (accord nommé de signature). Il faut aussi une entrée de plus dans la liste revue, le cas de posture `param-en-trop-par-bundle.yaml` à repointer, la lecture de `taches.yml` par `preuves.sh` l. 1213 (première référence), et `APP_DIGEST` à porter dans `stockage.sh`, `tekton.sh` (5 littéraux), `tsa.sh`, `politique.sh`, `kyverno-*.sh` et `redemarrer.sh` ;
+- **deux digests** : aucune signature, mais 5 témoins affaiblis à chaque rejeu futur (ci-dessus), un journal du test 8 et des contrôles 6 et 7 réécrit avec des témoins plus faibles, et une logique de `preuves.sh` jamais exécutée que seul un rejeu de zéro validerait.
+
+Faits pour les deux options (dans ce commit) : `voie-d.sh` (Go 1.26.11 lu dans le cache des modules, image de build exigée `8c11e856`, binaire `56f3cd7d`, référence `f5e6bcb0`), `buildkit.sh` (`BUILDER_D`, `APP_REF`, `BIN_REF`), `construction.sh` (défauts `APP_REF`, `BUILDER`, `APP_LAYOUT`).
+
+**Prédiction** ([`reference-layout.sh`](../reference-layout.sh), journal `reference-layout.log`) : layout `f5e6bcb0` du banc copié sous `~/.cache/supply-chain-poc/w/b04-1.26.11/app-layout` (lu par `construction.sh compte`, et par `stockage.sh registre` selon l'option) : index = `f5e6bcb0`, blobs conformes avant et après, copie identique. **Bilan attendu : 4 cas, 0 écart.**
