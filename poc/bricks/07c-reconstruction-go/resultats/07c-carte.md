@@ -46,3 +46,21 @@ Décision du propriétaire, verbatim : « Chantier à part ». Périmètre et ac
 **Étape 3, résultat** ([journal](pousser-builder.log), 13:20:30 à 13:20:56 UTC ; note de 2026-11-24T13:21:05Z) : **9 cas, 0 écart**, conforme. `192.168.161.13:5000/plateforme/builder-go-voie-d@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7`, tag `go1.26.11`, relu en anonyme (Env de la voie D) ; tags `a` et `b` toujours `d50ae575`. Authentification effacée, dossier de travail effacé.
 
 **Heures** : 13:11:04 à 13:21:05 UTC ; **total de la 07c : 0 h 10 min 01 s** pour 10 h estimées.
+
+## Étape 4 : relevé à sec du périmètre (note de 2026-11-24T13:21:54Z)
+
+Épinglages du chemin vivant (lecture seule, hors bancs et essais historiques) :
+- **image de build `d50ae575`** : `construction.sh` (l. 60), `bascule.sh` de la 03 (l. 50), `buildkit.sh` (l. 380), et la tâche signée `politique/taches/construire-image.signee.yaml` (l. 28 et 59) ;
+- **image `3a7ca1b1` attendue** : `construction.sh` (l. 48), `voie-d.sh`, `buildkit.sh`, `durcissement.sh` de la 08c (l. 886), `declencheur.sh` de la 01 (l. 31), `replay.sh` de la 10 (l. 74), `plateforme.sh` de la 07a (l. 96, cible du CronJob de scan), `s6a.sh` de la 06 (l. 55) ;
+- **images d'essai signées en J4** (`APP_DIGEST` de `stockage.sh`, `tekton.sh`, `tsa.sh`, `politique.sh`, `kyverno-*.sh`, `redemarrer.sh`) : copies de `3a7ca1b1` sous `builds/essai-*`, sans lien avec Go ; à laisser.
+
+Ce que l'étape 4 changerait :
+- la tâche `construire-image` rendue avec `8c11e856`, **re-signée** (`SIGNER=1`, clé des tâches lue par `tkn` sans être affichée) et publiée en bundle, avec la pipeline `sample-app` et celle de la bascule de la 03 (à mesurer : laquelle est en service) ;
+- la **liste revue** `politique/porte/taches.yml` augmentée des nouvelles références, anciennes gardées, puis posée dans le cluster ;
+- un PipelineRun qui doit produire `f5e6bcb0…`, signé par Chains, admis par la porte ;
+- la cible du CronJob `scan/scan-sample-app` portée à `f5e6bcb0…` ;
+- les scripts du rejeu ci-dessus.
+
+Journaux : `lancer` de `commun.sh` réécrit `resultats/<préfixe>-<étape>.log`. Il faut un préfixe propre à la 07c pour ne réécrire aucun journal.
+
+**Heures** : 13:11:04 à 13:21:54 UTC ; **total de la 07c : 0 h 10 min 50 s** pour 10 h estimées.
