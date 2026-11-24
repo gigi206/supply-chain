@@ -200,3 +200,9 @@ Non exercés encore : un passage du timer, `Wants` avec un lecteur en échec, le
 ## Étape 5, le seuil, prédiction (2026-11-24T21:09:31Z)
 
 [`seuil.sh`](../seuil.sh) : séries de Prometheus lues par l'auditeur contre le recalcul signé (`comparer_zot.py` sans le passage à clé étrangère). Attendu : **8 cas, 0 écart**, 134 séries, 105 valeurs comparées. Mesure à relire après un nouveau passage du timer.
+
+### Résultat de l'étape 5 et passage du timer, prédiction (2026-11-24T21:09:53Z)
+
+[`e5-seuil.log`](e5-seuil.log) (21:09:33 UTC, dépôt `6ebc7eda`) : **8 cas, 0 écart**. 134 séries dans Prometheus, 105 valeurs comparées au recalcul signé, 41 signatures. **Seuil de docs/02 tenu à cet instant** (« 0 écart avec le recalcul »).
+
+Passage du timer (`OnUnitActiveSec=15min`, premier passage à 21:07:38 UTC) : à partir de 21:24 UTC, `SUFFIXE=-2 seuil.sh` attendu **8 cas, 0 écart**, et âge du passage inférieur à 180 s, donc un passage de 21:22:38 à 21:23:38 environ (`AccuracySec` d'une minute par défaut).
