@@ -115,21 +115,31 @@ ATTENDUS = {
     "absent": ([], None),
 }
 
+def cas(requete, attendu):
+    """promtool ne tient pas deux NaN pour égaux (second passage, e6-promql-banc-2.log) : une requête à NaN attendu devient deux cas, les
+    valeurs qui sont des nombres (E >= -Inf écarte NaN), puis l'ensemble des NaN (E != bool E vaut 1 pour NaN, 0 sinon)."""
+    nan = {e for e, v in attendu.items() if v == "NaN"}
+    essais = [(f"({requete}) >= -Inf", {e: v for e, v in attendu.items() if e not in nan}),
+              (f"({requete}) != bool ({requete})", {e: int(e in nan) for e in attendu})] if nan else [(requete, attendu)]
+    return [{"expr": x, "eval_time": "10m", "exp_samples": [{"labels": e, "value": v} for e, v in a.items()]} for x, a in essais]
+
+
 with open(sys.argv[1], encoding="utf-8") as f:
     requetes = {f"{p['id']}{t['refId']}": t["expr"] for p in json.load(f)["panels"] for t in p.get("targets", [])}
 if sys.argv[2:]:
     ou, ancien, nouveau = sys.argv[2:]
+    if ancien == nouveau:
+        sys.exit("mutant identique")
     if ancien not in requetes[ou]:
         sys.exit(f"mutant : « {ancien} » absent de {ou}")
     requetes[ou] = requetes[ou].replace(ancien, nouveau)
+    print(requetes[ou], file=sys.stderr)
 tests = []
 for etat, (series, attendus) in ATTENDUS.items():
     attendus = dict.fromkeys(requetes, {}) if attendus is None else attendus
     if set(attendus) != set(requetes):
         sys.exit(f"{etat} : requêtes et attendus différents : {sorted(set(attendus) ^ set(requetes))}")
     tests.append({"name": etat, "interval": "1m", "input_series": [{"series": s, "values": f"{v}x20"} for s, v in series],
-                  "promql_expr_test": [{"expr": requetes[q], "eval_time": "10m", "exp_samples": [{"labels": e, "value": v} for e, v in attendus[q].items()]}
-                                       for q in sorted(requetes)]})
-# le test est du YAML : .nan, et non la chaîne "NaN" (premier passage, e6-promql-banc.log)
-sys.stdout.write(json.dumps({"evaluation_interval": "1m", "tests": tests}, ensure_ascii=False, indent=1).replace('"value": "NaN"', '"value": .nan'))
+                  "promql_expr_test": [c for q in sorted(requetes) for c in cas(requetes[q], attendus[q])]})
+json.dump({"evaluation_interval": "1m", "tests": tests}, sys.stdout, ensure_ascii=False, indent=1)
 print(f"{len(requetes)} requêtes, {len(tests)} états, {sum(len(t['promql_expr_test']) for t in tests)} cas", file=sys.stderr)

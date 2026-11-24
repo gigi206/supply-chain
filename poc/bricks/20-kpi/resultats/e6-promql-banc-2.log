@@ -1,0 +1,46 @@
+# promql-banc.sh, 2026-11-24T21:43:46Z, dépôt 9833f4fc, script 9ac13b63095b7249, témoins 45f47edda2be5d3a, tableau 6b46d45734a9639b, correctif 069ec1c12bcdc51f
+OK   sha256 de l'archive de Prometheus : 0388822ace519c5a3a8ef556a541ce1b536e21d872f82deded465bd27a5a0699
+promtool, version 3.13.5 (branch: HEAD, revision: f497435984d1ca1d84cda5ed309387ac2eb1f8f6)
+## 1. tableau, quatre états
+OK   témoins écrits, requêtes toutes couvertes (code) : 0
+29 requêtes, 4 états, 116 cas
+KO   requêtes du tableau : refusé (attendu passé)
+    FAILED:
+      expr: "kpi_scan_ecartees / kpi_scan_entrees", time: 10m,
+          exp: {depot="builds/sample-app", digest="aaaaaaaaaaaa", instance="local", job="fichiers"} 5E-01, {depot="builds/sample-app", digest="bbbbbbbbbbbb", instance="local", job="fichiers"} NaN, {depot="builds/sample-app-deb", digest="cccccccccccc", instance="local", job="fichiers"} 0E+00
+          got: {depot="builds/sample-app", digest="aaaaaaaaaaaa", instance="local", job="fichiers"} 5E-01, {depot="builds/sample-app", digest="bbbbbbbbbbbb", instance="local", job="fichiers"} NaN, {depot="builds/sample-app-deb", digest="cccccccccccc", instance="local", job="fichiers"} 0E+00
+  
+  
+## 2. mutants du tableau
+OK   mutant 1, 4A : « avg( » devient « sum( » : refusé
+OK   mutant 2, 5C : « count(kpi_replay_identique) » devient « count(kpi_replay_identique == 1) » : refusé
+OK   mutant 3, 10A : «  - kpi_scan_kev_ecartees » devient «  » : refusé
+OK   mutant 4, 11A : « kpi_scan_ecartees /  » devient « 1 - kpi_scan_ecartees /  » : refusé
+OK   mutant 5, 12A : «  or (0 * count(kpi_l3_verifie)) » devient «  » : refusé
+OK   mutant 6, 12A : « 0 * count(kpi_l3_verifie) » devient « vector(0) » : refusé
+OK   mutant 7, 13A : « on (depot, kev, ouverture) » devient « on (kev, ouverture) » : refusé
+OK   mutant 8, 13A : « on (depot, kev, ouverture) » devient « on (depot, kev) » : refusé
+OK   mutant 9, 14A : « on (depot, kev, ouverture) » devient « on (kev, ouverture) » : refusé
+OK   mutant 10, 14A : « on (depot, kev, ouverture) » devient « on (depot, kev) » : refusé
+OK   mutant 11, 16A : « min by » devient « max by » : refusé
+OK   mutant 12, 17A : «  or (0 * sum by (depot, digest) (kpi_l3_verifie)) » devient «  » : refusé
+OK   mutant 13, 17A : « 0 * sum by (depot, digest) (kpi_l3_verifie) » devient « 0 * kpi_l3_verifie » : refusé
+OK   mutant 14, 18A : « , retire) » devient « , retire, depot) » : refusé
+## 3. règles d'alerte, alertes-kpi.patch sur une copie
+OK   correctif appliqué (code) : 0
+OK   promtool check rules : valide
+  Checking T/copie/poc/bricks/19-observabilite/config/regles/alertes.yml
+    SUCCESS: 17 rules found
+  
+OK   règles de plus que celles de HEAD : 2
+OK   toute alerte a une ligne expr : 0
+OK   tests des règles, anciens et nouveaux : passé
+    SUCCESS
+  
+OK   mutant 1, KpiPassageEnRetard : « 45 * 60 » devient « 90 * 60 » : refusé
+OK   mutant 2, KpiPassageEnRetard : « 45 * 60 » devient « 20 * 60 » : refusé
+OK   mutant 3, KpiPassageEnRetard : «  or absent(kpi_exportateur_passage_timestamp_seconds) » devient «  » : refusé
+OK   mutant 4, KpiPassageEnRetard : « for: 10m » devient « for: 0m » : refusé
+OK   mutant 5, KpiSignatureRefusee : « > 0 » devient « > 1 » : refusé
+OK   mutant 6, KpiSignatureRefusee : « kpi_signatures_refusees > 0 » devient « sum(kpi_signatures_refusees) > 0 » : refusé
+## bilan : 28 cas, 1 écart(s)

@@ -38,3 +38,13 @@ Affichage réel dans Grafana (dont `noValue`, couleurs, lisibilité) ; Alertmana
 - **Passage 3** ([journal](e6-tableau-sec.log), 21:43:32 UTC) : 31 cas, **0 écart**.
 
 Correctif du témoin : `.nan`. Le tableau et ses requêtes ne changent pas. Attendu du second passage 1 (`SUFFIXE=-2`) : 28 cas, 0 écart. Il reste aveugle : aucun témoin n'a été évalué.
+
+## Second passage 1, et troisième (note de 2026-11-24T21:45:59Z)
+
+[Second passage](e6-promql-banc-2.log) (21:43:46 UTC) : 28 cas, **1 écart**. `promtool` ne tient pas deux `NaN` pour égaux, même attendu et obtenu. **Ce que ce journal ne prouve pas** : ses 14 lignes « refusé » de mutants du tableau, car le test de base échouait déjà ; un mutant sans effet y aurait été « refusé » aussi. Les mutants de règles ne sont pas touchés (leur test de base passe).
+
+Corrections, sans changer ni le tableau ni les requêtes :
+- la requête à `NaN` attendu (11A, état mixte) devient deux cas : les nombres, puis l'ensemble des `NaN` ; donc 117 cas pour `promtool` ;
+- un mutant du tableau ne compte que si le test de base passe **et** si la seule requête en échec est la mutée.
+
+Attendu du troisième passage (`SUFFIXE=-3`) : 28 cas, 0 écart ; les 28 autres requêtes ont déjà été évaluées conformes au second (aucun autre échec affiché), donc seuls 11A et les mutants restent aveugles.

@@ -31,14 +31,18 @@ essai() { (cd "$(dirname "$1")" && "$T/promtool" test rules "$(basename "$1")") 
   "$T/promtool" --version | head -1
   echo "## 1. tableau, quatre états"
   python3 -I "$here/tableau_temoins.py" "$TAB" 2> "$T/compte" > "$T/tableau.yml"; attendu "témoins écrits, requêtes toutes couvertes (code)" "$?" 0; cat "$T/compte"
-  attendu "requêtes du tableau" "$(essai "$T/tableau.yml")" passé
+  base=$(essai "$T/tableau.yml"); attendu "requêtes du tableau" "$base" passé
   [ "$(tail -1 "$T/sortie")" = "  SUCCESS" ] || sed 's/^/  /' "$T/sortie" | head -60
   echo "## 2. mutants du tableau"
   m=0
   while IFS='|' read -r ou ancien nouveau; do
     m=$((m + 1))
     python3 -I "$here/tableau_temoins.py" "$TAB" "$ou" "$ancien" "$nouveau" > "$T/mutant.yml" 2> "$T/compte" || { cat "$T/compte"; echo > "$T/mutant.yml"; }
-    attendu "mutant $m, $ou : « $ancien » devient « $nouveau »" "$(essai "$T/mutant.yml")" refusé
+    # un refus ne prouve rien si le test de base échoue déjà, ni si une autre requête que la mutée échoue (second passage, e6-promql-banc-2.log)
+    v=$(essai "$T/mutant.yml"); x=$(head -1 "$T/compte")
+    [ "$v" != refusé ] || v="refusé, $(grep -E '^ *expr: ' "$T/sortie" | grep -cvF -- "$x") autre(s)"
+    [ "$base" = passé ] || v="sans objet"
+    attendu "mutant $m, $ou : « $ancien » devient « $nouveau »" "$v" "refusé, 0 autre(s)"
   done <<'FIN'
 4A|avg(|sum(
 5C|count(kpi_replay_identique)|count(kpi_replay_identique == 1)
