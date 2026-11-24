@@ -217,3 +217,9 @@ Autres défauts trouvés en chemin : `construction.sh compte` lit `APP_LAYOUT@AP
 Faits pour les deux options (dans ce commit) : `voie-d.sh` (Go 1.26.11 lu dans le cache des modules, image de build exigée `8c11e856`, binaire `56f3cd7d`, référence `f5e6bcb0`), `buildkit.sh` (`BUILDER_D`, `APP_REF`, `BIN_REF`), `construction.sh` (défauts `APP_REF`, `BUILDER`, `APP_LAYOUT`).
 
 **Prédiction** ([`reference-layout.sh`](../reference-layout.sh), journal `reference-layout.log`) : layout `f5e6bcb0` du banc copié sous `~/.cache/supply-chain-poc/w/b04-1.26.11/app-layout` (lu par `construction.sh compte`, et par `stockage.sh registre` selon l'option) : index = `f5e6bcb0`, blobs conformes avant et après, copie identique. **Bilan attendu : 4 cas, 0 écart.**
+
+**Résultat** ([journal](reference-layout.log), 2026-11-24T14:27:56Z ; note de 2026-11-24T14:27:57Z) : **4 cas, 0 écart**, conforme ; 2,6 Mo, 3 blobs.
+
+**En attente** : décision du propriétaire, « un seul digest » (re-signature de `publier-essai`, accord nommé) ou « deux digests » (5 témoins affaiblis). Rien n'est lancé dans le cluster ni sur les VM.
+
+**Heures** : reprise de 14:15:44 à 14:27:57 UTC : 12 min 13 s ; **total de la 07c : au plus 1 h 02 min 26 s** pour 10 h estimées.
