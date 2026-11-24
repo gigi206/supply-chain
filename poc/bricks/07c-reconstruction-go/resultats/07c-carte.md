@@ -478,3 +478,13 @@ Rien n'est écrit, ni sur les VM, ni dans Zot, ni dans Grafana. La correction, c
 Reconstruire le deb « en Go 1.26.11 » ne corrigerait donc rien par la voie de la 07c. La correction passerait par un `golang-1.24` corrigé côté Debian (nouvel épinglage du verrou, rejeu de la 06), ou par un VEX si le code n'est pas atteignable. C'est un choix du propriétaire, non traité ici.
 
 **Heures de la 07c** : la tâche est hors du périmètre de la 07c (réserve d'une autre brique). Elle n'est pas comptée.
+
+## GO-2026-6859 sur le deb : un VEX est-il possible ? (note de 2026-11-24T17:44:56Z)
+
+Choix du propriétaire, verbatim : « Étudier un VEX ». Aucune nouvelle mesure n'est nécessaire : la question a déjà été mesurée par la 07b sur le binaire du deb `60f25f5c`, le même artefact que celui du relevé de 17:40:25Z.
+- [`deb-tri-2.log`](../../07a-sbom-grype/resultats/deb-tri-2.log), l. 167 : `GO-2026-6859 | Medium | C | net/http(oui) | 41 / 149`. La classe C de `deb-tri.sh` (l. 13) signifie « au moins un symbole listé présent : non couvert ».
+- La fiche OSV a été relue par ce passage (l. 97, sha256 `b7850110…`).
+- L'atteignabilité a été lue dans les sources de Go 1.24.7 pour l'image `3a7ca1b1` ([`07b-carte.md`](../../07a-sbom-grype/resultats/07b-carte.md), l. 2322) : `globalOptionsHandler` appelle `MaxBytesReader` et répond par défaut aux requêtes `OPTIONS *`. **Non vérifié** dans les sources 1.24.4 de Debian ; c'est la même branche 1.24, et la classe C suffit à exclure `vulnerable_code_not_present`.
+- Le VEX du deb publié le 24/11 (`builds/vex/sample-app-deb@44f86e53…`, 23 énoncés) ne couvre pas GO-2026-6859.
+
+**Conclusion** : aucune des justifications `not_affected` n'est mesurée. Comme pour l'image, la seule correction est une stdlib corrigée, donc un `golang-1.24` de Debian corrigé ou une autre toolchain pour le deb. C'est un choix du propriétaire. Rien n'est signé ni publié.
