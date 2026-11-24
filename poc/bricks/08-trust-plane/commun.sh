@@ -2,7 +2,8 @@
 # Le script appelant pose `here` (son répertoire) avant de charger ce fichier.
 . "${BASH_SOURCE[0]%/*}/distro.sh"
 repo=$(git -C "$here" rev-parse --show-toplevel)
-R=${RESULTATS:-$here/resultats}   # 07c (24/11/2026) : RESULTATS=<dossier> pour ne réécrire aucun journal existant
+R=$here/resultats
+RJ=${RESULTATS:-$R}   # 07c (24/11/2026) : RESULTATS=<dossier> reçoit les journaux de lancer et chrono.tsv (R reste lu pour les entrées)
 O=${CONFIANCE_DIR:-$HOME/.cache/supply-chain-poc/08}
 S=$O/secrets
 P=$O/pki
@@ -18,7 +19,7 @@ declare -A IP=([sc-confiance]=192.168.161.11 [sc-build]=192.168.161.12 [sc-stock
 SSH_OPTS=(-i "$O/ssh/id_ed25519" -o UserKnownHostsFile="$O/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
 mkdir -p "$R" "$P" "$W"
 (umask 077 && mkdir -p "$S")
-chrono() { printf '%s\t%s\t%s\n' "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${2:-}" >> "$R/chrono.tsv"; }
+chrono() { printf '%s\t%s\t%s\n' "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${2:-}" >> "$RJ/chrono.tsv"; }
 sur() { local vm=$1; shift; ssh "${SSH_OPTS[@]}" "poc@${IP[$vm]}" "$@"; }
 copier() { # vm répertoire-distant fichiers…
   local vm=$1 d=$2; shift 2
@@ -332,7 +333,7 @@ lancer() { # préfixe-du-journal jalon étape… : chaque étape etape_<nom> tou
   for e in "$@"; do declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }; done
   for e in "$@"; do
     chrono "$j $e"
-    { echo "# ${0##*/} $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/$p-$e.log"
+    { echo "# ${0##*/} $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$RJ/$p-$e.log"
     chrono "$j $e fait"
   done
 }

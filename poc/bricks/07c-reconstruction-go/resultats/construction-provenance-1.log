@@ -1,0 +1,10 @@
+# construction.sh provenance, 2026-11-24T13:28:43Z
+## prédiction
+cosign (clé de Chains) : enveloppes valides sur sc-stockage.poc.test:5000/builds/sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7, dont celle du PipelineRun j7-sample-app (invocationId 9539952b-07a7-4a0b-a6e1-084304d0e8af) ;
+  buildType slsa-tekton ; sujet sc-stockage.poc.test:5000/builds/sample-app ; resolvedDependencies : pipeline et trois tâches (bundles), images d'étape (BuildKit,
+  outils), git+https://…/workspace/sample-app.git@sha1:6391fd437f26696847041be3226bbbf633f55a2f, fermeture, web/dist et image de build par digest, déclarés désormais
+  par preparer-entrees ;
+  runtimeClassName kata dans les paramètres externes (taskRunSpecs) et dans le TaskRun construire ; autre clé refusée
+WARNING: Skipping tlog verification is an insecure practice that lacks transparency and auditability verification for the attestation.
+Error: loading verifierfrom key opts: loading public key: open ~/Documents/git/github/gigi206/supply-chain/poc/bricks/07c-reconstruction-go/resultats/chains-cle-publique.pem: no such file or directory
+error during command execution: loading verifierfrom key opts: loading public key: open ~/Documents/git/github/gigi206/supply-chain/poc/bricks/07c-reconstruction-go/resultats/chains-cle-publique.pem: no such file or directory

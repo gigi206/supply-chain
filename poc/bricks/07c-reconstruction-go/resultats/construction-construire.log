@@ -25,3 +25,122 @@ OK   politiques qui sélectionnent les pods de construire-image, sans entrée ni
 OK   politiques de builds qui autorisent du trafic (règles ingress ou egress ; elles s'additionneraient) : 0
 OK   CiliumNetworkPolicy de builds qui sélectionnent les pods de construire-image et autorisent du trafic : 
 ## j7-sample-app créé ([{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}],"runtimeClassName":"kata"}}])
+processus QEMU du sandbox de j7-sample-app-construire-pod : 1
+affinity assistant : affinity-assistant-474a2eef86-0 sur sc-build, phase Running
+### TaskRun j7-sample-app-construire (Succeeded, pod j7-sample-app-construire-pod)
+     step-construire : invité : 3 vCPU, 6119664 kB ; racine de BuildKit : tmpfs ; image de build sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7, 3 blobs conformes
+     step-construire : entrees : virtiofs ro,relatime ; écriture refusée
+     step-construire : time="2026-11-24T13:27:06Z" level=warning msg="failed check for fsverity support" error="mkdir /workspace/entrees/builder/.fsverity-check-2276335330: read-only file system" path=/workspace/entrees/builder
+     step-construire : #1 [internal] load build definition from Dockerfile
+     step-construire : #1 transferring dockerfile: 680B done
+     step-construire : #1 DONE 0.0s
+     step-construire : 
+     step-construire : #2 [context deps] load .dockerignore
+     step-construire : #2 transferring deps: 2B done
+     step-construire : #2 DONE 0.0s
+     step-construire : 
+     step-construire : #3 [context builder] load metadata for docker.io/library/builder@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+     step-construire : #3 DONE 0.0s
+     step-construire : 
+     step-construire : #4 [internal] load .dockerignore
+     step-construire : #4 transferring context: 2B done
+     step-construire : #4 DONE 0.0s
+     step-construire : 
+     step-construire : #5 [context deps] load from client
+     step-construire : #5 transferring deps: 113.42kB 0.0s done
+     step-construire : #5 DONE 0.0s
+     step-construire : 
+     step-construire : #6 [internal] load build context
+     step-construire : #6 transferring context: 56.68kB 0.0s done
+     step-construire : #6 DONE 0.0s
+     step-construire : 
+     step-construire : #7 [context builder] OCI load from client
+     step-construire : #7 resolve docker.io/library/builder@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7 done
+     step-construire : #7 sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e 9.44MB / 76.24MB 0.2s
+     step-construire : #7 sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e 16.78MB / 76.24MB 0.3s
+     step-construire : #7 sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e 27.26MB / 76.24MB 0.5s
+     step-construire : #7 sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e 37.15MB / 76.24MB 0.6s
+     step-construire : #7 sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e 48.23MB / 76.24MB 0.8s
+     step-construire : #7 sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e 61.87MB / 76.24MB 0.9s
+     step-construire : #7 sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e 75.50MB / 76.24MB 1.1s
+     step-construire : #7 sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e 76.24MB / 76.24MB 1.1s done
+     step-construire : #7 extracting sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e
+     step-construire : #7 extracting sha256:25289c758d11f18dc7f9b50b246a9122c34d4a10edd796ca4a6f89215a06018e 3.9s done
+     step-construire : #7 DONE 5.0s
+     step-construire : 
+     step-construire : #8 [build 1/4] WORKDIR /src
+     step-construire : #8 DONE 2.0s
+     step-construire : 
+     step-construire : #9 [build 2/4] COPY . .
+     step-construire : #9 DONE 2.1s
+     step-construire : 
+     step-construire : #10 [build 3/4] RUN --network=none --mount=type=bind,from=deps,target=/deps     GOPROXY=file:///deps/deps/gomod/pkg/mod/cache/download GOMODCACHE=/tmp/mod GOCACHE=/tmp/cache     go build -trimpath -buildvcs=false -ldflags "-s -w -buildid= -X main.Version=1.0.0" -o /out/sample-app .
+     step-construire : #10 2.216 go: downloading github.com/go-chi/chi/v5 v5.2.3
+     step-construire : #10 DONE 18.2s
+     step-construire : 
+     step-construire : #11 [stage-1 1/1] COPY --from=build /out/sample-app /sample-app
+     step-construire : #11 DONE 0.0s
+     step-construire : 
+     step-construire : #12 exporting to oci image format
+     step-construire : #12 exporting layers
+     step-construire : #12 exporting layers 0.2s done
+     step-construire : #12 rewriting layers with source-date-epoch 0 (1970-01-01 00:00:00 +0000 UTC)
+     step-construire : #12 rewriting layers with source-date-epoch 0 (1970-01-01 00:00:00 +0000 UTC) 0.2s done
+     step-construire : #12 exporting manifest sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 done
+     step-construire : #12 exporting config sha256:b2ebfe8d7a141da5bb39ab29c61e9f9397786beff5ba024ded6c8eff4642a6cf done
+     step-construire : #12 sending tarball 0.0s done
+     step-construire : #12 DONE 0.5s
+     step-construire : construction en 28 s : sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 ; tmpfs de BuildKit 1124 Mo
+### TaskRun j7-sample-app-preparer (Succeeded, pod j7-sample-app-preparer-pod)
+     step-sources : git version 2.52.0 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     step-entrees : fermeture : 7 fichiers ; web/dist : 2 fichiers ; image de build en layout OCI : sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+### TaskRun j7-sample-app-publier (Succeeded, pod j7-sample-app-publier-pod)
+     step-publier : publiée : sc-stockage.poc.test:5000/builds/sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 (relue en lecture anonyme)
+## mesures
+OK   PipelineRun j7-sample-app : True|Succeeded
+OK   kata : QEMU : -smp 3 -m 6176M
+TaskRun construire : TrustedResourcesVerified=True, pod j7-sample-app-construire-pod
+TaskRun preparer : TrustedResourcesVerified=True, pod j7-sample-app-preparer-pod
+TaskRun publier : TrustedResourcesVerified=True, pod j7-sample-app-publier-pod
+PipelineRun : TrustedResourcesVerified=True ; résultats IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app, IMAGE_DIGEST=sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
+pod construire : nœud sc-build, runtimeClassName kata, tekton.dev/task construire-image, étapes step-construire=privilégiée
+pod preparer : nœud sc-build, runtimeClassName -, tekton.dev/task preparer-entrees, étapes step-sources=uid 65532 step-entrees=uid 65532
+pod publier : nœud sc-build, runtimeClassName -, tekton.dev/task publier-image, étapes step-publier=uid pod
+OK   label tekton.dev/task du pod construire : construire-image
+CONSTAT  étape construire lancée 3 s après le premier conteneur du pod (fenêtre de démarrage mesurée : 0,5 à 1,1 s ; horodatages à la seconde)
+OK   image de sample-app construite dans le PipelineRun (voie A, sans sortie réseau, image de build en layout OCI) : sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
+OK   arbre du commit (dépôt Forgejo) : 30e808ffa327288c656ddda7b6fafe4005234b77
+## Chains
+TaskRun j7-sample-app-construire signé=true
+TaskRun j7-sample-app-preparer signé=true
+TaskRun j7-sample-app-publier signé=true
+OK   PipelineRun j7-sample-app signé par Chains : true
+## audit de Zot : écritures de manifestes de builds/sample-app depuis 2026-11-24T13:26:44Z
+{"t":"13:27:42","compte":"poc-images","action":"PUT","objet":"sha256…f5e6bcb0e0fb","code":201}
+{"t":"13:27:45","compte":"poc-build","action":"PUT","objet":"sha256…f5e6bcb0e0fb.att","code":201}
+{"t":"13:27:48","compte":"poc-build","action":"PUT","objet":"sha256…f5e6bcb0e0fb.att","code":201}
+OK   image poussée par poc-images (1 écriture(s) par digest)
+## témoin : label tekton.dev/task imposé par le créateur (PipelineRun annulé une fois le pod lu)
+taskRunSpecs : {"labels":{"tekton.dev/task":"autre","essai":"etiquette"}}
+TaskRun j7-sample-app-etiquette-construire : tekton.dev/task=construire-image, essai=etiquette
+pod j7-sample-app-etiquette-construire-pod : tekton.dev/task=construire-image, essai=etiquette
+OK   label tekton.dev/task du pod, imposé à « autre » par le créateur : construire-image
+OK   autre label du créateur, transmis au pod (témoin) : etiquette
+PipelineRun j7-sample-app-etiquette annulé : False|Cancelled|PipelineRun "j7-sample-app-etiquette" was cancelled
+## témoin : ancienne pipeline (sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:fb45b05dd405b3297e436622eb868c2c81a719dd48d66fa34ff1b54154111465)
+### TaskRun j7-sample-app-ancienne-construire (StepFailed, pod j7-sample-app-ancienne-construire-pod)
+     step-sources : fatal: unable to access 'https://sc-stockage.poc.test:3000/workspace/sample-app.git/': Could not resolve host: sc-stockage.poc.test (Timeout while contacting DNS servers)
+     step-entrees : 2026/11/24 13:28:28 Skipping step because a previous step failed
+     step-construire : 2026/11/24 13:28:28 Skipping step because a previous step failed
+PipelineRun j7-sample-app-ancienne : False|Failed|Tasks Completed: 1 (Failed: 1, Cancelled 0), Skipped: 1
+OK   ancienne construire-image en échec fermé : Could not resolve host: sc-stockage.poc.test (Timeout while contacting DNS servers)
+OK   TaskRun publier de l'ancienne pipeline : 0
+OK   écritures de poc-images depuis 2026-11-24T13:28:02Z : 0
+## même PipelineRun sans runtimeClassName
+PipelineRun j7-sample-app-sans-kata : False|Failed|Tasks Completed: 2 (Failed: 1, Cancelled 0), Skipped: 1
+TaskRun construire : PodAdmissionFailed : pods "j7-sample-app-sans-kata-construire-pod" is forbidden: violates PodSecurity "restricted:latest": privileged (container "step-construire" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container "step-construire" must set securityContext.allowPrivilegeEscalatio
+TaskRun preparer : Succeeded : All Steps have completed executing
+OK   pod de construction refusé hors Kata (Pod Security restricted de builds)
+OK   TaskRun preparer du PipelineRun sans Kata : Succeeded
+OK   TaskRun publier du PipelineRun sans Kata : 0
+OK   écritures de poc-images depuis 2026-11-24T13:28:30Z : 0
