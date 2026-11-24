@@ -79,3 +79,9 @@ Conséquence pour le KPI « délai de correction des KEV » (décision « Loki, 
 - **Décision du propriétaire** (verbatim, 24/11, sur « Laquelle porte le nom « L3 vérifié » dans Grafana ? ») : **« VSA seule (Recommandé) »**. Le taux de provenance s'affiche à côté, sous son nom littéral.
 - **Script corrigé** : `taux_vsa_slsa_build_level_3` devient `taux_l3_verifie` ; la vérification de la signature d'image s'arrête désormais sur un motif inconnu, au lieu de compter 0.
 - **Second passage** (`SUFFIXE=-2`), attendu : 10 cas, 0 écart ; mêmes lignes `KPI|` que `e2-recalcul.log` une fois les noms `vsa_slsa_build_level_3` et `taux_vsa_slsa_build_level_3` remplacés par `l3_verifie` et `taux_l3_verifie` (0 ligne de différence), si aucun scan ni commit d'épinglage n'a lieu entre-temps.
+
+## Résultat du second passage (note de 2026-11-24T19:32:27Z)
+
+[Journal](e2-recalcul-2.log) : 2026-11-24 à 19:32:02 UTC, dépôt `08a1be03`, scripts `b99a6826e4bf024a`. **10 cas, 0 écart** ; **0 ligne `KPI|` de différence** avec le premier passage, aux deux noms près. `taux_l3_verifie` = 1/4.
+
+Heures : 19:32:00 à 19:32:27, 0 min 27 s (l'attente de la réponse du propriétaire et la relecture qui précède ne sont pas comptées).

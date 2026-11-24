@@ -126,3 +126,5 @@ Sources : la [fiche des besoins](../../poc/bricks/07a-sbom-grype/resultats/adr00
 ## Statut accepté (note de 2026-11-24T16:28:55Z)
 
 À la question « Passer l'ADR 0004 au statut « Accepté » ? », posée après la pose du tableau, le propriétaire répond (verbatim) : « Oui, Accepté ». Les décisions 1 à 9 et leurs limites restent telles qu'écrites ci-dessus. Les écarts avec `docs/02` (projection Dependency-Track reportée, pas de score « CVSS × EPSS ») font partie de la décision.
+
+**Additif (brique 20, note de 2026-11-24T19:32:27Z).** Le recalcul signé (cosign, clés versionnées) est égal aux séries de `entrees-scan` dans Prometheus pour `f5e6bcb0` (5 entrées, 5 écartées, 0 KEV) et le deb (67, 23, 0). Les listes dans Loki sont incomplètes : seul le scan le plus récent de chaque passage est émis, et pour les seuls digests de `SCANS` (3 des 5 scans signés de sample-app). [Mesures](../../poc/bricks/20-kpi/resultats/e2-predictions.md).
