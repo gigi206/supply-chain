@@ -98,3 +98,8 @@ Le rejeu du 23/11 commence à 20:35:05 UTC (`rejeu-un-trait-1.log`). L'historiqu
 **`releve-zot.sh` corrigé pour les prochains passages** (sha256 `9893deefc1f1acad…`, contre `caa8ae0a…` pour le passage archivé) :
 - les dépôts hors `builds/` s'écrivent une ligne par dépôt (`HORS|…`), donc le filtre ne masque plus que les noms concernés ;
 - les cas 11 et 12 excluent les trois dépôts de témoins négatifs ; un treizième cas attend leurs **4** énoncés défectueux. Rejoués sur les lignes archivées, les trois cas donnent 0, 4 et 0.
+
+## Deux aveux (note de 2026-11-24T18:54:59Z)
+
+- Le relevé de Loki ci-dessus (`e1-loki-anciennete.log`) a été lancé **sans prédiction commitée**, contrairement à la règle du projet. Il n'a pas été présenté comme tel dans la note de 18:30:36Z.
+- Un message de clôture de la session a qualifié de « sûr » l'attendu du contrôle 6 (champ 9 à `ok`) en R5. Seule la présence de la clé de VSA dans la ConfigMap est vérifiée ; le résultat du contrôle 6 reste à mesurer.
