@@ -433,3 +433,9 @@ Projection, calculée : premières suppressions réelles le 28/11 entre 01:37 et
 - **Cible des séries** : basculée de `3a7ca1b1` vers `f5e6bcb0` par la 07c, avant la pose.
 - Détail dans la [carte de la 07b](resultats/07b-carte.md).
 - **Reste à la 07b** : le statut de l'ADR 0004, décision du propriétaire, et la clôture de la brique.
+
+**Additif du 24/11/2026 (note de 2026-11-24T16:29:49Z) : 07b close.**
+- **Décision du propriétaire** : « Clore maintenant », après l'acceptation de l'ADR 0004 (« Oui, Accepté »).
+- **Résultat** : la demande du 20/11 (« les cve trouvées et les failles réelles (VEX) ») est tenue pour sample-app et le deb, dans le tableau Grafana « Vulnérabilités et VEX ».
+- **Réserves** : voir la [carte](resultats/07b-carte.md), dernière note.
+- **Heures** : au plus 16 h 00 min 19 s, pour 10 h estimées.

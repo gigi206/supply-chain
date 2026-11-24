@@ -2612,3 +2612,15 @@ S'y ajoutent la liste par entrée dans Loki et les VEX signés par la clé `vex`
 - le deb de la 06 est compilé en Go 1.26.10.
 
 **Heures** : 10 h estimées, au plus 15 h 59 min 06 s avant cette note, plus 16:28:36 à 16:28:55 UTC. Le seuil de décision de 20 h n'est pas atteint. La clôture est une décision du propriétaire.
+
+## Clôture de la 07b (note de 2026-11-24T16:29:49Z)
+
+Décision du propriétaire, verbatim : « Clore maintenant ». Elle répond à « Clore la 07b maintenant ? », posée après le bilan de la note de 16:28:55Z.
+
+**La 07b est close, avec réserves.** Les réserves sont la liste « Hors périmètre ou ouvert » de cette note : Dependency-Track reporté en fin de projet, 44 entrées du deb sans VEX possible, VEX à échéance le 24/12/2026, 3 VEX à re-signer après un rejeu de zéro, deb de la 06 en Go 1.26.10.
+
+**Heures** : plus 16:28:36 à 16:29:49 UTC ; **total : au plus 16 h 00 min 19 s** pour 10 h estimées. Le dépassement de l'estimation est d'environ 1,6 fois ; le seuil de décision de 20 h n'est pas atteint.
+
+Ce qui suit passe dans d'autres briques :
+- la reconstruction en Go 1.26.11 et sa VSA restent dans la 07c ;
+- le renouvellement des VEX, à leur échéance, demandera un accord nommé.
