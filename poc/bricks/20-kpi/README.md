@@ -66,7 +66,7 @@ Quatre questions posées ensemble, chacune avec la recommandation du conseiller 
 
 Décision du 2026-11-24 sur la **vérification des signatures par l'exportateur** (écrite le 2026-11-24T20:07:20Z), verbatim : **« openssl (Recommandé) »**. Option retenue telle que posée : « Paquet openssl de Debian sur sc-stockage, rien à installer s'il y est déjà (à vérifier). Verdict docs/04 proposé « Sain » ; 14 CVE ouvertes dans trixie, aucun titre ne nomme la vérification ECDSA. Prix : 4 clés publiques à poser et à reposer après chaque rejeu. » Options écartées : « cosign épinglé », « Ne pas vérifier ». Donc `SIGNATURES=verifiees` à la pose, et pas de renommage des séries. Cette décision ne vaut pas accord de pose (étape 4).
 
-**À poser : l'accès du lecteur à Loki** (étape 4). Aucune option n'est neutre :
+Décision du 2026-11-24 sur **l'accès du lecteur à Loki** (écrite le 2026-11-24T20:41:04Z), verbatim : **« Compte Grafana Viewer (Recommandé) »**. Prix accepté, tel que posé : « un compte à créer, un mot de passe sur la VM, lecture de tous les journaux et des métriques, câblage dans rejeu.sh ». Elle ne vaut ni accord de pose, ni accord de création du compte. Options comparées, aucune n'étant neutre :
 
 | Option | Pouvoir sur les journaux | Secret sur `sc-stockage` | Fidélité à « Loki, 720 h » |
 |---|---|---|---|
