@@ -86,3 +86,15 @@ Pour les dépôts produits, builders et fermetures, **aucun énoncé n'est illis
 **Premier aperçu des dénominateurs, à ne pas prendre pour des KPI** (énoncés non vérifiés, dénominateur non choisi) : sur les 4 sujets produits, 4 ont une provenance, 3 un scan, 3 un VEX et 2 une VSA. Le seul digest en service de l'image, `f5e6bcb0`, n'a pas encore de VSA (R5).
 
 **Heures de la 20, étape 1** : de 18:23:30 à 18:27:04 UTC, script, prédiction, passage et note compris : 0 h 03 min 34 s.
+
+## Après relecture du conseiller (note de 2026-11-24T18:30:36Z)
+
+**Loki repart de zéro à chaque rejeu : mesuré.** La note de résultat l'affirmait sans mesure. Relevé [`e1-loki-anciennete.log`](e1-loki-anciennete.log) (script [`loki-anciennete.sh`](../loki-anciennete.sh), auditeur, comptes seulement, 18:30:04 UTC) :
+- les fenêtres de 24 h qui finissent le 22/11 à 12:00 et le 23/11 à 20:00 UTC n'ont **aucune série**, ni pour tout le journal, ni pour `entrees-scan`, alors que `entrees-scan` tourne depuis le 21/11 ;
+- la fenêtre qui finit le 24/11 à 12:00 a 475 914 lignes, dont 199 de `entrees-scan`.
+
+Le rejeu du 23/11 commence à 20:35:05 UTC (`rejeu-un-trait-1.log`). L'historique de Loki commence donc avec lui. Un premier passage du même relevé, lancé depuis le scratchpad à 18:29:44 UTC, a donné les mêmes valeurs ; il n'est pas archivé.
+
+**`releve-zot.sh` corrigé pour les prochains passages** (sha256 `9893deefc1f1acad…`, contre `caa8ae0a…` pour le passage archivé) :
+- les dépôts hors `builds/` s'écrivent une ligne par dépôt (`HORS|…`), donc le filtre ne masque plus que les noms concernés ;
+- les cas 11 et 12 excluent les trois dépôts de témoins négatifs ; un treizième cas attend leurs **4** énoncés défectueux. Rejoués sur les lignes archivées, les trois cas donnent 0, 4 et 0.

@@ -48,8 +48,9 @@ echo "# lecture seule, anonyme, API de Zot ($U) ; signatures non vérifiées ; a
 c=$(curl -sS -o "$T/catalogue.json" -w '%{http_code}' --cacert "$CA" "$U/_catalog")
 attendu "catalogue en anonyme" "$c" 200
 jq -r '.repositories[]' "$T/catalogue.json" | sort > "$T/depots"
-echo "## 1. dépôts : $(wc -l < "$T/depots") au catalogue, $(grep -c '^builds/' "$T/depots") sous builds/ ; hors builds/ (non relevés) :"
-grep -v '^builds/' "$T/depots" | tr '\n' ' '; echo
+echo "## 1. dépôts : $(wc -l < "$T/depots") au catalogue, $(grep -c '^builds/' "$T/depots") sous builds/ ; hors builds/ (non relevés), un par ligne :"
+# une ligne par dépôt (correction du 24/11 après le passage e1-releve-zot.log : sur une seule ligne, le filtre jeton|token masquait tout)
+grep -v '^builds/' "$T/depots" | sed 's/^/HORS|/'
 grep '^builds/' "$T/depots" | while read -r d; do echo "DEPOT|$d|$(classe "$d")"; done
 
 echo "## 2. sujets et attestations (tag .att, referrers des familles)"
@@ -110,8 +111,12 @@ attendu "VEX du deb 60f25f5c (builds/vex/sample-app-deb)" "$(compte builds/sampl
 attendu "au moins un scan de f5e6bcb0" "$([ "$(compte builds/sample-app f5e6bcb0e0fb builds/scan/sample-app)" -ge 1 ] && echo oui || echo non)" oui
 attendu "provenance SLSA v1 dans le .att de f5e6bcb0" "$(grep -c '^ATT|builds/sample-app|f5e6bcb0e0fb|tag .att|builds/sample-app|https://slsa.dev/provenance/v1|' "$T/lignes" | awk '{print ($1 >= 1) ? "oui" : "non"}')" oui
 attendu "prédicats licences/v1" "$(grep -c '|https://supply-chain.example/licences/v1|' "$T/lignes" || true)" 0
-attendu "referrers dont le type ne suit pas la famille" "$(grep '^ATT|' "$T/lignes" | awk -F'|' '$4 == "referrer" && !(($5 ~ /^builds\/scan\// && $6 == "https://supply-chain.example/scan/v1") || ($5 ~ /^builds\/vsa\// && $6 == "https://slsa.dev/verification_summary/v1") || ($5 ~ /^builds\/vex\// && $6 == "https://openvex.dev/ns/v0.2.0"))' | wc -l)" 0
-attendu "énoncés qui ne nomment pas leur sujet" "$(grep '^ATT|' "$T/lignes" | awk -F'|' '$7 != "oui"' | wc -l)" 0
+# Correction du 24/11 après le passage e1-releve-zot.log (2 fautes de la prédiction) : les témoins négatifs voulus (J6 :
+# essai-j6-att-illisible, essai-j6-autre-sujet ; G6 : builds/scan/essai-scan) sont attendus, et non plus comptés comme écarts.
+TEMOINS='^builds/(essai-j6-att-illisible|essai-j6-autre-sujet|essai-scan)$'
+attendu "referrers dont le type ne suit pas la famille, hors témoins" "$(grep '^ATT|' "$T/lignes" | awk -F'|' -v t="$TEMOINS" '$2 !~ t && $4 == "referrer" && !(($5 ~ /^builds\/scan\// && $6 == "https://supply-chain.example/scan/v1") || ($5 ~ /^builds\/vsa\// && $6 == "https://slsa.dev/verification_summary/v1") || ($5 ~ /^builds\/vex\// && $6 == "https://openvex.dev/ns/v0.2.0"))' | wc -l)" 0
+attendu "énoncés qui ne nomment pas leur sujet, hors témoins" "$(grep '^ATT|' "$T/lignes" | awk -F'|' -v t="$TEMOINS" '$2 !~ t && $7 != "oui"' | wc -l)" 0
+attendu "témoins négatifs : énoncés illisibles ou qui ne nomment pas leur sujet" "$(grep '^ATT|' "$T/lignes" | awk -F'|' -v t="$TEMOINS" '$2 ~ t && $7 != "oui"' | wc -l)" 4
 echo "## bilan : $N cas, $KO écart(s)"
 [ "$KO" = 0 ]
 } 2>&1 | sed -u "s#$HOME#~#g; $MASQUE" | tee "$LOG"

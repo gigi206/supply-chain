@@ -10,7 +10,9 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 **Étape 1 faite le 2026-11-24 (relevé anonyme de Zot, 18:26:24 UTC) ; rien n'est posé.** [Prédiction et résultat](resultats/e1-predictions.md) : **12 cas, 2 écarts**, tous deux des fautes de la prédiction. Les 4 énoncés en cause sont des témoins négatifs voulus (J6, G6) qu'elle n'avait pas comptés. Pour les produits, les builders et les fermetures, tous les énoncés sont lisibles et nomment leur sujet. Signatures non vérifiées : c'est l'étape 2, qui attend les choix ci-dessous.
 
-Aperçu des produits, énoncés non vérifiés : 4 sujets (`sample-app` `3a7ca1b1` et `f5e6bcb0`, deb `60f25f5c`, rpm `07b7bd6f`). Tous ont une provenance ; 3 ont un scan, 3 un VEX et 2 une VSA. Le digest en service, `f5e6bcb0`, n'a pas encore de VSA. L'historique des scans dans Zot commence au rejeu du 23/11.
+Aperçu des produits, énoncés non vérifiés : 4 sujets (`sample-app` `3a7ca1b1` et `f5e6bcb0`, deb `60f25f5c`, rpm `07b7bd6f`). Tous ont une provenance ; 3 ont un scan, 3 un VEX et 2 une VSA. Le digest en service, `f5e6bcb0`, n'a pas encore de VSA. L'historique des scans dans Zot commence au rejeu du 23/11, et celui de Loki aussi (mesuré, `e1-loki-anciennete.log`) : un rejeu de zéro remet les deux à zéro.
+
+**Heures de la 20** (2026-11-24, `date -u`) : 17:45:07 à 17:50:31 (ouverture, carte), 18:23:30 à 18:27:23 (étape 1), 18:27:23 à 18:30:36 (relecture, Loki, corrections), soit **0 h 12 min 30 s**. Majorant par la méthode de la 05 (écarts d'au plus 1 h entre commits de `poc/bricks/20-kpi`) : 42 min 16 s ; il compte à tort l'écart de 17:50:31 à 18:26:20, qui contient la clôture de la 05 et la 07c. Estimation : 1,5 pw.
 
 Les faits des sections suivantes, écrits avant l'étape 1, viennent du dépôt.
 
@@ -45,13 +47,16 @@ Constat qui pèse sur le seuil : `entrees-scan.py` (07b) **ne vérifie pas les s
 6. **Tableau « KPI supply-chain »** (accord) : provisionné comme « Vulnérabilités et VEX » (ADR 0004).
 7. **Câblage dans `rejeu.sh`**, sinon un rejeu de zéro efface la pose (leçon de l'export Hubble et de `entrees-scan`).
 
-## Choix du propriétaire à poser (avant l'étape 2)
+## Choix du propriétaire à poser
+
+Relu après l'étape 1 (conseiller) : seuls le dénominateur, l'âge des pins, l'âge des clés et le délai des KEV bloquent l'étape 2. Le recalcul de l'hôte vérifie les signatures quoi qu'il arrive : le premier choix ne concerne que l'exportateur (étape 4). Pour les licences, l'étape 1 a mesuré 0 prédicat `licences/v1` dans Zot, donc le recalcul donnera « source absente » quel que soit le choix.
+
 
 - **Vérification des signatures** : sur sc-stockage (installer cosign, donc accord et sudo), ou seulement dans le recalcul de l'hôte (l'exportateur compte les énoncés comme `entrees-scan`, et le recalcul prouve l'écart nul).
 - **Âge des pins** : âge depuis l'épinglage (date du commit qui fixe le digest), ou retard sur l'amont (comme les 44 paquets en retard de l'amorce de la 05, mesure qui demande un accès au réseau).
 - **Âge des clés** : date de la clé publique dans le dépôt (premier commit) ou date de création dans OpenBao (lecture avec un jeton, depuis l'hôte).
 - **Licences** : KPI vide tant que la 13a n'a pas de tâche de confiance, ou mesuré sur les prédicats du banc.
-- **Délai de correction des KEV** : historique tiré de Loki (720 h, listes de `entrees-scan`), ou état gardé par l'exportateur.
+- **Délai de correction des KEV** : historique tiré de Loki (720 h, listes de `entrees-scan`), ou état gardé par l'exportateur. Réserve mesurée : Loki repart de zéro à chaque rejeu, comme tout état gardé sur sc-stockage.
 - **Dénominateur** (ajouté le 2026-11-24, sur relecture du conseiller du plan de l'étape 1) : deux définitions changent tous les taux. Quels dépôts comptent : les produits seuls (`sample-app`, `sample-app-deb`, `sample-app-rpm`), ou aussi les builders, les fermetures et les essais ? Quel digest compte : celui en service seulement, ou tous les digests présents dans Zot (`3a7ca1b1` et `f5e6bcb0` cohabitent) ? Le relevé de l'étape 1 liste tout, avec une classe déduite du nom, et ne tranche pas.
 
 ## Outils
