@@ -210,3 +210,9 @@ Passage du timer (`OnUnitActiveSec=15min`, premier passage à 21:07:38 UTC) : à
 ### Correction du résultat de l'étape 5 (note de 2026-11-24T21:13:10Z, relecture du conseiller)
 
 Des 105 valeurs comparées, **102 viennent des séries** ; 3 sont posées par `comparer_zot.py` (`violations_licences`, constante ; deux `kev_delais`, remplis quand aucune série de KEV n'existe). Elles sont égales par construction. À vérifier au passage du timer : à 21:09:33 l'âge de 113 s place un passage vers 21:07:40, la pose relevait 21:07:38 ; l'unité a peut-être tourné deux fois (timer activé juste après le premier passage).
+
+### Passage du timer (note de 2026-11-24T21:24:37Z)
+
+[`e5-seuil-2.log`](e5-seuil-2.log) (21:24:16 UTC, dépôt `7f357194`) : **8 cas, 0 écart**, âge du passage 89 s. Passages vus par `kpi_exportateur_passage_timestamp_seconds` : 21:07:38 (pose), **21:07:41** (second passage, à l'activation du timer, `OnBootSec` étant dépassé : constat confirmé, sans conséquence), **21:22:47** (timer). Le timer et le lecteur qu'il entraîne ont donc tourné seuls, journal relu à 21:22:46.
+
+**Heures** : poses, seuil, notes et relecture de 21:07:03 à 21:13:10 UTC (6 min 07 s), attente du timer non comptée. Total de la brique : 1 h 15 min 43 s + 3 min 22 s + 6 min 07 s = 1 h 25 min 12 s.
