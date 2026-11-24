@@ -47,7 +47,18 @@ Constat qui pèse sur le seuil : `entrees-scan.py` (07b) **ne vérifie pas les s
 6. **Tableau « KPI supply-chain »** (accord) : provisionné comme « Vulnérabilités et VEX » (ADR 0004).
 7. **Câblage dans `rejeu.sh`**, sinon un rejeu de zéro efface la pose (leçon de l'export Hubble et de `entrees-scan`).
 
-## Choix du propriétaire à poser
+## Décisions du propriétaire (2026-11-24, 18:32:11 UTC)
+
+Quatre questions posées ensemble, chacune avec la recommandation du conseiller en première option. Réponses verbatim :
+
+- **Dénominateur** : « Produits, tous digests (Recommandé) ». Les taux comptent `sample-app`, `sample-app-deb` et `sample-app-rpm`, chaque digest présent dans Zot, étiqueté. Prix accepté : `3a7ca1b1` reste compté tant qu'il est dans Zot ;
+- **Âge des pins** : « Depuis l'épinglage (Recommandé) », c'est-à-dire la date du commit qui fixe le digest ou la version ;
+- **Âge des clés** : « Clé publique dans git (Recommandé) », c'est-à-dire le dernier changement de la clé publique versionnée ;
+- **Délai de correction des KEV** : « Loki, 720 h (Recommandé) ». Réserve écrite : l'historique repart de zéro à chaque rejeu (mesuré).
+
+Restent à poser, sans bloquer l'étape 2 : la vérification des signatures par l'exportateur (étape 4) et les licences (le recalcul donne « source absente », 0 prédicat mesuré dans Zot).
+
+## Choix du propriétaire (liste d'origine)
 
 Relu après l'étape 1 (conseiller) : seuls le dénominateur, l'âge des pins, l'âge des clés et le délai des KEV bloquent l'étape 2. Le recalcul de l'hôte vérifie les signatures quoi qu'il arrive : le premier choix ne concerne que l'exportateur (étape 4). Pour les licences, l'étape 1 a mesuré 0 prédicat `licences/v1` dans Zot, donc le recalcul donnera « source absente » quel que soit le choix.
 
