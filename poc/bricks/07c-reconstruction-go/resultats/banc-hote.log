@@ -1,0 +1,48 @@
+# banc de la 04 en Go 1.26.10 et 1.26.11, 2026-11-24T13:13:42Z, 4d89c55c, buildkit 0.25.2
+OK   entrées de la 03 : binaire de référence (1.26.10) : e3749c68b6babe6d
+## bench.sh de la 04, Go 1.26.10
+code 0 en 54 s
+  OK   image de build identique sur 2 builds (sha256:509f03bb8f98616e9ffd374bb8167b3f52f476bc763a840353b66e18f9560a13)
+  OK   image sample-app identique sur 2 builds sans cache, 2 chemins (sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5)
+  OK   binaire dans l'image = binaire de la brique 03, compilé hors BuildKit (e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11)
+  OK   négatif : build sans fermeture refusé (github.com/go-chi/chi/v5@v5.2.3: reading file:///deps/deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2)
+  OK   négatif : sortie réseau refusée dans l'étape --network=none (wget: bad address 'proxy.golang.org')
+## bench.sh de la 04, Go 1.26.11
+code 1 en 60 s
+  OK   image de build identique sur 2 builds (sha256:06359cd61741fd74fe06d2787a5ca6c5a70a353ae89aaee22b3866209ecd5d4a)
+  OK   image sample-app identique sur 2 builds sans cache, 2 chemins (sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7)
+  KO   binaire : BuildKit 56f3cd7d256562bef660f596de462af4105462356858b11f71cd04761c13b5c2 ≠ brique 03 e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+  OK   négatif : build sans fermeture refusé (github.com/go-chi/chi/v5@v5.2.3: reading file:///deps/deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2)
+  OK   négatif : sortie réseau refusée dans l'étape --network=none (wget: bad address 'proxy.golang.org')
+OK   témoin 1.26.10 : image de référence : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   témoin 1.26.10 : bench.sh sans KO : 0
+OK   1.26.11 : image identique sur deux constructions : oui
+OK   1.26.11 : digest différent de la référence : oui
+OK   1.26.11 : seul KO de bench.sh, l'étape 3 (binaire de la 03 en 1.26.10) : KO   binaire :
+DIGEST PRÉDIT|sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7
+binaire 1.26.11 : 6197374 octets, sha256 56f3cd7d256562bef660f596de462af4105462356858b11f71cd04761c13b5c2
+  ~/.cache/supply-chain-poc/07c/banc/b04-1.26.11/extrait/sample-app: go1.26.11
+  	path	example.com/supply-chain/sample-app
+  	mod	example.com/supply-chain/sample-app	(devel)	
+  	dep	github.com/go-chi/chi/v5	v5.2.3	h1:WQIt9uxdsAbgIYgid+BpYc+liqQZGMHRaUwp0JUcvdE=
+  	build	-buildmode=exe
+  	build	-compiler=gc
+  	build	-trimpath=true
+  	build	DefaultGODEBUG=containermaxprocs=0,cryptocustomrand=1,decoratemappings=0,httpservecontentmaxranges=1,tlssecpmlkem=0,tlssha1=1,updatemaxprocs=0,urlstrictcolons=0,x509sha256skid=0
+  	build	CGO_ENABLED=0
+  	build	GOARCH=amd64
+  	build	GOOS=linux
+  	build	GOAMD64=v1
+## compilation hors BuildKit, Go 1.26.11, sans réseau
+compilation : code 0 ; go: downloading github.com/go-chi/chi/v5 v5.2.3
+OK   binaire hors BuildKit = binaire de l'image (1.26.11) : 56f3cd7d256562bef660f596de462af4105462356858b11f71cd04761c13b5c2
+## scan Grype hors ligne, base du jour
+OK   sha256 de la couche de la base : sha256:fdf0cdec0b112f6769c3fd38cd5f992a3bb6162a4ab2fe30d639d14ae41ea8a9
+  Built:     2026-11-24T06:22:05Z
+  Status:    valid
+Go 1.26.10 : 15 : CVE-2026-97033 (stdlib@go1.26.10), CVE-2026-97034 (stdlib@go1.26.10), CVE-2026-97035 (stdlib@go1.26.10), CVE-2026-97036 (stdlib@go1.26.10), CVE-2026-97037 (stdlib@go1.26.10), CVE-2026-97038 (stdlib@go1.26.10), CVE-2026-97039 (stdlib@go1.26.10), CVE-2026-97043 (stdlib@go1.26.10), CVE-2026-97054 (stdlib@go1.26.10), GHSA-3fxj-6jh8-hvhx (github.com/go-chi/chi/v5@v5.2.3), GHSA-j6qf-3m9c-vwj3 (github.com/go-chi/chi/v5@v5.2.3), GHSA-mqqf-5wvp-8fh8 (github.com/go-chi/chi/v5@v5.2.3), GO-2026-5775 (github.com/go-chi/chi/v5@v5.2.3), GO-2026-5777 (github.com/go-chi/chi/v5@v5.2.3), GO-2026-6859 (stdlib@go1.26.10)
+Go 1.26.11 : 5 : GHSA-3fxj-6jh8-hvhx (github.com/go-chi/chi/v5@v5.2.3), GHSA-j6qf-3m9c-vwj3 (github.com/go-chi/chi/v5@v5.2.3), GHSA-mqqf-5wvp-8fh8 (github.com/go-chi/chi/v5@v5.2.3), GO-2026-5775 (github.com/go-chi/chi/v5@v5.2.3), GO-2026-5777 (github.com/go-chi/chi/v5@v5.2.3)
+KO   témoin 1.26.10 : 6 entrées, dont GO-2026-6859 : 15 true (attendu 6 true)
+OK   1.26.11 : 5 entrées, toutes sur chi : 5 github.com/go-chi/chi/v5
+OK   1.26.11 : 0 entrée stdlib : 0
+## bilan : 11 cas, 1 écart(s)
