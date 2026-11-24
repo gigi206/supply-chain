@@ -4,9 +4,9 @@ Origine : la 07b relève `GO-2026-6859` (stdlib 1.26.10, Medium) sur l'image `3a
 
 **Estimation : 10 h (non mesurée) ; seuil de décision : 20 h.** Heures comptées ici, pas dans la 07b, à partir de la note de 2026-11-24T13:11:58Z.
 
-## État (2026-11-24T14:13:34Z)
+## État (2026-11-24T14:39:31Z)
 
-**Étapes 1 à 4 faites**, journaux dans [`resultats/`](resultats/07c-carte.md) : toolchain vérifiée ; image prédite sur l'hôte (`f5e6bcb0`) ; image de build `plateforme/builder-go-voie-d@8c11e856` (tag `go1.26.11`) ; `construire-image` re-signée (`4dcbc4b7`, ajoutée à la liste revue, `66a9f298` gardée) ; construction dans le cluster conforme ; scan : **5 vulnérabilités chi, 0 stdlib, 0 KEV** ; déclencheurs basculés, porte admise. **Étape 6 faite** : VEX chi de `f5e6bcb0` validé (« Oui, je valide »), signé sur accord nommé (« J'autorise ») et publié (`builds/vex/sample-app@b139ef42`, 5 énoncés, échéance 2026-12-24) ; scan manuel : **5 vulnérabilités, 0 KEV, 5 écartées par un VEX**, visible dans Grafana. Reste l'étape 7 (défauts du rejeu, brique 10). Heures : au plus 0 h 50 min 13 s.
+**Étapes 1 à 4 faites**, journaux dans [`resultats/`](resultats/07c-carte.md) : toolchain vérifiée ; image prédite sur l'hôte (`f5e6bcb0`) ; image de build `plateforme/builder-go-voie-d@8c11e856` (tag `go1.26.11`) ; `construire-image` re-signée (`4dcbc4b7`, ajoutée à la liste revue, `66a9f298` gardée) ; construction dans le cluster conforme ; scan : **5 vulnérabilités chi, 0 stdlib, 0 KEV** ; déclencheurs basculés, porte admise. **Étape 6 faite** : VEX chi de `f5e6bcb0` validé (« Oui, je valide »), signé sur accord nommé (« J'autorise ») et publié (`builds/vex/sample-app@b139ef42`, 5 énoncés, échéance 2026-12-24) ; scan manuel : **5 vulnérabilités, 0 KEV, 5 écartées par un VEX**, visible dans Grafana. **Étape 7, scripts du rejeu : faits à sec** (décision « Un seul digest ») : voie D en Go 1.26.11 (mesurée à sec, 14 cas), voie A, construction, images d'essai de J2 à J8, Kyverno, scans de la 07a et de la 06 portés à `f5e6bcb0` ; `publier-essai` re-signée sur accord (« J'autorise », bundle `17b50c7c`, ajouté en premier à la liste revue). Rien de ceci n'a tourné dans un cluster. Restent, sur accord : VSA de `f5e6bcb0` (brique 10), rejeu de zéro (recrée la clé `vex`), déclaration de Go 1.26.11 dans `mise.toml`. Heures : au plus 1 h 14 min 00 s.
 
 ## Seuil
 

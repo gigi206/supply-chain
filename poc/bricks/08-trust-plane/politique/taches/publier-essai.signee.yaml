@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   annotations:
-    tekton.dev/signature: MEUCIGnBv80Dke1V1tZZmrxeMbmSH032NC826oUJc2gi64U0AiEAnOOfZRScbHDeuvYA0UVhFzvkOTw/A2B2NjPRtacgsYE=
+    tekton.dev/signature: MEUCIQDhsCoZmY/jQtrNimjVAfJvWit+9EeSn+6QmHLgUlG9GgIgY/GNBNpZ1GyEYTpASZ/gI/QkxCtEMJ/+FycuDCarAzQ=
   name: publier-essai
 spec:
   params:
@@ -35,4 +35,4 @@ spec:
       #!/bin/sh
       echo "commit $COMMIT de $DEPOT (essai : aucune construction avant J7)"
       printf '%s' 'sc-stockage.poc.test:5000/builds/essai-webhook' > $(results.IMAGE_URL.path)
-      printf '%s' 'sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5' > $(results.IMAGE_DIGEST.path)
+      printf '%s' 'sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7' > $(results.IMAGE_DIGEST.path)

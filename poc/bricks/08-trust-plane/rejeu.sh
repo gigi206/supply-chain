@@ -66,7 +66,7 @@
 #
 # Additif du 2026-11-24 (07c, étape 7, « Un seul digest ») : sample-app reconstruite en Go 1.26.11. Voie D (image de build 8c11e856,
 # toolchain lue dans le cache des modules), voie A, construction, J2 (référence f5e6bcb0 de w/b04-1.26.11), images d'essai de J4
-# à J8 et cibles du scan (07a, 06) portées à f5e6bcb0 ; tâche publier-essai : nouvelle signature exigée (carte de la 07c). PAS ENCORE REJOUÉ. Un rejeu recrée la clé vex :
+# à J8 et cibles du scan (07a, 06) portées à f5e6bcb0 ; tâche publier-essai re-signée sur accord (bundle 17b50c7c, en tête de la liste revue). PAS ENCORE REJOUÉ. Un rejeu recrée la clé vex :
 # les VEX signés ne se vérifient plus (nouvel accord nommé par document).
 #
 # Usage (racine du dépôt) : [POUSSER_VSA=1] [TAG_05=<tag>] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)

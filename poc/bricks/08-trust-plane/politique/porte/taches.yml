@@ -7,6 +7,11 @@ trusted_tasks:
   # Tâche d'essai (pipeline sample-app-essai du gabarit d'essai de J6, en service jusqu'à la bascule de J8 du 01/11/2026) :
   # politique/taches/publier-essai.signee.yaml, stepTemplate restreint ; véhicule des étapes de J6 et des cas de la porte
   oci://sc-stockage.poc.test:5000/tekton/tasks/publier-essai:
+    - ref: sha256:17b50c7c8bfa6c617f21946e75839db2acd0a0d159565e9ab45aed01301881af
+    # Brique 07c, étape 7 (24/11/2026, décision « Un seul digest » et accord « J'autorise » du propriétaire) : même tâche,
+    # résultat IMAGE_DIGEST f5e6bcb0 (Go 1.26.11) au lieu de 3a7ca1b1 ; seul changement avec la signature
+    # (07c-reconstruction-go/resultats/signer-publier-essai.log). EN PREMIER : preuves.sh (test 7, D2) lit la première
+    # référence comme tâche en service. 836cd080 reste : le cluster en service a ses images d'essai en 3a7ca1b1
     - ref: sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
   # J7 : construction de sample-app (voie A, pipeline sample-app de construction.sh) : politique/taches/construire-image.signee.yaml,
   # pod Kata privilégié, BuildKit v0.34.1 en root, état sur tmpfs, sans aucune sortie réseau (option 3 du contrôle de sortie,
