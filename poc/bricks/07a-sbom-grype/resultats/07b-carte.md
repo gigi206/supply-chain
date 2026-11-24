@@ -2475,3 +2475,5 @@ Confiance : haute pour le scanner (même chemin qu'au banc t3), moyenne pour le 
 - **RealIP** : relu dans les fiches gardées, `GO-2026-5775` et `GO-2026-5777` visent `github.com/go-chi/chi/v5/middleware`, symbole `RealIP` : la phrase du brouillon est exacte.
 
 **Heures** : plus au plus 12:43:34 à 13:07:15 UTC (0 h 23 min 41 s, en remplacement des lignes de 12:57:26 et 13:04:46, même départ) ; **total : au plus 15 h 36 min 07 s** pour 10 h estimées ; seuil de 20 h non atteint.
+
+**Décision du propriétaire (note de 2026-11-24T13:11:58Z)** : à la question « Où compter la reconstruction en Go 1.26.11 (environ 10 h, non mesurées) ? », réponse verbatim : « Chantier à part ». La reconstruction sort de la 07b : brique [07c](../../07c-reconstruction-go/README.md), estimation 10 h, ses propres heures. Accord de téléchargement de Go 1.26.11 inclus. La 07b garde le VEX du deb (brouillon en attente de validation) et les trois questions de l'ADR 0004.
