@@ -1,0 +1,18 @@
+# effet du VEX sur le scan du deb, 2026-11-24T13:40:37Z, b9fa642f
+job scan-sample-app-deb-vex-134037 : code 0
+attente : code 0
+Job : début 2026-11-24T13:40:37Z, fin 2026-11-24T13:42:48Z, réussi 1
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app-deb@sha256:bdda2d22eb17ad04b2fcffdfab7e35cc1e714b9fc5511dcf265180dfc35f859c, referrer de sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+  VEX|1 énoncé(s) vérifié(s), 1 retenu(s), 0 rejeté(s)|sc-stockage.poc.test:5000/builds/vex/sample-app-deb|cosign code 0
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, 67 vulnérabilités, 0 KEV, 23 écartée(s) par un VEX, 1 s
+OK   Job réussi : 1
+OK   VEX| : 1 document vérifié, retenu : 1
+OK   SCAN| : 67 vulnérabilités, 0 KEV, 23 écartées par un VEX : 1
+OK   PUBLIE| : scan publié : 1
+OK   ligne SCAN| du pod visible dans Grafana : 1
+  comptes : 67 entrée(s), 67 identifiant(s) ; KEV 0 ; avec correctif 67 ; écartées par un VEX 23 ; gravités : Critical 3, High 33, Low 1, Medium 28, Unknown 2
+OK   tableau : écartées par un VEX : écartées par un VEX 23
+  GO-2026-6604 : not_affected (2026-11-24T13:40:03Z)
+  GO-2026-4337 : -
+  GO-2026-6612 : -
+## bilan : 6 cas, 0 écart(s)
