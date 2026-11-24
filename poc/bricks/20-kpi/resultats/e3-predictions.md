@@ -83,3 +83,30 @@ Dans la configuration **versionnée** de Zot (`08-trust-plane/stockage/zot.json`
 - Les attendus, les témoins et les deux outils viennent de la même session : une erreur commune de lecture d'une règle ne se verrait pas.
 - L'exportateur n'a pas encore lu le vrai Zot, et n'est pas posé.
 - Écrire ces faux dans le vrai Zot demande un compte : le banc n'a ni comptes ni politique. La configuration versionnée le permet à `poc-build` et `poc-images` pour `builds/vsa/**`, pas pour `builds/scan/**` ni `builds/vex/**` (motifs plus précis, donc prioritaires). Pour les provenances, `poc-build` pousse `.att` et `.sig`, puisque c'est le compte de Chains. Donc, sur les faux du banc, la KEV masquée demande `poc-ecriture` ou `poc-scan`, le VEX `poc-vex`, et la VSA ou la provenance un compte de la zone de build.
+
+## Corrections sur relecture du conseiller (note de 2026-11-24T19:47:13Z)
+
+La dernière puce de « Ce que cela ne montre pas » dépasse ce qui a été lu, et le constat d'orientation parle à tort de « la zone de build » en bloc. Ce qui suit les remplace. Tout est **lu** dans la configuration versionnée de Zot et dans les briques 08 et 10, rien n'est mesuré en service :
+
+| Faux | Comptes que la configuration versionnée autorise | Où vit l'identifiant (lu) |
+|---|---|---|
+| VSA (référent, par digest, `builds/vsa/**` sans motif propre, donc `builds/**`) | `poc-ecriture`, `poc-build`, `poc-images`, `poc-replay` | `poc-images` : secret `zot-images` de l'espace `builds`, monté par `publier-image` ; `poc-build` : secret `zot-chains` de `tekton-chains`, zone de confiance |
+| Provenance et signature d'image (**tags** `.att` et `.sig`) | `poc-ecriture`, `poc-build` ; `poc-images` et `poc-replay` sont refusés sur les tags par leur condition | voir ci-dessus |
+| Scan (`builds/scan/**`) | `poc-ecriture`, `poc-scan` | non relu |
+| VEX (`builds/vex/**`) | `poc-vex` | non relu |
+
+Le compte le plus proche d'un build est donc `poc-images` : il suffit, d'après la configuration, pour faire compter une fausse VSA (donc un faux « L3 vérifié ») à un lecteur qui ne vérifie pas. Il ne suffit ni pour une fausse provenance, ni pour un faux scan.
+
+Deux limites à ajouter :
+- **l'exportateur n'a pas de lecteur Loki** : il lit un fichier (`JOURNAL`), alors que la décision est « Loki, 720 h ». C'est du travail d'étape 4 ;
+- **ses séries s'appellent `…_verifie` alors que rien n'est vérifié** : à renommer si le choix de l'étape 4 est de ne pas vérifier.
+
+Lu aussi : les quatre clés (Chains, scanner, VEX, VSA) sont des ECDSA P-256. `openssl dgst -verify` sur le PAE de l'enveloppe DSSE pourrait donc suffire à l'exportateur, sans cosign. Non essayé ; la présence d'openssl sur `sc-stockage` n'est pas vérifiée.
+
+## Complément : l'exportateur sur le vrai Zot, prédiction (2026-11-24T19:47:13Z)
+
+Commitée avant le lancement. [`exportateur-zot.sh`](../exportateur-zot.sh) lance l'exportateur depuis l'hôte, en lecture anonyme, sans `JOURNAL`, puis le recalcul signé, et [`comparer_zot.py`](../comparer_zot.py) les compare par (nom, dépôt, digest). Premiers énoncés que la session n'a pas fabriqués. Rien n'est posé.
+
+Attendu, **4 cas, 0 écart** : 4 sujets ; 56 valeurs comparées (13 par sujet, 3 taux, licences ; compte tiré de `e2-recalcul-3.log`) ; **0 écart** ; **0** énoncé refusé pour sa forme (l'étape 1 n'en a pas trouvé sur les produits). Hors comparaison : délais des KEV et dates git.
+
+Moins sûr : le champ `payloadType` et la forme des bundles réels de la VSA et des VEX, que l'exportateur exige exacte.
