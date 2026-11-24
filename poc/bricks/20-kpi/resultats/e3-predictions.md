@@ -110,3 +110,7 @@ Commitée avant le lancement. [`exportateur-zot.sh`](../exportateur-zot.sh) lanc
 Attendu, **4 cas, 0 écart** : 4 sujets ; 56 valeurs comparées (13 par sujet, 3 taux, licences ; compte tiré de `e2-recalcul-3.log`) ; **0 écart** ; **0** énoncé refusé pour sa forme (l'étape 1 n'en a pas trouvé sur les produits). Hors comparaison : délais des KEV et dates git.
 
 Moins sûr : le champ `payloadType` et la forme des bundles réels de la VSA et des VEX, que l'exportateur exige exacte.
+
+### Résultat du complément (note de 2026-11-24T19:47:45Z)
+
+[Journal](e3-exportateur-zot.log) : 2026-11-24 à 19:47:15 UTC, dépôt `d278c4d1`, exportateur `b22c696cb22a9948`. **4 cas, 0 écart** : 4 sujets, 56 valeurs comparées, 0 écart, 0 énoncé refusé ; le recalcul du même passage : 10 cas, 0 écart. 49 lignes `KPI|` hors comparaison (délais des KEV, dates git). Passage depuis l'hôte, sous Python 3.14.4 : ni `sc-stockage`, ni Prometheus, ni Grafana ne sont exercés, donc ce n'est pas encore le seuil de la brique.
