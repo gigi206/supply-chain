@@ -1,0 +1,29 @@
+# effet du VEX sur le scan de sample-app, 2026-11-24T09:32:38Z, bdf3f193
+## 1. Job du calendrier
+Job : scan-sample-app-29925210 ; début 2026-11-24T09:30:00Z, fin 2026-11-24T09:32:07Z, réussi 1
+OK   Job réussi : 1
+  VEX|1 énoncé(s) vérifié(s), 1 retenu(s), 0 rejeté(s)|sc-stockage.poc.test:5000/builds/vex/sample-app|cosign code 0
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 6 vulnérabilités, 0 KEV, 5 écartée(s) par un VEX, 1 s
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:bc95e660f20314be57cab98854723b857260089b4fb688e8a6648ca35fbfa561, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   VEX| : 1 attestation vérifiée (le document), 1 retenue, 0 rejetée : 1
+OK   SCAN| : 6 vulnérabilités, 0 KEV, 5 écartées par un VEX : 1
+OK   PUBLIE| : scan publié : 1
+## 2. Grafana (Loki)
+OK   ligne SCAN| du pod avec « 5 écartée(s) par un VEX », visible dans Grafana : 1
+## 3. tableau du nouveau scan signé (vex-gabarit.sh)
+# vex-gabarit.sh, 2026-11-24T09:32:39Z ; sujet sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; scan du 2026-11-24T09:31:58.802269331Z ; 3 scan(s) vérifié(s) par CLE_SCANNER (emprein
+
+| # | Identifiant | Alias | Gravité | KEV | EPSS | Paquet | Corrigé dans | VEX appliqué |
+|---|---|---|---|---|---|---|---|---|
+| 1 | GHSA-3fxj-6jh8-hvhx |  | Medium | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | not_affected (2026-11-24T08:49:43Z) |
+| 2 | GHSA-j6qf-3m9c-vwj3 | CVE-2026-114437 | Medium | non | 0.00129 | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.4.0 | not_affected (2026-11-24T08:49:43Z) |
+| 3 | GHSA-mqqf-5wvp-8fh8 | CVE-2025-69725 | Medium | non | 0.00264 | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.2.4 | not_affected (2026-11-24T08:49:43Z) |
+| 4 | GO-2026-5775 | GHSA-9g5q-2w5x-hmxf | Unknown | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | not_affected (2026-11-24T08:49:43Z) |
+| 5 | GO-2026-5777 | GHSA-rjr7-jggh-pgcp | Unknown | non | n/d | `pkg:golang/github.com/go-chi/chi@v5.2.3#v5` | 5.3.0 | not_affected (2026-11-24T08:49:43Z) |
+| 6 | GO-2026-6859 | CVE-2026-97054 | Medium | non | 0.00479 | `pkg:golang/stdlib@1.26.10` | 1.26.11, 1.27.4 | - |
+
+comptes : 6 entrée(s), 6 identifiant(s) ; KEV 0 ; avec correctif 6 ; écartées par un VEX 5 ; gravités : Medium 4, Unknown 2
+OK   entrées marquées par un VEX : 5
+OK   GO-2026-6859 sans VEX : -
+OK   comptes : écartées par un VEX : écartées par un VEX 5
+## bilan : 8 cas, 0 écart(s)

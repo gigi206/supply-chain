@@ -2398,3 +2398,19 @@ Script [`piece8-apres-scan.sh`](piece8-apres-scan.sh), en lecture seule, à lanc
 - la même ligne `SCAN|` dans Grafana (Loki, compte auditeur) ;
 - tableau de `vex-gabarit.sh` sur le nouveau scan : 5 entrées marquées `not_affected (2026-11-24T08:49:43Z)`, `GO-2026-6859` à « - », « écartées par un VEX 5 ».
 Confiance : haute pour le scanner (même chemin qu'au banc t3), moyenne pour le compte Loki (une ligne par pod attendue).
+
+## Pièce 8 : résultat de l'effet sur le scan de 09:30 (note de 2026-11-24T09:33:05Z)
+
+[Journal](piece8-apres-scan.log), lancé à 09:32:38Z, fini à 09:32:39Z : **8 cas, 0 écart ; la prédiction de 08:51:12Z tient**.
+- Job du calendrier `scan-sample-app-29925210` : début 09:30:00Z, fin 09:32:07Z, réussi.
+- `VEX|1 énoncé(s) vérifié(s), 1 retenu(s), 0 rejeté(s)|sc-stockage.poc.test:5000/builds/vex/sample-app|cosign code 0`.
+- **`SCAN|…sample-app@sha256:3a7ca1b1…, 6 vulnérabilités, 0 KEV, 5 écartée(s) par un VEX, 1 s`**.
+- `PUBLIE|…/builds/scan/sample-app@sha256:bc95e660f20314be…`, referrer de `3a7ca1b1` (scan signé par la clé du scanner).
+- Grafana (Loki, compte auditeur) : la ligne `SCAN|` du pod, avec « 5 écartée(s) par un VEX », est visible (compte 1).
+- `vex-gabarit.sh` sur ce scan (09:31:58Z) : les 5 entrées chi portent `not_affected (2026-11-24T08:49:43Z)` ; `GO-2026-6859` (stdlib 1.26.10, Medium, EPSS 0.00479) reste à « - » ; « écartées par un VEX 5 ».
+
+**Ce que cela établit** : la chaîne complète de l'ADR 0004 fonctionne de bout en bout sur la vraie plateforme, avec un VEX réel (rédigé sur mesure du binaire, validé et signé par le propriétaire) : signature `hashivault://vex` par `userpass`, publication en referrer, vérification par le scanner (clé `vex.pub` du `scan-config`), exemption comptée et visible dans Grafana.
+
+**Hors mesure** : le deb (`scan-sample-app-deb`, Go 1.24.4, 67 entrées) n'a aucun VEX ; `GO-2026-6859` n'est pas couverte (sources de Go 1.26.10 ou reconstruction en 1.26.11 : choix du propriétaire) ; l'échéance du 24/12 n'est pas éprouvée sur ce VEX (elle l'a été au banc t3).
+
+**Heures** : plus 08:47:33 à 08:52:04 UTC (4 min 31 s, signature, prédiction et poussée) ; l'attente du Job (08:52 à 09:32) n'est pas comptée, aucun travail n'y a eu lieu ; plus 09:32:31 à 09:33:05 UTC (0 min 34 s). **Total : au plus 15 h 12 min 26 s**, pour 10 h estimées ; le seuil de 20 h n'est pas atteint.
