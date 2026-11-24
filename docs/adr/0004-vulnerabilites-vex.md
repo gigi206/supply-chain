@@ -116,3 +116,9 @@ Sources : la [fiche des besoins](../../poc/bricks/07a-sbom-grype/resultats/adr00
 - L'échéance des VEX (3c) n'est pas suivie dans Grafana : elle reste dans Loki (`vexTimestamp`) et dans les lignes `ECHEANCE|` de `signer-vex.sh`. Le premier VEX réel échoit le 2026-12-24.
 
 **Le statut reste « À rédiger »** jusqu'au tableau posé ; son passage à une autre valeur est une décision du propriétaire.
+
+**Tableau posé** (note de 2026-11-24T16:15:17Z, accord « J'autorise la pose ») :
+- tableau « Vulnérabilités et VEX », dossier PoC, provisionné en lecture seule ([fournisseur](../../poc/bricks/19b-journalisation/config/provisioning/dashboards/tableaux.yaml), [tableau](../../poc/bricks/19b-journalisation/config/provisioning/dashboards/tableaux/vulnerabilites-vex.json)) ;
+- banc jetable : 17 cas, 0 écart ; contrôle après la pose : 7 cas, 0 écart, après rechargement du cache des droits de l'auditeur (voir la [carte de la 07b](../../poc/bricks/07a-sbom-grype/resultats/07b-carte.md)) ;
+- avant la pose, la cible des séries a été basculée vers `f5e6bcb0` (07c, « J'autorise la bascule »). Le tableau affiche, pour sample-app : 5 trouvées, 5 écartées, KPI 3a = 1 ; pour le deb : 67 trouvées, 23 écartées, KPI 3a ≈ 0,34 ; aucune KEV ;
+- **les trois besoins de l'ADR sont tranchés et outillés** : le passage du statut à « Accepté » attend la décision du propriétaire.

@@ -60,6 +60,9 @@ EOS
 }
 
 etape_controle() {
+  # Grafana garde en cache les droits d'un utilisateur : l'auditeur, connu avant la création du dossier PoC par le provisionnement,
+  # recevait 403 (passage pose-1, folders:read sans ce dossier) ; son propre GET avec reloadcache=true recharge ce cache (lecture)
+  attendu "cache des droits de l'auditeur rechargé" "$(graf auditeur GET '/api/access-control/user/permissions?reloadcache=true')" 200
   attendu "tableau servi (auditeur)" "$(graf auditeur GET /api/dashboards/uid/vulnerabilites-vex)" 200
   cp "$T/r.json" "$T/tableau.json"
   attendu "titre" "$(jq -r .dashboard.title "$T/tableau.json")" "Vulnérabilités et VEX"

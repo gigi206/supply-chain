@@ -413,3 +413,21 @@ Relevé en préparant le tableau de bord de l'ADR 0004 (07b) :
 4. Effet : `ScanEnRetard` ne sonne pas le 25/11, tant que le CronJob de 09:30 scanne `f5e6bcb0`.
 
 **Heures de la 07c** : plus 15:41:51 à 15:46:24 UTC (0 h 04 min 33 s ; constat, balayage, script à sec) ; **total : au plus 2 h 02 min 00 s** pour 10 h estimées.
+
+## Bascule des unités de scan : posée (note de 2026-11-24T16:15:17Z)
+
+Accord du propriétaire, verbatim : « J'autorise la bascule ». Sa question citait le drop-in (une ligne), la repose de `entrees-scan` par son script, sudo sur sc-stockage et le prix (`ScanEnRetard` à tort le 25/11 vers 11:37 UTC).
+
+| Pas | Journal | Résultat | Conforme |
+|---|---|---|---|
+| 1. `bascule-scans.sh pose`, 16:13:13 UTC | [`bascule-scans-pose.log`](bascule-scans-pose.log) | **7 cas, 0 écart**. Drop-in identique au rendu (`43101977…`) ; SCANS = `f5e6bcb0` et deb `60f25f5c` ; passage `success` ; `fraicheur-scan.prom` : sample-app à 2026-11-24T14:12:32Z, deb à 13:42:43Z | oui |
+| 2. `entrees-scan.sh pose`, 16:13:19 à 16:13:21 UTC | [`bascule-entrees-scan-pose.log`](bascule-entrees-scan-pose.log) | 2 artefacts, script identique, `success`, timer actif, **44 séries**. Sample-app : Medium 3, Unknown 2, toutes écartées, 0 KEV, `scannedAt` 14:12:28.5Z (4 s avant le référent), liste réémise (« liste émise »). Deb : 67 entrées, 23 écartées | oui |
+| 3. `entrees-scan.sh verif`, 16:13:46 UTC (Prometheus relu à 16:13:43) | [`bascule-entrees-scan-verif.log`](bascule-entrees-scan-verif.log) | 44 séries égales à jq sur les énoncés relus dans Zot ; dans Loki, 5 lignes et 1 document VEX pour sample-app, 67 lignes et 1 document pour le deb | oui |
+
+**Ce que cela établit** : Grafana compte l'image en service `f5e6bcb0`, et la fraîcheur de son scan est surveillée. L'alerte `ScanEnRetard` ne sonnera pas le 25/11 tant que le CronJob de 09:30 réussit. Ce dernier point n'est pas encore observé.
+
+**Hors mesure** :
+- l'unité de base `fraicheur-scan.service` garde `DIGEST=3a7ca1b1`, valeur masquée par SCANS ;
+- l'étape 4 de la 07c aurait dû inclure ces unités. Le rejeu de zéro les pose déjà avec `f5e6bcb0` (`s6a.sh`, commit `e61a4da6`) ; ce n'est pas mesuré.
+
+**Heures de la 07c** : plus 16:13:13 à 16:13:49 UTC (0 h 00 min 36 s) ; l'attente de la réponse du propriétaire (15:50:22 à 16:13:13) n'est pas comptée ; **total : au plus 2 h 02 min 36 s** pour 10 h estimées.

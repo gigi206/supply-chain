@@ -1,0 +1,23 @@
+# bascule des unités de scan de sc-stockage vers f5e6bcb0, étape pose, 2026-11-24T16:13:13Z, ad495038
+accord du propriétaire (verbatim) : « J'autorise la bascule »
+## drop-in en place, puis écart du rendu
+  # Brique 06, S6a : deux dépôts de scan (fraicheur-scan.py corrigé par s6a-fraicheur-deb.patch) ; SCANS remplace DEPOT_SCAN et DIGEST.
+  [Service]
+  Environment="SCANS=builds/scan/sample-app@sha256:3a7ca1b14dbf… builds/scan/sample-app-deb@sha256:60f25f5c3fb5…"
+  3c3
+  < Environment="SCANS=builds/scan/sample-app@sha256:3a7ca1b14dbf… builds/scan/sample-app-deb@sha256:60f25f5c3fb5…"
+  ---
+  > Environment="SCANS=builds/scan/sample-app@sha256:f5e6bcb0e0fb… builds/scan/sample-app-deb@sha256:60f25f5c3fb5…"
+OK   lignes changées par le rendu : 1
+OK   SCANS rendu : builds/scan/sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 builds/scan/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+OK   drop-in installé identique au rendu : 431019771e83696de131f3a3e8f6bfa1ef3c8d3923d02ce156bb8f1d0c6f3a0c
+OK   SCANS de fraicheur-scan en place : builds/scan/sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 builds/scan/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+OK   résultat du passage de fraicheur-scan : success
+OK   timer de fraicheur-scan actif : active
+## fraicheur-scan.prom après le passage
+  scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app"} 1795529552
+  scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb"} 1795527763
+  base_grype_construite_timestamp_seconds{depot="vulndb/grype"} 1795501325
+OK   horodatage de sample-app = dernier scan de f5e6bcb0 : 2026-11-24T14:12:32Z
+rappel : entrees-scan vise encore l'ancien SCANS jusqu'à entrees-scan.sh pose
+## bilan : 7 cas, 0 écart(s)

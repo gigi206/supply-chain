@@ -1,0 +1,59 @@
+début : 2026-11-24T16:13:19Z, étape pose, entrees-scan.py 9a43286a7bc87c0b…
+OK   deux artefacts dans SCANS : 2
+OK   entrees-scan.py installé identique : 9a43286a7bc87c0bae798b9c6733f07e248108767c96471e384ed75767e3197b
+OK   résultat du premier passage : success
+OK   timer actif : active
+## premier passage : résumé et nombre de lignes d'entrée au journal (lignes elles-mêmes non archivées)
+entrées builds/scan/sample-app=5@2026-11-24T14:12:28.516620047Z (liste émise) builds/scan/sample-app-deb=67@2026-11-24T13:42:38.730975632Z
+entrees-scan.service: Deactivated successfully.
+Finished entrees-scan.service - Entrées du scan signé en métriques et dans le journal (brique 07b, tranche 1).
+lignes d'entrée : 221
+## séries écrites
+  scan_entrees{depot="builds/scan/sample-app",gravite="Critical"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="High"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="Medium"} 3
+  scan_entrees{depot="builds/scan/sample-app",gravite="Low"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="Negligible"} 0
+  scan_entrees{depot="builds/scan/sample-app",gravite="Unknown"} 2
+  scan_entrees{depot="builds/scan/sample-app",gravite="autre"} 0
+  scan_entrees_vex{depot="builds/scan/sample-app",gravite="Critical"} 0
+  scan_entrees_vex{depot="builds/scan/sample-app",gravite="High"} 0
+  scan_entrees_vex{depot="builds/scan/sample-app",gravite="Medium"} 3
+  scan_entrees_vex{depot="builds/scan/sample-app",gravite="Low"} 0
+  scan_entrees_vex{depot="builds/scan/sample-app",gravite="Negligible"} 0
+  scan_entrees_vex{depot="builds/scan/sample-app",gravite="Unknown"} 2
+  scan_entrees_vex{depot="builds/scan/sample-app",gravite="autre"} 0
+  scan_entrees_kev{depot="builds/scan/sample-app"} 0
+  scan_entrees_kev_vex{depot="builds/scan/sample-app"} 0
+  scan_entrees_avec_correctif{depot="builds/scan/sample-app"} 5
+  scan_entrees_scanne_timestamp_seconds{depot="builds/scan/sample-app"} 1795529548
+  scan_vex_documents{depot="builds/scan/sample-app"} 1
+  scan_vex_rejetes{depot="builds/scan/sample-app"} 0
+  scan_vex_ecartees_sans_exemption{depot="builds/scan/sample-app"} 0
+  scan_vex_repli{depot="builds/scan/sample-app"} 0
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Critical"} 3
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="High"} 33
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Medium"} 28
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Low"} 1
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Negligible"} 0
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="Unknown"} 2
+  scan_entrees{depot="builds/scan/sample-app-deb",gravite="autre"} 0
+  scan_entrees_vex{depot="builds/scan/sample-app-deb",gravite="Critical"} 1
+  scan_entrees_vex{depot="builds/scan/sample-app-deb",gravite="High"} 5
+  scan_entrees_vex{depot="builds/scan/sample-app-deb",gravite="Medium"} 15
+  scan_entrees_vex{depot="builds/scan/sample-app-deb",gravite="Low"} 0
+  scan_entrees_vex{depot="builds/scan/sample-app-deb",gravite="Negligible"} 0
+  scan_entrees_vex{depot="builds/scan/sample-app-deb",gravite="Unknown"} 2
+  scan_entrees_vex{depot="builds/scan/sample-app-deb",gravite="autre"} 0
+  scan_entrees_kev{depot="builds/scan/sample-app-deb"} 0
+  scan_entrees_kev_vex{depot="builds/scan/sample-app-deb"} 0
+  scan_entrees_avec_correctif{depot="builds/scan/sample-app-deb"} 67
+  scan_entrees_scanne_timestamp_seconds{depot="builds/scan/sample-app-deb"} 1795527758
+  scan_vex_documents{depot="builds/scan/sample-app-deb"} 1
+  scan_vex_rejetes{depot="builds/scan/sample-app-deb"} 0
+  scan_vex_ecartees_sans_exemption{depot="builds/scan/sample-app-deb"} 0
+  scan_vex_repli{depot="builds/scan/sample-app-deb"} 0
+OK   séries écrites : 44
+-> Overall exposure level for entrees-scan.service: 2.9 OK :-)
+fraicheur-scan, pour comparer : -> Overall exposure level for fraicheur-scan.service: 2.9 OK :-)
+fin : 2026-11-24T16:13:21Z, bilan : tenu

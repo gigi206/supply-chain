@@ -2570,3 +2570,26 @@ Question posée en une fois (quatre questions, options avec leur prix ; recomman
 - Sans la bascule, sample-app afficherait 6, 5, 1 (image `3a7ca1b1`).
 
 **Heures de la 07b** : plus 15:46:24 à 15:50:22 UTC (0 h 03 min 58 s ; documentation de Grafana, tableau, banc, script de pose, installation de la 19b) ; **total : au plus 15 h 57 min 38 s** pour 10 h estimées ; seuil de 20 h non atteint.
+
+## Tableau « Vulnérabilités et VEX » : posé (note de 2026-11-24T16:15:17Z)
+
+Accord du propriétaire, verbatim : « J'autorise la pose ». Sa question citait 2 fichiers dans `/etc/grafana/provisioning` (sudo), le rechargement par l'API sans redémarrage, et la lecture seule. Le propriétaire a aussi répondu « Oui, pousse ».
+
+| Passage | Journal | Résultat |
+|---|---|---|
+| `pose`, 16:13:49 UTC | [`tableau-pose-pose-1.log`](tableau-pose-pose-1.log) | Fichiers installés (`bb875819…`, `e02e6717…`), rechargement 200. **5 écarts** : l'auditeur reçoit 403 sur le tableau. Les requêtes jouées par l'auditeur donnent déjà les valeurs prédites |
+| diagnostic, lecture seule, de 16:14:15 à 16:14:32 UTC | (dans cette note) | Les deux ordres concordent. L'auditeur est bien Viewer. Le dossier PoC porte les droits par défaut (Viewer : View, Editor : Edit). La recherche de l'auditeur trouve le tableau. Mais ses droits effectifs (`/api/access-control/user/permissions`) ne contiennent pas le dossier : `folders:read` se limite à `general` et `sharedwithme`. **Cause : le cache des droits de l'utilisateur**, établi avant la création du dossier. Au banc, le compte Viewer était créé après le tableau. Un GET de l'auditeur lui-même avec `reloadcache=true` recharge ce cache, en lecture : ensuite, `dashboards:read` et `folders:read` contiennent `folders:uid:dg5a6d8vo7m68c`, et le tableau répond 200 |
+| `controle`, 16:14:39 UTC | [`tableau-pose-controle.log`](tableau-pose-controle.log) | **7 cas, 0 écart** (rechargement du cache ajouté au contrôle). Tableau servi à l'auditeur, provisionné, dans le dossier PoC, 10 panneaux identiques ; enregistrement par l'auditeur refusé (403) |
+
+**Valeurs affichées** (16:14:39 UTC, conformes à la prédiction) :
+- sample-app : 5 trouvées, 5 écartées, 0 restante, KPI 3a = 1 ;
+- deb : 67 trouvées, 23 écartées, 44 restantes (Critical 2, High 28, Medium 13, Low 1), KPI 3a ≈ 0,343 ;
+- KEV ouvertes 0 ; KPI 3b vide (0/0, affiché « aucune KEV ») ;
+- âge du scan : environ 2 h pour sample-app et 2 h 32 min pour le deb.
+
+**Limites** :
+- **rendu visuel non vu** : contrôlé par l'API seulement, aucune capture ;
+- après un rejeu de zéro, l'auditeur est créé après le redémarrage de Grafana, donc après le dossier : le cache ne devrait pas gêner (non mesuré) ;
+- tout compte connu avant la création d'un futur dossier provisionné aura le même 403 jusqu'au rechargement de son cache, ou jusqu'à son expiration (durée non mesurée).
+
+**Heures de la 07b** : plus 16:13:49 à 16:15:17 UTC (0 h 01 min 28 s) ; **total : au plus 15 h 59 min 06 s** pour 10 h estimées ; seuil de 20 h non atteint.

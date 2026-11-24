@@ -1,0 +1,20 @@
+# tableau « Vulnérabilités et VEX », étape controle, 2026-11-24T16:14:39Z, ad495038
+fournisseur bb875819b0200a17…, tableau e02e67178fc64ee9…
+OK   cache des droits de l'auditeur rechargé : 200
+OK   tableau servi (auditeur) : 200
+OK   titre : Vulnérabilités et VEX
+OK   dossier : PoC
+OK   marqué provisionné : true
+OK   panneaux identiques au fichier : 936aaa041a9cfa6b
+OK   enregistrement par l'auditeur refusé : 403
+## requêtes des panneaux, jouées par l'auditeur (2026-11-24T16:14:39Z)
+  panneau 2 : builds/scan/sample-app = 5 ; builds/scan/sample-app-deb = 67
+  panneau 3 : builds/scan/sample-app = 5 ; builds/scan/sample-app-deb = 23
+  panneau 4 : builds/scan/sample-app = 0 ; builds/scan/sample-app-deb = 44
+  panneau 5 : builds/scan/sample-app-deb/Critical = 2 ; builds/scan/sample-app-deb/High = 28 ; builds/scan/sample-app-deb/Medium = 13 ; builds/scan/sample-app-deb/Low = 1
+  panneau 6 : builds/scan/sample-app = 1 ; builds/scan/sample-app-deb = 0.34328358208955223
+  panneau 7 : builds/scan/sample-app = 0 ; builds/scan/sample-app-deb = 0
+  panneau 8 : builds/scan/sample-app = null ; builds/scan/sample-app-deb = null
+  panneau 9 : builds/scan/sample-app = 7331 ; builds/scan/sample-app-deb = 9121
+  panneau 10 : builds/scan/sample-app = 7327 ; builds/scan/sample-app-deb = 9116
+## bilan : 7 cas, 0 écart(s)
