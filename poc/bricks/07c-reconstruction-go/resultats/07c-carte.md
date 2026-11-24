@@ -501,3 +501,27 @@ Sur recommandation du conseiller, deux relevés en lecture seule, non scriptés 
 **Conséquence** : un VEX ne corrige pas le deb, puisque 31 entrées sont en classe C. La correction passe par une toolchain corrigée. Il existe une voie dans Debian même : `golang-1.26-go` de trixie-backports, en 1.26.11 comme l'image, dont la stdlib n'a aucune entrée dans la base Grype du 24/11 (ADR 0004, l. 94). Cela changerait les dépendances de construction et le verrou de la 06 (`verrou-deb.txt`, `debian/rules` qui cite `golang-1.24-src` en dur), puis obligerait à rejouer la 06 et à refaire son VEX. C'est un chantier de la taille de la 07c, et un choix du propriétaire. Rien n'est modifié.
 
 *Correction de 17:50:25Z* : `deb-go-6859.sh` écrivait ses fichiers intermédiaires dans `/tmp` et les effaçait par une expansion de variable. Il utilise maintenant le chemin littéral `~/.cache/supply-chain-poc/07c/deb-go-6859`, effacé à la sortie. Le journal `deb-go-6859.log` vient de la version d'avant. Le calcul est le même ; seul le dossier temporaire change.
+
+## Commit d'archive de la VSA : correctif préparé à sec (note de 2026-11-24T18:19:36Z)
+
+Le correctif est préparé maintenant pour ne pas être écrit à la hâte après R5. Il n'est pas appliqué : R4 et R5 tournent avec `replay.sh` tel qu'il est poussé (`e02d2bc6`), et ni `outils/` ni `politique-replay.md` ne sont touchés.
+
+- [`archive-vsa.patch`](../archive-vsa.patch) (sha256 `543b9df1…`), produit par [`archive-vsa.py`](../archive-vsa.py) sur des copies : chaque remplacement doit trouver exactement une occurrence, sinon arrêt.
+- **`replay.sh`** :
+  - défauts portés à `f5e6bcb0` : `IMAGE`, `INVOCATION` `9539952b-07a7-4a0b-a6e1-084304d0e8af`, `FIN_BUILD` 2026-11-24T13:27:42Z (le `finishedOn` signé que R3 a relu, `r3-verifier_entrees.log` l. 46), Go 1.26.11 avec l'empreinte `9849f4e0…`. Les valeurs de `3a7ca1b1` restent en commentaire ;
+  - `RESULTATS_REPLAY` prend par défaut `resultats/f5e6bcb0` et reste donc toujours défini. Sinon, des défauts portés à `f5e6bcb0` auraient écrit dans `resultats/`, le dossier de la clôture de la 10, et `lancer`, qui ne refuse un journal existant que si `RESULTATS_REPLAY` est défini, aurait réécrit `r5-pousser_vsa.log`. Relu dans trois cas (rien, `RESULTATS` seul, `RESULTATS_REPLAY`) : `resultats/f5e6bcb0`, `resultats/f5e6bcb0`, la valeur donnée. Trou relevé par le conseiller, corrigé à 18:22:28Z ;
+  - `pousser_vsa` ne réécrit plus `r5-vsa-manifeste.json` s'il existe. Il compare le manifeste à l'archive et refuse s'il diffère (même bundle et même sujet donnent le même manifeste).
+- **`rejeu.sh`** : `10 (VSA)` pousse la VSA de `resultats/f5e6bcb0`, avec le jalon `rejeu-<libellé>-r5`. Le journal `r5-pousser_vsa.log` de R5 n'est donc jamais réécrit. Le commentaire « Ne pas lancer avec POUSSER_VSA=1 avant » est retiré. Conséquence voulue : un second rejeu avec le même libellé s'arrêtera à « 10 (VSA) », puisque son journal existera.
+- **Contrôles** : `bash -n` sur les deux copies ; `git apply --check` sur `e02d2bc6` ; les défauts, évalués sans environnement, donnent `f5e6bcb0`, `9539952b…`, 2026-11-24T13:27:42Z, `go1.26.11.linux-amd64.tar.gz` et `9849f4e0…`.
+- **À faire dans le commit d'archive** : remplacer les deux `@DATE@` par l'heure `date -u` du commit, relancer `archive-vsa.py` si `replay.sh` ou `rejeu.sh` ont changé (sinon `git apply`), puis un `bash -x` des défauts. Le re-push par le rejeu reste non mesuré jusqu'à un rejeu de zéro avec `POUSSER_VSA=1`.
+
+**Câblage dans `rejeu.sh` revu en même temps** (lecture seule) :
+- le tableau « Vulnérabilités et VEX » est déjà posé par l'installation de la 19b (`journalisation.sh` l. 150-152 et 174-176, commit `ad495038`) ;
+- la cible des scans (`SCANS`) vient de `s6a.sh fraicheur`, déjà porté à `f5e6bcb0` (`e61a4da6`) ;
+- le commentaire `3a7ca1b1` de la ConfigMap `porte` (`politique/porte/taches.yml` l. 24-26) est voulu : `66a9f298` reste pour que `3a7ca1b1` soit encore jugeable.
+
+Rien d'autre n'est à câbler pour la 07c.
+
+**Effet sur R5** : ce commit déplace HEAD. `etape_vsa` refuse un HEAD non poussé, donc une poussée (accord du propriétaire) sera nécessaire avant R5.
+
+**Heures de la 07c** : plus 18:16:45 à 18:22:28 UTC (0 h 05 min 43 s ; correctif, relecture du câblage, correction) ; **total : au plus 2 h 09 min 14 s** pour 10 h estimées.
