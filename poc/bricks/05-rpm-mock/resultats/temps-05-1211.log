@@ -47,3 +47,6 @@ premier commit : 196ee34 ; dernier : a4360d3b
 # nouveau relevé, même méthode (date d auteur, écarts <= 1 h), 2026-11-20T20:07:45Z à HEAD df0edb54, pour le dossier de clôture ; contrôle : 376 commits, 42.82 h à a4360d3b, égal au relevé ci-dessus ; les relevés ci-dessus ne sont pas réécrits
 premier commit : 196ee34 ; dernier touchant la brique : 3d09ede7
 396 commits, 46.78 h
+# nouveau relevé, même méthode (date d auteur, écarts <= 1 h, commits touchant poc/bricks/05-rpm-mock), 2026-11-24T18:11:51Z à HEAD f7146d84, pour la clôture ; contrôle : 396 commits, 46.78 h à 3d09ede7, égal au relevé ci-dessus ; les relevés ci-dessus ne sont pas réécrits
+premier commit : 196ee343 ; dernier touchant la brique : 797d1b59
+425 commits, 49.66 h

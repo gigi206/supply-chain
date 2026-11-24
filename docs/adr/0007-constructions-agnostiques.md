@@ -262,3 +262,5 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - `m5b-rejeu.sh` copie donc avant le démontage les entrées de l'hôte que ses étapes lisent : le rendu des builders, la mesure d'un autre jour et le layout de M4a.
 - Il rejoue aussi trois gardes de sûreté de la construction rpm : témoins réseau, construction hermétique, aucune URL.
 - Le banc passe à 115 OK. Le bloc 05 de `rejeu.sh` est écrit, et pas encore rejoué.
+
+**Additif du 24/11/2026, écrit à 2026-11-24T18:12:17Z UTC** : la brique 05 est close, seuil atteint avec réserves (décision du propriétaire « Avec ses réserves »). La voie rpm (mock en `--isolation=simple` dans Kata, amorce figée par digest, verrou de 222 rpm, fermeture servie par Zot) est reconstruite au bit près sur une plateforme recréée de zéro (M5b). Les réserves sont listées dans le [README de la 05](../../poc/bricks/05-rpm-mock/README.md) ; celles qui touchent cette ADR sont l'amorce figée, la barrière réseau unique et `TZ` laissé à l'hôte.
