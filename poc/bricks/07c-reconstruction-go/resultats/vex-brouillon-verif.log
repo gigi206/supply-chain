@@ -1,0 +1,22 @@
+# verdict du brouillon du VEX chi de f5e6bcb0, 2026-11-24T13:51:21Z, dcd31393, brouillon sha256 f99026eb22eba7d0
+## juge : scan-outil depuis une copie de HEAD (go1.24.7)
+OK   empreinte de scan-outil (celle de l'image b799feda) : 7dde1a8ed457f254
+## brouillon
+{"id":"https://supply-chain.example/vex/sample-app/f5e6bcb0","author":"","timestamp":"","enonces":[{"n":"GHSA-3fxj-6jh8-hvhx","j":"vulnerable_code_not_present"},{"n":"GHSA-j6qf-3m9c-vwj3","j":"vulnerable_code_not_present"},{"n":"GHSA-mqqf-5wvp-8fh8","j":"vulnerable_code_not_present"},{"n":"GO-2026-5775","j":"vulnerable_code_not_present"},{"n":"GO-2026-5777","j":"vulnerable_code_not_present"}]}
+## 1. brouillon tel quel (author et horodatages vides)
+REFUS|énoncés non classables par scan-outil vex (horodatage illisible ou nom absent) : 0/5
+OK   brouillon tel quel : refusé : 1
+## 2. copie témoin (auteur témoin, heure du moment), jamais signée
+JUGE|exemption, 5 énoncé(s) dont 0 large(s), document sha256 b57643d0f477fa413f872e4e9446f58ded856c71bafe43a830f1320c4dba256a, sujet sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7, VEX vers 192
+PUBLIES|0 énoncé(s) publié(s) vérifié(s) dans 192.168.161.13:5000/builds/vex/sample-app (CLE_PUBLIQUE), cosign code 1 : no matching attestations: 
+ECHEANCE|énoncé 0 : 2026-12-24T13:51:24Z (30 jours après 2026-11-24T13:51:24Z)
+ECHEANCE|énoncé 1 : 2026-12-24T13:51:24Z (30 jours après 2026-11-24T13:51:24Z)
+ECHEANCE|énoncé 2 : 2026-12-24T13:51:24Z (30 jours après 2026-11-24T13:51:24Z)
+ECHEANCE|énoncé 3 : 2026-12-24T13:51:24Z (30 jours après 2026-11-24T13:51:24Z)
+ECHEANCE|énoncé 4 : 2026-12-24T13:51:24Z (30 jours après 2026-11-24T13:51:24Z)
+OK   copie témoin : acceptée : 0
+OK   copie témoin : exemption de 5 énoncés : 1
+OK   copie témoin : 5 échéances : 5
+## dépôt
+OK   outil/ du dépôt inchangé (git status) : 0
+## bilan : 6 cas, 0 écart(s)

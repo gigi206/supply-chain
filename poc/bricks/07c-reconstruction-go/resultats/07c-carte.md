@@ -142,3 +142,9 @@ Reprise du chantier : 2026-11-24T13:49:12Z. Déroulé de la pièce 8 de la 07b :
 **(b) brouillon de la session, non validé** : [`vex/sample-app-f5e6bcb0.json`](../../07a-sbom-grype/vex/sample-app-f5e6bcb0.json), sha256 `f99026eb22eba7d0`. Texte du VEX de `3a7ca1b1` (validé et signé le 24/11), seuls changent : l'`@id` du document (`…/sample-app/f5e6bcb0`), le produit de chaque énoncé (`pkg:oci/sample-app@sha256:f5e6bcb0…`), et dans chaque `impact_statement` le digest de l'image, l'empreinte du fichier (`56f3cd7d256562be…`) et le journal cité (`07c-reconstruction-go/resultats/vex-binaire.log`). `author` et horodatages vides ; 0 occurrence restante de `3a7ca1b1`, `e3749c68`, `piece8-binaire-4`.
 
 **(c) verdict de `verifier`, prédiction** ([`vex-brouillon-verif.sh`](../vex-brouillon-verif.sh), copie de `deb-brouillon-verif.sh`, journal `vex-brouillon-verif.log`) : juge `scan-outil` reconstruit depuis HEAD (`7dde1a8ed457f254`) ; brouillon tel quel refusé (code 1) ; copie témoin (auteur témoin, heure du moment, jamais signée) acceptée, exemption de 5 énoncés, 5 échéances ; `outil/` inchangé. **Bilan attendu : 6 cas, 0 écart.**
+
+**(c), résultat** ([journal](vex-brouillon-verif.log), 13:51:21 à 13:51:25 UTC ; note de 2026-11-24T13:51:32Z) : **6 cas, 0 écart**, conforme. Brouillon tel quel refusé ; copie témoin acceptée : exemption de 5 énoncés (0 large), sujet `f5e6bcb0`, 5 échéances à 30 jours ; aucun VEX encore publié pour ce digest.
+
+**En attente du propriétaire** : validation du contenu du brouillon (et auteur à inscrire), puis accord nommé de signature pour ce document seul. Rien n'est signé.
+
+**Heures** : reprise 13:49:12 à 13:51:25 UTC (2 min 13 s) ; **total de la 07c : 0 h 28 min 4 s** pour 10 h estimées.
