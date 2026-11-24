@@ -223,3 +223,17 @@ Faits pour les deux options (dans ce commit) : `voie-d.sh` (Go 1.26.11 lu dans l
 **En attente** : décision du propriétaire, « un seul digest » (re-signature de `publier-essai`, accord nommé) ou « deux digests » (5 témoins affaiblis). Rien n'est lancé dans le cluster ni sur les VM.
 
 **Heures** : reprise de 14:15:44 à 14:27:57 UTC : 12 min 13 s ; **total de la 07c : au plus 1 h 02 min 26 s** pour 10 h estimées.
+
+## Étape 7 : option « un seul digest » (note de 2026-11-24T14:34:15Z)
+
+**Décision** : à la question « Pour les images d'essai : un seul digest ou deux digests ? », réponse verbatim du propriétaire : « Un seul digest ». Les images d'essai de J4 (`builds/essai-*`, copies de la référence de la 04 poussée en J2) passent elles aussi à `f5e6bcb0` ; `preuves.sh` garde sa logique (`APP_REEL` = `APP_DIGEST`).
+
+**Périmètre relevé à sec** (remplacements de `3a7ca1b1` par `f5e6bcb0`, et de `w/b04/app-layout` par `w/b04-1.26.11/app-layout`) :
+- J2 : `stockage.sh` (`APP_LAYOUT`, `APP_DIGEST`) ;
+- J4 : `tekton.sh` (5 littéraux et 2 chemins de layout, `signature`, `verifier`, `webhook`, `essais_webhook`) ;
+- J5 : `tsa.sh` ; J6 et suivants : `politique.sh` (sourcé par `preuves.sh` et `s4d3.sh` de la 06) ; fin du rejeu : `kyverno-correctif.sh`, `kyverno-permanent.sh`, `kyverno-admission.sh` ; hors rejeu, par cohérence : `redemarrer.sh` (lit `workspace/sample-app@APP_DIGEST`, que J2 ne poussera plus en `3a7ca1b1`) ;
+- 07a : `plateforme.sh` l. 96 (cible du scan) ; 06 : `s6a.sh` l. 55 ;
+- **tâche signée `publier-essai`** : son gabarit écrit le digest des essais en dur dans le résultat `IMAGE_DIGEST` ; la version signée porte `3a7ca1b1`. Re-signature par la clé des tâches (**accord nommé requis**), puis une entrée de plus dans la liste revue, **placée en premier** sous `publier-essai` : `preuves.sh` l. 1213 lit la première référence comme tâche en service (l'ancienne `836cd080` reste, pour le cluster en service, dont les images d'essai sont toujours `3a7ca1b1`) ;
+- inchangés : le cas de posture `param-en-trop-par-bundle.yaml` (référence lue comme une chaîne par le linter, jamais tirée : son attendu « aucune » ne dépend pas du bundle) ; `porte_test.rego` (jeu d'essai unitaire de la règle).
+
+**Prédiction** ([`predire-publier-essai.sh`](../predire-publier-essai.sh), journal `predire-publier-essai.log`, rien signé, Zot jetable) : rendus du gabarit avec `3a7ca1b1` et `f5e6bcb0` : 2 lignes de diff, la seule ligne changée est le résultat `IMAGE_DIGEST` ; la tâche signée versionnée porte l'ancien digest ; témoin : la tâche signée versionnée poussée par `tkn bundle push` dans le Zot jetable redonne `836cd080` (liste revue), deux fois. **Bilan attendu : 5 cas, 0 écart.** Si le témoin tient, le digest du bundle de la nouvelle signature pourra être calculé hors du vrai Zot.
