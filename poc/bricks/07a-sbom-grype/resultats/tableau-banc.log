@@ -1,0 +1,28 @@
+# banc du tableau « Vulnérabilités et VEX », Grafana 13.3.0, 2026-11-24T15:48:42Z, 85047a12
+fournisseur bb875819b0200a17…, tableau e02e67178fc64ee9…
+OK   sha256 de l'archive de Grafana : cec8f98cc59bc1a1945833b652371a073be678c5c159a9b1695ad63c04fae5a7
+OK   Grafana démarré (santé) : 200
+version : 13.3.0
+OK   avant le dépôt : tableau absent : 404
+OK   seule ligne réécrite dans le fournisseur : 1
+OK   rechargement du provisionnement (administrateur) : 200
+  réponse : {"message":"Dashboards config reloaded"}
+OK   tableau servi après rechargement : 200
+OK   titre : Vulnérabilités et VEX
+OK   panneaux : 10
+OK   dossier : PoC
+OK   marqué provisionné : true
+OK   panneaux identiques au fichier : 936aaa041a9cfa6b
+OK   enregistrement par l'administrateur refusé : 400
+  message : Cannot save provisioned dashboard
+OK   suppression par l'administrateur refusée : 400
+  message : provisioned dashboard cannot be deleted
+OK   compte lecteur créé (Viewer par défaut) : 200
+OK   le lecteur lit le tableau : 200
+OK   rôle du lecteur : 200Viewer
+OK   enregistrement par le lecteur refusé : 403
+OK   titre inchangé après les refus : 200Vulnérabilités et VEX
+lignes d'erreur du journal de Grafana sur le provisionnement : 0
+0
+## bilan : 17 cas, 0 écart(s)
+fin : 2026-11-24T15:48:51Z

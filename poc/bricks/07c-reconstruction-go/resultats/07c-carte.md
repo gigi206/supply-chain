@@ -385,3 +385,31 @@ Relevé en préparant le tableau de bord de l'ADR 0004 (07b) :
 **Suite** : balayage de l'état en service à la recherche d'autres restes de `3a7ca1b1`, en lecture seule. Ensuite, une bascule étroite préparée à sec, à poser sur accord : drop-in de `fraicheur-scan`, puis `entrees-scan.sh pose` et `verif`.
 
 **Heures de la 07c** : plus 15:41:51 à 15:44:44 UTC ; total donné à la note suivante.
+
+## Bascule des unités de scan : balayage, script à sec, prédiction (note de 2026-11-24T15:50:22Z, avant tout lancement de `pose`)
+
+**Balayage en lecture seule** (15:44:58 à 15:45:27 UTC), à la recherche d'autres restes de `3a7ca1b1` dans l'état en service :
+- **cluster** (CronJobs, ConfigMaps, Jobs, Deployments, DaemonSets, StatefulSets, politiques Kyverno, objets Tekton ; jamais les Secrets) :
+  - la ConfigMap `porte/porte`, clé `taches.yml`, contient un commentaire (« l'image 3a7ca1b1 et ses provenances doivent rester jugeables ») ;
+  - 3 anciens Jobs (`h-essai-signature`, `h-essai-webhook`, `scan-sample-app-29925210` de 09:30) ;
+  - rien d'actif ;
+- **sc-stockage** : `fraicheur-scan.service.d/s6a-deb.conf` et `entrees-scan.service` (la cible) ; `fraicheur-scan.service`, dont la valeur `DIGEST=3a7ca1b1` est masquée par `SCANS` ;
+- **sc-confiance, sc-build** : rien ;
+- **non balayé** : `/etc/grafana`, `/etc/prometheus` et `/etc/alertmanager` sur les trois VM, illisibles sans sudo ;
+- **le Job de la porte ne lit pas ces unités** (`porte-job.yaml` ne nomme ni `fraicheur` ni `entrees`) : la prédiction « porte inchangée » de R5 tient.
+
+**Prix de l'attente** (règles de `19-observabilite/config/regles/alertes.yml`, dernier scan vu par `fraicheur-scan` : 2026-11-24T09:32:03Z) :
+- `ScanEnRetard` (26 h, `for: 5m`) sonnera à tort vers **2026-11-25T11:37 UTC** ;
+- `ScanBientotRefuse` (5 jours, critique) vers 2026-11-29T09:32 UTC.
+
+**Script** [`bascule-scans.sh`](../bascule-scans.sh) (`sec` | `pose`, la pose sur accord) :
+- [`bascule-scans-sec-1.log`](bascule-scans-sec-1.log) : 2 écarts, dus au script (SCANS lu deux fois par `sed`), rien sur la VM ;
+- [`bascule-scans-sec.log`](bascule-scans-sec.log) : **5 cas, 0 écart**. Le drop-in rendu ne change qu'une ligne, le digest de sample-app. Derniers scans dans Zot : `f5e6bcb0` à 14:12:32Z, `3a7ca1b1` à 09:32:03Z, deb à 13:42:43Z.
+
+**Prédiction** (ordre imposé : `fraicheur-scan` d'abord, puis `entrees-scan`, qui relit SCANS dans l'unité en place) :
+1. `bascule-scans.sh pose` → `resultats/bascule-scans-pose.log` : **7 cas, 0 écart**. SCANS en place = `f5e6bcb0` et deb `60f25f5c` ; passage `success` ; horodatage de sample-app dans `fraicheur-scan.prom` = 2026-11-24T14:12:32Z.
+2. `mise exec -- poc/bricks/07a-sbom-grype/entrees-scan.sh pose` → `resultats/bascule-entrees-scan-pose.log` (script de la 07a inchangé) : 2 artefacts, `entrees-scan.py` identique, passage `success`, timer actif, **44 séries**. Sample-app : Medium 3, Unknown 2, autres gravités 0 ; écartées Medium 3, Unknown 2 ; 0 KEV ; `scan_entrees_scanne_timestamp_seconds` = `scannedAt` du scan de 14:12:32Z (quelques secondes avant). La liste de sample-app est réémise une fois dans Loki. Deb inchangé : 67 entrées, 23 écartées.
+3. `entrees-scan.sh verif` → `resultats/bascule-entrees-scan-verif.log` : 44 séries, égales à jq sur les énoncés relus dans Zot.
+4. Effet : `ScanEnRetard` ne sonne pas le 25/11, tant que le CronJob de 09:30 scanne `f5e6bcb0`.
+
+**Heures de la 07c** : plus 15:41:51 à 15:46:24 UTC (0 h 04 min 33 s ; constat, balayage, script à sec) ; **total : au plus 2 h 02 min 00 s** pour 10 h estimées.

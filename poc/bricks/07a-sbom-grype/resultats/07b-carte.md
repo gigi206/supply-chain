@@ -2532,3 +2532,41 @@ Question posée en une fois (quatre questions, options avec leur prix ; recomman
 **Constat en préparant le tableau** (lecture par l'auditeur dans Grafana à 15:41:51 UTC, puis lecture seule sur sc-stockage à 15:42:24 UTC) : les séries de sample-app comptent l'image `3a7ca1b1` (6 entrées : 4 Medium, 2 Unknown ; 5 écartées ; scan de 09:31:58 UTC), parce que `fraicheur-scan` et `entrees-scan` visent toujours `builds/scan/sample-app@sha256:3a7ca1b1…`. Oubli de l'étape 4 de la 07c, compté et traité dans la 07c.
 
 **Heures de la 07b** : plus 15:33:47 à 15:41:51 UTC (0 h 08 min 04 s) ; **total : au plus 15 h 53 min 40 s** pour 10 h estimées ; seuil de 20 h non atteint.
+
+## Tableau « Vulnérabilités et VEX » : écrit, banc jetable, prédiction de la pose (note de 2026-11-24T15:50:22Z, avant tout lancement de `pose`)
+
+**Fichiers** (versionnés dans la 19b, qui installe Grafana) :
+- [`tableaux.yaml`](../../19b-journalisation/config/provisioning/dashboards/tableaux.yaml) : fournisseur `file`, dossier PoC, `disableDeletion` et `allowUiUpdates: false` ;
+- [`vulnerabilites-vex.json`](../../19b-journalisation/config/provisioning/dashboards/tableaux/vulnerabilites-vex.json) : 10 panneaux :
+  - un texte de lecture et de limites ;
+  - trouvées, écartées, restantes, par dépôt ;
+  - restantes par gravité ;
+  - KPI 3a ;
+  - KEV ouvertes ;
+  - KPI 3b (0/0 affiché « aucune KEV ») ;
+  - âge du scan compté et âge vu par `fraicheur-scan` (seuils des alertes : 26 h et 5 jours).
+- Pas de score (choix 7). Les 9 requêtes ont été jouées par l'auditeur à 15:47:26 UTC : toutes répondent, et le ratio KEV vaut NaN (0/0).
+
+**Banc jetable** [`tableau-banc.sh`](../tableau-banc.sh) → [`tableau-banc.log`](tableau-banc.log), de 15:48:42 à 15:48:51 UTC : **17 cas, 0 écart**.
+- Grafana 13.3.0 tourne sur l'hôte, sans réseau. Son archive est revérifiée (sha256 de la 19b).
+- Le fournisseur, déposé à chaud, est pris par `POST /api/admin/provisioning/dashboards/reload` : **pas de redémarrage de Grafana**. La documentation de cette API a été lue avant le banc.
+- 10 panneaux identiques au fichier, dossier PoC, provisionné.
+- L'administrateur ne peut ni l'enregistrer (400, « Cannot save provisioned dashboard ») ni le supprimer (400). Un compte Viewer le lit et ne peut pas l'enregistrer (403).
+- Ligne d'erreur de provisionnement dans le journal de Grafana : 0. Le journal affiche « 0 » deux fois : `grep -c` sans correspondance sort en code 1, ce qui déclenche aussi `|| echo 0`. C'est un défaut d'affichage, sans effet sur le résultat.
+
+**Écart de procédure** : ce banc a été lancé **sans prédiction datée commitée** auparavant, comme le relevé `adr0004-cvss`. Les cas attendus étaient écrits dans l'en-tête et dans les `attendu` du script avant le lancement, mais pas commités.
+
+**Pose** [`tableau-pose.sh`](../tableau-pose.sh) (`sec` | `pose` sur accord | `controle`) :
+- [`tableau-pose-sec-1.log`](tableau-pose-sec-1.log) : 1 écart, dû à une attente fausse. `/etc/grafana` est en 0750, donc son contenu n'est pas visible sans sudo ;
+- [`tableau-pose-sec.log`](tableau-pose-sec.log) : **3 cas, 0 écart**. Le tableau est absent ; la source `prometheus` est présente.
+
+**Rejeu de zéro** : `journalisation.sh` (`installer`, 19b) copie et installe désormais les deux fichiers. Grafana y est redémarré, ce qui charge le fournisseur. **Non mesuré** avant un rejeu.
+
+**Prédiction de la pose**, après la bascule des unités de scan (07c), `tableau-pose.sh pose` → `resultats/tableau-pose-pose.log` : **7 cas, 0 écart**.
+- Le rechargement répond 200 ; le tableau est servi à l'auditeur, provisionné, 10 panneaux identiques ; l'enregistrement par l'auditeur est refusé (403).
+- Valeurs des panneaux, pour sample-app : trouvées 5, écartées 5, restantes 0, KPI 3a = 1.
+- Pour le deb : 67 trouvées, 23 écartées, 44 restantes (Critical 2, High 28, Medium 13, Low 1), KPI 3a ≈ 0,343.
+- KEV ouvertes : 0 ; KPI 3b : NaN, affiché « aucune KEV ».
+- Sans la bascule, sample-app afficherait 6, 5, 1 (image `3a7ca1b1`).
+
+**Heures de la 07b** : plus 15:46:24 à 15:50:22 UTC (0 h 03 min 58 s ; documentation de Grafana, tableau, banc, script de pose, installation de la 19b) ; **total : au plus 15 h 57 min 38 s** pour 10 h estimées ; seuil de 20 h non atteint.

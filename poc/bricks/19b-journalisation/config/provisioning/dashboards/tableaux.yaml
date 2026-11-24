@@ -1,0 +1,13 @@
+# Brique 19b, fournisseur des tableaux de bord de Grafana, versionnés (non modifiables dans l'interface).
+# Premier tableau : vulnérabilités et VEX (ADR 0004, décision du propriétaire du 24/11/2026, « Oui, un tableau »).
+apiVersion: 1
+providers:
+  - name: tableaux-poc
+    orgId: 1
+    folder: PoC
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 60
+    options:
+      path: /etc/grafana/provisioning/dashboards/tableaux

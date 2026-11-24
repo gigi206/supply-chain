@@ -1,0 +1,6 @@
+# tableau « Vulnérabilités et VEX », étape sec, 2026-11-24T15:49:28Z, 85047a12
+fournisseur bb875819b0200a17…, tableau e02e67178fc64ee9…
+KO   répertoire de provisionnement des tableaux sur la VM : absent (attendu présent)
+OK   tableau absent de Grafana (auditeur) : 404
+OK   sources de données : Prometheus (uid prometheus) : 200prometheus
+## bilan : 3 cas, 1 écart(s)

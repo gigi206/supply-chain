@@ -147,6 +147,9 @@ etape_installer() {
   cp "$A/$LOKI_ARCHIVE" "$A/$GRAFANA_ARCHIVE" "$P/ca-poc.crt" "$P/loki.crt" "$S/loki.key" "$P/grafana.crt" "$S/grafana.key" \
      "$P/grafana-client.crt" "$S/grafana-client.key" "$P/loki-interne.crt" "$S/loki-interne.key" "$S/grafana-admin.password" "$here/config/loki.yaml" "$here/config/grafana.ini" \
      "$here/config/provisioning/datasources/sources.yaml" "$here"/systemd/* "$D/"
+  # 07b, ADR 0004 (« Oui, un tableau », 24/11/2026) : fournisseur et tableau « Vulnérabilités et VEX » (banc : 07a tableau-banc.sh) ;
+  # ajouté à sec, non mesuré avant un rejeu de zéro
+  cp "$here/config/provisioning/dashboards/tableaux.yaml" "$here/config/provisioning/dashboards/tableaux/vulnerabilites-vex.json" "$D/"
   copier sc-stockage /tmp/journalisation-installation "$D"/*
   rm -rf "${D:?}"
   sur sc-stockage sudo bash -s <<EOS
@@ -168,6 +171,9 @@ install -d -m 0750 -g grafana /etc/grafana /etc/grafana/tls /etc/grafana/secrets
 for d in dashboards plugins alerting; do install -d -m 0750 -g grafana /etc/grafana/provisioning/\$d; done
 install -m 0640 -g grafana grafana.ini /etc/grafana/grafana.ini
 install -m 0640 -g grafana sources.yaml /etc/grafana/provisioning/datasources/sources.yaml
+install -d -m 0750 -g grafana /etc/grafana/provisioning/dashboards/tableaux
+install -m 0640 -g grafana tableaux.yaml /etc/grafana/provisioning/dashboards/tableaux.yaml
+install -m 0640 -g grafana vulnerabilites-vex.json /etc/grafana/provisioning/dashboards/tableaux/vulnerabilites-vex.json
 install -m 0644 ca-poc.crt grafana.crt grafana-client.crt /etc/grafana/tls/
 install -m 0640 -g grafana grafana.key grafana-client.key /etc/grafana/tls/
 install -m 0640 -g grafana grafana-admin.password /etc/grafana/secrets/admin.password
