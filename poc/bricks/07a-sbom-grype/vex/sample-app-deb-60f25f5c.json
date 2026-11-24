@@ -2,7 +2,7 @@
   "@context": "https://openvex.dev/ns/v0.2.0",
   "@id": "https://supply-chain.example/vex/sample-app-deb/60f25f5c",
   "author": "Ghislain LE MEUR",
-  "timestamp": "",
+  "timestamp": "2026-11-24T13:40:03Z",
   "version": 1,
   "statements": [
     {
@@ -22,7 +22,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RealIP ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -44,7 +44,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne contient aucune chaîne ClientIPFromXFF ni GetClientIP, et ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -66,7 +66,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RedirectSlashes ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -88,7 +88,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet database/sql de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -110,7 +110,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet os/exec de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -132,7 +132,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet net/mail de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -154,7 +154,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet archive/tar de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -176,7 +176,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet archive/zip de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -198,7 +198,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -220,7 +220,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -242,7 +242,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet archive/tar de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -264,7 +264,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet net/http/httputil de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -286,7 +286,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet net/mail de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -308,7 +308,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -330,7 +330,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -352,7 +352,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet net/mail de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -374,7 +374,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RealIP ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -396,7 +396,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RealIP ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -418,7 +418,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet encoding/xml de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -440,7 +440,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -462,7 +462,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -484,7 +484,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     },
     {
       "vulnerability": {
@@ -506,7 +506,7 @@
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
       "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, est construit pour linux ; le code visé (paquets os et internal/syscall/windows, réservé à goos windows d’après la fiche OSV) n’est compilé que pour Windows, et le binaire ne cite aucun fichier source de internal/syscall/windows (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
-      "timestamp": ""
+      "timestamp": "2026-11-24T13:40:03Z"
     }
   ]
 }

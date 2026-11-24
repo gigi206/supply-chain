@@ -1,0 +1,104 @@
+# piece8-signer.sh signer poc/bricks/07a-sbom-grype/vex/sample-app-deb-60f25f5c.json, 2026-11-24T13:40:00Z, 06834ea0
+accord du propriétaire (verbatim) : « J'autorise »
+## préalables (lecture seule)
+OK   document : sha256 (16) attendu, avant tout horodatage : ec0a9c0ef89bd319
+OK   document : horodatages encore vides : [""]
+{"id":"https://supply-chain.example/vex/sample-app-deb/60f25f5c","author":"Ghislain LE MEUR","enonces":[{"n":"GHSA-3fxj-6jh8-hvhx","j":"vulnerable_code_not_present"},{"n":"GHSA-j6qf-3m9c-vwj3","j":"vulnerable_code_not_present"},{"n":"GHSA-mqqf-5wvp-8fh8","j":"vulnerable_code_not_present"},{"n":"GO-2025-3849","j":"vulnerable_code_not_present"},{"n":"GO-2025-3956","j":"vulnerable_code_not_present"},{"n":"GO-2025-4006","j":"vulnerable_code_not_present"},{"n":"GO-2025-4014","j":"vulnerable_code_not_present"},{"n":"GO-2026-4342","j":"vulnerable_code_not_present"},{"n":"GO-2026-4603","j":"vulnerable_code_not_present"},{"n":"GO-2026-4865","j":"vulnerable_code_not_present"},{"n":"GO-2026-4869","j":"vulnerable_code_not_present"},{"n":"GO-2026-4976","j":"vulnerable_code_not_present"},{"n":"GO-2026-4977","j":"vulnerable_code_not_present"},{"n":"GO-2026-4980","j":"vulnerable_code_not_present"},{"n":"GO-2026-4982","j":"vulnerable_code_not_present"},{"n":"GO-2026-4986","j":"vulnerable_code_not_present"},{"n":"GO-2026-5775","j":"vulnerable_code_not_present"},{"n":"GO-2026-5777","j":"vulnerable_code_not_present"},{"n":"GO-2026-6088","j":"vulnerable_code_not_present"},{"n":"GO-2026-6091","j":"vulnerable_code_not_present"},{"n":"GO-2026-6599","j":"vulnerable_code_not_present"},{"n":"GO-2026-6600","j":"vulnerable_code_not_present"},{"n":"GO-2026-6604","j":"vulnerable_code_not_present"}]}
+OK   binaire bao : 9c5f36287c673f386e1533e9c044169a248e4ee50dd54810fa766e95bd41b788
+OK   mot de passe du propriétaire pour OpenBao présent (test -s) : oui
+OK   mot de passe de poc-vex présent (test -s) : oui
+OK   poc-vex authentifié sur /v2/ du vrai Zot (code HTTP) : 200
+OK   juge scan-outil depuis HEAD : 7dde1a8ed457f254
+OK   redirection vers openbao-0 ouverte (aucune connexion) : oui
+OK   redirection fermée
+## horodatage du document du dépôt (seul champ écrit)
+horodatage : 2026-11-24T13:40:03Z ; document sha256 b327e293d312b30b776ff381eeb6beac3d77085aa35bf31e23109cc6503994ce
+OK   seuls les horodatages ont changé : c4923e69a78f8a71
+JUGE|exemption, 23 énoncé(s) dont 0 large(s), document sha256 b327e293d312b30b776ff381eeb6beac3d77085aa35bf31e23109cc6503994ce, sujet sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, VEX vers 19
+PUBLIES|0 énoncé(s) publié(s) vérifié(s) dans 192.168.161.13:5000/builds/vex/sample-app-deb (CLE_PUBLIQUE), cosign code 1 : no matching attestations: 
+ECHEANCE|énoncé 0 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 1 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 2 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 3 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 4 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 5 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 6 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 7 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 8 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 9 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 10 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 11 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 12 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 13 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 14 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 15 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 16 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 17 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 18 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 19 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 20 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 21 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 22 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+OK   document horodaté : accepté par verifier : 0
+## connexion du propriétaire (userpass, -no-store, mot de passe lu par bao dans son fichier)
+OK   connexion : code, secret présent, politiques, durée : 0,oui,vex-signature,900
+## signature et publication (signer-vex.sh signer, hashivault://vex, poc-vex)
+JUGE|exemption, 23 énoncé(s) dont 0 large(s), document sha256 b327e293d312b30b776ff381eeb6beac3d77085aa35bf31e23109cc6503994ce, sujet sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, VEX vers 192.168.161.13:5000/bu
+PUBLIES|0 énoncé(s) publié(s) vérifié(s) dans 192.168.161.13:5000/builds/vex/sample-app-deb (CLE_PUBLIQUE), cosign code 1 : no matching attestations: 
+ECHEANCE|énoncé 0 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 1 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 2 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 3 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 4 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 5 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 6 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 7 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 8 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 9 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 10 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 11 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 12 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 13 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 14 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 15 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 16 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 17 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 18 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 19 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 20 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 21 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+ECHEANCE|énoncé 22 : 2026-12-24T13:40:03Z (30 jours après 2026-11-24T13:40:03Z)
+SIGNE|bundle sha256 d56236f267b95369c0db6ecec2da3a652a032be053de9fda5c5315e082206610, énoncé signé sha256 9da493194855a0c5b7e63198664e551e4d67fb7b32e1ab729e8dbebbe0b47194
+PUBLIE|192.168.161.13:5000/builds/vex/sample-app-deb@sha256:44f86e536f762929957ff24b706f49a53860b14d9e2d469d87954826a1fd39f4, referrer de sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e ; compte au scan quotidien sui
+OK   signer-vex.sh signer : code : 0
+OK   ligne PUBLIE : 1
+## révocation de soi et fermeture
+OK   révocation de soi : code : 0
+OK   redirection fermée
+## relecture : énoncés publiés vérifiés par la clé publique VEX
+PUBLIES|23 énoncé(s) publié(s) vérifié(s) dans 192.168.161.13:5000/builds/vex/sample-app-deb (CLE_PUBLIQUE), cosign code 0
+AVIS|renouvellement : énoncé 0 (GHSA-3fxj-6jh8-hvhx) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document peut ne p
+AVIS|renouvellement : énoncé 1 (CVE-2026-114437,GHSA-j6qf-3m9c-vwj3) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce do
+AVIS|renouvellement : énoncé 2 (CVE-2025-69725,GHSA-mqqf-5wvp-8fh8) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce doc
+AVIS|renouvellement : énoncé 3 (CVE-2025-47907,GO-2025-3849) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document p
+AVIS|renouvellement : énoncé 4 (CVE-2025-47906,GO-2025-3956) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document p
+AVIS|renouvellement : énoncé 5 (CVE-2025-61725,GO-2025-4006) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document p
+AVIS|renouvellement : énoncé 6 (CVE-2025-58183,GO-2025-4014) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document p
+AVIS|renouvellement : énoncé 7 (CVE-2025-61728,GO-2026-4342) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document p
+AVIS|renouvellement : énoncé 8 (CVE-2026-27142,GO-2026-4603) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document p
+AVIS|renouvellement : énoncé 9 (CVE-2026-32289,GO-2026-4865) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document p
+AVIS|renouvellement : énoncé 10 (CVE-2026-32288,GO-2026-4869) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+AVIS|renouvellement : énoncé 11 (CVE-2026-39825,GO-2026-4976) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+AVIS|renouvellement : énoncé 12 (CVE-2026-42499,GO-2026-4977) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+AVIS|renouvellement : énoncé 13 (CVE-2026-39826,GO-2026-4980) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+AVIS|renouvellement : énoncé 14 (CVE-2026-39823,GO-2026-4982) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+AVIS|renouvellement : énoncé 15 (CVE-2026-39820,GO-2026-4986) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+AVIS|renouvellement : énoncé 16 (GHSA-9g5q-2w5x-hmxf,GO-2026-5775) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce docu
+AVIS|renouvellement : énoncé 17 (GHSA-rjr7-jggh-pgcp,GO-2026-5777) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce docu
+AVIS|renouvellement : énoncé 18 (CVE-2026-56859,GO-2026-6088) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+AVIS|renouvellement : énoncé 19 (CVE-2026-56858,GO-2026-6091) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+AVIS|renouvellement : énoncé 20 (CVE-2026-94448,GO-2026-6599) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+AVIS|renouvellement : énoncé 21 (CVE-2026-97030,GO-2026-6600) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+AVIS|renouvellement : énoncé 22 (CVE-2026-56857,GO-2026-6604) du 2026-11-24T13:40:03Z : énoncé publié du 2026-11-24T13:40:03Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document 
+OK   énoncés publiés vérifiés sur le digest : 23
+## bilan : 15 cas, 0 écart(s)
