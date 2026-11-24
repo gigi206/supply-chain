@@ -39,7 +39,7 @@ etape_apres() { controles 403; return $ko; }
 etape_pose() { # ACCORD DU PROPRIÉTAIRE
   attendu "ligne dans le dépôt" "$(grep -cx "$LIGNE" "$here/config/grafana.ini")" 1
   [ "$ko" = 0 ] || return 1
-  local sans; sans=$(grep -vx "$LIGNE" "$here/config/grafana.ini" | sha256sum | cut -c1-64)
+  local sans; sans=$(grep -vx -e "$LIGNE" -e '; Proxy des sources .*' "$here/config/grafana.ini" | sha256sum | cut -c1-64)
   attendu "grafana.ini en service = dépôt sans la ligne" "$(sur "sudo sha256sum /etc/grafana/grafana.ini" | cut -c1-64)" "$sans"
   [ "$ko" = 0 ] || return 1
   sur "cat > /tmp/grafana-liste.ini" < "$here/config/grafana.ini" || return 1

@@ -178,3 +178,12 @@ Rien n'est posé : ni la liste, ni le compte, ni l'exportateur. `kpi-pose.sh` (c
 - Non exercés : lecture de `lignes` par `kpi` à travers le groupe, `Wants` avec un lecteur en échec, `LoadCredential` avec `ProtectHome=true`, la forme de `IPAddressDeny` relue par la pose. Un journal absent ou illisible pour `kpi` donne le code 2 et fige tout ; la pose le verrait.
 - `liste-proxy.sh` : si Grafana ne revient pas, la copie est remise et le script s'arrête. `kpi-pose.sh` : le dossier qui porte le mot de passe est effacé depuis l'hôte sur tout échec après la copie. Non lancés.
 - Le refus de `kpi-pose.sh pose` tant que le proxy mène à Loki est un choix de session : à poser au propriétaire.
+
+## Poses, accords et prédiction (2026-11-24T21:07:15Z)
+
+Réponses verbatim du propriétaire (avant 2026-11-24T21:07:03Z) : **« Liste, compte, pose (Recommandé) »** (trois accords, dans cet ordre, arrêt au premier KO) ; **« Oui, pousse »** (faite jusqu'à `010bb6a9`, 21:07:03 UTC) ; Chains v0.30.0 : **« Banc à sec après R5 »**.
+
+1. `liste-proxy.sh pose` (19b, `resultats/liste-proxy-pose.log`) : **10 cas, 0 KO** (ligne dans le dépôt, fichier en service égal au dépôt sans la ligne, pose, Grafana actif, fichier égal, 5 contrôles : proxy vers Loki 403). Le moins sûr : l'égalité du fichier en service, puis le contrôle juste après le redémarrage.
+2. `kpi-pose.sh compte` (`e4-kpi-compte.log`) : **5 cas, 0 KO**, rôle Viewer.
+3. `kpi-pose.sh pose` (`e4-kpi-pose.log`) : **20 cas, 0 KO** : 5 avant (dont le proxy à 403), 2 empreintes, dossier effacé, 2 passages `success`, timer, mot de passe refusé à `kpi`, filtre des deux unités (2), signatures refusées 0, vérifiées « oui », sans date 0. 134 séries environ, 41 signatures vérifiées. Les moins sûrs : `LoadCredential` avec `ProtectHome=true`, la lecture du journal par le groupe, la forme d'`IPAddressDeny`.
+4. `kpi-pose.sh verif` (`e4-kpi-verif.log`), après une collecte de Prometheus : **4 cas, 0 KO**.
