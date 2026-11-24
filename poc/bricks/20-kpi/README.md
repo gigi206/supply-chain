@@ -48,6 +48,7 @@ Constat qui pèse sur le seuil : `entrees-scan.py` (07b) **ne vérifie pas les s
 - **Âge des clés** : date de la clé publique dans le dépôt (premier commit) ou date de création dans OpenBao (lecture avec un jeton, depuis l'hôte).
 - **Licences** : KPI vide tant que la 13a n'a pas de tâche de confiance, ou mesuré sur les prédicats du banc.
 - **Délai de correction des KEV** : historique tiré de Loki (720 h, listes de `entrees-scan`), ou état gardé par l'exportateur.
+- **Dénominateur** (ajouté le 2026-11-24, sur relecture du conseiller du plan de l'étape 1) : deux définitions changent tous les taux. Quels dépôts comptent : les produits seuls (`sample-app`, `sample-app-deb`, `sample-app-rpm`), ou aussi les builders, les fermetures et les essais ? Quel digest compte : celui en service seulement, ou tous les digests présents dans Zot (`3a7ca1b1` et `f5e6bcb0` cohabitent) ? Le relevé de l'étape 1 liste tout, avec une classe déduite du nom, et ne tranche pas.
 
 ## Outils
 
