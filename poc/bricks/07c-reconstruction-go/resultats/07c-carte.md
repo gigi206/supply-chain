@@ -328,3 +328,43 @@ Les défauts de `replay.sh` et `rejeu.sh` ne passeront à `f5e6bcb0` que dans le
 **Prochaine étape** : R4 `rebuild`, au plus tôt le **2026-11-25T13:27:42Z**, déclenché à la main (action sur la VM, accord à demander). Il faut d'abord relire les trois points notés plus haut.
 
 **Heures** : de 15:08:17 à 15:13:31 UTC : 5 min 14 s. **Total de la 07c : au plus 1 h 48 min 00 s** pour 10 h estimées.
+
+### Relecture à sec avant R4 et R5 (note de 2026-11-24T15:22:58Z)
+
+Faite sur l'hôte, par lecture du code et des journaux. Seule lecture extérieure : deux lectures anonymes de manifestes dans Zot. Rien dans la VM, le cluster ou `mise.toml`.
+
+**1. Caches froids de R4 : tenus.**
+- `transporter_r4` vide `~/r4` avant la copie.
+- `rebuild.sh` vide la racine BuildKit (`rm -rf /var/lib/replay-buildkit`) et le contexte `~/r4/e`. Les deux constructions passent `--no-cache`.
+- Le second moteur pose `GOCACHE` et `GOMODCACHE` dans `~/r4/e`, donc vides.
+- R2 a fait `rm -rf /usr/local/go` avant d'extraire 1.26.11 : aucun fichier de 1.26.10 ne reste dans la toolchain copiée dans l'image de build du domaine.
+- Recette : Dockerfile `d56985c1`, contrôlé par la tâche en R3. C'est le même que celui du PASSED de `3a7ca1b1` (`04-hermetic-repro/Dockerfile`). Ses options de `go build` sont celles que `rebuild.sh` recherche. Seule change l'image de build.
+
+**2. « vsa.py de HEAD, poussé » (`etape_vsa`) : tenu, avec une conséquence pratique.**
+- Le contrôle porte sur deux choses : `outils/vsa.py` sans modification hors commit, et HEAD présent sur une branche distante.
+- Au moment de la relecture, HEAD est `7d8a0c8e`, poussé. Le commit de cette note le fait avancer : **il faut le pousser avant R5 `vsa`**, sinon l'étape refuse.
+- Ensuite, `vsa` peut suivre R4 sans nouvelle poussée, tant que le journal de R4 n'est pas commité. S'il l'est d'abord, il faut pousser avant `vsa`, avec un accord.
+- Aucune valeur figée (`3a7ca1b1`, `c4242a11`, 1.26.10) dans les scripts Python de `outils/` (`*.py`, seuls cherchés), ni dans `politique-replay.md` à `6c44219` (103 lignes, lu par `git show`), que la VSA citera. `vsa.py` reçoit l'image et l'invocation en arguments.
+
+**3. Dépendances de `preuves.sh reelle` (porte avant et après) : aucune image d'essai.**
+- `etape_reelle` ne juge que l'image réelle `builds/sample-app@f5e6bcb0` (`APP_DIGEST` de `politique.sh`). La source attendue est `TETE_J2` = `6391fd43`, le commit de la provenance vérifiée en R3. Elle utilise aussi les 8 bundles de `horodatage/bundles` et l'image de la porte `plateforme/porte@e77994c2`.
+- `PORTE_DIGEST` est inchangé depuis le 23/11 (aucun commit ne le touche).
+- Lecture anonyme dans Zot, entre 15:21:19 et 15:22:50 UTC (encadrement par deux `date -u`) : `plateforme/porte@e77994c2` et `builds/sample-app@f5e6bcb0` sont présents.
+- Les images d'essai `f5e6bcb0` absentes du Zot en service ne servent qu'aux étapes de J2 à J8 et au contrôle 6 (C2, `builds/essai-webhook`), hors de R5.
+- **Verdict comparé avant et après le push** (`juger` de `politique.sh` et `politique/porte-job.yaml`, lus en entier) :
+  - `porte_apres` compare les champs 3 à 5 (`success`, violations et avertissements de `ec`), 7 et 8 (contrôle 9, conteneur `horodatage`) ;
+  - les champs 9 et 10, ceux du contrôle 6 (conteneur `vsa`), sont exclus ; les champs 11 et 12 (contrôle 7) aussi ;
+  - `ec` tourne dans le premier conteneur d'initialisation (`porte`). `vsa` est un conteneur ordinaire, lancé après : son refus ne peut ni empêcher ni changer le verdict de `ec` ;
+  - le push écrit dans `builds/vsa/sample-app`. Il ne touche ni aux enveloppes de Chains ni à `horodatage/bundles`, d'où les champs 7 et 8 sont tirés.
+- La prédiction « porte inchangée avant et après le push » reste donc cohérente avec le commentaire de `rejeu.sh` : sans VSA de `f5e6bcb0`, c'est l'étape `controle6` qui refuserait l'image réelle (C1), pas `porte_avant`.
+- Attendu, sans être comparé : avant le push, le champ 9 ne sera pas `ok`, puisqu'aucune VSA de `f5e6bcb0` n'existe (le 03/11, il valait `ok|1/1` avant et `ok|2/2` après). Après le push, il devrait valoir `ok`, si la ConfigMap `porte` du cluster porte encore la clé du domaine. Ce n'est pas vérifié ici (lecture du cluster non faite).
+
+**Relevé à reporter dans le commit qui archive la VSA**
+- `rejeu.sh` re-pousse la VSA par `env JALON=r5 mise run replay -- pousser_vsa`.
+- Avec les défauts de `3a7ca1b1`, `lancer` réécrit `resultats/r5-pousser_vsa.log`. Avec `RESULTATS_REPLAY=…/f5e6bcb0`, il refuserait, puisque ce journal existera.
+- Ce commit devra donc donner au rejeu :
+  - un dossier ou un jalon propre (par exemple `JALON=rejeu-r5`) ;
+  - le chemin du bundle `f5e6bcb0`.
+- Code lu, non lancé.
+
+**Heures** : de 15:13:31 à 15:22:58 UTC, poussée comprise : 9 min 27 s. **Total de la 07c : au plus 1 h 57 min 27 s** pour 10 h estimées.
