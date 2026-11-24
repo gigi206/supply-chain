@@ -51,3 +51,22 @@ Relevé écrit à 20:29:09 UTC : 5 clés, 27 pins, conforme ; `verifier` sera la
 - [`e4-unite-hote.log`](e4-unite-hote.log) (20:30:13 UTC) : **23 cas, 3 écarts**, une seule cause. `systemd-run` cherche l'exécutable hors de l'unité, où `/mnt/bin/python3` n'existe pas : Python 3.13 n'a pas été lancé. Le reste est conforme : sous le durcissement, openssl par `/proc/self/fd` vérifie les 41 signatures, la sortie est la même, et les 6 sondes sont permises sans l'unité et refusées dedans. La durée de ce journal (« 505 ms ») n'est pas fiable non plus.
 
 Corrigé : Python 3.13 lancé par `/usr/bin/env`. Attendu du second passage : unité **23 cas, 0 écart** (`-2`) ; vrai Zot **10 cas, 0 écart** (`-2`).
+
+### Résultat (note de 2026-11-24T20:31:26Z)
+
+- [Unité, second passage](e4-unite-hote-2.log) : **23 cas, 0 écart**. Même sortie sans durcissement, durcie avec Python 3.14.4 et durcie avec Python 3.13.12 (132 séries) ; 41 signatures vérifiées, 0 refusée ; note hors ligne 2.9, celle de `entrees-scan.service`.
+- [Vrai Zot, second passage](e4-exportateur-zot-2.log) : **10 cas, 0 écart** ; 440 ms pour l'exportateur (`/proc/uptime`).
+- [Banc, second passage](e4-banc-2.log) : **59 cas, 0 écart**.
+
+Dans chaque cas, le premier passage est gardé : banc (5 écarts, témoin mal placé) et unité (3 écarts, Python 3.13 non lancé). Les deux fautes étaient dans le banc et dans le script, pas dans l'exportateur ni dans l'unité.
+
+**Ce que cela prouve** : un openssl qui accepte tout ou refuse tout arrête l'exportateur avant toute lecture de Zot ; les dates des clés et des pins sont celles du recalcul, et un fichier ou un digest inconnu du relevé est compté au lieu d'être daté ; la vérification par `/proc/self/fd` survit au durcissement de l'unité, sous Python 3.14 et 3.13.
+
+**Ce que cela ne prouve pas** :
+- rien n'a tourné sur `sc-stockage` : ni son noyau, ni son systemd, ni son OpenSSL 3.5.9, ni `IPAddressDeny`, ni l'utilisateur `kpi`. Prometheus et Grafana n'ont pas lu ces séries ;
+- les délais des KEV restent prouvés au banc seulement : 0 KEV dans le vrai Loki ; et les lignes de `entrees-scan` ne sont pas vérifiées ;
+- `lecteur_loki.py` n'a pas tourné sous une unité, et son accès en service n'est pas choisi ;
+- le relevé des dates périme après chaque rejeu, reconstruction ou re-signature (R5 compris si une provenance ou une clé change) : `verifier` est à relancer avant chaque pose ;
+- témoins, attendus et outils sont de la même session.
+
+**Heures** : de 20:18:37 UTC à cette note, 12 min 49 s. Total de la brique : 54 min 38 s.

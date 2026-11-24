@@ -8,6 +8,8 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 ## État
 
+**Étape 4 préparée à sec le 2026-11-24 (20:29:53 à 20:31:00 UTC), rien n'est posé.** [Prédiction et résultat](resultats/e4-predictions.md). Banc à 15 témoins : **59 cas, 0 écart** au second passage (premier : témoin mal placé, gardé). Vrai Zot depuis l'hôte : **10 cas, 0 écart** sur 105 valeurs, dates des pins et des clés comprises, 41 signatures vérifiées. Unité durcie [`kpi.service`](systemd/kpi.service), essayée sur l'hôte sans sudo : **23 cas, 0 écart** au second passage, sous Python 3.14 et 3.13. Ajouts : vecteur de test RFC 6979 vérifié au départ, [relevé versionné des dates de git](releve/dates-git.tsv), heure du dernier passage, [lecteur de Loki](../../../tools/metrics-exporter/lecteur_loki.py) séparé. `sc-stockage`, Prometheus et Grafana ne sont pas exercés ; 0 KEV dans le vrai Loki.
+
 **Essai openssl fait le 2026-11-24 (20:01:07 et 20:01:21 UTC).** [Prédiction et résultat](resultats/e3b-predictions.md) : l'exportateur peut vérifier les signatures avec `/usr/bin/openssl` et les quatre clés publiques, sans cosign. Banc à 14 témoins : **26 cas, 0 écart** (vérifiées : 0 écart avec le recalcul signé ; comptées : 39 écarts, ceux prédits). Vrai Zot depuis l'hôte : **8 cas, 0 écart**, 41 signatures vérifiées, 0 par une clé étrangère. Mode obligatoire (`SIGNATURES`), **décision du 24/11 : « openssl (Recommandé) »**, rien n'est posé. `sc-stockage` a OpenSSL 3.5.9 et Python 3.13.5 ([lu](resultats/e4-stockage-versions.log), 20:07:20 UTC) ; la vérification n'y a pas tourné, l'unité durcie non plus ; les délais des KEV ne sont pas couverts (lignes de `entrees-scan`, non vérifiées).
 
 **Étape 3 faite le 2026-11-24 (banc jetable, 19:42:34 UTC).** [Prédiction et résultat](resultats/e3-predictions.md) : **10 cas, 0 écart**, au premier passage. 9 sujets témoins dans un Zot jetable sans réseau. Sur les 7 sujets bien signés, 0 écart entre le recalcul et l'exportateur ; sur les 2 à signature fausse, **14 écarts, exactement ceux prédits** : l'exportateur, qui ne vérifie pas, masque une KEV ouverte et compte une VSA et une provenance fausses. Recalcul paramétré pour le banc, non-régression sur la plateforme à 19:42:45 UTC : 10 cas, 0 écart, 0 ligne `KPI|` différente. Exportateur écrit ([`tools/metrics-exporter`](../../../tools/metrics-exporter/metrics_exporter.py)), **non posé**. Lancé depuis l'hôte sur le vrai Zot en lecture anonyme (19:47:15 UTC, [journal](resultats/e3-exportateur-zot.log)) : 56 valeurs comparées au recalcul signé, **0 écart**.
@@ -18,7 +20,7 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 Aperçu des produits, énoncés non vérifiés : 4 sujets (`sample-app` `3a7ca1b1` et `f5e6bcb0`, deb `60f25f5c`, rpm `07b7bd6f`). Tous ont une provenance ; 3 ont un scan, 3 un VEX et 2 une VSA. Le digest en service, `f5e6bcb0`, n'a pas encore de VSA. L'historique des scans dans Zot commence au rejeu du 23/11, et celui de Loki aussi (mesuré, `e1-loki-anciennete.log`) : un rejeu de zéro remet les deux à zéro.
 
-**Heures de la 20** (2026-11-24, `date -u`) : 17:45:07 à 17:50:31 (ouverture, carte), 18:23:30 à 18:27:23 (étape 1), 18:27:23 à 18:30:36 (relecture, Loki, corrections), soit 0 h 12 min 30 s ; étape 2 de 18:49:15 à 18:56:03 (6 min 48 s). Corrections et second passage de 19:32:00 à 19:32:27 (0 min 27 s), attente du propriétaire non comptée. Étape 3 de 19:35:55 à 19:47:45 (11 min 50 s, relecture et complément compris). Essai openssl de 19:55:31 à 20:02:05 (6 min 34 s). Relevé d'OpenSSL et corrections de 20:02:05 à 20:05:11 (3 min 06 s). Décision et lecture des versions de 20:07:03 à 20:07:37 (0 min 34 s). Total **41 min 49 s**. Majorant par la méthode de la 05 (écarts d'au plus 1 h entre commits de `poc/bricks/20-kpi`) : 42 min 16 s ; il compte à tort l'écart de 17:50:31 à 18:26:20, qui contient la clôture de la 05 et la 07c. Estimation : 1,5 pw.
+**Heures de la 20** (2026-11-24, `date -u`) : 17:45:07 à 17:50:31 (ouverture, carte), 18:23:30 à 18:27:23 (étape 1), 18:27:23 à 18:30:36 (relecture, Loki, corrections), soit 0 h 12 min 30 s ; étape 2 de 18:49:15 à 18:56:03 (6 min 48 s). Corrections et second passage de 19:32:00 à 19:32:27 (0 min 27 s), attente du propriétaire non comptée. Étape 3 de 19:35:55 à 19:47:45 (11 min 50 s, relecture et complément compris). Essai openssl de 19:55:31 à 20:02:05 (6 min 34 s). Relevé d'OpenSSL et corrections de 20:02:05 à 20:05:11 (3 min 06 s). Décision et lecture des versions de 20:07:03 à 20:07:37 (0 min 34 s). Étape 4 à sec de 20:18:37 à 20:31:26 (12 min 49 s). Total **54 min 38 s**. Majorant, calculé avant l'étape 4, par la méthode de la 05 (écarts d'au plus 1 h entre commits de `poc/bricks/20-kpi`) : 42 min 16 s ; il compte à tort l'écart de 17:50:31 à 18:26:20, qui contient la clôture de la 05 et la 07c. Estimation : 1,5 pw.
 
 Les faits des sections suivantes, écrits avant l'étape 1, viennent du dépôt.
 
@@ -63,6 +65,16 @@ Quatre questions posées ensemble, chacune avec la recommandation du conseiller 
 - **Délai de correction des KEV** : « Loki, 720 h (Recommandé) ». Réserve écrite : l'historique repart de zéro à chaque rejeu (mesuré).
 
 Décision du 2026-11-24 sur la **vérification des signatures par l'exportateur** (écrite le 2026-11-24T20:07:20Z), verbatim : **« openssl (Recommandé) »**. Option retenue telle que posée : « Paquet openssl de Debian sur sc-stockage, rien à installer s'il y est déjà (à vérifier). Verdict docs/04 proposé « Sain » ; 14 CVE ouvertes dans trixie, aucun titre ne nomme la vérification ECDSA. Prix : 4 clés publiques à poser et à reposer après chaque rejeu. » Options écartées : « cosign épinglé », « Ne pas vérifier ». Donc `SIGNATURES=verifiees` à la pose, et pas de renommage des séries. Cette décision ne vaut pas accord de pose (étape 4).
+
+**À poser : l'accès du lecteur à Loki** (étape 4). Aucune option n'est neutre :
+
+| Option | Pouvoir sur les journaux | Secret sur `sc-stockage` | Fidélité à « Loki, 720 h » |
+|---|---|---|---|
+| Compte Grafana dédié, rôle Viewer | lit tous les journaux et les métriques, n'écrit pas dans Loki | un mot de passe, lisible du seul lecteur | oui |
+| Certificat client de la CA du PoC | lit **et écrit** tous les journaux (limite de D16, 19b, README l. 466) | une clé privée | oui |
+| Journal local (`journalctl -u entrees-scan.service`, par root avant le lecteur) | lit cette seule unité | aucun | non : ce n'est pas Loki, rétention de journald non mesurée |
+
+Seule la première a été essayée, avec le compte `auditeur`, depuis l'hôte.
 
 Reste à poser : les licences (le recalcul donne « source absente », 0 prédicat mesuré dans Zot).
 

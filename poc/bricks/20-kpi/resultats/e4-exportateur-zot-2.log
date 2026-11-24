@@ -1,0 +1,332 @@
+# exportateur-zot.sh, 2026-11-24T20:30:50Z, dépôt b3ce3ba5, exportateur 377132fccf3fc2eb, Python 3.14.4, OpenSSL 3.5.5
+journal : 5 lignes
+JOURNAL|5 résumés|0 entrées KEV|0 autres lignes
+kpi : 133 séries
+durée de l'exportateur : 440 ms
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="entree",nom="web-dist",pin="47f72275aa78",retire="0"} 1793376604
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="fermeture",nom="sample-app",pin="74c265e703fb",retire="0"} 1793732132
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="image",nom="builder-go-voie-d",pin="d50ae57551c3",retire="0"} 1793373433
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="image",nom="buildkit",pin="ace6811c2133",retire="0"} 1793368831
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="image",nom="outils-horodatage",pin="c7bebae2bd33",retire="0"} 1793308207
+PROM|kpi_pin_non_epingle{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="pipeline",nom="sample-app",pin="b8ff5ebb29cf"} 1
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="source",nom="sample-app.git",pin="6391fd437f26",retire="0"} 1793298058
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="tache",nom="construire-image",pin="66a9f2980a45",retire="0"} 1793734336
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="tache",nom="preparer-entrees",pin="2070d601ae3c",retire="0"} 1793385395
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="tache",nom="publier-image",pin="d21931f3807b",retire="0"} 1793376604
+PROM|kpi_pins_non_releves{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+PROM|kpi_enonces_refuses{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+PROM|kpi_l3_verifie{depot="builds/sample-app",digest="3a7ca1b14dbf"} 1
+PROM|kpi_provenance_chains_verifiee{depot="builds/sample-app",digest="3a7ca1b14dbf"} 1
+PROM|kpi_provenances_pipelinerun{depot="builds/sample-app",digest="3a7ca1b14dbf"} 3
+PROM|kpi_replay_identique{depot="builds/sample-app",digest="3a7ca1b14dbf"} 1
+PROM|kpi_scan_ecartees{depot="builds/sample-app",digest="3a7ca1b14dbf"} 5
+PROM|kpi_scan_entrees{depot="builds/sample-app",digest="3a7ca1b14dbf"} 6
+PROM|kpi_scan_kev{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+PROM|kpi_scan_kev_ecartees{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+PROM|kpi_scan_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf"} 1795512718
+PROM|kpi_vex_verifies{depot="builds/sample-app",digest="3a7ca1b14dbf"} 1
+PROM|kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="prov"} 6
+PROM|kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="scan"} 3
+PROM|kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="sig"} 1
+PROM|kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vex"} 1
+PROM|kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vsa"} 1
+PROM|kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="prov"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="scan"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="sig"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vex"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vsa"} 0
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="entree",nom="web-dist",pin="47f72275aa78",retire="0"} 1793376604
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="fermeture",nom="sample-app",pin="74c265e703fb",retire="0"} 1793732132
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="image",nom="builder-go-voie-d",pin="8c11e856b10f",retire="0"} 1795526430
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="image",nom="buildkit",pin="ace6811c2133",retire="0"} 1793368831
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="image",nom="outils-horodatage",pin="c7bebae2bd33",retire="0"} 1793308207
+PROM|kpi_pin_non_epingle{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="pipeline",nom="sample-app",pin="da76d95be5af"} 1
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="source",nom="sample-app.git",pin="6391fd437f26",retire="0"} 1793298058
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="tache",nom="construire-image",pin="4dcbc4b74681",retire="0"} 1795526695
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="tache",nom="preparer-entrees",pin="2070d601ae3c",retire="0"} 1793385395
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="tache",nom="publier-image",pin="d21931f3807b",retire="0"} 1793376604
+PROM|kpi_pins_non_releves{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|kpi_enonces_refuses{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|kpi_l3_verifie{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|kpi_provenance_chains_verifiee{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 1
+PROM|kpi_provenances_pipelinerun{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 4
+PROM|kpi_replay_identique{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|kpi_scan_ecartees{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 5
+PROM|kpi_scan_entrees{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 5
+PROM|kpi_scan_kev{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|kpi_scan_kev_ecartees{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|kpi_scan_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 1795529548
+PROM|kpi_vex_verifies{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 1
+PROM|kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="prov"} 8
+PROM|kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="scan"} 2
+PROM|kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="sig"} 1
+PROM|kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vex"} 1
+PROM|kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vsa"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="prov"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="scan"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="sig"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vex"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vsa"} 0
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="entree",nom="packaging-deb",pin="f0ed7a71cfcc",retire="0"} 1794694829
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="fermeture",nom="sample-app-deb",pin="bb7599a2e1cd",retire="0"} 1794420322
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="fermeture",nom="sample-app-sources",pin="50dc73f72d04",retire="0"} 1794420322
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="image",nom="outils-horodatage",pin="c7bebae2bd33",retire="0"} 1793308207
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="image",nom="outils-prefetch",pin="68e0ae705de5",retire="0"} 1793727678
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="image",nom="sbuild-debian13",pin="749d746cc9e1",retire="0"} 1794420322
+PROM|kpi_pin_non_epingle{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="pipeline",nom="sample-app-deb",pin="ed471138e467"} 1
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="source",nom="sample-app.git",pin="6391fd437f26",retire="0"} 1793298058
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="tache",nom="construire-deb",pin="3726ff0b116c",retire="0"} 1794425235
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="tache",nom="preparer-deb",pin="588617b83825",retire="0"} 1794426056
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="tache",nom="publier-image",pin="d21931f3807b",retire="0"} 1793376604
+PROM|kpi_pins_non_releves{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|kpi_enonces_refuses{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|kpi_l3_verifie{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|kpi_provenance_chains_verifiee{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 1
+PROM|kpi_provenances_pipelinerun{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 4
+PROM|kpi_replay_identique{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 1
+PROM|kpi_scan_ecartees{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 23
+PROM|kpi_scan_entrees{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 67
+PROM|kpi_scan_kev{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|kpi_scan_kev_ecartees{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|kpi_scan_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 1795527758
+PROM|kpi_vex_verifies{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 1
+PROM|kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="prov"} 8
+PROM|kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="scan"} 3
+PROM|kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="sig"} 1
+PROM|kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vex"} 1
+PROM|kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vsa"} 1
+PROM|kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="prov"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="scan"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="sig"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vex"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vsa"} 0
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="entree",nom="packaging-rpm",pin="333b7322290a",retire="0"} 1795180486
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="fermeture",nom="sample-app-rpm",pin="0983898054a9",retire="0"} 1795173420
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="fermeture",nom="sample-app-sources",pin="50dc73f72d04",retire="0"} 1794420322
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="image",nom="mock-rocky9",pin="70f8c4124532",retire="0"} 1795113732
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="image",nom="outils-horodatage",pin="c7bebae2bd33",retire="0"} 1793308207
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="image",nom="outils-prefetch",pin="68e0ae705de5",retire="0"} 1793727678
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="pipeline",nom="sample-app-rpm",pin="7d361cb1d5ea",retire="0"} 1795181844
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="source",nom="sample-app.git",pin="6391fd437f26",retire="0"} 1793298058
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="tache",nom="construire-rpm",pin="ca03f18908d0",retire="0"} 1795172388
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="tache",nom="preparer-rpm",pin="2f65f3903e98",retire="0"} 1795014970
+PROM|kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="tache",nom="publier-image",pin="d21931f3807b",retire="0"} 1793376604
+PROM|kpi_pins_non_releves{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|kpi_enonces_refuses{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|kpi_l3_verifie{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|kpi_provenance_chains_verifiee{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 1
+PROM|kpi_provenances_pipelinerun{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 1
+PROM|kpi_replay_identique{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|kpi_vex_verifies{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="prov"} 2
+PROM|kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="scan"} 0
+PROM|kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="sig"} 1
+PROM|kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vex"} 0
+PROM|kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vsa"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="prov"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="scan"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="sig"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vex"} 0
+PROM|kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vsa"} 0
+PROM|kpi_exportateur_journal_timestamp_seconds 1795552251
+PROM|kpi_cle_timestamp_seconds{cle="chains",empreinte="b446c5ffe7b6"} 1795471932
+PROM|kpi_cle_timestamp_seconds{cle="scanner",empreinte="09708ff49e5e"} 1795476983
+PROM|kpi_cle_timestamp_seconds{cle="tsa",empreinte="29fa7cc76f71"} 1795471932
+PROM|kpi_cle_timestamp_seconds{cle="vex",empreinte="d40d41a02833"} 1795476983
+PROM|kpi_cle_timestamp_seconds{cle="vsa",empreinte="b3e9f64b7d5e"} 1793700136
+PROM|kpi_cles_non_relevees 0
+PROM|kpi_exportateur_passage_timestamp_seconds 1795552251
+kpi : 65 séries
+PROM|témoin|kpi_enonces_refuses{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+PROM|témoin|kpi_l3_verifie{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+PROM|témoin|kpi_provenance_chains_verifiee{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+PROM|témoin|kpi_provenances_pipelinerun{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+PROM|témoin|kpi_replay_identique{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+PROM|témoin|kpi_vex_verifies{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="prov"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="scan"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="sig"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vex"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vsa"} 0
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="prov"} 6
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="scan"} 3
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="sig"} 1
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vex"} 1
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vsa"} 1
+PROM|témoin|kpi_enonces_refuses{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|témoin|kpi_l3_verifie{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|témoin|kpi_provenance_chains_verifiee{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|témoin|kpi_provenances_pipelinerun{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|témoin|kpi_replay_identique{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|témoin|kpi_vex_verifies{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="prov"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="scan"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="sig"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vex"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vsa"} 0
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="prov"} 8
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="scan"} 2
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="sig"} 1
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vex"} 1
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vsa"} 0
+PROM|témoin|kpi_enonces_refuses{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|témoin|kpi_l3_verifie{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|témoin|kpi_provenance_chains_verifiee{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|témoin|kpi_provenances_pipelinerun{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|témoin|kpi_replay_identique{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|témoin|kpi_vex_verifies{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="prov"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="scan"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="sig"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vex"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vsa"} 0
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="prov"} 8
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="scan"} 3
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="sig"} 1
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vex"} 1
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vsa"} 1
+PROM|témoin|kpi_enonces_refuses{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|témoin|kpi_l3_verifie{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|témoin|kpi_provenance_chains_verifiee{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|témoin|kpi_provenances_pipelinerun{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|témoin|kpi_replay_identique{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|témoin|kpi_vex_verifies{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="prov"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="scan"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="sig"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vex"} 0
+PROM|témoin|kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vsa"} 0
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="prov"} 2
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="scan"} 0
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="sig"} 1
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vex"} 0
+PROM|témoin|kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vsa"} 0
+PROM|témoin|kpi_exportateur_passage_timestamp_seconds 1795552252
+## 1. sujets : listé, vérifié, vérifié par la clé étrangère (témoin, attendu 0)
+DETAIL|builds/sample-app|3a7ca1b14dbf|sig 1|prov 6/6/0|scan 3/3/0|vsa 1/1/0|vex 1/1/0|tsa 37 listés, 37 vérifiés, 6/6 provenances couvertes
+DETAIL|builds/sample-app|f5e6bcb0e0fb|sig 1|prov 8/8/0|scan 2/2/0|vsa 0/0/0|vex 1/1/0|tsa 8 listés, 8 vérifiés, 8/8 provenances couvertes
+DETAIL|builds/sample-app-deb|60f25f5c3fb5|sig 1|prov 8/8/0|scan 3/3/0|vsa 1/1/0|vex 1/1/0|tsa 8 listés, 8 vérifiés, 8/8 provenances couvertes
+DETAIL|builds/sample-app-rpm|07b7bd6feb48|sig 1|prov 2/2/0|scan 0/0/0|vsa 0/0/0|vex 0/0/0|tsa 2 listés, 2 vérifiés, 2/2 provenances couvertes
+## 2. KPI par sujet
+## 3. KPI de plateforme
+KPI|cle_date:chains|-|-|1795471932
+KPI|cle_date:scanner|-|-|1795476983
+KPI|cle_date:tsa|-|-|1795471932
+KPI|cle_date:vex|-|-|1795476983
+KPI|cle_date:vsa|-|-|1793700136
+KPI|couverture_vex_entrees|builds/sample-app-deb|60f25f5c3fb5|23/67
+KPI|couverture_vex_entrees|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|couverture_vex_entrees|builds/sample-app|3a7ca1b14dbf|5/6
+KPI|couverture_vex_entrees|builds/sample-app|f5e6bcb0e0fb|5/5
+KPI|couverture_vex_kev|builds/sample-app-deb|60f25f5c3fb5|sans objet
+KPI|couverture_vex_kev|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|couverture_vex_kev|builds/sample-app|3a7ca1b14dbf|sans objet
+KPI|couverture_vex_kev|builds/sample-app|f5e6bcb0e0fb|sans objet
+KPI|kev_delais|builds/sample-app-deb|-|sans objet (0 KEV vue)
+KPI|kev_delais|builds/sample-app|-|sans objet (0 KEV vue)
+KPI|kev_ouvertes|builds/sample-app-deb|60f25f5c3fb5|0
+KPI|kev_ouvertes|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|kev_ouvertes|builds/sample-app|3a7ca1b14dbf|0
+KPI|kev_ouvertes|builds/sample-app|f5e6bcb0e0fb|0
+KPI|l3_verifie|builds/sample-app-deb|60f25f5c3fb5|0
+KPI|l3_verifie|builds/sample-app-rpm|07b7bd6feb48|0
+KPI|l3_verifie|builds/sample-app|3a7ca1b14dbf|1
+KPI|l3_verifie|builds/sample-app|f5e6bcb0e0fb|0
+KPI|pin_date:entree:packaging-deb:f0ed7a71cfcc|builds/sample-app-deb|60f25f5c3fb5|1794694829
+KPI|pin_date:entree:packaging-rpm:333b7322290a|builds/sample-app-rpm|07b7bd6feb48|1795180486
+KPI|pin_date:entree:web-dist:47f72275aa78|builds/sample-app|3a7ca1b14dbf|1793376604
+KPI|pin_date:entree:web-dist:47f72275aa78|builds/sample-app|f5e6bcb0e0fb|1793376604
+KPI|pin_date:fermeture:sample-app-deb:bb7599a2e1cd|builds/sample-app-deb|60f25f5c3fb5|1794420322
+KPI|pin_date:fermeture:sample-app-rpm:0983898054a9|builds/sample-app-rpm|07b7bd6feb48|1795173420
+KPI|pin_date:fermeture:sample-app-sources:50dc73f72d04|builds/sample-app-deb|60f25f5c3fb5|1794420322
+KPI|pin_date:fermeture:sample-app-sources:50dc73f72d04|builds/sample-app-rpm|07b7bd6feb48|1794420322
+KPI|pin_date:fermeture:sample-app:74c265e703fb|builds/sample-app|3a7ca1b14dbf|1793732132
+KPI|pin_date:fermeture:sample-app:74c265e703fb|builds/sample-app|f5e6bcb0e0fb|1793732132
+KPI|pin_date:image:builder-go-voie-d:8c11e856b10f|builds/sample-app|f5e6bcb0e0fb|1795526430
+KPI|pin_date:image:builder-go-voie-d:d50ae57551c3|builds/sample-app|3a7ca1b14dbf|1793373433
+KPI|pin_date:image:buildkit:ace6811c2133|builds/sample-app|3a7ca1b14dbf|1793368831
+KPI|pin_date:image:buildkit:ace6811c2133|builds/sample-app|f5e6bcb0e0fb|1793368831
+KPI|pin_date:image:mock-rocky9:70f8c4124532|builds/sample-app-rpm|07b7bd6feb48|1795113732
+KPI|pin_date:image:outils-horodatage:c7bebae2bd33|builds/sample-app-deb|60f25f5c3fb5|1793308207
+KPI|pin_date:image:outils-horodatage:c7bebae2bd33|builds/sample-app-rpm|07b7bd6feb48|1793308207
+KPI|pin_date:image:outils-horodatage:c7bebae2bd33|builds/sample-app|3a7ca1b14dbf|1793308207
+KPI|pin_date:image:outils-horodatage:c7bebae2bd33|builds/sample-app|f5e6bcb0e0fb|1793308207
+KPI|pin_date:image:outils-prefetch:68e0ae705de5|builds/sample-app-deb|60f25f5c3fb5|1793727678
+KPI|pin_date:image:outils-prefetch:68e0ae705de5|builds/sample-app-rpm|07b7bd6feb48|1793727678
+KPI|pin_date:image:sbuild-debian13:749d746cc9e1|builds/sample-app-deb|60f25f5c3fb5|1794420322
+KPI|pin_date:pipeline:sample-app-deb:ed471138e467|builds/sample-app-deb|60f25f5c3fb5|non épinglé dans git
+KPI|pin_date:pipeline:sample-app-rpm:7d361cb1d5ea|builds/sample-app-rpm|07b7bd6feb48|1795181844
+KPI|pin_date:pipeline:sample-app:b8ff5ebb29cf|builds/sample-app|3a7ca1b14dbf|non épinglé dans git
+KPI|pin_date:pipeline:sample-app:da76d95be5af|builds/sample-app|f5e6bcb0e0fb|non épinglé dans git
+KPI|pin_date:source:sample-app.git:6391fd437f26|builds/sample-app-deb|60f25f5c3fb5|1793298058
+KPI|pin_date:source:sample-app.git:6391fd437f26|builds/sample-app-rpm|07b7bd6feb48|1793298058
+KPI|pin_date:source:sample-app.git:6391fd437f26|builds/sample-app|3a7ca1b14dbf|1793298058
+KPI|pin_date:source:sample-app.git:6391fd437f26|builds/sample-app|f5e6bcb0e0fb|1793298058
+KPI|pin_date:tache:construire-deb:3726ff0b116c|builds/sample-app-deb|60f25f5c3fb5|1794425235
+KPI|pin_date:tache:construire-image:4dcbc4b74681|builds/sample-app|f5e6bcb0e0fb|1795526695
+KPI|pin_date:tache:construire-image:66a9f2980a45|builds/sample-app|3a7ca1b14dbf|1793734336
+KPI|pin_date:tache:construire-rpm:ca03f18908d0|builds/sample-app-rpm|07b7bd6feb48|1795172388
+KPI|pin_date:tache:preparer-deb:588617b83825|builds/sample-app-deb|60f25f5c3fb5|1794426056
+KPI|pin_date:tache:preparer-entrees:2070d601ae3c|builds/sample-app|3a7ca1b14dbf|1793385395
+KPI|pin_date:tache:preparer-entrees:2070d601ae3c|builds/sample-app|f5e6bcb0e0fb|1793385395
+KPI|pin_date:tache:preparer-rpm:2f65f3903e98|builds/sample-app-rpm|07b7bd6feb48|1795014970
+KPI|pin_date:tache:publier-image:d21931f3807b|builds/sample-app-deb|60f25f5c3fb5|1793376604
+KPI|pin_date:tache:publier-image:d21931f3807b|builds/sample-app-rpm|07b7bd6feb48|1793376604
+KPI|pin_date:tache:publier-image:d21931f3807b|builds/sample-app|3a7ca1b14dbf|1793376604
+KPI|pin_date:tache:publier-image:d21931f3807b|builds/sample-app|f5e6bcb0e0fb|1793376604
+KPI|provenance_chains_verifiee|builds/sample-app-deb|60f25f5c3fb5|1
+KPI|provenance_chains_verifiee|builds/sample-app-rpm|07b7bd6feb48|1
+KPI|provenance_chains_verifiee|builds/sample-app|3a7ca1b14dbf|1
+KPI|provenance_chains_verifiee|builds/sample-app|f5e6bcb0e0fb|1
+KPI|provenances_pipelinerun|builds/sample-app-deb|60f25f5c3fb5|4
+KPI|provenances_pipelinerun|builds/sample-app-rpm|07b7bd6feb48|1
+KPI|provenances_pipelinerun|builds/sample-app|3a7ca1b14dbf|3
+KPI|provenances_pipelinerun|builds/sample-app|f5e6bcb0e0fb|4
+KPI|replay_identique|builds/sample-app-deb|60f25f5c3fb5|1
+KPI|replay_identique|builds/sample-app-rpm|07b7bd6feb48|0
+KPI|replay_identique|builds/sample-app|3a7ca1b14dbf|1
+KPI|replay_identique|builds/sample-app|f5e6bcb0e0fb|0
+KPI|scan_date|builds/sample-app-deb|60f25f5c3fb5|1795527758
+KPI|scan_date|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|scan_date|builds/sample-app|3a7ca1b14dbf|1795512718
+KPI|scan_date|builds/sample-app|f5e6bcb0e0fb|1795529548
+KPI|scan_ecartees|builds/sample-app-deb|60f25f5c3fb5|23
+KPI|scan_ecartees|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|scan_ecartees|builds/sample-app|3a7ca1b14dbf|5
+KPI|scan_ecartees|builds/sample-app|f5e6bcb0e0fb|5
+KPI|scan_entrees|builds/sample-app-deb|60f25f5c3fb5|67
+KPI|scan_entrees|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|scan_entrees|builds/sample-app|3a7ca1b14dbf|6
+KPI|scan_entrees|builds/sample-app|f5e6bcb0e0fb|5
+KPI|scan_kev_ecartees|builds/sample-app-deb|60f25f5c3fb5|0
+KPI|scan_kev_ecartees|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|scan_kev_ecartees|builds/sample-app|3a7ca1b14dbf|0
+KPI|scan_kev_ecartees|builds/sample-app|f5e6bcb0e0fb|0
+KPI|scan_kev|builds/sample-app-deb|60f25f5c3fb5|0
+KPI|scan_kev|builds/sample-app-rpm|07b7bd6feb48|absent
+KPI|scan_kev|builds/sample-app|3a7ca1b14dbf|0
+KPI|scan_kev|builds/sample-app|f5e6bcb0e0fb|0
+KPI|taux_l3_verifie|-|-|1/4
+KPI|taux_provenance_chains_verifiee|-|-|4/4
+KPI|taux_replay_identique|-|-|2/4
+KPI|vex_verifies|builds/sample-app-deb|60f25f5c3fb5|1
+KPI|vex_verifies|builds/sample-app-rpm|07b7bd6feb48|0
+KPI|vex_verifies|builds/sample-app|3a7ca1b14dbf|1
+KPI|vex_verifies|builds/sample-app|f5e6bcb0e0fb|1
+KPI|violations_licences|-|-|source absente
+## 4. comparaisons
+## bilan : 10 cas, 0 écart(s)
+## comparaison (code de l'exportateur 0, avec la clé étrangère 0, du recalcul 0)
+OK   sujets : 4
+OK   valeurs comparées : 105
+OK   clés et pins sans date : 0
+OK   séries de KEV : 0
+OK   écarts recalcul contre exportateur : 0
+OK   énoncés refusés pour leur forme : 0
+OK   comptes de signatures par sujet et famille, recalcul contre exportateur : écarts : 0
+OK   signatures refusées avec les clés du dépôt : 0
+OK   clé étrangère : toutes les signatures refusées, aucune vérifiée : True
+OK   clé étrangère : séries restantes et leur somme : {'enonces_refuses': 0, 'l3_verifie': 0, 'provenance_chains_verifiee': 0, 'provenances_pipelinerun': 0, 'replay_identique': 0, 'vex_verifies': 0}
+signatures [vérifiées, refusées] : clés du dépôt [41, 0], clé étrangère [0, 41]
+## bilan : 10 cas, 0 écart(s)
+## codes : lecteur 0, exportateur 0, clé étrangère 0, recalcul 0, comparaison 0
