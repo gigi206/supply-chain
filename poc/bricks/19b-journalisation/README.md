@@ -671,3 +671,9 @@ Décision du propriétaire, verbatim : « Chercher une correction à sec ». Mes
 Lu sur la plateforme par l'auditeur ([`liste-proxy-avant.log`](resultats/liste-proxy-avant.log), 20:59:52 UTC) : le proxy mène à Loki (GET `buildinfo`, 200) ; aucun chemin qui agit n'a été demandé. `buildinfo` est une route listée de la source : la présence du défaut sur la plateforme est donc déduite du banc, pas mesurée.
 
 Limites : le suivi en direct de l'explorateur passe sans doute par le proxy, non essayé ; les porteurs d'un certificat client de la CA gardent l'accès direct (D16) ; aucune interface ouverte au banc. Pose écrite, non lancée : [`liste-proxy.sh`](liste-proxy.sh) (accord, sudo, redémarrage de Grafana ; `config/grafana.ini` sera modifié sur accord).
+
+### Liste du proxy posée (note de 2026-11-24T21:10:19Z)
+
+Accord du propriétaire, verbatim : « Liste, compte, pose (Recommandé) ». [`liste-proxy-pose.log`](resultats/liste-proxy-pose.log) (2026-11-24 à 21:07:17 UTC) : **10 cas, 0 KO**. `config/grafana.ini` porte la ligne, donc le rejeu aussi ; le fichier en service lui est égal. Proxy vers Loki : 200 avant (20:59:52), **403 après** ; proxy vers Prometheus 200 ; requêtes et étiquettes inchangées. Copie de l'ancien fichier gardée sur la VM (`grafana.ini.avant-liste`) pour `retrait`. Un compte Viewer de plus existe : `kpi-journal` (brique 20).
+
+Restent : le suivi en direct de l'explorateur non essayé, les porteurs d'un certificat client de la CA (D16), `Restart=on-failure` de `loki.service` inchangé. L'arrêt lui-même n'a jamais été essayé sur la plateforme, ni avant ni après.
