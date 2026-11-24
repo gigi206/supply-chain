@@ -1,0 +1,101 @@
+# essai-fuites.sh, 2026-11-24T22:17:03Z, dépôt b0bbec5f, script bee250e9d99db5bb, fuites c34eaf679be49801
+## 1. aucune fuite
+  # fuites.sh banc, 2026-11-24T22:17:04Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   code : code 0
+OK   cherché sur les trois VM : 3 3
+OK   ligne « absent » : 0
+## 2. fuite du mot de passe de kpi-journal sur sc-stockage
+  # fuites.sh banc, 2026-11-24T22:17:04Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  1    grafana-kpi-journal.password
+  KO   secret trouvé dans un journal
+  code 1
+OK   code : code 1
+OK   compte sc-stockage, sc-build : 1 0
+OK   valeur absente de la sortie : 0
+## 3. témoin : même fuite, fuites.sh d'avant (40dccc25)
+  # fuites.sh banc, 2026-11-24T22:17:04Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  ## sc-stockage : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   code (le défaut existait) : code 0
+## 4. fichier absent, puis vide ; non-régression de 08/secrets
+  # fuites.sh banc, 2026-11-24T22:17:04Z
+  absent ou vide, non cherché : grafana-kpi-journal.password
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   absent : code 0 1 3
+  # fuites.sh banc, 2026-11-24T22:17:04Z
+  absent ou vide, non cherché : grafana-kpi-journal.password
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   vide : code 0 1 1
+  # fuites.sh banc, 2026-11-24T22:17:04Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 3 lignes de journaux
+  témoin retrouvé (1)
+  1    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  KO   secret trouvé dans un journal
+  code 1
+OK   fuite d'un secret de la 08 : code 1 1 0
+## 5. répertoire de motifs effacé
+OK   travail/fuites : absent
+## bilan : 11 cas, 0 écart(s), 2026-11-24T22:17:05Z
