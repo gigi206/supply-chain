@@ -2375,3 +2375,16 @@ Choix du propriétaire (verbatim) : « Pièce 8 maintenant » (plutôt qu'un rej
 Confiance : moyenne. C'est la première signature par `userpass` sur la clé neuve `aeef0a8c…` (non mesurée depuis le rejeu, README de la 07a), et la première écriture de `poc-vex` dans le vrai Zot.
 
 **Effets attendus** : un referrer neuf dans le vrai Zot (registre en ajout seul : seul un retrait sur accord l'enlève) ; au scan quotidien suivant de sample-app, les 5 entrées passent à « écartée par un VEX ». L'échéance est fixée à 30 jours après l'horodatage.
+
+## Pièce 8 : résultat de `signer` — premier VEX signé et publié (note de 2026-11-24T08:49:57Z)
+
+[Journal](piece8-signer-signer-sample-app-3a7ca1b1.log), lancé à 08:49:40Z, fini au plus tard à 08:49:49Z (date -u juste après la commande) : **15 cas, 0 écart ; la prédiction tient**.
+- Horodatage du document du dépôt : **2026-11-24T08:49:43Z** (document et 5 énoncés), seul champ changé par rapport à HEAD ; document sha256 `90f5656bd81a300d…`.
+- Connexion `userpass` : code 0, `vex-signature` seule, 900 s ; **première signature par `userpass` sur la clé neuve `aeef0a8c…`** : mesurée.
+- `SIGNE|` : bundle `11994536e564c05e…`, énoncé signé `578f75804738dae8…`.
+- **`PUBLIE|192.168.161.13:5000/builds/vex/sample-app@sha256:fbf5d0bff100b2d0426aa3755df579dbb9310c2e93a9cc678a9522ef71f332fb`**, referrer de `sha256:3a7ca1b1…` : première écriture de `poc-vex` dans le vrai Zot.
+- Révocation de soi : code 0 ; redirection fermée.
+- Relecture : `PUBLIES|5` (cosign code 0). Les 5 lignes `AVIS|renouvellement` sont attendues : relu après publication, le document se compare à lui-même (même horodatage).
+- Échéance des 5 énoncés : **2026-12-24T08:49:43Z** (30 jours).
+
+**Suite** : le CronJob `scan/scan-sample-app` (`30 9 * * *`, `Etc/UTC`, créé au rejeu) scannera sample-app le 24/11 à 09:30 UTC. Attendu : `SCAN|…, 6 vulnérabilités, 0 KEV, 5 écartée(s) par un VEX` (Loki et Grafana), et la colonne « VEX appliqué » de `vex-gabarit.sh` remplie pour les 5 entrées ; `GO-2026-6859` reste comptée.

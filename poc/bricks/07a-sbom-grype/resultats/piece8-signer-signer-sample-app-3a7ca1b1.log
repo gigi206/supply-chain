@@ -1,0 +1,50 @@
+# piece8-signer.sh signer poc/bricks/07a-sbom-grype/vex/sample-app-3a7ca1b1.json, 2026-11-24T08:49:40Z, 9a2fc7a5
+accord du propriétaire (verbatim) : « J'autorise (signature par hashivault://vex et publication dans builds/vex/sample-app) »
+## préalables (lecture seule)
+OK   document : sha256 (16) attendu, avant tout horodatage : f634c57e7013d108
+OK   document : horodatages encore vides : [""]
+{"id":"https://supply-chain.example/vex/sample-app/3a7ca1b1","author":"Ghislain LE MEUR","enonces":[{"n":"GHSA-3fxj-6jh8-hvhx","j":"vulnerable_code_not_present"},{"n":"GHSA-j6qf-3m9c-vwj3","j":"vulnerable_code_not_present"},{"n":"GHSA-mqqf-5wvp-8fh8","j":"vulnerable_code_not_present"},{"n":"GO-2026-5775","j":"vulnerable_code_not_present"},{"n":"GO-2026-5777","j":"vulnerable_code_not_present"}]}
+OK   binaire bao : 9c5f36287c673f386e1533e9c044169a248e4ee50dd54810fa766e95bd41b788
+OK   mot de passe du propriétaire pour OpenBao présent (test -s) : oui
+OK   mot de passe de poc-vex présent (test -s) : oui
+OK   poc-vex authentifié sur /v2/ du vrai Zot (code HTTP) : 200
+OK   juge scan-outil depuis HEAD : 7dde1a8ed457f254
+OK   redirection vers openbao-0 ouverte (aucune connexion) : oui
+OK   redirection fermée
+## horodatage du document du dépôt (seul champ écrit)
+horodatage : 2026-11-24T08:49:43Z ; document sha256 90f5656bd81a300db9b0cd0c3585e78e3c274b9cebd95b9f7860b852b563b194
+OK   seuls les horodatages ont changé : cc00bfd807fe5f40
+JUGE|exemption, 5 énoncé(s) dont 0 large(s), document sha256 90f5656bd81a300db9b0cd0c3585e78e3c274b9cebd95b9f7860b852b563b194, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, VEX vers 192
+PUBLIES|0 énoncé(s) publié(s) vérifié(s) dans 192.168.161.13:5000/builds/vex/sample-app (CLE_PUBLIQUE), cosign code 1 : no matching attestations: 
+ECHEANCE|énoncé 0 : 2026-12-24T08:49:43Z (30 jours après 2026-11-24T08:49:43Z)
+ECHEANCE|énoncé 1 : 2026-12-24T08:49:43Z (30 jours après 2026-11-24T08:49:43Z)
+ECHEANCE|énoncé 2 : 2026-12-24T08:49:43Z (30 jours après 2026-11-24T08:49:43Z)
+ECHEANCE|énoncé 3 : 2026-12-24T08:49:43Z (30 jours après 2026-11-24T08:49:43Z)
+ECHEANCE|énoncé 4 : 2026-12-24T08:49:43Z (30 jours après 2026-11-24T08:49:43Z)
+OK   document horodaté : accepté par verifier : 0
+## connexion du propriétaire (userpass, -no-store, mot de passe lu par bao dans son fichier)
+OK   connexion : code, secret présent, politiques, durée : 0,oui,vex-signature,900
+## signature et publication (signer-vex.sh signer, hashivault://vex, poc-vex)
+JUGE|exemption, 5 énoncé(s) dont 0 large(s), document sha256 90f5656bd81a300db9b0cd0c3585e78e3c274b9cebd95b9f7860b852b563b194, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, VEX vers 192.168.161.13:5000/bui
+PUBLIES|0 énoncé(s) publié(s) vérifié(s) dans 192.168.161.13:5000/builds/vex/sample-app (CLE_PUBLIQUE), cosign code 1 : no matching attestations: 
+ECHEANCE|énoncé 0 : 2026-12-24T08:49:43Z (30 jours après 2026-11-24T08:49:43Z)
+ECHEANCE|énoncé 1 : 2026-12-24T08:49:43Z (30 jours après 2026-11-24T08:49:43Z)
+ECHEANCE|énoncé 2 : 2026-12-24T08:49:43Z (30 jours après 2026-11-24T08:49:43Z)
+ECHEANCE|énoncé 3 : 2026-12-24T08:49:43Z (30 jours après 2026-11-24T08:49:43Z)
+ECHEANCE|énoncé 4 : 2026-12-24T08:49:43Z (30 jours après 2026-11-24T08:49:43Z)
+SIGNE|bundle sha256 11994536e564c05eb6ffa9c1fae3a8e5fe76af726ceb50170ca11b260edebc42, énoncé signé sha256 578f75804738dae836bc44a9ae15a2b2a1b2a785d51e21eee2ff216c2b8b0c27
+PUBLIE|192.168.161.13:5000/builds/vex/sample-app@sha256:fbf5d0bff100b2d0426aa3755df579dbb9310c2e93a9cc678a9522ef71f332fb, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; compte au scan quotidien suivant
+OK   signer-vex.sh signer : code : 0
+OK   ligne PUBLIE : 1
+## révocation de soi et fermeture
+OK   révocation de soi : code : 0
+OK   redirection fermée
+## relecture : énoncés publiés vérifiés par la clé publique VEX
+PUBLIES|5 énoncé(s) publié(s) vérifié(s) dans 192.168.161.13:5000/builds/vex/sample-app (CLE_PUBLIQUE), cosign code 0
+AVIS|renouvellement : énoncé 0 (GHSA-3fxj-6jh8-hvhx) du 2026-11-24T08:49:43Z : énoncé publié du 2026-11-24T08:49:43Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce document peut ne p
+AVIS|renouvellement : énoncé 1 (CVE-2026-114437,GHSA-j6qf-3m9c-vwj3) du 2026-11-24T08:49:43Z : énoncé publié du 2026-11-24T08:49:43Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce do
+AVIS|renouvellement : énoncé 2 (CVE-2025-69725,GHSA-mqqf-5wvp-8fh8) du 2026-11-24T08:49:43Z : énoncé publié du 2026-11-24T08:49:43Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce doc
+AVIS|renouvellement : énoncé 3 (GHSA-9g5q-2w5x-hmxf,GO-2026-5775) du 2026-11-24T08:49:43Z : énoncé publié du 2026-11-24T08:49:43Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce docum
+AVIS|renouvellement : énoncé 4 (GHSA-rjr7-jggh-pgcp,GO-2026-5777) du 2026-11-24T08:49:43Z : énoncé publié du 2026-11-24T08:49:43Z (not_affected) au moins aussi récent sur une entrée du scan de même nom ; ce docum
+OK   énoncés publiés vérifiés sur le digest : 5
+## bilan : 15 cas, 0 écart(s)
