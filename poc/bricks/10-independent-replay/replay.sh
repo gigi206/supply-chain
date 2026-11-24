@@ -64,16 +64,21 @@ export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
 racine_depot=$(cd "$here/../../.." && pwd)
 R=$here/resultats
+# Additif du 24/11/2026 (brique 07c, VSA de f5e6bcb0) : IMAGE, INVOCATION, FIN_BUILD, GO_ARCHIVE, GO_SHA256 et RESULTATS se
+# passent par l'environnement ; les défauts restent ceux de 3a7ca1b1 / c4242a11 (rejeu.sh re-pousse cette VSA avec POUSSER_VSA=1)
+# jusqu'au commit qui archive la VSA de f5e6bcb0. RESULTATS (journaux et fichiers r4-/r5- produits) : dossier distinct, pour ne
+# pas réécrire les mesures de la clôture de la 10 ; un journal existant y est refusé. La clé publique de VSA reste lue dans $R.
+RJ=${RESULTATS:-$R}
 O=$HOME/.cache/supply-chain-poc/10
 T=$O/telechargements
 E=$O/essais
-mkdir -p "$R" "$T" "$E"
+mkdir -p "$R" "$RJ" "$T" "$E"
 ZOT_POC=192.168.161.13:5000                      # Zot du PoC, lecture anonyme seulement
 CA_POC=$O/ca-poc.crt                             # certificat public de la CA du PoC (TLS de Zot et de Forgejo), copié une fois
 [ -s "$CA_POC" ] || cp "$HOME/.cache/supply-chain-poc/08/pki/ca-poc.crt" "$CA_POC"   # public ; aucune clé de 08 n'est lue
-IMAGE=builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # sujet de la provenance
+IMAGE=${IMAGE:-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5}   # sujet de la provenance
 # INVOCATION=d9006af7-5d9a-4a5e-878e-1c9a5bd96d56   # PipelineRun du 02/11/2026, 13:58:36 à 13:59:30 UTC (VSA de R5, c804d946)
-INVOCATION=c4242a11-18f6-439f-b947-7fe3d4319078   # J7 du rejeu complet de la 08, 03/11/2026, 21:25:30 à 21:26:27 UTC (fermeture F2)
+INVOCATION=${INVOCATION:-c4242a11-18f6-439f-b947-7fe3d4319078}   # J7 du rejeu complet de la 08, 03/11/2026, 21:25:30 à 21:26:27 UTC (fermeture F2)
 
 # Domaine de replay : VM, réseau, clés (rien de commun avec 08 ; l'image Debian publique est relue dans le cache de 08 et revérifiée)
 IMG=$HOME/.cache/supply-chain-poc/08/telechargements/debian/debian-13-generic-amd64-20261026-2643.qcow2
@@ -92,7 +97,7 @@ OUTILS_SHA256="d18b8188b600e201a1b3d08c20e2a1e439cf51d2c2285f132dd9bd51c666f6d6 
 8781ab9f71c12f314d21c8e85f13ca1a82d90cf475aa5131a7b543fcc5487543  runc.amd64
 424e2c97d0b45fd7a6b608a87f090f35633f4c23ece5f092d48bba11aaf4bbfa  cosign-linux-amd64
 66fb0ad7206f3f6fa77ed5b552049d364ccf4b50b1684554f731f76302b52ca0  oras_1.3.6_linux_amd64.tar.gz
-ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5  go1.26.10.linux-amd64.tar.gz"
+${GO_SHA256:-ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5}  ${GO_ARCHIVE:=go1.26.10.linux-amd64.tar.gz}"
 v() { virsh -c qemu:///system "$@"; }
 sur() { ssh "${SSH_OPTS[@]}" "replay@$VM_IP" "$@"; }
 
@@ -101,7 +106,8 @@ lancer() { # jalon étape… : journal resultats/<jalon>-<étape>.log
   [ $# -gt 0 ] || { echo "usage : $0 $(declare -F | awk '$3 ~ /^etape_/ {sub("etape_", "", $3); printf "%s|", $3}' | sed 's/|$//')…" >&2; exit 2; }
   for e in "$@"; do declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }; done
   for e in "$@"; do
-    { echo "# ${0##*/} $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/$j-$e.log"
+    [ -z "${RESULTATS:-}" ] || [ ! -e "$RJ/$j-$e.log" ] || { echo "REFUS : $RJ/$j-$e.log existe déjà (journaux jamais réécrits)" >&2; exit 1; }
+    { echo "# ${0##*/} $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)${RESULTATS:+, IMAGE ${IMAGE#*@sha256:} INVOCATION $INVOCATION}"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$RJ/$j-$e.log"
   done
 }
 
@@ -152,7 +158,8 @@ EOS
 provenance() { # $O/provenance.json : énoncé de la provenance du PipelineRun INVOCATION, tiré du tag .att (lecture anonyme ;
   # sa signature n'est vérifiée qu'en R3, dans le domaine)
   local t l
-  [ -s "$O/provenance.json" ] && return
+  # 24/11/2026 : le cache ne vaut que pour la même invocation (sinon une autre IMAGE/INVOCATION relirait l'ancienne provenance)
+  [ -s "$O/provenance.json" ] && [ "$(jq -r '.predicate.runDetails.metadata.invocationId' "$O/provenance.json")" = "$INVOCATION" ] && return
   t=$(echo "${IMAGE#*@}" | tr : -).att
   for l in $(SSL_CERT_FILE=$CA_POC crane manifest "$ZOT_POC/${IMAGE%@*}:$t" | jq -r '.layers[].digest'); do
     SSL_CERT_FILE=$CA_POC crane blob "$ZOT_POC/${IMAGE%@*}@$l" | jq -r '.payload' | base64 -d > "$E/enonce.json"
@@ -278,7 +285,7 @@ etape_outils() {
   sur 'rm -rf /tmp/outils && mkdir -m 0700 /tmp/outils'
   mapfile -t fichiers < <(awk -v t="$T" '{print t "/" $2}' "$W/sha256-attendues")
   scp -q "${SSH_OPTS[@]}" "$W/sha256-attendues" "${fichiers[@]}" "replay@$VM_IP:/tmp/outils/"
-  sur sudo bash -s <<'EOS'
+  sur sudo bash -s -- "$GO_ARCHIVE" <<'EOS'   # 24/11/2026 : archive de Go en argument
 set -euo pipefail
 cd /tmp/outils
 echo "## empreintes vérifiées dans la VM"; sha256sum -c sha256-attendues
@@ -286,7 +293,7 @@ tar -xzf buildkit-v0.25.2.linux-amd64.tar.gz -C /usr/local bin/buildkitd bin/bui
 install -m 0755 runc.amd64 /usr/local/bin/runc
 install -m 0755 cosign-linux-amd64 /usr/local/bin/cosign
 tar -xzf oras_1.3.6_linux_amd64.tar.gz -C /usr/local/bin oras
-rm -rf /usr/local/go && tar -xzf go1.26.10.linux-amd64.tar.gz -C /usr/local
+rm -rf /usr/local/go && tar -xzf "$1" -C /usr/local
 cd / && rm -rf /tmp/outils
 echo "## versions"
 buildctl --version; buildkitd --version; runc --version | head -1; cosign version 2>&1 | grep GitVersion; oras version | head -1
@@ -348,7 +355,7 @@ etape_verifier_entrees() { # tout se passe dans la VM : verifier_entrees.py (tra
 }
 
 # FIN_BUILD=2026-11-02T13:59:30Z   # finishedOn de d9006af7, vérifié en R3 le 03/11/2026
-FIN_BUILD=2026-11-03T21:26:27Z   # finishedOn de c4242a11, lu sans vérification le 03/11/2026 (23:13 UTC) ; R3 le revérifie
+FIN_BUILD=${FIN_BUILD:-2026-11-03T21:26:27Z}   # finishedOn de c4242a11, lu sans vérification le 03/11/2026 (23:13 UTC) ; R3 le revérifie
 ATTENTE_HORS_LIGNE=${ATTENTE_HORS_LIGNE:-1200}   # secondes lien coupé ; le rebuild doit finir avant le rétablissement
 
 transporter_r4() { # rebuild.sh : bundle preparer-entrees et ce rebuild.sh copiés dans ~/r4 de la VM, vidé d'abord
@@ -512,7 +519,7 @@ etape_vsa() { # DANS LA VM, sous unshare -rn : outils/vsa.py (énoncé), signé 
   git -C "$racine_depot" branch -r --contains "$c" | grep -q . || { echo "REFUS : $c absent des branches distantes"; exit 1; }
   [ -z "$(git -C "$racine_depot" status --porcelain -- "$here/outils/vsa.py")" ] || { echo "REFUS : outils/vsa.py modifié hors commit"; exit 1; }
   git -C "$racine_depot" branch -r --contains HEAD | grep -q . || { echo "REFUS : HEAD ($(git -C "$racine_depot" rev-parse --short HEAD)) non poussé"; exit 1; }
-  grep -q '^OK   sortie de la VM inchangée' "$R/r4-rebuild.log" && grep -q '^OK   rebuild terminé' "$R/r4-rebuild.log" \
+  grep -q '^OK   sortie de la VM inchangée' "$RJ/r4-rebuild.log" && grep -q '^OK   rebuild terminé' "$RJ/r4-rebuild.log" \
     || { echo "REFUS : R4 non valable hors ligne (resultats/r4-rebuild.log)"; exit 1; }
   u=https://github.com/gigi206/supply-chain/blob/$c/$f
   rm -rf -- "${x:?}" && mkdir -p "$x" && chmod 0700 "$x"
@@ -541,23 +548,26 @@ python3 -I -c 'import json, base64; b = json.load(open("vsa.bundle.json")); prin
 rm -f sc.err ab.err vb.err
 sha256sum enonce.json vsa.bundle.json
 EOS
-  sur 'cat ~/r5/enonce.json' > "$R/r5-vsa-enonce.json"
-  sur 'cat ~/r5/vsa.bundle.json' > "$R/r5-vsa.bundle.json"
-  echo "## copies archivées"; ( cd "$R" && sha256sum r5-vsa-enonce.json r5-vsa.bundle.json )
+  sur 'cat ~/r5/enonce.json' > "$RJ/r5-vsa-enonce.json"
+  sur 'cat ~/r5/vsa.bundle.json' > "$RJ/r5-vsa.bundle.json"
+  echo "## copies archivées"; ( cd "$RJ" && sha256sum r5-vsa-enonce.json r5-vsa.bundle.json )
 }
 
 porte() { # avant|apres : étape reelle de preuves.sh de la 08 (Job de la porte, image réelle, source attendue, contrôle 9) ; son
   # journal est copié, puisque la 08 le réécrit à chaque passage
-  PASSAGE=$1 "$racine_depot/poc/bricks/08-trust-plane/preuves.sh" reelle
-  cp "$racine_depot/poc/bricks/08-trust-plane/resultats/preuves-reelle.log" "$R/r5-porte-$1.copie.log"
+  # 24/11/2026 : avec RESULTATS, le journal de la 08 va dans $RJ/porte-<passage> (sinon la copie lirait l'ancien)
+  local d=${RESULTATS:+$RJ/porte-$1}
+  [ -z "$d" ] || mkdir -p "$d"
+  RESULTATS=$d PASSAGE=$1 "$racine_depot/poc/bricks/08-trust-plane/preuves.sh" reelle
+  cp "${d:-$racine_depot/poc/bricks/08-trust-plane/resultats}/preuves-reelle.log" "$RJ/r5-porte-$1.copie.log"
 }
 etape_porte_avant() { porte avant; }
 etape_porte_apres() { # comparaison des deux passages : ligne VERDICT, champs 3 à 5, 7 et 8 (le 2 est le libellé du cas, le 6 la
   # durée du conteneur ec ; premier passage : le libellé, comparé, rendait KO)
   local a b
   porte apres
-  a=$(grep -m1 '^VERDICT|' "$R/r5-porte-avant.copie.log" | cut -d'|' -f3-5,7,8 || true)
-  b=$(grep -m1 '^VERDICT|' "$R/r5-porte-apres.copie.log" | cut -d'|' -f3-5,7,8 || true)
+  a=$(grep -m1 '^VERDICT|' "$RJ/r5-porte-avant.copie.log" | cut -d'|' -f3-5,7,8 || true)
+  b=$(grep -m1 '^VERDICT|' "$RJ/r5-porte-apres.copie.log" | cut -d'|' -f3-5,7,8 || true)
   echo "## comparaison avec le passage avant le push"; echo "avant : ${a:-absent}"; echo "après : ${b:-absent}"
   [ -n "$a" ] && [ "$a" = "$b" ] && echo "OK   même verdict de la porte avant et après le push de la VSA" || echo "KO   verdict de la porte différent ou absent"
 }
@@ -565,10 +575,10 @@ etape_porte_apres() { # comparaison des deux passages : ligne VERDICT, champs 3 
 etape_pousser_vsa() { # SUR L'HÔTE, compte poc-replay (D5), ACCORD DU PROPRIÉTAIRE À CHAQUE PUSH : manifeste fait main (subject =
   # image) poussé par digest dans builds/vsa/sample-app ; aucun referrer ni tag ajouté à builds/sample-app
   local x=$W/pousser s m a rc=0
-  [ -s "$R/r5-vsa.bundle.json" ] || { echo "REFUS : resultats/r5-vsa.bundle.json absent (étape vsa d'abord)"; exit 1; }
+  [ -s "$RJ/r5-vsa.bundle.json" ] || { echo "REFUS : resultats/r5-vsa.bundle.json absent (étape vsa d'abord)"; exit 1; }
   rm -rf -- "${x:?}" && (umask 077 && mkdir -p "$x")
   trap 'rm -rf -- "$W/pousser"' EXIT   # copie du mot de passe (auth.json) supprimée même en cas d'échec
-  strace -f -qq -e trace=connect -o "$x/trace" cosign verify-blob-attestation --bundle "$R/r5-vsa.bundle.json" --new-bundle-format \
+  strace -f -qq -e trace=connect -o "$x/trace" cosign verify-blob-attestation --bundle "$RJ/r5-vsa.bundle.json" --new-bundle-format \
     --key "$R/vsa-cle-publique.pem" --insecure-ignore-tlog --type "$TYPE_VSA" --digest "${IMAGE#*@sha256:}" --digestAlg sha256 > "$x/v.err" 2>&1 || rc=$?
   echo "bundle archivé, clé de VSA (hôte) : code $rc ; $(tail -1 "$x/v.err")"; [ "$rc" = 0 ] || exit 1
   connexions "verify-blob-attestation (hôte)" "$x/trace"
@@ -581,11 +591,11 @@ etape_pousser_vsa() { # SUR L'HÔTE, compte poc-replay (D5), ACCORD DU PROPRIÉT
     | tr -d '\r' | python3 -I -c 'import sys,json; h={l.split(": ",1)[0].lower(): l.split(": ",1)[1] for l in sys.stdin.read().splitlines() if ": " in l}; print(json.dumps({"mediaType": h["content-type"], "digest": h["docker-content-digest"], "size": int(h["content-length"])}))')
   echo "sujet : $s"
   printf '{"schemaVersion":2,"mediaType":"application/vnd.oci.image.manifest.v1+json","artifactType":"%s","config":{"mediaType":"application/vnd.oci.empty.v1+json","digest":"sha256:%s","size":2},"layers":[{"mediaType":"%s","digest":"sha256:%s","size":%s}],"subject":%s,"annotations":{"dev.sigstore.bundle.content":"dsse-envelope","dev.sigstore.bundle.predicateType":"%s"}}' \
-    "$TYPE_BUNDLE" "$(sha256sum < "$x/config.json" | cut -c1-64)" "$TYPE_BUNDLE" "$(sha256sum < "$R/r5-vsa.bundle.json" | cut -c1-64)" \
-    "$(wc -c < "$R/r5-vsa.bundle.json")" "$s" "$TYPE_VSA" > "$x/manifeste.json"
+    "$TYPE_BUNDLE" "$(sha256sum < "$x/config.json" | cut -c1-64)" "$TYPE_BUNDLE" "$(sha256sum < "$RJ/r5-vsa.bundle.json" | cut -c1-64)" \
+    "$(wc -c < "$RJ/r5-vsa.bundle.json")" "$s" "$TYPE_VSA" > "$x/manifeste.json"
   m=sha256:$(sha256sum < "$x/manifeste.json" | cut -c1-64)
-  cp "$x/manifeste.json" "$R/r5-vsa-manifeste.json"
-  oras blob push "${a[@]}" "$ZOT_POC/$DEPOT_VSA" "$R/r5-vsa.bundle.json" > /dev/null && echo "blob du bundle poussé"
+  cp "$x/manifeste.json" "$RJ/r5-vsa-manifeste.json"
+  oras blob push "${a[@]}" "$ZOT_POC/$DEPOT_VSA" "$RJ/r5-vsa.bundle.json" > /dev/null && echo "blob du bundle poussé"
   oras blob push "${a[@]}" "$ZOT_POC/$DEPOT_VSA" "$x/config.json" > /dev/null && echo "config vide poussée"
   oras manifest push "${a[@]}" "$ZOT_POC/$DEPOT_VSA@$m" "$x/manifeste.json" 2>&1 | tail -1
   rm -rf -- "${x:?}"
@@ -621,8 +631,8 @@ etape_negatifs() { # DANS LA VM, sur des copies (outils/negatifs.sh) ; rapports 
   sur 'sudo rm -rf ~/r5n && mkdir -m 0700 ~/r5n'   # distinct de ~/r5 (VSA) : negatifs.sh écrit en root dans ~/r5n
   scp -q "${SSH_OPTS[@]}" "$here/outils/negatifs.sh" "replay@$VM_IP:r5n/"
   sur 'sha256sum ~/r5n/negatifs.sh && sudo bash ~/r5n/negatifs.sh; sudo cat ~/r5n/n/resultat.txt'
-  sur 'sudo cat ~/r5n/n/diffoscope-couche.txt' > "$R/r5-n2-diffoscope-couche.txt"
-  sur 'sudo cat ~/r5n/n/diffoscope-config.txt' > "$R/r5-n2-diffoscope-config.txt"
+  sur 'sudo cat ~/r5n/n/diffoscope-couche.txt' > "$RJ/r5-n2-diffoscope-couche.txt"
+  sur 'sudo cat ~/r5n/n/diffoscope-config.txt' > "$RJ/r5-n2-diffoscope-config.txt"
   echo "## motif de N1 (journal de buildctl, fin)"; sur 'sudo tail -8 ~/r5n/n/n1.build.log'
 }
 
