@@ -29,6 +29,7 @@ dernier() { tail -1 "$T/sortie"; }
   sed -i '/\tnon-epingle$/d' "$T/c/$K/releve/dates-git.tsv"
   attendu "lignes retirées du relevé" "$(git -C "$T/c" diff --numstat HEAD -- "$K/releve/dates-git.tsv" | cut -f1,2 | tr '\t' ' ')" "0 3"
   lancer sec; attendu "sec : clés, relevé" "$(dernier), $(grep -c '^KO' "$T/sortie") KO, $(grep -o 'différentes de HEAD : [0-9]*' "$T/sortie")" "code 1, 2 KO, différentes de HEAD : 2"
+  export SANS_DATE=2; lancer sec; unset SANS_DATE; attendu "sec, SANS_DATE=2 dans l'environnement" "$(dernier), $(grep -c '^KO' "$T/sortie") KO, $(grep -o 'différentes de HEAD : [0-9]*' "$T/sortie")" "code 1, 2 KO, différentes de HEAD : 2"
   lancer sec_rejeu; attendu "sec_rejeu" "$(dernier), $(grep -o 'clés sans date : [0-9]*' "$T/sortie")" "code 0, clés sans date : 2"
   attendu "relevé redevenu celui de HEAD" "$(git -C "$T/c" diff --quiet HEAD -- "$K/releve" && echo oui || echo non)" oui
   echo "## témoin de la tolérance exacte : SANS_DATE forcé à 1"

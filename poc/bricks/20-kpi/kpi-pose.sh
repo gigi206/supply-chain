@@ -24,6 +24,7 @@ MDP=$HOME/.cache/supply-chain-poc/20/secrets/grafana-kpi-journal.password
 SSH_OPTS=(-i "$O8/ssh/id_ed25519" -o UserKnownHostsFile="$O8/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
 sur() { env -u SSH_AUTH_SOCK ssh "${SSH_OPTS[@]}" poc@192.168.161.13 "$@"; }
 ko=0
+unset SANS_DATE   # posé par au_rejeu seulement : hérité de l'environnement, il sauterait le contrôle des clés contre HEAD
 attendu() { if [ "$2" = "$3" ]; then echo "OK   $1 : $2"; else echo "KO   $1 : $2 (attendu : $3)"; ko=1; fi; }
 masque() { sed '/jeton\|token/I c\[ligne masquée : motif jeton|token]'; }
 T=$HOME/.cache/supply-chain-poc/20/kpi-pose   # chemin écrit en entier : effacé à la sortie

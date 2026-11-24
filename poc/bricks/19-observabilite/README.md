@@ -49,7 +49,7 @@ Cible (doc 02 §7) : métriques de Tekton, Kyverno, Zot, OpenBao et Forgejo ; Pr
 | O3 | Règles des 5 alertes (versionnées), tests unitaires des règles (`promtool test rules`) avant tout incident | Tests de règles réussis |
 | O4 | Incidents simulés, un par alerte, avec retour à la normale | Chaque alerte passe à `firing` puis se résout ; notification reçue par le récepteur local |
 
-Hors périmètre : KPI supply-chain (brique 20, 2c) ; observabilité du domaine de replay (brique 10).
+Hors périmètre : KPI supply-chain (brique 20, 2c ; séries et tableau posés le 24/11/2026, deux règles d'alerte écrites dans `20-kpi/alertes-kpi.patch`, **non déployées**) ; observabilité du domaine de replay (brique 10).
 
 ## Points à vérifier en cours de brique (non supposés)
 

@@ -677,3 +677,7 @@ Limites : le suivi en direct de l'explorateur passe sans doute par le proxy, non
 Accord du propriétaire, verbatim : « Liste, compte, pose (Recommandé) ». [`liste-proxy-pose.log`](resultats/liste-proxy-pose.log) (2026-11-24 à 21:07:17 UTC) : **10 cas, 0 KO**. `config/grafana.ini` porte la ligne, donc le rejeu aussi ; le fichier en service lui est égal. Proxy vers Loki : 200 avant (20:59:52), **403 après** ; proxy vers Prometheus 200 ; requêtes et étiquettes inchangées. Copie de l'ancien fichier gardée sur la VM (`grafana.ini.avant-liste`) pour `retrait`. Un compte Viewer de plus existe : `kpi-journal` (brique 20).
 
 Restent : le suivi en direct de l'explorateur non essayé, les porteurs d'un certificat client de la CA (D16), `Restart=on-failure` de `loki.service` inchangé. L'arrêt lui-même n'a jamais été essayé sur la plateforme, ni avant ni après.
+
+## Second tableau de Grafana (brique 20, note de 2026-11-24T22:05:39Z)
+
+« KPI supply-chain » ([`kpi-supply-chain.json`](config/provisioning/dashboards/tableaux/kpi-supply-chain.json)) posé le 24/11 à 21:57:56 UTC (accord « Tableau seul (Recommandé) », [40 cas, 0 KO](../20-kpi/resultats/e6-tableau-pose.log)), par le même fournisseur, sans redémarrage. `journalisation.sh` (étape `installer`) le copie aussi : `bash -n` seulement, jamais rejoué. Affichage non vu.

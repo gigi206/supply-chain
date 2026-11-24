@@ -17,3 +17,7 @@ Non mesurable à sec : l'étape dans `rejeu.sh` (`bash -n` seulement), la pose s
 ## Résultat (note de 2026-11-24T22:01:36Z)
 
 [Journal](e7-essai-rejeu.log), 21:59:41 UTC, dépôt `a1c4822c` : **11 cas, 0 écart**. Au cas 4, 28 signatures refusées et, en plus de ce qui était prédit, les séries de pins absentes (sans provenance vérifiée, `releve-dates.py` n'écrit aucun pin) : un second KO, attendu dans son principe mais pas écrit. Au cas 2, l'exportateur a tourné avec un relevé réécrit identique.
+
+## Second passage (prédiction de 2026-11-24T22:05:39Z, après relecture du conseiller)
+
+Défaut lu, non mesuré : `SANS_DATE` hérité de l'environnement sautait le contrôle des clés contre HEAD dans `pose`. `unset SANS_DATE` en tête du script ; un cas de plus (`sec` avec `SANS_DATE=2` et deux clés réécrites reste KO, code 1, 2 KO). `SUFFIXE=-2` : **12 cas, 0 écart**.

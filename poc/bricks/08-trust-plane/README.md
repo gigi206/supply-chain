@@ -2763,3 +2763,7 @@ Accord du propriétaire, « Maintenant », donné à la demande de la brique 09 
 - **Câblage des entrées de l'hôte du bloc 06** : `garder` avant le démontage (passage de 20:35) puis `replacer` après l'effacement de `$W` (reprise) : tenu. Le « non mesuré » de l'additif de 20:18:03Z est levé, en deux passages et non d'un seul trait.
 - **État** : clés publiques archivées réécrites par le rejeu : scanner `007f233f…`, VEX `aeef0a8c…` et témoin de G6 ; l’export Hubble posé à la main le 20/11 n’est pas dans `rejeu.sh` : il est perdu (relevé en lecture seule à 23:41:20 UTC : `cilium-config` à 163 clés, sans `hubble-flowlogs-config-path` ; ConfigMap `cilium-flowlog-config` absent).
 - **Non mesuré** : un rejeu de zéro entier d'un seul trait avec `secrets_ctrl_juge`.
+
+## Additif du rejeu : KPI de la brique 20 (note de 2026-11-24T22:05:39Z)
+
+`rejeu.sh` remet le compte Grafana `kpi-journal` et l'exportateur des KPI en fin de rejeu, après Kyverno corrigé et avant `fuites` (décision « Pose au rejeu, sans dates (Recommandé) », [essai à sec de `kpi-pose.sh`](../20-kpi/resultats/e7-predictions.md)). **Seulement si `TAG_05` est posé** : sans le rpm au catalogue, l'exportateur refuse ; un rejeu sans M5b, comme `plateforme-1`, perd donc la pose. `bash -n` seulement, jamais rejoué. Après un rejeu : clés à relire et commiter, `releve-dates.py ecrire`, commit, `kpi-pose.sh pose` (accord). `fuites` ne cherche pas le mot de passe de `kpi-journal`.
