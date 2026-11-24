@@ -2,7 +2,8 @@
 # Brique 08 : aucun secret de l'hôte ne doit apparaître dans les journaux des VM (fuite du jeton k3s
 # dans le journal sudo en J1). Pour chaque VM : journal systemd complet (sudo compris), fichiers *.log
 # de /var/log (journaux des pods compris), journal d'audit de l'API et volumes local-path (audit d'OpenBao), rapatriés sur l'hôte (0600), puis cherchés avec chaque secret
-# de ~/.cache/supply-chain-poc/08/secrets comme motif (grep -F -f : jamais en argument de commande).
+# de ~/.cache/supply-chain-poc/08/secrets comme motif (grep -F -f : jamais en argument de commande), et avec le mot de passe de kpi-journal
+# (brique 20, fichier nommé, dossier jamais listé ; absent ou vide : dit, non cherché). Les secrets des 07a, 09 et 10 ne sont pas cherchés.
 # Clés PEM : chaque ligne du corps base64 est un motif. Attendu : 0 partout. Témoin positif : une valeur
 # aléatoire non secrète, écrite dans le journal de chaque VM (logger), doit être retrouvée.
 #
@@ -23,7 +24,9 @@ exec > >(tee "$R/fuites-$lib.log") 2>&1
 echo "# fuites.sh $lib, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 # Motifs : une ligne par secret ; corps base64 pour les clés PEM.
-for f in "$S"/*; do
+kpi=$HOME/.cache/supply-chain-poc/20/secrets/grafana-kpi-journal.password
+[ -s "$kpi" ] || echo "absent ou vide, non cherché : ${kpi##*/}"
+for f in "$S"/* "$kpi"; do
   [ -f "$f" ] || continue
   grep -v -e '^-----' -e '^$' "$f" > "$W/motif-${f##*/}" || true
 done

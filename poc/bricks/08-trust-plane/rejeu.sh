@@ -85,7 +85,7 @@ export RESEAU   # même réseau pour k3s.sh, lancé par mise
 # Additif du 2026-11-24 (20, étape 7, « Pose au rejeu, sans dates (Recommandé) ») : compte Grafana kpi-journal, puis exportateur des KPI, après
 # les trois produits (le bloc 05 compris : sans builds/sample-app-rpm au catalogue, l'exportateur refuse). pose_rejeu réécrit
 # 20-kpi/releve/dates-git.tsv dans l'arbre, et tolère exactement les clés publiques réécrites et pas encore commitées, sans date jusque-là : clés à
-# relire et commiter, puis « releve-dates.py ecrire », commit, « kpi-pose.sh pose ». fuites ne lit pas le mot de passe de kpi-journal. PAS ENCORE REJOUÉ.
+# relire et commiter, puis « releve-dates.py ecrire », commit, « kpi-pose.sh pose ». fuites cherche aussi le mot de passe de kpi-journal. PAS ENCORE REJOUÉ.
 . "$here/distro.sh"   # DISTRO=rke2 (brique 08b) : rke2.sh à la place de k3s.sh ; préalable sur l'hôte : rke2.sh telecharger
 export DISTRO
 DEPUIS=${DEPUIS:-}
