@@ -1,6 +1,6 @@
 # Brique 20, étape 4 : KPI dérivés des attestations, signatures vérifiées par openssl (décision « openssl (Recommandé) » du 24/11/2026).
-# NON POSÉ. Seule sortie : Zot, en lecture anonyme. Seule écriture : kpi.prom. Aucun secret : quatre clés publiques, le vecteur de test,
-# la chaîne du TSA et le relevé des dates de git, posés en lecture seule dans /etc/kpi et à reposer après chaque rejeu ou re-signature.
+# NON POSÉ. Seule sortie : Zot, en lecture anonyme. Seule écriture : kpi.prom. Aucun secret : quatre clés publiques, vecteur.pub et
+# tsa.pem (chaîne du TSA) dans /etc/kpi/cles, relevé des dates dans /etc/kpi/dates-git.tsv ; lecture seule, à reposer après chaque rejeu ou re-signature.
 # Même durcissement que entrees-scan.service. JOURNAL (délais des KEV) : ajouté quand l'accès du lecteur à Loki sera choisi.
 [Unit]
 Description=KPI supply-chain dérivés des attestations (brique 20)

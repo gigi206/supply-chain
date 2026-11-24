@@ -17,7 +17,8 @@ Bibliothèque standard seulement, lectures anonymes de Zot par HTTPS, même moti
   - VSA : PASSED du vérifieur attendu ; une seule suffit, même si une FAILED est plus récente (même règle que le recalcul) ;
   - scan : le plus récent par scannedAt ; entrées, écartées par un VEX, KEV, KEV écartées. Aucun scan : séries absentes, jamais 0 ;
   - KEV : ouverture et fermeture, depuis les lignes de entrees-scan (fichier JOURNAL, écrit par un lecteur séparé : aucun secret ici).
-    Sans JOURNAL : séries absentes ;
+    Sans JOURNAL : séries absentes ; une ligne malformée : séries absentes aussi, et kpi_exportateur_journal_illisible à 1 (le journal
+    n'est pas signé : il ne doit ni figer les autres séries, ni laisser croire à une liste complète) ;
   - dates (RELEVE, relevé de git versionné, poc/bricks/20-kpi/releve/dates-git.tsv) : clés, liées à l'empreinte du fichier de CLES ; pins,
     liés au digest de chaque dépendance de la provenance de PipelineRun la plus récente. Une empreinte ou un digest que le relevé ne
     connaît pas n'a pas de date (série absente) et se compte : kpi_cles_non_relevees, kpi_pins_non_releves. Des dates, jamais des âges.
@@ -355,7 +356,12 @@ def main():
             tags = lire(f"builds/{nom}/tags/list").get("tags") or []
             texte += "".join(sujet(nom, d, tags, catalogue, verifier, dates and dates[1]) for d in digests(f"builds/{nom}", tags))
         if os.environ.get("JOURNAL"):
-            texte += kev(os.environ["JOURNAL"])
+            # le journal n'est pas signé : une ligne malformée ne doit pas figer les séries vérifiées
+            try:
+                delais, illisible = kev(os.environ["JOURNAL"]), 0
+            except (ValueError, KeyError, TypeError, AttributeError):
+                delais, illisible = "", 1
+            texte += delais + f"kpi_exportateur_journal_illisible {illisible}\n"
             texte += f"kpi_exportateur_journal_timestamp_seconds {int(os.stat(os.environ['JOURNAL']).st_mtime)}\n"
         if dates and verifier:
             texte += dates_cles(dates[0])

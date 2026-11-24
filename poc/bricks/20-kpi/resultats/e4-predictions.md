@@ -70,3 +70,11 @@ Dans chaque cas, le premier passage est gardé : banc (5 écarts, témoin mal pl
 - témoins, attendus et outils sont de la même session.
 
 **Heures** : de 20:18:37 UTC à cette note, 12 min 49 s. Total de la brique : 54 min 38 s.
+
+## Journal malformé, prédiction (2026-11-24T20:35:07Z)
+
+Relecture du conseiller : dans la version mesurée ci-dessus, une seule ligne malformée du journal (non signé ; tout porteur d'un certificat de la CA écrit dans Loki, limite de D16) donne le code 2 et fige toutes les séries vérifiées. Lu dans le code, non mesuré. Corrigé : les séries de KEV disparaissent et `kpi_exportateur_journal_illisible` passe à 1, le reste est écrit. Commentaire de `kpi.service` corrigé (chemin de `tsa.pem`), aucune directive changée. Exportateur `98f917abe061b8b1`, `banc.sh` `1912e1a8028c0583`.
+
+Attendu, journaux `-3` : banc **62 cas, 0 écart** (59, plus 3 journaux malformés : JSON coupé, dépôt absent, date illisible) ; vrai Zot **10 cas, 0 écart** ; unité **23 cas, 0 écart**.
+
+Écarts « comptées » comptés dans `e4-banc-2.log` : 40 lignes `ECART|comptées`, le nombre prédit.

@@ -83,6 +83,13 @@ if [ "${1:-}" = ns ]; then
   attendu "même sortie sous $(python3 --version | cut -d. -f1,2) (heure du passage exclue)" \
     "$(diff <(grep -v '^kpi_exportateur_passage' "$T/verifiees.prom") <(grep -v '^kpi_exportateur_passage' "$T/py313.prom") | wc -l)" 0
   attendu "sortie sous Python 3.13 non vide" "$([ "$(wc -l < "$T/py313.prom")" -gt 100 ] && echo oui || echo non)" oui
+  # journal malformé (un porteur d'un certificat de la CA écrit dans Loki, limite de D16) : les séries vérifiées ne sont pas figées
+  for v in '{"kev":true' '{"scannedAt":"2026-11-10T00:00:00Z","id":"x","kev":true}' 'entrées builds/scan/banc-kev=1@demain (liste émise)'; do
+    cp "$T/journal-scans" "$T/journal-injecte"; printf '%s\n' "$v" >> "$T/journal-injecte"; : > "$T/injecte.prom"
+    SIGNATURES=verifiees CLES=$T/cle JOURNAL=$T/journal-injecte SORTIE=$T/injecte.prom /usr/bin/python3 -I "$X" > /dev/null; i=$?
+    attendu "journal malformé ($v) : code, séries de KEV, illisible, autres séries différentes" \
+      "$i $(grep -c '^kpi_kev_' "$T/injecte.prom") $(sed -n 's/^kpi_exportateur_journal_illisible //p' "$T/injecte.prom") $(diff <(grep -vE '^kpi_(kev|exportateur)_' "$T/verifiees.prom") <(grep -vE '^kpi_(kev|exportateur)_' "$T/injecte.prom") | grep -c '^[<>]')" "0 0 1 0"
+  done
   echo "## lecteur de Loki, serveur factice"
   python3 -I "$here/lecteur_banc.py" "$RACINE/tools/metrics-exporter/lecteur_loki.py"; l=$?
   echo "## arrêts de l'exportateur : code 2, motif attendu, fichier inchangé"
@@ -123,7 +130,7 @@ if [ "${1:-}" = ns ]; then
   kill "$zp"; wait "$zp" 2> /dev/null
   arret "Zot arrêté" "URLError" env SIGNATURES=verifiees CLES="$T/cle" /usr/bin/python3 -I "$X"
   echo "## bilan des arrêts : 15 cas, $ko écart(s)"
-  echo "## bilan des contrôles de l'étape 4 : 4 cas, $ko4 écart(s) ; lecteur : code $l"
+  echo "## bilan des contrôles de l'étape 4 : 7 cas, $ko4 écart(s) ; lecteur : code $l"
   [ "$a$b$c$e$ko$ko4$l" = 0000000 ]; exit $?
 fi
 
