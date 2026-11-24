@@ -107,3 +107,11 @@ Le reste : témoins directs (3), compte créé, rôle Viewer, lecture (3), écri
 - 3 écarts du lecteur, même cause : Python refuse le certificat jetable (extensions manquantes en vérification stricte) ; les certificats de la plateforme passent (passages de 20:30 à 20:35 UTC).
 
 Second passage (`-2`), attendu **16 cas, 0 écart** : écritures POST et PUT en 403, lecteur et délais conformes. Mesuré sans attendu chiffré, pari écrit : **GET `/ingester/shutdown` par le proxy arrête Loki**.
+
+### Deuxième passage, et code de sortie de Loki, prédiction (2026-11-24T20:50:14Z)
+
+[`e4-banc-grafana-2.log`](e4-banc-grafana-2.log) (20:48:55 UTC) : **16 cas, 0 écart**. Écritures POST et PUT refusées (403), administrateur compris. **Pari tenu : un compte Viewer arrête Loki par GET `/ingester/shutdown` à travers le proxy de la source** (HTTP 204, Loki arrêté). Passent aussi en GET : `/flush` (204), `/log_level` (200), `/config`, `/services`, `/metrics`, `/ingester/prepare_shutdown` (200). Lecteur et délais conformes ; réponse tronquée refusée, fichier inchangé.
+
+Le compte `auditeur` de la plateforme a le même rôle Viewer : **défaut existant de la 19b**, indépendant de la 20. Non essayé sur la plateforme, et il ne doit pas l'être.
+
+Troisième passage (`-3`) : `loki.service` a `Restart=on-failure` ; attendu, code de sortie **0** (systemd ne relancerait donc pas Loki). **17 cas, 0 écart**. Le moins sûr : ce code.

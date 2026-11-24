@@ -79,6 +79,7 @@ if [ "${1:-}" = ns ]; then
   for x in "POST /api/datasources/proxy/uid/loki/ingester/shutdown" "GET /api/datasources/uid/loki/resources/ingester/shutdown" "GET /api/datasources/proxy/uid/loki/ingester/shutdown"; do
     c=$(g kpi-journal "${x%% *}" "${x#* }"); sleep 8; echo "MESURE|$x|HTTP $c|$(vie)"
   done
+  wait "$lp"; attendu "code de sortie de Loki (loki.service : Restart=on-failure ; 0 : systemd ne le relance pas)" "$?" 0
   echo "## bilan : $N cas, $KO écart(s)"
   [ "$KO" = 0 ]; exit $?
 fi
