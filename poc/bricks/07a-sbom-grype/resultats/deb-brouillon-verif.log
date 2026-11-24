@@ -1,0 +1,40 @@
+# verdict du brouillon du VEX du deb, 2026-11-24T13:04:34Z, dc57bacc, brouillon sha256 abd998ab931b8948
+## juge : scan-outil depuis une copie de HEAD (go1.24.7)
+OK   empreinte de scan-outil (celle de l'image b799feda) : 7dde1a8ed457f254
+## brouillon
+{"id":"https://supply-chain.example/vex/sample-app-deb/60f25f5c","author":"","timestamp":"","enonces":[{"n":"GHSA-3fxj-6jh8-hvhx","j":"vulnerable_code_not_present"},{"n":"GHSA-j6qf-3m9c-vwj3","j":"vulnerable_code_not_present"},{"n":"GHSA-mqqf-5wvp-8fh8","j":"vulnerable_code_not_present"},{"n":"GO-2025-3849","j":"vulnerable_code_not_present"},{"n":"GO-2025-3956","j":"vulnerable_code_not_present"},{"n":"GO-2025-4006","j":"vulnerable_code_not_present"},{"n":"GO-2025-4014","j":"vulnerable_code_not_present"},{"n":"GO-2026-4342","j":"vulnerable_code_not_present"},{"n":"GO-2026-4603","j":"vulnerable_code_not_present"},{"n":"GO-2026-4865","j":"vulnerable_code_not_present"},{"n":"GO-2026-4869","j":"vulnerable_code_not_present"},{"n":"GO-2026-4976","j":"vulnerable_code_not_present"},{"n":"GO-2026-4977","j":"vulnerable_code_not_present"},{"n":"GO-2026-4980","j":"vulnerable_code_not_present"},{"n":"GO-2026-4982","j":"vulnerable_code_not_present"},{"n":"GO-2026-4986","j":"vulnerable_code_not_present"},{"n":"GO-2026-5775","j":"vulnerable_code_not_present"},{"n":"GO-2026-5777","j":"vulnerable_code_not_present"},{"n":"GO-2026-6088","j":"vulnerable_code_not_present"},{"n":"GO-2026-6091","j":"vulnerable_code_not_present"},{"n":"GO-2026-6599","j":"vulnerable_code_not_present"},{"n":"GO-2026-6600","j":"vulnerable_code_not_present"},{"n":"GO-2026-6604","j":"vulnerable_code_not_present"}]}
+## 1. brouillon tel quel (author et horodatages vides)
+REFUS|énoncés non classables par scan-outil vex (horodatage illisible ou nom absent) : 0/23
+OK   brouillon tel quel : refusé : 1
+## 2. copie témoin (auteur témoin, heure du moment), jamais signée
+JUGE|exemption, 23 énoncé(s) dont 0 large(s), document sha256 b50fb69dc39db6156b1c99e8a766e8fe0ac0fe69e19a620dbbd7eb6d24ce9a92, sujet sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, VEX vers 19
+PUBLIES|0 énoncé(s) publié(s) vérifié(s) dans 192.168.161.13:5000/builds/vex/sample-app-deb (CLE_PUBLIQUE), cosign code 1 : no matching attestations: 
+ECHEANCE|énoncé 0 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 1 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 2 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 3 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 4 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 5 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 6 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 7 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 8 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 9 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 10 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 11 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 12 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 13 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 14 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 15 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 16 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 17 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 18 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 19 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 20 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 21 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+ECHEANCE|énoncé 22 : 2026-12-24T13:04:37Z (30 jours après 2026-11-24T13:04:37Z)
+OK   copie témoin : acceptée : 0
+OK   copie témoin : exemption de 23 énoncés : 1
+OK   copie témoin : 23 échéances : 23
+## dépôt
+OK   outil/ du dépôt inchangé (git status) : 0
+## bilan : 6 cas, 0 écart(s)
