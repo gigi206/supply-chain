@@ -1,0 +1,61 @@
+# binaire de sample-app, 2026-11-24T08:34:57Z, ab59ae54, crane 0.20.6
+## image (lecture anonyme)
+OK   digest du manifeste relu : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+{"Entrypoint":["/sample-app"],"Cmd":null,"User":"65532:65532"}
+tar : code 0 ; 0 ligne(s) d'erreur
+point d'entrée : /sample-app ; 6197374 octets ; sha256 e3749c68b6babe6d
+ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, stripped
+## modules liés (go version -m)
+  ~/.cache/supply-chain-poc/07a/piece8-binaire/fs/sample-app: go1.26.10
+  	path	example.com/supply-chain/sample-app
+  	mod	example.com/supply-chain/sample-app	(devel)	
+  	dep	github.com/go-chi/chi/v5	v5.2.3	h1:WQIt9uxdsAbgIYgid+BpYc+liqQZGMHRaUwp0JUcvdE=
+  	build	-buildmode=exe
+  	build	-compiler=gc
+  	build	-trimpath=true
+  	build	DefaultGODEBUG=containermaxprocs=0,cryptocustomrand=1,decoratemappings=0,httpservecontentmaxranges=1,tlssecpmlkem=0,tlssha1=1,updatemaxprocs=0,urlstrictcolons=0,x509sha256skid=0
+  	build	CGO_ENABLED=0
+  	build	GOARCH=amd64
+  	build	GOOS=linux
+  	build	GOAMD64=v1
+OK   module chi lié : 1
+## noms de fonctions (pclntab, par strings)
+noms retenus : 935 ; dont chi : 55
+### témoins (doivent être présents : le code de main.go)
+OK   chi : (*Mux).ServeHTTP : 1
+OK   chi : (*Mux).routeHTTP : 1
+OK   net/http : (*Server).Serve : 1
+### paquets de chi liés
+       47 github.com/go-chi/chi/v5
+        7 github.com/go-chi/chi/v5@v5
+### fonctions nommées par les fiches OSV
+  github.com/go-chi/chi/v5/middleware : 0
+  RealIP : 0
+  realIP : 0
+  ClientIPFromXFF : 0
+  GetClientIP : 0
+  RedirectSlashes : 0
+OK   aucune fonction du paquet chi/v5/middleware liée : 0
+### fichiers sources de chi cités par le binaire
+  github.com/go-chi/chi/v5@v5.2.3/chain.go
+  github.com/go-chi/chi/v5@v5.2.3/chi.go
+  github.com/go-chi/chi/v5@v5.2.3/context.go
+  github.com/go-chi/chi/v5@v5.2.3/mux.go
+  github.com/go-chi/chi/v5@v5.2.3/path_value.go
+  github.com/go-chi/chi/v5@v5.2.3/pattern.go
+  github.com/go-chi/chi/v5@v5.2.3/tree.go
+OK   chemins de fichiers sources sous middleware/ : 0
+KO   « middleware » dans toutes les chaînes du binaire : 5 (attendu 0)
+  chaîne : Middlewares
+  chaîne : middlewares
+  chaîne : *chi.Middlewares
+  chaîne : *func() chi.Middlewares
+  chaîne : github.com/go-chi/chi/v5.Middlewares.Handler
+OK   « realip » ou « strip.go » dans toutes les chaînes : 0
+### net/http : MaxBytesReader et MaxBytesHandler (GO-2026-6859)
+  net/http.(*MaxBytesError).Error
+  net/http.(*maxBytesReader).Close
+  net/http.(*maxBytesReader).Read
+  net/http.MaxBytesReader
+  lignes : 4
+## bilan : 9 cas, 1 écart(s)

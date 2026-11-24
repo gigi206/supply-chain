@@ -2309,3 +2309,25 @@ Choix du propriétaire (verbatim) : « Pièce 8 maintenant » (plutôt qu'un rej
   - que `http.FileServer` n'utilise pas `MaxBytesReader` ;
   - qu'un outil d'atteignabilité (`govulncheck`) donnerait le même avis : il n'est pas installé ;
   - que l'image `3a7ca1b1…` a été construite exactement depuis ces sources.
+
+## Pièce 8 : brouillon proposé par la session, NON VALIDÉ (note de 2026-11-24T08:36:51Z)
+
+À la question sur son « go » sans contenu, le propriétaire choisit « Proposez un brouillon » : brouillon de justification et d'impact par la session, à partir des seuls faits mesurés, relu par le conseiller ; rien n'est signé avant sa validation entrée par entrée.
+
+**Faits mesurés sur l'artefact signé** ([script](piece8-binaire.sh), lecture anonyme de `builds/sample-app@sha256:3a7ca1b1…`, binaire jamais exécuté) :
+- passage 1 ([journal](piece8-binaire.log), 08:32:39Z, 6 cas, 0 écart) : binaire `/sample-app` (sha256 `e3749c68b6babe6d…`), Go 1.26.10, module chi v5.2.3 lié ; témoins `(*Mux).ServeHTTP`, `(*Mux).routeHTTP` et `(*Server).Serve` présents ; aucune fonction du paquet `chi/v5/middleware`, ni `RealIP`, `ClientIPFromXFF`, `GetClientIP` ou `RedirectSlashes` ; `net/http.MaxBytesReader` **lié** (`MaxBytesHandler` absent) ;
+- passage 2 ([journal](piece8-binaire-2.log), demandé par le conseiller) : les 7 fichiers sources de chi cités sont tous à la racine de `chi/v5@v5.2.3` (chain, chi, context, mux, path_value, pattern, tree), aucun sous `middleware/` ; **une attente fausse** (« middleware » absent de toutes les chaînes : 5) ;
+- passage 3 ([journal](piece8-binaire-3.log)) : les 5 chaînes sont le type `Middlewares` du paquet racine (`*chi.Middlewares`, `chi/v5.Middlewares.Handler`…) ; l'attente du passage 2 était trop large (critère du conseiller, reconnu par lui) ;
+- passage 4 ([journal](piece8-binaire-4.log), 08:35:57Z, **15 cas, 0 écart**) : attentes ciblées sur toutes les chaînes : ni `chi/v5/middleware`, ni nom qualifié `middleware.`, ni « middleware » hors de `[Mm]iddlewares`, ni `RealIP`, `ClientIPFromXFF`, `GetClientIP`, `RedirectSlashes`.
+- `GO-2026-6859` : dans les sources de Go **1.24.7** (les seules sur l'hôte ; le binaire est en 1.26.10), `net/http` appelle `MaxBytesReader` dans `globalOptionsHandler`, servi par défaut aux requêtes `OPTIONS *` (`DisableGeneralOptionsHandler` faux), et dans `MaxBytesHandler`.
+
+**Brouillon** [`vex/sample-app-3a7ca1b1.json`](../vex/sample-app-3a7ca1b1.json) (sha256 `6310943806f6f39b…`) :
+- énoncés 1 à 5 (`GHSA-3fxj-6jh8-hvhx`, `GHSA-j6qf-3m9c-vwj3`, `GHSA-mqqf-5wvp-8fh8`, `GO-2026-5775`, `GO-2026-5777`) : `vulnerable_code_not_present`, impact citant le binaire et `piece8-binaire-4.log` ; le module chi est lié, donc `component_not_present` serait faux ;
+- énoncé 6 (`GO-2026-6859`) **retiré, proposition « non couvert »** : aucune des cinq justifications n'est mesurée (code lié, atteignable par `OPTIONS *` d'après les sources 1.24.7). Le gabarit à 6 énoncés reste dans le commit `ab59ae54` ;
+- `@id` `https://supply-chain.example/vex/sample-app/3a7ca1b1` ; `author` et horodatages laissés **vides** : l'auteur est au propriétaire, et l'horodatage ouvre les 30 jours, il se pose à la validation. Tel quel, le brouillon est refusé.
+
+**Verdict** ([journal](piece8-brouillon-verif.log), [script](piece8-brouillon-verif.sh), 08:36:43Z, 6 cas, 0 écart) : le brouillon tel quel est refusé par `signer-vex.sh verifier` ; une copie jetable (auteur témoin, heure du moment) est acceptée : exemption de 5 énoncés, 5 échéances à 30 jours, aucun VEX publié sur sample-app. Rien signé.
+
+**Limites** : le VEX ne vaut que pour le digest `3a7ca1b1…` ; le deb est un autre binaire (Go 1.24.4), non mesuré. Un nom absent de la pclntab dit que le code n'est pas lié ; les chemins sources bornent le risque d'inlining pour chi.
+
+**Heures** : plus 08:19:52 à 08:36:51 UTC le 24/11 (16 min 59 s). **Total : au plus 15 h 04 min 28 s**, pour 10 h estimées ; le seuil de 20 h n'est pas atteint.

@@ -1,6 +1,6 @@
 {
   "@context": "https://openvex.dev/ns/v0.2.0",
-  "@id": "https://supply-chain.example/vex/sample-app/A-NOMMER",
+  "@id": "https://supply-chain.example/vex/sample-app/3a7ca1b1",
   "author": "",
   "timestamp": "",
   "version": 1,
@@ -20,8 +20,8 @@
         }
       ],
       "status": "not_affected",
-      "justification": "",
-      "impact_statement": "",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /sample-app de l’image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (fichier sha256 e3749c68b6babe6d…) ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RealIP ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/piece8-binaire-4.log, 2026-11-24).",
       "timestamp": ""
     },
     {
@@ -42,8 +42,8 @@
         }
       ],
       "status": "not_affected",
-      "justification": "",
-      "impact_statement": "",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /sample-app de l’image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (fichier sha256 e3749c68b6babe6d…) ne contient aucune chaîne ClientIPFromXFF ni GetClientIP, et ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/piece8-binaire-4.log, 2026-11-24).",
       "timestamp": ""
     },
     {
@@ -64,8 +64,8 @@
         }
       ],
       "status": "not_affected",
-      "justification": "",
-      "impact_statement": "",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /sample-app de l’image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (fichier sha256 e3749c68b6babe6d…) ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RedirectSlashes ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/piece8-binaire-4.log, 2026-11-24).",
       "timestamp": ""
     },
     {
@@ -86,8 +86,8 @@
         }
       ],
       "status": "not_affected",
-      "justification": "",
-      "impact_statement": "",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /sample-app de l’image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (fichier sha256 e3749c68b6babe6d…) ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RealIP ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/piece8-binaire-4.log, 2026-11-24).",
       "timestamp": ""
     },
     {
@@ -108,30 +108,8 @@
         }
       ],
       "status": "not_affected",
-      "justification": "",
-      "impact_statement": "",
-      "timestamp": ""
-    },
-    {
-      "vulnerability": {
-        "name": "GO-2026-6859",
-        "aliases": [
-          "CVE-2026-97054"
-        ]
-      },
-      "products": [
-        {
-          "@id": "pkg:oci/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5",
-          "subcomponents": [
-            {
-              "@id": "pkg:golang/stdlib@1.26.10"
-            }
-          ]
-        }
-      ],
-      "status": "not_affected",
-      "justification": "",
-      "impact_statement": "",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /sample-app de l’image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (fichier sha256 e3749c68b6babe6d…) ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RealIP ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/piece8-binaire-4.log, 2026-11-24).",
       "timestamp": ""
     }
   ]
