@@ -1,0 +1,92 @@
+# sante-openssl.sh, début 2026-11-24T20:04:25Z, dépôt openssl/openssl, script 266eb1bec9f00271
+## Scorecard (API publique, via tools/health/scorecard.sh)
+Relevé du 2026-11-24 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| OpenSSL | openssl/openssl | signature | oui | 6.3 | 2026-11-09 | 10 | 8 | 0 | ? |
+## Dépôt
+nom openssl/openssl ; archivé false ; licence Apache-2.0 ; branche master ; dernier push 2026-11-24T19:10:18Z
+## Releases (15 dernières)
+openssl-4.1.0	2026-10-23T12:23:31Z	pré-release=false
+openssl-4.1.0-beta2	2026-10-09T12:22:55Z	pré-release=true
+openssl-4.0.3	2026-09-29T13:53:57Z	pré-release=false
+openssl-3.6.5	2026-09-29T14:01:50Z	pré-release=false
+openssl-3.5.9	2026-09-29T14:10:08Z	pré-release=false
+openssl-3.4.8	2026-09-29T14:19:12Z	pré-release=false
+openssl-4.1.0-beta1	2026-09-23T13:24:11Z	pré-release=true
+openssl-4.1.0-alpha1	2026-09-09T13:28:44Z	pré-release=true
+openssl-4.0.2	2026-08-25T11:44:22Z	pré-release=false
+openssl-3.6.4	2026-08-25T11:53:03Z	pré-release=false
+openssl-3.5.8	2026-08-25T12:02:03Z	pré-release=false
+openssl-3.4.7	2026-08-25T12:10:59Z	pré-release=false
+openssl-3.0.22	2026-08-25T12:20:18Z	pré-release=false
+openssl-4.0.1	2026-06-09T11:43:18Z	pré-release=false
+openssl-3.6.3	2026-06-09T11:51:12Z	pré-release=false
+dernière release 3.5 : openssl-3.5.9 ; fichiers attachés :
+  openssl-3.5.9.tar.gz	53279637
+  openssl-3.5.9.tar.gz.asc	931
+  openssl-3.5.9.tar.gz.sha1	63
+  openssl-3.5.9.tar.gz.sha256	87
+tag openssl-3.5.9 : tag d0ca66a1abe52545f14eca635c648932fcde5615
+tag annoté, vérification GitHub : false (unknown_key)
+## Activité depuis 2026-08-26T20:04:29Z (branche par défaut)
+commits : 981 ; auteurs distincts (adresse) : 157 ; commits de robots : 8
+part du premier auteur : 104 commits
+domaines (auteurs, commits) :
+  openssl.org : 12 auteurs, 340 commits
+  openssl.foundation : 7 auteurs, 203 commits
+  gmail.com : 59 auteurs, 135 commits
+  oracle.com : 2 auteurs, 57 commits
+  idrix.fr : 1 auteurs, 50 commits
+  users.noreply.github.com : 14 auteurs, 21 commits
+  iki.fi : 1 auteurs, 19 commits
+  ddvo.net : 1 auteurs, 18 commits
+  redhat.com : 5 auteurs, 13 commits
+  linux.ibm.com : 2 auteurs, 11 commits
+  dencrypt.dk : 1 auteurs, 11 commits
+  isrc.iscas.ac.cn : 1 auteurs, 10 commits
+  mouha.be : 1 auteurs, 9 commits
+  qq.com : 2 auteurs, 6 commits
+  tum.de : 1 auteurs, 5 commits
+  rit.edu : 3 auteurs, 5 commits
+  ugent.be : 1 auteurs, 4 commits
+  pengutronix.de : 1 auteurs, 4 commits
+  icloud.com : 3 auteurs, 4 commits
+  hotmail.de : 1 auteurs, 4 commits
+## Processus de sécurité
+absent : SECURITY.md
+absent : .github/SECURITY.md
+politique https://openssl-library.org/policies/general/security-policy/ : HTTP 200
+avis publiés (GHSA du dépôt) : 0
+CLA : 8 mention(s) dans CONTRIBUTING.md
+## Debian trixie (source openssl)
+stable	3.5.9-1~deb13u1
+- Available versions
+  Release | Version
+  bookworm | 3.0.20-1~deb12u2
+  bookworm (security) | 3.0.22-1~deb12u2
+  trixie | 3.5.9-1~deb13u1
+  trixie (security) | 3.5.7-1~deb13u3
+  forky | 3.6.5-1
+  sid | 3.6.5-1
+- Open issues
+  Bug | bookworm | trixie | forky | sid | Description
+  CVE-2026-124709 | fixed | vulnerable | vulnerable | vulnerable | Issue summary: A QUIC server that rejects a stream opened by the peer ...
+  CVE-2026-121482 | fixed | vulnerable | vulnerable | vulnerable | Verifying a maliciously crafted CMS or PKCS#7 SignedData message with ...
+  CVE-2026-121481 | vulnerable | vulnerable | vulnerable | vulnerable | Issue summary: Calling EVP_EncodeBlock() with an input length close to ...
+  CVE-2026-107496 | vulnerable | vulnerable | vulnerable | vulnerable | Issue summary: Encrypting a CMS message to an EC certificate whose gro ...
+  CVE-2026-107494 | fixed | vulnerable | vulnerable | vulnerable | Issue summary: The QUIC stack queues a RETIRE_CONNECTION_ID frame also ...
+  CVE-2026-107493 | vulnerable | vulnerable | vulnerable | vulnerable | Issue summary: When an application passes a stack to PEM_X509_INFO_rea ...
+  CVE-2026-95692 | fixed | vulnerable | vulnerable | vulnerable | Issue summary: Setting an AES-GCM-SIV IV shorter than the expected non ...
+  CVE-2026-95691 | fixed | vulnerable | vulnerable | vulnerable | Issue summary: A retransmitted QUIC CRYPTO frame can release packet st ...
+  CVE-2026-95690 | vulnerable | vulnerable | vulnerable | vulnerable | Issue summary: Receiving crafted out-of-sequence DTLS handshake fragme ...
+  CVE-2026-88823 | fixed | vulnerable | vulnerable | vulnerable | Issue summary: The AES-GCM-SIV implementation treats a zero-length Add ...
+  CVE-2026-88822 | fixed | vulnerable | vulnerable | vulnerable | Issue summary: QUIC, when performing automated peer detection, may all ...
+  CVE-2026-84786 | vulnerable | vulnerable | vulnerable | vulnerable | Issue summary: A DANE-enabled TLS client may crash by dereferencing a ...
+  CVE-2026-84785 | fixed | vulnerable | vulnerable | vulnerable | Unbounded Out-of-Order Fragment Reassembly in QUIC Streams
+  CVE-2026-35190 | fixed | vulnerable | vulnerable | vulnerable | Issue summary: A server configured with the Suite B certificate flag t ...
+- Open unimportant issues
+  Bug | bookworm | trixie | forky | sid | Description
+  CVE-2025-27587 | vulnerable | fixed | fixed | fixed | OpenSSL 3.0.0 through 3.3.2 on the PowerPC architecture is vulnerable ...
+fin 2026-11-24T20:04:38Z

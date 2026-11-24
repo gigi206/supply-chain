@@ -27,6 +27,7 @@ Athens	gomods/athens	stockage	non
 Rook	rook/rook	stockage	non
 Ceph	ceph/ceph	stockage	non
 cosign	sigstore/cosign	signature	oui
+OpenSSL	openssl/openssl	signature	non
 timestamp-authority	sigstore/timestamp-authority	signature	oui
 OpenBao	openbao/openbao	signature	oui
 python-tuf	theupdateframework/python-tuf	signature	non

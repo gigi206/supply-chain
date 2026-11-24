@@ -80,3 +80,28 @@ Une correction de vocabulaire : en mode compté, les séries gardent les noms `�
 ## Relevé de santé d'OpenSSL, prédiction (2026-11-24T20:04:24Z)
 
 Sur relecture du conseiller : openssl deviendrait une dépendance d'exécution de l'exportateur, et docs/04 n'a pas de verdict pour lui. [`sante-openssl.sh`](../sante-openssl.sh), lecture publique seule, commité avant le lancement. Attendu selon les critères de docs/04 : release de moins de 6 mois, au moins 3 auteurs de 2 domaines d'employeurs en 90 jours, SECURITY.md ou politique publiée, releases signées (fichiers `.asc`), Scorecard ≥ 6, corrections de sécurité suivies dans trixie. Verdict attendu : **Sain**. Le moins sûr : le score Scorecard (le plus ancien relevé possible de l'API) et la signature du tag.
+
+### Résultat du relevé et corrections sur relecture (note de 2026-11-24T20:05:11Z)
+
+[Journal](sante-openssl.log), 2026-11-24 à 20:04:25 UTC. Verdict attendu confirmé, avec deux points que la prédiction ne disait pas :
+
+| Critère | Relevé |
+|---|---|
+| Release | 4.1.0 le 23/10/2026 ; 3.5.9 (série de Debian 13) le 29/09/2026 |
+| Activité, 90 jours | 981 commits, 157 adresses d'auteurs ; openssl.org 12 auteurs, openssl.foundation 7, oracle.com 2, redhat.com 5, linux.ibm.com 2 ; premier auteur : 104 commits |
+| Scorecard | 6,3 (relevé du 09/11/2026), Maintained 10, Signed-Releases 8, **Code-Review 0** |
+| Releases signées | `.asc` et `.sha256` présents, signature non vérifiée ici ; tag annoté, clé inconnue de GitHub |
+| Sécurité | **pas de SECURITY.md**, politique publiée sur le site du projet (HTTP 200) |
+| Licence, CLA | Apache-2.0 ; CLA mentionné dans CONTRIBUTING.md |
+| Debian 13 | trixie 3.5.9-1~deb13u1 ; **14 CVE ouvertes dans trixie** au security-tracker, non corrigées non plus dans forky ni sid |
+
+Verdict proposé : **Sain**. Les titres des 14 CVE (tronqués, lus) parlent de QUIC, DTLS, CMS, DANE, AES-GCM-SIV, Suite B, `EVP_EncodeBlock` et `PEM_X509_INFO_read` ; aucun ne nomme la vérification ECDSA de `dgst -verify`. Les avis complets n'ont pas été lus.
+
+**Corrections sur relecture du conseiller** :
+
+1. **La réserve `sc-stockage` manquait dans l'ADR 0004** : ajoutée. Indices, lus, aucun n'est une mesure : `vm.sh` fait sortir `sc-stockage` et `sc-confiance` de la même image `debian-13-generic` ; `openbao.sh` l. 147 lance `sudo openssl` sur `sc-confiance` ; `ca-certificates` dépend d'`openssl` dans trixie (`03-deps-closure/resultats/banc-debian-simulation.log`). La mesure sera la première étape de la pose.
+2. **Version non épinglée** : ce serait l'openssl du paquet Debian de la VM, hors `mise`, comme le Python de `entrees-scan`.
+3. **Prix du mode vérifié : les clés.** Un rejeu recrée des clés. Des clés posées puis périmées donnent tout refusé et des KPI à 0, sans arrêt de l'exportateur (`kpi_signatures_refusees` le montre, aucune alerte ne le dit). La pose devra copier les 4 clés publiques, et l'étape 7 les reposer après chaque rejeu ou re-signature.
+4. **Le code 1 d'openssl reste ambigu à un endroit** : le contrôle de départ exerce `openssl pkey`, pas `dgst -verify` par `/proc/self/fd`. Si ce chemin échouait sous l'unité durcie, tout serait refusé en silence. Réserve d'étape 4 : un vecteur de test embarqué (message, signature, clé), vérifié au départ, code 2 sinon.
+
+**Heures** : de 20:02:05 à 20:05:11 UTC, 3 min 06 s. Total de la brique : 41 min 15 s.

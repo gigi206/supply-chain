@@ -18,7 +18,7 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 Aperçu des produits, énoncés non vérifiés : 4 sujets (`sample-app` `3a7ca1b1` et `f5e6bcb0`, deb `60f25f5c`, rpm `07b7bd6f`). Tous ont une provenance ; 3 ont un scan, 3 un VEX et 2 une VSA. Le digest en service, `f5e6bcb0`, n'a pas encore de VSA. L'historique des scans dans Zot commence au rejeu du 23/11, et celui de Loki aussi (mesuré, `e1-loki-anciennete.log`) : un rejeu de zéro remet les deux à zéro.
 
-**Heures de la 20** (2026-11-24, `date -u`) : 17:45:07 à 17:50:31 (ouverture, carte), 18:23:30 à 18:27:23 (étape 1), 18:27:23 à 18:30:36 (relecture, Loki, corrections), soit 0 h 12 min 30 s ; étape 2 de 18:49:15 à 18:56:03 (6 min 48 s). Corrections et second passage de 19:32:00 à 19:32:27 (0 min 27 s), attente du propriétaire non comptée. Étape 3 de 19:35:55 à 19:47:45 (11 min 50 s, relecture et complément compris). Essai openssl de 19:55:31 à 20:02:05 (6 min 34 s). Total **38 min 09 s**. Majorant par la méthode de la 05 (écarts d'au plus 1 h entre commits de `poc/bricks/20-kpi`) : 42 min 16 s ; il compte à tort l'écart de 17:50:31 à 18:26:20, qui contient la clôture de la 05 et la 07c. Estimation : 1,5 pw.
+**Heures de la 20** (2026-11-24, `date -u`) : 17:45:07 à 17:50:31 (ouverture, carte), 18:23:30 à 18:27:23 (étape 1), 18:27:23 à 18:30:36 (relecture, Loki, corrections), soit 0 h 12 min 30 s ; étape 2 de 18:49:15 à 18:56:03 (6 min 48 s). Corrections et second passage de 19:32:00 à 19:32:27 (0 min 27 s), attente du propriétaire non comptée. Étape 3 de 19:35:55 à 19:47:45 (11 min 50 s, relecture et complément compris). Essai openssl de 19:55:31 à 20:02:05 (6 min 34 s). Relevé d'OpenSSL et corrections de 20:02:05 à 20:05:11 (3 min 06 s). Total **41 min 15 s**. Majorant par la méthode de la 05 (écarts d'au plus 1 h entre commits de `poc/bricks/20-kpi`) : 42 min 16 s ; il compte à tort l'écart de 17:50:31 à 18:26:20, qui contient la clôture de la 05 et la 07c. Estimation : 1,5 pw.
 
 Les faits des sections suivantes, écrits avant l'étape 1, viennent du dépôt.
 
@@ -86,7 +86,7 @@ Relu après l'étape 1 (conseiller) : seuls le dénominateur, l'âge des pins, l
 
 ## Outils
 
-Aucun outil nouveau n'est prévu : Python 3 de la distribution (comme `entrees-scan.py`), cosign 3.1.4 et crane 0.20.6, épinglés dans `mise.toml` (l. 21-22, `mise.lock`). Si un outil s'ajoute, il passera d'abord par le doc 04.
+Python 3 de la distribution (comme `entrees-scan.py`), cosign 3.1.4 et crane 0.20.6, épinglés dans `mise.toml` (l. 21-22, `mise.lock`). **Un outil s'ajoute si l'exportateur vérifie** (note de 2026-11-24T20:05:11Z) : `openssl` de Debian 13, version du paquet de la VM, non épinglée par mise. [docs/04](../../../docs/04-sante-projets.md) n'avait pas de verdict pour lui : relevé du 2026-11-24 ([journal](resultats/sante-openssl.log)), verdict proposé « Sain ».
 
 ## Liens
 
