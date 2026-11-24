@@ -130,5 +130,6 @@ for etat, (series, attendus) in ATTENDUS.items():
     tests.append({"name": etat, "interval": "1m", "input_series": [{"series": s, "values": f"{v}x20"} for s, v in series],
                   "promql_expr_test": [{"expr": requetes[q], "eval_time": "10m", "exp_samples": [{"labels": e, "value": v} for e, v in attendus[q].items()]}
                                        for q in sorted(requetes)]})
-json.dump({"evaluation_interval": "1m", "tests": tests}, sys.stdout, ensure_ascii=False, indent=1)
+# le test est du YAML : .nan, et non la chaîne "NaN" (premier passage, e6-promql-banc.log)
+sys.stdout.write(json.dumps({"evaluation_interval": "1m", "tests": tests}, ensure_ascii=False, indent=1).replace('"value": "NaN"', '"value": .nan'))
 print(f"{len(requetes)} requêtes, {len(tests)} états, {sum(len(t['promql_expr_test']) for t in tests)} cas", file=sys.stderr)

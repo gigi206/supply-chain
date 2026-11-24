@@ -30,3 +30,11 @@ Attendu : tableau absent (404), « Vulnérabilités et VEX » servi (200), 29 re
 ## Non couvert
 
 Affichage réel dans Grafana (dont `noValue`, couleurs, lisibilité) ; Alertmanager ; pose ; collecte. Une série qui porte une étiquette de plus, un jour, changerait le nombre de séries sans erreur.
+
+## Résultat des premiers passages, et second passage 1 (note de 2026-11-24T21:43:44Z)
+
+- **Passage 1** ([journal](e6-promql-banc.log), 21:42:11 UTC) : 28 cas, **15 écarts, tous dus à une faute du témoin** : `NaN` écrit comme une chaîne, que le YAML de `promtool` refuse ; aucune requête du tableau n'a donc été évaluée, et les 14 mutants sont « erreur », pas « refusé ». Les règles d'alerte sont conformes : 11 cas, 0 écart, 6 mutants refusés.
+- **Passage 2** ([journal](e6-tableau-banc.log), 21:43:22 UTC) : 22 cas, **0 écart**.
+- **Passage 3** ([journal](e6-tableau-sec.log), 21:43:32 UTC) : 31 cas, **0 écart**.
+
+Correctif du témoin : `.nan`. Le tableau et ses requêtes ne changent pas. Attendu du second passage 1 (`SUFFIXE=-2`) : 28 cas, 0 écart. Il reste aveugle : aucun témoin n'a été évalué.
