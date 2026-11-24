@@ -88,3 +88,13 @@ Limites ajoutées :
 - `unite-hote.sh` reprend le durcissement de `kpi.service`, mais passe ses propres variables et chemins : les `Environment` et `ReadWritePaths` de l'unité n'ont pas tourné.
 
 **Heures** : de 20:18:37 UTC à cette note, 17 min 16 s (remplace le compte de la note précédente). Total de la brique : 59 min 05 s.
+
+## Compte Grafana Viewer et Loki : prémisse à vérifier, prédiction (2026-11-24T20:47:50Z)
+
+Commitée avant le lancement, sur relecture du conseiller. La décision « Compte Grafana Viewer (Recommandé) » a été prise sur une phrase **non mesurée** du README : « n'écrit pas dans Loki ». Les routes de la source Loki (`plugin.json` 13.2.2, lu dans l'archive de Grafana 13.3.0) ne listent pas `/loki/api/v1/push` et ne disent pas ce que le proxy fait d'un chemin absent.
+
+[`banc-grafana.sh`](../banc-grafana.sh) : Grafana 13.3.0 et Loki 3.7.9 jetables, mTLS, sans réseau, archives en cache. Attendu : **16 cas**, dont deux sont des paris sur le proxy, pas des lectures :
+- écriture par le proxy de la source avec le compte Viewer : **204, 1 ligne** (elle passe). C'est le moins sûr, et c'est la mesure qui compte ; si elle passe, la prémisse de la décision est fausse et `auditeur` a le même pouvoir ;
+- écriture par les ressources de la source : **404, 0 ligne**.
+
+Le reste : témoins directs (3), compte créé, rôle Viewer, lecture (3), écriture de l'administrateur par le proxy (204, 1), lecteur et délais (7). Les autres chemins (`/config`, `/metrics`, `log_level`, `flush`, suppression, `/ingester/shutdown`) sont mesurés sans attendu.
