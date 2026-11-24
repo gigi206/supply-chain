@@ -54,11 +54,12 @@ if [ "${1:-}" = ns ]; then
     attendu "$2, $3 $4" "$c, $(compte "$1") ligne(s)" "$5"
     head -c 160 "$T/g.out" | tr '\n' ' ' | sed 's/^/  réponse : /'; echo
   }
-  essai viewer-proxy kpi-journal POST /api/datasources/proxy/uid/loki/loki/api/v1/push "204, 1 ligne(s)"
+  essai viewer-proxy kpi-journal POST /api/datasources/proxy/uid/loki/loki/api/v1/push "403, 0 ligne(s)"
+  essai viewer-put kpi-journal PUT /api/datasources/proxy/uid/loki/loki/api/v1/push "403, 0 ligne(s)"
   essai viewer-ressource kpi-journal POST /api/datasources/uid/loki/resources/loki/api/v1/push "404, 0 ligne(s)"
-  essai admin-proxy admin POST /api/datasources/proxy/uid/loki/loki/api/v1/push "204, 1 ligne(s)"
+  essai admin-proxy admin POST /api/datasources/proxy/uid/loki/loki/api/v1/push "403, 0 ligne(s)"
   echo "## 4. autres chemins de Loki par le proxy, Viewer (code HTTP)"
-  for x in "GET /config" "GET /metrics" "POST /log_level?log_level=debug" "POST /flush" "POST /loki/api/v1/delete?query=%7Bsource%3D%22essai%22%7D&start=0"; do
+  for x in "GET /config" "GET /metrics" "POST /log_level?log_level=debug" "POST /flush" "GET /flush" "GET /log_level?log_level=debug" "GET /ingester/prepare_shutdown" "PUT /ingester/prepare_shutdown" "DELETE /ingester/prepare_shutdown" "GET /services" "POST /loki/api/v1/delete?query=%7Bsource%3D%22essai%22%7D&start=0"; do
     c=$(g kpi-journal "${x%% *}" "/api/datasources/proxy/uid/loki${x#* }"); echo "MESURE|$x|HTTP $c"
   done
   echo "## 5. lecteur_loki.py, puis kev() : délais du banc"
@@ -74,8 +75,10 @@ if [ "${1:-}" = ns ]; then
   sleep 2; h=$(sha256sum < "$T/lignes"); lecteur; c=$?
   attendu "réponse tronquée : code, fichier inchangé" "$c $([ "$h" = "$(sha256sum < "$T/lignes")" ] && echo oui || echo non)" "2 oui"
   echo "## 6. arrêt de Loki par le proxy, Viewer"
-  c=$(g kpi-journal POST /api/datasources/proxy/uid/loki/ingester/shutdown); sleep 5
-  echo "MESURE|POST /ingester/shutdown|HTTP $c|Loki ensuite : $(kill -0 $lp 2> /dev/null && echo vivant || echo arrêté), /ready $("${L[@]}" https://127.0.0.1:3100/ready 2> /dev/null)"
+  vie() { echo "Loki $(kill -0 $lp 2> /dev/null && echo vivant || echo arrêté), /ready $("${L[@]}" https://127.0.0.1:3100/ready 2> /dev/null)"; }
+  for x in "POST /api/datasources/proxy/uid/loki/ingester/shutdown" "GET /api/datasources/uid/loki/resources/ingester/shutdown" "GET /api/datasources/proxy/uid/loki/ingester/shutdown"; do
+    c=$(g kpi-journal "${x%% *}" "${x#* }"); sleep 8; echo "MESURE|$x|HTTP $c|$(vie)"
+  done
   echo "## bilan : $N cas, $KO écart(s)"
   [ "$KO" = 0 ]; exit $?
 fi
@@ -91,11 +94,11 @@ mkdir -p "$T"; chmod 700 "$T"
   python3 -I -c 'import sys, zipfile; zipfile.ZipFile(sys.argv[1]).extract("loki-linux-amd64", sys.argv[2])' "$A/$(v LOKI_ARCHIVE)" "$T" && mv "$T/loki-linux-amd64" "$T/loki" && chmod 755 "$T/loki"
   tar xzf "$A/$(v GRAFANA_ARCHIVE)" -C "$T"
   ec=(-newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes)
-  openssl req -x509 "${ec[@]}" -days 1 -subj /CN=ca-jetable -addext basicConstraints=critical,CA:TRUE -keyout "$T/ca.key" -out "$T/ca.crt" 2> /dev/null
+  openssl req -x509 "${ec[@]}" -days 1 -subj /CN=ca-jetable -addext basicConstraints=critical,CA:TRUE -addext keyUsage=critical,keyCertSign,cRLSign -keyout "$T/ca.key" -out "$T/ca.crt" 2> /dev/null
   for k in serveur:serverAuth client:clientAuth; do
     n=${k%%:*}
     openssl req -x509 "${ec[@]}" -days 1 -subj "/CN=$n" -CA "$T/ca.crt" -CAkey "$T/ca.key" -addext subjectAltName=IP:127.0.0.1 \
-      -addext basicConstraints=critical,CA:FALSE -addext "extendedKeyUsage=${k#*:}" -keyout "$T/$n.key" -out "$T/$n.crt" 2> /dev/null || echo "KO   certificat $n"
+      -addext basicConstraints=critical,CA:FALSE -addext keyUsage=critical,digitalSignature -addext authorityKeyIdentifier=keyid -addext "extendedKeyUsage=${k#*:}" -keyout "$T/$n.key" -out "$T/$n.crt" 2> /dev/null || echo "KO   certificat $n"
   done
   for c in admin kpi-journal; do (umask 077; openssl rand -hex 16 | tr -d '\n' > "$T/$c.mdp"); done
   cat > "$T/loki.yaml" <<YAML

@@ -98,3 +98,12 @@ Commitée avant le lancement, sur relecture du conseiller. La décision « Compt
 - écriture par les ressources de la source : **404, 0 ligne**.
 
 Le reste : témoins directs (3), compte créé, rôle Viewer, lecture (3), écriture de l'administrateur par le proxy (204, 1), lecteur et délais (7). Les autres chemins (`/config`, `/metrics`, `log_level`, `flush`, suppression, `/ingester/shutdown`) sont mesurés sans attendu.
+
+### Premier passage, 5 écarts ; second passage, prédiction (2026-11-24T20:48:55Z)
+
+[`e4-banc-grafana.log`](e4-banc-grafana.log) (20:47:52 UTC) : 15 cas (16 annoncés, faute de compte), 5 écarts.
+- **Le pari était faux, la prémisse tient pour les POST** : écriture par le proxy **403, 0 ligne**, pour le Viewer (et pour l'administrateur) : « non allow-listed POSTs not allowed on proxied loki datasource ».
+- Mais des GET non listés passent : `/config` et `/metrics` en 200. Or certains chemins de Loki agissent sur un simple GET (`/flush`, `/ingester/shutdown`) : non mesurés à ce passage, qui n'avait essayé que POST.
+- 3 écarts du lecteur, même cause : Python refuse le certificat jetable (extensions manquantes en vérification stricte) ; les certificats de la plateforme passent (passages de 20:30 à 20:35 UTC).
+
+Second passage (`-2`), attendu **16 cas, 0 écart** : écritures POST et PUT en 403, lecteur et délais conformes. Mesuré sans attendu chiffré, pari écrit : **GET `/ingester/shutdown` par le proxy arrête Loki**.
