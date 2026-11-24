@@ -1,0 +1,10 @@
+# image de build de la voie D, Go 1.26.10 (témoin) et 1.26.11, 2026-11-24T13:18:32Z, a80261e2, crane 0.20.6
+1.26.10 a : couche 683ffab60c2ef72f (226570240 octets), image sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+1.26.10 b : couche 683ffab60c2ef72f (226570240 octets), image sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+1.26.11 a : couche ad0e342619a73352 (226785280 octets), image sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+1.26.11 b : couche ad0e342619a73352 (226785280 octets), image sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+OK   témoin 1.26.10 : image épinglée par construction.sh : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+OK   1.26.11 : identique sur deux assemblages : sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+OK   1.26.11 : go de l'image : go version go1.26.11 linux/amd64
+BUILDER PRÉDIT|sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7
+## bilan : 3 cas, 0 écart(s)

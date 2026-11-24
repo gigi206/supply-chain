@@ -30,3 +30,9 @@ Décision du propriétaire, verbatim : « Chantier à part ». Périmètre et ac
 ## Étape 3 à sec : image de build de la voie D (prédiction, note de 2026-11-24T13:18:30Z)
 
 [`predire-builder.sh`](../predire-builder.sh), journal `predire-builder.log`, registre Zot jetable sur 127.0.0.1:5077, assemblage recopié de `voie-d.sh` : **témoin 1.26.10 = `d50ae575…`** (sinon la recopie est fausse) ; 1.26.11 identique sur deux assemblages, digest non prédit (ligne `BUILDER PRÉDIT|`) ; `go version go1.26.11`. **Bilan attendu : 3 cas, 0 écart.**
+
+**Étape 3 à sec, résultat** ([journal](predire-builder.log), 13:18:32 à 13:18:52 UTC ; note de 2026-11-24T13:19:09Z) : **3 cas, 0 écart**, conforme. Témoin 1.26.10 : `d50ae575…`, la recopie de `voie-d.sh` est fidèle. **Image de build Go 1.26.11 : `sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7`** (couche de 226 785 280 octets, identique sur deux assemblages). Registre jetable effacé ; rien écrit dans le vrai Zot.
+
+**Suite, sur accord nommé** : pousser cette image dans le vrai Zot (`plateforme/builder-go-voie-d`, compte d'écriture de `voie-d.sh`), digest attendu `8c11e856…`. Puis l'étape 4 (tâches re-signées, pipeline, liste revue, porte, cible des CronJobs), changement de politique et de configuration, sur un second accord.
+
+**Heures** : 13:11:04 à 13:19:09 UTC ; **total de la 07c : 0 h 08 min 05 s** pour 10 h estimées.
