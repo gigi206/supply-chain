@@ -172,3 +172,29 @@ Reprise du chantier : 2026-11-24T13:49:12Z. Déroulé de la pièce 8 de la 07b :
 **Reste** : étape 7, défauts des scripts du rejeu (`construction.sh`, `voie-d.sh`, `plateforme.sh`, `declencheur.sh`, `replay.sh`, `s6a.sh`, `durcissement.sh`, `bascule.sh` de la 03) et brique 10 ; jamais de rejeu de zéro avant (il recrée la clé `vex` et reconstruirait `3a7ca1b1`).
 
 **Heures** : reprise de 13:49:12 à 2026-11-24T14:13:34Z, attentes des réponses du propriétaire comprises : 24 min 22 s ; **total de la 07c : au plus 0 h 50 min 13 s** pour 10 h estimées.
+
+## Étape 7 : relevé à sec des défauts du rejeu (note de 2026-11-24T14:20:40Z)
+
+Méthode : périmètre tiré de la liste des étapes de `08-trust-plane/rejeu.sh` (étape → script → fonction → valeur épinglée), pas d'une recherche des digests. Lecture seule ; rien lancé, rien écrit hors du dépôt.
+
+**Correction de la phrase de l'étape 4 et de l'étape 6** (« un rejeu de zéro reconstruirait `3a7ca1b1` et re-signerait l'ancienne tâche ») : fausse, mesurée sur le code. `construction.sh taches` rend la tâche avec `BUILDER` (défaut `d50ae575`) et la compare à la signature versionnée, qui porte `8c11e856` depuis l'étape 4. Sans `SIGNER`, la comparaison échoue (« gabarit modifié depuis la signature versionnée ») : **un rejeu de zéro lancé aujourd'hui s'arrêterait en KO à « J7 (construction) »**, après avoir refait la voie D et la voie A en Go 1.26.10. Rien n'est re-signé.
+
+**Sur le chemin du rejeu** (à porter) :
+- **J7 (voie D)**, `voie-d.sh` : toolchain `GO_MODULE` 1.26.10, prise dans `GOROOT_DIR` de `mise.toml` (1.26.10) ; `BIN_REF` `e3749c68` ; `APP_REF` `3a7ca1b1`, lue dans `workspace/sample-app`. C'est la seule étape du rejeu qui produit `plateforme/builder-go-voie-d` : elle doit donner `8c11e856`, sinon la tâche signée tire une image absente. `ARBRE_*` et `ENTREES_SHA` portent sur les sources et la fermeture, indépendantes de Go : inchangées ;
+- **J2 (registre)**, `stockage.sh` : pousse dans `workspace/sample-app` la seule référence de la 04 (`3a7ca1b1`, `~/.cache/supply-chain-poc/w/b04/app-layout`), dont viennent aussi les images d'essai de J4. La voie D en 1.26.11 a besoin d'une référence `f5e6bcb0` : layout de la 04 en 1.26.11 présent sur l'hôte (`07c/banc/b04-1.26.11/app-layout`, index = `f5e6bcb0`), à copier hors du banc, sous `w/` (qui survit au démontage) ;
+- **J7 (voie A, sans réseau)**, `buildkit.sh` l. 380 à 382 : `BUILDER_D` `d50ae575`, `APP_REF` `3a7ca1b1`, `BIN_REF` `e3749c68` ;
+- **J7 (construction)**, `construction.sh` : défauts `APP_REF` et `BUILDER` (surchargeables depuis l'étape 4) ;
+- **J8 (tests, bascule, contrôles 6 et 7)**, `preuves.sh` : `APP` vaut `builds/sample-app@${APP_REEL:-$APP_DIGEST}`, défaut `3a7ca1b1`. Plus profond : **le test 8 suppose que l'image réelle et les images d'essai ont le même digest** (index des bundles par `APP_DIGEST`, l. 1421 : « toutes les images de ce digest », bundles de `essai-webhook` pris dans le même index ; « autre digest » exclu par `APP_DIGEST`, l. 1464 à 1475), et `referrers()` (contrôles 6 et 7, R5) compte les referrers de l'image réelle par `APP_DIGEST`. C2 du contrôle 6 (« même digest, autre dépôt ») change de sens. Ces blocs n'ont jamais tourné avec deux digests (l'étape 4 n'a lancé que `bascule`) ;
+- **07a (G3, G4, G6, G7, G8)**, `plateforme.sh` l. 96 : `IMAGE` `3a7ca1b1`, cible du CronJob de scan. Après un démontage, `builds/sample-app@3a7ca1b1` n'existe plus : le scan échouerait ;
+- **06 (S6a)**, `s6a.sh` l. 55 : `APP_REF` `3a7ca1b1`, même CronJob reposé avec le deb.
+
+**Hors du chemin du rejeu** (à garder tels quels, mesures historiques ; mesuré dans `rejeu.sh`) : `declencheur.sh` de la 01 (S5 sautée), `bascule.sh` de la 03 (pas sur le chemin, mesure de 13:22:20Z), `durcissement.sh` l. 886 (`etape_h6_mesure`, `h6*` exclues), les images d'essai de J4 (`APP_DIGEST` de `stockage.sh`, `tekton.sh`, `tsa.sh`, `politique.sh`, `kyverno-*.sh`, `redemarrer.sh`, tâche signée `publier-essai`) : elles restent des copies de `3a7ca1b1`, ce qui évite de re-signer `publier-essai`.
+
+**Choix de conception (à sec)** : deux digests. L'image réelle passe à `f5e6bcb0` ; les images d'essai restent `3a7ca1b1` (la référence de la 04 en 1.26.10, toujours poussée en J2). Le test 8 et `referrers()` séparent les deux.
+
+**Restent au propriétaire** (rien lancé) :
+- **VSA** : le bundle versionné de la 10, re-poussé par `pousser_vsa`, est lié à `3a7ca1b1`. Avec `POUSSER_VSA=1`, le contrôle 6 ne peut pas passer sur `f5e6bcb0` tant que la brique 10 n'a pas produit une VSA de la nouvelle image (clé du propriétaire, un accord par push) ;
+- **rejeu de zéro** : action sur les VM ; il recrée la clé `vex`, donc les trois VEX signés deviennent invérifiables et chacun demande un nouvel accord nommé ;
+- **`mise.toml`** : Go 1.26.11 n'y est déclaré nulle part (promesse de l'étape 1 de ne pas le modifier). `voie-d.sh` lira la toolchain dans le cache des modules, comme `prefetch.sh` de la 03, sans toucher `GOROOT_DIR`.
+
+**Prédiction de la mesure suivante** ([`predire-voie-d.sh`](../predire-voie-d.sh), journal `predire-voie-d.log`) : assemblage de la voie D recopié de `voie-d.sh etape_assembler` sur un Zot jetable (127.0.0.1:5077). Témoin : binaire `e3749c68` face au layout `3a7ca1b1` ; puis binaire `56f3cd7d` face au layout `f5e6bcb0`. Dans les deux cas : deux assemblages identiques, index du layout = digest de référence, binaire de la référence = binaire assemblé, même taille de tar, écarts limités à la somme de contrôle, devmajor et devminor, configuration identique hors rootfs, historique et created, created `1970-01-01T00:00:00Z` face à `0001-01-01T00:00:00Z`. Le digest de la voie D n'est pas prédit (il diffère de la référence par construction) : il est relevé. **Bilan attendu : 14 cas, 0 écart.**
