@@ -161,3 +161,11 @@ Attendu, lecture seule :
 - [`e4-unite-hote-4.log`](e4-unite-hote-4.log) : 27 cas, **3 écarts**, deux causes : la note de `kpi.service` est 3.0 (2.9 attendu ; `SupplementaryGroups`, oublié dans la prédiction) ; le lecteur ne lit pas son mot de passe, car `ProtectHome=true` masque `/run/user`, où le gestionnaire utilisateur met les identifiants. La réserve annoncée vaut.
 
 Dernier passage (`-5`), `ProtectHome` retiré pour le lecteur seulement, notes attendues « 2.9 3.0 2.9 » : **27 cas, 0 écart**. En cas d'écart, réserve, sans nouvel essai.
+
+### Résultat (note de 2026-11-24T21:00:36Z)
+
+[`e4-unite-hote-5.log`](e4-unite-hote-5.log) : **27 cas, 0 écart**. Le lecteur durci (sauf `ProtectHome`) lit son mot de passe par `LoadCredential` et 5 lignes dans le vrai Grafana ; `LoadCredential` avec `ProtectHome=true` reste à exercer sur la VM (`base-grype.service`, en service, a les deux).
+
+Rien n'est posé : ni la liste, ni le compte, ni l'exportateur. `kpi-pose.sh` (compte, pose, verif, retrait) et `liste-proxy.sh` (pose, apres, retrait) n'ont pas été lancés.
+
+**Heures** : de 20:55:04 UTC (réponses du propriétaire) à cette note, 5 min 32 s. Total de la brique : 1 h 15 min 43 s.

@@ -663,3 +663,11 @@ Mesuré au banc jetable seulement (Grafana 13.3.0, Loki 3.7.9, `grafana.ini` de 
 - Lu, non mesuré : `loki.service` a `Restart=on-failure`, donc systemd ne le relancerait pas. Prometheus ne collecte pas Loki, mais la règle `LokiInjoignable` (critique, aucun envoi réussi d'Alloy vers Loki depuis 5 min, puis `for: 2m`) est faite pour ce cas ; elle n'a pas été exercée sur cet arrêt.
 
 Le compte `auditeur` est Viewer : le défaut existe depuis L2. Il porte sur la disponibilité des journaux, pas sur leur écriture. Aucune correction n'est choisie ; toute correction change la VM et demande un accord.
+
+### Correction candidate (note de 2026-11-24T21:00:36Z) : liste du proxy des sources, non posée
+
+Décision du propriétaire, verbatim : « Chercher une correction à sec ». Mesuré au banc (`VARIANTE=liste`, [40 cas, 0 écart](../20-kpi/resultats/e4-banc-grafana-liste.log), 20:56:06 UTC) : avec `data_source_proxy_whitelist = 127.0.0.1:9090` dans `[security]`, le proxy refuse Loki (403) à tous, administrateur compris ; Loki survit à 10 formes d'arrêt (5 par le proxy, 5 par les ressources) ; `/api/ds/query`, les étiquettes de l'explorateur, la santé de la source et le proxy vers Prometheus marchent. Un programme qui sort avec le code 0 est relancé par `Restart=always`, pas par `on-failure` (complément possible pour `loki.service`, non essayé sur Loki).
+
+Lu sur la plateforme par l'auditeur ([`liste-proxy-avant.log`](resultats/liste-proxy-avant.log), 20:59:52 UTC) : le proxy mène à Loki (GET `buildinfo`, 200) ; aucun chemin qui agit n'a été demandé.
+
+Limites : le suivi en direct de l'explorateur passe sans doute par le proxy, non essayé ; les porteurs d'un certificat client de la CA gardent l'accès direct (D16) ; aucune interface ouverte au banc. Pose écrite, non lancée : [`liste-proxy.sh`](liste-proxy.sh) (accord, sudo, redémarrage de Grafana ; `config/grafana.ini` sera modifié sur accord).
