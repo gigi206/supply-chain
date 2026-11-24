@@ -14,7 +14,7 @@ Banc sec (`essai-fuites.sh`) : HOME jetable, faux secrets tirés au sort, faux `
 | 4, fichier absent, fichier vide, fuite d'un secret de la 08 | code 0 avec la ligne « absent ou vide » ; idem ; code 1 (non-régression) |
 | 5 | dossier de travail effacé |
 
-Non mesuré ici : le passage sur les vraies VM (ssh, accord du propriétaire). Les secrets des 07a, 09 et 10 ne sont pas cherchés non plus : constat du même relevé, choix du propriétaire.
+Non mesuré ici : le passage sur les vraies VM (ssh, accord du propriétaire). Les secrets des 07a, 09 et 10 ne sont pas cherchés non plus : constat du même relevé, choix à poser au propriétaire.
 
 ## Résultat (note de 2026-11-24T22:19:49Z)
 
