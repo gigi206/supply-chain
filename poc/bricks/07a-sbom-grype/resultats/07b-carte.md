@@ -2388,3 +2388,13 @@ Confiance : moyenne. C'est la première signature par `userpass` sur la clé neu
 - Échéance des 5 énoncés : **2026-12-24T08:49:43Z** (30 jours).
 
 **Suite** : le CronJob `scan/scan-sample-app` (`30 9 * * *`, `Etc/UTC`, créé au rejeu) scannera sample-app le 24/11 à 09:30 UTC. Attendu : `SCAN|…, 6 vulnérabilités, 0 KEV, 5 écartée(s) par un VEX` (Loki et Grafana), et la colonne « VEX appliqué » de `vex-gabarit.sh` remplie pour les 5 entrées ; `GO-2026-6859` reste comptée.
+
+## Pièce 8 : prédiction de l'effet sur le scan de 09:30 (note de 2026-11-24T08:51:12Z, avant le Job)
+
+Script [`piece8-apres-scan.sh`](piece8-apres-scan.sh), en lecture seule, à lancer après le Job du calendrier (`scan/scan-sample-app`, 09:30 UTC ; rien n'est déclenché à la main). Attendu, **8 cas, 0 écart** :
+- Job réussi ;
+- `VEX|1 énoncé(s) vérifié(s), 1 retenu(s), 0 rejeté(s)` : le scanner compte les attestations (une par document publié), pas les énoncés (`politique/scanner.sh`, l. 114 ; même forme au banc `07b-t3-banc-6.log`) ;
+- `SCAN|…sample-app@sha256:3a7ca1b1…, 6 vulnérabilités, 0 KEV, 5 écartée(s) par un VEX` ; une ligne `PUBLIE|` ;
+- la même ligne `SCAN|` dans Grafana (Loki, compte auditeur) ;
+- tableau de `vex-gabarit.sh` sur le nouveau scan : 5 entrées marquées `not_affected (2026-11-24T08:49:43Z)`, `GO-2026-6859` à « - », « écartées par un VEX 5 ».
+Confiance : haute pour le scanner (même chemin qu'au banc t3), moyenne pour le compte Loki (une ligne par pod attendue).
