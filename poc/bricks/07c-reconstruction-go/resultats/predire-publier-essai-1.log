@@ -1,0 +1,30 @@
+# tâche publier-essai, gabarit et bundle, 2026-11-24T14:34:31Z, 50dafea3, Client version: 0.46.2
+busybox : sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f
+  2c2
+  < # et publiée en bundle (tekton/tasks/publier-essai). sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f, sc-stockage.poc.test:5000/builds/essai-webhook, sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : politique.sh declencheurs.
+  ---
+  > # et publiée en bundle (tekton/tasks/publier-essai). sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f, sc-stockage.poc.test:5000/builds/essai-webhook, sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7 : politique.sh declencheurs.
+  40c40
+  <       printf '%s' 'sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5' > $(results.IMAGE_DIGEST.path)
+  ---
+  >       printf '%s' 'sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7' > $(results.IMAGE_DIGEST.path)
+KO   lignes différentes entre les deux rendus : 4 (attendu 2)
+OK   seule ligne changée : le résultat IMAGE_DIGEST : 1
+OK   la tâche signée versionnée porte l'ancien digest : 1
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+Creating Tekton Bundle:
+	- Added Task: publier-essai to image
+Error: could not push image to registry as "127.0.0.1:5077/tekton/tasks/publier-essai:a": PUT http://127.0.0.1:5077/v2/tekton/tasks/publier-essai/manifests/a: MANIFEST_INVALID: manifest invalid; map[description:During upload, manifests undergo several checks ensuring validity. If those checks fail, this error MAY be returned, unless a more specific error is included. The detail will contain information the failed validation. mediaType:application/vnd.docker.distribution.manifest.v2+json]
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+Creating Tekton Bundle:
+	- Added Task: publier-essai to image
+Error: could not push image to registry as "127.0.0.1:5077/tekton/tasks/publier-essai:b": PUT http://127.0.0.1:5077/v2/tekton/tasks/publier-essai/manifests/b: MANIFEST_INVALID: manifest invalid; map[description:During upload, manifests undergo several checks ensuring validity. If those checks fail, this error MAY be returned, unless a more specific error is included. The detail will contain information the failed validation. mediaType:application/vnd.docker.distribution.manifest.v2+json]
+2026/11/24 15:34:33 HEAD request failed, falling back on GET: HEAD http://127.0.0.1:5077/v2/tekton/tasks/publier-essai/manifests/a: unexpected status code 404 Not Found (HEAD responses have no body, use GET for details)
+Error: GET http://127.0.0.1:5077/v2/tekton/tasks/publier-essai/manifests/a: MANIFEST_UNKNOWN: manifest unknown; map[description:This error is returned when the manifest, identified by name and tag is unknown to the repository. reference:a]
+KO   témoin : bundle de la tâche signée versionnée = liste revue :  (attendu sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849)
+2026/11/24 15:34:33 HEAD request failed, falling back on GET: HEAD http://127.0.0.1:5077/v2/tekton/tasks/publier-essai/manifests/b: unexpected status code 404 Not Found (HEAD responses have no body, use GET for details)
+Error: GET http://127.0.0.1:5077/v2/tekton/tasks/publier-essai/manifests/b: MANIFEST_UNKNOWN: manifest unknown; map[description:This error is returned when the manifest, identified by name and tag is unknown to the repository. reference:b]
+2026/11/24 15:34:33 HEAD request failed, falling back on GET: HEAD http://127.0.0.1:5077/v2/tekton/tasks/publier-essai/manifests/a: unexpected status code 404 Not Found (HEAD responses have no body, use GET for details)
+Error: GET http://127.0.0.1:5077/v2/tekton/tasks/publier-essai/manifests/a: MANIFEST_UNKNOWN: manifest unknown; map[description:This error is returned when the manifest, identified by name and tag is unknown to the repository. reference:a]
+OK   témoin : deux poussées, même digest : 
+## bilan : 5 cas, 2 écart(s)
