@@ -1,0 +1,512 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://supply-chain.example/vex/sample-app-deb/60f25f5c",
+  "author": "",
+  "timestamp": "",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": {
+        "name": "GHSA-3fxj-6jh8-hvhx"
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RealIP ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GHSA-j6qf-3m9c-vwj3",
+        "aliases": [
+          "CVE-2026-114437"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne contient aucune chaîne ClientIPFromXFF ni GetClientIP, et ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GHSA-mqqf-5wvp-8fh8",
+        "aliases": [
+          "CVE-2025-69725"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RedirectSlashes ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2025-3849",
+        "aliases": [
+          "CVE-2025-47907"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet database/sql de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2025-3956",
+        "aliases": [
+          "CVE-2025-47906"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet os/exec de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2025-4006",
+        "aliases": [
+          "CVE-2025-61725"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet net/mail de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2025-4014",
+        "aliases": [
+          "CVE-2025-58183"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet archive/tar de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-4342",
+        "aliases": [
+          "CVE-2025-61728"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet archive/zip de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-4603",
+        "aliases": [
+          "CVE-2026-27142"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-4865",
+        "aliases": [
+          "CVE-2026-32289"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-4869",
+        "aliases": [
+          "CVE-2026-32288"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet archive/tar de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-4976",
+        "aliases": [
+          "CVE-2026-39825"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet net/http/httputil de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-4977",
+        "aliases": [
+          "CVE-2026-42499"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet net/mail de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-4980",
+        "aliases": [
+          "CVE-2026-39826"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-4982",
+        "aliases": [
+          "CVE-2026-39823"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-4986",
+        "aliases": [
+          "CVE-2026-39820"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet net/mail de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-5775",
+        "aliases": [
+          "GHSA-9g5q-2w5x-hmxf"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RealIP ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-5777",
+        "aliases": [
+          "GHSA-rjr7-jggh-pgcp"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet github.com/go-chi/chi/v5/middleware, qui porte RealIP ; seul le paquet racine chi/v5 est lié (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-6088",
+        "aliases": [
+          "CVE-2026-56859"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet encoding/xml de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-6091",
+        "aliases": [
+          "CVE-2026-56858"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-6599",
+        "aliases": [
+          "CVE-2026-94448"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-6600",
+        "aliases": [
+          "CVE-2026-97030"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, ne lie aucun symbole ni fichier source du paquet html/template de la bibliothèque standard, seul visé par la fiche OSV (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    },
+    {
+      "vulnerability": {
+        "name": "GO-2026-6604",
+        "aliases": [
+          "CVE-2026-56857"
+        ]
+      },
+      "products": [
+        {
+          "@id": "pkg:oci/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e",
+          "subcomponents": [
+            {
+              "@id": "pkg:golang/stdlib@1.24.4"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "Le binaire /usr/bin/sample-app du paquet sample-app_1.0.0-2_amd64.deb (fichier sha256 10d475d00dc2a14c…, Go 1.24.4, GOOS=linux), contenu dans l’artefact sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e, est construit pour linux ; le code visé (paquets os et internal/syscall/windows, réservé à goos windows d’après la fiche OSV) n’est compilé que pour Windows, et le binaire ne cite aucun fichier source de internal/syscall/windows (poc/bricks/07a-sbom-grype/resultats/deb-tri-2.log et deb-preuves.log, 2026-11-24).",
+      "timestamp": ""
+    }
+  ]
+}

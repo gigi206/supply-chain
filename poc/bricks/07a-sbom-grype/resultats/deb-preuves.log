@@ -1,0 +1,29 @@
+# preuves du deb avant brouillon, 2026-11-24T13:03:40Z, b40379c5
+OK   digest du manifeste relu : sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+OK   binaire (celui du tri) : 10d475d00dc2a14c
+## 1. étalon
+  chemin témoin : crypto/tls/conn.go
+  chemin témoin : net/http/server.go
+OK   témoin net/http/server.go présent : oui
+OK   témoin crypto/tls présent : oui
+## 2. classe A : chemins de fichiers sources des paquets visés
+OK   aucun fichier source de database/sql : 0
+OK   aucun fichier source de os/exec : 0
+OK   aucun fichier source de net/mail : 0
+OK   aucun fichier source de archive/tar : 0
+OK   aucun fichier source de archive/zip : 0
+OK   aucun fichier source de html/template : 0
+OK   aucun fichier source de net/http/httputil : 0
+OK   aucun fichier source de encoding/xml : 0
+## 3. chi
+OK   chemins sous chi/v5…/middleware/ : 0
+OK   chemin de paquet chi/v5/middleware : 0
+OK   RealIP : 0
+OK   ClientIPFromXFF : 0
+OK   GetClientIP : 0
+OK   RedirectSlashes : 0
+OK   realip ou /strip.go : 0
+## 4. GO-2026-6604 (Windows)
+OK   GOOS du binaire : linux
+OK   aucun fichier source de internal/syscall/windows : 0
+## bilan : 21 cas, 0 écart(s)
