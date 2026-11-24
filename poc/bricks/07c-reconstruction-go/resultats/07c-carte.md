@@ -455,3 +455,16 @@ Rien ne touche au cluster, aux VM ni à Zot.
 **Prix** : HEAD a avancé. Il faut une poussée avant `etape_vsa` de R5, comme annoncé au propriétaire.
 
 **Heures de la 07c** : plus 16:54:44 à 16:55:39 UTC, notes comprises, soit 0 h 00 min 55 s ; **total : au plus 2 h 03 min 31 s** pour 10 h estimées.
+
+## GO-2026-6859 sur le deb de la 06 : prédiction (note de 2026-11-24T17:40:11Z)
+
+Le propriétaire a demandé, verbatim : « Il faut qu'on puisse avancer ». R4 attend jusqu'au 25/11 à 13:27:42 UTC. Le délai est imposé par la politique (`politique-replay.md` l. 63, `outils/vsa.py` l. 71, `replay.sh` l. 391), donc lancer plus tôt donnerait une VSA FAILED. Le conseiller a recommandé de lever pendant ce temps les réserves qui ne demandent aucun accord. Celle-ci en est une : « le deb de la 06 est encore compilé en Go 1.26.10 », sans que GO-2026-6859 ait été mesuré sur le deb.
+
+**Avertissement** : le relevé a déjà été fait à la main avant cette note, à 17:39:20 et 17:39:33 UTC, par deux requêtes identiques à celles du script. La prédiction ci-dessous en reprend le résultat. Le journal archivé est la répétition scriptée de ce relevé, ce n'est pas une mesure à l'aveugle.
+
+**Prédiction**, `bash poc/bricks/07c-reconstruction-go/deb-go-6859.sh` → `resultats/deb-go-6859.log`, lecture seule par l'auditeur dans Grafana (Loki, listes de `entrees-scan`) :
+- le dernier scan du deb (`builds/scan/sample-app-deb`, 13:42:38 UTC) compte 67 entrées, dont une GO-2026-6859 Medium hors KEV ;
+- le dernier scan de l'image (`builds/scan/sample-app`, `f5e6bcb0`, 14:12:28 UTC) compte 5 entrées, sans GO-2026-6859 ;
+- 3 cas, 0 écart.
+
+Rien n'est écrit, ni sur les VM, ni dans Zot, ni dans Grafana. La correction, c'est-à-dire reconstruire le deb en Go 1.26.11 ou poser un VEX, reste un choix du propriétaire.
