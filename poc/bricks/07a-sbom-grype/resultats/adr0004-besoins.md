@@ -74,3 +74,19 @@ Lu le 23/11 entre 23:00 et 23:02 UTC (une recherche, puis quatre pages lues par 
 - L'issue [DependencyTrack/dependency-track#3584](https://github.com/DependencyTrack/dependency-track/issues/3584) porte sur l'import des SBOM CycloneDX 1.6 (fermée le 15/05/2024), pas sur OpenVEX ni CSAF.
 
 **Conclusion, avec sa limite** : la documentation de la v5 ne décrit que l'import de VEX CycloneDX ; l'affirmation de `docs/00` (« ni CSAF ni OpenVEX ») est **cohérente avec la documentation**, sans preuve d'absence dans le code (notes de version et code non lus). Pour l'option 1b, une conversion OpenVEX → VEX CycloneDX reste donc nécessaire, et l'import n'agit que sur des findings que Dependency-Track a déjà calculés lui-même (à partir du SBOM), pas sur ceux de Grype.
+
+## Mise à jour avant les questions (note de 2026-11-24T15:33:47Z ; rien n'est réécrit au-dessus)
+
+**Chiffres actuels**, tirés des journaux archivés (les chiffres du 23/11 ci-dessus portaient sur `3a7ca1b1`) :
+- l'image en service est `f5e6bcb0` (Go 1.26.11, brique 07c) : 5 entrées (chi), 0 KEV, 5 écartées par un VEX signé ([`vex-apres-scan.log`](../../07c-reconstruction-go/resultats/vex-apres-scan.log) de la 07c) ;
+- deb `60f25f5c` : 67 entrées, 0 KEV, 23 écartées par un VEX signé ([`deb-apres-scan.log`](deb-apres-scan.log)) ;
+- aucune série de la pièce 7 n'a encore de tableau de bord dans Grafana.
+
+**Option 2b, le point « non mesuré » est mesuré** ([`adr0004-cvss.log`](adr0004-cvss.log), 6 cas, 0 écart, lecture seule des deux sorties JSON de Grype 0.104.1 gardées par le banc de la 07c, base construite le 2026-11-24T06:22:05Z) :
+- la sortie de Grype **porte un CVSS** (`vulnerability.cvss[]`, version et score de base) ; `outil/main.go` ne le recopie pas ;
+- sur `f5e6bcb0` : 3 entrées sur 5 ont un CVSS direct ; les 2 entrées `GO-2026-5775` et `GO-2026-5777` (gravité « Unknown ») n'en ont que par leur alias GHSA (`relatedVulnerabilities`, CVSS 4.0 = 7.7) ; 0 entrée sans aucun CVSS ;
+- **les versions sont mélangées** : CVSS 3.1 et 4.0 dans la même image, et `GHSA-j6qf-3m9c-vwj3` porte les deux par son alias (4.0 = 6.3, 3.1 = 4.8). Un score « CVSS × EPSS » demande donc une règle écrite : quelle version retenir, et quand prendre le CVSS d'un alias ;
+- sur l'image en Go 1.26.10 (témoin), 13 entrées sur 15 ont un CVSS direct, dont 12 en 3.1 ;
+- **non mesuré** : le deb (67 entrées) ; la stabilité de ces champs d'une base à l'autre.
+
+Prix de 2b, inchangé : changement de `outil/main.go`, nouvelle image `outils-scan`, poses des pièces 3 et 5 à refaire, porte et `entrees-scan` relus. La mesure lève seulement le doute sur la présence du CVSS.

@@ -2509,3 +2509,12 @@ Confiance : haute pour le scanner (même chemin qu'au banc t3), moyenne pour le 
 **Ce que cela établit** : le deb a son VEX, signé par le propriétaire ; 23 entrées sur 67 sont écartées au scan, dont 1 Critical ; 44 restent comptées (2 Critical, 28 High), faute de justification `vulnerable_code_not_present` ou d'analyse d'atteignabilité.
 
 **Heures** : plus 13:36:55 à 13:43:37 UTC (0 h 06 min 42 s, en remplacement de la ligne de 13:38:31, même départ) ; **total de la 07b : au plus 15 h 42 min 49 s** pour 10 h estimées ; seuil de 20 h non atteint.
+
+## ADR 0004 : mesure avant les questions (note de 2026-11-24T15:33:47Z)
+
+R4 de la 10 (07c) ne peut pas partir avant le 2026-11-25T13:27:42Z (seuil de la 10 et `politique-replay.md`, l. 63) ; en attendant, reprise de la 07b pour les trois questions de l'ADR 0004.
+
+- [`adr0004-cvss.sh`](../adr0004-cvss.sh), lecture seule des sorties JSON de Grype gardées par le banc de la 07c : [`adr0004-cvss.log`](adr0004-cvss.log), **6 cas, 0 écart**. La sortie de Grype 0.104.1 porte un CVSS : 3 entrées de `f5e6bcb0` sur 5 en direct, 2 par leur alias GHSA, versions 3.1 et 4.0 mélangées. Le même relevé avait été fait à la main à 15:32:51 UTC, avant l'écriture du script : il n'y a donc pas de prédiction datée ; le script redonne les mêmes valeurs.
+- Fiche des besoins complétée par une note datée (chiffres actuels, option 2b mesurée).
+
+**Heures de la 07b** : plus 15:31:00 à 15:33:47 UTC (0 h 02 min 47 s ; reprise de la 07b, la 07c attend R4) ; **total : au plus 15 h 45 min 36 s** pour 10 h estimées ; seuil de 20 h non atteint.

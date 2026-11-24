@@ -1,0 +1,38 @@
+# CVSS dans la sortie de Grype (ADR 0004, option 2b), 2026-11-24T15:33:25Z, 5db926db
+## Go 1.26.10 : grype-1.26.10.json, sha256 c543f0f66ab0ad90e9ebbc0df0ab3f961c0b230e93d092dd9d779f1d78d0b264, 49680 octets
+grype 0.104.1, base construite 2026-11-24T06:22:05Z
+  id | paquet | gravité | CVSS direct (version=score) | CVSS des vulnérabilités liées | EPSS (nombre)
+  CVE-2026-97034 | stdlib@go1.26.10 | High | 3.1=8.8 |  | 1
+  CVE-2026-97043 | stdlib@go1.26.10 | High | 3.1=8.8 |  | 1
+  CVE-2026-97035 | stdlib@go1.26.10 | High | 3.1=8.8 |  | 1
+  CVE-2026-97036 | stdlib@go1.26.10 | High | 3.1=8.8 |  | 1
+  CVE-2026-97037 | stdlib@go1.26.10 | High | 3.1=8.8 |  | 1
+  CVE-2026-97033 | stdlib@go1.26.10 | High | 3.1=8.8 |  | 1
+  CVE-2026-97038 | stdlib@go1.26.10 | High | 3.1=8.8 |  | 1
+  CVE-2026-97039 | stdlib@go1.26.10 | High | 3.1=8.3 |  | 1
+  CVE-2026-97054 | stdlib@go1.26.10 | Medium | 3.1=5.9 |  | 1
+  GO-2026-6859 | stdlib@go1.26.10 | Medium | 3.1=5.9 | CVE-2026-97054:3.1=5.9 | 1
+  GHSA-mqqf-5wvp-8fh8 | github.com/go-chi/chi/v5@v5.2.3 | Medium | 3.1=4.7 | CVE-2025-69725:3.1=4.7 | 1
+  GHSA-j6qf-3m9c-vwj3 | github.com/go-chi/chi/v5@v5.2.3 | Medium | 3.1=4.8 | CVE-2026-114437:4.0=6.3/3.1=4.8 | 1
+  GHSA-3fxj-6jh8-hvhx | github.com/go-chi/chi/v5@v5.2.3 | Medium | 4.0=6.9 |  | 0
+  GO-2026-5775 | github.com/go-chi/chi/v5@v5.2.3 | Unknown |  | GHSA-9g5q-2w5x-hmxf:4.0=7.7 | 0
+  GO-2026-5777 | github.com/go-chi/chi/v5@v5.2.3 | Unknown |  | GHSA-rjr7-jggh-pgcp:4.0=7.7 | 0
+  entrées 15 ; avec CVSS direct 13 ; sans CVSS direct mais avec un CVSS lié 2 ; sans aucun CVSS 0
+  versions de CVSS directes : 3.1 ×12, 4.0 ×1
+## Go 1.26.11 : grype-1.26.11.json, sha256 030ffdffda725c07ca57516c6c638722bd443258c714c04bdf93e4d6e2b9419f, 20387 octets
+grype 0.104.1, base construite 2026-11-24T06:22:05Z
+  id | paquet | gravité | CVSS direct (version=score) | CVSS des vulnérabilités liées | EPSS (nombre)
+  GHSA-mqqf-5wvp-8fh8 | github.com/go-chi/chi/v5@v5.2.3 | Medium | 3.1=4.7 | CVE-2025-69725:3.1=4.7 | 1
+  GHSA-j6qf-3m9c-vwj3 | github.com/go-chi/chi/v5@v5.2.3 | Medium | 3.1=4.8 | CVE-2026-114437:4.0=6.3/3.1=4.8 | 1
+  GHSA-3fxj-6jh8-hvhx | github.com/go-chi/chi/v5@v5.2.3 | Medium | 4.0=6.9 |  | 0
+  GO-2026-5775 | github.com/go-chi/chi/v5@v5.2.3 | Unknown |  | GHSA-9g5q-2w5x-hmxf:4.0=7.7 | 0
+  GO-2026-5777 | github.com/go-chi/chi/v5@v5.2.3 | Unknown |  | GHSA-rjr7-jggh-pgcp:4.0=7.7 | 0
+  entrées 5 ; avec CVSS direct 3 ; sans CVSS direct mais avec un CVSS lié 2 ; sans aucun CVSS 0
+  versions de CVSS directes : 3.1 ×2, 4.0 ×1
+OK   f5e6bcb0 : version de Grype : 0.104.1
+OK   f5e6bcb0 : entrées : 5
+OK   f5e6bcb0 : entrées avec CVSS direct : 3
+OK   f5e6bcb0 : entrées sans CVSS direct, avec un CVSS lié : 2
+OK   f5e6bcb0 : entrées sans aucun CVSS : 0
+OK   f5e6bcb0 : versions de CVSS mélangées (directes et liées) : 3.1,4.0
+## bilan : 6 cas, 0 écart(s)
