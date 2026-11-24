@@ -4,7 +4,7 @@ Mêmes passages que banc_comparer.py, mais par (nom, dépôt, digest) : les prod
 l'étape 4, rien n'est hors comparaison : kev_delais (une série absente vaut « sans objet (0 KEV vue) » : sans KEV, l'égalité ne prouve que
 l'absence), pin_date et cle_date (relevé versionné). Les comptes de signatures (kpi_signatures_*) sont comparés
 aux lignes DETAIL| du même recalcul ; le second .prom vient de l'exportateur lancé avec une clé étrangère.
-Usage : comparer_zot.py <journal du recalcul> <exportateur.prom> <exportateur, clé étrangère.prom>"""
+Usage : comparer_zot.py <journal du recalcul> <exportateur.prom> <exportateur, clé étrangère.prom, ou - (seuil.sh : sans ce passage)>"""
 import re
 import sys
 
@@ -70,7 +70,8 @@ def signatures(f):
     return {k: x for k, x in v.items() if x != [0, 0]}
 
 
-bonnes, temoin, rec = signatures(sys.argv[2]), signatures(sys.argv[3]), {}
+SANS = sys.argv[3] == "-"
+bonnes, temoin, rec = signatures(sys.argv[2]), {} if SANS else signatures(sys.argv[3]), {}
 for ligne in open(sys.argv[1], encoding="utf-8"):
     c = ligne.split("|")
     if c[0] == "DETAIL" and c[1].startswith("builds/"):
@@ -83,7 +84,7 @@ for k in sorted(k for k in set(rec) | set(bonnes) if rec.get(k) != bonnes.get(k)
     print(f"ECART|signatures|{'|'.join(k)}|recalcul {rec.get(k)}|exportateur {bonnes.get(k)}")
 inverse = {k: [0, sum(v)] for k, v in bonnes.items()}
 sous_temoin = {}
-for ligne in open(sys.argv[3], encoding="utf-8"):
+for ligne in () if SANS else open(sys.argv[3], encoding="utf-8"):
     if ligne.startswith("kpi_exportateur_"):
         continue
     m = re.fullmatch(r"kpi_(\w+)\{[^}]*\} (\d+)\n", ligne)
@@ -99,6 +100,8 @@ for nom, obtenu, voulu in (("sujets", len(sujets), 4), ("valeurs comparées", le
                            ("clé étrangère : séries restantes et leur somme", sous_temoin, {
                                "enonces_refuses": 0, "l3_verifie": 0, "provenance_chains_verifiee": 0, "provenances_pipelinerun": 0,
                                "replay_identique": 0, "vex_verifies": 0})):
+    if SANS and nom.startswith("clé étrangère"):
+        continue
     n += 1
     ko += obtenu != voulu
     print(f"{'OK  ' if obtenu == voulu else 'KO  '} {nom} : {obtenu}" + ("" if obtenu == voulu else f" (attendu {voulu})"))

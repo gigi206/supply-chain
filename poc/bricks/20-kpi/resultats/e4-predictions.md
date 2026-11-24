@@ -187,3 +187,16 @@ Réponses verbatim du propriétaire (avant 2026-11-24T21:07:03Z) : **« Liste, c
 2. `kpi-pose.sh compte` (`e4-kpi-compte.log`) : **5 cas, 0 KO**, rôle Viewer.
 3. `kpi-pose.sh pose` (`e4-kpi-pose.log`) : **20 cas, 0 KO** : 5 avant (dont le proxy à 403), 2 empreintes, dossier effacé, 2 passages `success`, timer, mot de passe refusé à `kpi`, filtre des deux unités (2), signatures refusées 0, vérifiées « oui », sans date 0. 134 séries environ, 41 signatures vérifiées. Les moins sûrs : `LoadCredential` avec `ProtectHome=true`, la lecture du journal par le groupe, la forme d'`IPAddressDeny`.
 4. `kpi-pose.sh verif` (`e4-kpi-verif.log`), après une collecte de Prometheus : **4 cas, 0 KO**.
+
+### Résultat des poses (note de 2026-11-24T21:09:31Z)
+
+- [`liste-proxy-pose.log`](../../19b-journalisation/resultats/liste-proxy-pose.log) (21:07:17 UTC) : **10 cas, 0 KO**. Le proxy vers Loki répond 403, celui vers Prometheus 200 ; requêtes et étiquettes inchangées. `grafana.ini` en service était égal au dépôt sans la ligne.
+- [`e4-kpi-compte.log`](e4-kpi-compte.log) (21:07:28 UTC) : **5 cas, 0 KO**, rôle Viewer, connexion vérifiée.
+- [`e4-kpi-pose.log`](e4-kpi-pose.log) (21:07:28 UTC) : **16 cas, 0 KO** (20 annoncés : faute de compte, 5 + 11 = 16). 134 séries, 41 signatures vérifiées, 0 refusée, 0 clé ni pin sans date, journal lisible. Levées : `LoadCredential` avec `ProtectHome=true`, lecture du journal par le groupe, `/proc/self/fd` sous l'unité réelle, OpenSSL 3.5.9 et Python 3.13.5 de `sc-stockage`. Notes d'exposition : 3.0, 2.9, comme à sec.
+- [`e4-kpi-verif.log`](e4-kpi-verif.log) (21:09:00 UTC) : **4 cas, 0 KO**, 134 séries dans Prometheus.
+
+Non exercés encore : un passage du timer, `Wants` avec un lecteur en échec, les refus réseau des filtres (seule la propriété est relue).
+
+## Étape 5, le seuil, prédiction (2026-11-24T21:09:31Z)
+
+[`seuil.sh`](../seuil.sh) : séries de Prometheus lues par l'auditeur contre le recalcul signé (`comparer_zot.py` sans le passage à clé étrangère). Attendu : **8 cas, 0 écart**, 134 séries, 105 valeurs comparées. Mesure à relire après un nouveau passage du timer.

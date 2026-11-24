@@ -1,0 +1,12 @@
+début : 2026-11-24T21:07:17Z, étape pose, dépôt 59cc6bbf
+OK   ligne dans le dépôt : 1
+OK   grafana.ini en service = dépôt sans la ligne : 620e6a176e703e1f7a130e7c4ac77e8ea3cc891987e26bd002e7bce82766d991
+OK   pose : 0
+OK   Grafana actif : active
+OK   grafana.ini en service = dépôt : 831bc3aaf498ad1e05cc223b04d4d3baa2ec8dba4e1e77717e71157bbf96e153
+OK   proxy vers Loki (buildinfo) : 403
+OK   proxy vers Prometheus (règles) : 200
+OK   requête Loki par /api/ds/query, trames non vides : 200 true
+OK   requête Prometheus par /api/ds/query : 200
+OK   étiquettes de l'explorateur : 200 true
+fin : 2026-11-24T21:07:24Z, bilan : tenu
