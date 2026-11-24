@@ -2489,3 +2489,9 @@ Confiance : haute pour le scanner (même chemin qu'au banc t3), moyenne pour le 
 **Préalables, résultat** ([journal](piece8-signer-prealables-sample-app-deb-60f25f5c.log), 13:38:19 à 13:38:24 UTC ; note de 2026-11-24T13:38:31Z) : **10 cas, 0 écart**, conforme. Copie horodatée : `JUGE|exemption, 23 énoncé(s) dont 0 large(s)` ; `PUBLIES|0` sur `builds/vex/sample-app-deb` ; rien signé, document inchangé (`ec0a9c0e…`). **Suite** : accord nommé du propriétaire pour signer et publier ce document seul.
 
 **Heures de la 07b** : plus 13:36:55 (fin de la 07c, borne basse de la reprise) à 13:38:31 UTC (0 h 01 min 36 s) ; **total : au plus 15 h 37 min 43 s** pour 10 h estimées ; seuil de 20 h non atteint.
+
+## VEX du deb : signature (note de 2026-11-24T13:38:59Z)
+
+**Accord nommé** : à la question « Autorisez-vous la signature et la publication du VEX du deb (sample-app-deb-60f25f5c.json) ? », réponse verbatim du propriétaire : « J'autorise ». Portée : ce document seul.
+
+**Prédiction** (`ACCORD='J'"'"'autorise' piece8-signer.sh signer vex/sample-app-deb-60f25f5c.json ec0a9c0ef89bd319`, journal `piece8-signer-signer-sample-app-deb-60f25f5c.log`) : comme au signer de la pièce 8 (15 cas, 0 écart) : seuls les horodatages changent ; document horodaté accepté ; connexion userpass (politique `vex-signature`, 900 s) ; `signer-vex.sh signer` code 0, une ligne `PUBLIE|` ; révocation de soi ; redirection fermée ; **`PUBLIES|23`** sur `60f25f5c`.
