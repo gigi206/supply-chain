@@ -525,3 +525,15 @@ Rien d'autre n'est à câbler pour la 07c.
 **Effet sur R5** : ce commit déplace HEAD. `etape_vsa` refuse un HEAD non poussé, donc une poussée (accord du propriétaire) sera nécessaire avant R5.
 
 **Heures de la 07c** : plus 18:16:45 à 18:22:28 UTC (0 h 05 min 43 s ; correctif, relecture du câblage, correction) ; **total : au plus 2 h 09 min 14 s** pour 10 h estimées.
+
+## ConfigMap `porte` en service, relue avant R5 (note de 2026-11-24T18:23:01Z, lecture seule, sur avis du conseiller)
+
+Lue par `kubectl get` (une ConfigMap, aucun Secret) de 18:22:55 à 18:23:01 UTC :
+- 14 clés, dont `vsa.sh` et `vsa.pub` ;
+- `vsa.pub` : empreinte DER `578dd771bcedd582…`, identique à `10-independent-replay/resultats/vsa-cle-publique.pem` ;
+- `vsa.sh` (`06cae142…`) et `horodatage.sh` (`dead62e6…`) identiques aux fichiers versionnés. Un premier calcul par `jq -r` donnait d'autres empreintes, à cause du saut de ligne qu'il ajoute ; le calcul par `jq -j` fait foi ;
+- `taches.yml` diffère (cluster `8e4e1b31…`, dépôt `12b140e2…`). Seul écart : les 5 lignes de la référence `17b50c7c` (publier-essai pour le rejeu), absentes du cluster. C'est l'écart déjà écrit à l'étape 7 (« La liste revue du dépôt n'est plus égale à la ConfigMap `porte` du cluster »).
+
+**Effet sur R5** : `preuves.sh reelle`, lancé par `porte_avant` et `porte_apres`, juge avec la ConfigMap telle qu'elle est. Il n'appelle pas `cm_porte` et ne repose donc pas `taches.yml`. L'attendu « champ 9 à `ok` après le push » a donc sa clé : la condition laissée ouverte dans la note de R5 est levée.
+
+**Heures de la 07c** : plus 18:22:28 à 18:23:30 UTC (0 h 01 min 02 s ; lecture, `preuves.sh`, note) ; **total : au plus 2 h 10 min 16 s** pour 10 h estimées.
