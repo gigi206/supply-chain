@@ -121,3 +121,14 @@ Journaux : `lancer` de `commun.sh` réécrit `resultats/<préfixe>-<étape>.log`
 - l'image `3a7ca1b1` reste jugeable (`66a9f298` gardée dans la liste revue) ; son VEX du 24/11 reste publié.
 
 **Heures** : 13:11:04 à 13:36:55 UTC ; **total de la 07c : 0 h 25 min 51 s** pour 10 h estimées.
+
+## Étape 6 : VEX chi de `f5e6bcb0` (prédiction, note de 2026-11-24T13:50:05Z)
+
+Reprise du chantier : 2026-11-24T13:49:12Z. Déroulé de la pièce 8 de la 07b : mesure du binaire, brouillon, vérification, **validation du contenu par le propriétaire**, puis **accord nommé de signature** (ce document seul).
+
+**(a) mesure, prédiction** ([`vex-binaire.sh`](../vex-binaire.sh), copie de `piece8-binaire.sh` passage 4 avec trois ajouts ; journal `vex-binaire.log`) :
+- entrées du scan signé en vigueur (`a92cf233`) : les 5 noms du VEX de `3a7ca1b1` (`GHSA-3fxj-6jh8-hvhx`, `GHSA-j6qf-3m9c-vwj3`, `GHSA-mqqf-5wvp-8fh8`, `GO-2026-5775`, `GO-2026-5777`), aucune hors chi ; gabarit : noms, alias et sous-composants identiques à ceux de ce VEX, produit `pkg:oci/sample-app@sha256:f5e6bcb0…` ;
+- binaire : sha256 `56f3cd7d…` (banc de l'hôte), `go1.26.11`, chi `v5.2.3` ;
+- témoins présents (`(*Mux).ServeHTTP`, `(*Mux).routeHTTP`, `net/http.(*Server).Serve`) ; paquets de chi liés : le seul paquet racine `github.com/go-chi/chi/v5` ; les 7 mêmes fichiers sources (`chain.go` à `tree.go`) ; **0** pour tout ce qui touche `middleware` (fonctions, chemins, nom qualifié), `RealIP`, `ClientIPFromXFF`, `GetClientIP`, `RedirectSlashes`, `realip`, `/strip.go` ;
+- fiches OSV : 5 lues, imports seulement dans `github.com/go-chi/chi/v5/middleware` ;
+- **bilan attendu : 25 cas, 0 écart.**
