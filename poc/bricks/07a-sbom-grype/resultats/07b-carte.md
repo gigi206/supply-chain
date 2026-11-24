@@ -2331,3 +2331,9 @@ Choix du propriétaire (verbatim) : « Pièce 8 maintenant » (plutôt qu'un rej
 **Limites** : le VEX ne vaut que pour le digest `3a7ca1b1…` ; le deb est un autre binaire (Go 1.24.4), non mesuré. Un nom absent de la pclntab dit que le code n'est pas lié ; les chemins sources bornent le risque d'inlining pour chi.
 
 **Heures** : plus 08:19:52 à 08:36:51 UTC le 24/11 (16 min 59 s). **Total : au plus 15 h 04 min 28 s**, pour 10 h estimées ; le seuil de 20 h n'est pas atteint.
+
+## Pièce 8 : contenu validé par le propriétaire (note de 2026-11-24T08:44:40Z)
+
+À la question « Validez-vous le brouillon tel quel (5 entrées, la 6e non couverte) ? », le propriétaire répond (verbatim) : « Oui, je valide ». Le contenu de [`vex/sample-app-3a7ca1b1.json`](../vex/sample-app-3a7ca1b1.json) (sha256 `6310943806f6f39b…`, inchangé depuis le verdict de 08:36:43Z) devient sa décision : 5 énoncés `vulnerable_code_not_present`, `GO-2026-6859` non couvert.
+
+**Reste avant la signature** : le nom d'auteur (au propriétaire) et l'accord nommé pour signer par `hashivault://vex` et publier dans `builds/vex/sample-app`. L'horodatage sera posé à la signature. Rien signé.
