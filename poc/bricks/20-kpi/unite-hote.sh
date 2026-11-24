@@ -10,6 +10,7 @@
 # Usage (racine du dépôt) : [SUFFIXE=-2] mise exec -- bash poc/bricks/20-kpi/unite-hote.sh   (journal : resultats/e4-unite-hote<SUFFIXE>.log)
 set -uo pipefail
 export LC_ALL=C.UTF-8
+centiemes() { tr -d . < /proc/uptime | cut -d" " -f1; }   # horloge monotone ; le date de l'hôte (uutils) rend %3N sans zéro de tête
 here=$(cd "$(dirname "$0")" && pwd)
 LOG=$here/resultats/e4-unite-hote${SUFFIXE:-}.log
 [ ! -e "$LOG" ] || { echo "journal présent, jamais réécrit : $LOG" >&2; exit 2; }
@@ -52,11 +53,11 @@ attendu "systemd-analyze security, note hors ligne (entrees-scan : $(note "$M"))
 echo "## 2. exportateur sans durcissement, puis durci"
 CA=$T/ca.crt CLES=$T/cles RELEVE=$T/dates-git.tsv SORTIE=$T/libre.prom /usr/bin/python3 -I "$T/metrics_exporter.py"; rc=$?
 attendu "sans durcissement : code" "$rc" 0
-t0=$(date -u +%s%3N)
+t0=$(centiemes)
 unite durci /usr/bin/python3 -I /srv/metrics_exporter.py; rc=$?
-echo "durée : $(($(date -u +%s%3N) - t0)) ms"
+echo "durée : $(( ($(centiemes) - t0) * 10 )) ms"
 attendu "durci, $(/usr/bin/python3 --version) : code" "$rc" 0
-unite py313 /mnt/bin/python3 -I /srv/metrics_exporter.py; rc=$?
+unite py313 /usr/bin/env /mnt/bin/python3 -I /srv/metrics_exporter.py; rc=$?
 attendu "durci, $(python3 --version) : code" "$rc" 0
 for f in durci py313; do
   attendu "$f : séries différentes de la sortie sans durcissement" "$(diff <(grep -v '^kpi_exportateur_' "$T/libre.prom") <(grep -v '^kpi_exportateur_' "$T/$f.prom") | grep -c '^[<>]')" 0

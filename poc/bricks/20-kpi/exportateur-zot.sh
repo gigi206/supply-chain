@@ -8,6 +8,7 @@
 # Usage (racine du dépôt) : [SUFFIXE=-1] mise exec -- bash poc/bricks/20-kpi/exportateur-zot.sh
 set -uo pipefail
 export LC_ALL=C.UTF-8
+centiemes() { tr -d . < /proc/uptime | cut -d" " -f1; }   # horloge monotone ; le date de l'hôte (uutils) rend %3N sans zéro de tête
 here=$(cd "$(dirname "$0")" && pwd)
 LOG=$here/resultats/e4-exportateur-zot${SUFFIXE:-}.log
 [ ! -e "$LOG" ] || { echo "journal présent, jamais réécrit : $LOG" >&2; exit 2; }
@@ -31,9 +32,9 @@ export REG=192.168.161.13:5000 CA=$HOME/.cache/supply-chain-poc/08/pki/ca-poc.cr
   GRAFANA=https://192.168.161.13:3001 UTILISATEUR=auditeur MDP=$HOME/.cache/supply-chain-poc/08/secrets/grafana-auditeur.password \
     SORTIE=$T/journal /usr/bin/python3 -I "$here/../../../tools/metrics-exporter/lecteur_loki.py"; e=$?
   echo "JOURNAL|$(grep -c 'liste émise' "$T/journal") résumés|$(grep -c '^{' "$T/journal") entrées KEV|$(grep -vc -e 'liste émise' -e '"kev":true' "$T/journal") autres lignes"
-  debut=$(date -u +%s%3N)
+  debut=$(centiemes)
   RELEVE=$here/releve/dates-git.tsv JOURNAL=$T/journal SIGNATURES=verifiees CLES=$T/cles SORTIE=$T/kpi.prom /usr/bin/python3 -I "$X"; a=$?
-  echo "durée de l'exportateur : $(($(date -u +%s%3N) - debut)) ms"
+  echo "durée de l'exportateur : $(( ($(centiemes) - debut) * 10 )) ms"
   sed 's/^/PROM|/' "$T/kpi.prom"
   SIGNATURES=verifiees CLES=$T/temoin SORTIE=$T/temoin.prom /usr/bin/python3 -I "$X"; d=$?
   sed 's/^/PROM|témoin|/' "$T/temoin.prom"

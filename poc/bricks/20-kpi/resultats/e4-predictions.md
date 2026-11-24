@@ -43,3 +43,11 @@ Commitée avant tout passage. Plan relu par le conseiller. Sans accord : banc je
 [`e4-banc.log`](e4-banc.log) (20:29:15 UTC) : 5 écarts, une seule cause, dans le témoin et non dans l'exportateur. `banc-pins` avait été inséré juste avant l'écriture de `SCANS`, qui désignait donc son digest : `entrees-scan.py` n'a vu aucun scan de `banc-kev`, et les délais de KEV manquaient partout, recalcul compris. Les 15 arrêts, les 11 cas du lecteur et les dates de pins étaient déjà conformes. `banc-kev` est remis en dernier ; attendu inchangé, **59 cas, 0 écart**, journal `e4-banc-2.log`.
 
 Relevé écrit à 20:29:09 UTC : 5 clés, 27 pins, conforme ; `verifier` sera lancé après son commit.
+
+### Deuxième passage du banc, vrai Zot, premier passage de l'unité (2026-11-24T20:30:47Z)
+
+- [`e4-banc-2.log`](e4-banc-2.log) : **59 cas, 0 écart**. `releve-dates.py verifier` après le commit du relevé : identique à git, 0 ligne différente (le piège `HORS_CONF` est évité).
+- [`e4-exportateur-zot.log`](e4-exportateur-zot.log) (20:30:01 UTC) : **10 cas, 0 écart**, 105 valeurs, 41 signatures vérifiées. Journal lu par `lecteur_loki.py` dans le vrai Loki : 5 résumés, 0 entrée KEV. **La durée écrite (« -231 ms ») est fausse** : le `date` de l'hôte (uutils 0.10.0) rend `%3N` sans zéro de tête (mesuré à 20:30:37 UTC). Remplacé par `/proc/uptime` ; le passage `-2` donnera la durée.
+- [`e4-unite-hote.log`](e4-unite-hote.log) (20:30:13 UTC) : **23 cas, 3 écarts**, une seule cause. `systemd-run` cherche l'exécutable hors de l'unité, où `/mnt/bin/python3` n'existe pas : Python 3.13 n'a pas été lancé. Le reste est conforme : sous le durcissement, openssl par `/proc/self/fd` vérifie les 41 signatures, la sortie est la même, et les 6 sondes sont permises sans l'unité et refusées dedans. La durée de ce journal (« 505 ms ») n'est pas fiable non plus.
+
+Corrigé : Python 3.13 lancé par `/usr/bin/env`. Attendu du second passage : unité **23 cas, 0 écart** (`-2`) ; vrai Zot **10 cas, 0 écart** (`-2`).
