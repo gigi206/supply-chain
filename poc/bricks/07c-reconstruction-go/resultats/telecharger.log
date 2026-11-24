@@ -1,0 +1,11 @@
+# Go 1.26.11, 2026-11-24T13:12:18Z, b3981088
+OK   module absent avant : absent
+1.26.10 avant : h1:5VAGHlY8yl8pTPVSNIez3SNMy6fWabs+QMR25f3oMT0=
+go: downloading go1.26.11 (linux/amd64)
+go version go1.26.11 linux/amd64
+OK   taille du module : 71800213
+OK   ziphash = sum.golang.org (relevé avant l'accord) : h1:KyINmJ/FQdKRmDYGuTAAXkumyeR2DyUlSNHZj7XaLFg=
+OK   sum.golang.org relu maintenant : h1:KyINmJ/FQdKRmDYGuTAAXkumyeR2DyUlSNHZj7XaLFg=
+OK   go version de la toolchain : go version go1.26.11 linux/amd64
+OK   1.26.10 intacte : h1:5VAGHlY8yl8pTPVSNIez3SNMy6fWabs+QMR25f3oMT0=
+## bilan : 6 cas, 0 écart(s)
