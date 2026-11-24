@@ -83,3 +83,10 @@ Journaux : `lancer` de `commun.sh` réécrit `resultats/<préfixe>-<étape>.log`
 **(a), résultat** ([journal](signer/construction-taches.log), 13:24:18 à 13:24:24 UTC ; note de 2026-11-24T13:24:54Z) : **conforme**. `construire-image` re-signée : le diff de `construire-image.signee.yaml` ne touche que la signature et les deux digests de l'image de build (`d50ae575` → `8c11e856`) ; bundle **`tekton/tasks/construire-image@sha256:4dcbc4b7468137d894bb40085b32b9cc816a37bfece3204ed06466ee4741eb6b`** à ajouter ; `preparer-entrees` (`2070d601`) et `publier-image` (`d21931f3`) inchangées et listées ; pipeline `sample-app@6838969f…` ; témoin `c7e8b275` conforme.
 
 **(b), prédiction** : `taches.yml` augmenté de `4dcbc4b7` sous `construire-image` (`66a9f298` gardé) ; [`porte-taches.sh`](../porte-taches.sh), journal `porte-taches.log` : liste du cluster = ancienne version commitée avant le patch ; après : = dépôt, nouvelle et ancienne références présentes, autres clés de la ConfigMap inchangées ; **5 cas, 0 écart**.
+
+**(b), résultat** ([journal](porte-taches.log), 13:24:55 UTC ; note de 2026-11-24T13:25:13Z) : **5 cas, 0 écart**, conforme. ConfigMap `porte/porte` : `taches.yml` = dépôt (`8e4e1b31…`), `4dcbc4b7` et `66a9f298` présentes, autres clés inchangées.
+
+**(c), prédiction** (`construction.sh taches construire provenance`, `BUILDER=…@8c11e856`, `APP_REF=f5e6bcb0…`, journaux `construction-<étape>.log` de la 07c ; `construction.sh` s'arrête au premier KO) :
+- taches : les trois tâches dans la liste revue (`construire-image@4dcbc4b7`), pipeline re-signée sous un nouveau digest ;
+- construire : PipelineRun `j7-sample-app` (l'ancien, de `3a7ca1b1`, purgé par le script) réussi sous Kata (`-smp 3 -m 6176M`), **`IMAGE_DIGEST` = `sha256:f5e6bcb0…`**, arbre `30e808ff`, Chains signe les TaskRuns et le PipelineRun, écriture par `poc-images` ; témoins : label imposé, ancienne pipeline en échec fermé, PipelineRun sans Kata refusé ; alerte `ChainsEchecSignature` attendue, comme au rejeu ;
+- provenance : enveloppe valide sur `builds/sample-app@f5e6bcb0…`, sujet, `slsa-tekton`, **image de build `8c11e856…`** dans `resolvedDependencies`, autre clé refusée.
