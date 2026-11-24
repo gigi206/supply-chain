@@ -1,7 +1,7 @@
 {
   "@context": "https://openvex.dev/ns/v0.2.0",
   "@id": "https://supply-chain.example/vex/sample-app/3a7ca1b1",
-  "author": "",
+  "author": "Ghislain LE MEUR",
   "timestamp": "",
   "version": 1,
   "statements": [

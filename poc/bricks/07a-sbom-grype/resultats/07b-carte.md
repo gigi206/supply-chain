@@ -2337,3 +2337,13 @@ Choix du propriétaire (verbatim) : « Pièce 8 maintenant » (plutôt qu'un rej
 À la question « Validez-vous le brouillon tel quel (5 entrées, la 6e non couverte) ? », le propriétaire répond (verbatim) : « Oui, je valide ». Le contenu de [`vex/sample-app-3a7ca1b1.json`](../vex/sample-app-3a7ca1b1.json) (sha256 `6310943806f6f39b…`, inchangé depuis le verdict de 08:36:43Z) devient sa décision : 5 énoncés `vulnerable_code_not_present`, `GO-2026-6859` non couvert.
 
 **Reste avant la signature** : le nom d'auteur (au propriétaire) et l'accord nommé pour signer par `hashivault://vex` et publier dans `builds/vex/sample-app`. L'horodatage sera posé à la signature. Rien signé.
+
+## Pièce 8 : auteur, script de signature, prédiction des préalables (note de 2026-11-24T08:47:12Z)
+
+**Auteur** : le propriétaire donne (verbatim) « Ghislain LE MEUR » ; inscrit dans `author` du document (sha256 `f634c57e7013d108…`) ; horodatages toujours vides.
+
+**Script neuf** [`piece8-signer.sh`](../piece8-signer.sh) : aucun script ne signait ni ne publiait dans le vrai Zot (l'essai du 22/11 et les bancs visaient un Zot jetable). Deux étapes :
+- `prealables` (lecture seule) : document figé, binaire bao, mots de passe présents (`test -s`), `poc-vex` authentifié sur `/v2/`, juge depuis HEAD, redirection vers `openbao-0` ouverte et fermée sans connexion, `verifier` sur une copie horodatée, aucun VEX déjà publié ;
+- `signer` : seulement avec la phrase d'accord du propriétaire (`ACCORD`, recopiée au journal) ; horodatage du document du dépôt (seul champ écrit), `verifier`, connexion `userpass` (`-no-store`, mot de passe lu par bao dans son fichier), `signer-vex.sh signer`, révocation de soi, relecture des énoncés publiés.
+
+**Prédiction de `prealables`** (avant le lancement) : 11 cas, 0 écart ; `poc-vex` répond 200 ; juge `7dde1a8ed457f254` ; copie horodatée acceptée (exemption de 5 énoncés) ; `PUBLIES|0` ; document inchangé. Confiance : haute, sauf l'authentification de `poc-vex` sur le Zot recréé par le rejeu (moyenne : bloc htpasswd de `stockage.sh`, non relu depuis le rejeu).
