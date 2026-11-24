@@ -2357,3 +2357,21 @@ Choix du propriétaire (verbatim) : « Pièce 8 maintenant » (plutôt qu'un rej
 **Heures** : plus 08:44:40 à 08:47:33 UTC (2 min 53 s). **Total : au plus 15 h 07 min 21 s**, pour 10 h estimées ; le seuil de 20 h n'est pas atteint.
 
 **Reste** : la phrase d'accord nommé du propriétaire pour `signer`.
+
+## Pièce 8 : accord nommé et prédiction de `signer` (note de 2026-11-24T08:49:25Z, avant le lancement)
+
+À la question « Autorisez-vous la signature par hashivault://vex et la publication dans builds/vex/sample-app ? », le propriétaire répond (verbatim) : « J'autorise ». Accord pour ce seul document (`vex/sample-app-3a7ca1b1.json`, sha256 `f634c57e7013d108…` avant horodatage), cette clé et ce dépôt ; il ne vaut pas pour un autre VEX ni pour un renouvellement.
+
+**Commande** : `ACCORD='J'\''autorise (signature par hashivault://vex et publication dans builds/vex/sample-app)' piece8-signer.sh signer vex/sample-app-3a7ca1b1.json f634c57e7013d108`.
+
+**Prédiction** :
+- préalables : 8 cas tenus, comme à 08:47:27Z (sans la copie horodatée) ;
+- horodatage du document du dépôt à l'heure du lancement ; seuls les horodatages changent par rapport à HEAD ; `verifier` accepte ;
+- connexion `userpass` : code 0, politique `vex-signature` seule, 900 s ;
+- `signer-vex.sh signer` : code 0, une ligne `SIGNE|`, une ligne `PUBLIE|` (referrer dans `192.168.161.13:5000/builds/vex/sample-app`) ;
+- révocation de soi : code 0 ; redirection fermée ;
+- relecture : `PUBLIES|5` ;
+- **bilan : 15 cas, 0 écart**.
+Confiance : moyenne. C'est la première signature par `userpass` sur la clé neuve `aeef0a8c…` (non mesurée depuis le rejeu, README de la 07a), et la première écriture de `poc-vex` dans le vrai Zot.
+
+**Effets attendus** : un referrer neuf dans le vrai Zot (registre en ajout seul : seul un retrait sur accord l'enlève) ; au scan quotidien suivant de sample-app, les 5 entrées passent à « écartée par un VEX ». L'échéance est fixée à 30 jours après l'horodatage.
