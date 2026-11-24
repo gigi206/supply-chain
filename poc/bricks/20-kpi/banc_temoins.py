@@ -165,7 +165,6 @@ def poser():
     scan("banc-illisible", s, "2026-11-21T00:00:00Z", [], sig="")
     vsa("banc-illisible", s, "PASSED", [BIT, L3], sig=base64.b64encode(b"pas une signature").decode()); vex("banc-illisible", s, sig="!!!")
     s = sujet("banc-att-illisible"); chains("banc-att-illisible", s, [PR], illisible=True)
-    s = sujet("banc-kev"); chains("banc-kev", s, [PR])
     # étape 4 : quatre provenances ; seule compte la plus récente des PipelineRun vérifiées (rang 1). Rang 2 : TaskRun ; rang 3 : clé
     # étrangère, plus récente
     s = sujet("banc-pins")
@@ -176,6 +175,7 @@ def poser():
              dep("present", "2")], "2026-11-19T00:00:00Z", "chains"),
         2: ([dep("tache", "8")], "2026-11-20T00:00:00Z", "chains"),
         3: ([dep("forge", "2")], "2026-11-21T00:00:00Z", "etrangere")})
+    s = sujet("banc-kev"); chains("banc-kev", s, [PR])
     print(f"SCANS=builds/scan/banc-kev@{s['digest']}")
 
 

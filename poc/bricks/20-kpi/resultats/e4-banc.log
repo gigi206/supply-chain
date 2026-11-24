@@ -1,0 +1,781 @@
+# banc.sh, 2026-11-24T20:29:15Z, dépôt 67e59e5d, scripts 6470a7787784dbc7
+# cosign v3.1.4, zot v2.1.22, exportateur Python 3.14.4, OpenSSL 3.5.5
+# routes dans l'espace de noms : 0
+entrees-scan.py : 0 lignes d'entrées, 0 listes émises, 4 résumés
+## recalcul signé
+HORS BANC|horodatage (TSA) ; dates des clés et des pins (git) ; Prometheus et Grafana
+## 1. sujets : listé, vérifié, vérifié par la clé étrangère (témoin, attendu 0)
+DETAIL|builds/banc-complet|b621e90b00b8|sig 1|prov 2/2/0|scan 1/1/0|vsa 1/1/0|vex 1/1/0|tsa 0 listés, 0 vérifiés, 0/2 provenances couvertes
+DETAIL|builds/banc-sans-vsa|563f99592829|sig 1|prov 1/1/0|scan 1/1/0|vsa 0/0/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-vsa-failed|6b9de77a4a59|sig 1|prov 1/1/0|scan 1/1/0|vsa 1/1/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-forge|3eb46c2d327a|sig 1|prov 1/1/0|scan 2/1/0|vsa 1/0/0|vex 1/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-prov-forgee|1df1146f9240|sig 0|prov 1/0/0|scan 0/0/0|vsa 0/0/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/0 provenances couvertes
+DETAIL|builds/banc-prov-seule|dc3dd1314760|sig 1|prov 1/1/0|scan 0/0/0|vsa 0/0/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-prov-tache|8d95c413b9c4|sig 1|prov 1/1/0|scan 0/0/0|vsa 0/0/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-sans-sig|de5b1ebb482a|sig 0|prov 1/1/0|scan 0/0/0|vsa 0/0/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-mauvais-role|62ec63937e6e|sig 1|prov 1/1/0|scan 1/0/0|vsa 1/0/0|vex 1/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-role-prov|2a6ff1407322|sig 0|prov 1/0/0|scan 0/0/0|vsa 0/0/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/0 provenances couvertes
+DETAIL|builds/banc-sig-forgee|1354300c72b8|sig 0|prov 1/1/0|scan 0/0/0|vsa 0/0/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-illisible|b749fb2a8ab1|sig 1|prov 1/1/0|scan 2/1/0|vsa 1/0/0|vex 1/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-att-illisible|32717a16df2c|sig 0|prov 2/1/0|scan 0/0/0|vsa 0/0/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-kev|da3a79c245cb|sig 1|prov 1/1/0|scan 3/3/0|vsa 0/0/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/1 provenances couvertes
+DETAIL|builds/banc-pins|7997e44ce0c0|sig 1|prov 4/3/0|scan 0/0/0|vsa 0/0/0|vex 0/0/0|tsa 0 listés, 0 vérifiés, 0/3 provenances couvertes
+OK   attestations listées = vérifiées (toutes les clés en service) : 27
+OK   témoin : attestations vérifiées par la clé étrangère : 0
+## 2. KPI par sujet
+## 3. KPI de plateforme
+KPI|couverture_vex_entrees|builds/banc-att-illisible|32717a16df2c|absent
+KPI|couverture_vex_entrees|builds/banc-complet|b621e90b00b8|2/3
+KPI|couverture_vex_entrees|builds/banc-forge|3eb46c2d327a|0/1
+KPI|couverture_vex_entrees|builds/banc-illisible|b749fb2a8ab1|0/1
+KPI|couverture_vex_entrees|builds/banc-kev|da3a79c245cb|1/2
+KPI|couverture_vex_entrees|builds/banc-mauvais-role|62ec63937e6e|absent
+KPI|couverture_vex_entrees|builds/banc-pins|7997e44ce0c0|absent
+KPI|couverture_vex_entrees|builds/banc-prov-forgee|1df1146f9240|absent
+KPI|couverture_vex_entrees|builds/banc-prov-seule|dc3dd1314760|absent
+KPI|couverture_vex_entrees|builds/banc-prov-tache|8d95c413b9c4|absent
+KPI|couverture_vex_entrees|builds/banc-role-prov|2a6ff1407322|absent
+KPI|couverture_vex_entrees|builds/banc-sans-sig|de5b1ebb482a|absent
+KPI|couverture_vex_entrees|builds/banc-sans-vsa|563f99592829|sans objet
+KPI|couverture_vex_entrees|builds/banc-sig-forgee|1354300c72b8|absent
+KPI|couverture_vex_entrees|builds/banc-vsa-failed|6b9de77a4a59|0/1
+KPI|couverture_vex_kev|builds/banc-att-illisible|32717a16df2c|absent
+KPI|couverture_vex_kev|builds/banc-complet|b621e90b00b8|1/1
+KPI|couverture_vex_kev|builds/banc-forge|3eb46c2d327a|0/1
+KPI|couverture_vex_kev|builds/banc-illisible|b749fb2a8ab1|0/1
+KPI|couverture_vex_kev|builds/banc-kev|da3a79c245cb|1/2
+KPI|couverture_vex_kev|builds/banc-mauvais-role|62ec63937e6e|absent
+KPI|couverture_vex_kev|builds/banc-pins|7997e44ce0c0|absent
+KPI|couverture_vex_kev|builds/banc-prov-forgee|1df1146f9240|absent
+KPI|couverture_vex_kev|builds/banc-prov-seule|dc3dd1314760|absent
+KPI|couverture_vex_kev|builds/banc-prov-tache|8d95c413b9c4|absent
+KPI|couverture_vex_kev|builds/banc-role-prov|2a6ff1407322|absent
+KPI|couverture_vex_kev|builds/banc-sans-sig|de5b1ebb482a|absent
+KPI|couverture_vex_kev|builds/banc-sans-vsa|563f99592829|sans objet
+KPI|couverture_vex_kev|builds/banc-sig-forgee|1354300c72b8|absent
+KPI|couverture_vex_kev|builds/banc-vsa-failed|6b9de77a4a59|0/1
+KPI|kev_ouvertes|builds/banc-att-illisible|32717a16df2c|absent
+KPI|kev_ouvertes|builds/banc-complet|b621e90b00b8|0
+KPI|kev_ouvertes|builds/banc-forge|3eb46c2d327a|1
+KPI|kev_ouvertes|builds/banc-illisible|b749fb2a8ab1|1
+KPI|kev_ouvertes|builds/banc-kev|da3a79c245cb|1
+KPI|kev_ouvertes|builds/banc-mauvais-role|62ec63937e6e|absent
+KPI|kev_ouvertes|builds/banc-pins|7997e44ce0c0|absent
+KPI|kev_ouvertes|builds/banc-prov-forgee|1df1146f9240|absent
+KPI|kev_ouvertes|builds/banc-prov-seule|dc3dd1314760|absent
+KPI|kev_ouvertes|builds/banc-prov-tache|8d95c413b9c4|absent
+KPI|kev_ouvertes|builds/banc-role-prov|2a6ff1407322|absent
+KPI|kev_ouvertes|builds/banc-sans-sig|de5b1ebb482a|absent
+KPI|kev_ouvertes|builds/banc-sans-vsa|563f99592829|0
+KPI|kev_ouvertes|builds/banc-sig-forgee|1354300c72b8|absent
+KPI|kev_ouvertes|builds/banc-vsa-failed|6b9de77a4a59|1
+KPI|l3_verifie|builds/banc-att-illisible|32717a16df2c|0
+KPI|l3_verifie|builds/banc-complet|b621e90b00b8|1
+KPI|l3_verifie|builds/banc-forge|3eb46c2d327a|0
+KPI|l3_verifie|builds/banc-illisible|b749fb2a8ab1|0
+KPI|l3_verifie|builds/banc-kev|da3a79c245cb|0
+KPI|l3_verifie|builds/banc-mauvais-role|62ec63937e6e|0
+KPI|l3_verifie|builds/banc-pins|7997e44ce0c0|0
+KPI|l3_verifie|builds/banc-prov-forgee|1df1146f9240|0
+KPI|l3_verifie|builds/banc-prov-seule|dc3dd1314760|0
+KPI|l3_verifie|builds/banc-prov-tache|8d95c413b9c4|0
+KPI|l3_verifie|builds/banc-role-prov|2a6ff1407322|0
+KPI|l3_verifie|builds/banc-sans-sig|de5b1ebb482a|0
+KPI|l3_verifie|builds/banc-sans-vsa|563f99592829|0
+KPI|l3_verifie|builds/banc-sig-forgee|1354300c72b8|0
+KPI|l3_verifie|builds/banc-vsa-failed|6b9de77a4a59|0
+KPI|pin_date:image:a"} 1:666666666666|builds/banc-pins|7997e44ce0c0|non épinglé dans git
+KPI|pin_date:image:inconnu:555555555555|builds/banc-pins|7997e44ce0c0|non épinglé dans git
+KPI|pin_date:image:jamais:444444444444|builds/banc-pins|7997e44ce0c0|non épinglé dans git
+KPI|pin_date:image:present:222222222222|builds/banc-pins|7997e44ce0c0|1793287629
+KPI|pin_date:image:retire:333333333333|builds/banc-pins|7997e44ce0c0|non épinglé dans git
+KPI|pin_date:source:source.git:222222222222|builds/banc-pins|7997e44ce0c0|1793287629
+KPI|pin_date:tache:t:777777777777|builds/banc-pins|7997e44ce0c0|non épinglé dans git
+KPI|provenance_chains_verifiee|builds/banc-att-illisible|32717a16df2c|0
+KPI|provenance_chains_verifiee|builds/banc-complet|b621e90b00b8|1
+KPI|provenance_chains_verifiee|builds/banc-forge|3eb46c2d327a|1
+KPI|provenance_chains_verifiee|builds/banc-illisible|b749fb2a8ab1|1
+KPI|provenance_chains_verifiee|builds/banc-kev|da3a79c245cb|1
+KPI|provenance_chains_verifiee|builds/banc-mauvais-role|62ec63937e6e|1
+KPI|provenance_chains_verifiee|builds/banc-pins|7997e44ce0c0|1
+KPI|provenance_chains_verifiee|builds/banc-prov-forgee|1df1146f9240|0
+KPI|provenance_chains_verifiee|builds/banc-prov-seule|dc3dd1314760|1
+KPI|provenance_chains_verifiee|builds/banc-prov-tache|8d95c413b9c4|0
+KPI|provenance_chains_verifiee|builds/banc-role-prov|2a6ff1407322|0
+KPI|provenance_chains_verifiee|builds/banc-sans-sig|de5b1ebb482a|0
+KPI|provenance_chains_verifiee|builds/banc-sans-vsa|563f99592829|1
+KPI|provenance_chains_verifiee|builds/banc-sig-forgee|1354300c72b8|0
+KPI|provenance_chains_verifiee|builds/banc-vsa-failed|6b9de77a4a59|1
+KPI|provenances_pipelinerun|builds/banc-att-illisible|32717a16df2c|1
+KPI|provenances_pipelinerun|builds/banc-complet|b621e90b00b8|1
+KPI|provenances_pipelinerun|builds/banc-forge|3eb46c2d327a|1
+KPI|provenances_pipelinerun|builds/banc-illisible|b749fb2a8ab1|1
+KPI|provenances_pipelinerun|builds/banc-kev|da3a79c245cb|1
+KPI|provenances_pipelinerun|builds/banc-mauvais-role|62ec63937e6e|1
+KPI|provenances_pipelinerun|builds/banc-pins|7997e44ce0c0|2
+KPI|provenances_pipelinerun|builds/banc-prov-forgee|1df1146f9240|0
+KPI|provenances_pipelinerun|builds/banc-prov-seule|dc3dd1314760|1
+KPI|provenances_pipelinerun|builds/banc-prov-tache|8d95c413b9c4|0
+KPI|provenances_pipelinerun|builds/banc-role-prov|2a6ff1407322|0
+KPI|provenances_pipelinerun|builds/banc-sans-sig|de5b1ebb482a|1
+KPI|provenances_pipelinerun|builds/banc-sans-vsa|563f99592829|1
+KPI|provenances_pipelinerun|builds/banc-sig-forgee|1354300c72b8|1
+KPI|provenances_pipelinerun|builds/banc-vsa-failed|6b9de77a4a59|1
+KPI|replay_identique|builds/banc-att-illisible|32717a16df2c|0
+KPI|replay_identique|builds/banc-complet|b621e90b00b8|1
+KPI|replay_identique|builds/banc-forge|3eb46c2d327a|0
+KPI|replay_identique|builds/banc-illisible|b749fb2a8ab1|0
+KPI|replay_identique|builds/banc-kev|da3a79c245cb|0
+KPI|replay_identique|builds/banc-mauvais-role|62ec63937e6e|0
+KPI|replay_identique|builds/banc-pins|7997e44ce0c0|0
+KPI|replay_identique|builds/banc-prov-forgee|1df1146f9240|0
+KPI|replay_identique|builds/banc-prov-seule|dc3dd1314760|0
+KPI|replay_identique|builds/banc-prov-tache|8d95c413b9c4|0
+KPI|replay_identique|builds/banc-role-prov|2a6ff1407322|0
+KPI|replay_identique|builds/banc-sans-sig|de5b1ebb482a|0
+KPI|replay_identique|builds/banc-sans-vsa|563f99592829|0
+KPI|replay_identique|builds/banc-sig-forgee|1354300c72b8|0
+KPI|replay_identique|builds/banc-vsa-failed|6b9de77a4a59|0
+KPI|scan_date|builds/banc-att-illisible|32717a16df2c|absent
+KPI|scan_date|builds/banc-complet|b621e90b00b8|1795132800
+KPI|scan_date|builds/banc-forge|3eb46c2d327a|1795132800
+KPI|scan_date|builds/banc-illisible|b749fb2a8ab1|1795132800
+KPI|scan_date|builds/banc-kev|da3a79c245cb|1794268800
+KPI|scan_date|builds/banc-mauvais-role|62ec63937e6e|absent
+KPI|scan_date|builds/banc-pins|7997e44ce0c0|absent
+KPI|scan_date|builds/banc-prov-forgee|1df1146f9240|absent
+KPI|scan_date|builds/banc-prov-seule|dc3dd1314760|absent
+KPI|scan_date|builds/banc-prov-tache|8d95c413b9c4|absent
+KPI|scan_date|builds/banc-role-prov|2a6ff1407322|absent
+KPI|scan_date|builds/banc-sans-sig|de5b1ebb482a|absent
+KPI|scan_date|builds/banc-sans-vsa|563f99592829|1795132800
+KPI|scan_date|builds/banc-sig-forgee|1354300c72b8|absent
+KPI|scan_date|builds/banc-vsa-failed|6b9de77a4a59|1795132800
+KPI|scan_ecartees|builds/banc-att-illisible|32717a16df2c|absent
+KPI|scan_ecartees|builds/banc-complet|b621e90b00b8|2
+KPI|scan_ecartees|builds/banc-forge|3eb46c2d327a|0
+KPI|scan_ecartees|builds/banc-illisible|b749fb2a8ab1|0
+KPI|scan_ecartees|builds/banc-kev|da3a79c245cb|1
+KPI|scan_ecartees|builds/banc-mauvais-role|62ec63937e6e|absent
+KPI|scan_ecartees|builds/banc-pins|7997e44ce0c0|absent
+KPI|scan_ecartees|builds/banc-prov-forgee|1df1146f9240|absent
+KPI|scan_ecartees|builds/banc-prov-seule|dc3dd1314760|absent
+KPI|scan_ecartees|builds/banc-prov-tache|8d95c413b9c4|absent
+KPI|scan_ecartees|builds/banc-role-prov|2a6ff1407322|absent
+KPI|scan_ecartees|builds/banc-sans-sig|de5b1ebb482a|absent
+KPI|scan_ecartees|builds/banc-sans-vsa|563f99592829|0
+KPI|scan_ecartees|builds/banc-sig-forgee|1354300c72b8|absent
+KPI|scan_ecartees|builds/banc-vsa-failed|6b9de77a4a59|0
+KPI|scan_entrees|builds/banc-att-illisible|32717a16df2c|absent
+KPI|scan_entrees|builds/banc-complet|b621e90b00b8|3
+KPI|scan_entrees|builds/banc-forge|3eb46c2d327a|1
+KPI|scan_entrees|builds/banc-illisible|b749fb2a8ab1|1
+KPI|scan_entrees|builds/banc-kev|da3a79c245cb|2
+KPI|scan_entrees|builds/banc-mauvais-role|62ec63937e6e|absent
+KPI|scan_entrees|builds/banc-pins|7997e44ce0c0|absent
+KPI|scan_entrees|builds/banc-prov-forgee|1df1146f9240|absent
+KPI|scan_entrees|builds/banc-prov-seule|dc3dd1314760|absent
+KPI|scan_entrees|builds/banc-prov-tache|8d95c413b9c4|absent
+KPI|scan_entrees|builds/banc-role-prov|2a6ff1407322|absent
+KPI|scan_entrees|builds/banc-sans-sig|de5b1ebb482a|absent
+KPI|scan_entrees|builds/banc-sans-vsa|563f99592829|0
+KPI|scan_entrees|builds/banc-sig-forgee|1354300c72b8|absent
+KPI|scan_entrees|builds/banc-vsa-failed|6b9de77a4a59|1
+KPI|scan_kev_ecartees|builds/banc-att-illisible|32717a16df2c|absent
+KPI|scan_kev_ecartees|builds/banc-complet|b621e90b00b8|1
+KPI|scan_kev_ecartees|builds/banc-forge|3eb46c2d327a|0
+KPI|scan_kev_ecartees|builds/banc-illisible|b749fb2a8ab1|0
+KPI|scan_kev_ecartees|builds/banc-kev|da3a79c245cb|1
+KPI|scan_kev_ecartees|builds/banc-mauvais-role|62ec63937e6e|absent
+KPI|scan_kev_ecartees|builds/banc-pins|7997e44ce0c0|absent
+KPI|scan_kev_ecartees|builds/banc-prov-forgee|1df1146f9240|absent
+KPI|scan_kev_ecartees|builds/banc-prov-seule|dc3dd1314760|absent
+KPI|scan_kev_ecartees|builds/banc-prov-tache|8d95c413b9c4|absent
+KPI|scan_kev_ecartees|builds/banc-role-prov|2a6ff1407322|absent
+KPI|scan_kev_ecartees|builds/banc-sans-sig|de5b1ebb482a|absent
+KPI|scan_kev_ecartees|builds/banc-sans-vsa|563f99592829|0
+KPI|scan_kev_ecartees|builds/banc-sig-forgee|1354300c72b8|absent
+KPI|scan_kev_ecartees|builds/banc-vsa-failed|6b9de77a4a59|0
+KPI|scan_kev|builds/banc-att-illisible|32717a16df2c|absent
+KPI|scan_kev|builds/banc-complet|b621e90b00b8|1
+KPI|scan_kev|builds/banc-forge|3eb46c2d327a|1
+KPI|scan_kev|builds/banc-illisible|b749fb2a8ab1|1
+KPI|scan_kev|builds/banc-kev|da3a79c245cb|2
+KPI|scan_kev|builds/banc-mauvais-role|62ec63937e6e|absent
+KPI|scan_kev|builds/banc-pins|7997e44ce0c0|absent
+KPI|scan_kev|builds/banc-prov-forgee|1df1146f9240|absent
+KPI|scan_kev|builds/banc-prov-seule|dc3dd1314760|absent
+KPI|scan_kev|builds/banc-prov-tache|8d95c413b9c4|absent
+KPI|scan_kev|builds/banc-role-prov|2a6ff1407322|absent
+KPI|scan_kev|builds/banc-sans-sig|de5b1ebb482a|absent
+KPI|scan_kev|builds/banc-sans-vsa|563f99592829|0
+KPI|scan_kev|builds/banc-sig-forgee|1354300c72b8|absent
+KPI|scan_kev|builds/banc-vsa-failed|6b9de77a4a59|1
+KPI|taux_l3_verifie|-|-|1/15
+KPI|taux_provenance_chains_verifiee|-|-|9/15
+KPI|taux_replay_identique|-|-|1/15
+KPI|vex_verifies|builds/banc-att-illisible|32717a16df2c|0
+KPI|vex_verifies|builds/banc-complet|b621e90b00b8|1
+KPI|vex_verifies|builds/banc-forge|3eb46c2d327a|0
+KPI|vex_verifies|builds/banc-illisible|b749fb2a8ab1|0
+KPI|vex_verifies|builds/banc-kev|da3a79c245cb|0
+KPI|vex_verifies|builds/banc-mauvais-role|62ec63937e6e|0
+KPI|vex_verifies|builds/banc-pins|7997e44ce0c0|0
+KPI|vex_verifies|builds/banc-prov-forgee|1df1146f9240|0
+KPI|vex_verifies|builds/banc-prov-seule|dc3dd1314760|0
+KPI|vex_verifies|builds/banc-prov-tache|8d95c413b9c4|0
+KPI|vex_verifies|builds/banc-role-prov|2a6ff1407322|0
+KPI|vex_verifies|builds/banc-sans-sig|de5b1ebb482a|0
+KPI|vex_verifies|builds/banc-sans-vsa|563f99592829|0
+KPI|vex_verifies|builds/banc-sig-forgee|1354300c72b8|0
+KPI|vex_verifies|builds/banc-vsa-failed|6b9de77a4a59|0
+KPI|violations_licences|-|-|source absente
+## 4. comparaisons
+OK   Loki : scans dont le nombre d'entrées (couples id et paquet) diffère de leur résumé : 0
+KO   Loki : lignes d'entrées lues (le zéro KEV n'est pas à vide) : False (attendu True)
+OK   sujets produits : 15
+## bilan : 5 cas, 1 écart(s)
+## exportateur, signatures comptées
+kpi : 142 séries
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-complet",digest="b621e90b00b8"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-complet",digest="b621e90b00b8"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|comptees|kpi_scan_ecartees{depot="builds/banc-complet",digest="b621e90b00b8"} 2
+PROM|comptees|kpi_scan_entrees{depot="builds/banc-complet",digest="b621e90b00b8"} 3
+PROM|comptees|kpi_scan_kev{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|comptees|kpi_scan_kev_ecartees{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|comptees|kpi_scan_timestamp_seconds{depot="builds/banc-complet",digest="b621e90b00b8"} 1795132800
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-sans-vsa",digest="563f99592829"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-sans-vsa",digest="563f99592829"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|comptees|kpi_scan_ecartees{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|comptees|kpi_scan_entrees{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|comptees|kpi_scan_kev{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|comptees|kpi_scan_kev_ecartees{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|comptees|kpi_scan_timestamp_seconds{depot="builds/banc-sans-vsa",digest="563f99592829"} 1795132800
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|comptees|kpi_scan_ecartees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|comptees|kpi_scan_entrees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 1
+PROM|comptees|kpi_scan_kev{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 1
+PROM|comptees|kpi_scan_kev_ecartees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|comptees|kpi_scan_timestamp_seconds{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 1795132800
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-forge",digest="3eb46c2d327a"} 1
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-forge",digest="3eb46c2d327a"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-forge",digest="3eb46c2d327a"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-forge",digest="3eb46c2d327a"} 1
+PROM|comptees|kpi_scan_ecartees{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|comptees|kpi_scan_entrees{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|comptees|kpi_scan_kev{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|comptees|kpi_scan_kev_ecartees{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|comptees|kpi_scan_timestamp_seconds{depot="builds/banc-forge",digest="3eb46c2d327a"} 1795219200
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-forge",digest="3eb46c2d327a"} 1
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 0
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|comptees|kpi_replay_identique{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 1
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 1
+PROM|comptees|kpi_scan_ecartees{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 0
+PROM|comptees|kpi_scan_entrees{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 1
+PROM|comptees|kpi_scan_kev{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 1
+PROM|comptees|kpi_scan_kev_ecartees{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 0
+PROM|comptees|kpi_scan_timestamp_seconds{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 1795132800
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 1
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-role-prov",digest="2a6ff1407322"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-role-prov",digest="2a6ff1407322"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1
+PROM|comptees|kpi_scan_ecartees{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|comptees|kpi_scan_entrees{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|comptees|kpi_scan_kev{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|comptees|kpi_scan_kev_ecartees{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|comptees|kpi_scan_timestamp_seconds{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1795219200
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-att-illisible",digest="32717a16df2c"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-att-illisible",digest="32717a16df2c"} 2
+PROM|comptees|kpi_replay_identique{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-kev",digest="da3a79c245cb"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-kev",digest="da3a79c245cb"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-kev",digest="da3a79c245cb"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-kev",digest="da3a79c245cb"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-kev",digest="da3a79c245cb"} 1
+PROM|comptees|kpi_replay_identique{depot="builds/banc-kev",digest="da3a79c245cb"} 0
+PROM|comptees|kpi_scan_ecartees{depot="builds/banc-kev",digest="da3a79c245cb"} 1
+PROM|comptees|kpi_scan_entrees{depot="builds/banc-kev",digest="da3a79c245cb"} 2
+PROM|comptees|kpi_scan_kev{depot="builds/banc-kev",digest="da3a79c245cb"} 2
+PROM|comptees|kpi_scan_kev_ecartees{depot="builds/banc-kev",digest="da3a79c245cb"} 1
+PROM|comptees|kpi_scan_timestamp_seconds{depot="builds/banc-kev",digest="da3a79c245cb"} 1794268800
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-kev",digest="da3a79c245cb"} 0
+PROM|comptees|kpi_pin_timestamp_seconds{depot="builds/banc-pins",digest="7997e44ce0c0",genre="image",nom="forge",pin="222222222222",retire="0"} 1700000002
+PROM|comptees|kpi_pins_non_releves{depot="builds/banc-pins",digest="7997e44ce0c0"} 0
+PROM|comptees|kpi_enonces_refuses{depot="builds/banc-pins",digest="7997e44ce0c0"} 0
+PROM|comptees|kpi_l3_verifie{depot="builds/banc-pins",digest="7997e44ce0c0"} 0
+PROM|comptees|kpi_provenance_chains_verifiee{depot="builds/banc-pins",digest="7997e44ce0c0"} 1
+PROM|comptees|kpi_provenances_pipelinerun{depot="builds/banc-pins",digest="7997e44ce0c0"} 3
+PROM|comptees|kpi_replay_identique{depot="builds/banc-pins",digest="7997e44ce0c0"} 0
+PROM|comptees|kpi_vex_verifies{depot="builds/banc-pins",digest="7997e44ce0c0"} 0
+PROM|comptees|kpi_exportateur_journal_timestamp_seconds 1795552162
+PROM|comptees|kpi_exportateur_passage_timestamp_seconds 1795552165
+## exportateur, signatures vérifiées
+kpi : 293 séries
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-complet",digest="b621e90b00b8"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-complet",digest="b621e90b00b8"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|verifiees|kpi_scan_ecartees{depot="builds/banc-complet",digest="b621e90b00b8"} 2
+PROM|verifiees|kpi_scan_entrees{depot="builds/banc-complet",digest="b621e90b00b8"} 3
+PROM|verifiees|kpi_scan_kev{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|verifiees|kpi_scan_kev_ecartees{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|verifiees|kpi_scan_timestamp_seconds{depot="builds/banc-complet",digest="b621e90b00b8"} 1795132800
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-complet",digest="b621e90b00b8"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-complet",digest="b621e90b00b8",famille="prov"} 2
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-complet",digest="b621e90b00b8",famille="scan"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-complet",digest="b621e90b00b8",famille="sig"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-complet",digest="b621e90b00b8",famille="vex"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-complet",digest="b621e90b00b8",famille="vsa"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-complet",digest="b621e90b00b8",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-complet",digest="b621e90b00b8",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-complet",digest="b621e90b00b8",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-complet",digest="b621e90b00b8",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-complet",digest="b621e90b00b8",famille="vsa"} 0
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-sans-vsa",digest="563f99592829"} 1
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-sans-vsa",digest="563f99592829"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|verifiees|kpi_scan_ecartees{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|verifiees|kpi_scan_entrees{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|verifiees|kpi_scan_kev{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|verifiees|kpi_scan_kev_ecartees{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|verifiees|kpi_scan_timestamp_seconds{depot="builds/banc-sans-vsa",digest="563f99592829"} 1795132800
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-sans-vsa",digest="563f99592829"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sans-vsa",digest="563f99592829",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sans-vsa",digest="563f99592829",famille="scan"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sans-vsa",digest="563f99592829",famille="sig"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sans-vsa",digest="563f99592829",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sans-vsa",digest="563f99592829",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sans-vsa",digest="563f99592829",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sans-vsa",digest="563f99592829",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sans-vsa",digest="563f99592829",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sans-vsa",digest="563f99592829",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sans-vsa",digest="563f99592829",famille="vsa"} 0
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 1
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|verifiees|kpi_scan_ecartees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|verifiees|kpi_scan_entrees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 1
+PROM|verifiees|kpi_scan_kev{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 1
+PROM|verifiees|kpi_scan_kev_ecartees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|verifiees|kpi_scan_timestamp_seconds{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 1795132800
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-vsa-failed",digest="6b9de77a4a59"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59",famille="scan"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59",famille="sig"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59",famille="vsa"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-vsa-failed",digest="6b9de77a4a59",famille="vsa"} 0
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-forge",digest="3eb46c2d327a"} 1
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-forge",digest="3eb46c2d327a"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|verifiees|kpi_scan_ecartees{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|verifiees|kpi_scan_entrees{depot="builds/banc-forge",digest="3eb46c2d327a"} 1
+PROM|verifiees|kpi_scan_kev{depot="builds/banc-forge",digest="3eb46c2d327a"} 1
+PROM|verifiees|kpi_scan_kev_ecartees{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|verifiees|kpi_scan_timestamp_seconds{depot="builds/banc-forge",digest="3eb46c2d327a"} 1795132800
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-forge",digest="3eb46c2d327a"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-forge",digest="3eb46c2d327a",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-forge",digest="3eb46c2d327a",famille="scan"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-forge",digest="3eb46c2d327a",famille="sig"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-forge",digest="3eb46c2d327a",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-forge",digest="3eb46c2d327a",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-forge",digest="3eb46c2d327a",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-forge",digest="3eb46c2d327a",famille="scan"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-forge",digest="3eb46c2d327a",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-forge",digest="3eb46c2d327a",famille="vex"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-forge",digest="3eb46c2d327a",famille="vsa"} 1
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-prov-forgee",digest="1df1146f9240"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-forgee",digest="1df1146f9240",famille="prov"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-forgee",digest="1df1146f9240",famille="scan"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-forgee",digest="1df1146f9240",famille="sig"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-forgee",digest="1df1146f9240",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-forgee",digest="1df1146f9240",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-forgee",digest="1df1146f9240",famille="prov"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-forgee",digest="1df1146f9240",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-forgee",digest="1df1146f9240",famille="sig"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-forgee",digest="1df1146f9240",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-forgee",digest="1df1146f9240",famille="vsa"} 0
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 1
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 0
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-prov-seule",digest="dc3dd1314760"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-seule",digest="dc3dd1314760",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-seule",digest="dc3dd1314760",famille="scan"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-seule",digest="dc3dd1314760",famille="sig"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-seule",digest="dc3dd1314760",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-seule",digest="dc3dd1314760",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-seule",digest="dc3dd1314760",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-seule",digest="dc3dd1314760",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-seule",digest="dc3dd1314760",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-seule",digest="dc3dd1314760",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-seule",digest="dc3dd1314760",famille="vsa"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-prov-tache",digest="8d95c413b9c4"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-tache",digest="8d95c413b9c4",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-tache",digest="8d95c413b9c4",famille="scan"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-tache",digest="8d95c413b9c4",famille="sig"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-tache",digest="8d95c413b9c4",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-prov-tache",digest="8d95c413b9c4",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-tache",digest="8d95c413b9c4",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-tache",digest="8d95c413b9c4",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-tache",digest="8d95c413b9c4",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-tache",digest="8d95c413b9c4",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-prov-tache",digest="8d95c413b9c4",famille="vsa"} 0
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-sans-sig",digest="de5b1ebb482a"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sans-sig",digest="de5b1ebb482a",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sans-sig",digest="de5b1ebb482a",famille="scan"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sans-sig",digest="de5b1ebb482a",famille="sig"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sans-sig",digest="de5b1ebb482a",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sans-sig",digest="de5b1ebb482a",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sans-sig",digest="de5b1ebb482a",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sans-sig",digest="de5b1ebb482a",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sans-sig",digest="de5b1ebb482a",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sans-sig",digest="de5b1ebb482a",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sans-sig",digest="de5b1ebb482a",famille="vsa"} 0
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 1
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 0
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-mauvais-role",digest="62ec63937e6e"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-mauvais-role",digest="62ec63937e6e",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-mauvais-role",digest="62ec63937e6e",famille="scan"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-mauvais-role",digest="62ec63937e6e",famille="sig"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-mauvais-role",digest="62ec63937e6e",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-mauvais-role",digest="62ec63937e6e",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-mauvais-role",digest="62ec63937e6e",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-mauvais-role",digest="62ec63937e6e",famille="scan"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-mauvais-role",digest="62ec63937e6e",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-mauvais-role",digest="62ec63937e6e",famille="vex"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-mauvais-role",digest="62ec63937e6e",famille="vsa"} 1
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-role-prov",digest="2a6ff1407322"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-role-prov",digest="2a6ff1407322",famille="prov"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-role-prov",digest="2a6ff1407322",famille="scan"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-role-prov",digest="2a6ff1407322",famille="sig"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-role-prov",digest="2a6ff1407322",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-role-prov",digest="2a6ff1407322",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-role-prov",digest="2a6ff1407322",famille="prov"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-role-prov",digest="2a6ff1407322",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-role-prov",digest="2a6ff1407322",famille="sig"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-role-prov",digest="2a6ff1407322",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-role-prov",digest="2a6ff1407322",famille="vsa"} 0
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-sig-forgee",digest="1354300c72b8"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sig-forgee",digest="1354300c72b8",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sig-forgee",digest="1354300c72b8",famille="scan"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sig-forgee",digest="1354300c72b8",famille="sig"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sig-forgee",digest="1354300c72b8",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-sig-forgee",digest="1354300c72b8",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sig-forgee",digest="1354300c72b8",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sig-forgee",digest="1354300c72b8",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sig-forgee",digest="1354300c72b8",famille="sig"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sig-forgee",digest="1354300c72b8",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-sig-forgee",digest="1354300c72b8",famille="vsa"} 0
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|verifiees|kpi_scan_ecartees{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|verifiees|kpi_scan_entrees{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1
+PROM|verifiees|kpi_scan_kev{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1
+PROM|verifiees|kpi_scan_kev_ecartees{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|verifiees|kpi_scan_timestamp_seconds{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 1795132800
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-illisible",digest="b749fb2a8ab1"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-illisible",digest="b749fb2a8ab1",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-illisible",digest="b749fb2a8ab1",famille="scan"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-illisible",digest="b749fb2a8ab1",famille="sig"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-illisible",digest="b749fb2a8ab1",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-illisible",digest="b749fb2a8ab1",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-illisible",digest="b749fb2a8ab1",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-illisible",digest="b749fb2a8ab1",famille="scan"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-illisible",digest="b749fb2a8ab1",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-illisible",digest="b749fb2a8ab1",famille="vex"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-illisible",digest="b749fb2a8ab1",famille="vsa"} 1
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-att-illisible",digest="32717a16df2c"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-att-illisible",digest="32717a16df2c"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-att-illisible",digest="32717a16df2c",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-att-illisible",digest="32717a16df2c",famille="scan"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-att-illisible",digest="32717a16df2c",famille="sig"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-att-illisible",digest="32717a16df2c",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-att-illisible",digest="32717a16df2c",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-att-illisible",digest="32717a16df2c",famille="prov"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-att-illisible",digest="32717a16df2c",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-att-illisible",digest="32717a16df2c",famille="sig"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-att-illisible",digest="32717a16df2c",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-att-illisible",digest="32717a16df2c",famille="vsa"} 0
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-kev",digest="da3a79c245cb"} 0
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-kev",digest="da3a79c245cb"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-kev",digest="da3a79c245cb"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-kev",digest="da3a79c245cb"} 1
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-kev",digest="da3a79c245cb"} 1
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-kev",digest="da3a79c245cb"} 0
+PROM|verifiees|kpi_scan_ecartees{depot="builds/banc-kev",digest="da3a79c245cb"} 1
+PROM|verifiees|kpi_scan_entrees{depot="builds/banc-kev",digest="da3a79c245cb"} 2
+PROM|verifiees|kpi_scan_kev{depot="builds/banc-kev",digest="da3a79c245cb"} 2
+PROM|verifiees|kpi_scan_kev_ecartees{depot="builds/banc-kev",digest="da3a79c245cb"} 1
+PROM|verifiees|kpi_scan_timestamp_seconds{depot="builds/banc-kev",digest="da3a79c245cb"} 1794268800
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-kev",digest="da3a79c245cb"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-kev",digest="da3a79c245cb",famille="prov"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-kev",digest="da3a79c245cb",famille="scan"} 3
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-kev",digest="da3a79c245cb",famille="sig"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-kev",digest="da3a79c245cb",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-kev",digest="da3a79c245cb",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-kev",digest="da3a79c245cb",famille="prov"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-kev",digest="da3a79c245cb",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-kev",digest="da3a79c245cb",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-kev",digest="da3a79c245cb",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-kev",digest="da3a79c245cb",famille="vsa"} 0
+PROM|verifiees|kpi_pin_timestamp_seconds{depot="builds/banc-pins",digest="7997e44ce0c0",genre="image",nom="illisible",pin="666666666666",retire="0"} 1700000006
+PROM|verifiees|kpi_pin_non_epingle{depot="builds/banc-pins",digest="7997e44ce0c0",genre="image",nom="jamais",pin="444444444444"} 1
+PROM|verifiees|kpi_pin_timestamp_seconds{depot="builds/banc-pins",digest="7997e44ce0c0",genre="image",nom="present",pin="222222222222",retire="0"} 1700000002
+PROM|verifiees|kpi_pin_timestamp_seconds{depot="builds/banc-pins",digest="7997e44ce0c0",genre="image",nom="retire",pin="333333333333",retire="1"} 1700000003
+PROM|verifiees|kpi_pin_timestamp_seconds{depot="builds/banc-pins",digest="7997e44ce0c0",genre="source",nom="source.git",pin="222222222222",retire="0"} 1700000002
+PROM|verifiees|kpi_pin_timestamp_seconds{depot="builds/banc-pins",digest="7997e44ce0c0",genre="tache",nom="t",pin="777777777777",retire="0"} 1700000007
+PROM|verifiees|kpi_pins_non_releves{depot="builds/banc-pins",digest="7997e44ce0c0"} 1
+PROM|verifiees|kpi_enonces_refuses{depot="builds/banc-pins",digest="7997e44ce0c0"} 0
+PROM|verifiees|kpi_l3_verifie{depot="builds/banc-pins",digest="7997e44ce0c0"} 0
+PROM|verifiees|kpi_provenance_chains_verifiee{depot="builds/banc-pins",digest="7997e44ce0c0"} 1
+PROM|verifiees|kpi_provenances_pipelinerun{depot="builds/banc-pins",digest="7997e44ce0c0"} 2
+PROM|verifiees|kpi_replay_identique{depot="builds/banc-pins",digest="7997e44ce0c0"} 0
+PROM|verifiees|kpi_vex_verifies{depot="builds/banc-pins",digest="7997e44ce0c0"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-pins",digest="7997e44ce0c0",famille="prov"} 3
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-pins",digest="7997e44ce0c0",famille="scan"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-pins",digest="7997e44ce0c0",famille="sig"} 1
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-pins",digest="7997e44ce0c0",famille="vex"} 0
+PROM|verifiees|kpi_signatures_verifiees{depot="builds/banc-pins",digest="7997e44ce0c0",famille="vsa"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-pins",digest="7997e44ce0c0",famille="prov"} 1
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-pins",digest="7997e44ce0c0",famille="scan"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-pins",digest="7997e44ce0c0",famille="sig"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-pins",digest="7997e44ce0c0",famille="vex"} 0
+PROM|verifiees|kpi_signatures_refusees{depot="builds/banc-pins",digest="7997e44ce0c0",famille="vsa"} 0
+PROM|verifiees|kpi_exportateur_journal_timestamp_seconds 1795552162
+PROM|verifiees|kpi_cle_timestamp_seconds{cle="chains",empreinte="a28e9aa187f7"} 1700000011
+PROM|verifiees|kpi_cle_timestamp_seconds{cle="scanner",empreinte="ed9fb93a23b0"} 1700000012
+PROM|verifiees|kpi_cles_non_relevees 3
+PROM|verifiees|kpi_exportateur_passage_timestamp_seconds 1795552166
+## comparaison (code du recalcul 1, de l'exportateur : comptées 0, vérifiées 0)
+DIFF|recalcul|kev_delais|builds/banc-kev|None|attendu [('CVE-2026-90001', 1793491200, 1794139200), ('CVE-2026-90002', 1793491200, 1794268800), ('CVE-2026-90003', 1794268800, None)]
+KO   recalcul : valeurs différentes des attendus écrits à la main, sur 200 : 1 (attendu 0)
+DIFF|exportateur, comptées|kev_delais|builds/banc-kev|None|attendu [('CVE-2026-90001', 1793491200, 1794139200), ('CVE-2026-90002', 1793491200, 1794268800), ('CVE-2026-90003', 1794268800, None)]
+KO   exportateur, comptées : valeurs différentes des attendus écrits à la main, sur 200 : 1 (attendu 0)
+DIFF|exportateur, vérifiées|kev_delais|builds/banc-kev|None|attendu [('CVE-2026-90001', 1793491200, 1794139200), ('CVE-2026-90002', 1793491200, 1794268800), ('CVE-2026-90003', 1794268800, None)]
+KO   exportateur, vérifiées : valeurs différentes des attendus écrits à la main, sur 200 : 1 (attendu 0)
+ECART|comptées|couverture_vex_entrees|builds/banc-forge|recalcul 0/1|exportateur sans objet
+ECART|comptées|couverture_vex_entrees|builds/banc-illisible|recalcul 0/1|exportateur sans objet
+ECART|comptées|couverture_vex_entrees|builds/banc-mauvais-role|recalcul absent|exportateur 0/1
+ECART|comptées|couverture_vex_kev|builds/banc-forge|recalcul 0/1|exportateur sans objet
+ECART|comptées|couverture_vex_kev|builds/banc-illisible|recalcul 0/1|exportateur sans objet
+ECART|comptées|couverture_vex_kev|builds/banc-mauvais-role|recalcul absent|exportateur 0/1
+ECART|comptées|kev_ouvertes|builds/banc-forge|recalcul 1|exportateur 0
+ECART|comptées|kev_ouvertes|builds/banc-illisible|recalcul 1|exportateur 0
+ECART|comptées|kev_ouvertes|builds/banc-mauvais-role|recalcul absent|exportateur 1
+ECART|comptées|l3_verifie|builds/banc-forge|recalcul 0|exportateur 1
+ECART|comptées|l3_verifie|builds/banc-illisible|recalcul 0|exportateur 1
+ECART|comptées|l3_verifie|builds/banc-mauvais-role|recalcul 0|exportateur 1
+ECART|comptées|provenance_chains_verifiee|builds/banc-att-illisible|recalcul 0|exportateur 1
+ECART|comptées|provenance_chains_verifiee|builds/banc-prov-forgee|recalcul 0|exportateur 1
+ECART|comptées|provenance_chains_verifiee|builds/banc-role-prov|recalcul 0|exportateur 1
+ECART|comptées|provenance_chains_verifiee|builds/banc-sig-forgee|recalcul 0|exportateur 1
+ECART|comptées|provenances_pipelinerun|builds/banc-att-illisible|recalcul 1|exportateur 2
+ECART|comptées|provenances_pipelinerun|builds/banc-pins|recalcul 2|exportateur 3
+ECART|comptées|provenances_pipelinerun|builds/banc-prov-forgee|recalcul 0|exportateur 1
+ECART|comptées|provenances_pipelinerun|builds/banc-role-prov|recalcul 0|exportateur 1
+ECART|comptées|replay_identique|builds/banc-forge|recalcul 0|exportateur 1
+ECART|comptées|replay_identique|builds/banc-illisible|recalcul 0|exportateur 1
+ECART|comptées|replay_identique|builds/banc-mauvais-role|recalcul 0|exportateur 1
+ECART|comptées|scan_date|builds/banc-forge|recalcul 1795132800|exportateur 1795219200
+ECART|comptées|scan_date|builds/banc-illisible|recalcul 1795132800|exportateur 1795219200
+ECART|comptées|scan_date|builds/banc-mauvais-role|recalcul absent|exportateur 1795132800
+ECART|comptées|scan_ecartees|builds/banc-mauvais-role|recalcul absent|exportateur 0
+ECART|comptées|scan_entrees|builds/banc-forge|recalcul 1|exportateur 0
+ECART|comptées|scan_entrees|builds/banc-illisible|recalcul 1|exportateur 0
+ECART|comptées|scan_entrees|builds/banc-mauvais-role|recalcul absent|exportateur 1
+ECART|comptées|scan_kev|builds/banc-forge|recalcul 1|exportateur 0
+ECART|comptées|scan_kev|builds/banc-illisible|recalcul 1|exportateur 0
+ECART|comptées|scan_kev|builds/banc-mauvais-role|recalcul absent|exportateur 1
+ECART|comptées|scan_kev_ecartees|builds/banc-mauvais-role|recalcul absent|exportateur 0
+ECART|comptées|taux_l3_verifie|-|recalcul 1/15|exportateur 4/15
+ECART|comptées|taux_provenance_chains_verifiee|-|recalcul 9/15|exportateur 13/15
+ECART|comptées|taux_replay_identique|-|recalcul 1/15|exportateur 4/15
+ECART|comptées|vex_verifies|builds/banc-forge|recalcul 0|exportateur 1
+ECART|comptées|vex_verifies|builds/banc-illisible|recalcul 0|exportateur 1
+ECART|comptées|vex_verifies|builds/banc-mauvais-role|recalcul 0|exportateur 1
+OK   comptées : écarts avec le recalcul hors des témoins à signature fausse et des taux : 0
+OK   comptées : écarts avec le recalcul dus aux signatures fausses : 40
+OK   vérifiées : écarts avec le recalcul : 0
+OK   vérifiées : comptes [vérifiées, refusées] par sujet et famille différents des lignes DETAIL du recalcul : 0
+OK   vérifiées : attestations [vérifiées, refusées] : [27, 13]
+OK   vérifiées : signatures d'image vérifiées, par sujet, différentes du recalcul : 0
+OK   vérifiées : signatures d'image [vérifiées, refusées] : [10, 4]
+OK   énoncés refusés pour leur forme [comptées, vérifiées] : [0, 0]
+OK   comptées : dates des pins de banc-pins : {('image', 'forge', '222222222222', '0'): '1700000002'}
+OK   comptées : pins datés d'un autre sujet : 0
+OK   comptées : dépendances de banc-pins inconnues du relevé : 0
+OK   comptées : clés datées : {}
+OK   comptées : clés sans date : None
+OK   comptées : heures du passage et du journal, en ordre : True
+OK   vérifiées : dates des pins de banc-pins : {('image', 'illisible', '666666666666', '0'): '1700000006', ('image', 'jamais', '444444444444', None): 'non épinglé', ('image', 'present', '222222222222', '0'): '1700000002', ('image', 'retire', '333333333333', '1'): '1700000003', ('source', 'source.git', '222222222222', '0'): '1700000002', ('tache', 't', '777777777777', '0'): '1700000007'}
+OK   vérifiées : pins datés d'un autre sujet : 0
+OK   vérifiées : dépendances de banc-pins inconnues du relevé : 1
+OK   vérifiées : clés datées : {'chains': '1700000011', 'scanner': '1700000012'}
+OK   vérifiées : clés sans date : 3
+OK   vérifiées : heures du passage et du journal, en ordre : True
+OK   comptées : séries kpi_signatures_* : 0
+## bilan : 24 cas, 3 écart(s)
+## journal injecté, Python 3.13
+OK   journal injecté : lignes mal formées dans le .prom : 0
+KO   journal injecté : séries de KEV illisible : 0 (attendu 1)
+OK   même sortie sous Python 3.13 (heure du passage exclue) : 0
+OK   sortie sous Python 3.13 non vide : oui
+## lecteur de Loki, serveur factice
+OK   lecteur, réponse « bon » : code 0, journal : 2 lignes
+OK   lecteur, réponse « sans frames » : code 0, journal : 0 lignes
+OK   lecteur, réponse « tronqué » : code 2, refus : Refus : 5000 lignes, réponse peut-être tronquée
+OK   lecteur, réponse « erreur » : code 2, refus : Refus : requête en erreur
+OK   lecteur, réponse « saut de ligne » : code 2, refus : Refus : ligne illisible
+OK   lecteur, réponse « JSON coupé » : code 2, refus : JSONDecodeError
+OK   lecteur, réponse « sans A » : code 2, refus : KeyError
+OK   lecteur, réponse « 401 » : code 2, refus : HTTPError 401
+OK   lecteur, réponse « sans mot de passe » : code 2, refus : FileNotFoundError
+OK   lecteur, réponse « arrêté » : code 2, refus : URLError
+OK   lecteur : authentification, fenêtre de 719 h et requête des KEV envoyées
+## bilan du lecteur : 11 cas, 0 écart(s)
+## arrêts de l'exportateur : code 2, motif attendu, fichier inchangé
+OK   SIGNATURES absent
+OK   SIGNATURES inconnu
+OK   CLES absent
+OK   clé de la VSA absente
+OK   clé de la VSA illisible
+OK   clé de la VSA p384
+OK   clé de la VSA vide
+OK   openssl inutilisable (/dev/null monté dessus)
+OK   vecteur absent
+OK   vecteur différent
+OK   openssl qui accepte tout
+OK   openssl qui refuse tout
+OK   relevé illisible
+OK   relevé absent
+OK   Zot arrêté
+## bilan des arrêts : 15 cas, 0 écart(s)
+## bilan des contrôles de l'étape 4 : 4 cas, 1 écart(s) ; lecteur : code 0

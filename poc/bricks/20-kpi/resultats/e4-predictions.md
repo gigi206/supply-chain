@@ -37,3 +37,9 @@ Commitée avant tout passage. Plan relu par le conseiller. Sans accord : banc je
 ### Limites connues d'avance
 
 `IPAddressDeny`, l'utilisateur dédié, le noyau, systemd et Python de `sc-stockage` ne sont pas exercés. Le lecteur est essayé contre un serveur factice puis contre le vrai Grafana par le compte de l'auditeur, pas sous une unité. Témoins, attendus et outils sont écrits dans la même session.
+
+### Premier passage du banc raté, correction (2026-11-24T20:29:41Z)
+
+[`e4-banc.log`](e4-banc.log) (20:29:15 UTC) : 5 écarts, une seule cause, dans le témoin et non dans l'exportateur. `banc-pins` avait été inséré juste avant l'écriture de `SCANS`, qui désignait donc son digest : `entrees-scan.py` n'a vu aucun scan de `banc-kev`, et les délais de KEV manquaient partout, recalcul compris. Les 15 arrêts, les 11 cas du lecteur et les dates de pins étaient déjà conformes. `banc-kev` est remis en dernier ; attendu inchangé, **59 cas, 0 écart**, journal `e4-banc-2.log`.
+
+Relevé écrit à 20:29:09 UTC : 5 clés, 27 pins, conforme ; `verifier` sera lancé après son commit.
