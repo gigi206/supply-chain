@@ -431,3 +431,18 @@ Accord du propriétaire, verbatim : « J'autorise la bascule ». Sa question cit
 - l'étape 4 de la 07c aurait dû inclure ces unités. Le rejeu de zéro les pose déjà avec `f5e6bcb0` (`s6a.sh`, commit `e61a4da6`) ; ce n'est pas mesuré.
 
 **Heures de la 07c** : plus 16:13:13 à 16:13:49 UTC (0 h 00 min 36 s) ; l'attente de la réponse du propriétaire (15:50:22 à 16:13:13) n'est pas comptée ; **total : au plus 2 h 02 min 36 s** pour 10 h estimées.
+
+## Go 1.26.11 déclaré dans `mise.toml` : prédiction (note de 2026-11-24T16:55:05Z)
+
+Choix du propriétaire, verbatim : « 2 ». Sa question, pendant l'attente de R4 de la brique 10, était « Déclarer Go 1.26.11 dans `mise.toml` maintenant », contre « Attendre R4 ». Le prix cité : une poussée de plus avant R5, puisque `etape_vsa` refuse un HEAD non poussé.
+
+**Changement** : nouvelle tâche `outils:go-1.26.11`, jumelle de `outils:go-1.26.9` et `outils:go-1.27`. `GOROOT_DIR` et `outils:go-toolchain` restent en 1.26.10 : la voie A et les bancs qui les lisent ne changent pas. `voie-d.sh` lit toujours la toolchain dans le cache des modules. La tâche permet maintenant de la retrouver si ce cache est effacé.
+
+**État avant** (16:55:05 UTC) : le module est déjà dans le cache. Le zip fait 71 800 213 octets et a été écrit le 24/11 à 13:12:24 UTC. Son ziphash vaut `h1:KyINmJ/FQdKRmDYGuTAAXkumyeR2DyUlSNHZj7XaLFg=`, la valeur publiée par sum.golang.org (relevée à l'étape 1).
+
+**Prédiction**, `mise run outils:go-1.26.11` → `resultats/mise-go-1.26.11.log` :
+- deux lignes `go version go1.26.11 linux/amd64`, l'une par `GOTOOLCHAIN`, l'autre par le binaire du cache ;
+- aucun nouveau téléchargement : la date et la taille du zip ne changent pas, le ziphash non plus ;
+- `mise tasks` liste `outils:go-1.26.11`.
+
+Rien ne touche au cluster, aux VM ni à Zot.
