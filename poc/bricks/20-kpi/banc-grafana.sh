@@ -6,12 +6,14 @@
 #   - compte Viewer créé par l'API d'administration ; droits mesurés par /api/ds/query, par le proxy de la source et par ses ressources ;
 #   - lecteur_loki.py et kev() de l'exportateur sur des lignes au format de entrees-scan.py (ses fonctions, importées), délais du banc.
 # Limites : ni la VM, ni Alloy, ni la source Prometheus.
-# Usage (racine du dépôt) : [SUFFIXE=-2] mise exec -- bash poc/bricks/20-kpi/banc-grafana.sh   (journal : resultats/e4-banc-grafana<SUFFIXE>.log)
+# VARIANTE=liste : data_source_proxy_whitelist = 127.0.0.1:9090 dans [security] de grafana.ini (la source Prometheus, seule permise au proxy) ;
+# le proxy doit refuser Loki, sans changer /api/ds/query ni les ressources. Sans variante : la configuration en service.
+# Usage (racine du dépôt) : [VARIANTE=liste] [SUFFIXE=-2] mise exec -- bash poc/bricks/20-kpi/banc-grafana.sh   (journal : resultats/e4-banc-grafana<SUFFIXE>.log)
 set -uo pipefail
 export LC_ALL=C.UTF-8
 here=$(cd "$(dirname "$0")" && pwd)
 RACINE=$(cd "$here/../../.." && pwd)
-LOG=$here/resultats/e4-banc-grafana${SUFFIXE:-}.log
+LOG=$here/resultats/e4-banc-grafana${VARIANTE:+-$VARIANTE}${SUFFIXE:-}.log
 export T=$HOME/.cache/supply-chain-poc/20/banc-grafana   # chemin écrit en entier : effacé à la sortie
 A=$HOME/.cache/supply-chain-poc/19b/amont J19=$here/../19b-journalisation
 N=0; KO=0
@@ -76,6 +78,26 @@ if [ "${1:-}" = ns ]; then
   attendu "réponse tronquée : code, fichier inchangé" "$c $([ "$h" = "$(sha256sum < "$T/lignes")" ] && echo oui || echo non)" "2 oui"
   echo "## 6. arrêt de Loki par le proxy, Viewer"
   vie() { echo "Loki $(kill -0 $lp 2> /dev/null && echo vivant || echo arrêté), /ready $("${L[@]}" https://127.0.0.1:3100/ready 2> /dev/null)"; }
+  if [ "${VARIANTE:-}" = liste ]; then
+    echo "## 7. avec la liste : ce qui doit marcher encore, ce qui doit être refusé"
+    attendu "requête normale par /api/ds/query" "$(g kpi-journal POST /api/ds/query "$q") $(grep -c temoin-direct "$T/g.out")" "200 1"
+    attendu "noms d'étiquettes par les ressources (explorateur)" "$(g kpi-journal GET "/api/datasources/uid/loki/resources/labels?start=$(($(date +%s) - 600))000000000&end=$(date +%s)000000000") $(jq -r '.data | index("source") != null' "$T/g.out")" "200 true"
+    attendu "santé de la source (administrateur)" "$(g admin GET /api/datasources/uid/loki/health)" 200
+    attendu "proxy vers la source Prometheus (rien n'écoute : 502, donc permis)" "$(g kpi-journal GET /api/datasources/proxy/uid/prometheus/api/v1/rules)" 502
+    for c in kpi-journal admin; do for x in /config /flush "/log_level?log_level=debug" /loki/api/v1/labels; do
+      attendu "$c, GET proxy $x" "$(g "$c" GET "/api/datasources/proxy/uid/loki$x")" 403
+    done; done
+    for x in uid/loki/ingester/shutdown 2/ingester/shutdown uid/loki//ingester/shutdown uid/loki/%2e%2e/ingester/shutdown uid/loki/loki/api/v1/../../../ingester/shutdown; do
+      c=$(printf 'user = "kpi-journal:%s"\n' "$(cat "$T/kpi-journal.mdp")" | curl -sS -K - --path-as-is --cacert "$T/ca.crt" -o "$T/g.out" -w '%{http_code}' "https://127.0.0.1:3001/api/datasources/proxy/$x"); sleep 4
+      echo "MESURE|GET proxy/$x|HTTP $c|$(head -c 90 "$T/g.out" | tr '\n' ' ')"; attendu "après GET proxy/$x" "$(vie)" "Loki vivant, /ready 200"
+    done
+    for x in ingester/shutdown /ingester/shutdown ../ingester/shutdown ..%2f..%2f..%2fingester%2fshutdown labels/../../../../ingester/shutdown; do
+      c=$(printf 'user = "kpi-journal:%s"\n' "$(cat "$T/kpi-journal.mdp")" | curl -sS -K - --path-as-is --cacert "$T/ca.crt" -o "$T/g.out" -w '%{http_code}' "https://127.0.0.1:3001/api/datasources/uid/loki/resources/$x"); sleep 4
+      echo "MESURE|GET resources/$x|HTTP $c"; attendu "après GET resources/$x" "$(vie)" "Loki vivant, /ready 200"
+    done
+    echo "## bilan : $N cas, $KO écart(s)"
+    [ "$KO" = 0 ]; exit $?
+  fi
   for x in "POST /api/datasources/proxy/uid/loki/ingester/shutdown" "GET /api/datasources/uid/loki/resources/ingester/shutdown" "GET /api/datasources/proxy/uid/loki/ingester/shutdown"; do
     c=$(g kpi-journal "${x%% *}" "${x#* }"); sleep 8; echo "MESURE|$x|HTTP $c|$(vie)"
   done
@@ -115,10 +137,22 @@ YAML
   sed -E "s#^http_addr = .*#http_addr = 127.0.0.1#; s#^domain = .*#domain = 127.0.0.1#; s#^cert_file = .*#cert_file = $T/serveur.crt#; s#^cert_key = .*#cert_key = $T/serveur.key#
     s#^data = .*#data = $T/g-data#; s#^logs = .*#logs = $T/g-log#; s#^plugins = .*#plugins = $T/g-plugins#; s#^provisioning = .*#provisioning = $T/prov#
     s#^admin_password = .*#admin_password = \$__file{$T/admin.mdp}#" "$J19/config/grafana.ini" > "$T/grafana.ini"
+  [ -z "${VARIANTE:-}" ] || sed -i "s/^\[security\]$/[security]\ndata_source_proxy_whitelist = 127.0.0.1:9090/" "$T/grafana.ini"
+  echo "# variante : ${VARIANTE:-configuration en service} ; grafana.ini : $(grep -c data_source_proxy_whitelist "$T/grafana.ini") ligne de liste"
   mkdir -p "$T"/prov/{datasources,dashboards,plugins,alerting}
   sed "s#192.168.161.13#127.0.0.1#; s#/etc/grafana/tls/ca-poc.crt#$T/ca.crt#; s#/etc/grafana/tls/grafana-client#$T/client#" "$J19/config/provisioning/datasources/sources.yaml" > "$T/prov/datasources/sources.yaml"
   echo "# Loki $("$T/loki" -version 2>&1 | head -1 | cut -d' ' -f3), Grafana $("$T/grafana-13.3.0/bin/grafana" --version | cut -d' ' -f3)"
   unshare -rn bash "$here/banc-grafana.sh" ns; r=$?
+  if [ "${VARIANTE:-}" = liste ]; then
+    echo "## 8. systemd (gestionnaire utilisateur) : programme qui sort avec le code 0, relancé ?"
+    for m in on-failure always; do
+      systemd-run --user -q --unit "banc-kpi-$m" -p "Restart=$m" -p RestartSec=1s -p RemainAfterExit=no /usr/bin/sleep 1 2>&1
+      sleep 7; n=$(systemctl --user show -p NRestarts --value "banc-kpi-$m" 2> /dev/null)
+      systemctl --user stop "banc-kpi-$m" 2> /dev/null
+      attendu "Restart=$m : relancé" "$([ "${n:-0}" -gt 0 ] && echo oui || echo non)" "$([ "$m" = always ] && echo oui || echo non)"
+    done
+    [ "$KO" = 0 ] || r=1
+  fi
   [ "$r" = 0 ] || { echo "## fins de journaux (sans ligne de requête)"; grep -E 'lvl=eror|level=error' "$T/grafana.out" "$T/loki.out" | tail -4 | cut -c1-220; }
   exit "$r"
 } 2>&1 | sed -u "s#$HOME#~#g; /jeton\|token/I c\[ligne masquée : motif jeton|token]" | tee "$LOG"

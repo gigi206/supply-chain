@@ -128,3 +128,16 @@ Troisième passage (`-3`) : `loki.service` a `Restart=on-failure` ; attendu, cod
 La phrase « n'écrit pas dans Loki » tient pour ces chemins ; « lecture seule » était **faux** : le prix posé au propriétaire était incomplet. L'unité du lecteur et le script de pose ne sont pas écrits : ils attendent sa réponse.
 
 **Heures** : de 20:43:08 UTC à cette note, 11 min 06 s. Total de la brique : 1 h 10 min 11 s.
+
+## Décisions du propriétaire et correction à chercher, prédiction (2026-11-24T20:56:06Z)
+
+Réponses verbatim (avant 2026-11-24T20:55:04Z) : accès du lecteur, prix corrigé, **« Compte Grafana Viewer (Recommandé) »** (ne vaut pas accord de pose) ; défaut de la 19b, **« Chercher une correction à sec »** ; poussée, **« Oui, pousse »** (faite jusqu'à `32cad1c1`, 20:55:04 UTC).
+
+Candidat lu dans `conf/defaults.ini` de l'archive de Grafana 13.3.0 : `data_source_proxy_whitelist` ([security]). Hypothèse à éprouver : la liste ne joue que sur `/api/datasources/proxy`, pas sur `/api/ds/query` ni sur les ressources. Mise à `127.0.0.1:9090`, elle ne laisserait au proxy que la source Prometheus, dont des relevés archivés se servent (07a, `base-grype-24.sh`, `tableau-pose.sh` lit la source sans proxy).
+
+`VARIANTE=liste banc-grafana.sh` (journal `e4-banc-grafana-liste.log`). Attendu **40 cas, 0 écart** : les 16 de la configuration en service (écritures toujours 403, lecteur et délais conformes), puis 22 :
+- marchent encore : requête, étiquettes de l'explorateur, santé, proxy vers Prometheus (502, rien n'écoute) ;
+- 403 : `/config`, `/flush`, `/log_level`, `/loki/api/v1/labels` par le proxy, Viewer et administrateur ;
+- Loki reste vivant après 5 formes d'arrêt par le proxy (identifiant numérique, double barre, `%2e%2e`, remontées) et 5 par les ressources ;
+
+et 2 sur systemd : un programme qui sort avec le code 0 est relancé par `Restart=always`, pas par `Restart=on-failure`. Les moins sûrs : les remontées de chemin par les ressources, puis la portée de la liste.
