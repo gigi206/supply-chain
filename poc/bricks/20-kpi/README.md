@@ -8,9 +8,9 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 ## État
 
-**Étape 2 faite le 2026-11-24 (recalcul de référence, signatures vérifiées, 18:55:04 UTC).** [Prédiction et résultat](resultats/e2-predictions.md) : **10 cas, 0 écart** ; 37 attestations listées et vérifiées, 0 par la clé étrangère. Provenance de Chains vérifiée 4/4, VSA `SLSA_BUILD_LEVEL_3` 1/4, replay identique 2/4, 0 KEV ; pour `f5e6bcb0` et le deb, Prometheus est égal au recalcul. Constat : Loki ne voit pas tous les scans (3 sur 5 pour `sample-app`). Rien n'est posé. **Choix à poser** : la définition de « L3 vérifié » (ci-dessous).
+**Étape 2 faite le 2026-11-24 (recalcul de référence, signatures vérifiées, 18:55:04 UTC).** [Prédiction et résultat](resultats/e2-predictions.md) : **10 cas, 0 écart** ; 37 attestations listées et vérifiées, 0 par la clé étrangère. Provenance de Chains vérifiée 4/4, VSA `SLSA_BUILD_LEVEL_3` 1/4, replay identique 2/4, 0 KEV ; pour `f5e6bcb0` et le deb, Prometheus est égal au recalcul. Constat : Loki ne voit pas tous les scans (3 sur 5 pour `sample-app`). Rien n'est posé.
 
-**Étape 1 faite le 2026-11-24 (relevé anonyme de Zot, 18:26:24 UTC).** [Prédiction et résultat](resultats/e1-predictions.md) : **12 cas, 2 écarts**, tous deux des fautes de la prédiction. Les 4 énoncés en cause sont des témoins négatifs voulus (J6, G6) qu'elle n'avait pas comptés. Pour les produits, les builders et les fermetures, tous les énoncés sont lisibles et nomment leur sujet. Signatures non vérifiées : c'est l'étape 2, qui attend les choix ci-dessous.
+**Étape 1 faite le 2026-11-24 (relevé anonyme de Zot, 18:26:24 UTC).** [Prédiction et résultat](resultats/e1-predictions.md) : **12 cas, 2 écarts**, tous deux des fautes de la prédiction. Les 4 énoncés en cause sont des témoins négatifs voulus (J6, G6) qu'elle n'avait pas comptés. Pour les produits, les builders et les fermetures, tous les énoncés sont lisibles et nomment leur sujet. Signatures non vérifiées à cette étape.
 
 Aperçu des produits, énoncés non vérifiés : 4 sujets (`sample-app` `3a7ca1b1` et `f5e6bcb0`, deb `60f25f5c`, rpm `07b7bd6f`). Tous ont une provenance ; 3 ont un scan, 3 un VEX et 2 une VSA. Le digest en service, `f5e6bcb0`, n'a pas encore de VSA. L'historique des scans dans Zot commence au rejeu du 23/11, et celui de Loki aussi (mesuré, `e1-loki-anciennete.log`) : un rejeu de zéro remet les deux à zéro.
 
@@ -60,12 +60,12 @@ Quatre questions posées ensemble, chacune avec la recommandation du conseiller 
 
 Restent à poser, sans bloquer l'étape 2 : la vérification des signatures par l'exportateur (étape 4) et les licences (le recalcul donne « source absente », 0 prédicat mesuré dans Zot).
 
-## Choix ouverts après l'étape 2
+## Après l'étape 2 : décision et limites
 
-- **« Taux L3 vérifié » (docs/02) n'a pas de définition tranchée.** Deux lectures, calculées toutes les deux sous des noms distincts :
-  - provenance de Chains vérifiée (signature, `builder.id`, PipelineRun, signature d'image) : **4/4**. La politique de la porte n'est pas rejouée, donc « L3 » n'y est pas prouvé ; compter le deb et le rpm comme L3 contredirait la décision du 12/11 (« Bit identique seul ») ;
+- **« Taux L3 vérifié » (docs/02)** : décision du propriétaire du 24/11, verbatim **« VSA seule (Recommandé) »**. L3 vérifié = VSA de replay qui porte `SLSA_BUILD_LEVEL_3`. Les deux lectures comparées :
+  - provenance de Chains vérifiée (signature, `builder.id`, PipelineRun, signature d'image) : **4/4**. La politique de la porte n'est pas rejouée, donc « L3 » n'y est pas prouvé ; afficher le deb en L3 contredirait la décision du 12/11 (« Bit identique seul »). Affiché à côté, sous son nom littéral ;
   - VSA de replay qui porte `SLSA_BUILD_LEVEL_3` : **1/4**. Le deb ne l'aura jamais, par décision ; le rpm non plus tant qu'il n'a pas de VSA.
-- **Délai des KEV** : la décision « Loki, 720 h » tient, avec une limite mesurée. `entrees-scan` n'émet que le scan le plus récent de chaque passage (15 min) et seulement pour les digests de `SCANS` : les scans intermédiaires et le rpm sont invisibles.
+- **Délai des KEV** : limite mesurée de la décision « Loki, 720 h » : `entrees-scan` n'émet que le scan le plus récent de chaque passage (15 min) et seulement pour les digests de `SCANS` : les scans intermédiaires et le rpm sont invisibles.
 - **L'exportateur n'a pas git** : les dates des pins et des clés devront lui venir d'un relevé versionné (étape 4).
 
 ## Choix du propriétaire (liste d'origine)

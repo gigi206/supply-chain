@@ -72,3 +72,10 @@ Bilan attendu : **10 cas, 0 écart**. Réellement non lus : les cas 2, 3 et 6.
 Conséquence pour le KPI « délai de correction des KEV » (décision « Loki, 720 h ») : une KEV vue seulement dans un scan intermédiaire, ou sur un digest pas encore dans `SCANS`, n'est pas comptée, et le rpm n'est pas suivi. Les dates de scan, elles, sont exactes (`scannedAt`). Aucun effet aujourd'hui (les 8 scans signés des produits ont chacun 0 KEV, relus un par un).
 
 **Heures de l'étape 2** : de 18:49:15 UTC (orientation) à cette note, 6 min 48 s.
+
+## Corrections après relecture du conseiller, et second passage prédit (note de 2026-11-24T19:32:00Z)
+
+- **Cause fausse** : la note de résultat attribue l'absence du scan de 22:28:25Z au passage toutes les 15 min. Le relevé dit autre chose : les listes du scan `sample-app` de 22:30:42Z et du scan deb de 23:19:20Z sont émises à la même seconde, le 23/11 à 23:19:45Z. C'est donc le premier passage de l'unité depuis le rejeu dont Loki ait la trace, 49 min après le premier scan. Ce qui est mesuré : à chaque passage, seul le scan le plus récent est émis.
+- **Décision du propriétaire** (verbatim, 24/11, sur « Laquelle porte le nom « L3 vérifié » dans Grafana ? ») : **« VSA seule (Recommandé) »**. Le taux de provenance s'affiche à côté, sous son nom littéral.
+- **Script corrigé** : `taux_vsa_slsa_build_level_3` devient `taux_l3_verifie` ; la vérification de la signature d'image s'arrête désormais sur un motif inconnu, au lieu de compter 0.
+- **Second passage** (`SUFFIXE=-2`), attendu : 10 cas, 0 écart ; mêmes lignes `KPI|` que `e2-recalcul.log` une fois les noms `vsa_slsa_build_level_3` et `taux_vsa_slsa_build_level_3` remplacés par `l3_verifie` et `taux_l3_verifie` (0 ligne de différence), si aucun scan ni commit d'épinglage n'a lieu entre-temps.

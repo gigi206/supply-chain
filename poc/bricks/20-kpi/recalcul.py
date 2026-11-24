@@ -8,7 +8,8 @@ Principes :
     HTTP arrête tout, et une erreur de cosign autre que « no matching attestations » ou « no valid bundles » aussi ;
   - témoin négatif : les mêmes appels avec une clé étrangère (g6-temoin-cle-publique.pem) doivent vérifier 0 attestation ;
   - des DATES, jamais des âges : l'âge change entre ce recalcul et l'exportateur, la date non ;
-  - « L3 » : deux comptes nommés, aucun n'est appelé « L3 vérifié » tant que le propriétaire n'a pas choisi (la porte n'est pas rejouée).
+  - « L3 vérifié » : VSA de replay qui porte SLSA_BUILD_LEVEL_3 (décision « VSA seule » du 24/11) ; la provenance vérifiée est comptée à
+    côté, sous son nom : la politique de la porte n'est pas rejouée ici.
 Sortie : lignes KPI|nom|dépôt|digest|valeur (triées, « absent » ou « sans objet » quand il n'y a pas de dénominateur), DETAIL|… et les
 cas comparés. Aucun contenu d'énoncé : les VEX portent un auteur."""
 import base64
@@ -219,6 +220,8 @@ def main():
             if f"sha256-{h}.sig" in tags:
                 r = subprocess.run(["cosign", "verify", "--key", f"{BRIQUES}/{CLES['chains']}", "--insecure-ignore-tlog=true",
                                     "--registry-cacert", CA, f"{REG}/builds/{nom}@{digest}"], capture_output=True, text=True, timeout=120)
+                if r.returncode and not re.search(r"no matching signatures|invalid signature", r.stderr):
+                    arret(f"cosign verify {nom} : code {r.returncode}, motif non reconnu")
                 sig = sum(1 for x in json.loads(r.stdout or "[]") if x["critical"]["type"] == "cosign container image signature"
                           and x["critical"]["image"]["docker-manifest-digest"] == digest) if r.returncode == 0 else 0
             s.update(sig=sig, tsa=(nb, len(h_tsa), couvertes))
@@ -246,7 +249,7 @@ def main():
         s["replay"] = int(any("POC_REPLAY_BIT_IDENTIQUE" in v["verifiedLevels"] for v in vsa))
         s["l3_vsa"] = int(any("SLSA_BUILD_LEVEL_3" in v["verifiedLevels"] for v in vsa))
         kpi("replay_identique", d, h, s["replay"])
-        kpi("vsa_slsa_build_level_3", d, h, s["l3_vsa"])
+        kpi("l3_verifie", d, h, s["l3_vsa"])
         scans = sorted((e["predicate"] for e, _ in s["scan"]), key=lambda p: p["scannedAt"])
         s["scans"] = scans
         s["dernier"] = scans[-1] if scans else None
@@ -270,7 +273,7 @@ def main():
     print("## 3. KPI de plateforme")
     n = len(sujets)
     kpi("taux_provenance_chains_verifiee", "-", "-", rapport(sum(s["provenance"] for s in sujets), n))
-    kpi("taux_vsa_slsa_build_level_3", "-", "-", rapport(sum(s["l3_vsa"] for s in sujets), n))
+    kpi("taux_l3_verifie", "-", "-", rapport(sum(s["l3_vsa"] for s in sujets), n))
     kpi("taux_replay_identique", "-", "-", rapport(sum(s["replay"] for s in sujets), n))
     kpi("violations_licences", "-", "-", "source absente")
     for k in sorted(CLES):
