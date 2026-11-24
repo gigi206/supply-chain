@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   annotations:
-    tekton.dev/signature: MEUCIQDkg9ygiZtdUZLgti3dg/yc8GJOzmhfC4THcaDL3fNNkwIgT+rNWPzzoeHbY9mZKdv6LruZ8fsBczhwdPlZJyBDlOk=
+    tekton.dev/signature: MEUCIQDGGin/uPzG6SS2UcylF3qB7UkvnkpHygcQY91Cn8OjDAIgHmma4Ug8RCh/JMJRvgb6dAcbTk0hz8KH8LF9yD0UVck=
   name: construire-image
 spec:
   results:
@@ -25,7 +25,7 @@ spec:
       ! touch "$e/.ecriture" 2> /dev/null || { echo "workspace entrees inscriptible" >&2; exit 1; }
       mkdir -p /tmp/run /tmp/df
       i=$(sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p' "$e/builder/index.json")
-      [ "$i" = sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67 ] || { echo "layout de l'image de build : $i" >&2; exit 1; }
+      [ "$i" = sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7 ] || { echo "layout de l'image de build : $i" >&2; exit 1; }
       n=0
       for f in "$e"/builder/blobs/sha256/*; do
         [ "$(sha256sum < "$f" | cut -c1-64)" = "${f##*/}" ] || { echo "blob altéré : ${f##*/}" >&2; exit 1; }
@@ -56,7 +56,7 @@ spec:
       t=$(date +%s)
       buildctl --addr unix:///tmp/run/bk.sock build --frontend dockerfile.v0 --no-cache --opt build-arg:SOURCE_DATE_EPOCH=0 \
         --local context="$e/src" --local dockerfile=/tmp/df --opt filename=Dockerfile \
-        --oci-layout magasin="$e/builder" --opt context:builder=oci-layout://magasin@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67 \
+        --oci-layout magasin="$e/builder" --opt context:builder=oci-layout://magasin@sha256:8c11e856b10fcc3dce8d22815b803d95e2f643cda265cfd3ebdaed8615b2edf7 \
         --local deps="$e/deps" --opt context:deps=local:deps \
         --output type=oci,dest=$(workspaces.sortie.path)/image.tar,rewrite-timestamp=true
       d=$(tar -xOf $(workspaces.sortie.path)/image.tar index.json | sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p')

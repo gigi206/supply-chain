@@ -16,6 +16,10 @@ trusted_tasks:
   # comme c7e8b275 avant elle (première version, qui tirait ses entrées elle-même)
   oci://sc-stockage.poc.test:5000/tekton/tasks/construire-image:
     - ref: sha256:66a9f2980a45d2899c49612de926ab86c27a7e34a694fb9a3e5e3efb38411357
+    # Brique 07c (24/11/2026, accord du propriétaire « J'autorise l'étape 4 ») : même tâche, image de build de la voie D en
+    # Go 1.26.11 (plateforme/builder-go-voie-d@8c11e856) au lieu de 1.26.10 (d50ae575) ; seul changement du gabarit avec la
+    # signature. 66a9f298 reste : l'image 3a7ca1b1 et ses provenances doivent rester jugeables
+    - ref: sha256:4dcbc4b7468137d894bb40085b32b9cc816a37bfece3204ed06466ee4741eb6b
   # J7 : politique/taches/preparer-entrees.signee.yaml, pod runc restreint : sources, fermeture, web/dist et image de build
   # (layout OCI) tirés dans le workspace ; entrées déclarées à Chains
   oci://sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees:

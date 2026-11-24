@@ -1,0 +1,21 @@
+# construction.sh taches, 2026-11-24T13:24:18Z
+## tâches (tkn 0.46.2) ; Dockerfile de la brique 04 : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   preparer-entrees : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   preparer-entrees dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees@sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+SIGNER : nouvelle signature dans politique/taches/construire-image.signee.yaml (liste revue à mettre à jour)
+OK   construire-image : signature versionnée conforme au gabarit rendu, signature exceptée
+SIGNER : à ajouter à politique/porte/taches.yml après revue, puis relancer sans SIGNER : sc-stockage.poc.test:5000/tekton/tasks/construire-image@sha256:4dcbc4b7468137d894bb40085b32b9cc816a37bfece3204ed06466ee4741eb6b
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   publier-image : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   publier-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+## pipeline sample-app (signée à chaque passage ; ses tâches et ses entrées hors dépôt sont épinglées par digest)
+fermeture de la plateforme (brique 03, F2, 2026-11-23T21:38:57Z) : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   fermeture épinglée dans la pipeline : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:6838969f7635a39ac940a3e55ef3bd2e2462925f7c81df9ef66b72bcc7edf4dc
+## témoin : première version de construire-image et sa pipeline, depuis l'historique git
+OK   bundle de l'ancienne construire-image (signature versionnée au commit b77ff6b) : sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+ancienne pipeline (témoin) : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:2edb76a972dbc561d2631826ba753545bf1524a9a75b6ea88edff10a6467734e
