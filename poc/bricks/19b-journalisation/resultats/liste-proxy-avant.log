@@ -1,0 +1,7 @@
+début : 2026-11-24T20:59:52Z, étape avant, dépôt a2411f22
+OK   proxy vers Loki (buildinfo) : 200
+OK   proxy vers Prometheus (règles) : 200
+OK   requête Loki par /api/ds/query, trames non vides : 200 true
+OK   requête Prometheus par /api/ds/query : 200
+OK   étiquettes de l'explorateur : 200 true
+fin : 2026-11-24T20:59:52Z, bilan : tenu

@@ -1,0 +1,39 @@
+# unite-hote.sh, 2026-11-24T20:59:49Z, dépôt a2411f22, script f7fc89c8179353ab, exportateur 98f917abe061b8b1, systemd 259
+## 1. unité
+OK   durcissement : lignes différentes de entrees-scan.service : 0
+OK   durcissement du lecteur : lignes différentes de entrees-scan.service : 0
+OK   systemd-analyze verify, lignes sur kpi : 0
+KO   systemd-analyze security, note hors ligne (entrees-scan : 2.9) : 3.0 (attendu 2.9)
+## 2. exportateur sans durcissement, puis durci
+kpi : 132 séries
+OK   sans durcissement : code : 0
+kpi : 132 séries
+durée : 550 ms
+OK   durci, Python 3.14.4 : code : 0
+kpi : 132 séries
+OK   durci, Python 3.13.12 : code : 0
+OK   durci : séries différentes de la sortie sans durcissement : 0
+OK   durci : séries : 132
+OK   py313 : séries différentes de la sortie sans durcissement : 0
+OK   py313 : séries : 132
+OK   signatures vérifiées et refusées, durci : 41 0
+## 2 bis. lecteur durci, mot de passe de l'auditeur remis par LoadCredential (chemin seul en argument), vrai Grafana
+refus : PermissionError 
+KO   lecteur durci : code : 2 (attendu 0)
+KO   lecteur durci : résumés lus : non (attendu oui)
+kpi : 134 séries
+OK   exportateur durci avec ce journal : code, illisible : 0 0
+## 3. sondes : permises sans durcissement (témoin), refusées dans l'unité
+OK   témoin, écrire un autre fichier du dossier : permis
+OK   unité, écrire un autre fichier du dossier : refusé
+OK   témoin, lister le dossier personnel : permis
+OK   unité, lister le dossier personnel : refusé
+OK   témoin, socket IPv6 : permis
+OK   unité, socket IPv6 : refusé
+OK   témoin, socket netlink : permis
+OK   unité, socket netlink : refusé
+OK   témoin, nouvel espace de noms : permis
+OK   unité, nouvel espace de noms : refusé
+OK   témoin, mémoire à la fois écrite et exécutable : permis
+OK   unité, mémoire à la fois écrite et exécutable : refusé
+## bilan : 27 cas, 3 écart(s)

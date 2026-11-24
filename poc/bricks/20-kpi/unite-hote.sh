@@ -52,7 +52,8 @@ sed 's#^ExecStart=.*#ExecStart=/usr/bin/true#' "$U" > "$T/kpi.service"; cp "$her
 sed 's#^ExecStart=.*#ExecStart=/usr/bin/true#' "$J" > "$T/kpi-journal.service"
 attendu "systemd-analyze verify, lignes sur kpi" "$(systemd-analyze verify "$T/kpi.service" "$T/kpi-journal.service" "$T/kpi.timer" 2>&1 | grep -cE 'kpi(-journal)?\.(service|timer)')" 0
 note() { systemd-analyze security --offline=true --no-pager "$1" 2> /dev/null | sed -nE 's/.*Overall exposure level for [^:]+: ([0-9.]+) .*/\1/p'; }
-attendu "systemd-analyze security, note hors ligne (entrees-scan : $(note "$M"))" "$(note "$U")" "$(note "$M")"
+# SupplementaryGroups (kpi lit le journal, groupe kpi-journal) coûte 0,1 à kpi.service ; le lecteur garde la note du modèle
+attendu "systemd-analyze security, notes hors ligne : modèle, kpi, kpi-journal" "$(note "$M") $(note "$U") $(note "$J")" "2.9 3.0 2.9"
 echo "## 2. exportateur sans durcissement, puis durci"
 CA=$T/ca.crt CLES=$T/cles RELEVE=$T/dates-git.tsv SORTIE=$T/libre.prom /usr/bin/python3 -I "$T/metrics_exporter.py"; rc=$?
 attendu "sans durcissement : code" "$rc" 0
@@ -67,10 +68,12 @@ for f in durci py313; do
   attendu "$f : séries" "$(wc -l < "$T/$f.prom")" "$(wc -l < "$T/libre.prom")"
 done
 attendu "signatures vérifiées et refusées, durci" "$(awk '/^kpi_signatures_verifiees/{v += $2} /^kpi_signatures_refusees/{r += $2} END {print v, r}' "$T/durci.prom")" "41 0"
-echo "## 2 bis. lecteur durci, mot de passe de l'auditeur remis par LoadCredential (chemin seul en argument), vrai Grafana"
+# ProtectHome=true masque aussi /run/user, où le gestionnaire utilisateur met les identifiants ; un service système les a dans
+# /run/credentials (base-grype.service, en service, a LoadCredential et ProtectHome=true). Retiré ici seulement, donc non exercé.
+echo "## 2 bis. lecteur durci (sans ProtectHome), mot de passe de l'auditeur remis par LoadCredential (chemin seul en argument), vrai Grafana"
 : > "$T/lignes"; cp "$here/../../../tools/metrics-exporter/lecteur_loki.py" "$T/"
 p=(); while read -r d; do p+=(-p "$d"); done < <(durcissement "$J" | grep -vE '^IPAddress')
-systemd-run --user --wait --pipe --collect -q "${p[@]}" -p UMask=0027 -p "BindPaths=$T:/srv" -p ReadOnlyPaths=/srv -p ReadWritePaths=/srv/lignes \
+systemd-run --user --wait --pipe --collect -q "${p[@]}" -p ProtectHome=false -p UMask=0027 -p "BindPaths=$T:/srv" -p ReadOnlyPaths=/srv -p ReadWritePaths=/srv/lignes \
   -p "LoadCredential=mdp:$HOME/.cache/supply-chain-poc/08/secrets/grafana-auditeur.password" -E GRAFANA=https://192.168.161.13:3001 -E CA=/srv/ca.crt \
   -E UTILISATEUR=auditeur -E SORTIE=/srv/lignes /bin/sh -c 'MDP=$CREDENTIALS_DIRECTORY/mdp exec /usr/bin/python3 -I /srv/lecteur_loki.py' 2>&1; rc=$?
 attendu "lecteur durci : code" "$rc" 0

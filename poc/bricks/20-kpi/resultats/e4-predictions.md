@@ -153,3 +153,11 @@ Attendu, lecture seule :
 - `kpi-pose.sh sec` (`e4-kpi-pose-sec.log`) : 3 cas, 0 KO ; mot de passe absent ;
 - `unite-hote.sh` (`e4-unite-hote-4.log`) : **27 cas, 0 écart** (23, plus le durcissement du lecteur et 3 sur le lecteur durci avec `LoadCredential`). Le moins sûr : `LoadCredential` sous le gestionnaire utilisateur ; s'il est refusé, c'est une réserve pour la pose ;
 - `liste-proxy.sh avant` (19b, `resultats/liste-proxy-avant.log`), auditeur, seul chemin de Loki demandé : `/loki/api/v1/status/buildinfo` : **5 cas, 0 KO**, proxy vers Loki **200** (le défaut existe sur la plateforme pour les GET ; rien d'actif n'est essayé).
+
+### Passages de 20:59, et dernier passage de l'unité, prédiction (2026-11-24T21:00:10Z)
+
+- [`e4-kpi-pose-sec.log`](e4-kpi-pose-sec.log) (20:59:43 UTC) : 3 cas, 0 KO.
+- [`liste-proxy-avant.log`](../../19b-journalisation/resultats/liste-proxy-avant.log) (20:59:52 UTC) : 5 cas, 0 KO. **Sur la plateforme, le proxy mène à Loki pour l'auditeur** (GET `buildinfo` : 200). Aucun chemin qui agit n'y a été demandé.
+- [`e4-unite-hote-4.log`](e4-unite-hote-4.log) : 27 cas, **3 écarts**, deux causes : la note de `kpi.service` est 3.0 (2.9 attendu ; `SupplementaryGroups`, oublié dans la prédiction) ; le lecteur ne lit pas son mot de passe, car `ProtectHome=true` masque `/run/user`, où le gestionnaire utilisateur met les identifiants. La réserve annoncée vaut.
+
+Dernier passage (`-5`), `ProtectHome` retiré pour le lecteur seulement, notes attendues « 2.9 3.0 2.9 » : **27 cas, 0 écart**. En cas d'écart, réserve, sans nouvel essai.
