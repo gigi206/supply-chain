@@ -31,3 +31,11 @@ Non mesuré ici : le passage sur les vraies VM (ssh, accord du propriétaire). N
 ## Premier passage, non valable en section 5 (note de 2026-11-25T09:30:58Z)
 
 [23 cas, 0 écart](e10-essai-fuites.log), mais les 6 cas « fuite de … » portent tous sur `10-zot-poc-replay.password` : `neuf()` écrasait la variable `e` de la boucle. Cinq étiquettes n'ont donc pas été éprouvées. Banc corrigé (`local e`), `fuites.sh` inchangé, relancé avec `SUFFIXE=-2` : **attendu toujours 23 cas, 0 écart, cette fois une étiquette différente par cas**.
+
+## Résultat (note de 2026-11-25T09:31:44Z)
+
+[Second passage : 23 cas, 0 écart](e10-essai-fuites-2.log), 09:31:01 à 09:31:04 UTC, une étiquette différente par cas en section 5. Les témoins des sections 3 et 6 ont bien exécuté l'ancien `fuites.sh` : la ligne « aucun secret dans les journaux » y est 2 fois.
+
+Mutants, joués hors du dépôt à 09:31:13 et 09:31:16 UTC (journaux non archivés) : sans le filtre de 16 caractères, 7 écarts ; en-têtes armurés gardés, 1 écart (section 7). Limite du banc : les témoins des sections 3 et 6 n'attendent que « code 0 », qu'un script vide rendrait aussi ; c'est la ligne citée ci-dessus qui prouve leur exécution.
+
+`archive-vsa.patch` s'applique encore (`git apply --check`) ; `releve-dates.py verifier` : 0 ligne différente. **Jamais lancé sur les VM.**

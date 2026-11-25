@@ -1,0 +1,559 @@
+# essai-fuites.sh, 2026-11-25T09:31:01Z, dépôt 5354d0c0, script fc486d863c6fc668, fuites 8cdb64174a8b7e35
+## 1. aucune fuite
+  # fuites.sh banc, 2026-11-25T09:31:01Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   code : code 0
+OK   cherché sur les trois VM : 3 3
+OK   ligne « absent » : 0
+## 2. fuite du mot de passe de kpi-journal sur sc-stockage
+  # fuites.sh banc, 2026-11-25T09:31:01Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  1    grafana-kpi-journal.password
+  KO   secret trouvé dans un journal
+  code 1
+OK   code : code 1
+OK   compte sc-stockage, sc-build : 1 0
+OK   valeur absente de la sortie : 0
+## 3. témoin : même fuite, fuites.sh d'avant (40dccc25)
+  # fuites.sh banc, 2026-11-25T09:31:01Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  ## sc-stockage : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   code (le défaut existait) : code 0
+## 4. fichier absent, puis vide ; non-régression de 08/secrets
+  # fuites.sh banc, 2026-11-25T09:31:02Z
+  absent ou vide, non cherché : grafana-kpi-journal.password
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   absent : code 0 1 3
+  # fuites.sh banc, 2026-11-25T09:31:02Z
+  absent ou vide, non cherché : grafana-kpi-journal.password
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   vide : code 0 1 1
+  # fuites.sh banc, 2026-11-25T09:31:02Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  1    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  KO   secret trouvé dans un journal
+  code 1
+OK   fuite d'un secret de la 08 : code 1 1 0
+## 5. secrets des 07a, 09 et 10 : cherchés, fuite de chacun sur sc-confiance
+  # fuites.sh banc, 2026-11-25T09:31:02Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   cherchés sur les trois VM, code : 18 code 0
+  # fuites.sh banc, 2026-11-25T09:31:02Z
+  ## sc-confiance : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  1    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  KO   secret trouvé dans un journal
+  code 1
+OK   fuite de 07a-zot-poc-vex.password : code, sc-confiance, sc-build, autres étiquettes, valeur affichée : code 1 1 0 0 0
+  # fuites.sh banc, 2026-11-25T09:31:02Z
+  ## sc-confiance : 3 lignes de journaux
+  témoin retrouvé (1)
+  1    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  KO   secret trouvé dans un journal
+  code 1
+OK   fuite de 07a-openbao-proprietaire.password : code, sc-confiance, sc-build, autres étiquettes, valeur affichée : code 1 1 0 0 0
+  # fuites.sh banc, 2026-11-25T09:31:03Z
+  ## sc-confiance : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  1    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  KO   secret trouvé dans un journal
+  code 1
+OK   fuite de 09-zot-poc-lien.password : code, sc-confiance, sc-build, autres étiquettes, valeur affichée : code 1 1 0 0 0
+  # fuites.sh banc, 2026-11-25T09:31:03Z
+  ## sc-confiance : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  1    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  KO   secret trouvé dans un journal
+  code 1
+OK   fuite de 09-openbao-lien.secret : code, sc-confiance, sc-build, autres étiquettes, valeur affichée : code 1 1 0 0 0
+  # fuites.sh banc, 2026-11-25T09:31:03Z
+  ## sc-confiance : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  1    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  KO   secret trouvé dans un journal
+  code 1
+OK   fuite de 09-cle-openpgp.asc : code, sc-confiance, sc-build, autres étiquettes, valeur affichée : code 1 1 0 0 0
+  # fuites.sh banc, 2026-11-25T09:31:03Z
+  ## sc-confiance : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  1    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  KO   secret trouvé dans un journal
+  code 1
+OK   fuite de 10-zot-poc-replay.password : code, sc-confiance, sc-build, autres étiquettes, valeur affichée : code 1 1 0 0 0
+## 6. témoin : fuite du secret de la 10, fuites.sh d'avant (000edd4c)
+  # fuites.sh banc, 2026-11-25T09:31:03Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   code (le défaut existait) : code 0
+## 7. clé armurée : en-tête, pied et ligne de contrôle dans un journal, sans corps
+  # fuites.sh banc, 2026-11-25T09:31:03Z
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 5 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-openbao-proprietaire.password
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   aucun faux positif : code 0 0
+## 8. fichiers absents, vides, trop courts
+  # fuites.sh banc, 2026-11-25T09:31:04Z
+  absent ou vide, non cherché : 07a-zot-poc-vex.password
+  absent ou vide, non cherché : 07a-openbao-proprietaire.password
+  absent ou vide, non cherché : 09-zot-poc-lien.password
+  absent ou vide, non cherché : 09-openbao-lien.secret
+  absent ou vide, non cherché : 09-cle-openpgp.asc
+  absent ou vide, non cherché : 10-zot-poc-replay.password
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   absents : code 0 6 0
+  # fuites.sh banc, 2026-11-25T09:31:04Z
+  absent ou vide, non cherché : 07a-zot-poc-vex.password
+  absent ou vide, non cherché : 07a-openbao-proprietaire.password
+  absent ou vide, non cherché : 09-zot-poc-lien.password
+  absent ou vide, non cherché : 09-openbao-lien.secret
+  absent ou vide, non cherché : 09-cle-openpgp.asc
+  absent ou vide, non cherché : 10-zot-poc-replay.password
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    faux-08
+  0    grafana-kpi-journal.password
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   vides : code 0 6 0
+  # fuites.sh banc, 2026-11-25T09:31:04Z
+  aucune ligne de 16 caractères, non cherché : 07a-openbao-proprietaire.password
+  ## sc-confiance : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-build : 3 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  ## sc-stockage : 2 lignes de journaux
+  témoin retrouvé (1)
+  0    07a-zot-poc-vex.password
+  0    09-cle-openpgp.asc
+  0    09-openbao-lien.secret
+  0    09-zot-poc-lien.password
+  0    10-zot-poc-replay.password
+  0    faux-08
+  0    grafana-kpi-journal.password
+  OK   aucun secret dans les journaux des trois VM
+  code 0
+OK   trop court : code 0 1 1
+## 9. répertoire de motifs effacé
+OK   travail/fuites : absent
+## bilan : 23 cas, 0 écart(s), 2026-11-25T09:31:04Z
