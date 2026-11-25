@@ -27,3 +27,7 @@ Banc sec (`essai-fuites.sh`, journal `e10-essai-fuites.log`) : HOME jetable, fau
 | 9 | dossier de motifs effacé |
 
 Non mesuré ici : le passage sur les vraies VM (ssh, accord du propriétaire). Non cherchés, dit dans l'en-tête : hachages htpasswd, copie base64 du compte de `poc-lien`, certificat de révocation OpenPGP, clé de la VSA (dans `sc-replay`).
+
+## Premier passage, non valable en section 5 (note de 2026-11-25T09:30:58Z)
+
+[23 cas, 0 écart](e10-essai-fuites.log), mais les 6 cas « fuite de … » portent tous sur `10-zot-poc-replay.password` : `neuf()` écrasait la variable `e` de la boucle. Cinq étiquettes n'ont donc pas été éprouvées. Banc corrigé (`local e`), `fuites.sh` inchangé, relancé avec `SUFFIXE=-2` : **attendu toujours 23 cas, 0 écart, cette fois une étiquette différente par cas**.

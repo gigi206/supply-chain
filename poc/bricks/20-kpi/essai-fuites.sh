@@ -16,7 +16,7 @@ chemin() { printf '%s' "$H/.cache/supply-chain-poc/${1%%-*}/secrets/${1#*-}"; } 
 N=0 KO=0
 attendu() { N=$((N + 1)); if [ "$2" = "$3" ]; then echo "OK   $1 : $2"; else echo "KO   $1 : $2 (attendu $3)"; KO=$((KO + 1)); fi; }
 H=$T/h; S8=$H/.cache/supply-chain-poc/08/secrets; F=$H/.cache/supply-chain-poc/20/secrets/grafana-kpi-journal.password
-neuf() { # dossier neuf ; $1 : source de fuites.sh (arbre ou commit)
+neuf() { local e # e : boucle des appelants ; dossier neuf ; $1 : source de fuites.sh (arbre ou commit)
   [ ! -e "$T/h" ] || find ~/.cache/supply-chain-poc/20/essai-fuites/h -delete
   mkdir -p "$S8" "${F%/*}" "$T/b/resultats" "$H/vm"
   cp "$here/../08-trust-plane/distro.sh" "$T/b/"
