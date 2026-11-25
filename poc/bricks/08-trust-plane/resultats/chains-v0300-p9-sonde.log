@@ -1,0 +1,42 @@
+# P9, sonde du 2026-11-25T20:40:44Z, dépôt 0955ec1d
+112:_avec_fonction(attestations, opts) := {d |
+113-	some d in porte.deny with input.attestations as attestations
+114-		with data.rule_data__configuration__ as _regles
+115-		with data.config.default_sigstore_opts as opts
+116-		with ec.sigstore.verify_attestation as _verif_bonne
+117-}
+118-
+119:_avec_valeur(attestations, valeur) := {d |
+120-	some d in porte.deny with input.attestations as attestations
+121-		with data.rule_data__configuration__ as _regles
+122-		with data.config.default_sigstore_opts as _opts
+123-		with ec.sigstore.verify_attestation as valeur
+124-}
+125-
+126:_refus(verdicts) if {
+127-	some d in verdicts
+128-	d.code == "porte.fermeture_plateforme"
+129-}
+130-
+131-_message(verdicts, motif) if {
+132-	some d in verdicts
+--
+337:_juge_deb(attestations) := _juge(attestations, _fermetures_bonnes, _opts)
+338-
+339-_codes(verdicts) := {d.code | some d in verdicts}
+340-
+341-_msg(verdicts, code, motif) if {
+342-	some d in verdicts
+343-	d.code == code
+## ancien
+["deb",[]]
+["essai_hors_regle",[]]
+["fermeture",["porte.construction_kata"]]
+["hors_appariement",[]]
+["une_bonne",["porte.construction_kata"]]
+## neuf
+["deb",["porte.taches_vues"]]
+["essai_hors_regle",["porte.taches_vues"]]
+["fermeture",["porte.taches_vues"]]
+["hors_appariement",["porte.taches_vues"]]
+["une_bonne",["porte.taches_vues"]]
