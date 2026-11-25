@@ -94,7 +94,8 @@ for n, t in TACHES.items():
 IMG = "oci://r/x/y"
 A_LA_MAIN = [(None, "image"), (5, "image"), ("", "image"), ("pipeline", "pipeline"), ("pipeline/x", "image"), ("task", "image"), ("inputs/result", "image"),
              ("pipelineTask", "tache"), ("pipelineTask/x", "tache"), ("pipelineTask/x/y", "tache"), ("pipelineTask/", "image"), ("PipelineTask/x", "image"),
-             ("pipelineTaskX", "image"), ("pipelineTaskX/y", "image"), ("x/pipelineTask/y", "image"), (" pipelineTask", "image")]
+             ("pipelineTaskX", "image"), ("pipelineTaskX/y", "image"), ("x/pipelineTask/y", "image"), (" pipelineTask", "image"),
+             ("pipelineTask/x\ny", "tache"), ("pipelineTask/x\n", "tache"), ("pipelineTask\n", "image")]
 for nom, g in A_LA_MAIN:
     cas(f"nom {nom!r}", [fs["apres", q]({"name": nom, "uri": IMG}) for q in ("exportateur", "recalcul")], [g, g])
 cas("sans nom", [fs["apres", q]({"uri": IMG}) for q in ("exportateur", "recalcul")], ["image", "image"])

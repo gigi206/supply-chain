@@ -26,7 +26,7 @@ index 7fb0d077..502275b4 100755
          return "pipeline"
 -    if nom == "pipelineTask":
 +    # Chains v0.29.x : pipelineTask ; v0.30.0 : pipelineTask/<tâche>, ou pipelineTask/<tâche>/<TaskRun> pour une matrice
-+    if re.fullmatch("pipelineTask(/.+)?", str(nom)):
++    if re.fullmatch("pipelineTask(/.+)?", str(nom), re.S):
          return "tache"
      if uri.startswith("git+"):
          return "source"

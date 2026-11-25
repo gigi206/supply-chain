@@ -34,3 +34,9 @@ Dépôt `ce0baf02` (prédictions et scripts commités avant), un seul passage pa
 **Limites** : le vrai Zot ne porte que des noms de v0.29.x, G6 ne prouve que la non-régression. La forme matrice n'a jamais été produite, seulement lue dans la source. Les énoncés de v0.30.0 ne sont pas signés (G4 lit `genre()` seule) ; le bout en bout signé vient des témoins synthétiques (G2). Les journaux gardés des mutants ne sont que leurs lignes KO.
 
 **Reste** : appliquer les deux correctifs (`git apply`) et reposer l'exportateur sur sc-stockage (accord, sudo), ou les garder jusqu'à une montée de Chains. La montée reste bloquée par la porte, `ivpol` et les scripts.
+
+## Second passage, prédiction (2026-11-25T21:28:52Z)
+
+Relecture du conseiller, vérifiée : un nom avec un saut de ligne (`pipelineTask/x` suivi d'un saut de ligne et de `y`) était `image` pour l'exportateur (`.` sans `re.S`) et `tache` pour le recalcul. Chains ne peut pas produire un tel nom (noms Kubernetes), mais les deux écritures doivent dire la même chose : `re.S` ajouté à l'exportateur, trois noms ajoutés à l'étape `sorties`. Le premier passage et ses journaux restent.
+
+**Prédiction** (`SUFFIXE=-2`) : G1, G2, G3 et G6 inchangés (G6 : mêmes lignes, 0 différente) ; `sorties` **80 cas, 0 KO**.
