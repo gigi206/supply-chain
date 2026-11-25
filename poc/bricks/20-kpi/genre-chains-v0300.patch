@@ -1,0 +1,32 @@
+diff --git a/poc/bricks/20-kpi/recalcul.py b/poc/bricks/20-kpi/recalcul.py
+index 11a9fda4..e045ee72 100644
+--- a/poc/bricks/20-kpi/recalcul.py
++++ b/poc/bricks/20-kpi/recalcul.py
+@@ -136,8 +136,11 @@ def date_conf(valeur):
+ 
+ 
+ def genre(dep):
+-    if dep.get("name") in ("pipeline", "pipelineTask"):
+-        return "pipeline" if dep["name"] == "pipeline" else "tache"
++    if dep.get("name") == "pipeline":
++        return "pipeline"
++    debut, barre, suite = str(dep.get("name")).partition("/")
++    if debut == "pipelineTask" and bool(barre) == bool(suite):  # v0.29.x : sans barre ; v0.30.0 : barre et nom de la tâche
++        return "tache"
+     if dep["uri"].startswith("git+"):
+         return "source"
+     if "/builds/fermetures/" in dep["uri"]:
+diff --git a/tools/metrics-exporter/metrics_exporter.py b/tools/metrics-exporter/metrics_exporter.py
+index 7fb0d077..502275b4 100755
+--- a/tools/metrics-exporter/metrics_exporter.py
++++ b/tools/metrics-exporter/metrics_exporter.py
+@@ -261,7 +261,8 @@ def genre(d):
+     nom, uri = d.get("name"), d["uri"]
+     if nom == "pipeline":
+         return "pipeline"
+-    if nom == "pipelineTask":
++    # Chains v0.29.x : pipelineTask ; v0.30.0 : pipelineTask/<tâche>, ou pipelineTask/<tâche>/<TaskRun> pour une matrice
++    if re.fullmatch("pipelineTask(/.+)?", str(nom)):
+         return "tache"
+     if uri.startswith("git+"):
+         return "source"
