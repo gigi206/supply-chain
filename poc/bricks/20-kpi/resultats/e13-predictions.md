@@ -40,3 +40,7 @@ Dépôt `ce0baf02` (prédictions et scripts commités avant), un seul passage pa
 Relecture du conseiller, vérifiée : un nom avec un saut de ligne (`pipelineTask/x` suivi d'un saut de ligne et de `y`) était `image` pour l'exportateur (`.` sans `re.S`) et `tache` pour le recalcul. Chains ne peut pas produire un tel nom (noms Kubernetes), mais les deux écritures doivent dire la même chose : `re.S` ajouté à l'exportateur, trois noms ajoutés à l'étape `sorties`. Le premier passage et ses journaux restent.
 
 **Prédiction** (`SUFFIXE=-2`) : G1, G2, G3 et G6 inchangés (G6 : mêmes lignes, 0 différente) ; `sorties` **80 cas, 0 KO**.
+
+## Second passage, résultat (note de 2026-11-25T21:32:06Z)
+
+Dépôt `5e7f07eb`. **0 écart avec la prédiction** : [sorties](e13-genre-sorties-2.log) 80 cas, 0 KO ; [banc](e13-genre-banc-2.log) rouge 2 écarts, vert 0, sept mutants refusés ; [zot](e13-genre-zot-2.log) 301 lignes, 0 différente (exportateur corrigé `fc0b8e0d…`). Le correctif retenu est celui du second passage. Heures de ce travail : de 21:19:15Z au 21:32:06Z, imputées à la 20.

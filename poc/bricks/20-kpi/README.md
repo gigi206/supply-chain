@@ -8,7 +8,7 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 ## État
 
-**`genre()` et Chains v0.30.0 (25/11, note de 2026-11-25T21:26:34Z)** : deux correctifs éprouvés à sec, **non appliqués, non déployés** ([témoins](genre-temoins.patch), [exportateur et recalcul](genre-chains-v0300.patch), [banc](banc-genre.sh)) : rouge 2 écarts, vert 0, sept mutants refusés, 13 tâches sur 13 reconnues dans les sorties de v0.30.0, 301 lignes égales sur le vrai Zot ([prédictions et résultat](resultats/e13-predictions.md)). Les témoins ajoutent un contrôle qui manquait : au banc, rien ne regardait le genre lu par le recalcul. La montée de Chains reste bloquée ailleurs (porte, `ivpol`, scripts).
+**`genre()` et Chains v0.30.0 (25/11, note de 2026-11-25T21:26:34Z)** : deux correctifs éprouvés à sec, **non appliqués, non déployés** ([témoins](genre-temoins.patch), [exportateur et recalcul](genre-chains-v0300.patch), [banc](banc-genre.sh)) : rouge 2 écarts, vert 0, sept mutants refusés, 13 tâches sur 13 reconnues dans les sorties de v0.30.0, 301 lignes égales sur le vrai Zot ; second passage après relecture, mêmes résultats ([prédictions et résultat](resultats/e13-predictions.md), heures comprises). Les témoins ajoutent un contrôle qui manquait : au banc, rien ne regardait le genre lu par le recalcul. La montée de Chains reste bloquée ailleurs (porte, `ivpol`, scripts).
 
 **VSA de `f5e6bcb0` (25/11, note de 2026-11-25T18:25:07Z)** : [seuil n° 5](resultats/e5-seuil-5.log) conforme à la [prédiction](resultats/e12-predictions.md) (105 valeurs, 0 écart, 44 signatures) ; `taux_l3_verifie` 1/4 → **2/4**, `taux_replay_identique` 2/4 → **3/4**.
 

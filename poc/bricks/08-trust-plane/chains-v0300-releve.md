@@ -16,7 +16,7 @@ Le label `tekton.dev/pipelineTask` et le champ `pipelineTaskName` viennent de Te
 | Porte, règle maison | [porte.rego](politique/porte/porte.rego), `porte.taches_vues` | **refus** (« aucune tâche vue ») : le témoin devrait fermer la porte au lieu d'une acceptation à vide. `construction_kata`, seule, accepterait à vide |
 | Test de la porte | `politique/porte/porte_test.rego:49` | le jeu d'essai garde l'ancien nom : il resterait vert et ne prouverait rien |
 | Politique d'image Kyverno (réserve C) | `politique/reserve-c/ivpol.tmpl.yaml:89` | `taches_pr` vide : verdict à mesurer |
-| Exportateur et recalcul de la 20 | `genre()` de `tools/metrics-exporter/metrics_exporter.py` et de `20-kpi/recalcul.py` | la tâche deviendrait une `image`. **Les deux ont le même défaut : le seuil (0 écart) ne le verrait pas** |
+| Exportateur et recalcul de la 20 | `genre()` de `tools/metrics-exporter/metrics_exporter.py` et de `20-kpi/recalcul.py` | la tâche deviendrait une `image`. **Les deux ont le même défaut : le seuil (0 écart) ne le verrait pas** ; correctif éprouvé à sec le 25/11, [non appliqué](../20-kpi/resultats/e13-predictions.md) |
 | Scripts de preuve | 05 (`m1b-construction` 2, `m1b-fermeture` 1, `m1b-provenance` 2, `m4b` 1, `m4c` 2), 06 (`s4a` 1, `s4b` 4, `s4d` 2, `s4d2` 4), 03 (`bascule` 3, `prefetch` 1), 08 (`construction` 1, `politique` 6, `preuves` 7, `tekton` 1) : lignes contenant `pipelineTask"` hors label, commentaires et textes compris | sélections vides ; une sélection vide comparée à une liste attendue échoue, mais un mutant appliqué à une sélection vide ne mute rien (`s4d2.sh`, `preuves.sh`) |
 | Banc des témoins de la 20 | `20-kpi/banc_temoins.py:174` | jeu d'essai à l'ancien nom |
 
