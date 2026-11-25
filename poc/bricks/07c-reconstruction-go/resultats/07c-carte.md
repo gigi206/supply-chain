@@ -537,3 +537,28 @@ Lue par `kubectl get` (une ConfigMap, aucun Secret) de 18:22:55 à 18:23:01 UTC 
 **Effet sur R5** : `preuves.sh reelle`, lancé par `porte_avant` et `porte_apres`, juge avec la ConfigMap telle qu'elle est. Il n'appelle pas `cm_porte` et ne repose donc pas `taches.yml`. L'attendu « champ 9 à `ok` après le push » a donc sa clé : la condition laissée ouverte dans la note de R5 est levée.
 
 **Heures de la 07c** : plus 18:22:28 à 18:23:30 UTC (0 h 01 min 02 s ; lecture, `preuves.sh`, note) ; **total : au plus 2 h 10 min 16 s** pour 10 h estimées.
+
+## R4 `rebuild` de `f5e6bcb0` : PASSED (note de 2026-11-25T13:48:52Z)
+
+Accord du propriétaire, verbatim : « Les 2 », le 25/11, sur la question « Planifier le seuil à 09:36 UTC et R4 (VM sc-replay) à 13:28 UTC ? ». Il couvre R4 seulement.
+
+**Avant le lancement (13:28:08 UTC)** : pas de journal R4 ; `outils/`, `politique-replay.md` et `replay.sh` sans modification hors commit ; `git log 6c44219..` vide pour `outils/` et la politique ; `sc-replay` démarrée, lien actif ; charge de l'hôte 2,41.
+
+**Passage unique** ([journal](../../10-independent-replay/resultats/f5e6bcb0/r4-rebuild.log), 13:28:12 à 13:48:14 UTC, code 0) :
+
+| Prédiction | Mesuré |
+|---|---|
+| ≥ 2026-11-25T13:27:42Z | 13:28:12, 1440 min après la fin du build |
+| lien coupé 1 200 s | coupé à 13:28:14, rétabli à 13:48:14 ; `porteuse_enp1s0=0` au début et à la fin du rebuild, vue de la VM ; `vnet124` `down` vu de l'hôte à 13:28:17, `up` à 13:48:20 |
+| sortie de la VM inchangée | `tx_bytes=8159842 tx_packets=78013` juste après la coupure et juste avant le rétablissement ; mêmes valeurs vues de l'invité |
+| `PASSED` | `verdict=PASSED`, `sujet_provenance` égal à `image_reconstruite` |
+| image `f5e6bcb0…` | `sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7` |
+| binaire `56f3cd7d…` | `binaire_image` et `binaire_go_build` : `56f3cd7d256562bef660f596de462af4105462356858b11f71cd04761c13b5c2` |
+
+**0 écart avec la prédiction.** Non prédit : image de build du domaine `0fd3ae1a…` (20 s), image reconstruite en 15 s ; rebuild terminé à 13:29:20, soit 66 s, 18 min 54 s avant le rétablissement. La ligne `go: downloading github.com/go-chi/chi/v5` vient du mandataire local (`GOPROXY=file://`, `rebuild.sh` l. 109) : le lien était coupé et les compteurs n'ont pas bougé.
+
+**Portée** : mêmes octets, hors ligne, par la toolchain et le moteur du domaine. Les limites de la 10 demeurent (les recettes et les entrées viennent de la plateforme, vérifiées en R3). La VSA n'existe pas encore : `taux_l3_verifie` reste à 1/4.
+
+**Suite** : poussée (accord), puis R5 sur accords : `vsa` dans la VM, puis push de la VSA. `etape_vsa` refuse un HEAD non poussé.
+
+**Heures de la 07c** : plus 13:28:08 à 13:28:17 et 13:48:20 à 13:48:52 UTC (0 min 41 s ; attente du rebuild non comptée) ; **total : au plus 2 h 10 min 57 s** pour 10 h estimées.
