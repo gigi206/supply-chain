@@ -2,8 +2,10 @@
 # Brique 08 : aucun secret de l'hôte ne doit apparaître dans les journaux des VM (fuite du jeton k3s
 # dans le journal sudo en J1). Pour chaque VM : journal systemd complet (sudo compris), fichiers *.log
 # de /var/log (journaux des pods compris), journal d'audit de l'API et volumes local-path (audit d'OpenBao), rapatriés sur l'hôte (0600), puis cherchés avec chaque secret
-# de ~/.cache/supply-chain-poc/08/secrets comme motif (grep -F -f : jamais en argument de commande), et avec le mot de passe de kpi-journal
-# (brique 20, fichier nommé, dossier jamais listé ; absent ou vide : dit, non cherché). Les secrets des 07a, 09 et 10 ne sont pas cherchés.
+# de ~/.cache/supply-chain-poc/08/secrets comme motif (grep -F -f : jamais en argument de commande), et avec ceux
+# des briques 07a, 09, 10 et 20 (fichiers nommés, d'après les scripts qui les créent, dossiers jamais listés ; absent ou vide : dit, non
+# cherché ; motifs de 16 caractères ou plus, la ligne de contrôle d'une clé armurée en ferait de faux). Non cherchés : hachages htpasswd,
+# copie base64 des comptes dans la configuration de registre de poc-lien, certificat de révocation OpenPGP, clé de la VSA (dans sc-replay).
 # Clés PEM : chaque ligne du corps base64 est un motif. Attendu : 0 partout. Témoin positif : une valeur
 # aléatoire non secrète, écrite dans le journal de chaque VM (logger), doit être retrouvée.
 #
@@ -29,6 +31,15 @@ kpi=$HOME/.cache/supply-chain-poc/20/secrets/grafana-kpi-journal.password
 for f in "$S"/* "$kpi"; do
   [ -f "$f" ] || continue
   grep -v -e '^-----' -e '^$' "$f" > "$W/motif-${f##*/}" || true
+done
+# Décision du propriétaire du 25/11/2026 (« Oui, à sec ») : 07a, 09 et 10. Étiquette préfixée par la brique.
+for n in 07a/zot-poc-vex.password 07a/openbao-proprietaire.password 09/zot-poc-lien.password 09/openbao-lien.secret 09/cle-openpgp.asc \
+  10/zot-poc-replay.password; do
+  f=$HOME/.cache/supply-chain-poc/${n%%/*}/secrets/${n##*/}
+  m=$W/motif-${n%%/*}-${n##*/}
+  if [ ! -s "$f" ]; then echo "absent ou vide, non cherché : ${n%%/*}-${n##*/}"; continue; fi
+  grep -v -E -e '^[[:space:]]*:?-----' "$f" | awk 'length($0) >= 16' > "$m" || true
+  [ -s "$m" ] || echo "aucune ligne de 16 caractères, non cherché : ${n%%/*}-${n##*/}"
 done
 
 temoin=$(openssl rand -hex 16)
