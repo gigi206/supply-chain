@@ -1,0 +1,11 @@
+# banc-genre.sh zot, 2026-11-25T21:25:44Z, dépôt ce0baf02, témoins b8da59c47b225a14, correctif ef2b38b45c2d5330, script 6891519ddedd2f48
+OK   avant : code : 0
+## bilan : 10 cas, 0 écart(s)
+## codes : lecteur 0, exportateur 0, clé étrangère 0, recalcul 0, comparaison 0
+OK   apres : code : 0
+## bilan : 10 cas, 0 écart(s)
+## codes : lecteur 0, exportateur 0, clé étrangère 0, recalcul 0, comparaison 0
+OK   lignes KPI et PROM comparées : plus de 200
+     (301 lignes, dont 12 séries de tâche)
+OK   lignes différentes : 0
+## zot : 0 KO, 25 s

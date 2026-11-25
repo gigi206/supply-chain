@@ -1,0 +1,79 @@
+# banc-genre.sh sorties, 2026-11-25T21:23:19Z, dépôt ce0baf02, témoins b8da59c47b225a14, correctif ef2b38b45c2d5330, script 6891519ddedd2f48
+OK   f2-prefetch-1, v0.29.x, exportateur avant : tâches : 2
+OK   f2-prefetch-1, v0.30.x, exportateur avant : tâches : 0
+OK   f2-prefetch-1, v0.29.x, recalcul avant : tâches : 2
+OK   f2-prefetch-1, v0.30.x, recalcul avant : tâches : 0
+OK   f2-prefetch-1, v0.29.x, exportateur apres : tâches : 2
+OK   f2-prefetch-1, v0.30.x, exportateur apres : tâches : 2
+OK   f2-prefetch-1, v0.29.x, recalcul apres : tâches : 2
+OK   f2-prefetch-1, v0.30.x, recalcul apres : tâches : 2
+OK   f2-prefetch-1, exportateur après : mêmes genres, dans l'ordre, pour les deux formats : True
+OK   f2-prefetch-1, exportateur : v0.29.x inchangé par le correctif : True
+OK   f2-prefetch-1, recalcul après : mêmes genres, dans l'ordre, pour les deux formats : True
+OK   f2-prefetch-1, recalcul : v0.29.x inchangé par le correctif : True
+OK   j7-sample-app, v0.29.x, exportateur avant : tâches : 3
+OK   j7-sample-app, v0.30.x, exportateur avant : tâches : 0
+OK   j7-sample-app, v0.29.x, recalcul avant : tâches : 3
+OK   j7-sample-app, v0.30.x, recalcul avant : tâches : 0
+OK   j7-sample-app, v0.29.x, exportateur apres : tâches : 3
+OK   j7-sample-app, v0.30.x, exportateur apres : tâches : 3
+OK   j7-sample-app, v0.29.x, recalcul apres : tâches : 3
+OK   j7-sample-app, v0.30.x, recalcul apres : tâches : 3
+OK   j7-sample-app, exportateur après : mêmes genres, dans l'ordre, pour les deux formats : True
+OK   j7-sample-app, exportateur : v0.29.x inchangé par le correctif : True
+OK   j7-sample-app, recalcul après : mêmes genres, dans l'ordre, pour les deux formats : True
+OK   j7-sample-app, recalcul : v0.29.x inchangé par le correctif : True
+OK   m5b-4-construction-1, v0.29.x, exportateur avant : tâches : 3
+OK   m5b-4-construction-1, v0.30.x, exportateur avant : tâches : 0
+OK   m5b-4-construction-1, v0.29.x, recalcul avant : tâches : 3
+OK   m5b-4-construction-1, v0.30.x, recalcul avant : tâches : 0
+OK   m5b-4-construction-1, v0.29.x, exportateur apres : tâches : 3
+OK   m5b-4-construction-1, v0.30.x, exportateur apres : tâches : 3
+OK   m5b-4-construction-1, v0.29.x, recalcul apres : tâches : 3
+OK   m5b-4-construction-1, v0.30.x, recalcul apres : tâches : 3
+OK   m5b-4-construction-1, exportateur après : mêmes genres, dans l'ordre, pour les deux formats : True
+OK   m5b-4-construction-1, exportateur : v0.29.x inchangé par le correctif : True
+OK   m5b-4-construction-1, recalcul après : mêmes genres, dans l'ordre, pour les deux formats : True
+OK   m5b-4-construction-1, recalcul : v0.29.x inchangé par le correctif : True
+OK   m5b-4-rpm-1, v0.29.x, exportateur avant : tâches : 2
+OK   m5b-4-rpm-1, v0.30.x, exportateur avant : tâches : 0
+OK   m5b-4-rpm-1, v0.29.x, recalcul avant : tâches : 2
+OK   m5b-4-rpm-1, v0.30.x, recalcul avant : tâches : 0
+OK   m5b-4-rpm-1, v0.29.x, exportateur apres : tâches : 2
+OK   m5b-4-rpm-1, v0.30.x, exportateur apres : tâches : 2
+OK   m5b-4-rpm-1, v0.29.x, recalcul apres : tâches : 2
+OK   m5b-4-rpm-1, v0.30.x, recalcul apres : tâches : 2
+OK   m5b-4-rpm-1, exportateur après : mêmes genres, dans l'ordre, pour les deux formats : True
+OK   m5b-4-rpm-1, exportateur : v0.29.x inchangé par le correctif : True
+OK   m5b-4-rpm-1, recalcul après : mêmes genres, dans l'ordre, pour les deux formats : True
+OK   m5b-4-rpm-1, recalcul : v0.29.x inchangé par le correctif : True
+OK   sample-app-deb-6391f, v0.29.x, exportateur avant : tâches : 3
+OK   sample-app-deb-6391f, v0.30.x, exportateur avant : tâches : 0
+OK   sample-app-deb-6391f, v0.29.x, recalcul avant : tâches : 3
+OK   sample-app-deb-6391f, v0.30.x, recalcul avant : tâches : 0
+OK   sample-app-deb-6391f, v0.29.x, exportateur apres : tâches : 3
+OK   sample-app-deb-6391f, v0.30.x, exportateur apres : tâches : 3
+OK   sample-app-deb-6391f, v0.29.x, recalcul apres : tâches : 3
+OK   sample-app-deb-6391f, v0.30.x, recalcul apres : tâches : 3
+OK   sample-app-deb-6391f, exportateur après : mêmes genres, dans l'ordre, pour les deux formats : True
+OK   sample-app-deb-6391f, exportateur : v0.29.x inchangé par le correctif : True
+OK   sample-app-deb-6391f, recalcul après : mêmes genres, dans l'ordre, pour les deux formats : True
+OK   sample-app-deb-6391f, recalcul : v0.29.x inchangé par le correctif : True
+OK   nom None : ['image', 'image']
+OK   nom 5 : ['image', 'image']
+OK   nom '' : ['image', 'image']
+OK   nom 'pipeline' : ['pipeline', 'pipeline']
+OK   nom 'pipeline/x' : ['image', 'image']
+OK   nom 'task' : ['image', 'image']
+OK   nom 'inputs/result' : ['image', 'image']
+OK   nom 'pipelineTask' : ['tache', 'tache']
+OK   nom 'pipelineTask/x' : ['tache', 'tache']
+OK   nom 'pipelineTask/x/y' : ['tache', 'tache']
+OK   nom 'pipelineTask/' : ['image', 'image']
+OK   nom 'PipelineTask/x' : ['image', 'image']
+OK   nom 'pipelineTaskX' : ['image', 'image']
+OK   nom 'pipelineTaskX/y' : ['image', 'image']
+OK   nom 'x/pipelineTask/y' : ['image', 'image']
+OK   nom ' pipelineTask' : ['image', 'image']
+OK   sans nom : ['image', 'image']
+## sorties : 0 KO, 0 s

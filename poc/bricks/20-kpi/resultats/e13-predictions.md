@@ -18,3 +18,19 @@ Deux correctifs, **non appliqués au dépôt** (précédent : `alertes-kpi.patch
 **Réfuté si** une ligne diffère. **G6 non valable si** un scan ou un énoncé arrive dans Zot entre les deux passages.
 
 **Ne dit pas** que la montée en v0.30.0 est possible : la porte, `ivpol` (réserve C) et les scripts des 03, 05, 06 et 08 comparent toujours le nom exact.
+
+## Résultat (note de 2026-11-25T21:26:34Z)
+
+Dépôt `ce0baf02` (prédictions et scripts commités avant), un seul passage par étape. **0 écart avec la prédiction.**
+
+| N° | Journal | Mesuré |
+|---|---|---|
+| G1 | [banc](e13-genre-banc.log), [rouge](e13-genre-rouge.log) | code 1, 25 cas, 2 écarts, les deux nommés ; `t-neuf` et `t-matrice` en `image` |
+| G2 | [banc](e13-genre-banc.log), [vert](e13-genre-vert.log) | code 0, 25 cas, 0 écart |
+| G3 | [banc](e13-genre-banc.log) | sept mutants sur sept refusés, chacun par le seul cas annoncé |
+| G4, G5 | [sorties](e13-genre-sorties.log) | 77 cas, 0 KO : 13 tâches avec v0.29.9 (avant, après), 0 puis 13 avec v0.30.0 ; genres égaux dans l'ordre ; 17 noms tenus |
+| G6 | [zot](e13-genre-zot.log), [avant](e13-genre-zot-avant.log), [après](e13-genre-zot-apres.log) | 301 lignes comparées, dont 12 séries de tâche, **0 différente** ; exportateur `98f917ab…` puis `a587011c…` |
+
+**Limites** : le vrai Zot ne porte que des noms de v0.29.x, G6 ne prouve que la non-régression. La forme matrice n'a jamais été produite, seulement lue dans la source. Les énoncés de v0.30.0 ne sont pas signés (G4 lit `genre()` seule) ; le bout en bout signé vient des témoins synthétiques (G2). Les journaux gardés des mutants ne sont que leurs lignes KO.
+
+**Reste** : appliquer les deux correctifs (`git apply`) et reposer l'exportateur sur sc-stockage (accord, sudo), ou les garder jusqu'à une montée de Chains. La montée reste bloquée par la porte, `ivpol` et les scripts.
