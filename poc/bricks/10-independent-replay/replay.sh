@@ -65,10 +65,11 @@ here=$(cd "$(dirname "$0")" && pwd)
 racine_depot=$(cd "$here/../../.." && pwd)
 R=$here/resultats
 # Additif du 24/11/2026 (brique 07c, VSA de f5e6bcb0) : IMAGE, INVOCATION, FIN_BUILD, GO_ARCHIVE, GO_SHA256 et RESULTATS_REPLAY se
-# passent par l'environnement ; les défauts restent ceux de 3a7ca1b1 / c4242a11 (rejeu.sh re-pousse cette VSA avec POUSSER_VSA=1)
-# jusqu'au commit qui archive la VSA de f5e6bcb0. RESULTATS_REPLAY (journaux et fichiers r4-/r5- produits) : dossier distinct, pour ne
+# passent par l'environnement. Commit d'archive de la VSA de f5e6bcb0 (2026-11-25T18:13:40Z) : les défauts sont ceux de f5e6bcb0 / 9539952b ;
+# ceux de 3a7ca1b1 / c4242a11 restent en commentaire. RESULTATS_REPLAY (journaux et fichiers r4-/r5- produits) : dossier distinct, pour ne
 # pas réécrire les mesures de la clôture de la 10 ; un journal existant y est refusé. La clé publique de VSA reste lue dans $R.
-RJ=$(realpath -m "${RESULTATS_REPLAY:-$R}")   # nom propre : rejeu.sh de la 08 exporte RESULTATS ; absolu pour preuves.sh
+RESULTATS_REPLAY=${RESULTATS_REPLAY:-$R/f5e6bcb0}   # défaut : dossier de f5e6bcb0 ; toujours défini, donc un journal existant est toujours refusé
+RJ=$(realpath -m "$RESULTATS_REPLAY")   # nom propre : rejeu.sh de la 08 exporte RESULTATS ; absolu pour preuves.sh
 O=$HOME/.cache/supply-chain-poc/10
 T=$O/telechargements
 E=$O/essais
@@ -76,9 +77,11 @@ mkdir -p "$R" "$RJ" "$T" "$E"
 ZOT_POC=192.168.161.13:5000                      # Zot du PoC, lecture anonyme seulement
 CA_POC=$O/ca-poc.crt                             # certificat public de la CA du PoC (TLS de Zot et de Forgejo), copié une fois
 [ -s "$CA_POC" ] || cp "$HOME/.cache/supply-chain-poc/08/pki/ca-poc.crt" "$CA_POC"   # public ; aucune clé de 08 n'est lue
-IMAGE=${IMAGE:-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5}   # sujet de la provenance
+# IMAGE=builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # Go 1.26.10 (VSA du 04/11/2026)
+IMAGE=${IMAGE:-builds/sample-app@sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7}   # sujet de la provenance (07c, Go 1.26.11)
 # INVOCATION=d9006af7-5d9a-4a5e-878e-1c9a5bd96d56   # PipelineRun du 02/11/2026, 13:58:36 à 13:59:30 UTC (VSA de R5, c804d946)
-INVOCATION=${INVOCATION:-c4242a11-18f6-439f-b947-7fe3d4319078}   # J7 du rejeu complet de la 08, 03/11/2026, 21:25:30 à 21:26:27 UTC (fermeture F2)
+# INVOCATION=c4242a11-18f6-439f-b947-7fe3d4319078   # J7 du rejeu complet de la 08, 03/11/2026, 21:25:30 à 21:26:27 UTC (fermeture F2)
+INVOCATION=${INVOCATION:-9539952b-07a7-4a0b-a6e1-084304d0e8af}   # PipelineRun de f5e6bcb0 (07c, étape 7), fin 2026-11-24T13:27:42Z
 
 # Domaine de replay : VM, réseau, clés (rien de commun avec 08 ; l'image Debian publique est relue dans le cache de 08 et revérifiée)
 IMG=$HOME/.cache/supply-chain-poc/08/telechargements/debian/debian-13-generic-amd64-20261026-2643.qcow2
@@ -97,7 +100,8 @@ OUTILS_SHA256="d18b8188b600e201a1b3d08c20e2a1e439cf51d2c2285f132dd9bd51c666f6d6 
 8781ab9f71c12f314d21c8e85f13ca1a82d90cf475aa5131a7b543fcc5487543  runc.amd64
 424e2c97d0b45fd7a6b608a87f090f35633f4c23ece5f092d48bba11aaf4bbfa  cosign-linux-amd64
 66fb0ad7206f3f6fa77ed5b552049d364ccf4b50b1684554f731f76302b52ca0  oras_1.3.6_linux_amd64.tar.gz
-${GO_SHA256:-ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5}  ${GO_ARCHIVE:=go1.26.10.linux-amd64.tar.gz}"
+${GO_SHA256:-9849f4e04ee35303714e34fbc3ac8ab44ea3e448a95aa182f91e3b9b79c710ec}  ${GO_ARCHIVE:=go1.26.11.linux-amd64.tar.gz}"
+# Go 1.26.10 (3a7ca1b1) : ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5  go1.26.10.linux-amd64.tar.gz
 v() { virsh -c qemu:///system "$@"; }
 sur() { ssh "${SSH_OPTS[@]}" "replay@$VM_IP" "$@"; }
 
@@ -355,7 +359,8 @@ etape_verifier_entrees() { # tout se passe dans la VM : verifier_entrees.py (tra
 }
 
 # FIN_BUILD=2026-11-02T13:59:30Z   # finishedOn de d9006af7, vérifié en R3 le 03/11/2026
-FIN_BUILD=${FIN_BUILD:-2026-11-03T21:26:27Z}   # finishedOn de c4242a11, lu sans vérification le 03/11/2026 (23:13 UTC) ; R3 le revérifie
+# FIN_BUILD=2026-11-03T21:26:27Z   # finishedOn de c4242a11, lu sans vérification le 03/11/2026 (23:13 UTC) ; R3 le revérifie
+FIN_BUILD=${FIN_BUILD:-2026-11-24T13:27:42Z}   # finishedOn de 9539952b, vérifié en R3 le 24/11/2026 (07c)
 ATTENTE_HORS_LIGNE=${ATTENTE_HORS_LIGNE:-1200}   # secondes lien coupé ; le rebuild doit finir avant le rétablissement
 
 transporter_r4() { # rebuild.sh : bundle preparer-entrees et ce rebuild.sh copiés dans ~/r4 de la VM, vidé d'abord
@@ -594,7 +599,12 @@ etape_pousser_vsa() { # SUR L'HÔTE, compte poc-replay (D5), ACCORD DU PROPRIÉT
     "$TYPE_BUNDLE" "$(sha256sum < "$x/config.json" | cut -c1-64)" "$TYPE_BUNDLE" "$(sha256sum < "$RJ/r5-vsa.bundle.json" | cut -c1-64)" \
     "$(wc -c < "$RJ/r5-vsa.bundle.json")" "$s" "$TYPE_VSA" > "$x/manifeste.json"
   m=sha256:$(sha256sum < "$x/manifeste.json" | cut -c1-64)
-  cp "$x/manifeste.json" "$RJ/r5-vsa-manifeste.json"
+  if [ -e "$RJ/r5-vsa-manifeste.json" ]; then   # re-push (rejeu.sh) : l'archive n'est jamais réécrite, le manifeste doit être le même
+    cmp -s "$x/manifeste.json" "$RJ/r5-vsa-manifeste.json" || { echo "REFUS : manifeste différent de resultats/r5-vsa-manifeste.json"; exit 1; }
+    echo "manifeste identique à l'archive : $m"
+  else
+    cp "$x/manifeste.json" "$RJ/r5-vsa-manifeste.json"
+  fi
   oras blob push "${a[@]}" "$ZOT_POC/$DEPOT_VSA" "$RJ/r5-vsa.bundle.json" > /dev/null && echo "blob du bundle poussé"
   oras blob push "${a[@]}" "$ZOT_POC/$DEPOT_VSA" "$x/config.json" > /dev/null && echo "config vide poussée"
   oras manifest push "${a[@]}" "$ZOT_POC/$DEPOT_VSA@$m" "$x/manifeste.json" 2>&1 | tail -1

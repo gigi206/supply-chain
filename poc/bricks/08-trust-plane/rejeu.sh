@@ -202,10 +202,11 @@ etape "07a (passage périodique)" plateforme g7_periodique g7_grafana
 # sont actives (absent()) jusqu'à cette étape. g8_grafana et l'incident a7 sont hors du rejeu, mesures ponctuelles.
 etape "07a (G8)" plateforme g8_metriques
 if [ "${POUSSER_VSA:-}" = 1 ]; then
-  # VSA de la brique 10 (bundle versionné, lié au seul digest 3a7ca1b1, que J7 vérifie) re-poussée, puis contrôle 6 de la porte
-  # 07c, étape 7 (24/11/2026) : J7 construit désormais f5e6bcb0 ; cette VSA ne la couvre pas, le contrôle 6 refuserait l'image
-  # réelle tant que la brique 10 n'a pas produit de VSA de f5e6bcb0 (déduit du code, non mesuré). Ne pas lancer avec POUSSER_VSA=1 avant.
-  etape "10 (VSA)" env JALON=r5 mise run replay -- pousser_vsa
+  # VSA de la brique 10 (bundle versionné, lié au seul digest f5e6bcb0, que J7 construit) re-poussée, puis contrôle 6 de la porte
+  # 07c, commit d'archive (2026-11-25T18:13:40Z) : VSA de f5e6bcb0 (resultats/f5e6bcb0 de la 10), défauts de replay.sh portés à f5e6bcb0.
+  # Jalon propre au rejeu : le journal r5-pousser_vsa.log de f5e6bcb0 existe et n'est jamais réécrit ; le manifeste est comparé à
+  # l'archive (même bundle, même sujet). PAS ENCORE REJOUÉ.
+  etape "10 (VSA)" env JALON="rejeu-$lib-r5" RESULTATS_REPLAY="$here/../10-independent-replay/resultats/f5e6bcb0" mise run replay -- pousser_vsa
   etape "J8 (contrôle 6)" mise run confiance:preuves -- controle6
   etape "J8 (contrôle 7)" mise run confiance:preuves -- controle7
   etape "07a (G6)" plateforme g6_temoins
