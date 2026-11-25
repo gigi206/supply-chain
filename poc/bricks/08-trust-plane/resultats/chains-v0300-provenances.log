@@ -1,0 +1,38 @@
+# provenances v0.29.9 / v0.30.0, banc à sec ; 2026-11-25T20:37:51Z, dépôt cab91ca6
+src29 : commit 89219ea5443fe3164715b9a93f7e6fd16d56b38a, binaire banc29 sha256 6f056d49c6de99438720ffd6ef728c62031bdc9252bb8a80c89cb4d614ecceac
+src30 : commit b59bced2524ec2da5dcbe3f916c2109262b9b819, binaire banc30 sha256 dbd9dafa4475b3389a824fe1adcf054b8dabb84399a50d852012956084599a19
+## P1 : sortie de v0.29.9 contre la provenance signée
+ÉGAL  j7-sample-app ; contenus 3 3
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+ÉGAL  sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f ; contenus 3 3
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+ÉGAL  m5b-4-construction-1 ; contenus 3 3
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+ÉGAL  f2-prefetch-1 ; contenus 2 2
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+   champs de plus dans l'objet du cluster : ['apiVersion', 'kind'] métadonnées [] annotations [] | moins : ['managedFields']
+## P2 à P4 : chemins qui diffèrent entre v0.29.9 et v0.30.0
+f2-prefetch-1 :  2 predicate.buildDefinition.resolvedDependencies.N.name; 2 predicate.runDetails.byproducts.N.name;
+j7-sample-app :  3 predicate.buildDefinition.resolvedDependencies.N.name; 6 predicate.runDetails.byproducts.N.name;
+m5b-4-construction-1 :  3 predicate.buildDefinition.resolvedDependencies.N.name; 6 predicate.runDetails.byproducts.N.name;
+m5b-4-rpm-1 :  2 predicate.buildDefinition.resolvedDependencies.N.name; 1 predicate.runDetails.byproducts.N.name;
+sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f :  3 predicate.buildDefinition.resolvedDependencies.N.name; 6 predicate.runDetails.byproducts.N.name;
+tr-f2-prefetch-1-prefetch :  2 predicate.runDetails.byproducts.N.name;
+tr-f2-prefetch-1-publier : 
+tr-j7-sample-app-construire :  1 predicate.runDetails.byproducts.N.name;
+tr-j7-sample-app-preparer :  5 predicate.runDetails.byproducts.N.name;
+tr-j7-sample-app-publier : 
+tr-m5b-4-construction-1-construire :  1 predicate.runDetails.byproducts.N.name;
+tr-m5b-4-construction-1-preparer :  5 predicate.runDetails.byproducts.N.name;
+tr-m5b-4-construction-1-publier : 
+tr-m5b-4-rpm-1-prefetch :  1 predicate.runDetails.byproducts.N.name;
+tr-m5b-4-rpm-1-publier : 
+tr-sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire :  1 predicate.runDetails.byproducts.N.name;
+tr-sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier : 
+tr-sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer :  5 predicate.runDetails.byproducts.N.name;

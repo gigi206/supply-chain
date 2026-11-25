@@ -30,3 +30,5 @@ La branche `claude/argo-l3` (porte Kyverno, enveloppe Go) n'est pas couverte par
 4. Les deux correctifs attendus (`b1c0af9`, #2096), et le cas « aucun signataire », toujours sans `recordError`.
 
 Local : les deux clones de Chains ont v0.29.9 seulement ; le Go de l'hôte est 1.24.7. Le banc demandera donc un téléchargement et une chaîne Go récente, à demander.
+
+**Correctif et résultat (2026-11-25T20:38:13Z)** : Go 1.27.3 était déjà local (`chains-correctif/go-dl`) ; seule la source de v0.30.0 a été prise, sur accord. Le banc est passé : [résultat](resultats/chains-v0300-predictions.md). Points 1, 2 et 3 établis (politique Kyverno de la réserve C et enveloppe Go exceptées) ; **point 4 non mesuré**. La porte refuse l'énoncé neuf (`porte.taches_vues`) ; les `byproducts` sont renommés aussi, et aucun lecteur du dépôt ni de la bibliothèque ne les lit (`git grep`).

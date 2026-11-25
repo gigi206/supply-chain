@@ -314,7 +314,7 @@ Règle ajoutée ([`alertes.yml`](config/regles/alertes.yml)) : `increase(marked_
 - A3 éprouvée sur une série de test (contrat de la brique 10, D2 a) ; preuve complète à la brique 10.
 - Le premier volet de A2 (`signing_failures`) n'a été déclenché par aucun incident réel ici : `decision3`, qui le produisait, ne tourne plus depuis la bascule de J8.
 - Second volet : référence sur un seul build normal ; en trafic mêlé, un build normal à reprises peut masquer un échec en ouvert.
-- Chains v0.29.9 échoue en ouvert sans OpenBao : l'alerte le détecte, elle ne l'empêche pas. Le correctif amont (`b1c0af9`) n'est pas publié. **Note du 2026-11-24T21:05:35Z** : il l'est depuis le 05/11/2026 (v0.30.0, lu à la source, non mesuré) ; la version en service reste v0.29.9, et le cas « aucun signataire » n'appelle toujours pas `recordError`. Voir [docs/04](../../../docs/04-sante-projets.md), avec un changement cassant (#2041).
+- Chains v0.29.9 échoue en ouvert sans OpenBao : l'alerte le détecte, elle ne l'empêche pas. Le correctif amont (`b1c0af9`) n'est pas publié. **Note du 2026-11-24T21:05:35Z** : il l'est depuis le 05/11/2026 (v0.30.0, lu à la source, non mesuré) ; la version en service reste v0.29.9, et le cas « aucun signataire » n'appelle toujours pas `recordError`. Voir [docs/04](../../../docs/04-sante-projets.md), avec un changement cassant (#2041). Note du 2026-11-25T20:38:13Z : banc à sec du format passé ([résultat](../08-trust-plane/resultats/chains-v0300-predictions.md)) ; `b1c0af9` reste non mesuré.
 
 ### Essai d'un correctif de Chains (02/11/2026, 22:52 à 23:04 UTC, demande du propriétaire)
 

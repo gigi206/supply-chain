@@ -1,0 +1,26 @@
+# lecteurs.py, dépôt cab91ca6
+## forme de v0.30.0 sur les sorties réelles
+OK    j7-sample-app, noms de tâche : ['pipelineTask/construire', 'pipelineTask/preparer', 'pipelineTask/publier']
+OK    j7-sample-app, hors noms des dépendances et du TaskRun dans les byproducts : égal
+OK    j7-sample-app, renomme() égale à la sortie réelle de v0.30.0 sur les noms : ['pipeline', 'pipelineTask/preparer', '', '', 'pipelineTask/construire', 'pipelineTask/publier', 'inputs/result', 'inputs/result', 'inputs/result', 'inputs/result']
+OK    sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f, noms de tâche : ['pipelineTask/construire', 'pipelineTask/preparer', 'pipelineTask/publier']
+OK    sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f, hors noms des dépendances et du TaskRun dans les byproducts : égal
+OK    sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f, renomme() égale à la sortie réelle de v0.30.0 sur les noms : ['pipeline', 'pipelineTask/preparer', '', '', 'pipelineTask/construire', '', 'pipelineTask/publier', 'inputs/result', 'inputs/result', 'inputs/result', 'inputs/result']
+OK    m5b-4-rpm-1, noms de tâche : ['pipelineTask/prefetch', 'pipelineTask/publier']
+OK    m5b-4-rpm-1, hors noms des dépendances et du TaskRun dans les byproducts : égal
+OK    m5b-4-rpm-1, renomme() égale à la sortie réelle de v0.30.0 sur les noms : ['pipeline', 'pipelineTask/prefetch', '', 'pipelineTask/publier', '', 'inputs/result']
+OK    m5b-4-construction-1, noms de tâche : ['pipelineTask/construire', 'pipelineTask/preparer', 'pipelineTask/publier']
+OK    m5b-4-construction-1, hors noms des dépendances et du TaskRun dans les byproducts : égal
+OK    m5b-4-construction-1, renomme() égale à la sortie réelle de v0.30.0 sur les noms : ['pipeline', 'pipelineTask/preparer', '', '', 'pipelineTask/construire', '', 'pipelineTask/publier', 'inputs/result', 'inputs/result', 'inputs/result', 'inputs/result']
+OK    f2-prefetch-1, noms de tâche : ['pipelineTask/prefetch', 'pipelineTask/publier']
+OK    f2-prefetch-1, hors noms des dépendances et du TaskRun dans les byproducts : égal
+OK    f2-prefetch-1, renomme() égale à la sortie réelle de v0.30.0 sur les noms : ['pipeline', 'pipelineTask/prefetch', '', 'pipelineTask/publier', '', 'inputs/result']
+## app : 8 énoncés signés, 4 de PipelineRun, le plus récent fini à 2026-11-24T13:35:24Z ; neuf fini à 2026-11-24T13:27:42Z
+  fermetures 1, provenances de fermeture vérifiées 4
+OK    app P6 ancien seul : []
+OK    app P5 neuf seul (fermetures lues 0) : ['porte.taches_vues', 'slsa_build_scripted_build.build_task_image_results_found', 'slsa_build_scripted_build.image_built_by_trusted_task', 'tasks.pipeline_has_tasks']
+OK    app P5 tous renommés : ['porte.taches_vues', 'slsa_build_scripted_build.build_task_image_results_found', 'slsa_build_scripted_build.image_built_by_trusted_task', 'tasks.pipeline_has_tasks']
+OK    app P7 mélange, neuf le plus récent : ['porte.taches_vues', 'slsa_build_scripted_build.build_task_image_results_found', 'slsa_build_scripted_build.image_built_by_trusted_task', 'tasks.pipeline_has_tasks']
+OK    app P7 mélange, ancien le plus récent : []
+OK    app P8 fermetures prouvées par des énoncés neufs (4 provenances) : ['porte.fermeture_plateforme']
+## deb : 8 énoncés signés, 4 de PipelineRun, le plus récent fini à 2026-11-23T23:16:34Z ; neuf fini à 2026-11-23T23:16:34Z

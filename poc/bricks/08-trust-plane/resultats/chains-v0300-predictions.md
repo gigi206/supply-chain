@@ -34,3 +34,25 @@ Prédiction écrite le 2026-11-25T18:45:45Z, avant tout téléchargement de la s
 **Réfuté si** : P5 ou P8 rend une admission (échec ouvert, à signaler aussitôt) ; P2 donne une autre forme.
 
 **Non mesuré par ce banc** : la signature et le stockage (`b1c0af9`, #2096), le contrôleur lui-même, la politique d'image Kyverno de la réserve C (lue seulement), l'enveloppe Go de la branche `claude/argo-l3`, `ec validate image` de bout en bout (il demande le registre et les noms du cluster).
+
+## Résultat (2026-11-25T20:38:13Z)
+
+Journaux : [provenances](chains-v0300-provenances.log) (P1 à P4), [lecteurs](chains-v0300-lecteurs-3.log) (P5 à P11). **0 écart sur P5 à P11 ; P3 et P4 réfutées ; aucune admission à tort : pas d'échec ouvert de la porte sur les cas joués.**
+
+| N° | Résultat |
+|---|---|
+| P1 | Tenue : 4 provenances signées sur 4 égales à la sortie de v0.29.9 (`m5b-4-rpm-1` non comparé). Écarts retirés : annotations `chains.tekton.dev/*`, `resourceVersion`, `finalizers`, `kind`/`apiVersion`, `managedFields` (caché par `kubectl`, donc champ signé non comparé) |
+| P2 | Tenue : `pipelineTask/<tâche>`, une par tâche, 0 `pipelineTask`, sur 5 PipelineRuns. La forme d'une matrice (`pipelineTask/<tâche>/<TaskRun>`) est lue dans la source, pas mesurée |
+| P3 | **Réfutée** : les noms de `byproducts` changent aussi. Rien d'autre ne change (comparaison de tous les chemins). docs/04 l'annonçait déjà (« change les `byProducts` ») : la prédiction ne l'a pas repris |
+| P4 | **Réfutée** pour la même raison, dans les TaskRuns qui ont des `byproducts` (8 sur 13 ; 5 TaskRuns `publier` inchangés) |
+| P5 | Tenue, app et deb, énoncé neuf seul et tous renommés : refus `porte.taches_vues`, plus `tasks.pipeline_has_tasks` et deux codes `slsa_build_scripted_build` |
+| P6 | Tenue : 0 code de refus |
+| P7 | Tenue : ancien le plus récent, admis ; neuf le plus récent, refus |
+| P8 | Tenue : `porte.fermeture_plateforme`, seul code (app : 4 provenances de fermeture ; deb : 8) |
+| P9 | Tenue : 39/39 avec l'ancien nom ; avec le nom neuf, 5 réussites et 34 échecs |
+| P10 | Tenue : `image` au lieu de `tache` chez l'exportateur **et** le recalcul, d'accord entre eux |
+| P11 | Tenue pour les sélections (3 puis 0). L'effet sur les mutants est déduit de la sélection vide : les mutants n'ont pas été lancés |
+
+**Trois passages.** Le premier ([journal](chains-v0300-lecteurs-premier-passage.log)), lancé à 2026-11-25T18:51:19Z, a été arrêté pendant le cas deb, entre 20:34:50Z (dernier relevé) et 20:35:42Z ; le processus avait alors plus de 1 h 43 min 18 s. `ec.oci.image_manifests` cherchait les bundles sur `sc-stockage.poc.test`, que l'hôte ne résout pas, et réessayait. Les bundles n'y étaient donc pas lus : ses résultats d'app valent pour `porte.*`, pas pour `trusted_task`. Le deuxième ([journal](chains-v0300-lecteurs-2.log), 20:35:42Z à 20:36:31Z) injecte les vrais manifestes, lus par l'adresse du registre à la même empreinte : mêmes codes. Il comptait deux fois chaque échec de P9 (68 au lieu de 34, `opa` liste les échecs deux fois). Le troisième, retenu (20:36:54Z à 20:37:42Z), ne change que ce compte.
+
+**Limites** : énoncés neufs non signés (règles seules) ; nombre de fermetures lues = 0 quand l'énoncé neuf est seul, la règle de fermeture n'y est donc pas éprouvée (P8 la couvre) ; six des neuf paquets (`trusted_task`, `attestation_type`, `slsa_build_build_service`, `slsa_provenance_available`, `slsa_source_correlated`, `slsa_source_version_controlled`) n'ont rendu aucun refus : le banc ne dit pas s'ils refuseraient un énoncé neuf fautif ; `trusted_task`, muet, n'a vu aucune tâche. Le « Non mesuré » ci-dessus reste entier.
