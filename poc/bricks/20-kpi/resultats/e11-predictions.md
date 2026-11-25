@@ -25,3 +25,5 @@ Prédiction écrite le 2026-11-25T10:41:45Z, avant le passage de 11:15 UTC du 25
 **Réfuté si** : un écart recalcul contre exportateur, une signature refusée, un Job en échec, ou un scan nouveau pour un autre sujet que le deb.
 
 **Non valable si** : aucun passage de l'exportateur n'a eu lieu entre la fin du Job et le seuil ; dans ce cas, attendre.
+
+**Condition de validité resserrée, note du 2026-11-25T10:44:25Z** (avant le scan, sur relecture du conseiller) : l'exportateur date son passage à la fin de son travail (`metrics_exporter.py`, juste avant l'écriture). Un passage commencé avant la fin du Job peut donc porter une date postérieure, et donner un faux écart (recalcul 4, exportateur 3). `kpi.service` est borné par `TimeoutStartSec=2min` : le seuil n'est lancé qu'après un passage daté de plus de 120 s après la fin du Job, sinon au passage suivant. Le compte du deb n'est pas lu avant le seuil.
