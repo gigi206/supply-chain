@@ -562,3 +562,27 @@ Accord du propriétaire, verbatim : « Les 2 », le 25/11, sur la question « Pl
 **Suite** : poussée (accord), puis R5 sur accords : `vsa` dans la VM, puis push de la VSA. `etape_vsa` refuse un HEAD non poussé.
 
 **Heures de la 07c** : plus 13:28:08 à 13:28:17 et 13:48:20 à 13:48:52 UTC (0 min 41 s ; attente du rebuild non comptée) ; **total : au plus 2 h 10 min 57 s** pour 10 h estimées.
+
+## R5 : VSA de `f5e6bcb0` signée et poussée (note de 2026-11-25T18:15:17Z)
+
+Accord du propriétaire, verbatim : « Pousse » (les 9 commits jusqu'à `39834860`, distant relu à 18:02:42Z), puis « Tout », sur la question « Je lance tout R5, avec signature et push de la VSA de `f5e6bcb0` ? ». Prédiction : [`predictions.md`](../../10-independent-replay/resultats/f5e6bcb0/predictions.md) du 24/11, et l'attendu « champ 9 à `ok` après le push » de la note de R5.
+
+| Étape (UTC) | Prédiction | Mesuré |
+|---|---|---|
+| `vsa` (18:12:53, [journal](../../10-independent-replay/resultats/f5e6bcb0/r5-vsa.log)) | `PASSED`, sujet `f5e6bcb0`, entrée = bundle horodaté de `9539952b`, signée et revérifiée | `PASSED` ; bundle `49e015fc…` (`bundle-3642a117c2a49725`, 1 parmi 8) ; `timeVerified` 13:29:12Z ; `attest-blob` et `verify-blob-attestation` code 0, `tlog` et horodatage absents ; `vsa.py` et politique aux empreintes de HEAD |
+| `porte_avant` (18:13:02) | image admise | admise, contrôle 9 `ok` (8/8), **contrôle 6 `refus`, 0/0 VSA** |
+| `pousser_vsa` (18:13:16, [journal](../../10-independent-replay/resultats/f5e6bcb0/r5-pousser_vsa.log)) | poussée par digest dans `builds/vsa/sample-app`, compte `poc-replay` | manifeste `f6442817…` ; aucun tag ; referrers de `builds/sample-app` 0 avant et après |
+| `porte_apres` (18:13:22) | verdict inchangé | verdict inchangé ; **contrôle 6 `refus` → `ok`, 1/1 VSA** (hors de la comparaison du script) |
+| `lire_vsa` (18:13:31) | clés croisées refusées | clé de VSA acceptée, clé de Chains refusée ; provenance refusée par la clé de VSA ; 2 témoins acceptés ; aucune connexion hors de Zot |
+
+**0 écart avec la prédiction.** Contre la VSA du 04/11 (`3a7ca1b1`), l'énoncé ne diffère que par le sujet, le bundle, `timeVerified` et la version de Go (1.26.11).
+
+**Grafana** : le push est lu par l'auditeur à travers Loki ([journal](../../10-independent-replay/resultats/f5e6bcb0/r5-push-loki.log)) : `POST`, `PUT` du bundle et `PUT` du manifeste par `poc-replay` (202, 201, 201), de 18:13:18 à 18:13:19Z.
+
+**Commit d'archive** (`122168d9`) : le correctif `archive-vsa.patch` est appliqué, avec `@DATE@` au 2026-11-25T18:13:40Z. `replay.sh` n'avait pas changé depuis sa préparation. `bash -n` sur les deux scripts ; les défauts, évalués sans environnement, donnent `resultats/f5e6bcb0`, l'image `f5e6bcb0…`, `9539952b…` et 2026-11-24T13:27:42Z. Le re-push par `rejeu.sh` n'est **pas encore rejoué**.
+
+**Portée** : cette VSA atteste la construction du 24/11. Un rejeu de zéro qui reconstruit `f5e6bcb0` serait encore admis par elle (limite « acceptée en connaissance de cause » du 03/11) ; la seconde VSA, sur la provenance du rejeu, reste à faire.
+
+**KPI** : [seuil n° 5 de la 20](../../20-kpi/resultats/e5-seuil-5.log) (18:24:23Z) : `taux_l3_verifie` 1/4 → 2/4, `taux_replay_identique` 2/4 → 3/4, 0 écart.
+
+**Heures de la 07c** : plus 18:02:34 à 18:02:52, 18:12:53 à 18:13:43 et 18:14:21 à 18:15:17 UTC (0 h 02 min 04 s) ; **total : au plus 2 h 13 min 01 s** pour 10 h estimées.
