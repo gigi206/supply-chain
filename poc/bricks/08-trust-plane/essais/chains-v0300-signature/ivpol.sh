@@ -126,7 +126,7 @@ statut() { # nom code : statut(s) du code dans le diagnostic, uniques, ou absent
   rendre "$T/rc-temoin.yaml" "$T/cle/cosign.pub" "$T/taches-temoin.yml" diagnostic
   rendre "$T/rc-autre.yaml" "$T/autre/cosign.pub" "$T/taches.yml" diagnostic
   sed -n '/^ivpol() {/,/^}/p' "$P08/commun.sh" > "$T/c9-fonction.sh"
-  attendu "contrôle 9 : fonction ivpol lue dans commun.sh" "$(head -1 "$T/c9-fonction.sh" | cut -c1-8) $(tail -1 "$T/c9-fonction.sh")" "ivpol() }"
+  attendu "contrôle 9 : fonction ivpol lue dans commun.sh" "$(head -1 "$T/c9-fonction.sh" | cut -c1-7) $(tail -1 "$T/c9-fonction.sh")" "ivpol() }"
   cp "$T/cle/cosign.pub" "$T/c9/chains-cle-publique.pem"; cp "$T/autre/cosign.pub" "$T/c9-autre/chains-cle-publique.pem"
   ( REG_HOTE=$REG R=$T/c9; . "$T/c9-fonction.sh"; ivpol horodatage/bundles "" c9 ) > "$T/c9.yaml"
   ( REG_HOTE=$REG R=$T/c9-autre; . "$T/c9-fonction.sh"; ivpol horodatage/bundles "" c9 ) > "$T/c9-autre.yaml"

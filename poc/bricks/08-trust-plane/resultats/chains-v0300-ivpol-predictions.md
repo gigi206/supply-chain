@@ -56,3 +56,15 @@ Si X4 tombe, `trusted_task.trusted` de reserve-c ne lit pas les tâches de v0.30
 - Les referrers passent par le repli par étiquette, pas par l'API referrers de Zot.
 - On mesure le CLI, pas l'admission ; le registre est en HTTP ; un seul cas.
 - reserve-c n'a pas d'équivalent de `porte.taches_vues`, de Kata ni de la fermeture. Son refus de v0.30.0 ne repose que sur deux règles de la bibliothèque.
+
+## Résultat du passage 1 (note de 2026-11-26T09:06:28Z)
+
+Commit de la prédiction : `268df164`. [Journal](chains-v0300-ivpol.log) : 2026-11-26T09:06:13Z → 09:06:21Z, 8 s, 41 OK, 1 KO.
+
+X1 à X6 sont tenues dans le journal. **X7 n'est pas tenue**, à cause d'un défaut de la garde et non de la mesure. La garde « fonction ivpol lue dans commun.sh » coupait la première ligne à 8 caractères (`ivpol() `, espace compris) et la comparait à `ivpol()`. Le rendu du contrôle 9 a pourtant été contrôlé par la ligne suivante (sans `tsaCertChain`, une règle C9), et il a été jugé.
+
+Correction : la coupe passe à 7 caractères. Rien d'autre ne change.
+
+## Prédiction du passage -2 (2026-11-26T09:06:28Z)
+
+Mêmes énoncés X1 à X7, avec la garde corrigée : 0 KO.
