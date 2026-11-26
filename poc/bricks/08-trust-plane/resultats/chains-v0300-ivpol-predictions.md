@@ -68,3 +68,38 @@ Correction : la coupe passe à 7 caractères. Rien d'autre ne change.
 ## Prédiction du passage -2 (2026-11-26T09:06:28Z)
 
 Mêmes énoncés X1 à X7, avec la garde corrigée : 0 KO.
+
+## Résultat du passage -2 (note de 2026-11-26T09:06:50Z)
+
+Commit de la prédiction : `bd3d3f70`. [Journal](chains-v0300-ivpol-2.log) : 2026-11-26T09:06:39Z → 09:06:46Z, 7 s, 42 OK, 0 KO. La table d'état des règles est identique à celle du passage 1.
+
+| Prédiction | Verdict |
+|---|---|
+| X1 (rejeu) | **Tenue** : bundles créés, vérifiés et publiés dans l'ordre TaskRun puis PipelineRun ; tout diagnostic à clé juste retient la provenance du PipelineRun (`9539952b…`) |
+| X2 (rejeu) | **Tenue** : v0.29.9, 0 règle `ko` (`trusted_task.tagged` en avertissement 3 fois) ; v0.30.0, exactement `build_task_image_results_found` et `pipeline_has_tasks` |
+| X3 | **Tenue** : décision `pass` pour v0.29.9, `fail` pour v0.30.0, avec ces deux règles pour motif |
+| X4 | **Tenue** : liste revue sans `publier-image`, `trusted_task.trusted` est `ko` pour v0.29.9 (seul code de plus) et `ok` pour v0.30.0 (échecs inchangés) |
+| X5 | **Tenue** : avec l'autre clé, signature d'image et de provenance `ko` pour les deux versions (aucune provenance retenue) |
+| X6 | **Tenue** : contrôle 9 `pass` pour les deux versions, `fail` pour les deux avec l'autre clé. Le message reste « provenance sans horodatage RFC 3161 valide » : il est fixe dans la politique, alors que le refus vient de la clé |
+| X7 | **Tenue** : 0 KO, 7 s |
+
+**Ce que le banc établit.** Sous Kyverno, la réserve de la décision C refuse v0.30.0 comme Conforma, par les deux mêmes règles de la bibliothèque. Elle n'a pas l'équivalent de `porte.taches_vues`, qui fait le troisième code chez Conforma. `trusted_task.trusted` y réussit à vide pour v0.30.0, comme chez Conforma ; le témoin le prouve. D'autres règles réussissent aussi pour v0.30.0, sans témoin :
+
+- `subject_build_task_matches` ;
+- `successful_pipeline_tasks` ;
+- les autres règles `trusted_task.*`.
+
+`trusted_task.tagged` passe d'avertissement à succès : la règle ne voit plus de tâche.
+
+Le contrôle 9 admet les deux versions : il ne vérifie que la signature des bundles et ne lit pas leur contenu. La montée de Chains ne change donc rien pour lui.
+
+Réserves, celles écrites d'avance :
+
+- bundles sans jeton TSA ;
+- referrers par le repli par étiquette ;
+- le CLI et non l'admission ;
+- registre en HTTP ;
+- un seul cas ;
+- refus de reserve-c tenu par deux règles seulement.
+
+Non couverts : KMS, contrôleur, Zot réel, admission, la porte Kyverno de l'autre session.
