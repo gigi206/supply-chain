@@ -93,3 +93,20 @@ porte `OnUnitActiveSec=15min` (précision par défaut de systemd : 1 min). La po
 
 Réserve écrite avant : l'origine timer du passage est déduite (aucun lancement à la main par cette session) ; le journal
 systemd de sc-stockage n'est pas lu (ssh = accord).
+
+## Levée de la réserve du timer, résultat (note de 2026-11-26T11:10:20Z)
+
+| N° | Journal | Mesuré |
+|---|---|---|
+| H8 | guet hors journal (lecture de l'auditeur toutes les 15 s) | tenu : passage de 11:09:17Z, lu par l'auditeur dans Prometheus à 11:09:44Z, aucun lancement à la main |
+| H9 | [seuil -8](e5-seuil-8.log), 11:09:49Z | tenu : HTTP 200, 134 séries, âge du passage 32 s, 105 valeurs, 0 écart, codes 200, 0, 0 |
+
+Le journal du seuil -8 est identique à celui du -7, en dehors de l'en-tête, de l'âge et des séries `kpi_exportateur_*`
+(contrôlé par `diff`).
+
+La réserve du timer est levée : un passage déclenché par `kpi.timer` avec l'exportateur `fc0b8e0d…` est mesuré. Son origine
+reste déduite, voir la réserve écrite avant. Le guet n'a pas de journal dans le dépôt : il ne lisait qu'une série, celle que
+le seuil -8 relit (`kpi_exportateur_passage_timestamp_seconds 1795691357`).
+
+Heures : 11:03:37Z à 11:04:20Z (état, sonde, prédiction, commit), puis 11:09:46Z à 11:10:20Z (seuil, note). L'attente du
+timer n'est pas comptée.
