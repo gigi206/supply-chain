@@ -56,8 +56,15 @@ sc-stockage (sudo, commit faf63450) ? ».
 | N° | Journal | Mesuré |
 |---|---|---|
 | H5 | [pose](e15-pose.log), 10:54:04Z à 10:54:16Z | tenu, 0 KO. `metrics_exporter.py` installé identique (`fc0b8e0d…`), `lecteur_loki.py` aussi. Premier passage réussi pour `kpi-journal` et `kpi`, timer actif. Le compte `kpi` ne lit pas le mot de passe. 0 signature refusée, 0 clé ni pin sans date. Exposition systemd : 3,0 pour `kpi.service`, 2,9 pour `kpi-journal.service` |
-| H6 | [verif](e15-verif.log), 10:54:24Z | tenu : 134 séries `kpi_*`, passage et journal de moins de 20 min, 0 refus |
+| H6 | [verif](e15-verif.log), 10:54:24Z, puis [verif -2](e15-verif-2.log), 10:56:46Z | premier passage non valable (voir plus bas) ; second passage tenu : 134 séries `kpi_*`, passage et journal de moins de 20 min, 0 refus |
 | H7 | [seuil -7](e5-seuil-7.log), 10:55:00Z | tenu : 105 valeurs, 0 écart ; passage vu par Prometheus vieux de 46 s (10:54:14Z, celui de la pose) |
+
+**H6 rejoué, même défaut.** Le premier `verif` (10:54:24Z) a tourné six secondes avant le seuil -6. Il lisait donc très
+probablement l'ancien passage, et il ne compte pas pour H6. Il est rejoué dans [verif -2](e15-verif-2.log) à 10:56:46Z,
+après la lecture de 10:54:14Z par Prometheus : tenu, 134 séries, passage et journal de moins de 20 min, 0 refus.
+
+Réserve : le seuil -7 lit le passage lancé à la main par la pose. Aucun passage déclenché par le timer avec le nouvel
+exportateur n'est observé ici.
 
 Passage non valable, gardé : le [seuil -6](e5-seuil-6.log), lancé à 10:54:30Z, a lu dans Prometheus le passage de 10:51:19Z
 (« âge du passage 191 s »). C'était le dernier passage de l'ancien exportateur `98f917ab…`, avant que Prometheus ait relevé
@@ -70,4 +77,5 @@ L'écart dépôt/VM est fermé : sc-stockage porte l'exportateur du commit `faf6
 en v0.29.9.
 
 Heures : 10:40:27Z à 10:41:36Z (prédiction, application, banc, sec, commits), puis 10:54:04Z à 10:55:26Z (pose, verif,
-seuils, notes), soit 2 min 31 s. L'attente de l'accord n'est pas comptée, et le temps de la question non plus.
+seuils, notes), soit 2 min 31 s. La lecture des correctifs et la préparation, du choix jusqu'à 10:40:27Z, n'ont pas de
+`date -u` : elles ne sont pas mesurées. L'attente de l'accord n'est pas comptée, et le temps de la question non plus.
