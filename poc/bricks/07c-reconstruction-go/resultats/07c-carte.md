@@ -592,3 +592,5 @@ Accord du propriétaire, verbatim : « Pousse » (les 9 commits jusqu'à `398348
 Accord : choix du propriétaire « Clore avec réserves », verbatim, sur la question « Que faire de la 07c ? ». Seuil, réserves et effort : section « Clôture » du [README](../README.md). Aucune mesure nouvelle.
 
 **Heures de la 07c** : plus 13:21:42Z à 13:22:18Z (clôture) ; **total : au plus 2 h 13 min 01 s plus la clôture** pour 10 h estimées.
+
+**Retouche (note de 2026-11-26T13:24:09Z)** : la réserve « scan planifié » est bornée à ce qui a été lu. Les passages planifiés des 25 et 26/11 sont vus indirectement par les seuils n° 3 à 8 de la 20 (heures de scan 09:32:07Z et 09:32:09Z) ; leur origine CronJob est déduite. **Heures de la 07c** : plus 13:22:31Z à 13:24:09Z.
