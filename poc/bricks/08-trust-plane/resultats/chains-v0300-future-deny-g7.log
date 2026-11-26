@@ -1,0 +1,36 @@
+# G7 de future-deny : sorties d erreur d ec gardées du passage -2, relues sans relance, 2026-11-26T11:18:49Z, dépôt 7a2a2a50
+== service-29 : modifié 2026-11-26T10:22:54Z, lignes 9, échecs de récupération 9
+   lignes par fonction :
+         9 function=ec.oci.image_manifest
+   lignes par bundle (chaque ligne nomme le bundle deux fois : URL et input_ref) :
+   construire-image 3
+   preparer-entrees 3
+   publier-image 3
+== regles-29 : modifié 2026-11-26T10:22:55Z, lignes 12, échecs de récupération 12
+   lignes par fonction :
+        12 function=ec.oci.image_manifest
+   lignes par bundle (chaque ligne nomme le bundle deux fois : URL et input_ref) :
+   construire-image 4
+   preparer-entrees 4
+   publier-image 4
+== futur-29 : modifié 2026-11-26T10:22:56Z, lignes 12, échecs de récupération 12
+   lignes par fonction :
+        12 function=ec.oci.image_manifest
+   lignes par bundle (chaque ligne nomme le bundle deux fois : URL et input_ref) :
+   construire-image 4
+   preparer-entrees 4
+   publier-image 4
+== immediat-29 : modifié 2026-11-26T10:22:57Z, lignes 12, échecs de récupération 12
+   lignes par fonction :
+        12 function=ec.oci.image_manifest
+   lignes par bundle (chaque ligne nomme le bundle deux fois : URL et input_ref) :
+   construire-image 4
+   preparer-entrees 4
+   publier-image 4
+== eteint-29 : modifié 2026-11-26T10:22:58Z, lignes 9, échecs de récupération 9
+   lignes par fonction :
+         9 function=ec.oci.image_manifest
+   lignes par bundle (chaque ligne nomme le bundle deux fois : URL et input_ref) :
+   construire-image 3
+   preparer-entrees 3
+   publier-image 3

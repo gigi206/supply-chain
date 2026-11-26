@@ -146,7 +146,7 @@ G1 à G6 tenues. G7 n'est pas tenue, et c'est elle qui porte les 3 KO.
   `publier` est dans l'énoncé signé, sous `pipelineTask/publier`.
 - **G7** (sortie d'erreur d'ec)
   - `service` et `eteint` : 9 lignes pour v0.29.9, comme prédit.
-  - `regles`, `futur` et `immediat` : 12 lignes, soit 4 échecs de récupération par bundle au lieu de 3. Déduit du compte, non
+  - `regles`, `futur` et `immediat` : 12 lignes, soit 4 échecs de récupération par bundle au lieu de 3 (compte par bundle mesuré depuis, voir plus bas). Déduit du compte, non
     mesuré autrement : le nouveau système, une fois actif, demande les manifestes une fois de plus. Mon compte ne tenait
     pas compte de ce changement. Le script commité attend toujours 9 et rend donc 3 KO par construction (noté dans son en-tête).
   - v0.30.0 : 0 ligne partout.
@@ -161,3 +161,16 @@ raisons, toutes deux mesurées : la liste revue est à l'ancien format, et le no
 Réserves : celles écrites avant le lancement. La liste de règles est fabriquée. ec est seul juge, `reserve-c` n'ayant pas
 d'équivalent. Il n'y a qu'un cas (j7). Les bundles sont absents du registre du banc, et aucune règle `versions` n'est
 essayée. Rien n'est ouvert chez un tiers.
+
+## G7 relue sur les sorties gardées (note de 2026-11-26T11:18:56Z)
+
+Après « continue », sans relance : les sorties d'erreur d'ec du passage -2 sont relues dans le dossier de travail du banc.
+Leurs dates de modification (10:22:54Z à 10:22:58Z) tombent dans le passage -2 ([relevé](chains-v0300-future-deny-g7.log)).
+
+- Toutes les lignes, sous les cinq politiques, viennent de la même fonction, `ec.oci.image_manifest`.
+- `service` et `eteint` : 3 lignes par bundle (`construire-image`, `preparer-entrees`, `publier-image`).
+- `regles`, `futur` et `immediat` : 4 lignes par bundle.
+
+Le compte de 4 par bundle est donc mesuré, et non plus déduit du total. Reste déduit : que la demande en plus vienne du
+nouveau système. Les lignes ne nomment pas la règle qui appelle `ec.oci.image_manifest`. Les 3 KO restent ceux d'un
+attendu faux (9), pas d'un défaut de la porte.
