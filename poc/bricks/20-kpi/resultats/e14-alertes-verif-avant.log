@@ -1,0 +1,10 @@
+# alertes-verif.sh, 2026-11-26T07:57:13Z, dépôt 3aed35d2, script 208e079ee1071f1c
+OK   HTTP (règles) : 200
+OK   règles chargées, vues par Grafana : 15
+OK   HTTP (ALERTS) : 200
+OK   alertes kpi en attente ou déclenchées : (aucun résultat)
+OK   HTTP (âge) : 200
+OK   âge du dernier passage : 503 s (< 2700)
+OK   HTTP (refus) : 200
+OK   signatures refusées (somme) : 0
+## bilan : 0 KO
