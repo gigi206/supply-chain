@@ -1,0 +1,141 @@
+# porte.sh, 2026-11-26T08:55:51Z, dépôt 22e61f22, script 0663bfa9faf4c97d, main.go 76e03e674842ed47
+OK   réseau du banc : interfaces : 1
+OK   réseau du banc : routes de la table principale : 0
+OK   ec : empreinte du verrou (politique.sh) : 895c6f7e63cfefe6257a2e54c052c3d90803e8127adf5a7eb13f245262859abf
+ec : v0.10.42 ; cosign : v3.1.4
+src29 : commit 89219ea5443fe3164715b9a93f7e6fd16d56b38a, main.go identique, binaire 984b202a73690182
+src30 : commit b59bced2524ec2da5dcbe3f916c2109262b9b819, main.go identique, binaire 380f637667285595
+OK   bibliothèque : arbre de ebd3fbd270297c15f590f4023360465ffb41d4fe : 0fd26021bb08582553f392565ca0faf316c51229
+bibliothèque : 76 fichiers Rego (sans les tests, comme l'image de la porte)
+cas : j7-sample-app, 3 TaskRuns, digest d'origine sha256:f5e6bcb0e0fb… ; source attendue : https://sc-stockage.poc.test:3000/workspace/sample-app.git @ 6391fd437f26…
+OK   deux clés jetables : distinctes
+OK   noms remplacés dans porte.rego et taches.yml : 1 15
+OK   policy.yaml : seuls les chemins changent : 4
+  sources:
+    - name: porte
+      policy:
+        - TRAVAIL/biblio/policy/release
+        - TRAVAIL/biblio/policy/lib
+        - TRAVAIL/politique/regles
+      data:
+        - TRAVAIL/politique/donnees
+      ruleData:
+        allowed_builder_ids:
+          - https://supply-chain.example/builders/tekton-chains@v1
+      config:
+        include:
+          - "@slsa3"
+          - trusted_task
+          - porte
+OK   témoin trusted_task : lignes changées dans taches.yml et policy.yaml : 1 1
+## v29 : signature
+image du banc : sha256:1092e195b598…
+OK   v29 signer, code : 0
+OK   v29 erreurs de Sign : 0
+OK   v29 cosign verify-attestation, attestations : 2
+## v30 : signature
+image du banc : sha256:bfafe3fb1396…
+OK   v30 signer, code : 0
+OK   v30 erreurs de Sign : 0
+OK   v30 cosign verify-attestation, attestations : 2
+## v29 : porte
+OK   v29 ec, code (--strict=false) : 0
+succès : false ; violations 1, avertissements 3, réussites 34, attestations lues 2
+codes refusés :
+  porte.fermeture_plateforme
+      1   porte.fermeture_plateforme : fermeture REGISTRE/builds/fermetures/sample-app@sha256:74c265e703fb… (FERMETURE_ARTIFACT_INPUTS) : aucune provenance de la pipeline de prefetc
+erreurs d'ec : 9
+      3 level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/construire-image/manifests/sha256:4dcbc4b74681…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/construire-image@sha256:4dcbc4b74681…"
+      3 level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/preparer-entrees/manifests/sha256:2070d601ae3c…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/preparer-entrees@sha256:2070d601ae3c…"
+      3 level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/publier-image/manifests/sha256:d21931f3807b…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/publier-image@sha256:d21931f3807b…"
+## v30 : porte
+OK   v30 ec, code (--strict=false) : 0
+succès : false ; violations 3, avertissements 0, réussites 32, attestations lues 2
+codes refusés :
+  porte.taches_vues
+  slsa_build_scripted_build.build_task_image_results_found
+  tasks.pipeline_has_tasks
+      1   porte.taches_vues : aucune tâche vue dans 1 provenance(s) de PipelineRun
+      1   slsa_build_scripted_build.build_task_image_results_found : Build task not found
+      1   tasks.pipeline_has_tasks : No tasks found in PipelineRun attestation
+erreurs d'ec : 0
+## état des règles (v29 | v30)
+  porte.construction_kata                                      succès       | succès
+  porte.fermeture_plateforme                                   refus         | succès
+  porte.image_signature                                        succès       | succès
+  porte.preparation_appariee                                   succès       | succès
+  porte.taches_vues                                            succès       | refus
+  slsa_build_scripted_build.build_script_used                  succès       | succès
+  slsa_build_scripted_build.build_task_image_results_found     succès       | refus
+  slsa_build_scripted_build.subject_build_task_matches         succès       | succès
+  tasks.pipeline_has_tasks                                     succès       | refus
+  tasks.successful_pipeline_tasks                              succès       | absent
+  trusted_task.current                                         succès       | succès
+  trusted_task.data                                            succès       | succès
+  trusted_task.data_format                                     succès       | succès
+  trusted_task.future_deny_rule                                succès       | succès
+  trusted_task.pinned                                          succès       | succès
+  trusted_task.tagged                                          avertissement | succès
+  trusted_task.trusted                                         succès       | succès
+  trusted_task.trusted_parameters                              succès       | succès
+  trusted_task.valid_trusted_artifact_inputs                   succès       | succès
+réussites de v29 seule : porte.taches_vues slsa_build_scripted_build.build_task_image_results_found tasks.pipeline_has_tasks tasks.successful_pipeline_tasks 
+réussites de v30 seule : porte.fermeture_plateforme trusted_task.tagged 
+## écart
+v30 seul : porte.taches_vues slsa_build_scripted_build.build_task_image_results_found tasks.pipeline_has_tasks 
+v29 seul : porte.fermeture_plateforme 
+OK   codes refusés pour v0.29.9 et pas pour v0.30.0 : porte.fermeture_plateforme 
+OK   porte.fermeture_plateforme : v29 refus, v30 succès : refus succès
+OK   porte.taches_vues dans l'écart : 1
+OK   écart contenu dans celui du banc à sec : 0
+OK   v29 : porte.taches_vues absent : 0
+## témoin : v0.30.0 jugée avec une autre clé publique
+OK   témoin ec, code (--strict=false) : 0
+OK   témoin succès : false
+codes refusés :
+  builtin.attestation.signature_check
+  builtin.image.signature_check
+témoin : attestations lues 0
+OK   témoin : porte.taches_vues absent (rien de lu) : 0
+erreurs d'ec : 0
+## témoin trusted_task : digest de publier-image retiré de la liste revue
+OK   témoin tt v29 ec, code : 0
+v29 codes refusés : porte.fermeture_plateforme trusted_task.trusted 
+  trusted_task.trusted : PipelineTask "publier" uses an untrusted task reference: oci://REGISTRE/tekton/tasks/publier-image@sha256:d21931f3807b…. Please upgrade the ta
+erreurs d'ec : 9
+      3 level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/construire-image/manifests/sha256:4dcbc4b74681…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/construire-image@sha256:4dcbc4b74681…"
+      3 level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/preparer-entrees/manifests/sha256:2070d601ae3c…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/preparer-entrees@sha256:2070d601ae3c…"
+      3 level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/publier-image/manifests/sha256:d21931f3807b…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/publier-image@sha256:d21931f3807b…"
+OK   témoin tt v30 ec, code : 0
+v30 codes refusés : porte.taches_vues slsa_build_scripted_build.build_task_image_results_found tasks.pipeline_has_tasks 
+erreurs d'ec : 0
+OK   témoin tt : trusted_task.trusted (v29 | v30) : refus | succès
+## témoin construction_kata : TaskRun construire en runc au lieu de kata
+OK   témoin kata : TaskRun changé : tr-j7-sample-app-construire
+OK   témoin kata : lignes changées : 1
+  45c45
+  <       "runtimeClassName": "kata",
+  ---
+  >       "runtimeClassName": "runc",
+image du témoin v29 : sha256:fdcc6e8fd33a…
+OK   témoin kata v29 signer, code : 0
+OK   témoin kata v29 erreurs de Sign : 0
+OK   témoin kata v29 cosign verify-attestation, attestations : 2
+OK   témoin kata v29 ec, code : 0
+v29 codes refusés : porte.construction_kata porte.fermeture_plateforme 
+  porte.construction_kata : TaskRun j7-sample-app-construire de construction : runtimeClassName "runc" dans la spec signée, kata exigé
+erreurs d'ec : 9
+      3 level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/construire-image/manifests/sha256:4dcbc4b74681…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/construire-image@sha256:4dcbc4b74681…"
+      3 level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/preparer-entrees/manifests/sha256:2070d601ae3c…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/preparer-entrees@sha256:2070d601ae3c…"
+      3 level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/publier-image/manifests/sha256:d21931f3807b…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/publier-image@sha256:d21931f3807b…"
+image du témoin v30 : sha256:f0f9854301fa…
+OK   témoin kata v30 signer, code : 0
+OK   témoin kata v30 erreurs de Sign : 0
+OK   témoin kata v30 cosign verify-attestation, attestations : 2
+OK   témoin kata v30 ec, code : 0
+v30 codes refusés : porte.taches_vues slsa_build_scripted_build.build_task_image_results_found tasks.pipeline_has_tasks 
+erreurs d'ec : 0
+OK   témoin kata : porte.construction_kata (v29 | v30) : refus | succès
+OK   témoin kata v29 : codes = ceux de v29 plus construction_kata : porte.construction_kata 
+OK   témoin kata v30 : codes = ceux de v30 : 0
+## bilan : 0 KO, 2026-11-26T08:56:02Z

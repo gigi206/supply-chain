@@ -142,6 +142,8 @@ La fermeture de la porte tient donc à la seule absence de tâche vue. Les règl
 
 Non couverts, inchangés : KMS, contrôleur, Zot réel (bundles et fermetures), `ivpol`, Kyverno, contrôles 6, 7 et 9, un seul cas, et `construction_kata` sans témoin propre.
 
+(Réserve sur `construction_kata` levée au passage -3, ci-dessous.)
+
 ## Prédiction du passage -3 : témoin de `construction_kata` (2026-11-26T08:55:38Z)
 
 Le passage -3 ajoute un seul témoin, celui qui manquait :
@@ -162,3 +164,23 @@ Le reste du banc est inchangé. Lancement : `SUFFIXE=-3`.
 | W5 | 0 KO, moins de 30 s |
 
 Si W3 tombe, le témoin ne prouve rien : la règle ne lirait pas ce champ dans l'énoncé de v0.29.9. Dans ce cas, la réserve reste écrite telle quelle.
+
+## Résultat du passage -3 (note de 2026-11-26T08:56:05Z)
+
+Commit de la prédiction : `22e61f22`. [Journal](chains-v0300-porte-3.log) : 2026-11-26T08:55:51Z → 08:56:02Z, 11 s, 40 OK, 0 KO.
+
+| Prédiction | Verdict |
+|---|---|
+| W1 | **Tenue** : les 27 contrôles du passage -2 restent OK |
+| W2 | **Tenue** : un seul TaskRun (`tr-j7-sample-app-construire`), une seule ligne (`runtimeClassName` `kata` → `runc`) ; signé sans erreur par les deux versions, 2 attestations chacune |
+| W3 | **Tenue** : v0.29.9 refusée par `porte.construction_kata` (« runtimeClassName "runc" dans la spec signée, kata exigé ») ; seul code de plus que sur les objets d'origine |
+| W4 | **Tenue** : v0.30.0, `porte.construction_kata` réussit ; codes identiques à ceux des objets d'origine |
+| W5 | **Tenue** : 11 s |
+
+La réserve est levée : `porte.construction_kata` réussit à vide pour v0.30.0. Son témoin lui est propre : une construction hors Kata est refusée sous v0.29.9 et admise sous v0.30.0. Les trois règles de tâches de `porte.rego` qui ne refusent pas v0.30.0 ont maintenant chacune leur témoin :
+
+- la fermeture ;
+- `trusted_task.trusted` ;
+- `construction_kata`.
+
+Non couverts, inchangés : KMS, contrôleur, Zot réel (bundles et fermetures), `ivpol`, Kyverno, contrôles 6, 7 et 9, et un seul cas.
