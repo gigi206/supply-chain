@@ -586,3 +586,9 @@ Accord du propriétaire, verbatim : « Pousse » (les 9 commits jusqu'à `398348
 **KPI** : [seuil n° 5 de la 20](../../20-kpi/resultats/e5-seuil-5.log) (18:24:23Z) : `taux_l3_verifie` 1/4 → 2/4, `taux_replay_identique` 2/4 → 3/4, 0 écart.
 
 **Heures de la 07c** : plus 18:02:34 à 18:02:52, 18:12:53 à 18:13:43 et 18:14:21 à 18:15:17 UTC (0 h 02 min 04 s) ; **total : au plus 2 h 13 min 01 s** pour 10 h estimées.
+
+## Clôture (note de 2026-11-26T13:22:18Z)
+
+Accord : choix du propriétaire « Clore avec réserves », verbatim, sur la question « Que faire de la 07c ? ». Seuil, réserves et effort : section « Clôture » du [README](../README.md). Aucune mesure nouvelle.
+
+**Heures de la 07c** : plus 13:21:42Z à 13:22:18Z (clôture) ; **total : au plus 2 h 13 min 01 s plus la clôture** pour 10 h estimées.
