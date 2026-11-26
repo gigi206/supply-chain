@@ -77,3 +77,36 @@ Commit de la prédiction : `d30d4932`. [Journal](chains-v0300-porte.log) : 2026-
 Sur une vraie signature, la porte en service refuse donc v0.30.0 : `ec` vérifie les deux signatures, lit les deux attestations et rend trois refus. Mais **la fermeture de la porte tient à trois règles seulement** : `porte.taches_vues`, qui est maison, et deux règles de `@slsa3`. Les contrôles de Kata, de fermeture et de tâches de confiance réussissent à vide. Une adaptation des lecteurs qui ferait passer `taches_vues` sans réapprendre les noms aux autres règles admettrait une image sans aucun de ces contrôles. Le témoin montre que le refus vient bien de la politique : avec une autre clé, rien n'est lu et seules les règles de signature refusent.
 
 Non couverts, inchangés : KMS, contrôleur, Zot réel (bundles et fermetures), `ivpol`, Kyverno, contrôles 6, 7 et 9, un seul cas.
+
+## Relecture du conseiller et prédiction du passage -2 (note de 2026-11-26T08:48:46Z)
+
+**Corrections du résultat ci-dessus**, sur avis du conseiller :
+
+- **Preuve non archivée.** Les listes de réussites viennent d'une commande hors du script, dans un dossier que le prochain lancement efface. Le passage -2 écrit l'état de chaque règle dans son journal.
+- **« À vide », démontré pour la fermeture seulement.** Pour la fermeture, le premier passage le montre directement : la fermeture est absente pour les deux versions ; v0.29.9 est refusée, v0.30.0 réussit. Pour `construction_kata`, c'est `porte.rego` qui le dit (« Sans TaskRun de construire-image, la règle ne refuse rien (succès à vide) »), et le banc à sec du 25/11 l'avait trouvée muette. Pour `trusted_task`, c'est une déduction : `trusted` réussit aussi pour v0.29.9 sans bundles. Le passage -2 ajoute un témoin.
+- **« Admettrait une image sans aucun de ces contrôles » est faux tel quel.** Si `porte.taches_vues` passait seule, deux règles de `@slsa3` refuseraient encore. Et `porte.rego` montre que ses trois règles de tâches (`taches_vues`, `construction_kata`, `fermeture_plateforme`) lisent la même extraction, `lib.tasks_from_pipelinerun`, de la bibliothèque. Critère pour toute adaptation : la corriger là où les tâches sont extraites, puis montrer qu'un témoin fautif est refusé par chaque règle.
+- **« Vient de l'appel »**, précisé : depuis le test 7, `politique.sh` passe l'image par `--images` avec la source attendue (ApplicationSnapshot). Le premier passage utilisait `--image` sans source, comme J6. Le passage -2 reprend la forme du service.
+
+**Changements du script** (passage -2) :
+
+- source attendue passée comme en service : dépôt et commit lus dans le PipelineRun ;
+- état de chaque règle `porte.*`, `trusted_task.*`, `tasks.*` et `slsa_build_scripted_build.*` pour les deux versions ;
+- écart attendu ramené à trois codes ;
+- `porte.fermeture_plateforme` attendue en refus pour v0.29.9 et en réussite pour v0.30.0 ;
+- erreurs d'`ec` coupées à 400 caractères au lieu de 240 ;
+- témoin `trusted_task` : même politique, mais le digest de `publier-image` est remplacé par un digest nul dans la liste revue.
+
+**Prédictions** :
+
+- **V1** : contrôles d'isolement, d'empreinte, d'arbre et de signature tenus comme au premier passage. Confiance très bonne.
+- **V2** : avec la source attendue, `slsa_source_correlated.source_code_reference_provided` disparaît pour les deux versions. Confiance moyenne : d'autres codes `slsa_source_*` peuvent apparaître, la provenance du banc étant celle de j7 (dépôt et commit réels). Si aucun n'apparaît, v0.29.9 n'est plus refusée que par `porte.fermeture_plateforme`, qui est dû au banc.
+- **V3** :
+  - refusé pour v0.29.9 seule : `porte.fermeture_plateforme` ;
+  - refusés pour v0.30.0 seule : les trois codes ;
+  - fermeture : refus pour v0.29.9, réussite pour v0.30.0.
+
+  Confiance bonne.
+- **V4** : pour v0.30.0, `porte.construction_kata` et `trusted_task.trusted` réussissent, et `tasks.successful_pipeline_tasks` est absent. Pour v0.29.9, `trusted_task.tagged` est en avertissement. Confiance bonne.
+- **V5 (témoin `trusted_task`)** : `trusted_task.trusted` est refusé pour v0.29.9, avec un message qui nomme la tâche `publier`, et réussit pour v0.30.0. Confiance bonne pour v0.30.0, moyenne-bonne pour v0.29.9 (au premier passage, la règle a réussi sans manifestes : elle compare donc les références à la liste).
+- **V6** : le témoin de clé est inchangé : refus par les deux règles de signature, 0 attestation lue. Confiance très bonne.
+- **V7** : moins d'une minute. Confiance bonne.
