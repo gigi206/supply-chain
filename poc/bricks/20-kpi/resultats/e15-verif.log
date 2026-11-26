@@ -1,0 +1,7 @@
+début : 2026-11-26T10:54:24Z, étape verif, dépôt faf63450
+OK   auditeur, Prometheus : 200
+séries kpi_* dans Prometheus : 134
+OK   passage de moins de 20 min : oui
+OK   lecture du journal de moins de 20 min : oui
+OK   signatures refusées, sans date, illisible : 0 présentes
+fin : 2026-11-26T10:54:24Z, bilan : tenu

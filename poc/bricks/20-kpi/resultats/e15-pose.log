@@ -1,0 +1,413 @@
+début : 2026-11-26T10:54:04Z, étape pose, dépôt faf63450
+OK   clés publiques de l'arbre différentes de HEAD : 0
+OK   relevé des dates de git : à jour
+OK   fichiers à poser : 12
+OK   aucune clé privée parmi eux : 0
+OK   mot de passe de kpi-journal : présent
+OK   proxy de Grafana vers Loki, auditeur, GET /loki/api/v1/status/buildinfo : 403
+OK   metrics_exporter.py installé identique : fc0b8e0dc63bdb4f2cc7c753f8d5ec712f4146181ce0b3b66e93fc80ec15cf1f
+OK   lecteur_loki.py installé identique : 2a37871827f965921717a22f547d5edc2a3945057f6710ad68e13aaad2407aba
+OK   dossier d'installation effacé : effacé
+OK   résultat du premier passage, kpi-journal : success
+OK   résultat du premier passage, kpi : success
+OK   timer : active
+OK   le compte kpi ne lit pas le mot de passe : refusé
+OK   filtre réseau des deux unités : 2
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="entree",nom="web-dist",pin="47f72275aa78",retire="0"} 1793376604
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="fermeture",nom="sample-app",pin="74c265e703fb",retire="0"} 1793732132
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="image",nom="builder-go-voie-d",pin="d50ae57551c3",retire="0"} 1793373433
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="image",nom="buildkit",pin="ace6811c2133",retire="0"} 1793368831
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="image",nom="outils-horodatage",pin="c7bebae2bd33",retire="0"} 1793308207
+  kpi_pin_non_epingle{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="pipeline",nom="sample-app",pin="b8ff5ebb29cf"} 1
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="source",nom="sample-app.git",pin="6391fd437f26",retire="0"} 1793298058
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="tache",nom="construire-image",pin="66a9f2980a45",retire="0"} 1793734336
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="tache",nom="preparer-entrees",pin="2070d601ae3c",retire="0"} 1793385395
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf",genre="tache",nom="publier-image",pin="d21931f3807b",retire="0"} 1793376604
+  kpi_pins_non_releves{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+  kpi_enonces_refuses{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+  kpi_l3_verifie{depot="builds/sample-app",digest="3a7ca1b14dbf"} 1
+  kpi_provenance_chains_verifiee{depot="builds/sample-app",digest="3a7ca1b14dbf"} 1
+  kpi_provenances_pipelinerun{depot="builds/sample-app",digest="3a7ca1b14dbf"} 3
+  kpi_replay_identique{depot="builds/sample-app",digest="3a7ca1b14dbf"} 1
+  kpi_scan_ecartees{depot="builds/sample-app",digest="3a7ca1b14dbf"} 5
+  kpi_scan_entrees{depot="builds/sample-app",digest="3a7ca1b14dbf"} 6
+  kpi_scan_kev{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+  kpi_scan_kev_ecartees{depot="builds/sample-app",digest="3a7ca1b14dbf"} 0
+  kpi_scan_timestamp_seconds{depot="builds/sample-app",digest="3a7ca1b14dbf"} 1795512718
+  kpi_vex_verifies{depot="builds/sample-app",digest="3a7ca1b14dbf"} 1
+  kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="prov"} 6
+  kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="scan"} 3
+  kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="sig"} 1
+  kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vex"} 1
+  kpi_signatures_verifiees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vsa"} 1
+  kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="prov"} 0
+  kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="scan"} 0
+  kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="sig"} 0
+  kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vex"} 0
+  kpi_signatures_refusees{depot="builds/sample-app",digest="3a7ca1b14dbf",famille="vsa"} 0
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="entree",nom="web-dist",pin="47f72275aa78",retire="0"} 1793376604
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="fermeture",nom="sample-app",pin="74c265e703fb",retire="0"} 1793732132
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="image",nom="builder-go-voie-d",pin="8c11e856b10f",retire="0"} 1795526430
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="image",nom="buildkit",pin="ace6811c2133",retire="0"} 1793368831
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="image",nom="outils-horodatage",pin="c7bebae2bd33",retire="0"} 1793308207
+  kpi_pin_non_epingle{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="pipeline",nom="sample-app",pin="da76d95be5af"} 1
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="source",nom="sample-app.git",pin="6391fd437f26",retire="0"} 1793298058
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="tache",nom="construire-image",pin="4dcbc4b74681",retire="0"} 1795526695
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="tache",nom="preparer-entrees",pin="2070d601ae3c",retire="0"} 1793385395
+  kpi_pin_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb",genre="tache",nom="publier-image",pin="d21931f3807b",retire="0"} 1793376604
+  kpi_pins_non_releves{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+  kpi_enonces_refuses{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+  kpi_l3_verifie{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 1
+  kpi_provenance_chains_verifiee{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 1
+  kpi_provenances_pipelinerun{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 4
+  kpi_replay_identique{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 1
+  kpi_scan_ecartees{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 5
+  kpi_scan_entrees{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 5
+  kpi_scan_kev{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+  kpi_scan_kev_ecartees{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 0
+  kpi_scan_timestamp_seconds{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 1795685529
+  kpi_vex_verifies{depot="builds/sample-app",digest="f5e6bcb0e0fb"} 1
+  kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="prov"} 8
+  kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="scan"} 4
+  kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="sig"} 1
+  kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vex"} 1
+  kpi_signatures_verifiees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vsa"} 1
+  kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="prov"} 0
+  kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="scan"} 0
+  kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="sig"} 0
+  kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vex"} 0
+  kpi_signatures_refusees{depot="builds/sample-app",digest="f5e6bcb0e0fb",famille="vsa"} 0
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="entree",nom="packaging-deb",pin="f0ed7a71cfcc",retire="0"} 1794694829
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="fermeture",nom="sample-app-deb",pin="bb7599a2e1cd",retire="0"} 1794420322
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="fermeture",nom="sample-app-sources",pin="50dc73f72d04",retire="0"} 1794420322
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="image",nom="outils-horodatage",pin="c7bebae2bd33",retire="0"} 1793308207
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="image",nom="outils-prefetch",pin="68e0ae705de5",retire="0"} 1793727678
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="image",nom="sbuild-debian13",pin="749d746cc9e1",retire="0"} 1794420322
+  kpi_pin_non_epingle{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="pipeline",nom="sample-app-deb",pin="ed471138e467"} 1
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="source",nom="sample-app.git",pin="6391fd437f26",retire="0"} 1793298058
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="tache",nom="construire-deb",pin="3726ff0b116c",retire="0"} 1794425235
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="tache",nom="preparer-deb",pin="588617b83825",retire="0"} 1794426056
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5",genre="tache",nom="publier-image",pin="d21931f3807b",retire="0"} 1793376604
+  kpi_pins_non_releves{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+  kpi_enonces_refuses{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+  kpi_l3_verifie{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+  kpi_provenance_chains_verifiee{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 1
+  kpi_provenances_pipelinerun{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 4
+  kpi_replay_identique{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 1
+  kpi_scan_ecartees{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 23
+  kpi_scan_entrees{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 67
+  kpi_scan_kev{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+  kpi_scan_kev_ecartees{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 0
+  kpi_scan_timestamp_seconds{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 1795605533
+  kpi_vex_verifies{depot="builds/sample-app-deb",digest="60f25f5c3fb5"} 1
+  kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="prov"} 8
+  kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="scan"} 4
+  kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="sig"} 1
+  kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vex"} 1
+  kpi_signatures_verifiees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vsa"} 1
+  kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="prov"} 0
+  kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="scan"} 0
+  kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="sig"} 0
+  kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vex"} 0
+  kpi_signatures_refusees{depot="builds/sample-app-deb",digest="60f25f5c3fb5",famille="vsa"} 0
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="entree",nom="packaging-rpm",pin="333b7322290a",retire="0"} 1795180486
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="fermeture",nom="sample-app-rpm",pin="0983898054a9",retire="0"} 1795173420
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="fermeture",nom="sample-app-sources",pin="50dc73f72d04",retire="0"} 1794420322
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="image",nom="mock-rocky9",pin="70f8c4124532",retire="0"} 1795113732
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="image",nom="outils-horodatage",pin="c7bebae2bd33",retire="0"} 1793308207
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="image",nom="outils-prefetch",pin="68e0ae705de5",retire="0"} 1793727678
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="pipeline",nom="sample-app-rpm",pin="7d361cb1d5ea",retire="0"} 1795181844
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="source",nom="sample-app.git",pin="6391fd437f26",retire="0"} 1793298058
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="tache",nom="construire-rpm",pin="ca03f18908d0",retire="0"} 1795172388
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="tache",nom="preparer-rpm",pin="2f65f3903e98",retire="0"} 1795014970
+  kpi_pin_timestamp_seconds{depot="builds/sample-app-rpm",digest="07b7bd6feb48",genre="tache",nom="publier-image",pin="d21931f3807b",retire="0"} 1793376604
+  kpi_pins_non_releves{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+  kpi_enonces_refuses{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+  kpi_l3_verifie{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+  kpi_provenance_chains_verifiee{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 1
+  kpi_provenances_pipelinerun{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 1
+  kpi_replay_identique{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+  kpi_vex_verifies{depot="builds/sample-app-rpm",digest="07b7bd6feb48"} 0
+  kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="prov"} 2
+  kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="scan"} 0
+  kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="sig"} 1
+  kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vex"} 0
+  kpi_signatures_verifiees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vsa"} 0
+  kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="prov"} 0
+  kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="scan"} 0
+  kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="sig"} 0
+  kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vex"} 0
+  kpi_signatures_refusees{depot="builds/sample-app-rpm",digest="07b7bd6feb48",famille="vsa"} 0
+  kpi_exportateur_journal_illisible 0
+  kpi_exportateur_journal_timestamp_seconds 1795690454
+  kpi_cle_timestamp_seconds{cle="chains",empreinte="b446c5ffe7b6"} 1795471932
+  kpi_cle_timestamp_seconds{cle="scanner",empreinte="09708ff49e5e"} 1795476983
+  kpi_cle_timestamp_seconds{cle="tsa",empreinte="29fa7cc76f71"} 1795471932
+  kpi_cle_timestamp_seconds{cle="vex",empreinte="d40d41a02833"} 1795476983
+  kpi_cle_timestamp_seconds{cle="vsa",empreinte="b3e9f64b7d5e"} 1793700136
+  kpi_cles_non_relevees 0
+  kpi_exportateur_passage_timestamp_seconds 1795690454
+OK   signatures refusées : 0 présentes
+OK   signatures vérifiées : oui
+OK   clés sans date : 0
+OK   pins sans date, journal illisible : 0 présentes
+  NAME                                                        DESCRIPTION                                                        EXPOSURE
+✗ RemoveIPC=                                                  Service user may leave SysV IPC objects around                          0.1
+✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                           0.1
+✗ SupplementaryGroups=                                        Service runs with supplementary groups                                  0.1
+✓ User=/DynamicUser=                                          Service runs under a static non-root user identity                 
+✓ RestrictRealtime=                                           Service realtime scheduling access is restricted                   
+✓ CapabilityBoundingSet=~CAP_SYS_TIME                         Service processes cannot change the system clock                   
+✓ NoNewPrivileges=                                            Service processes cannot acquire new privileges                    
+✓ AmbientCapabilities=                                        Service process does not receive ambient capabilities              
+✓ CapabilityBoundingSet=~CAP_BPF                              Service may not load BPF programs                                  
+✓ SystemCallArchitectures=                                    Service may execute system calls only with native ABI              
+✗ RestrictAddressFamilies=~AF_UNIX                            Service may allocate local sockets                                      0.1
+✗ RestrictAddressFamilies=~AF_(INET|INET6)                    Service may allocate Internet sockets                                   0.3
+✓ ProtectSystem=                                              Service has strict read-only access to the OS file hierarchy       
+✓ CapabilityBoundingSet=~CAP_SYS_RAWIO                        Service has no raw I/O access                                      
+✓ CapabilityBoundingSet=~CAP_SYS_PTRACE                       Service has no ptrace() debugging abilities                        
+✓ CapabilityBoundingSet=~CAP_SYS_(NICE|RESOURCE)              Service has no privileges to change resource use parameters        
+✓ CapabilityBoundingSet=~CAP_NET_ADMIN                        Service has no network configuration privileges                    
+✓ CapabilityBoundingSet=~CAP_NET_(BIND_SERVICE|BROADCAST|RAW) Service has no elevated networking privileges                      
+✓ CapabilityBoundingSet=~CAP_AUDIT_*                          Service has no audit subsystem access                              
+✓ CapabilityBoundingSet=~CAP_SYS_ADMIN                        Service has no administrator privileges                            
+✓ PrivateTmp=                                                 Service has no access to other software's temporary files          
+✓ CapabilityBoundingSet=~CAP_SYSLOG                           Service has no access to kernel logging                            
+✓ ProtectHome=                                                Service has no access to home directories                          
+✓ PrivateDevices=                                             Service has no access to hardware devices                          
+✗ ProtectProc=                                                Service has full access to process tree (/proc hidepid=)                0.2
+✗ ProcSubset=                                                 Service has full access to non-process /proc files (/proc subset=)      0.1
+✗ PrivateNetwork=                                             Service has access to the host's network                                0.5
+✗ PrivateUsers=                                               Service has access to other users                                       0.2
+✗ DeviceAllow=                                                Service has a device ACL with some special devices: char-rtc:r          0.1
+✓ KeyringMode=                                                Service doesn't share key material with other services             
+✓ Delegate=                                                   Service does not maintain its own delegated control group subtree  
+✗ SystemCallFilter=~@clock                                    Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@cpu-emulation                            Service does not filter system calls                                    0.1
+✗ SystemCallFilter=~@debug                                    Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@module                                   Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@mount                                    Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@obsolete                                 Service does not filter system calls                                    0.1
+✗ SystemCallFilter=~@privileged                               Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@raw-io                                   Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@reboot                                   Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@resources                                Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@swap                                     Service does not filter system calls                                    0.2
+✗ IPAddressDeny=                                              Service defines IP address allow list with non-localhost entries        0.1
+✓ NotifyAccess=                                               Service child processes cannot alter service state                 
+✓ ProtectClock=                                               Service cannot write to the hardware clock or system clock         
+✓ CapabilityBoundingSet=~CAP_SYS_PACCT                        Service cannot use acct()                                          
+✓ CapabilityBoundingSet=~CAP_KILL                             Service cannot send UNIX signals to arbitrary processes            
+✓ ProtectKernelLogs=                                          Service cannot read from or write to the kernel log ring buffer    
+✓ CapabilityBoundingSet=~CAP_WAKE_ALARM                       Service cannot program timers that wake up the system              
+✓ CapabilityBoundingSet=~CAP_(DAC_*|FOWNER|IPC_OWNER)         Service cannot override UNIX file/IPC permission checks            
+✓ ProtectControlGroups=                                       Service cannot modify the control group file system                
+✓ CapabilityBoundingSet=~CAP_LINUX_IMMUTABLE                  Service cannot mark files immutable                                
+✓ CapabilityBoundingSet=~CAP_IPC_LOCK                         Service cannot lock memory into RAM                                
+✓ ProtectKernelModules=                                       Service cannot load or read kernel modules                         
+✓ CapabilityBoundingSet=~CAP_SYS_MODULE                       Service cannot load kernel modules                                 
+✓ CapabilityBoundingSet=~CAP_SYS_TTY_CONFIG                   Service cannot issue vhangup()                                     
+✓ CapabilityBoundingSet=~CAP_SYS_BOOT                         Service cannot issue reboot()                                      
+✓ CapabilityBoundingSet=~CAP_SYS_CHROOT                       Service cannot issue chroot()                                      
+✓ PrivateMounts=                                              Service cannot install system mounts                               
+✓ CapabilityBoundingSet=~CAP_BLOCK_SUSPEND                    Service cannot establish wake locks                                
+✓ MemoryDenyWriteExecute=                                     Service cannot create writable executable memory mappings          
+✓ RestrictNamespaces=~user                                    Service cannot create user namespaces                              
+✓ RestrictNamespaces=~pid                                     Service cannot create process namespaces                           
+✓ RestrictNamespaces=~net                                     Service cannot create network namespaces                           
+✓ RestrictNamespaces=~uts                                     Service cannot create hostname namespaces                          
+✓ RestrictNamespaces=~mnt                                     Service cannot create file system namespaces                       
+✓ CapabilityBoundingSet=~CAP_LEASE                            Service cannot create file leases                                  
+✓ CapabilityBoundingSet=~CAP_MKNOD                            Service cannot create device nodes                                 
+✓ RestrictNamespaces=~cgroup                                  Service cannot create cgroup namespaces                            
+✓ RestrictNamespaces=~ipc                                     Service cannot create IPC namespaces                               
+✓ ProtectHostname=                                            Service cannot change system host/domainname                       
+✓ CapabilityBoundingSet=~CAP_(CHOWN|FSETID|SETFCAP)           Service cannot change file ownership/access mode/capabilities      
+✓ CapabilityBoundingSet=~CAP_SET(UID|GID|PCAP)                Service cannot change UID/GID identities/capabilities              
+✓ LockPersonality=                                            Service cannot change ABI personality                              
+✓ ProtectKernelTunables=                                      Service cannot alter kernel tunables (/proc/sys, …)                
+✓ RestrictAddressFamilies=~AF_PACKET                          Service cannot allocate packet sockets                             
+✓ RestrictAddressFamilies=~AF_NETLINK                         Service cannot allocate netlink sockets                            
+✓ RestrictAddressFamilies=~…                                  Service cannot allocate exotic sockets                             
+✓ CapabilityBoundingSet=~CAP_MAC_*                            Service cannot adjust SMACK MAC                                    
+✓ RestrictSUIDSGID=                                           SUID/SGID file creation by service is restricted                   
+✗ UMask=                                                      Files created by service are world-readable by default                  0.1
+
+→ Overall exposure level for kpi.service: 3.0 OK :-)
+
+  NAME                                                        DESCRIPTION                                                        EXPOSURE
+✗ RemoveIPC=                                                  Service user may leave SysV IPC objects around                          0.1
+✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                           0.1
+✓ User=/DynamicUser=                                          Service runs under a static non-root user identity                 
+✓ RestrictRealtime=                                           Service realtime scheduling access is restricted                   
+✓ CapabilityBoundingSet=~CAP_SYS_TIME                         Service processes cannot change the system clock                   
+✓ NoNewPrivileges=                                            Service processes cannot acquire new privileges                    
+✓ AmbientCapabilities=                                        Service process does not receive ambient capabilities              
+✓ CapabilityBoundingSet=~CAP_BPF                              Service may not load BPF programs                                  
+✓ SystemCallArchitectures=                                    Service may execute system calls only with native ABI              
+✗ RestrictAddressFamilies=~AF_UNIX                            Service may allocate local sockets                                      0.1
+✗ RestrictAddressFamilies=~AF_(INET|INET6)                    Service may allocate Internet sockets                                   0.3
+✓ ProtectSystem=                                              Service has strict read-only access to the OS file hierarchy       
+✓ SupplementaryGroups=                                        Service has no supplementary groups                                
+✓ CapabilityBoundingSet=~CAP_SYS_RAWIO                        Service has no raw I/O access                                      
+✓ CapabilityBoundingSet=~CAP_SYS_PTRACE                       Service has no ptrace() debugging abilities                        
+✓ CapabilityBoundingSet=~CAP_SYS_(NICE|RESOURCE)              Service has no privileges to change resource use parameters        
+✓ CapabilityBoundingSet=~CAP_NET_ADMIN                        Service has no network configuration privileges                    
+✓ CapabilityBoundingSet=~CAP_NET_(BIND_SERVICE|BROADCAST|RAW) Service has no elevated networking privileges                      
+✓ CapabilityBoundingSet=~CAP_AUDIT_*                          Service has no audit subsystem access                              
+✓ CapabilityBoundingSet=~CAP_SYS_ADMIN                        Service has no administrator privileges                            
+✓ PrivateTmp=                                                 Service has no access to other software's temporary files          
+✓ CapabilityBoundingSet=~CAP_SYSLOG                           Service has no access to kernel logging                            
+✓ ProtectHome=                                                Service has no access to home directories                          
+✓ PrivateDevices=                                             Service has no access to hardware devices                          
+✗ ProtectProc=                                                Service has full access to process tree (/proc hidepid=)                0.2
+✗ ProcSubset=                                                 Service has full access to non-process /proc files (/proc subset=)      0.1
+✗ PrivateNetwork=                                             Service has access to the host's network                                0.5
+✗ PrivateUsers=                                               Service has access to other users                                       0.2
+✗ DeviceAllow=                                                Service has a device ACL with some special devices: char-rtc:r          0.1
+✓ KeyringMode=                                                Service doesn't share key material with other services             
+✓ Delegate=                                                   Service does not maintain its own delegated control group subtree  
+✗ SystemCallFilter=~@clock                                    Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@cpu-emulation                            Service does not filter system calls                                    0.1
+✗ SystemCallFilter=~@debug                                    Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@module                                   Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@mount                                    Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@obsolete                                 Service does not filter system calls                                    0.1
+✗ SystemCallFilter=~@privileged                               Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@raw-io                                   Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@reboot                                   Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@resources                                Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@swap                                     Service does not filter system calls                                    0.2
+✗ IPAddressDeny=                                              Service defines IP address allow list with non-localhost entries        0.1
+✓ NotifyAccess=                                               Service child processes cannot alter service state                 
+✓ ProtectClock=                                               Service cannot write to the hardware clock or system clock         
+✓ CapabilityBoundingSet=~CAP_SYS_PACCT                        Service cannot use acct()                                          
+✓ CapabilityBoundingSet=~CAP_KILL                             Service cannot send UNIX signals to arbitrary processes            
+✓ ProtectKernelLogs=                                          Service cannot read from or write to the kernel log ring buffer    
+✓ CapabilityBoundingSet=~CAP_WAKE_ALARM                       Service cannot program timers that wake up the system              
+✓ CapabilityBoundingSet=~CAP_(DAC_*|FOWNER|IPC_OWNER)         Service cannot override UNIX file/IPC permission checks            
+✓ ProtectControlGroups=                                       Service cannot modify the control group file system                
+✓ CapabilityBoundingSet=~CAP_LINUX_IMMUTABLE                  Service cannot mark files immutable                                
+✓ CapabilityBoundingSet=~CAP_IPC_LOCK                         Service cannot lock memory into RAM                                
+✓ ProtectKernelModules=                                       Service cannot load or read kernel modules                         
+✓ CapabilityBoundingSet=~CAP_SYS_MODULE                       Service cannot load kernel modules                                 
+✓ CapabilityBoundingSet=~CAP_SYS_TTY_CONFIG                   Service cannot issue vhangup()                                     
+✓ CapabilityBoundingSet=~CAP_SYS_BOOT                         Service cannot issue reboot()                                      
+✓ CapabilityBoundingSet=~CAP_SYS_CHROOT                       Service cannot issue chroot()                                      
+✓ PrivateMounts=                                              Service cannot install system mounts                               
+✓ CapabilityBoundingSet=~CAP_BLOCK_SUSPEND                    Service cannot establish wake locks                                
+✓ MemoryDenyWriteExecute=                                     Service cannot create writable executable memory mappings          
+✓ RestrictNamespaces=~user                                    Service cannot create user namespaces                              
+✓ RestrictNamespaces=~pid                                     Service cannot create process namespaces                           
+✓ RestrictNamespaces=~net                                     Service cannot create network namespaces                           
+✓ RestrictNamespaces=~uts                                     Service cannot create hostname namespaces                          
+✓ RestrictNamespaces=~mnt                                     Service cannot create file system namespaces                       
+✓ CapabilityBoundingSet=~CAP_LEASE                            Service cannot create file leases                                  
+✓ CapabilityBoundingSet=~CAP_MKNOD                            Service cannot create device nodes                                 
+✓ RestrictNamespaces=~cgroup                                  Service cannot create cgroup namespaces                            
+✓ RestrictNamespaces=~ipc                                     Service cannot create IPC namespaces                               
+✓ ProtectHostname=                                            Service cannot change system host/domainname                       
+✓ CapabilityBoundingSet=~CAP_(CHOWN|FSETID|SETFCAP)           Service cannot change file ownership/access mode/capabilities      
+✓ CapabilityBoundingSet=~CAP_SET(UID|GID|PCAP)                Service cannot change UID/GID identities/capabilities              
+✓ LockPersonality=                                            Service cannot change ABI personality                              
+✓ ProtectKernelTunables=                                      Service cannot alter kernel tunables (/proc/sys, …)                
+✓ RestrictAddressFamilies=~AF_PACKET                          Service cannot allocate packet sockets                             
+✓ RestrictAddressFamilies=~AF_NETLINK                         Service cannot allocate netlink sockets                            
+✓ RestrictAddressFamilies=~…                                  Service cannot allocate exotic sockets                             
+✓ CapabilityBoundingSet=~CAP_MAC_*                            Service cannot adjust SMACK MAC                                    
+✓ RestrictSUIDSGID=                                           SUID/SGID file creation by service is restricted                   
+✗ UMask=                                                      Files created by service are group-readable by default                  0.1
+
+→ Overall exposure level for kpi-journal.service: 2.9 OK :-)
+
+  NAME                                                        DESCRIPTION                                                        EXPOSURE
+✗ RemoveIPC=                                                  Service user may leave SysV IPC objects around                          0.1
+✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                           0.1
+✓ User=/DynamicUser=                                          Service runs under a static non-root user identity                 
+✓ RestrictRealtime=                                           Service realtime scheduling access is restricted                   
+✓ CapabilityBoundingSet=~CAP_SYS_TIME                         Service processes cannot change the system clock                   
+✓ NoNewPrivileges=                                            Service processes cannot acquire new privileges                    
+✓ AmbientCapabilities=                                        Service process does not receive ambient capabilities              
+✓ CapabilityBoundingSet=~CAP_BPF                              Service may not load BPF programs                                  
+✓ SystemCallArchitectures=                                    Service may execute system calls only with native ABI              
+✗ RestrictAddressFamilies=~AF_UNIX                            Service may allocate local sockets                                      0.1
+✗ RestrictAddressFamilies=~AF_(INET|INET6)                    Service may allocate Internet sockets                                   0.3
+✓ ProtectSystem=                                              Service has strict read-only access to the OS file hierarchy       
+✓ SupplementaryGroups=                                        Service has no supplementary groups                                
+✓ CapabilityBoundingSet=~CAP_SYS_RAWIO                        Service has no raw I/O access                                      
+✓ CapabilityBoundingSet=~CAP_SYS_PTRACE                       Service has no ptrace() debugging abilities                        
+✓ CapabilityBoundingSet=~CAP_SYS_(NICE|RESOURCE)              Service has no privileges to change resource use parameters        
+✓ CapabilityBoundingSet=~CAP_NET_ADMIN                        Service has no network configuration privileges                    
+✓ CapabilityBoundingSet=~CAP_NET_(BIND_SERVICE|BROADCAST|RAW) Service has no elevated networking privileges                      
+✓ CapabilityBoundingSet=~CAP_AUDIT_*                          Service has no audit subsystem access                              
+✓ CapabilityBoundingSet=~CAP_SYS_ADMIN                        Service has no administrator privileges                            
+✓ PrivateTmp=                                                 Service has no access to other software's temporary files          
+✓ CapabilityBoundingSet=~CAP_SYSLOG                           Service has no access to kernel logging                            
+✓ ProtectHome=                                                Service has no access to home directories                          
+✓ PrivateDevices=                                             Service has no access to hardware devices                          
+✗ ProtectProc=                                                Service has full access to process tree (/proc hidepid=)                0.2
+✗ ProcSubset=                                                 Service has full access to non-process /proc files (/proc subset=)      0.1
+✗ PrivateNetwork=                                             Service has access to the host's network                                0.5
+✗ PrivateUsers=                                               Service has access to other users                                       0.2
+✗ DeviceAllow=                                                Service has a device ACL with some special devices: char-rtc:r          0.1
+✓ KeyringMode=                                                Service doesn't share key material with other services             
+✓ Delegate=                                                   Service does not maintain its own delegated control group subtree  
+✗ SystemCallFilter=~@clock                                    Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@cpu-emulation                            Service does not filter system calls                                    0.1
+✗ SystemCallFilter=~@debug                                    Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@module                                   Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@mount                                    Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@obsolete                                 Service does not filter system calls                                    0.1
+✗ SystemCallFilter=~@privileged                               Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@raw-io                                   Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@reboot                                   Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@resources                                Service does not filter system calls                                    0.2
+✗ SystemCallFilter=~@swap                                     Service does not filter system calls                                    0.2
+✗ IPAddressDeny=                                              Service defines IP address allow list with non-localhost entries        0.1
+✓ NotifyAccess=                                               Service child processes cannot alter service state                 
+✓ ProtectClock=                                               Service cannot write to the hardware clock or system clock         
+✓ CapabilityBoundingSet=~CAP_SYS_PACCT                        Service cannot use acct()                                          
+✓ CapabilityBoundingSet=~CAP_KILL                             Service cannot send UNIX signals to arbitrary processes            
+✓ ProtectKernelLogs=                                          Service cannot read from or write to the kernel log ring buffer    
+✓ CapabilityBoundingSet=~CAP_WAKE_ALARM                       Service cannot program timers that wake up the system              
+✓ CapabilityBoundingSet=~CAP_(DAC_*|FOWNER|IPC_OWNER)         Service cannot override UNIX file/IPC permission checks            
+✓ ProtectControlGroups=                                       Service cannot modify the control group file system                
+✓ CapabilityBoundingSet=~CAP_LINUX_IMMUTABLE                  Service cannot mark files immutable                                
+✓ CapabilityBoundingSet=~CAP_IPC_LOCK                         Service cannot lock memory into RAM                                
+✓ ProtectKernelModules=                                       Service cannot load or read kernel modules                         
+✓ CapabilityBoundingSet=~CAP_SYS_MODULE                       Service cannot load kernel modules                                 
+✓ CapabilityBoundingSet=~CAP_SYS_TTY_CONFIG                   Service cannot issue vhangup()                                     
+✓ CapabilityBoundingSet=~CAP_SYS_BOOT                         Service cannot issue reboot()                                      
+✓ CapabilityBoundingSet=~CAP_SYS_CHROOT                       Service cannot issue chroot()                                      
+✓ PrivateMounts=                                              Service cannot install system mounts                               
+✓ CapabilityBoundingSet=~CAP_BLOCK_SUSPEND                    Service cannot establish wake locks                                
+✓ MemoryDenyWriteExecute=                                     Service cannot create writable executable memory mappings          
+✓ RestrictNamespaces=~user                                    Service cannot create user namespaces                              
+✓ RestrictNamespaces=~pid                                     Service cannot create process namespaces                           
+✓ RestrictNamespaces=~net                                     Service cannot create network namespaces                           
+✓ RestrictNamespaces=~uts                                     Service cannot create hostname namespaces                          
+✓ RestrictNamespaces=~mnt                                     Service cannot create file system namespaces                       
+✓ CapabilityBoundingSet=~CAP_LEASE                            Service cannot create file leases                                  
+✓ CapabilityBoundingSet=~CAP_MKNOD                            Service cannot create device nodes                                 
+✓ RestrictNamespaces=~cgroup                                  Service cannot create cgroup namespaces                            
+✓ RestrictNamespaces=~ipc                                     Service cannot create IPC namespaces                               
+✓ ProtectHostname=                                            Service cannot change system host/domainname                       
+✓ CapabilityBoundingSet=~CAP_(CHOWN|FSETID|SETFCAP)           Service cannot change file ownership/access mode/capabilities      
+✓ CapabilityBoundingSet=~CAP_SET(UID|GID|PCAP)                Service cannot change UID/GID identities/capabilities              
+✓ LockPersonality=                                            Service cannot change ABI personality                              
+✓ ProtectKernelTunables=                                      Service cannot alter kernel tunables (/proc/sys, …)                
+✓ RestrictAddressFamilies=~AF_PACKET                          Service cannot allocate packet sockets                             
+✓ RestrictAddressFamilies=~AF_NETLINK                         Service cannot allocate netlink sockets                            
+✓ RestrictAddressFamilies=~…                                  Service cannot allocate exotic sockets                             
+✓ CapabilityBoundingSet=~CAP_MAC_*                            Service cannot adjust SMACK MAC                                    
+✓ RestrictSUIDSGID=                                           SUID/SGID file creation by service is restricted                   
+✗ UMask=                                                      Files created by service are world-readable by default                  0.1
+
+→ Overall exposure level for entrees-scan.service: 2.9 OK :-)
+
+UNIT                 EXPOSURE PREDICATE HAPPY
+kpi.service               3.0 OK        :-)
+kpi-journal.service       2.9 OK        :-)
+entrees-scan.service      2.9 OK        :-)
+fin : 2026-11-26T10:54:16Z, bilan : tenu

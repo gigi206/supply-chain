@@ -47,3 +47,27 @@ Correctifs appliqués à 10:40:44Z sur `7278d746`.
 
 Complément (2026-11-26T10:42Z) : `banc_temoins.py`, cinquième fichier, n'était pas dans le contrôle de la base. `git log
 5e7f07eb..7278d746` ne le montre dans aucun commit : la base des mutants de e13 tient pour les cinq fichiers.
+
+## Résultat, pose (note de 2026-11-26T10:55:26Z)
+
+Accord du propriétaire du 2026-11-26 (verbatim) : « Pose ». Il porte sur la question « Je pose l'exportateur corrigé sur
+sc-stockage (sudo, commit faf63450) ? ».
+
+| N° | Journal | Mesuré |
+|---|---|---|
+| H5 | [pose](e15-pose.log), 10:54:04Z à 10:54:16Z | tenu, 0 KO. `metrics_exporter.py` installé identique (`fc0b8e0d…`), `lecteur_loki.py` aussi. Premier passage réussi pour `kpi-journal` et `kpi`, timer actif. Le compte `kpi` ne lit pas le mot de passe. 0 signature refusée, 0 clé ni pin sans date. Exposition systemd : 3,0 pour `kpi.service`, 2,9 pour `kpi-journal.service` |
+| H6 | [verif](e15-verif.log), 10:54:24Z | tenu : 134 séries `kpi_*`, passage et journal de moins de 20 min, 0 refus |
+| H7 | [seuil -7](e5-seuil-7.log), 10:55:00Z | tenu : 105 valeurs, 0 écart ; passage vu par Prometheus vieux de 46 s (10:54:14Z, celui de la pose) |
+
+Passage non valable, gardé : le [seuil -6](e5-seuil-6.log), lancé à 10:54:30Z, a lu dans Prometheus le passage de 10:51:19Z
+(« âge du passage 191 s »). C'était le dernier passage de l'ancien exportateur `98f917ab…`, avant que Prometheus ait relevé
+celui de la pose. Il rend lui aussi 105 valeurs et 0 écart, mais ne mesure pas le nouvel exportateur. La faute vient de
+l'ordre de lancement : j'ai lancé le seuil sans contrôler l'âge du passage, contre la règle déjà écrite (« planifier un
+seuil après un passage de l'exportateur »). Avant le -7, une requête de l'auditeur a lu 10:54:14Z comme dernier passage
+(10:54:56Z, hors journal).
+
+L'écart dépôt/VM est fermé : sc-stockage porte l'exportateur du commit `faf63450`. Le gain reste latent tant que Chains est
+en v0.29.9.
+
+Heures : 10:40:27Z à 10:41:36Z (prédiction, application, banc, sec, commits), puis 10:54:04Z à 10:55:26Z (pose, verif,
+seuils, notes), soit 2 min 31 s. L'attente de l'accord n'est pas comptée, et le temps de la question non plus.
