@@ -81,3 +81,46 @@ ces bancs ne contrôlait la sortie d'erreur d'ec. Dans l'ancien système, `_mani
 qui alimente `trusted_parameters` : les digests de résultats des tâches de construction n'y sont pas entrés, seuls ceux du
 snapshot l'ont été. En service, Zot répond et `_manifests` est défini. Ce que ce trou change aux résultats de ces bancs
 n'est pas mesuré.
+
+## Cause mesurée et corrections (sondes hors mesure, 2026-11-26T10:20:57Z à 10:21:39Z)
+
+Les deux sondes sont faites par `ec opa eval`, dans un espace réseau neuf, sur l'énoncé signé v0.29.9 du passage 1, avec
+`rule_data__configuration__` posé à la main.
+- **`_manifests` n'est pas indéfini.** `ec.oci.image_manifests` rend `{}` quand le registre ne répond pas : `count` à 0,
+  une ligne d'erreur, code 0. La cause probable écrite plus haut est donc fausse.
+- **La donnée est lue, mais le système est éteint par défaut.** Avec la donnée du cas `futur`, `future_deny_rules` compte
+  1 règle et les clés des trois tâches sont bien `oci://<registre>/tekton/tasks/<nom>`. Pourtant,
+  `missing_trusted_task_rules_data` vaut `true`. Les défauts de la bibliothèque (`policy/lib/rule_data/rule_data.rego`,
+  ligne 152) contiennent `"trusted_task_rules_enabled": false`, que `trusted.rego` traite comme une donnée manquante. Avec
+  `trusted_task_rules_enabled: true`, la règle avertit avec le message prédit en F4, `_manifests` valant toujours `{}`.
+
+Corrections du passage 1 :
+- le passage 1 a mesuré ceci : sans `trusted_task_rules_enabled`, poser `trusted_task_rules` ne change rien ; F3 ne disait
+  donc rien de l'`allow` ;
+- les deux paragraphes « Conséquence » sont faux. Le nouveau système ne se tait pas faute de manifestes : sans champ
+  `versions`, une règle ne les lit pas, et `_manifests` vaut `{}`. L'ancien système appelle `is_trusted_task(task, _)`, qui
+  ignore les manifestes. Les 9 lignes d'erreur des bancs `porte.sh` et `temoins.sh` restent un fait mesuré, mais aucun effet
+  sur leurs résultats n'est établi ;
+- je n'avais pas lu les défauts de `rule_data` avant la prédiction.
+
+## Prédiction du passage -2 (2026-11-26T10:22:30Z)
+
+Le passage -2 pose `trusted_task_rules_enabled: true` dans les cas `regles` et `futur`, et ajoute deux cas :
+- `immediat` : `regles` plus la même règle `deny`, sans `effective_on`, donc effective. C'est le témoin de `regles` : sans
+  lui, son silence ne prouve pas que l'`allow` a été jugé ;
+- `eteint` : la donnée de `futur` sans l'activation, soit le passage 1 rejoué comme contrôle.
+
+La sortie d'erreur d'ec est contrôlée à chaque jugement. Les bundles ne sont pas poussés dans le registre du banc : aucune
+règle du banc n'a de champ `versions`.
+
+- **G1** : F1, avec 5, 9, 8 et 8 lignes ajoutées et aucune retirée (`regles`, `futur`, `immediat`, `eteint`). `futur` et
+  `immediat` contiennent `regles`, et `eteint` ne diffère de `futur` que par la ligne d'activation.
+- **G2** : F2, inchangée.
+- **G3** (`regles`) : F3, inchangée, mais le système est cette fois actif.
+- **G4** (`futur`) : F4 et F5, inchangées.
+- **G5** (`immediat`, v0.29.9) : face à `regles`, un seul code ajouté, `trusted_task.trusted` en refus. Son terme est
+  `publier-image` et son message donne la raison `deny_rule`. `trusted_parameters` reste en succès : le paramètre `digest`
+  de `publier` est le digest de l'image, présent dans le snapshot. Pour v0.30.0, rien ne change.
+- **G6** (`eteint`) : aucun code ajouté ni retiré face à `service`, pour les deux versions.
+- **G7** : chaque jugement v0.29.9 écrit 9 lignes d'erreur, toutes des échecs de récupération des manifestes. Les
+  jugements v0.30.0 n'en écrivent aucune. 0 KO.

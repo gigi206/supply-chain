@@ -5,10 +5,14 @@
 # signature, main.go inchangé), puis jugés comme dans temoins.sh (ec v0.10.42) sous trois politiques qui ne diffèrent que par
 # le ruleData de policy.yaml :
 #   service   politique en service (liste revue trusted_tasks seule)
-#   regles    + trusted_task_rules, allow seul (motif oci://<registre>/tekton/tasks/*) : bascule sur le nouveau système
-#   futur     + une règle deny sur publier-image, effective_on 2099-12-31 (date future)              future_deny_rule
-# Critère : pour v0.29.9, regles ne change aucun code et futur n'ajoute que l'avertissement future_deny_rule ; pour v0.30.0,
-# rien ne change, et le bundle de publier-image est contrôlé dans l'énoncé signé (pipelineTask/publier).
+#   regles    + trusted_task_rules_enabled: true et trusted_task_rules, allow seul (motif oci://<registre>/tekton/tasks/*)
+#   futur     regles + une règle deny sur publier-image, effective_on 2099-12-31 (date future)       future_deny_rule
+#   immediat  regles + la même règle deny, sans effective_on (effective)                         trusted (témoin de regles)
+#   eteint    futur sans trusted_task_rules_enabled (défaut false de la bibliothèque) : rien ne doit changer
+# Critère : pour v0.29.9, regles ne change aucun code, futur n'ajoute que l'avertissement future_deny_rule, immediat que le
+# refus trusted, eteint rien ; pour v0.30.0, rien ne change, et le bundle de publier-image est contrôlé dans l'énoncé signé.
+# Passage -2 : trusted_task_rules_enabled (défaut false, lib/rule_data) manquait au passage 1 ; cas immediat et eteint ajoutés ;
+# la sortie d'erreur d'ec est contrôlée (les bundles ne sont pas dans le registre du banc : 9 lignes pour v0.29.9).
 # La liste de règles est fabriquée pour le banc : le résultat ne dit rien de la porte en service, qui n'a pas trusted_task_rules.
 # Tout tourne dans un espace réseau neuf (unshare -rn, boucle locale seule) : aucun appel ne peut sortir de l'hôte.
 # Usage (racine du dépôt) : [SUFFIXE=-2] mise exec -- bash poc/bricks/08-trust-plane/essais/chains-v0300-signature/future-deny.sh
@@ -110,21 +114,24 @@ bundle_publier() { # version : nom de la dépendance de publier et dépôt de so
   attendu "noms remplacés dans porte.rego et taches.yml" "$(diff "$P08/politique/porte/porte.rego" "$T/politique/regles/porte.rego" | grep -c '^>') $(diff "$P08/politique/porte/taches.yml" "$T/politique/donnees/taches.yml" | grep -c '^>')" "1 15"
   attendu "policy.yaml : seuls les chemins changent" "$(diff <(grep -v '^ *#' "$P08/politique/porte/policy.yaml") <(grep -v '^ *#' "$T/service.yaml") | grep -c '^>')" 4
   # trusted_task_rules ajouté au ruleData, juste après allowed_builder_ids (même indentation que lui)
+  printf '      trusted_task_rules_enabled: true\n' > "$T/active.yaml"
   printf '      trusted_task_rules:\n        allow:\n          banc:\n            - pattern: "oci://%s/tekton/tasks/*"\n' "$REG" > "$T/allow.yaml"
   printf '        deny:\n          futur:\n            - pattern: "oci://%s/tekton/tasks/publier-image"\n              effective_on: "%s"\n' "$REG" "$FUTUR" > "$T/deny.yaml"
-  cat "$T/allow.yaml" > "$T/regles.bloc"; cat "$T/allow.yaml" "$T/deny.yaml" > "$T/futur.bloc"
-  for p in regles futur; do
+  printf '        deny:\n          immediat:\n            - pattern: "oci://%s/tekton/tasks/publier-image"\n' "$REG" > "$T/deny-immediat.yaml"
+  cat "$T/active.yaml" "$T/allow.yaml" > "$T/regles.bloc"; cat "$T/active.yaml" "$T/allow.yaml" "$T/deny.yaml" > "$T/futur.bloc"
+  cat "$T/active.yaml" "$T/allow.yaml" "$T/deny-immediat.yaml" > "$T/immediat.bloc"; cat "$T/allow.yaml" "$T/deny.yaml" > "$T/eteint.bloc"
+  for p in regles futur immediat eteint; do
     sed "\#https://supply-chain.example/builders/tekton-chains@v1#r $T/$p.bloc" "$T/service.yaml" > "$T/$p.yaml"
     echo "-- $p : lignes ajoutées à policy.yaml"; diff "$T/service.yaml" "$T/$p.yaml" | sed -n 's/^> /  /p' | abrege
   done
-  attendu "regles | futur : lignes ajoutées, aucune retirée" "$(diff "$T/service.yaml" "$T/regles.yaml" | grep -c '^>') $(diff "$T/service.yaml" "$T/regles.yaml" | grep -c '^<') | $(diff "$T/service.yaml" "$T/futur.yaml" | grep -c '^>') $(diff "$T/service.yaml" "$T/futur.yaml" | grep -c '^<')" "4 0 | 8 0"
-  attendu "futur : ajouts de regles compris" "$(diff "$T/regles.yaml" "$T/futur.yaml" | grep -c '^<')" 0
+  attendu "regles futur immediat eteint : lignes ajoutées et retirées" "$(for p in regles futur immediat eteint; do printf '%s %s | ' "$(diff "$T/service.yaml" "$T/$p.yaml" | grep -c '^>')" "$(diff "$T/service.yaml" "$T/$p.yaml" | grep -c '^<')"; done)" "5 0 | 9 0 | 8 0 | 8 0 | "
+  attendu "futur et immediat : ajouts de regles compris ; eteint = futur moins l'activation" "$(diff "$T/regles.yaml" "$T/futur.yaml" | grep -c '^<') $(diff "$T/regles.yaml" "$T/immediat.yaml" | grep -c '^<') $(diff "$T/futur.yaml" "$T/eteint.yaml" | grep -c '^[<>]')" "0 0 1"
   for v in 29 30; do
     echo "## v$v"
     signer "$v"
     if [ "$v" = 29 ]; then n=pipelineTask; else n=pipelineTask/publier; fi
     attendu "v$v : dépendance de publier et dépôt de son bundle dans l'énoncé signé" "$(bundle_publier "$v" | abrege)" "$n REGISTRE/tekton/tasks/publier-image"
-    for p in service regles futur; do
+    for p in service regles futur immediat eteint; do
       juger "$p-$v" "$REG/builds/sample-app@$(cat "$T/digest-$v")" "$T/$p.yaml"
       echo "ec $p : $(tr '\n' ' ' < "$T/e-$p-$v" | sed 's/=refus/=R/g; s/=avertissement/=A/g')"
     done
@@ -132,10 +139,10 @@ bundle_publier() { # version : nom de la dépendance de publier et dépôt de so
   echo "## référence (service)"
   attendu "service v29 : codes refusés" "$(grep '=refus$' "$T/e-service-29" | sed 's/=refus$//' | trie)" "porte.fermeture_plateforme "
   attendu "service v30 : codes refusés" "$(grep '=refus$' "$T/e-service-30" | sed 's/=refus$//' | trie)" "porte.taches_vues slsa_build_scripted_build.build_task_image_results_found tasks.pipeline_has_tasks "
-  echo "## règles trusted_task (service | regles | futur)"
+  echo "## règles trusted_task (service | regles | futur | immediat | eteint)"
   for v in 29 30; do
     for c in $(jq -r '.components[] | [.successes[]?, .violations[]?, .warnings[]?] | map(.metadata.code) | unique[] | select(startswith("trusted_task."))' "$T/ec-service-$v.json"); do
-      echo "  v$v $c : $(etat_ec "service-$v" "$c") | $(etat_ec "regles-$v" "$c") | $(etat_ec "futur-$v" "$c")"
+      echo "  v$v $c : $(etat_ec "service-$v" "$c") | $(etat_ec "regles-$v" "$c") | $(etat_ec "futur-$v" "$c") | $(etat_ec "immediat-$v" "$c") | $(etat_ec "eteint-$v" "$c")"
     done
   done
   echo "## contrôles"
@@ -154,9 +161,22 @@ bundle_publier() { # version : nom de la dépendance de publier et dépôt de so
   attendu "futur v29 : message de $REGLE" "$(jq -r --arg c "$REGLE" '[.components[] | .warnings[]? | select(.metadata.code == $c) | .msg] | join(" | ")' "$T/ec-futur-29.json" | abrege)" \
     "Task \"publier\" will be denied by rule pattern \"oci://REGISTRE/tekton/tasks/publier-image\" starting on $FUTUR."
   attendu "futur v29 : terme de $REGLE" "$(jq -r --arg c "$REGLE" '[.components[] | .warnings[]? | select(.metadata.code == $c) | .metadata.term] | join(" ")' "$T/ec-futur-29.json")" publier-image
+  # témoin de regles : une règle deny effective fait refuser trusted (sans elle, le silence de regles ne prouverait rien)
+  attendu "immediat v29 : codes ajoutés | retirés (face à regles)" "$(comm -13 "$T/e-regles-29" "$T/e-immediat-29" | trie)| $(comm -23 "$T/e-regles-29" "$T/e-immediat-29" | trie)" "trusted_task.trusted=refus | "
+  attendu "immediat v29 : terme de trusted_task.trusted" "$(jq -r '[.components[] | .violations[]? | select(.metadata.code == "trusted_task.trusted") | .metadata.term] | join(" ")' "$T/ec-immediat-29.json")" publier-image
+  attendu "immediat v29 : raison du refus" "$(jq -r '[.components[] | .violations[]? | select(.metadata.code == "trusted_task.trusted") | .msg | test("The denial reason is: deny_rule")] | map(tostring) | join(" ")' "$T/ec-immediat-29.json")" true
+  jq -r '.components[] | .violations[]? | select(.metadata.code == "trusted_task.trusted") | "  message : " + .msg' "$T/ec-immediat-29.json" | abrege
+  attendu "immediat v29 : trusted_task.trusted_parameters" "$(etat_ec immediat-29 trusted_task.trusted_parameters)" succès
+  attendu "immediat v30 : codes ajoutés | retirés (face à regles)" "$(comm -13 "$T/e-regles-30" "$T/e-immediat-30" | trie)| $(comm -23 "$T/e-regles-30" "$T/e-immediat-30" | trie)" "| "
+  # défaut de la bibliothèque : sans trusted_task_rules_enabled, la même donnée que futur ne change rien
   for v in 29 30; do
-    for p in service regles futur; do
-      [ ! -s "$T/ec-$p-$v.err" ] || { echo "  $p-$v : sortie d'erreur d'ec ($(wc -l < "$T/ec-$p-$v.err") lignes)"; head -3 "$T/ec-$p-$v.err" | abrege | sed 's/^/    /'; }
+    attendu "eteint v$v : codes ajoutés | retirés (face à service)" "$(comm -13 "$T/e-service-$v" "$T/e-eteint-$v" | trie)| $(comm -23 "$T/e-service-$v" "$T/e-eteint-$v" | trie)" "| "
+  done
+  # sortie d'erreur d'ec : bundles absents du registre du banc (lus par ec.oci.image_manifests, qui rend alors {})
+  for v in 29 30; do
+    if [ "$v" = 29 ]; then a="9 9"; else a="0 0"; fi
+    for p in service regles futur immediat eteint; do
+      attendu "$p-$v : sortie d'erreur d'ec (lignes, échecs de récupération)" "$(wc -l < "$T/ec-$p-$v.err") $(grep -c 'failed to fetch image' "$T/ec-$p-$v.err")" "$a"
     done
   done
   kill "$SERVE"; wait "$SERVE" 2> /dev/null; SERVE=
