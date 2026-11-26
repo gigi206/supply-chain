@@ -57,3 +57,27 @@ Réserves écrites avant le lancement :
 - ec seul : `reserve-c` (Kyverno) n'est pas jugée. Elle n'a pas d'équivalent de `future_deny_rule` (`ivpol.tmpl.yaml`,
   ligne 5), et son générateur lit la liste revue à l'ancien format ;
 - un seul cas (j7) ; KMS, contrôleur, Zot réel et admission restent hors du banc.
+
+## Résultat (passage 1, 2026-11-26T10:16:42Z à 10:16:52Z, 3 KO)
+
+Journal : [`chains-v0300-future-deny.log`](chains-v0300-future-deny.log). F1, F2, F3 et F5 tiennent : contrôles initiaux,
+4 et 8 lignes ajoutées à `policy.yaml`, bundle de `publier` lu dans l'énoncé signé des deux versions, codes de la base des
+témoins sous `service`, aucun code changé sous `regles`, rien de changé pour v0.30.0.
+
+**F4 n'est pas tenue** : sous `futur`, v0.29.9 n'a aucun code ajouté, et `future_deny_rule` reste en succès. Le banc l'a jugée
+sans sa donnée d'entrée. Chaque jugement v0.29.9 écrit 9 lignes d'erreur d'ec : `failed to fetch image` par
+`ec.oci.image_manifest`, pour les trois bundles (`NAME_UNKNOWN` : le registre du banc ne les contient pas). La règle
+appelle `future_deny_rules_for_task(task, _manifests)`, avec `_manifests := ec.oci.image_manifests(lib.pipelinerun_bundle_refs)`.
+Cause probable, pas encore mesurée : `_manifests` est indéfini quand la récupération échoue, et le corps de la règle échoue
+avec lui. v0.30.0 n'écrit aucune erreur : elle ne lit aucune tâche, donc aucune référence de bundle.
+
+Conséquence pour F3, lue et non mesurée : tout le nouveau système passe par `_manifests` (`untrusted_task_refs_rules`,
+`_trust_errors_rules`). Le succès de `trusted_task.trusted` sous `regles` peut donc être un succès à vide, et non le fait de
+l'`allow`.
+
+Conséquence pour les bancs précédents, mesurée dans leurs dossiers de travail gardés : tous les jugements v0.29.9 de
+`porte.sh` et de `temoins.sh` ont les mêmes 9 lignes d'erreur (6 erreurs de récupération pour le témoin `epingle`). Aucun de
+ces bancs ne contrôlait la sortie d'erreur d'ec. Dans l'ancien système, `_manifests` ne sert qu'à `_trusted_build_digests`,
+qui alimente `trusted_parameters` : les digests de résultats des tâches de construction n'y sont pas entrés, seuls ceux du
+snapshot l'ont été. En service, Zot répond et `_manifests` est défini. Ce que ce trou change aux résultats de ces bancs
+n'est pas mesuré.

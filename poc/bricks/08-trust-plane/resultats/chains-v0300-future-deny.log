@@ -1,0 +1,107 @@
+# future-deny.sh, 2026-11-26T10:16:42Z, dépôt fe238b46, script d3bfc899ad855e8b, main.go 76e03e674842ed47
+OK   réseau du banc : interfaces : 1
+OK   réseau du banc : routes de la table principale : 0
+OK   ec : empreinte du verrou (politique.sh) : 895c6f7e63cfefe6257a2e54c052c3d90803e8127adf5a7eb13f245262859abf
+ec : v0.10.42 ; cosign : v3.1.4
+src29 : commit 89219ea5443fe3164715b9a93f7e6fd16d56b38a, main.go identique, binaire 984b202a73690182
+src30 : commit b59bced2524ec2da5dcbe3f916c2109262b9b819, main.go identique, binaire 380f637667285595
+OK   bibliothèque : arbre de ebd3fbd270297c15f590f4023360465ffb41d4fe : 0fd26021bb08582553f392565ca0faf316c51229
+cas : j7-sample-app, 3 TaskRuns, PipelineRun 9539952b…
+## politiques
+OK   noms remplacés dans porte.rego et taches.yml : 1 15
+OK   policy.yaml : seuls les chemins changent : 4
+-- regles : lignes ajoutées à policy.yaml
+        trusted_task_rules:
+          allow:
+            banc:
+              - pattern: "oci://REGISTRE/tekton/tasks/*"
+-- futur : lignes ajoutées à policy.yaml
+        trusted_task_rules:
+          allow:
+            banc:
+              - pattern: "oci://REGISTRE/tekton/tasks/*"
+          deny:
+            futur:
+              - pattern: "oci://REGISTRE/tekton/tasks/publier-image"
+                effective_on: "2099-12-31T00:00:00Z"
+OK   regles | futur : lignes ajoutées, aucune retirée : 4 0 | 8 0
+OK   futur : ajouts de regles compris : 0
+## v29
+OK   v29 : signer, code : 0
+OK   v29 : erreurs de Sign : 0
+OK   v29 : signature de l'image (cosign verify) : signée
+OK   v29 : attestations sur l'image : 2
+OK   v29 : dépendance de publier et dépôt de son bundle dans l'énoncé signé : pipelineTask REGISTRE/tekton/tasks/publier-image
+OK   service-29 : ec, code (--strict=false) : 0
+ec service : porte.fermeture_plateforme=R trusted_task.tagged=A 
+OK   regles-29 : ec, code (--strict=false) : 0
+ec regles : porte.fermeture_plateforme=R trusted_task.tagged=A 
+OK   futur-29 : ec, code (--strict=false) : 0
+ec futur : porte.fermeture_plateforme=R trusted_task.tagged=A 
+## v30
+OK   v30 : signer, code : 0
+OK   v30 : erreurs de Sign : 0
+OK   v30 : signature de l'image (cosign verify) : signée
+OK   v30 : attestations sur l'image : 2
+OK   v30 : dépendance de publier et dépôt de son bundle dans l'énoncé signé : pipelineTask/publier REGISTRE/tekton/tasks/publier-image
+OK   service-30 : ec, code (--strict=false) : 0
+ec service : porte.taches_vues=R slsa_build_scripted_build.build_task_image_results_found=R tasks.pipeline_has_tasks=R 
+OK   regles-30 : ec, code (--strict=false) : 0
+ec regles : porte.taches_vues=R slsa_build_scripted_build.build_task_image_results_found=R tasks.pipeline_has_tasks=R 
+OK   futur-30 : ec, code (--strict=false) : 0
+ec futur : porte.taches_vues=R slsa_build_scripted_build.build_task_image_results_found=R tasks.pipeline_has_tasks=R 
+## référence (service)
+OK   service v29 : codes refusés : porte.fermeture_plateforme 
+OK   service v30 : codes refusés : porte.taches_vues slsa_build_scripted_build.build_task_image_results_found tasks.pipeline_has_tasks 
+## règles trusted_task (service | regles | futur)
+  v29 trusted_task.current : succès | succès | succès
+  v29 trusted_task.data : succès | succès | succès
+  v29 trusted_task.data_format : succès | succès | succès
+  v29 trusted_task.future_deny_rule : succès | succès | succès
+  v29 trusted_task.pinned : succès | succès | succès
+  v29 trusted_task.tagged : avertissement | avertissement | avertissement
+  v29 trusted_task.trusted : succès | succès | succès
+  v29 trusted_task.trusted_parameters : succès | succès | succès
+  v29 trusted_task.valid_trusted_artifact_inputs : succès | succès | succès
+  v30 trusted_task.current : succès | succès | succès
+  v30 trusted_task.data : succès | succès | succès
+  v30 trusted_task.data_format : succès | succès | succès
+  v30 trusted_task.future_deny_rule : succès | succès | succès
+  v30 trusted_task.pinned : succès | succès | succès
+  v30 trusted_task.tagged : succès | succès | succès
+  v30 trusted_task.trusted : succès | succès | succès
+  v30 trusted_task.trusted_parameters : succès | succès | succès
+  v30 trusted_task.valid_trusted_artifact_inputs : succès | succès | succès
+## contrôles
+OK   regles v29 : codes ajoutés | retirés : | 
+OK   regles v29 : trusted_task.trusted : succès
+OK   regles v29 : trusted_task.data_format : succès
+OK   regles v29 : trusted_task.future_deny_rule : succès
+OK   futur v29 : trusted_task.trusted : succès
+OK   futur v29 : trusted_task.data_format : succès
+OK   futur v29 : codes retirés (face à regles) : 
+OK   regles v30 : codes ajoutés | retirés : | 
+OK   regles v30 : trusted_task.trusted : succès
+OK   regles v30 : trusted_task.data_format : succès
+OK   regles v30 : trusted_task.future_deny_rule : succès
+OK   futur v30 : trusted_task.trusted : succès
+OK   futur v30 : trusted_task.data_format : succès
+OK   futur v30 : codes retirés (face à regles) : 
+KO   futur v29 : codes ajoutés (face à regles) : obtenu «  », attendu « trusted_task.future_deny_rule=avertissement  »
+OK   futur v30 : codes ajoutés (face à regles) : 
+OK   futur v30 : trusted_task.future_deny_rule : succès
+KO   futur v29 : message de trusted_task.future_deny_rule : obtenu «  », attendu « Task "publier" will be denied by rule pattern "oci://REGISTRE/tekton/tasks/publier-image" starting on 2099-12-31T00:00:00Z. »
+KO   futur v29 : terme de trusted_task.future_deny_rule : obtenu «  », attendu « publier-image »
+  service-29 : sortie d'erreur d'ec (9 lignes)
+    time="2026-11-26T11:16:45+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/preparer-entrees/manifests/sha256:2070d601ae3c…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/preparer-entrees@sha256:2070d601ae3c…"
+    time="2026-11-26T11:16:45+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/construire-image/manifests/sha256:4dcbc4b74681…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/construire-image@sha256:4dcbc4b74681…"
+    time="2026-11-26T11:16:45+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/publier-image/manifests/sha256:d21931f3807b…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/publier-image@sha256:d21931f3807b…"
+  regles-29 : sortie d'erreur d'ec (9 lignes)
+    time="2026-11-26T11:16:46+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/construire-image/manifests/sha256:4dcbc4b74681…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/construire-image@sha256:4dcbc4b74681…"
+    time="2026-11-26T11:16:46+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/publier-image/manifests/sha256:d21931f3807b…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/publier-image@sha256:d21931f3807b…"
+    time="2026-11-26T11:16:46+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/preparer-entrees/manifests/sha256:2070d601ae3c…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/preparer-entrees@sha256:2070d601ae3c…"
+  futur-29 : sortie d'erreur d'ec (9 lignes)
+    time="2026-11-26T11:16:47+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/preparer-entrees/manifests/sha256:2070d601ae3c…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/preparer-entrees@sha256:2070d601ae3c…"
+    time="2026-11-26T11:16:47+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/publier-image/manifests/sha256:d21931f3807b…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/publier-image@sha256:d21931f3807b…"
+    time="2026-11-26T11:16:47+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/construire-image/manifests/sha256:4dcbc4b74681…: NAME_UNKNOWN: Unknown name" function=ec.oci.image_manifest input_ref="REGISTRE/tekton/tasks/construire-image@sha256:4dcbc4b74681…"
+## bilan : 3 KO, 2026-11-26T10:16:52Z
