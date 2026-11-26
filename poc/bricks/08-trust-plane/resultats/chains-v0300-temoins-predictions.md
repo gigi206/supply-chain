@@ -121,7 +121,7 @@ Pour v0.30.0, le même champ changé ne change rien. Cinq réussissent à vide c
 
 Trois règles n'ont pas de témoin possible ici, pour trois raisons différentes. Elles réussissent à vide pour v0.29.9 aussi :
 
-- `build_script_used` tient à la forme v1 de la provenance. Elle réussit pour v0.29.9 alors qu'aucune tâche n'a de champ `steps` au premier niveau (mesuré), c'est-à-dire alors que sa condition de refus est vraie. La cause (`build_task.name` indéfini) est une lecture, non mesurée. Cette règle concerne la porte en service, pas seulement la montée ;
+- `build_script_used` tient à la forme v1 de la provenance. Elle réussit pour v0.29.9 alors qu'aucune tâche n'a de champ `steps` au premier niveau (mesuré), c'est-à-dire alors que sa condition de refus est vraie. La cause (`build_task.name` indéfini) est une lecture, non mesurée ici ; elle l'est depuis, dans [un banc à part](chains-v0300-cause-build-script-predictions.md). Cette règle concerne la porte en service, pas seulement la montée ;
 - `future_deny_rule` tient au format de la liste revue : elle ne s'active qu'avec `trusted_task_rules` ;
 - `preparation_appariee` tient au cas j7 : elle ne vise que la voie deb.
 

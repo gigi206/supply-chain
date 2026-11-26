@@ -24,3 +24,26 @@ premier niveau de chaque TaskRun ; `nom-etapes` ajoute en plus une étape.
 Si Z1 à Z3 tiennent, le silence vient du terme `build_task.name` et non des étapes. La règle est alors fausse dans les deux
 sens pour une provenance v1 : muette aujourd'hui, et elle refuserait toute provenance v1 si le nom était lu, puisque les
 étapes d'un TaskRun v1 ne sont pas au premier niveau. Ce second point est déduit, pas mesuré sur une vraie correction.
+
+## Résultat (passage 1, 2026-11-26T09:42:39Z à 09:42:48Z, 0 KO)
+
+Journal : [`chains-v0300-cause-build-script.log`](chains-v0300-cause-build-script.log). ec à l'empreinte du verrou, arbre de
+la bibliothèque contrôlé, seule `lo` dans l'espace, énoncés tirés des enveloppes gardées du passage -3 (empreintes au journal).
+
+| Prédiction | Mesure |
+|---|---|
+| Z1 | **Tenue** : une attestation de PipelineRun, 3 tâches vues, une seule de construction (`publier`), `name` absent, 0 étape lue ; aucun refus de la règle |
+| Z2 | **Tenue** : avec `name` ajouté, `build_script_used` refuse : `Build task "publier" does not contain any steps` |
+| Z3 | **Tenue** : avec `name` et une étape, aucun refus |
+| Z4 | **Tenue** : v0.30.0, 0 tâche vue pour les trois entrées ; seul refus `build_task_image_results_found` |
+
+Le silence de `build_script_used` sur une provenance v1 vient du terme `build_task.name` du message, indéfini sur un TaskRun :
+le corps de la règle échoue avant de rendre un refus. Les étapes absentes n'y sont pour rien : dès que le nom est lu, la règle
+refuse la tâche `publier`, qui a pourtant une étape, dans `status.steps` et dans `status.taskSpec.steps`, pas au premier niveau (lu sur l'entrée
+`entree-29-base.json` à 09:43Z, hors journal).
+La règle est donc fausse dans les deux sens pour une provenance v1. Elle est muette dans la porte en service (v0.29.9), et une
+correction du seul nom la ferait refuser toute provenance v1. Ce second sens est mesuré sur une entrée non signée modifiée,
+pas sur une vraie correction de la bibliothèque.
+
+Réserves : un seul cas (j7), une seule tâche de construction ; entrée non signée pour les deux contrôles, la signature n'étant
+pas jugée par `ec opa eval`. Rien n'est ouvert chez le projet tiers.
