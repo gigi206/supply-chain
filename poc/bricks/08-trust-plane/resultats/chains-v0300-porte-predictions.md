@@ -191,3 +191,14 @@ Ce n'est pas exhaustif. D'après la table d'état du [journal](chains-v0300-port
 - les autres règles `trusted_task.*`.
 
 Non couverts, inchangés : KMS, contrôleur, Zot réel (bundles et fermetures), `ivpol`, Kyverno, contrôles 6, 7 et 9, et un seul cas.
+
+## Contrôle du champ du témoin kata dans l'énoncé signé (prédiction, 2026-11-26T09:43:53Z)
+
+Le témoin `construction_kata` du passage -3 n'a pas contrôlé que son champ changé était dans l'énoncé signé par v0.30.0 : un
+« non signalé » pour v0.30.0 serait aussi ce qu'on verrait si la mutation s'était perdue à la signature. Les attestations
+vérifiées par `cosign verify-attestation` au passage -3 (`att-kata-<v>.json`) sont gardées sur disque. Lecture seule par
+[`champ-kata.sh`](../essais/chains-v0300-signature/champ-kata.sh), sans signature ni réseau.
+
+- **K1** : pour chaque version, dans l'énoncé du PipelineRun, la dépendance de `construire` (`pipelineTask` pour v0.29.9,
+  `pipelineTask/construire` pour v0.30.0) porte `spec.podTemplate.runtimeClassName` = `runc` ; les autres TaskRuns sont tels
+  qu'au banc (aucun `runc`).
