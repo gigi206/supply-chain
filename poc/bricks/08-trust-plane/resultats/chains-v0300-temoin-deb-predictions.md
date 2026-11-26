@@ -46,3 +46,19 @@ Réserves écrites avant le lancement :
   (hors du paquet `porte`) ne sont pas jugées ;
 - fermetures non vérifiées faute de registre : leurs messages ne disent rien de la preuve des fermetures ;
 - un seul PipelineRun deb.
+
+## Résultat (passage 1, 2026-11-26T09:56:12Z à 09:56:21Z, 4 KO)
+
+Journal : [`chains-v0300-temoin-deb.log`](chains-v0300-temoin-deb.log). D1, D2, D4 et D5 tiennent : contrôles initiaux,
+mutation lue dans l'énoncé des deux versions, `construire-deb` et `preparer-deb` reconnues en base (énoncé signé et sortie à
+sec rendent les mêmes valeurs), v0.30.0 à 0 tâche vue avec `porte.taches_vues` seul, aucune erreur d'évaluation, six requêtes
+en moins de 2 s par cas.
+
+**D3 n'est pas tenue, par faute du témoin.** Au témoin v0.29.9, `preparer-deb` **et** `preparer-entrees` sont reconnues, donc
+`preparation_appariee` ne refuse pas. Les fermetures de `preparer-deb` restent jugées, et la ligne de `preparer-entrees` s'y
+ajoute. Cause lue dans la bibliothèque (`policy/lib/tekton/refs.rego`, `_ref_name`) : le nom d'une tâche est pris d'abord
+dans l'étiquette `tekton.dev/task` du TaskRun, que Tekton pose depuis la Task résolue, et le paramètre `name` de la
+`taskRef` ne sert qu'en repli. L'étiquette est restée à `preparer-deb`. `_tache` reconnaît une tâche par le nom **ou** par le
+dépôt du bundle : la tâche témoin était reconnue sous les deux noms. J'avais lu `_tache` avant la prédiction, pas `task_ref`.
+
+Ce passage ne dit donc rien de la règle : le témoin n'était pas une construction deb sans `preparer-deb`.
