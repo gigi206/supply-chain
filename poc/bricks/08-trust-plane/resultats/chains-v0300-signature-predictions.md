@@ -62,3 +62,29 @@ Corrections dans `main.go` (`76e03e674842ed47`) : import de `formats/all` ; retr
 Non couverts, inchangés : signataire KMS, contrôleur réel, Zot, `ec validate image` sur ces attestations signées, transparence.
 
 Heures (2026-11-26, `date -u`) : de 08:15:55 (premier relevé, avant l'orientation) à 08:26:59 (cette note), soit 11 min 04 s. Ce temps couvre l'orientation, le programme, le script, la prédiction, les deux passages et les notes.
+
+## Relecture du résultat et passage -3, prédiction (note de 2026-11-26T08:30:28Z)
+
+Relecture par le conseiller : trois phrases du résultat disaient plus que le journal.
+
+1. « Première mesure de `b1c0af9` » : faux. En O4 de la 19 (02/11/2026), une image d'essai v0.29.9 + #1834 + correctif maison, sous le vrai contrôleur, a fini avec quatre objets `signed=failed`. Le neuf ici est la mesure **sur la release v0.30.0**, au niveau d'`ObjectSigner.Sign`. Phrase corrigée dans docs/03, docs/04, l'ADR 0000 et le README de la 19 (textes de ce jour, non poussés).
+2. « Seuls les noms `pipelineTask/<nom>` changent » : le second passage n'a relevé que les noms `pipeline*`, sans comparer les énoncés. Le banc à sec avait aussi trouvé les `byproducts` renommés. D'où le passage -3.
+3. « `preparer` et `construire` n'ont pas de sujet » : c'était déduit. C'est désormais lu : `.subject | length` vaut 0 pour ces deux TaskRuns et 1 pour `publier`, dans les sorties à sec de v0.30.0.
+
+Autres points :
+- « 0 KO » ne couvrait que les codes de sortie, et S3 à S6 ont été lus à l'œil.
+- La borne de 08:26:59 précède les notes des docs et le commit `1f24daf5`.
+- `storage.oci.encoding-format` existe toujours sous ce nom dans v0.30.0 (`config.go`, l. 195).
+
+**Passage -3** (`banc.sh` `0fbc5a6c67abe0f7`, `main.go` inchangé) : mêmes appels, plus 17 contrôles mécaniques.
+- Les constats S3 à S6 deviennent des `attendu`. Pour v0.29.9 sans signataire, la valeur attendue est l'échec ouvert déjà mesuré.
+- L'énoncé signé du PipelineRun et celui de `publier` sont comparés à la sortie du banc à sec de la même version (`sorties/j7-sample-app.<v>.json`, `sorties/tr-j7-sample-app-publier.<v>.json`).
+- Normalisation des deux côtés : `content` décodé, annotations et finaliseurs `chains.tekton.dev*` retirés. Côté signé seulement, l'hôte et le digest du banc sont remis à ceux d'origine, après décodage.
+
+| | Prédiction | Confiance |
+|---|---|---|
+| T1 | Tous les contrôles repris de S1 à S6 sont OK dans les deux versions | haute (même code, mêmes entrées) |
+| T2 | Pour chaque version, l'énoncé signé du PipelineRun est égal à la sortie à sec. Si un écart apparaît, il se limite aux `digest` des trois dépendances `pipelineTask*`, au cas où ils seraient calculés sur le contenu, que le banc a nettoyé | moyenne |
+| T3 | Pour chaque version, l'énoncé signé de `publier` est égal à la sortie à sec, avec la même réserve | moyenne |
+
+Avec T2 tenue, le refus de la porte mesuré à sec sur la sortie de v0.30.0 vaut pour l'énoncé que v0.30.0 signe et stocke.

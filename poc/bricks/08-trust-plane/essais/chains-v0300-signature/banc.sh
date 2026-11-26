@@ -30,6 +30,14 @@ attendu() { # libellé obtenu attendu
 noms() { # registre digest : noms pipelineTask des attestations vérifiées, triés, une ligne par attestation
   jq -r '.payload | @base64d | fromjson | [.predicate.buildDefinition.resolvedDependencies[]?.name // empty | select(startswith("pipelineTask") or startswith("pipeline"))] | join(",")' "$1" | sort
 }
+# Énoncé normalisé : content décodé, annotations et finaliseurs chains.tekton.dev retirés (ils viennent de la signature en service),
+# clés triées. Appliqué à l'énoncé signé (hôte et digest du banc remis à ceux d'origine) et à la sortie du banc à sec.
+NORM='def net: .metadata.annotations |= ((. // {}) | with_entries(select(.key | startswith("chains.tekton.dev/") | not)))
+  | .metadata.finalizers |= ((. // []) | map(select(startswith("chains.tekton.dev") | not)));
+  .predicate.buildDefinition.resolvedDependencies |= map(if .content then .content |= (@base64d | fromjson | net) else . end)'
+enonce() { # fichier d'attestations, version, filtre de sélection : énoncé normalisé sur la sortie
+  jq -c '.payload | @base64d | fromjson' "$1" | jq -c "select($3)" | jq -c "$NORM" | sed "s#$REG#$HOTE#g; s#$D#$ANCIEN#g" | jq -S .
+}
 {
   echo "# banc.sh, $(date -u +%Y-%m-%dT%H:%M:%SZ), dépôt $(git -C "$here" rev-parse --short=8 HEAD), script $(sha256sum < "$0" | cut -c1-16), main.go $(sha256sum < "$here/main.go" | cut -c1-16)"
   echo "cosign : $(cosign version 2>&1 | sed -n 's/^GitVersion: *//p')"
@@ -58,17 +66,35 @@ noms() { # registre digest : noms pipelineTask des attestations vérifiées, tri
     attendu "v$v cosign verify (simplesigning), code" "$c" 0; [ "$c" -eq 0 ] || sed "s#$HOME#~#g" "$T/sig-$v.err" | tail -3
     cosign verify-attestation --key "$T/cle/cosign.pub" --insecure-ignore-tlog=true --type slsaprovenance1 "$REG/builds/sample-app@$D" > "$T/att-$v.json" 2> "$T/att-$v.err"; c=$?
     attendu "v$v cosign verify-attestation, code" "$c" 0; [ "$c" -eq 0 ] || sed "s#$HOME#~#g" "$T/att-$v.err" | tail -3
-    echo "attestations vérifiées : $(grep -c . "$T/att-$v.json")"
+    attendu "v$v attestations vérifiées" "$(grep -c . "$T/att-$v.json")" 2
     noms "$T/att-$v.json" > "$T/noms-$v.txt"; sed 's/^/  noms : /' "$T/noms-$v.txt"
+    [ "$v" = 29 ] && n=pipeline,pipelineTask,pipelineTask,pipelineTask || n=pipeline,pipelineTask/preparer,pipelineTask/construire,pipelineTask/publier
+    attendu "v$v noms pipeline* de l'attestation du PipelineRun" "$(grep . "$T/noms-$v.txt")" "$n"
+    attendu "v$v objets annotés signed=true" "$(jq '[.annotations[] | select(."chains.tekton.dev/signed" == "true")] | length' "$T/sign-$v.json")" 4
+    attendu "v$v erreurs comptées par le Recorder" "$(jq '[.recorder | to_entries[] | select(.key | startswith("erreur:"))] | length' "$T/sign-$v.json")" 0
+    enonce "$T/att-$v.json" "$v" '[.predicate.buildDefinition.resolvedDependencies[]?.name] | index("pipeline")' > "$T/enonce-pr-$v.json"
+    jq -S "$NORM" "$C/sorties/$CAS.$v.json" > "$T/sec-pr-$v.json"
+    attendu "v$v énoncé signé du PipelineRun = sortie à sec" "$(cmp -s "$T/enonce-pr-$v.json" "$T/sec-pr-$v.json" && echo égal || echo différent)" égal
+    cmp -s "$T/enonce-pr-$v.json" "$T/sec-pr-$v.json" || diff <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/sec-pr-$v.json") <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/enonce-pr-$v.json") | cut -c1-240 | head -20
+    enonce "$T/att-$v.json" "$v" '[.predicate.buildDefinition.resolvedDependencies[]?.name] | index("task")' > "$T/enonce-tr-$v.json"
+    jq -S "$NORM" "$C/sorties/tr-$CAS-publier.$v.json" > "$T/sec-tr-$v.json"
+    attendu "v$v énoncé signé de publier = sortie à sec" "$(cmp -s "$T/enonce-tr-$v.json" "$T/sec-tr-$v.json" && echo égal || echo différent)" égal
+    cmp -s "$T/enonce-tr-$v.json" "$T/sec-tr-$v.json" || diff <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/sec-tr-$v.json") <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/enonce-tr-$v.json") | cut -c1-240 | head -20
     # aucun signataire : dossier de clé vide, nouvelle image
     D2=$("$B" image "$REG" builds/sans-cle)
     "$B" signer "$REG/builds/sans-cle" "$T/vide" "$HOTE/builds/sample-app" "$ANCIEN" "$D2" "$PR" "${TRS[@]}" > "$T/vide-$v.json" 2> "$T/zap-vide-$v.log"
     sed -i "s#$REG/builds/sans-cle#REGISTRE/builds/sans-cle#g" "$T/vide-$v.json"
     echo "aucun signataire, Sign :"; jq -c '.sign' "$T/vide-$v.json"
+    [ "$v" = 29 ] && e=0 || e=4
+    attendu "v$v aucun signataire, objets en erreur" "$(jq '[.sign[] | select(test("no signer x509 configured"))] | length' "$T/vide-$v.json")" "$e"
+    [ "$v" = 29 ] && e=4 || e=0
+    attendu "v$v aucun signataire, objets marqués signed=true" "$(jq '[.annotations[] | select(."chains.tekton.dev/signed" == "true")] | length' "$T/vide-$v.json")" "$e"
+    attendu "v$v aucun signataire, erreurs comptées par le Recorder" "$(jq '[.recorder | to_entries[] | select(.key | startswith("erreur:"))] | length' "$T/vide-$v.json")" 0
     echo "aucun signataire, recorder : $(jq -c '.recorder' "$T/vide-$v.json")"
     echo "aucun signataire, annotations : $(jq -c '.annotations' "$T/vide-$v.json")"
     cosign tree "$REG/builds/sans-cle@$D2" > "$T/arbre-vide-$v.txt" 2>&1
-    echo "aucun signataire, cosign tree :"; sed -E "s#$REG#REGISTRE#g; s#sha256:([0-9a-f]{12})[0-9a-f]{52}#sha256:\\1…#g; s/^/  /" "$T/arbre-vide-$v.txt"
+    echo "aucun signataire, cosign tree :"; sed -E "s#$REG#REGISTRE#g; s#sha256:([0-9a-f]{12})[0-9a-f]{52}#sha256:\\1…#g; s/^/  /" "$T/arbre-vide-$v.txt"; echo
+    attendu "v$v aucun signataire, rien d'attaché à l'image" "$(grep -c 'No Supply Chain Security Related Artifacts found' "$T/arbre-vide-$v.txt")" 1
     kill "$SERVE"; wait "$SERVE" 2> /dev/null; SERVE=
   done
   echo "## comparaison"
