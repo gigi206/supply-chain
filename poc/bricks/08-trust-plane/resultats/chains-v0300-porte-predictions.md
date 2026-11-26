@@ -141,3 +141,24 @@ Deux règles réussissent à vide, chacune prouvée par un témoin :
 La fermeture de la porte tient donc à la seule absence de tâche vue. Les règles de tâches de `porte.rego` lisent `lib.tasks_from_pipelinerun`. Toute adaptation des lecteurs à `pipelineTask/<nom>` se fait là où les tâches sont extraites, et doit montrer qu'un témoin fautif est refusé par chaque règle, fermeture et `trusted_task` compris.
 
 Non couverts, inchangés : KMS, contrôleur, Zot réel (bundles et fermetures), `ivpol`, Kyverno, contrôles 6, 7 et 9, un seul cas, et `construction_kata` sans témoin propre.
+
+## Prédiction du passage -3 : témoin de `construction_kata` (2026-11-26T08:55:38Z)
+
+Le passage -3 ajoute un seul témoin, celui qui manquait :
+
+- les objets de j7 sont recopiés ;
+- seul le TaskRun `construire` change : `spec.podTemplate.runtimeClassName` passe de `kata` à `runc` ;
+- chaque version les signe sur une image neuve ;
+- la politique en service les juge.
+
+Le reste du banc est inchangé. Lancement : `SUFFIXE=-3`.
+
+| Prédiction | Énoncé |
+|---|---|
+| W1 | Les 27 contrôles du passage -2 restent OK, avec les mêmes codes pour v0.29.9 et v0.30.0 |
+| W2 | Le témoin change un seul TaskRun (`tr-j7-sample-app-construire`) et une seule ligne ; les deux versions le signent sans erreur, 2 attestations chacune |
+| W3 | Témoin v0.29.9 : `porte.construction_kata` refuse, et c'est le seul code de plus que v0.29.9 sur les objets d'origine |
+| W4 | Témoin v0.30.0 : `porte.construction_kata` réussit, codes identiques à v0.30.0 sur les objets d'origine (la règle ne voit aucune tâche de construction) |
+| W5 | 0 KO, moins de 30 s |
+
+Si W3 tombe, le témoin ne prouve rien : la règle ne lirait pas ce champ dans l'énoncé de v0.29.9. Dans ce cas, la réserve reste écrite telle quelle.

@@ -9,6 +9,8 @@
 # Passage -2 : image passée par --images avec la source attendue (ApplicationSnapshot, forme de politique.sh depuis le test 7 :
 # dépôt et commit du PipelineRun) ; état de chaque règle des paquets porte, trusted_task, tasks et slsa_build_scripted_build
 # dans le journal ; témoin trusted_task : liste revue où le digest de publier-image est remplacé par un digest nul.
+# Passage -3 : témoin construction_kata : objets de j7 où le TaskRun construire porte runtimeClassName runc au lieu de kata,
+# signés par chaque version sur une image neuve, jugés avec la politique en service.
 # Tout tourne dans un espace réseau neuf (unshare -rn, boucle locale seule) : aucun appel ne peut sortir de l'hôte.
 # Usage (racine du dépôt) : [SUFFIXE=-2] mise exec -- bash poc/bricks/08-trust-plane/essais/chains-v0300-signature/porte.sh
 set -uo pipefail
@@ -145,6 +147,35 @@ erreurs() { # nom : erreurs d'ec, registre et digests abrégés
     erreurs "tt-$v"
   done
   attendu "témoin tt : trusted_task.trusted (v29 | v30)" "$(etat "$T/ec-tt-29.json" trusted_task.trusted) | $(etat "$T/ec-tt-30.json" trusted_task.trusted)" "refus | succès"
+  echo "## témoin construction_kata : TaskRun construire en runc au lieu de kata"
+  K=$T/objets-temoin; mkdir -p "$K"
+  cp "$PR" "$K/"
+  TRSK=()
+  for f in "${TRS[@]}"; do
+    if [ "$(jq -r '.spec.podTemplate.runtimeClassName // ""' "$f")" = kata ]; then
+      jq '.spec.podTemplate.runtimeClassName = "runc"' "$f" > "$K/$(basename "$f")"; KATA=$(basename "$f" .json)
+    else cp "$f" "$K/"; fi
+    TRSK+=("$K/$(basename "$f")")
+  done
+  attendu "témoin kata : TaskRun changé" "${KATA:-aucun}" "tr-$CAS-construire"
+  attendu "témoin kata : lignes changées" "$(diff <(jq -S . "$O/$KATA.json") <(jq -S . "$K/$KATA.json") | grep -c '^>')" 1
+  diff <(jq -S . "$O/$KATA.json") <(jq -S . "$K/$KATA.json") | sed 's/^/  /'
+  for v in 29 30; do
+    B=$C/sig/banc-signature$v
+    D=$("$B" image "$REG" builds/sample-app); echo "image du témoin v$v : ${D:0:19}…"; echo "$D" > "$T/digest-kata-$v"
+    "$B" signer "$REG" "$T/cle" "$HOTE" "$ANCIEN" "$D" "$K/$(basename "$PR")" "${TRSK[@]}" > "$T/sign-kata-$v.json" 2> "$T/zap-kata-$v.log"; attendu "témoin kata v$v signer, code" "$?" 0
+    attendu "témoin kata v$v erreurs de Sign" "$(jq '[.sign[] | select(. != "")] | length' "$T/sign-kata-$v.json")" 0
+    cosign verify-attestation --key "$T/cle/cosign.pub" --insecure-ignore-tlog=true --type slsaprovenance1 "$REG/builds/sample-app@$D" > "$T/att-kata-$v.json" 2> "$T/att-kata-$v.err"
+    attendu "témoin kata v$v cosign verify-attestation, attestations" "$(grep -c . "$T/att-kata-$v.json")" 2
+    juger "kata-$v" "$REG/builds/sample-app@$D" "$T/cle/cosign.pub"; attendu "témoin kata v$v ec, code" "$?" 0
+    codes "$T/ec-kata-$v.json" > "$T/codes-kata-$v.txt"
+    echo "v$v codes refusés : $(tr '\n' ' ' < "$T/codes-kata-$v.txt")"
+    jq -r '.components[].violations[]? | select(.metadata.code == "porte.construction_kata") | "  " + .metadata.code + " : " + (.msg | .[0:200])' "$T/ec-kata-$v.json"
+    erreurs "kata-$v"
+  done
+  attendu "témoin kata : porte.construction_kata (v29 | v30)" "$(etat "$T/ec-kata-29.json" porte.construction_kata) | $(etat "$T/ec-kata-30.json" porte.construction_kata)" "refus | succès"
+  attendu "témoin kata v29 : codes = ceux de v29 plus construction_kata" "$(comm -3 "$T/codes-29.txt" "$T/codes-kata-29.txt" | tr -d '\t' | tr '\n' ' ')" "porte.construction_kata "
+  attendu "témoin kata v30 : codes = ceux de v30" "$(comm -3 "$T/codes-30.txt" "$T/codes-kata-30.txt" | wc -l)" 0
   kill "$SERVE"; wait "$SERVE" 2> /dev/null; SERVE=
   echo "## bilan : $ko KO, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   [ "$ko" -eq 0 ]
