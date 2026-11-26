@@ -62,3 +62,14 @@ dans l'étiquette `tekton.dev/task` du TaskRun, que Tekton pose depuis la Task r
 dépôt du bundle : la tâche témoin était reconnue sous les deux noms. J'avais lu `_tache` avant la prédiction, pas `task_ref`.
 
 Ce passage ne dit donc rien de la règle : le témoin n'était pas une construction deb sans `preparer-deb`.
+
+## Prédiction du passage -2 (2026-11-26T09:57:11Z)
+
+Le témoin écrit `preparer-entrees` aussi dans l'étiquette `tekton.dev/task`, comme Tekton le ferait en résolvant le bundle
+de `preparer-entrees` : trois valeurs changées dans un seul TaskRun, l'identité de la tâche telle que Tekton l'écrit. Le
+contrôle de l'énoncé lit aussi l'étiquette.
+
+- **D6** : D1 à D5 telles qu'écrites plus haut, avec trois chemins changés (étiquette, `params[0]`, `params[1]`) et
+  l'étiquette lue dans l'énoncé des deux versions. Au témoin v0.29.9, seule `preparer-entrees` est reconnue à côté de
+  `construire-deb`, `preparation_appariee` refuse avec son message et les fermetures portent les deux messages prédits en D3.
+  0 KO.

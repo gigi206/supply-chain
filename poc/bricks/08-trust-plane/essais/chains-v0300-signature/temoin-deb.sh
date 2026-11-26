@@ -7,8 +7,10 @@
 # Cas :
 #   signe-29            énoncé signé en service, inchangé
 #   base-29, base-30    sortie à sec sur les objets capturés
-#   temoin-29, -30      sortie à sec, TaskRun preparer désigné comme preparer-entrees (paramètres name et bundle de taskRef :
-#                       _tache reconnaît l'un ou l'autre ; même digest de bundle) ; aucun autre champ changé
+#   temoin-29, -30      sortie à sec, TaskRun preparer désigné comme preparer-entrees, comme Tekton l'écrit quand il résout
+#                       ce bundle : étiquette tekton.dev/task (nom lu d'abord par task_ref) et paramètres name et bundle de
+#                       taskRef (_tache reconnaît le nom ou le dépôt du bundle ; même digest) ; aucun autre champ changé
+# Passage -2 : le passage 1 ne changeait pas l'étiquette, la tâche témoin restait reconnue comme preparer-deb.
 # Tout tourne dans un espace réseau neuf (unshare -rn, boucle locale seule) : aucun appel ne peut sortir de l'hôte. Les règles
 # de fermeture qui vérifient une provenance (ec.sigstore.verify_attestation) échouent donc : attendu et contrôlé.
 # Usage (racine du dépôt) : [SUFFIXE=-2] mise exec -- bash poc/bricks/08-trust-plane/essais/chains-v0300-signature/temoin-deb.sh
@@ -76,14 +78,14 @@ declare -A ATTENDU=(
   cp "$O/pr-$N.json" "$T/obj-base/pr.json"; cp "$O/pr-$N.json" "$T/obj-temoin/pr.json"
   for x in "${enfants[@]}"; do
     cp "$O/tr-$x.json" "$T/obj-base/tr-$x.json"
-    jq 'if .metadata.labels["tekton.dev/pipelineTask"] == "preparer" then .spec.taskRef.params |= map(
+    jq 'if .metadata.labels["tekton.dev/pipelineTask"] == "preparer" then .metadata.labels["tekton.dev/task"] = "preparer-entrees" | .spec.taskRef.params |= map(
           if .name == "name" then .value = "preparer-entrees"
           elif .name == "bundle" then .value |= sub("/tekton/tasks/preparer-deb@"; "/tekton/tasks/preparer-entrees@")
           else . end) else . end' "$O/tr-$x.json" > "$T/obj-temoin/tr-$x.json"
   done
   attendu "témoin : objets changés (fichiers différents de la base)" "$(for f in "$T"/obj-base/*.json; do cmp -s "$f" "$T/obj-temoin/${f##*/}" || echo "${f##*/}"; done | sed 's/.*-//')" "preparer.json"
-  attendu "témoin : champs changés dans preparer (chemins)" "$(diff <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T"/obj-base/tr-*-preparer.json) <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T"/obj-temoin/tr-*-preparer.json) | sed -n 's/^> \[\(\[[^]]*\]\).*/\1/p' | tr '\n' ' ')" \
-    '["spec","taskRef","params",0,"value"] ["spec","taskRef","params",1,"value"] '
+  attendu "témoin : champs changés dans preparer (chemins)" "$(diff <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T"/obj-base/tr-*-preparer.json) <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T"/obj-temoin/tr-*-preparer.json) | sed -n 's/^> \[\(\[[^]]*\]\).*/\1/p' | sort | tr '\n' ' ')" \
+    '["metadata","labels","tekton.dev/task"] ["spec","taskRef","params",0,"value"] ["spec","taskRef","params",1,"value"] '
   for m in base temoin; do
     for v in 29 30; do
       "$C/banc/banc$v" "$T/obj-$m/pr.json" "$T"/obj-$m/tr-*.json > "$T/st-$m-$v.json" 2> "$T/banc-$m-$v.err"
@@ -95,9 +97,9 @@ declare -A ATTENDU=(
   for c in signe-29 base-29 base-30 temoin-29 temoin-30; do
     case $c in signe-29) attente=preparer-deb ;; base-*) attente=preparer-deb ;; temoin-*) attente=preparer-entrees ;; esac
     case $c in *-29) dep=pipelineTask ;; *-30) dep=pipelineTask/preparer ;; esac
-    attendu "$c : taskRef de preparer dans l'énoncé (dépendance $dep)" "$(jq -r --arg d "$dep" '[.predicate.buildDefinition.resolvedDependencies[] | select(.name == $d) | .content | @base64d | fromjson
-        | select(.metadata.labels["tekton.dev/pipelineTask"] == "preparer") | .spec.taskRef.params[] | select(.name == "name" or .name == "bundle") | .value | sub("@sha256:.*"; "")] | join(" ")' "$T/st-$c.json")" \
-      "sc-stockage.poc.test:5000/tekton/tasks/$attente $attente"
+    attendu "$c : étiquette tekton.dev/task et taskRef de preparer dans l'énoncé (dépendance $dep)" "$(jq -r --arg d "$dep" '[.predicate.buildDefinition.resolvedDependencies[] | select(.name == $d) | .content | @base64d | fromjson
+        | select(.metadata.labels["tekton.dev/pipelineTask"] == "preparer") | .metadata.labels["tekton.dev/task"], (.spec.taskRef.params[] | select(.name == "name" or .name == "bundle") | .value | sub("@sha256:.*"; ""))] | join(" ")' "$T/st-$c.json")" \
+      "$attente sc-stockage.poc.test:5000/tekton/tasks/$attente $attente"
     jq -n --slurpfile s "$T/st-$c.json" '{attestations: [{statement: $s[0]}]}' > "$T/entree-$c.json"
   done
   for c in signe-29 base-29 temoin-29 base-30 temoin-30; do
