@@ -39,7 +39,7 @@ Accord à demander : déploiement des règles (correctif appliqué et commité, 
 
 **Posé et seuil tenu le 2026-11-24** (accords « Liste, compte, pose (Recommandé) », [prédiction et résultat](resultats/e4-predictions.md)). Liste du proxy de Grafana : 10 cas, 0 KO (21:07:17 UTC). Compte `kpi-journal` : 5 cas (21:07:28). Exportateur et lecteur sur `sc-stockage` : 16 cas, 0 KO (21:07:28), 134 séries, 41 signatures vérifiées par OpenSSL 3.5.9 sous l'unité durcie. **Étape 5, le seuil : [8 cas, 0 écart](resultats/e5-seuil.log) (21:09:33), puis après un passage du timer (21:22:47) [8 cas, 0 écart](resultats/e5-seuil-2.log) (21:24:16)**, 105 valeurs comparées au recalcul signé : 102 issues des séries de Prometheus, lues par l'auditeur, et 3 égales par construction (`violations_licences`, deux `kev_delais`).
 
-Réserves : délais des KEV égaux parce qu'aucune KEV n'est vue ; un journal bien formé mais faux ne serait pas vu ; `Wants` avec un lecteur en échec et les refus réseau non exercés ; aucune alerte sur l'âge du passage ; câblé dans `rejeu.sh` mais jamais rejoué (étape 7, plus haut) ; après un rejeu, clés et relevé à commiter, trois VEX à refaire ; tableau posé (étape 6, plus haut).
+Réserves : délais des KEV égaux parce qu'aucune KEV n'est vue ; un journal bien formé mais faux ne serait pas vu ; `Wants` avec un lecteur en échec et les refus réseau non exercés ; aucune alerte sur l'âge du passage (levée le 26/11 : `KpiPassageEnRetard` déployée, [e14](resultats/e14-predictions.md)) ; câblé dans `rejeu.sh` mais jamais rejoué (étape 7, plus haut) ; après un rejeu, clés et relevé à commiter, trois VEX à refaire ; tableau posé (étape 6, plus haut).
 
 **Banc Grafana et Loki (20:47:52 à 20:50:15 UTC)** : le compte Viewer choisi pour le lecteur peut arrêter Loki, voir la correction sous la décision. Lecteur et délais des KEV conformes contre de vrais Grafana 13.3.0 et Loki 3.7.9 jetables (17 cas, 0 écart au troisième passage ; premier : 5 écarts, gardé). **Correction candidate** (décision « Chercher une correction à sec ») : `data_source_proxy_whitelist = 127.0.0.1:9090` dans `grafana.ini`, banc 40 cas, 0 écart ([journal](resultats/e4-banc-grafana-liste.log)). **Pose écrite à sec** : [`kpi-pose.sh`](kpi-pose.sh), [`kpi-journal.service`](systemd/kpi-journal.service), [`liste-proxy.sh`](../19b-journalisation/liste-proxy.sh) ; unité du lecteur essayée sur l'hôte (27 cas, 0 écart au cinquième passage, `ProtectHome` excepté). `kpi-pose.sh pose` refuse tant que le proxy mène à Loki. Accords à demander : liste, compte, pose.
 
@@ -59,9 +59,10 @@ Aperçu des produits, énoncés non vérifiés : 4 sujets (`sample-app` `3a7ca1b
 - e13 (`genre()` à sec, 21:19:15 à 21:32:06 le 25/11, 12 min 51 s) ;
 - e14 (alertes, non chiffrées : aucune heure n'y est écrite) ;
 - e15 (application et pose de `genre()`, 2 min 31 s mesurées). La lecture des correctifs, depuis le choix « Patchs de
-  genre() » jusqu'à 10:40:27Z, n'a pas de `date -u` et n'est pas comptée.
+  genre() » jusqu'à 10:40:27Z, n'a pas de `date -u` et n'est pas comptée. La levée de la réserve du timer y ajoute 1 min
+  17 s (11:03:37Z à 11:04:20Z, puis 11:09:46Z à 11:10:20Z), attente du timer non comptée.
 
-Total connu : **2 h 21 min 02 s**, e14 non compris. Majorant, calculé avant l'étape 4, par la méthode de la 05 (écarts d'au plus 1 h entre commits de `poc/bricks/20-kpi`) : 42 min 16 s ; il compte à tort l'écart de 17:50:31 à 18:26:20, qui contient la clôture de la 05 et la 07c. Estimation : 1,5 pw.
+Total connu : **2 h 22 min 19 s**, e14 non compris. Majorant, calculé avant l'étape 4, par la méthode de la 05 (écarts d'au plus 1 h entre commits de `poc/bricks/20-kpi`) : 42 min 16 s ; il compte à tort l'écart de 17:50:31 à 18:26:20, qui contient la clôture de la 05 et la 07c. Estimation : 1,5 pw.
 
 Les faits des sections suivantes, écrits avant l'étape 1, viennent du dépôt.
 
