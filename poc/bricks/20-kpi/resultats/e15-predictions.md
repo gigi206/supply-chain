@@ -44,3 +44,6 @@ Correctifs appliqués à 10:40:44Z sur `7278d746`.
 | H4 | [sec](e15-sec.log) | tenu : 12 fichiers à poser, aucune clé privée, exportateur à poser `fc0b8e0d…`. Passage fait avant le commit des correctifs (arbre de travail) |
 
 Écart dépôt/VM : ouvert à partir du commit des correctifs. sc-stockage garde `98f917ab…` jusqu'à la pose.
+
+Complément (2026-11-26T10:42Z) : `banc_temoins.py`, cinquième fichier, n'était pas dans le contrôle de la base. `git log
+5e7f07eb..7278d746` ne le montre dans aucun commit : la base des mutants de e13 tient pour les cinq fichiers.
