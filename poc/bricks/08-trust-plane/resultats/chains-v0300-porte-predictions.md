@@ -52,3 +52,28 @@ Les contrôles `attendu` du script couvrent U1, U2, U4 et le témoin ; U3, les n
 - Zot réel, bundles et fermetures réels : le banc à sec les avait, ce banc ne les a pas.
 - `ivpol`, Kyverno, horodatage (contrôle 9), VSA (contrôle 6), scan (contrôle 7).
 - Un seul cas (`j7-sample-app`).
+
+## Résultat (note de 2026-11-26T08:44:43Z)
+
+Commit de la prédiction : `d30d4932`. [Journal](chains-v0300-porte.log) : 2026-11-26T08:43:54Z → 08:43:58Z, 4 s, 1 KO.
+
+| Prédiction | Verdict |
+|---|---|
+| U1 | **Tenue** : 1 interface, 0 route ; `ec` v0.10.42 à l'empreinte du verrou ; arbre `0fd26021`, 76 fichiers Rego |
+| U2 | **Tenue** : les deux versions signent sans erreur ; 2 attestations vérifiées par image |
+| U3 | **Tenue sur le verdict, non tenue sur les codes** : code 0 et `success` faux pour les deux. Codes dus au banc : `porte.fermeture_plateforme` pour v0.29.9 seule (fermeture absente du registre du banc), et `slsa_source_correlated.source_code_reference_provided` pour les deux. Ce second code vient de l'appel, pas du registre : aucune source attendue n'est fournie à `ec`, comme pour l'image réelle de J6 (README de la 08, réglé au test 7). Je ne l'avais pas prévu. Bundles introuvables : 9 erreurs d'`ec` pour v0.29.9 (3 bundles, `NAME_UNKNOWN`), 3 avertissements `trusted_task.tagged`, mais **aucun refus** de `trusted_task` |
+| U4 | **Non tenue sur la première partie** : `porte.fermeture_plateforme` est refusé pour v0.29.9 et pas pour v0.30.0. **Tenue** sur les autres : `porte.taches_vues` est dans l'écart et absent pour v0.29.9 ; l'écart (`porte.taches_vues`, `slsa_build_scripted_build.build_task_image_results_found`, `tasks.pipeline_has_tasks`) est contenu dans les quatre codes du banc à sec. Il en compte trois : `image_built_by_trusted_task` appartient aux collections `redhat` et `redhat_security`, pas à `@slsa3`. Le banc à sec évaluait les paquets entiers ; j'avais vérifié l'appartenance par fichier et non par règle |
+| U5 | **Tenue** : code 0, `success` faux, refus `builtin.attestation.signature_check` et `builtin.image.signature_check` (noms attendus), 0 attestation lue, `porte.taches_vues` absent |
+| U6 | **Tenue** : 4 s |
+
+**Faute de prédiction (U4)** : j'ai tenu le refus de fermeture pour un effet du banc, le même pour les deux versions. Or le banc à sec l'avait déjà mesuré : avec l'énoncé neuf, `fermeture_plateforme` et `construction_kata` sont muettes. Une règle qui ne voit aucune tâche ne cherche pas de fermeture.
+
+**Ce que le banc établit.** Les règles réussies, comparées entre les deux versions (relevé du 2026-11-26T08:44Z, `succes-29.txt` et `succes-30.txt` dans le dossier de travail) :
+
+- v0.30.0 seule : `porte.fermeture_plateforme` et `trusted_task.tagged` y passent de refus ou avertissement à **réussite** ;
+- v0.29.9 seule : `porte.taches_vues`, `slsa_build_scripted_build.build_task_image_results_found`, `tasks.pipeline_has_tasks` et `tasks.successful_pipeline_tasks` ; cette dernière n'apparaît pour v0.30.0 ni en réussite ni en refus ;
+- pour v0.30.0, `porte.construction_kata` et les règles `trusted_task` qui jugent les tâches (`trusted`, `pinned`, `current`) réussissent alors qu'aucune tâche n'est vue. `ec` ne lit même pas les bundles (0 erreur, 0 avertissement). `porte.preparation_appariee` réussit pour les deux versions ; je n'ai pas vérifié si elle réussit à vide pour v0.30.0.
+
+Sur une vraie signature, la porte en service refuse donc v0.30.0 : `ec` vérifie les deux signatures, lit les deux attestations et rend trois refus. Mais **la fermeture de la porte tient à trois règles seulement** : `porte.taches_vues`, qui est maison, et deux règles de `@slsa3`. Les contrôles de Kata, de fermeture et de tâches de confiance réussissent à vide. Une adaptation des lecteurs qui ferait passer `taches_vues` sans réapprendre les noms aux autres règles admettrait une image sans aucun de ces contrôles. Le témoin montre que le refus vient bien de la politique : avec une autre clé, rien n'est lu et seules les règles de signature refusent.
+
+Non couverts, inchangés : KMS, contrôleur, Zot réel (bundles et fermetures), `ivpol`, Kyverno, contrôles 6, 7 et 9, un seul cas.

@@ -1,0 +1,81 @@
+# porte.sh, 2026-11-26T08:43:54Z, dépôt d30d4932, script 4d62cbcb59b5405d, main.go 76e03e674842ed47
+OK   réseau du banc : interfaces : 1
+OK   réseau du banc : routes de la table principale : 0
+OK   ec : empreinte du verrou (politique.sh) : 895c6f7e63cfefe6257a2e54c052c3d90803e8127adf5a7eb13f245262859abf
+ec : v0.10.42 ; cosign : v3.1.4
+src29 : commit 89219ea5443fe3164715b9a93f7e6fd16d56b38a, main.go identique, binaire 984b202a73690182
+src30 : commit b59bced2524ec2da5dcbe3f916c2109262b9b819, main.go identique, binaire 380f637667285595
+OK   bibliothèque : arbre de ebd3fbd270297c15f590f4023360465ffb41d4fe : 0fd26021bb08582553f392565ca0faf316c51229
+bibliothèque : 76 fichiers Rego (sans les tests, comme l'image de la porte)
+cas : j7-sample-app, 3 TaskRuns, digest d'origine sha256:f5e6bcb0e0fb…
+OK   deux clés jetables : distinctes
+OK   noms remplacés dans porte.rego et taches.yml : 1 15
+OK   policy.yaml : seuls les chemins changent : 4
+  sources:
+    - name: porte
+      policy:
+        - TRAVAIL/biblio/policy/release
+        - TRAVAIL/biblio/policy/lib
+        - TRAVAIL/politique/regles
+      data:
+        - TRAVAIL/politique/donnees
+      ruleData:
+        allowed_builder_ids:
+          - https://supply-chain.example/builders/tekton-chains@v1
+      config:
+        include:
+          - "@slsa3"
+          - trusted_task
+          - porte
+## v29 : signature
+image du banc : sha256:df300a64ba8f…
+OK   v29 signer, code : 0
+OK   v29 erreurs de Sign : 0
+OK   v29 cosign verify-attestation, attestations : 2
+## v30 : signature
+image du banc : sha256:a4297216a210…
+OK   v30 signer, code : 0
+OK   v30 erreurs de Sign : 0
+OK   v30 cosign verify-attestation, attestations : 2
+## v29 : porte
+OK   v29 ec, code (--strict=false) : 0
+succès : false ; violations 2, avertissements 3, réussites 33, attestations lues 2
+codes refusés :
+  porte.fermeture_plateforme
+  slsa_source_correlated.source_code_reference_provided
+      1   porte.fermeture_plateforme : fermeture REGISTRE/builds/fermetures/sample-app@sha256:74c265e703fb… (FERMETURE_ARTIFACT_INPUTS) : aucune provenance de la pipeline de prefetc
+      1   slsa_source_correlated.source_code_reference_provided : Expected source code reference was not provided for verification
+erreurs d'ec : 9
+      3 time="2026-11-26T09:43:56+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/construire-image/manifests/sha256:4dcbc4b7468137d894bb40085b32b9cc816a37bfece3204ed06466ee4741eb6b: NAM
+      3 time="2026-11-26T09:43:56+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/preparer-entrees/manifests/sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4: NAM
+      3 time="2026-11-26T09:43:56+01:00" level=error msg="failed to fetch image" action="fetch image" error="GET http://REGISTRE/v2/tekton/tasks/publier-image/manifests/sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b: NAME_U
+## v30 : porte
+OK   v30 ec, code (--strict=false) : 0
+succès : false ; violations 4, avertissements 0, réussites 31, attestations lues 2
+codes refusés :
+  porte.taches_vues
+  slsa_build_scripted_build.build_task_image_results_found
+  slsa_source_correlated.source_code_reference_provided
+  tasks.pipeline_has_tasks
+      1   porte.taches_vues : aucune tâche vue dans 1 provenance(s) de PipelineRun
+      1   slsa_build_scripted_build.build_task_image_results_found : Build task not found
+      1   slsa_source_correlated.source_code_reference_provided : Expected source code reference was not provided for verification
+      1   tasks.pipeline_has_tasks : No tasks found in PipelineRun attestation
+erreurs d'ec : 0
+## écart
+v30 seul : porte.taches_vues slsa_build_scripted_build.build_task_image_results_found tasks.pipeline_has_tasks 
+v29 seul : porte.fermeture_plateforme 
+KO   codes refusés pour v0.29.9 et pas pour v0.30.0 : obtenu « 1 », attendu « 0 »
+OK   porte.taches_vues dans l'écart : 1
+OK   écart contenu dans celui du banc à sec : 0
+OK   v29 : porte.taches_vues absent : 0
+## témoin : v0.30.0 jugée avec une autre clé publique
+OK   témoin ec, code (--strict=false) : 0
+OK   témoin succès : false
+codes refusés :
+  builtin.attestation.signature_check
+  builtin.image.signature_check
+témoin : attestations lues 0
+OK   témoin : porte.taches_vues absent (rien de lu) : 0
+erreurs d'ec : 0
+## bilan : 1 KO, 2026-11-26T08:43:58Z
