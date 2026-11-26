@@ -1,0 +1,12 @@
+## champ du témoin kata dans l'énoncé signé, 2026-11-26T09:44:15Z
+attestations gardées v29 : 20c610bc9bd687b8 (2 attestations)
+v29 : pipelineTask>preparer=aucun pipelineTask>construire=runc pipelineTask>publier=aucun
+OK   v29 : construire en runc sous pipelineTask : 1
+OK   v29 : runc ailleurs : 0
+OK   v29 : énoncés du PipelineRun lus : 1
+attestations gardées v30 : 9a8a5920a22b0e52 (2 attestations)
+v30 : pipelineTask/preparer>preparer=aucun pipelineTask/construire>construire=runc pipelineTask/publier>publier=aucun
+OK   v30 : construire en runc sous pipelineTask/construire : 1
+OK   v30 : runc ailleurs : 0
+OK   v30 : énoncés du PipelineRun lus : 1
+## bilan : 0 KO, 2026-11-26T09:44:15Z

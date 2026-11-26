@@ -133,7 +133,7 @@ Réserves, celles écrites d'avance :
 - un témoin par règle, sur un seul champ ;
 - `current` témoigné par la liste revue, chez `ec` seulement.
 
-Non couverts : KMS, contrôleur, Zot réel, admission, la porte Kyverno de l'autre session ; `build_script_used` et `future_deny_rule` sur une autre forme de provenance ou de liste ; `preparation_appariee` sur un cas deb. Le témoin `construction_kata` du passage -3 de la porte a le même trou que celui comblé ici au passage -3 : son champ changé n'a pas été contrôlé dans l'énoncé signé par v0.30.0.
+Non couverts : KMS, contrôleur, Zot réel, admission, la porte Kyverno de l'autre session ; `build_script_used` et `future_deny_rule` sur une autre forme de provenance ou de liste ; `preparation_appariee` sur un cas deb. Le témoin `construction_kata` du passage -3 de la porte a le même trou que celui comblé ici au passage -3 : son champ changé n'a pas été contrôlé dans l'énoncé signé par v0.30.0 (contrôlé depuis, en lecture seule : présent, voir [K1](chains-v0300-porte-predictions.md)).
 
 ## Prédiction du passage -3 (2026-11-26T09:34:15Z)
 

@@ -202,3 +202,8 @@ vérifiées par `cosign verify-attestation` au passage -3 (`att-kata-<v>.json`) 
 - **K1** : pour chaque version, dans l'énoncé du PipelineRun, la dépendance de `construire` (`pipelineTask` pour v0.29.9,
   `pipelineTask/construire` pour v0.30.0) porte `spec.podTemplate.runtimeClassName` = `runc` ; les autres TaskRuns sont tels
   qu'au banc (aucun `runc`).
+
+**Résultat (2026-11-26T09:44:15Z, 0 KO, [journal](chains-v0300-champ-kata.log))** : K1 tenue. Pour les deux versions, l'énoncé
+du PipelineRun porte `construire` en `runc` (sous `pipelineTask` pour v0.29.9, sous `pipelineTask/construire` pour v0.30.0),
+et aucun autre TaskRun en `runc`. Le « non signalé » de `construction_kata` pour v0.30.0 n'est donc pas une mutation perdue :
+la règle ne voit pas le champ, qui est bien dans l'énoncé signé. La réserve écrite au banc des témoins est levée.
