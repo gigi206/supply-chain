@@ -1,0 +1,62 @@
+## témoin deb de preparation_appariee, 2026-11-26T09:57:19Z
+OK   ec : empreinte du binaire (politique.sh) : 895c6f7e63cfefe6257a2e54c052c3d90803e8127adf5a7eb13f245262859abf
+OK   bibliothèque : arbre de ebd3fbd270297c15f590f4023360465ffb41d4fe : 0fd26021bb08582553f392565ca0faf316c51229
+OK   banc29 : empreinte (chains-v0300-provenances.log) : 6f056d49c6de99438720ffd6ef728c62031bdc9252bb8a80c89cb4d614ecceac
+OK   banc30 : empreinte (chains-v0300-provenances.log) : dbd9dafa4475b3389a824fe1adcf054b8dabb84399a50d852012956084599a19
+porte.rego : eecaf46c, sha256 f16c81acc094b3f2
+énoncé signé en service : sha256 5906e43417c3ea72
+OK   réseau : interfaces de l'espace : lo 
+OK   énoncé signé : sujet = IMAGE_DIGEST du PipelineRun capturé : sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
+OK   TaskRuns du PipelineRun capturés : 3 3
+OK   témoin : objets changés (fichiers différents de la base) : preparer.json
+OK   témoin : champs changés dans preparer (chemins) : ["metadata","labels","tekton.dev/task"] ["spec","taskRef","params",0,"value"] ["spec","taskRef","params",1,"value"] 
+OK   banc29 base : énoncé produit, sans erreur : https://slsa.dev/provenance/v1 0
+OK   banc30 base : énoncé produit, sans erreur : https://slsa.dev/provenance/v1 0
+OK   banc29 temoin : énoncé produit, sans erreur : https://slsa.dev/provenance/v1 0
+OK   banc30 temoin : énoncé produit, sans erreur : https://slsa.dev/provenance/v1 0
+OK   signe-29 : étiquette tekton.dev/task et taskRef de preparer dans l'énoncé (dépendance pipelineTask) : preparer-deb sc-stockage.poc.test:5000/tekton/tasks/preparer-deb preparer-deb
+OK   base-29 : étiquette tekton.dev/task et taskRef de preparer dans l'énoncé (dépendance pipelineTask) : preparer-deb sc-stockage.poc.test:5000/tekton/tasks/preparer-deb preparer-deb
+OK   base-30 : étiquette tekton.dev/task et taskRef de preparer dans l'énoncé (dépendance pipelineTask/preparer) : preparer-deb sc-stockage.poc.test:5000/tekton/tasks/preparer-deb preparer-deb
+OK   temoin-29 : étiquette tekton.dev/task et taskRef de preparer dans l'énoncé (dépendance pipelineTask) : preparer-entrees sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees preparer-entrees
+OK   temoin-30 : étiquette tekton.dev/task et taskRef de preparer dans l'énoncé (dépendance pipelineTask/preparer) : preparer-entrees sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees preparer-entrees
+-- signe-29
+OK   signe-29 : attestations de PipelineRun : 1
+OK   signe-29 : tâches vues : 3
+OK   signe-29 : tâches reconnues par _tache : construire-deb preparer-deb
+OK   signe-29 : codes refusés par la porte : porte.fermeture_plateforme
+OK   signe-29 : messages de preparation_appariee : 
+OK   signe-29 : messages de fermeture_plateforme : fermeture sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 (FERMETURE_DEB_ARTIFACT_INPUTS) : aucune provenance de la pipeline de prefetch deb | fermeture sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 (FERMETURE_SOURCES_ARTIFACT_INPUTS) : aucune provenance de la pipeline de prefetch gomod
+     durée des six requêtes : 2234 ms
+-- base-29
+OK   base-29 : attestations de PipelineRun : 1
+OK   base-29 : tâches vues : 3
+OK   base-29 : tâches reconnues par _tache : construire-deb preparer-deb
+OK   base-29 : codes refusés par la porte : porte.fermeture_plateforme
+OK   base-29 : messages de preparation_appariee : 
+OK   base-29 : messages de fermeture_plateforme : fermeture sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 (FERMETURE_DEB_ARTIFACT_INPUTS) : aucune provenance de la pipeline de prefetch deb | fermeture sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 (FERMETURE_SOURCES_ARTIFACT_INPUTS) : aucune provenance de la pipeline de prefetch gomod
+     durée des six requêtes : 2242 ms
+-- temoin-29
+OK   temoin-29 : attestations de PipelineRun : 1
+OK   temoin-29 : tâches vues : 3
+OK   temoin-29 : tâches reconnues par _tache : construire-deb preparer-entrees
+OK   temoin-29 : codes refusés par la porte : porte.fermeture_plateforme porte.preparation_appariee
+OK   temoin-29 : messages de preparation_appariee : construire-deb sans preparer-deb dans la même provenance
+OK   temoin-29 : messages de fermeture_plateforme : construction sans fermeture lisible dans les résultats de sa préparation | préparation preparer-entrees sans fermeture lisible dans le résultat FERMETURE_ARTIFACT_INPUTS
+     durée des six requêtes : 2163 ms
+-- base-30
+OK   base-30 : attestations de PipelineRun : 1
+OK   base-30 : tâches vues : 0
+OK   base-30 : tâches reconnues par _tache : 
+OK   base-30 : codes refusés par la porte : porte.taches_vues
+OK   base-30 : messages de preparation_appariee : 
+OK   base-30 : messages de fermeture_plateforme : 
+     durée des six requêtes : 2241 ms
+-- temoin-30
+OK   temoin-30 : attestations de PipelineRun : 1
+OK   temoin-30 : tâches vues : 0
+OK   temoin-30 : tâches reconnues par _tache : 
+OK   temoin-30 : codes refusés par la porte : porte.taches_vues
+OK   temoin-30 : messages de preparation_appariee : 
+OK   temoin-30 : messages de fermeture_plateforme : 
+     durée des six requêtes : 2415 ms
+## bilan : 0 KO, 2026-11-26T09:57:30Z

@@ -123,7 +123,7 @@ Trois règles n'ont pas de témoin possible ici, pour trois raisons différentes
 
 - `build_script_used` tient à la forme v1 de la provenance. Elle réussit pour v0.29.9 alors qu'aucune tâche n'a de champ `steps` au premier niveau (mesuré), c'est-à-dire alors que sa condition de refus est vraie. La cause (`build_task.name` indéfini) est une lecture, non mesurée ici ; elle l'est depuis, dans [un banc à part](chains-v0300-cause-build-script-predictions.md). Cette règle concerne la porte en service, pas seulement la montée ;
 - `future_deny_rule` tient au format de la liste revue : elle ne s'active qu'avec `trusted_task_rules` ;
-- `preparation_appariee` tient au cas j7 : elle ne vise que la voie deb.
+- `preparation_appariee` tient au cas j7 : elle ne vise que la voie deb. Son témoin a été fait depuis sur le PipelineRun deb, sans signature ([banc](chains-v0300-temoin-deb-predictions.md)).
 
 Le témoin sujet retire aussi la signature de l'image, pour les deux versions. Il ne prouve donc la règle visée que par l'état de cette règle, pas par un ensemble de codes inchangé par ailleurs.
 

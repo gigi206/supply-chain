@@ -73,3 +73,26 @@ contrôle de l'énoncé lit aussi l'étiquette.
   l'étiquette lue dans l'énoncé des deux versions. Au témoin v0.29.9, seule `preparer-entrees` est reconnue à côté de
   `construire-deb`, `preparation_appariee` refuse avec son message et les fermetures portent les deux messages prédits en D3.
   0 KO.
+
+**Résultat du passage -2 (2026-11-26T09:57:19Z à 09:57:30Z, 48 OK, 0 KO, [journal](chains-v0300-temoin-deb-2.log))** :
+D6 tenue.
+
+| Cas | Tâches vues | Reconnues | Codes refusés (paquet `porte`) |
+|---|---|---|---|
+| `signe-29`, `base-29` | 3 | `construire-deb`, `preparer-deb` | `fermeture_plateforme` (2 fermetures non vérifiées, faute de registre) |
+| `temoin-29` | 3 | `construire-deb`, `preparer-entrees` | `fermeture_plateforme`, **`preparation_appariee`** : « construire-deb sans preparer-deb dans la même provenance » |
+| `base-30`, `temoin-30` | 0 | aucune | `taches_vues` seul |
+
+`preparation_appariee` a désormais un témoin. Elle refuse pour v0.29.9 une construction deb préparée par `preparer-entrees`,
+et l'énoncé signé en service rend les mêmes valeurs que la sortie à sec. Pour v0.30.0, elle réussit à vide comme les autres
+règles de tâches, alors que le champ changé est dans l'énoncé, sous `pipelineTask/preparer`. Seule `taches_vues` refuse.
+
+Lu en passant (passage 1) : la bibliothèque nomme une tâche d'abord par l'étiquette `tekton.dev/task` du TaskRun. `_tache`
+la reconnaît par ce nom **ou** par le dépôt de son bundle, donc une tâche dont l'étiquette et le bundle divergent est reconnue
+sous les deux noms. Tekton pose l'étiquette depuis la Task résolue dans le bundle : un écart demanderait un bundle qui
+contient une Task d'un autre nom que son dépôt. Le banc ne l'a pas mesuré, et `trusted_task` (liste revue des bundles) n'est
+pas jugé ici.
+
+Réserves : celles écrites avant le lancement. Les règles sont jugées par `ec opa eval` ; les énoncés des témoins ne sont pas
+signés ; l'égalité avec un énoncé signé n'est mesurée que pour v0.29.9 ; il n'y a qu'un PipelineRun deb. Rien n'est ouvert
+chez un tiers.
