@@ -74,3 +74,28 @@ Si Y3 tombe pour un témoin, la règle lit au moins une tâche de v0.30.0, et c'
 - Les réserves des deux bancs précédents : bundles sans jeton TSA, referrers par repli d'étiquette, CLI et non admission, registre en HTTP, un seul cas.
 - Un témoin par règle, sur un seul champ : il montre que la règle sait refuser ce cas, pas qu'elle refuse tout ce qu'elle devrait.
 - `current` est témoigné par la liste revue (`ec` seulement) ; reserve-c n'a pas cette règle.
+
+## Résultat du passage 1 (note de 2026-11-26T09:29:27Z)
+
+Commit de la prédiction : `7aef1c22`. [Journal](chains-v0300-temoins.log) : 2026-11-26T09:28:18Z → 09:28:45Z, 27 s, 135 OK, 4 KO.
+
+Y1, Y4 et Y5 (hors KO) sont tenues. Y2 et Y3 sont tenues pour echec, parametre, artefact, epingle et courant, sous les deux juges.
+
+**Le témoin sujet donne les 4 KO, par une faute de prédiction.** La règle visée se comporte comme prévu :
+
+- `subject_build_task_matches` passe de succès à refus pour v0.29.9 chez `ec`, et de `ok` à `ko` sous reserve-c ;
+- elle reste en succès (`ok`) pour v0.30.0.
+
+Mais le témoin retire aussi la signature de l'image, pour les deux versions. `builtin.image.signature_check` et `porte.image_signature` refusent chez `ec`, et `builtin.image.signature_check` est `ko` sous reserve-c. Chains signe l'image depuis le TaskRun `publier`, dont le résultat `IMAGE_DIGEST` est devenu le digest nul. La sonde l'avait montré pour l'attestation du TaskRun, mais je n'en ai pas tiré la conséquence pour la signature. C'est une lecture : le passage 1 ne contrôle pas l'absence de signature.
+
+Correction : pour le témoin sujet, ces codes de signature sont attendus pour les deux versions, et le banc contrôle que l'image est signée ou non (`cosign verify`). Les contrôles « v30 inchangé » deviennent « codes ajoutés » et « codes retirés » pour v0.30.0, vides sauf pour sujet. Rien d'autre ne change.
+
+## Prédiction du passage -2 (2026-11-26T09:29:27Z)
+
+Mêmes énoncés Y1 à Y5, avec ces changements :
+
+- sujet : image non signée pour les deux versions (les autres témoins et la base : signée) ;
+- Y2 pour sujet : `builtin.image.signature_check` et `porte.image_signature` en plus chez `ec`, `builtin.image.signature_check` en plus sous reserve-c ;
+- Y3 pour sujet : ces mêmes codes de signature ajoutés pour v0.30.0, et rien d'autre.
+
+0 KO attendu.

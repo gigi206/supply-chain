@@ -15,6 +15,8 @@
 # Règles sans témoin possible ici, contrôlées : build_script_used (aucune tâche n'a de champ steps au premier niveau, condition
 # de refus déjà vraie pour v0.29.9), future_deny_rule (pas de trusted_task_rules dans la liste revue), preparation_appariee (pas
 # de construire-deb dans j7).
+# Passage -2 : le témoin sujet retire aussi la signature de l'image (Chains la produit depuis le TaskRun publier, dont le sujet
+# devient le digest nul) : signature d'image refusée pour les deux versions, attendue et contrôlée (image signée ou non).
 # Tout tourne dans un espace réseau neuf (unshare -rn, boucle locale seule) : aucun appel ne peut sortir de l'hôte.
 # Usage (racine du dépôt) : [SUFFIXE=-2] mise exec -- bash poc/bricks/08-trust-plane/essais/chains-v0300-signature/temoins.sh
 set -uo pipefail
@@ -56,17 +58,21 @@ TACHE[echec]=preparer;     FILTRE[echec]='.status.conditions |= map(if .type == 
 TACHE[parametre]=publier;  FILTRE[parametre]='.spec.params |= map(if .name == "digest" then .value = $nul else . end)'
 TACHE[artefact]=construire; FILTRE[artefact]='.spec.params = [{"name": "SOURCE_ARTIFACT", "value": ("oci:sc-stockage.poc.test:5000/entrees/absent@" + $nul)}]'
 TACHE[epingle]=publier;    FILTRE[epingle]='.spec.taskRef.params |= map(if .name == "bundle" then .value |= sub("@sha256:[0-9a-f]{64}$"; "") else . end)'
-AJOUT_EC[sujet]='slsa_build_scripted_build.subject_build_task_matches=refus'
+AJOUT_EC[sujet]='builtin.image.signature_check=refus porte.image_signature=refus slsa_build_scripted_build.subject_build_task_matches=refus'
 AJOUT_EC[echec]='tasks.successful_pipeline_tasks=refus'
 AJOUT_EC[parametre]='trusted_task.trusted_parameters=refus'
 AJOUT_EC[artefact]='trusted_task.valid_trusted_artifact_inputs=refus'
 AJOUT_EC[epingle]='trusted_task.pinned=avertissement trusted_task.trusted=refus'
 AJOUT_EC[courant]='trusted_task.current=avertissement'
-AJOUT_RC[sujet]='slsa_build_scripted_build.subject_build_task_matches=ko'
+AJOUT_RC[sujet]='builtin.image.signature_check=ko slsa_build_scripted_build.subject_build_task_matches=ko'
 AJOUT_RC[echec]='tasks.successful_pipeline_tasks=ko'
 AJOUT_RC[parametre]='trusted_task.trusted_parameters=ko'
 AJOUT_RC[artefact]='trusted_task.valid_trusted_artifact_inputs=ko'
 AJOUT_RC[epingle]='trusted_task.pinned=avert trusted_task.trusted=ko'
+# codes ajoutés pour v0.30.0 (aucun, sauf la signature d'image du témoin sujet)
+declare -A AJOUT_EC30 AJOUT_RC30
+AJOUT_EC30[sujet]='builtin.image.signature_check=refus porte.image_signature=refus'
+AJOUT_RC30[sujet]='builtin.image.signature_check=ko'
 TEMOINS='sujet echec parametre artefact epingle'
 ko=0
 attendu() { # libellé obtenu attendu
@@ -132,13 +138,16 @@ print(r[0].get("result", "?") + "\t" + (r[0].get("message") or "").replace("\n",
 etat_rc() { # nom code : statut(s) dans le diagnostic, ou absent
   local s; s=$(sed -n "s/^$2=//p" "$T/r-$1" | sort -u | paste -sd, -); echo "${s:-absent}"
 }
-signer() { # nom version dossier-objets nombre-attendu : image neuve signée ; $T/digest-<nom>
+signer() { # nom version dossier-objets nombre-attendu signature-attendue : image neuve signée ; $T/digest-<nom>
   local B=$C/sig/banc-signature$2 D L=() f
   for f in "${TRS[@]}"; do L+=("$3/$(basename "$f")"); done
   D=$("$B" image "$REG" builds/sample-app); echo "$D" > "$T/digest-$1"
   "$B" signer "$REG" "$T/cle" "$HOTE" "$ANCIEN" "$D" "$3/$(basename "$PR")" "${L[@]}" > "$T/sign-$1.json" 2> "$T/zap-$1.log"
   attendu "$1 : signer, code" "$?" 0
   attendu "$1 : erreurs de Sign" "$(jq '[.sign[] | select(. != "")] | length' "$T/sign-$1.json")" 0
+  cosign verify --key "$T/cle/cosign.pub" --insecure-ignore-tlog=true "$REG/builds/sample-app@$D" > "$T/sig-$1.json" 2> "$T/sig-$1.err" \
+    && s=signée || s="non signée"
+  attendu "$1 : signature de l'image (cosign verify)" "$s" "$5"
   publier "$1" "$D" "$4"
 }
 {
@@ -189,8 +198,9 @@ signer() { # nom version dossier-objets nombre-attendu : image neuve signée ; $
   for m in base $TEMOINS; do
     for v in 29 30; do
       echo "## $m v$v"
-      if [ "$m" = sujet ]; then n=1; else n=2; fi   # sujet : l'attestation du TaskRun publier a pour sujet le digest nul
-      signer "$m-$v" "$v" "$T/obj-$m" "$n"
+      # sujet : l'attestation et la signature du TaskRun publier ont pour sujet le digest nul
+      if [ "$m" = sujet ]; then n=1; s="non signée"; else n=2; s=signée; fi
+      signer "$m-$v" "$v" "$T/obj-$m" "$n" "$s"
       I=$REG/builds/sample-app@$(cat "$T/digest-$m-$v")
       juger "$m-$v" "$I"
       echo "ec : $(tr '\n' ' ' < "$T/e-$m-$v" | sed 's/=refus/=R/g; s/=avertissement/=A/g')"
@@ -223,7 +233,8 @@ signer() { # nom version dossier-objets nombre-attendu : image neuve signée ; $
   for m in $TEMOINS courant; do
     attendu "$m v29, ec : codes ajoutés" "$(comm -13 "$T/e-base-29" "$T/e-$m-29" | trie)" "$(trie <<< "${AJOUT_EC[$m]}")"
     attendu "$m v29, ec : codes retirés" "$(comm -23 "$T/e-base-29" "$T/e-$m-29" | trie)" ""
-    attendu "$m v30, ec : inchangé" "$(diff "$T/e-base-30" "$T/e-$m-30" | grep -c '^[<>]')" 0
+    attendu "$m v30, ec : codes ajoutés" "$(comm -13 "$T/e-base-30" "$T/e-$m-30" | trie)" "$(trie <<< "${AJOUT_EC30[$m]:-}")"
+    attendu "$m v30, ec : codes retirés" "$(comm -23 "$T/e-base-30" "$T/e-$m-30" | trie)" ""
     for a in ${AJOUT_EC[$m]}; do
       attendu "$m : ${a%=*}, succès pour v29 de base" "$(etat_ec base-29 "${a%=*}")" succès
     done
@@ -231,7 +242,8 @@ signer() { # nom version dossier-objets nombre-attendu : image neuve signée ; $
   for m in $TEMOINS; do
     attendu "$m v29, reserve-c : codes ajoutés" "$(comm -13 <(grep -v '=ok$' "$T/r-base-29") <(grep -v '=ok$' "$T/r-$m-29") | trie)" "$(trie <<< "${AJOUT_RC[$m]}")"
     attendu "$m v29, reserve-c : codes retirés" "$(comm -23 <(grep -v '=ok$' "$T/r-base-29") <(grep -v '=ok$' "$T/r-$m-29") | trie)" ""
-    attendu "$m v30, reserve-c : inchangé" "$(diff "$T/r-base-30" "$T/r-$m-30" | grep -c '^[<>]')" 0
+    attendu "$m v30, reserve-c : codes ajoutés" "$(comm -13 <(grep -v '=ok$' "$T/r-base-30") <(grep -v '=ok$' "$T/r-$m-30") | trie)" "$(trie <<< "${AJOUT_RC30[$m]:-}")"
+    attendu "$m v30, reserve-c : codes retirés" "$(comm -23 <(grep -v '=ok$' "$T/r-base-30") <(grep -v '=ok$' "$T/r-$m-30") | trie)" ""
   done
   for m in $TEMOINS courant; do
     jq -r --arg l "${AJOUT_EC[$m]}" '.components[] | (.violations + .warnings)[]? | select(.metadata.code as $c | $l | split(" ") | map(split("=")[0]) | index($c))
