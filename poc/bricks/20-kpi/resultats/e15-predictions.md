@@ -31,3 +31,16 @@ Après accord seulement, prédit pour la suite :
   0 clé ni pin sans date ;
 - **H6** (`kpi-pose.sh verif`) : 0 KO ;
 - **H7** (`seuil.sh`, après un passage de l'exportateur posé) : 105 valeurs, 0 écart.
+
+## Résultat, partie hôte (note de 2026-11-26T10:41:18Z)
+
+Correctifs appliqués à 10:40:44Z sur `7278d746`.
+
+| N° | Journal | Mesuré |
+|---|---|---|
+| H1 | `git diff --stat` (hors journal) | exportateur `fc0b8e0d…`, comme prédit ; **5 fichiers changés et non 4** : `genre-temoins.patch` touche aussi `banc_temoins.py` (deux lignes). Faute de la prédiction, qui comptait les fichiers cibles de e13 de mémoire |
+| H2 | [banc](e4-banc-4.log) | code 0, 5 bilans, 25 cas, 0 écart |
+| H3 | (hors journal) | `releve-dates.py verifier` : à jour |
+| H4 | [sec](e15-sec.log) | tenu : 12 fichiers à poser, aucune clé privée, exportateur à poser `fc0b8e0d…`. Passage fait avant le commit des correctifs (arbre de travail) |
+
+Écart dépôt/VM : ouvert à partir du commit des correctifs. sc-stockage garde `98f917ab…` jusqu'à la pose.

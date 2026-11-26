@@ -136,8 +136,11 @@ def date_conf(valeur):
 
 
 def genre(dep):
-    if dep.get("name") in ("pipeline", "pipelineTask"):
-        return "pipeline" if dep["name"] == "pipeline" else "tache"
+    if dep.get("name") == "pipeline":
+        return "pipeline"
+    debut, barre, suite = str(dep.get("name")).partition("/")
+    if debut == "pipelineTask" and bool(barre) == bool(suite):  # v0.29.x : sans barre ; v0.30.0 : barre et nom de la tâche
+        return "tache"
     if dep["uri"].startswith("git+"):
         return "source"
     if "/builds/fermetures/" in dep["uri"]:

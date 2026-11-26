@@ -261,7 +261,8 @@ def genre(d):
     nom, uri = d.get("name"), d["uri"]
     if nom == "pipeline":
         return "pipeline"
-    if nom == "pipelineTask":
+    # Chains v0.29.x : pipelineTask ; v0.30.0 : pipelineTask/<tâche>, ou pipelineTask/<tâche>/<TaskRun> pour une matrice
+    if re.fullmatch("pipelineTask(/.+)?", str(nom), re.S):
         return "tache"
     if uri.startswith("git+"):
         return "source"

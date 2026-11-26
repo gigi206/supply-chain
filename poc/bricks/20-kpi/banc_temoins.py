@@ -172,6 +172,8 @@ def poser():
         0: ([dep("ancien", "1")], "2026-11-18T00:00:00Z", "chains"),
         1: ([dep("present", "2"), dep("retire", "3"), dep("jamais", "4"), dep("inconnu", "5"), dep('a"} 1', "6"),
              dep("present", "2", "git+https://forge.test/x/source.git"), {**dep("t", "7"), "name": "pipelineTask"},
+             {**dep("t-neuf", "a"), "name": "pipelineTask/construire"}, {**dep("t-matrice", "b"), "name": "pipelineTask/m/m-tr-0"},
+             {**dep("t-vide", "c"), "name": "pipelineTask/"}, {**dep("t-faux", "d"), "name": "pipelineTaskX"},
              dep("present", "2")], "2026-11-19T00:00:00Z", "chains"),
         2: ([dep("tache", "8")], "2026-11-20T00:00:00Z", "chains"),
         3: ([dep("forge", "2")], "2026-11-21T00:00:00Z", "etrangere")})

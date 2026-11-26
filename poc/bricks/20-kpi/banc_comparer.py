@@ -40,7 +40,14 @@ PLATEFORME = {"taux_provenance_chains_verifiee": "9/15", "taux_l3_verifie": "1/1
 # étape 4 : séries de dates, écrites à la main (relevé du banc : banc.sh) ; {genre, nom, pin, retire : date} ou {… : "non épinglé"}
 PINS = {("image", "present", "2" * 12, "0"): "1700000002", ("image", "retire", "3" * 12, "1"): "1700000003",
         ("image", "jamais", "4" * 12, None): "non épinglé", ("image", "illisible", "6" * 12, "0"): "1700000006",
-        ("source", "source.git", "2" * 12, "0"): "1700000002", ("tache", "t", "7" * 12, "0"): "1700000007"}
+        ("source", "source.git", "2" * 12, "0"): "1700000002", ("tache", "t", "7" * 12, "0"): "1700000007",
+        ("tache", "t-neuf", "a" * 12, "0"): "1700000021", ("tache", "t-matrice", "b" * 12, "0"): "1700000022",
+        ("image", "t-vide", "c" * 12, "0"): "1700000023", ("image", "t-faux", "d" * 12, "0"): "1700000024"}
+# genre lu par le recalcul, écrit à la main lui aussi : sans cela, rien au banc ne regardait ses lignes pin_date
+GENRES = sorted(f"{g}:{n}:{c * 12}" for g, n, c in (
+    ("image", "present", "2"), ("image", "retire", "3"), ("image", "jamais", "4"), ("image", "inconnu", "5"), ("image", 'a"} 1', "6"),
+    ("source", "source.git", "2"), ("tache", "t", "7"), ("tache", "t-neuf", "a"), ("tache", "t-matrice", "b"), ("image", "t-vide", "c"),
+    ("image", "t-faux", "d")))
 PINS_FORGES = {("image", "forge", "2" * 12, "0"): "1700000002"}
 CLES_DATEES = {"chains": "1700000011", "scanner": "1700000012"}   # vsa : empreinte d'un autre fichier ; vex : absente ; tsa.pem : fichier absent
 DELAIS = [("CVE-2026-90001", K1, K2), ("CVE-2026-90002", K1, K3), ("CVE-2026-90003", K3, None)]
@@ -195,6 +202,9 @@ for qui, f, pins, inconnus, cles in (("comptées", sys.argv[2], PINS_FORGES, 0, 
     cas(f"{qui} : clés sans date", n.get("kpi_cles_non_relevees"), 3 if cles else None)
     cas(f"{qui} : heures du passage et du journal, en ordre", n["kpi_exportateur_journal_timestamp_seconds"]
         <= n["kpi_exportateur_passage_timestamp_seconds"], True)
+lus = [x.split("|")[1].removeprefix("pin_date:") for x in open(sys.argv[1], encoding="utf-8")
+       if x.startswith("KPI|pin_date:") and x.split("|")[2] == "builds/banc-pins"]
+cas("recalcul : genre, nom et pin des dépendances de banc-pins", sorted(lus), GENRES)
 cas("comptées : séries kpi_signatures_*", len(signatures(sys.argv[2])), 0)
 print(f"## bilan : {ko[0]} cas, {ko[1]} écart(s)")
 sys.exit(1 if ko[1] else 0)

@@ -60,6 +60,8 @@ if [ "${1:-}" = ns ]; then
     printf 'pin\t%s\t1700000001\tpresent\n' "$(c64 1)"
     printf 'pin\t%s\t1700000002\tpresent\npin\t%s\t1700000003\tretire\npin\t%s\t-\tnon-epingle\n' "$(c64 2)" "$(c64 3)" "$(c64 4)"
     printf 'pin\t%s\t1700000006\tpresent\npin\t%s\t1700000007\tpresent\npin\t%s\t1700000008\tpresent\n' "$(c64 6)" "$(c64 7)" "$(c64 8)"
+    printf 'pin\t%s\t1700000021\tpresent\npin\t%s\t1700000022\tpresent\n' "$(c64 a)" "$(c64 b)"   # genre() : noms de Chains v0.30.0
+    printf 'pin\t%s\t1700000023\tpresent\npin\t%s\t1700000024\tpresent\n' "$(c64 c)" "$(c64 d)"
   } > "$T/releve.tsv"
   export RELEVE=$T/releve.tsv
   echo "## exportateur, signatures comptées"

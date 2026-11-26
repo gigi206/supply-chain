@@ -8,6 +8,8 @@
 #   zot      exportateur-zot.sh sur le vrai Zot (lecture anonyme ; Grafana par l'auditeur), avant puis après : mêmes lignes KPI et PROM
 # Usage (racine du dépôt) : mise exec -- bash poc/bricks/20-kpi/banc-genre.sh <banc|sorties|zot>
 #   (journaux : resultats/e13-genre-*.log, jamais réécrits ; SUFFIXE=-2 pour un passage de plus)
+# Les deux correctifs sont appliqués et commités depuis le 2026-11-26 (e15) : ce banc ne s'applique plus sur HEAD ; ses journaux e13
+# restent la mesure (même précédent que alertes-kpi.patch et promql-banc.sh).
 set -uo pipefail
 export LC_ALL=C.UTF-8
 here=$(cd "$(dirname "$0")" && pwd)
