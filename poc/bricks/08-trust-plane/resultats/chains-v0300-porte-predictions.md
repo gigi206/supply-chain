@@ -110,3 +110,34 @@ Non couverts, inchangés : KMS, contrôleur, Zot réel (bundles et fermetures), 
 - **V5 (témoin `trusted_task`)** : `trusted_task.trusted` est refusé pour v0.29.9, avec un message qui nomme la tâche `publier`, et réussit pour v0.30.0. Confiance bonne pour v0.30.0, moyenne-bonne pour v0.29.9 (au premier passage, la règle a réussi sans manifestes : elle compare donc les références à la liste).
 - **V6** : le témoin de clé est inchangé : refus par les deux règles de signature, 0 attestation lue. Confiance très bonne.
 - **V7** : moins d'une minute. Confiance bonne.
+
+## Résultat du passage -2 (note de 2026-11-26T08:49:43Z)
+
+Commit de la prédiction : `75528650`. [Journal](chains-v0300-porte-2.log) : 2026-11-26T08:49:15Z → 08:49:21Z, 6 s, 27 OK, 0 KO.
+
+| Prédiction | Verdict |
+|---|---|
+| V1 | **Tenue** |
+| V2 | **Tenue** : avec la source attendue, aucun code `slsa_source_*` refusé ; v0.29.9 n'est plus refusée que par `porte.fermeture_plateforme` (fermeture absente du registre du banc) |
+| V3 | **Tenue** : v0.29.9 seule `porte.fermeture_plateforme` ; v0.30.0 seule les trois codes ; fermeture refus puis réussite |
+| V4 | **Tenue** : v0.30.0, `construction_kata` et `trusted_task.trusted` en réussite, `tasks.successful_pipeline_tasks` absent ; v0.29.9, `trusted_task.tagged` en avertissement |
+| V5 | **Tenue** : liste revue sans le digest de `publier-image`, `trusted_task.trusted` refuse v0.29.9 (« PipelineTask "publier" uses an untrusted task reference ») et **réussit pour v0.30.0** |
+| V6 | **Tenue** |
+| V7 | **Tenue** : 6 s |
+
+**Ce que le banc établit.** Sur des attestations réellement signées, la porte en service (même `ec`, même politique, même forme d'appel) refuse v0.30.0. Trois codes lui sont propres :
+
+- `porte.taches_vues` ;
+- `slsa_build_scripted_build.build_task_image_results_found` ;
+- `tasks.pipeline_has_tasks`.
+
+Deux règles réussissent à vide, chacune prouvée par un témoin :
+
+- `porte.fermeture_plateforme` : la fermeture est absente pour les deux versions ; v0.29.9 est refusée, v0.30.0 réussit ;
+- `trusted_task.trusted` : une tâche est retirée de la liste revue ; v0.29.9 est refusée, v0.30.0 réussit.
+
+`porte.construction_kata` réussit aussi pour v0.30.0. Pour elle, « à vide » repose sur `porte.rego` et sur le banc à sec, pas sur un témoin de ce banc.
+
+La fermeture de la porte tient donc à la seule absence de tâche vue. Les règles de tâches de `porte.rego` lisent `lib.tasks_from_pipelinerun`. Toute adaptation des lecteurs à `pipelineTask/<nom>` se fait là où les tâches sont extraites, et doit montrer qu'un témoin fautif est refusé par chaque règle, fermeture et `trusted_task` compris.
+
+Non couverts, inchangés : KMS, contrôleur, Zot réel (bundles et fermetures), `ivpol`, Kyverno, contrôles 6, 7 et 9, un seul cas, et `construction_kata` sans témoin propre.
