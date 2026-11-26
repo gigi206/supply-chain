@@ -177,10 +177,17 @@ Commit de la prédiction : `22e61f22`. [Journal](chains-v0300-porte-3.log) : 202
 | W4 | **Tenue** : v0.30.0, `porte.construction_kata` réussit ; codes identiques à ceux des objets d'origine |
 | W5 | **Tenue** : 11 s |
 
-La réserve est levée : `porte.construction_kata` réussit à vide pour v0.30.0. Son témoin lui est propre : une construction hors Kata est refusée sous v0.29.9 et admise sous v0.30.0. Les trois règles de tâches de `porte.rego` qui ne refusent pas v0.30.0 ont maintenant chacune leur témoin :
+La réserve est levée : `porte.construction_kata` réussit à vide pour v0.30.0, et son témoin lui est propre. Sous v0.29.9, la règle refuse une construction hors Kata. Sous v0.30.0, elle ne la signale pas. L'image du témoin reste refusée, mais par les trois codes de v0.30.0, pas par celui-ci.
 
-- la fermeture ;
-- `trusted_task.trusted` ;
-- `construction_kata`.
+Trois règles ont maintenant chacune un témoin :
+
+- deux règles de `porte.rego` : la fermeture et `construction_kata` ;
+- une règle de la bibliothèque : `trusted_task.trusted`.
+
+Ce n'est pas exhaustif. D'après la table d'état du [journal](chains-v0300-porte-3.log), d'autres règles réussissent pour v0.30.0 sans témoin, et peuvent elles aussi réussir à vide :
+
+- `porte.preparation_appariee` ;
+- `slsa_build_scripted_build.build_script_used` et `subject_build_task_matches` ;
+- les autres règles `trusted_task.*`.
 
 Non couverts, inchangés : KMS, contrôleur, Zot réel (bundles et fermetures), `ivpol`, Kyverno, contrôles 6, 7 et 9, et un seul cas.
