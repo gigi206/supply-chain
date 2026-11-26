@@ -174,3 +174,6 @@ Leurs dates de modification (10:22:54Z à 10:22:58Z) tombent dans le passage -2 
 Le compte de 4 par bundle est donc mesuré, et non plus déduit du total. Reste déduit : que la demande en plus vienne du
 nouveau système. Les lignes ne nomment pas la règle qui appelle `ec.oci.image_manifest`. Les 3 KO restent ceux d'un
 attendu faux (9), pas d'un défaut de la porte.
+
+Un passage d'`ec opa eval` paquet par paquet, isolé, n'a pas tranché l'origine (note de 2026-11-26T12:13:05Z,
+[origine-g7](chains-v0300-origine-g7-predictions.md)) : non expliqué.

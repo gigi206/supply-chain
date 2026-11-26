@@ -1,0 +1,40 @@
+# origine-g7.sh, 2026-11-26T12:12:33Z, dépôt a5cdf3fb, script b7a2953498ab8316
+OK   réseau du banc : interfaces : 1
+OK   ec : empreinte du verrou (politique.sh) : 895c6f7e63cfefe6257a2e54c052c3d90803e8127adf5a7eb13f245262859abf
+OK   bibliothèque : arbre de ebd3fbd270297c15f590f4023360465ffb41d4fe : 0fd26021bb08582553f392565ca0faf316c51229
+KO   porte.rego : identique à la copie du passage -2 : obtenu « non », attendu « oui »
+taches.yml du passage -2 : 16ae2899d2f8a2a7
+OK   registre du banc : motif de regles.bloc : 1
+énoncés gardés v29 : b21933ecf6f54b89, 2 dans l'entrée
+énoncés gardés v30 : f2e2202713076475, 2 dans l'entrée
+== O1 : garde de données (v29)
+OK   service : trusted_task_rules_enabled : false
+OK   regles : trusted_task_rules_enabled : true
+OK   service : missing_trusted_task_rules_data : true
+OK   regles : missing_trusted_task_rules_data : false
+== O2/O3 : v29 service, paquet seul (deny et warn)
+   tasks : résultats 1 ; lignes 3 ; par bundle construire-image:1 preparer-entrees:1 publier-image:1 ; fonctions function=ec.oci.image_manifest:3 ; autres lignes 0
+OK   v29 service tasks : lignes par bundle : construire-image:1 preparer-entrees:1 publier-image:1
+   trusted_task : résultats 3 ; lignes 3 ; par bundle construire-image:1 preparer-entrees:1 publier-image:1 ; fonctions function=ec.oci.image_manifest:3 ; autres lignes 0
+OK   v29 service trusted_task : lignes par bundle : construire-image:1 preparer-entrees:1 publier-image:1
+   slsa_build_scripted_build : résultats  ; lignes 3 ; par bundle construire-image:1 preparer-entrees:1 publier-image:1 ; fonctions function=ec.oci.image_manifest:3 ; autres lignes 0
+OK   v29 service slsa_build_scripted_build : lignes par bundle : construire-image:1 preparer-entrees:1 publier-image:1
+   porte : résultats  ; lignes 0 ; par bundle construire-image:0 preparer-entrees:0 publier-image:0 ; fonctions  ; autres lignes 0
+OK   v29 service porte : lignes par bundle : construire-image:0 preparer-entrees:0 publier-image:0
+OK   v29 service : somme par paquet (bundle publier-image) : 3
+== O2/O3 : v29 regles, paquet seul (deny et warn)
+   tasks : résultats 1 ; lignes 3 ; par bundle construire-image:1 preparer-entrees:1 publier-image:1 ; fonctions function=ec.oci.image_manifest:3 ; autres lignes 0
+   trusted_task : résultats 3 ; lignes 3 ; par bundle construire-image:1 preparer-entrees:1 publier-image:1 ; fonctions function=ec.oci.image_manifest:3 ; autres lignes 0
+   slsa_build_scripted_build : résultats  ; lignes 3 ; par bundle construire-image:1 preparer-entrees:1 publier-image:1 ; fonctions function=ec.oci.image_manifest:3 ; autres lignes 0
+   porte : résultats  ; lignes 0 ; par bundle construire-image:0 preparer-entrees:0 publier-image:0 ; fonctions  ; autres lignes 0
+KO   v29 regles : somme par paquet (bundle publier-image) : obtenu « 3 », attendu « 4 »
+== O4/O6 : ensemble (les quatre paquets dans un seul processus)
+   v29 service : résultats  ; lignes 3 ; fonctions function=ec.oci.image_manifest:3 ; autres lignes 0
+KO   v29 service ensemble : lignes par bundle : obtenu « construire-image:1 preparer-entrees:1 publier-image:1 », attendu « construire-image:3 preparer-entrees:3 publier-image:3 »
+   v29 regles : résultats  ; lignes 3 ; fonctions function=ec.oci.image_manifest:3 ; autres lignes 0
+KO   v29 regles ensemble : lignes par bundle : obtenu « construire-image:1 preparer-entrees:1 publier-image:1 », attendu « construire-image:4 preparer-entrees:4 publier-image:4 »
+   v30 service : résultats  ; lignes 0 ; fonctions  ; autres lignes 0
+OK   v30 service ensemble : lignes par bundle : construire-image:0 preparer-entrees:0 publier-image:0
+   v30 regles : résultats  ; lignes 0 ; fonctions  ; autres lignes 0
+OK   v30 regles ensemble : lignes par bundle : construire-image:0 preparer-entrees:0 publier-image:0
+## bilan : 4 KO, 2026-11-26T12:12:39Z

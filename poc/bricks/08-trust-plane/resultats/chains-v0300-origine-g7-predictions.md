@@ -56,3 +56,36 @@ garde est le compte « ensemble », qui doit redonner 3 et 4.
 Critère : si les comptes par paquet ne redonnent pas 3 et 4, ou si « ensemble » ne redonne pas 3 et 4, la note dira « non
 expliqué » et rien ne sera relancé. Si aucune ligne n'apparaît du tout, `ec opa eval` ne journalise pas ces échecs comme
 `ec validate image` : même conclusion.
+
+## Résultat (note de 2026-11-26T12:13:05Z)
+
+Passage unique : [journal](chains-v0300-origine-g7.log), 12:12:33Z à 12:12:39Z, dépôt `a5cdf3fb`, 4 KO, non relancé.
+
+| N° | Mesuré |
+|---|---|
+| O1 | tenu : `false` et `true`, puis `true` et `false` |
+| O2 | tenu : `tasks` 1, `trusted_task` 1, `slsa_build_scripted_build` 1, `porte` 0, soit une somme de 3 |
+| O3 | **réfuté** : sous `regles`, chaque paquet seul rend encore 1 ligne par bundle (somme 3, et non 4). Une seconde demande dans un même paquet serait masquée (voir plus bas) |
+| O4 | **réfuté** : « ensemble » rend 1 ligne par bundle sous les deux politiques, et non 3 et 4 |
+| O5 | tenu : `ec.oci.image_manifest` seule, aucune autre ligne |
+| O6 | tenu : 0 ligne pour v0.30.0 |
+
+Conclusion selon le critère écrit avant : **non expliqué**.
+
+- La garde « ensemble » ne tient pas. Dans un seul processus `ec opa eval`, il n'y a qu'une ligne par bundle pour les
+  trois paquets : les demandes suivantes ne laissent pas de ligne. Pour `ec validate image`, les comptes de 3 et 4 ne
+  viennent donc pas d'appels faits dans une même évaluation. Cette forme ne reproduit pas G7, comme la limite écrite avant le
+  craignait.
+- Pour la même raison, O3 ne prouve rien. Une seconde demande faite dans un même paquet serait masquée elle aussi. Le passage
+  n'apprend donc rien sur l'origine du surplus.
+- L'origine reste déduite, comme avant. Aucun verdict ne change. Les 3 KO de G7 restent ceux d'un attendu faux.
+
+Fautes du script, sans effet sur les comptes :
+- `porte.rego` est copié du dépôt, et non du passage -2 (KO « identique à la copie »). La copie du passage -2 diffère d'une
+  ligne, le nom du registre (`future-deny.sh`, ligne 113). `porte` n'appelle aucune fonction `ec.oci` et rend 0 ligne.
+- La requête `count(deny) + count(warn)` rend un résultat vide pour `slsa_build_scripted_build` et `porte`.
+  Cause déduite : pas de règle `warn`. Les lignes d'erreur sont comptées quand même. Pour « ensemble », la somme est indéfinie, et `porte` n'y est
+  peut-être pas évalué (déduit, non contrôlé). Il rend 0 ligne seul.
+
+Heures : 12:08:41Z à 12:13:05Z (lecture, prédiction, script, passage, note), soit 4 min 24 s. L'heure de la note avait
+d'abord été écrite 12:14:10Z, une heure estimée : corrigée avant le commit.
