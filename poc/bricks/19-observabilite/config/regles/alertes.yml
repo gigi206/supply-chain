@@ -101,6 +101,25 @@ groups:
           alerte: base
           severite: critique
 
+      # KPI en retard (brique 20) : un arrêt de l'exportateur laisse kpi.prom inchangé, donc d'anciennes valeurs dans Grafana ; seule
+      # l'heure du dernier passage réussi le montre. 45 min : un cycle sain a au plus 21 min (timer de 15 min, AccuracySec de 1 min par
+      # défaut, TimeoutStartSec de 3 min du lecteur et de 2 min de l'exportateur), un passage manqué au plus 36 ; l'alerte part donc au deuxième
+      # passage manqué de suite. for: 10m : démarrage de sc-stockage (OnBootSec 5 min, plus un passage de 5 min au plus), et absent() (A4).
+      - alert: KpiPassageEnRetard
+        expr: time() - kpi_exportateur_passage_timestamp_seconds > 45 * 60 or absent(kpi_exportateur_passage_timestamp_seconds)
+        for: 10m
+        labels:
+          alerte: kpi
+          severite: avertissement
+
+      # Signature refusée par l'exportateur (brique 20) : une attestation d'un produit, dans Zot, ne se vérifie pas avec la clé publique de
+      # sa famille. Attestation fausse, ou clé recréée sans que la nouvelle soit posée (rejeu, re-signature) : les deux sont à traiter.
+      - alert: KpiSignatureRefusee
+        expr: kpi_signatures_refusees > 0
+        labels:
+          alerte: kpi
+          severite: critique
+
       # Disque de sc-stockage occupé à plus de 80 % (brique 19b, D13 a : rétention de 30 jours des journaux dans Loki,
       # compression réelle à mesurer). Métrique écrite chaque minute par disque-metriques (19b), servie par fichiers.
       - alert: DisqueStockagePlein
