@@ -32,3 +32,20 @@ Ce qui est déployé : [`alertes-kpi.patch`](../alertes-kpi.patch), écrit et é
 - Un rejeu sans `TAG_05` laisse l'exportateur non posé : `KpiPassageEnRetard` sonnera (voulu), ce qui fera du bruit pendant ce rejeu.
 - `promql-banc.sh` (étape 6) applique le correctif à une copie de HEAD : une fois le correctif appliqué, son cas « correctif appliqué » échouera. Le banc reste archivé ; ce n'est pas un défaut des règles.
 - Non exercés : le déclenchement réel des deux alertes sur la plateforme et la notification par Alertmanager (couverts par promtool seulement).
+
+## Résultat (note de 2026-11-26T08:09:27Z)
+
+Commits : prédiction `a57a4b01`, correctif appliqué `96a66df7`.
+
+| Prédiction | Verdict |
+|---|---|
+| D1 | **Tenue** ([journal](../../19-observabilite/resultats/kpi20-regles.log), 07:57:48Z) : promtool 3.13.5, `SUCCESS: 17 rules found`, tests réussis |
+| D2 | **Tenue** ([journal](../../19-observabilite/resultats/kpi20-reference.log)) : les deux expressions neuves, et toutes les autres, sans résultat |
+| D3 | **Tenue** ([journal](../../19-observabilite/resultats/kpi20-deployer.log), 07:58:01Z) : Prometheus `active`, 17 règles `ok` et `inactive`, dont `KpiPassageEnRetard` et `KpiSignatureRefusee` |
+| D4 | **Tenue** (07:58:11Z) : sha256 en place `a2d66710…` = `alertes.yml` de `96a66df7` |
+| D5 | **Non tenue au premier passage, faute du contrôle** ([journal](e14-alertes-verif.log), 07:58:11Z) : 1 KO, Grafana lit encore **15** règles. `prometheus_rule_group_rules` vient de la collecte de Prometheus par lui-même : 10 s après le redémarrage, le dernier point était celui d'avant. **Tenue au second** ([journal](e14-alertes-verif-2.log), 08:09:20Z) : 8 cas, 0 KO, 17 règles vues par l'auditeur, aucune alerte `kpi`, âge du passage 323 s (passage de l'exportateur postérieur au redémarrage) |
+| D6 | **Tenue** ([relevé](e14-alertes-toutes.log), 08:09:27Z) : aucune alerte en attente ou déclenchée. La commande du passage en arrière-plan qui devait le relever a échoué (jq lisait aussi la date) : relevé refait à part |
+
+**Règles d'alerte KPI déployées**, 0 écart sur les règles elles-mêmes. Leçon : après un redémarrage, attendre une collecte avant de lire une série que Prometheus produit sur lui-même.
+
+Non couverts, inchangés : déclenchement réel des deux alertes sur la plateforme, notification par Alertmanager, rejeu (étape 7).

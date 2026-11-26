@@ -1,0 +1,46 @@
+# observabilite.sh reference, 2026-11-26T07:57:59Z
+début des données de Prometheus : 2026-11-23T22:19:49Z
+## A5 : refus de Kyverno sur l'historique, par espace
+  {"resource_namespace":"livraison"} 0
+## A5 : maximum, sur l'historique, des refus en 5 min (tous espaces)
+  {} 0
+## A5 : admissions acceptées sur l'historique (activité de référence)
+  {} 3769.470752089136
+## A2 : échecs de signature de Chains sur l'historique
+  {"error_type":"payload_creation"} 0
+  {"error_type":"payload_creation"} 0
+## expressions de alertes.yml évaluées sur le Prometheus réel (règles non déployées)
+- vault_core_unsealed == 0 or (up{job="openbao"} == 0 and on() up{job="kyverno"} == 1)
+  (aucun résultat)
+- (increase(watcher_pipelinerun_signing_failures_total[10m]) > 0) or (watcher_pipelinerun_signing_failures_total unless watcher_pipelinerun_signing_failures_total offset 10m) or (increase(watcher_taskrun_signing_failures_total[10m]) > 0) or (watcher_taskrun_signing_failures_total unless watcher_taskrun_signing_failures_total offset 10m)
+  (aucun résultat)
+- (increase(watcher_pipelinerun_marked_signed_total[10m]) - increase(watcher_pipelinerun_sign_created_total[10m]) > 0) or (increase(watcher_taskrun_marked_signed_total[10m]) - increase(watcher_taskrun_sign_created_total[10m]) > 0)
+  (aucun résultat)
+- replay_dernier_resultat == 0
+  (aucun résultat)
+- time() - sync_derniere_reussite_timestamp_seconds > 86400 or absent(sync_derniere_reussite_timestamp_seconds)
+  (aucun résultat)
+- sum((increase(kyverno_admission_requests_total{request_allowed="false"}[5m]) > 0) or (kyverno_admission_requests_total{request_allowed="false"} unless kyverno_admission_requests_total{request_allowed="false"} offset 5m)) > 5
+  (aucun résultat)
+- certificat_expiration_timestamp_seconds - time() < 30 * 86400
+  (aucun résultat)
+- time() - scan_dernier_referrer_timestamp_seconds > 26 * 3600 or absent(scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app"}) or absent(scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb"})
+  (aucun résultat)
+- time() - scan_dernier_referrer_timestamp_seconds > 5 * 86400
+  (aucun résultat)
+- time() - base_grype_construite_timestamp_seconds > 2 * 86400 or absent(base_grype_construite_timestamp_seconds)
+  (aucun résultat)
+- time() - kpi_exportateur_passage_timestamp_seconds > 45 * 60 or absent(kpi_exportateur_passage_timestamp_seconds)
+  (aucun résultat)
+- kpi_signatures_refusees > 0
+  (aucun résultat)
+- disque_utilise_ratio > 0.8
+  (aucun résultat)
+- label_replace(sum by (component_id) (increase(loki_source_api_entries_written{job="alloy", component_id=~"loki.source.api.(confiance|build)"}[5m])), "noeud", "sc-$1", "component_id", "loki.source.api.(.*)") == 0 or label_replace(sum(increase(loki_source_journal_target_lines_total{job="alloy"}[5m])), "noeud", "sc-stockage", "", "") == 0
+  (aucun résultat)
+- sum(increase(loki_process_custom_evenements_lignes_total{job="alloy"}[15m])) == 0 or (absent(loki_process_custom_evenements_lignes_total{job="alloy"}) and on() (up{job="alloy"} == 1))
+  (aucun résultat)
+- sum(increase(loki_write_request_duration_seconds_count{job="alloy", status_code=~"2.."}[5m])) == 0
+  (aucun résultat)
+- up{job!="openbao"} == 0
+  (aucun résultat)

@@ -1,0 +1,19 @@
+# observabilite.sh deployer, 2026-11-26T07:58:01Z
+active
+  /etc/prometheus/regles/alertes.yml	OpenBaoScelle	ok	inactive
+  /etc/prometheus/regles/alertes.yml	ChainsEchecSignature	ok	inactive
+  /etc/prometheus/regles/alertes.yml	ChainsMarqueSansSignature	ok	inactive
+  /etc/prometheus/regles/alertes.yml	ReplayNonBitIdentique	ok	inactive
+  /etc/prometheus/regles/alertes.yml	MiroirEnRetard	ok	inactive
+  /etc/prometheus/regles/alertes.yml	KyvernoRefusAnormaux	ok	inactive
+  /etc/prometheus/regles/alertes.yml	CertificatExpireBientot	ok	inactive
+  /etc/prometheus/regles/alertes.yml	ScanEnRetard	ok	inactive
+  /etc/prometheus/regles/alertes.yml	ScanBientotRefuse	ok	inactive
+  /etc/prometheus/regles/alertes.yml	BaseGrypeVieillie	ok	inactive
+  /etc/prometheus/regles/alertes.yml	KpiPassageEnRetard	ok	inactive
+  /etc/prometheus/regles/alertes.yml	KpiSignatureRefusee	ok	inactive
+  /etc/prometheus/regles/alertes.yml	DisqueStockagePlein	ok	inactive
+  /etc/prometheus/regles/alertes.yml	SourceMuette	ok	inactive
+  /etc/prometheus/regles/alertes.yml	EvenementsMuets	ok	inactive
+  /etc/prometheus/regles/alertes.yml	LokiInjoignable	ok	inactive
+  /etc/prometheus/regles/alertes.yml	CollecteEnPanne	ok	inactive
