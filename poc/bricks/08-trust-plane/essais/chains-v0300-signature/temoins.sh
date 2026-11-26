@@ -17,6 +17,8 @@
 # de construire-deb dans j7).
 # Passage -2 : le témoin sujet retire aussi la signature de l'image (Chains la produit depuis le TaskRun publier, dont le sujet
 # devient le digest nul) : signature d'image refusée pour les deux versions, attendue et contrôlée (image signée ou non).
+# Passage -3 : pour chaque témoin et chaque version, le champ changé est contrôlé dans l'énoncé signé du PipelineRun (dépendance
+# pipelineTask pour v0.29.9, pipelineTask/<nom> pour v0.30.0) : un « inchangé » pour v0.30.0 n'est pas une mutation perdue.
 # Tout tourne dans un espace réseau neuf (unshare -rn, boucle locale seule) : aucun appel ne peut sortir de l'hôte.
 # Usage (racine du dépôt) : [SUFFIXE=-2] mise exec -- bash poc/bricks/08-trust-plane/essais/chains-v0300-signature/temoins.sh
 set -uo pipefail
@@ -58,6 +60,13 @@ TACHE[echec]=preparer;     FILTRE[echec]='.status.conditions |= map(if .type == 
 TACHE[parametre]=publier;  FILTRE[parametre]='.spec.params |= map(if .name == "digest" then .value = $nul else . end)'
 TACHE[artefact]=construire; FILTRE[artefact]='.spec.params = [{"name": "SOURCE_ARTIFACT", "value": ("oci:sc-stockage.poc.test:5000/entrees/absent@" + $nul)}]'
 TACHE[epingle]=publier;    FILTRE[epingle]='.spec.taskRef.params |= map(if .name == "bundle" then .value |= sub("@sha256:[0-9a-f]{64}$"; "") else . end)'
+# champ changé, lu dans le contenu de la dépendance de la tâche (TaskRun) de l'énoncé signé du PipelineRun
+declare -A CHAMP
+CHAMP[sujet]='[.status.results[] | select(.name == "IMAGE_DIGEST") | .value] == [$nul]'
+CHAMP[echec]='[.status.conditions[] | select(.type == "Succeeded") | .status] == ["False"]'
+CHAMP[parametre]='[.spec.params[] | select(.name == "digest") | .value] == [$nul]'
+CHAMP[artefact]='[.spec.params[]? | select(.name == "SOURCE_ARTIFACT") | .value | endswith("@" + $nul)] == [true]'
+CHAMP[epingle]='[.spec.taskRef.params[] | select(.name == "bundle") | .value | contains("@")] == [false]'
 AJOUT_EC[sujet]='builtin.image.signature_check=refus porte.image_signature=refus slsa_build_scripted_build.subject_build_task_matches=refus'
 AJOUT_EC[echec]='tasks.successful_pipeline_tasks=refus'
 AJOUT_EC[parametre]='trusted_task.trusted_parameters=refus'
@@ -138,6 +147,18 @@ print(r[0].get("result", "?") + "\t" + (r[0].get("message") or "").replace("\n",
 etat_rc() { # nom code : statut(s) dans le diagnostic, ou absent
   local s; s=$(sed -n "s/^$2=//p" "$T/r-$1" | sort -u | paste -sd, -); echo "${s:-absent}"
 }
+champ() { # témoin version : dépendance de la tâche dans l'énoncé du PipelineRun, nom et champ changé
+  local e st n
+  while IFS= read -r e; do
+    st=$(jq -r '.payload' <<< "$e" | base64 -d)
+    [ "$(jq -r '.predicate.runDetails.metadata.invocationId' <<< "$st")" = "$UID_PR" ] || continue
+    jq -c --arg t "${TACHE[$1]}" '[.predicate.buildDefinition.resolvedDependencies[] | select((.name // "") | startswith("pipelineTask"))
+      | {name, run: (.content | @base64d | fromjson)} | select(.run.metadata.labels["tekton.dev/pipelineTask"] == $t)]' <<< "$st" > "$T/dep-$1-$2.json"
+  done < "$T/env-$1-$2.jsonl"
+  if [ "$2" = 29 ]; then n=pipelineTask; else n="pipelineTask/${TACHE[$1]}"; fi
+  attendu "$1 v$2 : dépendance de ${TACHE[$1]} dans l'énoncé du PipelineRun" "$(jq -r '[.[].name] | join(" ")' "$T/dep-$1-$2.json")" "$n"
+  attendu "$1 v$2 : champ changé présent dans l'énoncé signé" "$(jq --arg nul "$NUL" ".[0].run | ${CHAMP[$1]}" "$T/dep-$1-$2.json")" true
+}
 signer() { # nom version dossier-objets nombre-attendu signature-attendue : image neuve signée ; $T/digest-<nom>
   local B=$C/sig/banc-signature$2 D L=() f
   for f in "${TRS[@]}"; do L+=("$3/$(basename "$f")"); done
@@ -201,6 +222,7 @@ signer() { # nom version dossier-objets nombre-attendu signature-attendue : imag
       # sujet : l'attestation et la signature du TaskRun publier ont pour sujet le digest nul
       if [ "$m" = sujet ]; then n=1; s="non signée"; else n=2; s=signée; fi
       signer "$m-$v" "$v" "$T/obj-$m" "$n" "$s"
+      [ "$m" = base ] || champ "$m" "$v"
       I=$REG/builds/sample-app@$(cat "$T/digest-$m-$v")
       juger "$m-$v" "$I"
       echo "ec : $(tr '\n' ' ' < "$T/e-$m-$v" | sed 's/=refus/=R/g; s/=avertissement/=A/g')"

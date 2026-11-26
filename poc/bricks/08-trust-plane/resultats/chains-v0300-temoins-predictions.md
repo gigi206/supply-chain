@@ -134,3 +134,22 @@ Réserves, celles écrites d'avance :
 - `current` témoigné par la liste revue, chez `ec` seulement.
 
 Non couverts : KMS, contrôleur, Zot réel, admission, la porte Kyverno de l'autre session ; `build_script_used` et `future_deny_rule` sur une autre forme de provenance ou de liste ; `preparation_appariee` sur un cas deb.
+
+## Prédiction du passage -3 (2026-11-26T09:34:15Z)
+
+Relecture du conseiller : pour v0.30.0, un ensemble de codes « inchangé » serait aussi ce qu'on verrait si la mutation s'était perdue à la signature. Rien d'archivé ne montrait que le champ changé est dans l'énoncé signé par v0.30.0 (la sonde ne l'avait regardé que pour v0.29.9).
+
+**Déjà vu**, avant cette prédiction : une lecture hors dépôt du dossier de travail du passage -2 a trouvé chaque champ changé dans l'énoncé du PipelineRun signé par chaque version. Pour v0.29.9, il est dans la dépendance `pipelineTask` ; pour v0.30.0, dans `pipelineTask/<nom>`.
+
+Ajout au banc : pour chaque témoin et chaque version, deux contrôles :
+
+- le nom de la dépendance de la tâche changée ;
+- la présence du champ changé dans son contenu.
+
+Prédiction : Y1 à Y5 inchangées, et Y6 :
+
+| | Énoncé |
+|---|---|
+| Y6 (rejeu de la lecture) | Pour chaque témoin sur objets, la dépendance de la tâche changée s'appelle `pipelineTask` pour v0.29.9 et `pipelineTask/<nom>` pour v0.30.0. Elle porte le champ changé dans les deux cas |
+
+0 KO attendu.
