@@ -103,3 +103,31 @@ Avec T2 tenue, le refus de la porte mesuré à sec sur la sortie de v0.30.0 vaut
 Les écarts affichés touchent ces seuls chemins, dans les deux versions. Ils sont tronqués à 20 lignes : le reste n'est pas vu.
 
 Correction : `banc.sh` `6f9c4e1ed98f2d08`. Il nettoie `internalParameters.annotations`, décode le `content` des `byproducts` en texte, remplace le digest sans son préfixe et affiche 40 lignes d'écart. Prédictions T2 et T3 inchangées. Passage -4.
+
+## Passage -4, résultat (note de 2026-11-26T08:32:09Z)
+
+[Journal](chains-v0300-signature-4.log), lancé sur `47ed100b` : 29 OK, 0 KO.
+
+| Prédiction | Verdict |
+|---|---|
+| T1 | **Tenue**, comme au passage -3 |
+| T2 | **Tenue** : dans chaque version, l'énoncé signé et stocké du PipelineRun est égal, après normalisation, à la sortie du banc à sec. La réserve sur les `digest` ne s'est pas présentée |
+| T3 | **Tenue** : de même pour `publier` |
+
+**Témoin de la comparaison**, relu à 08:31:54Z dans le dossier de travail du passage -4, hors journal. Écarts de chemins scalaires :
+- énoncé signé de v0.29.9 contre sortie à sec de v0.30.0 : 18 ;
+- énoncé signé de v0.30.0 contre sortie à sec de v0.29.9 : 18 ;
+- énoncé signé de v0.30.0 contre sa propre sortie à sec : 0.
+
+La normalisation laisse donc voir les écarts réels. Entre les deux énoncés signés, les 18 lignes portent uniquement sur des noms : ceux de 3 dépendances (`pipelineTask` devient `pipelineTask/<nom>`) et ceux de 6 `byproducts` (`taskRunResults/<TaskRun>/…` devient `taskRunResults/<tâche du pipeline>/…`).
+
+**Bilan du banc.** Avec la configuration en service, et hors signataire KMS, contrôleur et Zot :
+- v0.30.0 signe et stocke comme v0.29.9 ;
+- son énoncé signé ne diffère de celui de v0.29.9 que par ces noms ;
+- il est égal à la sortie du banc à sec. Le refus de la porte mesuré à sec vaut donc pour ce que v0.30.0 signerait réellement.
+
+Sans signataire, v0.30.0 échoue fermé, et v0.29.9 échoue ouvert, comme en O4. Aucune des deux ne compte d'erreur dans le Recorder.
+
+La montée reste bloquée par la porte, `ivpol`, les scripts et `genre()` de la 20 (patchs non appliqués).
+
+Heures (2026-11-26, `date -u`) : de 08:15:55 (premier relevé, avant l'orientation) à 2026-11-26T08:32:09Z (cette note), soit 16 min 14 s. Ce temps couvre l'orientation, le programme, le script, les quatre passages, la relecture et les notes.

@@ -1,0 +1,70 @@
+# banc.sh, 2026-11-26T08:31:38Z, dépôt 47ed100b, script 6f9c4e1ed98f2d08, main.go 76e03e674842ed47
+cosign : v3.1.4
+src29 : commit 89219ea5443fe3164715b9a93f7e6fd16d56b38a, main.go identique, binaire 984b202a73690182
+src30 : commit b59bced2524ec2da5dcbe3f916c2109262b9b819, main.go identique, binaire 380f637667285595
+cas : j7-sample-app, 3 TaskRuns, digest d'origine sha256:f5e6bcb0e0fb…
+OK   clé jetable créée : cosign.key cosign.password cosign.pub 
+## v29
+image du banc : sha256:934dea350fb7…
+OK   v29 signer, code : 0
+{"pipelinerun/j7-sample-app":"","taskrun/j7-sample-app-construire":"","taskrun/j7-sample-app-preparer":"","taskrun/j7-sample-app-publier":""}
+{"compte:mrcount":4,"compte:sgcount":5,"compte:stcount":5}
+{"pipelinerun/j7-sample-app":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-construire":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-preparer":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-publier":["chains.tekton.dev/signed"]}
+avertissements et erreurs du journal zap : 0
+OK   v29 erreurs de Sign : 0
+OK   v29 cosign verify (simplesigning), code : 0
+OK   v29 cosign verify-attestation, code : 0
+OK   v29 attestations vérifiées : 2
+  noms : 
+  noms : pipeline,pipelineTask,pipelineTask,pipelineTask
+OK   v29 noms pipeline* de l'attestation du PipelineRun : pipeline,pipelineTask,pipelineTask,pipelineTask
+OK   v29 objets annotés signed=true : 4
+OK   v29 erreurs comptées par le Recorder : 0
+OK   v29 énoncé signé du PipelineRun = sortie à sec : égal
+OK   v29 énoncé signé de publier = sortie à sec : égal
+aucun signataire, Sign :
+{"pipelinerun/j7-sample-app":"","taskrun/j7-sample-app-construire":"","taskrun/j7-sample-app-preparer":"","taskrun/j7-sample-app-publier":""}
+OK   v29 aucun signataire, objets en erreur : 0
+OK   v29 aucun signataire, objets marqués signed=true : 4
+OK   v29 aucun signataire, erreurs comptées par le Recorder : 0
+aucun signataire, recorder : {"compte:mrcount":4}
+aucun signataire, annotations : {"pipelinerun/j7-sample-app":{"chains.tekton.dev/signed":"true"},"taskrun/j7-sample-app-construire":{"chains.tekton.dev/signed":"true"},"taskrun/j7-sample-app-preparer":{"chains.tekton.dev/signed":"true"},"taskrun/j7-sample-app-publier":{"chains.tekton.dev/signed":"true"}}
+aucun signataire, cosign tree :
+  📦 Supply Chain Security Related artifacts for an image: REGISTRE/builds/sans-cle@sha256:dc9b98bdc572…
+  No Supply Chain Security Related Artifacts found for image REGISTRE/builds/sans-cle@sha256:dc9b98bdc572…,
+   start creating one with simply running$ cosign sign <img>
+OK   v29 aucun signataire, rien d'attaché à l'image : 1
+## v30
+image du banc : sha256:76ec9ec6037f…
+OK   v30 signer, code : 0
+{"pipelinerun/j7-sample-app":"","taskrun/j7-sample-app-construire":"","taskrun/j7-sample-app-preparer":"","taskrun/j7-sample-app-publier":""}
+{"compte:mrcount":4,"compte:sgcount":5,"compte:stcount":5}
+{"pipelinerun/j7-sample-app":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-construire":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-preparer":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-publier":["chains.tekton.dev/signed"]}
+avertissements et erreurs du journal zap : 0
+OK   v30 erreurs de Sign : 0
+OK   v30 cosign verify (simplesigning), code : 0
+OK   v30 cosign verify-attestation, code : 0
+OK   v30 attestations vérifiées : 2
+  noms : 
+  noms : pipeline,pipelineTask/preparer,pipelineTask/construire,pipelineTask/publier
+OK   v30 noms pipeline* de l'attestation du PipelineRun : pipeline,pipelineTask/preparer,pipelineTask/construire,pipelineTask/publier
+OK   v30 objets annotés signed=true : 4
+OK   v30 erreurs comptées par le Recorder : 0
+OK   v30 énoncé signé du PipelineRun = sortie à sec : égal
+OK   v30 énoncé signé de publier = sortie à sec : égal
+aucun signataire, Sign :
+{"pipelinerun/j7-sample-app":"1 error occurred:\n\t* no signer x509 configured for tekton-pipeline-run\n\n","taskrun/j7-sample-app-construire":"1 error occurred:\n\t* no signer x509 configured for tekton\n\n","taskrun/j7-sample-app-preparer":"1 error occurred:\n\t* no signer x509 configured for tekton\n\n","taskrun/j7-sample-app-publier":"1 error occurred:\n\t* no signer x509 configured for tekton\n\n"}
+OK   v30 aucun signataire, objets en erreur : 4
+OK   v30 aucun signataire, objets marqués signed=true : 0
+OK   v30 aucun signataire, erreurs comptées par le Recorder : 0
+aucun signataire, recorder : {}
+aucun signataire, annotations : {"pipelinerun/j7-sample-app":{"chains.tekton.dev/retries":"0"},"taskrun/j7-sample-app-construire":{"chains.tekton.dev/retries":"0"},"taskrun/j7-sample-app-preparer":{"chains.tekton.dev/retries":"0"},"taskrun/j7-sample-app-publier":{"chains.tekton.dev/retries":"0"}}
+aucun signataire, cosign tree :
+  📦 Supply Chain Security Related artifacts for an image: REGISTRE/builds/sans-cle@sha256:0d6ccd844041…
+  No Supply Chain Security Related Artifacts found for image REGISTRE/builds/sans-cle@sha256:0d6ccd844041…,
+   start creating one with simply running$ cosign sign <img>
+OK   v30 aucun signataire, rien d'attaché à l'image : 1
+## comparaison
+v29 :  pipeline,pipelineTask,pipelineTask,pipelineTask 
+v30 :  pipeline,pipelineTask/preparer,pipelineTask/construire,pipelineTask/publier 
+## bilan : 0 KO
