@@ -56,3 +56,10 @@ même allure si une requête avait échoué. Au passage -2, chaque valeur passe 
 requêtes sont gardées.
 
 - **Z5** : les valeurs du passage 1, contrôlées une à une (30 contrôles), et aucune erreur d'évaluation ; 0 KO.
+
+**Résultat du passage -2 (2026-11-26T09:46:40Z à 09:46:53Z, 35 OK, 0 KO, [journal](chains-v0300-cause-build-script-2.log))** :
+Z5 tenue. Les 30 valeurs de Z1 à Z4 sont celles du passage 1, et aucune requête n'a écrit d'erreur.
+
+Réserve ajoutée : les enveloppes lues sont reliées au passage -3 des témoins par leur seule date de modification (09:34:32Z pour
+v0.29.9, 09:34:34Z pour v0.30.0, dans le passage qui a tourné de 09:34:30Z à 09:34:58Z) ; ce journal n'écrit pas les digests
+des images de base.

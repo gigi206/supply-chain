@@ -1,0 +1,45 @@
+## cause de build_script_used, 2026-11-26T09:46:40Z
+OK   ec : empreinte du binaire (politique.sh) : 895c6f7e63cfefe6257a2e54c052c3d90803e8127adf5a7eb13f245262859abf
+OK   bibliothèque : arbre de ebd3fbd270297c15f590f4023360465ffb41d4fe : 0fd26021bb08582553f392565ca0faf316c51229
+OK   réseau : interfaces de l'espace : lo 
+enveloppes gardées v29 : 37629e55e462d399 (2 attestations)
+OK   v29 : énoncé du PipelineRun trouvé : https://slsa.dev/provenance/v1
+enveloppes gardées v30 : 063a8bd12b9af6c3 (2 attestations)
+OK   v30 : énoncé du PipelineRun trouvé : https://slsa.dev/provenance/v1
+-- v29 base
+OK   v29 base : attestations de PipelineRun : 1
+OK   v29 base : tâches vues : 3
+OK   v29 base : tâches de construction (étiquette:name:étapes) : publier:ABSENT:0
+OK   v29 base : refus de la règle : 
+OK   v29 base : message de build_script_used : 
+-- v29 nom
+OK   v29 nom : attestations de PipelineRun : 1
+OK   v29 nom : tâches vues : 3
+OK   v29 nom : tâches de construction (étiquette:name:étapes) : publier:publier:0
+OK   v29 nom : refus de la règle : slsa_build_scripted_build.build_script_used
+OK   v29 nom : message de build_script_used : Build task "publier" does not contain any steps
+-- v29 nom-etapes
+OK   v29 nom-etapes : attestations de PipelineRun : 1
+OK   v29 nom-etapes : tâches vues : 3
+OK   v29 nom-etapes : tâches de construction (étiquette:name:étapes) : publier:publier:1
+OK   v29 nom-etapes : refus de la règle : 
+OK   v29 nom-etapes : message de build_script_used : 
+-- v30 base
+OK   v30 base : attestations de PipelineRun : 1
+OK   v30 base : tâches vues : 0
+OK   v30 base : tâches de construction (étiquette:name:étapes) : 
+OK   v30 base : refus de la règle : slsa_build_scripted_build.build_task_image_results_found
+OK   v30 base : message de build_script_used : 
+-- v30 nom
+OK   v30 nom : attestations de PipelineRun : 1
+OK   v30 nom : tâches vues : 0
+OK   v30 nom : tâches de construction (étiquette:name:étapes) : 
+OK   v30 nom : refus de la règle : slsa_build_scripted_build.build_task_image_results_found
+OK   v30 nom : message de build_script_used : 
+-- v30 nom-etapes
+OK   v30 nom-etapes : attestations de PipelineRun : 1
+OK   v30 nom-etapes : tâches vues : 0
+OK   v30 nom-etapes : tâches de construction (étiquette:name:étapes) : 
+OK   v30 nom-etapes : refus de la règle : slsa_build_scripted_build.build_task_image_results_found
+OK   v30 nom-etapes : message de build_script_used : 
+## bilan : 0 KO, 2026-11-26T09:46:53Z

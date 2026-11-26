@@ -211,3 +211,7 @@ la règle ne voit pas le champ, qui est bien dans l'énoncé signé. La réserve
 **Prédiction du passage -2 (2026-11-26T09:46:27Z)** : relecture du conseiller, rien ne reliait les fichiers gardés au passage
 -3 archivé. **K2** : pour chaque version, le digest gardé (`digest-kata-<v>`) a le préfixe écrit au journal
 [`chains-v0300-porte-3.log`](chains-v0300-porte-3.log) (« image du témoin »), et chaque attestation lue a ce digest pour sujet.
+
+**Résultat du passage -2 (2026-11-26T09:46:53Z, 0 KO, [journal](chains-v0300-champ-kata-2.log))** : K1 et K2 tenues. Les
+attestations lues sont bien celles du passage -3 : digest gardé au préfixe du journal, sujet signé égal à ce digest, pour les
+deux versions.
