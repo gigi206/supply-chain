@@ -99,3 +99,38 @@ Mêmes énoncés Y1 à Y5, avec ces changements :
 - Y3 pour sujet : ces mêmes codes de signature ajoutés pour v0.30.0, et rien d'autre.
 
 0 KO attendu.
+
+## Résultat du passage -2 (note de 2026-11-26T09:30:15Z)
+
+Commit de la prédiction : `983aa98d`. [Journal](chains-v0300-temoins-2.log) : 2026-11-26T09:29:42Z → 09:30:11Z, 29 s, 164 OK, 0 KO. L'état des règles visées est identique à celui du passage 1, avec en plus les lignes de signature d'image du témoin sujet.
+
+| Prédiction | Verdict |
+|---|---|
+| Y1 | **Tenue** : base v0.29.9 refusée par `porte.fermeture_plateforme` seul, v0.30.0 par les trois codes du passage -3 ; reserve-c, 0 `ko` et les deux codes du passage -2 ; chaque diagnostic retient la provenance du PipelineRun |
+| Y2 | **Tenue** : pour v0.29.9, chaque témoin ajoute exactement les codes prédits, sans en retirer, sous les deux juges (signature d'image comprise pour sujet) |
+| Y3 | **Tenue** : pour v0.30.0, aucun témoin ne change les codes, sauf la signature d'image retirée par sujet, comme prédit au passage -2 |
+| Y4 | **Tenue** : `build_script_used`, `future_deny_rule` et `preparation_appariee` en succès pour les deux versions ; 0 tâche avec `steps`, 0 `trusted_task_rules`, 0 `construire-deb` |
+| Y5 | **Tenue** : 0 KO, 29 s ; image non signée pour sujet seulement |
+
+**Ce que le banc établit.** Ces règles savent refuser (ou avertir) quand elles voient les tâches, et chacune a maintenant un témoin pour v0.29.9 :
+
+- chez `ec` : `subject_build_task_matches`, `successful_pipeline_tasks`, `trusted_parameters`, `valid_trusted_artifact_inputs`, `pinned` et `current` ;
+- sous reserve-c : les mêmes, sauf `current`, que reserve-c n'a pas.
+
+Pour v0.30.0, le même champ changé ne change rien : elles réussissent à vide. Pour `successful_pipeline_tasks` chez `ec`, la règle reste absente (elle dépend de `pipeline_has_tasks`).
+
+Trois règles n'ont pas de témoin possible sur j7, et elles réussissent à vide pour v0.29.9 aussi :
+
+- `build_script_used`, faute de champ `steps` lisible ;
+- `future_deny_rule`, faute de `trusted_task_rules` ;
+- `preparation_appariee`, faute de voie deb.
+
+Le témoin sujet retire aussi la signature de l'image, pour les deux versions. Il ne prouve donc la règle visée que par l'état de cette règle, pas par un ensemble de codes inchangé par ailleurs.
+
+Réserves, celles écrites d'avance :
+
+- celles des deux bancs précédents : bundles sans jeton TSA, referrers par repli d'étiquette, CLI et non admission, registre en HTTP, un seul cas ;
+- un témoin par règle, sur un seul champ ;
+- `current` témoigné par la liste revue, chez `ec` seulement.
+
+Non couverts : KMS, contrôleur, Zot réel, admission, la porte Kyverno de l'autre session ; `build_script_used` et `future_deny_rule` sur une autre forme de provenance ou de liste ; `preparation_appariee` sur un cas deb.
