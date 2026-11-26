@@ -72,20 +72,25 @@ Passage unique : [journal](chains-v0300-origine-g7.log), 12:12:33Z à 12:12:39Z,
 
 Conclusion selon le critère écrit avant : **non expliqué**.
 
-- La garde « ensemble » ne tient pas. Dans un seul processus `ec opa eval`, il n'y a qu'une ligne par bundle pour les
-  trois paquets : les demandes suivantes ne laissent pas de ligne. Pour `ec validate image`, les comptes de 3 et 4 ne
-  viennent donc pas d'appels faits dans une même évaluation. Cette forme ne reproduit pas G7, comme la limite écrite avant le
-  craignait.
-- Pour la même raison, O3 ne prouve rien. Une seconde demande faite dans un même paquet serait masquée elle aussi. Le passage
-  n'apprend donc rien sur l'origine du surplus.
+- La garde « ensemble » ne tient pas : 1 ligne par bundle (mesuré). La requête rend un résultat vide, donc le journal ne
+  dit pas quels paquets ce processus a évalués. Deux lectures restent **déduites** :
+  - les demandes suivantes ne laissent pas de ligne dans un même processus ;
+  - les comptes de 3 et 4 d'`ec validate image` ne viennent pas d'appels faits dans une même évaluation.
+  Cette forme ne reproduit pas G7, comme la limite écrite avant le craignait.
+- Si la première lecture est juste, O3 ne prouve rien : une seconde demande faite dans un même paquet serait masquée elle
+  aussi. Le passage n'apprend donc rien sur l'origine du surplus.
+- Les « résultats » sous `service` (`tasks` 1, `trusted_task` 3) ne sont pas rapprochés de ceux d'`ec validate image`.
 - L'origine reste déduite, comme avant. Aucun verdict ne change. Les 3 KO de G7 restent ceux d'un attendu faux.
 
-Fautes du script, sans effet sur les comptes :
+Fautes du script :
 - `porte.rego` est copié du dépôt, et non du passage -2 (KO « identique à la copie »). La copie du passage -2 diffère d'une
   ligne, le nom du registre (`future-deny.sh`, ligne 113). `porte` n'appelle aucune fonction `ec.oci` et rend 0 ligne.
 - La requête `count(deny) + count(warn)` rend un résultat vide pour `slsa_build_scripted_build` et `porte`.
-  Cause déduite : pas de règle `warn`. Les lignes d'erreur sont comptées quand même. Pour « ensemble », la somme est indéfinie, et `porte` n'y est
-  peut-être pas évalué (déduit, non contrôlé). Il rend 0 ligne seul.
+  Cause déduite : pas de règle `warn`. Les lignes d'erreur sont comptées quand même. Pour « ensemble », la somme est
+  indéfinie, et `porte` n'y est peut-être pas évalué (déduit, non contrôlé ; il rend 0 ligne seul). Cette faute touche O4.
 
 Heures : 12:08:41Z à 12:13:05Z (lecture, prédiction, script, passage, note), soit 4 min 24 s. L'heure de la note avait
 d'abord été écrite 12:14:10Z, une heure estimée : corrigée avant le commit.
+
+Retouche après relecture du conseiller (note de 2026-11-26T12:15:36Z) : lectures déduites marquées, faute de la requête rattachée à O4,
+résultats non rapprochés notés. Aucune relance.

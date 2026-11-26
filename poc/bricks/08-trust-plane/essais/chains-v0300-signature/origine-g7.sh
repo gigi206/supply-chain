@@ -4,6 +4,8 @@
 # sous la politique service puis regles (rule_data du passage -2), sur les énoncés v0.29.9 gardés par future-deny.sh
 # (passage -2, lus sans écriture). Les bundles pointent vers le registre du banc, éteint : chaque demande échoue et ec écrit
 # une ligne d'erreur. Puis un processus « ensemble » évalue les quatre paquets d'un coup (garde : 3 et 4 lignes par bundle).
+# Passage unique du 2026-11-26 (4 KO, non expliqué, voir resultats/chains-v0300-origine-g7-predictions.md) : tel quel, le script
+# rend 4 KO ; il n'est pas à relancer (un seul processus ne laisse qu'une ligne par bundle, la forme ne reproduit pas G7).
 # Sans signature ni registre. Tout tourne dans un espace réseau neuf (unshare -rn, boucle locale seule).
 # Usage (racine du dépôt) : [SUFFIXE=-2] mise exec -- bash poc/bricks/08-trust-plane/essais/chains-v0300-signature/origine-g7.sh
 set -uo pipefail
