@@ -79,3 +79,17 @@ en v0.29.9.
 Heures : 10:40:27Z à 10:41:36Z (prédiction, application, banc, sec, commits), puis 10:54:04Z à 10:55:26Z (pose, verif,
 seuils, notes), soit 2 min 31 s. La lecture des correctifs et la préparation, du choix jusqu'à 10:40:27Z, n'ont pas de
 `date -u` : elles ne sont pas mesurées. L'attente de l'accord n'est pas comptée, et le temps de la question non plus.
+
+## Levée de la réserve du timer, prédiction (2026-11-26T11:04:12Z)
+
+Après « continue », sans action sur sc-stockage : rien n'est lancé à la main, on attend le passage du timer. `kpi.timer`
+porte `OnUnitActiveSec=15min` (précision par défaut de systemd : 1 min). La pose a lancé `kpi.service` à la main
+(`systemctl start`), dont le passage porte l'heure 10:54:14Z. Sonde hors mesure, à 11:04:00Z : l'auditeur lit encore
+10:54:14Z comme dernier passage dans Prometheus.
+
+- **H8** : Prometheus lit un passage d'heure comprise entre 11:09:00Z et 11:10:30Z, sans lancement à la main.
+- **H9** (`seuil.sh`, `SUFFIXE=-8`, lancé après lecture de H8 par l'auditeur) : HTTP 200, 134 séries, âge du passage
+  inférieur à 15 min, 105 valeurs, 0 écart, codes 200, 0, 0.
+
+Réserve écrite avant : l'origine timer du passage est déduite (aucun lancement à la main par cette session) ; le journal
+systemd de sc-stockage n'est pas lu (ssh = accord).
