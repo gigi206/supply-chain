@@ -41,3 +41,24 @@ Un KO de montage (code non nul hors des cas prédits, `main.go` différent de ce
 - Une indication à confirmer au second passage : sans signataire, v0.29.9 ne rend aucune erreur pour l'image (simplesigning), tandis que v0.30.0 rend « no signer x509 configured for oci ». C'est le changement b1c0af9 (« échec ouvert »).
 
 Corrections dans `main.go` (`76e03e674842ed47`) : import de `formats/all` ; retrait, à la lecture, des annotations `chains.tekton.dev/*` et des finaliseurs `chains.tekton.dev*` ; registre sans journal HTTP. Prédictions inchangées. Second passage : `SUFFIXE=-2`.
+
+## Résultat (note de 2026-11-26T08:26:59Z)
+
+[Journal du second passage](chains-v0300-signature-2.log), lancé à 08:26:20Z sur `1cb99f0a` : 0 KO. `main.go` est identique dans les deux sources ; cosign v3.1.4.
+
+| Prédiction | Verdict |
+|---|---|
+| S1 | **Tenue** : les deux versions signent le PipelineRun et les trois TaskRuns sans erreur. Recorder : `mrcount` 4, `sgcount` 5, `stcount` 5 dans chaque version, aucun avertissement dans le journal de Chains |
+| S2 | **Tenue** : `cosign verify` de la signature simplesigning réussit dans les deux versions |
+| S3 | **Tenue** : deux attestations vérifiées dans chaque version, celle du PipelineRun et celle de `publier` (dépendance `task`). Les TaskRuns `preparer` et `construire` sont signés mais n'ont pas de sujet, et rien n'est attaché à l'image pour eux (5 stockages comptés, 2 attestations sur l'image) |
+| S4 | **Tenue** : v0.29.9 écrit `pipeline`, `pipelineTask` ×3 ; v0.30.0 écrit `pipeline`, `pipelineTask/preparer`, `pipelineTask/construire`, `pipelineTask/publier`. Le reste des dépendances est identique (`inputs/result` ×4). Le renommage du banc à sec se retrouve donc dans l'énoncé **signé et stocké** |
+| S5 | **Tenue** : les quatre objets sont annotés `chains.tekton.dev/signed` dans les deux versions |
+| S6 | **Tenue pour v0.30.0, non tenue pour v0.29.9 (erreur de prédiction)**. v0.30.0 : `Sign` rend « no signer x509 configured » pour chacun des quatre objets ; seule l'annotation `chains.tekton.dev/retries: "0"` est posée, sans `signed` ; le Recorder ne compte rien, aucune erreur comprise ; rien n'est attaché à l'image. v0.29.9 : `Sign` ne rend **aucune** erreur, les quatre objets sont marqués `signed: "true"` (`mrcount` 4) et rien n'est attaché à l'image. C'est l'échec ouvert déjà mesuré en service en O4 de la 19 (02/11/2026, signataire KMS injoignable). La prédiction l'avait oublié |
+
+**Ce que le banc établit.** Avec la configuration en service (hors signataire), v0.30.0 signe et stocke comme v0.29.9 : mêmes compteurs, mêmes attestations vérifiables par cosign. Seuls les noms `pipelineTask/<nom>` changent, cette fois dans l'énoncé signé. Le cas « aucun signataire » échoue **fermé** en v0.30.0 (`b1c0af9`, #1834) : c'est la **première mesure** de ce correctif, jusqu'ici lu à la source seulement. En revanche, aucune erreur n'est comptée par le Recorder : `recordError` reste absent sur ce chemin, comme la lecture du code l'annonçait. Le compteur `signing_failures` ne voit donc pas ce cas. Les objets n'ont que `retries`. C'est le contrôleur qui pose ensuite `signed=failed`, après ses tentatives ; le premier volet d'A2 (19) voit cette annotation, mais le banc n'exerce pas cette étape.
+
+**Ce qui bloque toujours la montée** : la porte et `ivpol` ne connaissent que `pipelineTask` (banc à sec : la porte refuse l'énoncé neuf). Les patchs de `genre()` de la 20 ne sont pas appliqués.
+
+Non couverts, inchangés : signataire KMS, contrôleur réel, Zot, `ec validate image` sur ces attestations signées, transparence.
+
+Heures (2026-11-26, `date -u`) : de 08:15:55 (premier relevé, avant l'orientation) à 08:26:59 (cette note), soit 11 min 04 s. Ce temps couvre l'orientation, le programme, le script, la prédiction, les deux passages et les notes.
