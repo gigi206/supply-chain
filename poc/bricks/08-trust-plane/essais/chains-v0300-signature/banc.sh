@@ -30,13 +30,15 @@ attendu() { # libellé obtenu attendu
 noms() { # registre digest : noms pipelineTask des attestations vérifiées, triés, une ligne par attestation
   jq -r '.payload | @base64d | fromjson | [.predicate.buildDefinition.resolvedDependencies[]?.name // empty | select(startswith("pipelineTask") or startswith("pipeline"))] | join(",")' "$1" | sort
 }
-# Énoncé normalisé : content décodé, annotations et finaliseurs chains.tekton.dev retirés (ils viennent de la signature en service),
+# Énoncé normalisé : content des dépendances (JSON) et des byproducts (texte) décodé, annotations (objets et internalParameters) et finaliseurs chains.tekton.dev retirés (ils viennent de la signature en service),
 # clés triées. Appliqué à l'énoncé signé (hôte et digest du banc remis à ceux d'origine) et à la sortie du banc à sec.
 NORM='def net: .metadata.annotations |= ((. // {}) | with_entries(select(.key | startswith("chains.tekton.dev/") | not)))
   | .metadata.finalizers |= ((. // []) | map(select(startswith("chains.tekton.dev") | not)));
-  .predicate.buildDefinition.resolvedDependencies |= map(if .content then .content |= (@base64d | fromjson | net) else . end)'
+  .predicate.buildDefinition.resolvedDependencies |= map(if .content then .content |= (@base64d | fromjson | net) else . end)
+  | .predicate.buildDefinition.internalParameters.annotations |= ((. // {}) | with_entries(select(.key | startswith("chains.tekton.dev/") | not)))
+  | .predicate.runDetails.byproducts |= ((. // []) | map(if .content then .content |= @base64d else . end))'
 enonce() { # fichier d'attestations, version, filtre de sélection : énoncé normalisé sur la sortie
-  jq -c '.payload | @base64d | fromjson' "$1" | jq -c "select($3)" | jq -c "$NORM" | sed "s#$REG#$HOTE#g; s#$D#$ANCIEN#g" | jq -S .
+  jq -c '.payload | @base64d | fromjson' "$1" | jq -c "select($3)" | jq -c "$NORM" | sed "s#$REG#$HOTE#g; s#${D#sha256:}#${ANCIEN#sha256:}#g" | jq -S .
 }
 {
   echo "# banc.sh, $(date -u +%Y-%m-%dT%H:%M:%SZ), dépôt $(git -C "$here" rev-parse --short=8 HEAD), script $(sha256sum < "$0" | cut -c1-16), main.go $(sha256sum < "$here/main.go" | cut -c1-16)"
@@ -75,11 +77,11 @@ enonce() { # fichier d'attestations, version, filtre de sélection : énoncé no
     enonce "$T/att-$v.json" "$v" '[.predicate.buildDefinition.resolvedDependencies[]?.name] | index("pipeline")' > "$T/enonce-pr-$v.json"
     jq -S "$NORM" "$C/sorties/$CAS.$v.json" > "$T/sec-pr-$v.json"
     attendu "v$v énoncé signé du PipelineRun = sortie à sec" "$(cmp -s "$T/enonce-pr-$v.json" "$T/sec-pr-$v.json" && echo égal || echo différent)" égal
-    cmp -s "$T/enonce-pr-$v.json" "$T/sec-pr-$v.json" || diff <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/sec-pr-$v.json") <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/enonce-pr-$v.json") | cut -c1-240 | head -20
+    cmp -s "$T/enonce-pr-$v.json" "$T/sec-pr-$v.json" || diff <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/sec-pr-$v.json") <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/enonce-pr-$v.json") | cut -c1-240 | head -40
     enonce "$T/att-$v.json" "$v" '[.predicate.buildDefinition.resolvedDependencies[]?.name] | index("task")' > "$T/enonce-tr-$v.json"
     jq -S "$NORM" "$C/sorties/tr-$CAS-publier.$v.json" > "$T/sec-tr-$v.json"
     attendu "v$v énoncé signé de publier = sortie à sec" "$(cmp -s "$T/enonce-tr-$v.json" "$T/sec-tr-$v.json" && echo égal || echo différent)" égal
-    cmp -s "$T/enonce-tr-$v.json" "$T/sec-tr-$v.json" || diff <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/sec-tr-$v.json") <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/enonce-tr-$v.json") | cut -c1-240 | head -20
+    cmp -s "$T/enonce-tr-$v.json" "$T/sec-tr-$v.json" || diff <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/sec-tr-$v.json") <(jq -c 'paths(scalars) as $p | [$p, getpath($p)]' "$T/enonce-tr-$v.json") | cut -c1-240 | head -40
     # aucun signataire : dossier de clé vide, nouvelle image
     D2=$("$B" image "$REG" builds/sans-cle)
     "$B" signer "$REG/builds/sans-cle" "$T/vide" "$HOTE/builds/sample-app" "$ANCIEN" "$D2" "$PR" "${TRS[@]}" > "$T/vide-$v.json" 2> "$T/zap-vide-$v.log"

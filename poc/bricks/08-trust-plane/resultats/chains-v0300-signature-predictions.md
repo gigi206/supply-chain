@@ -88,3 +88,18 @@ Autres points :
 | T3 | Pour chaque version, l'énoncé signé de `publier` est égal à la sortie à sec, avec la même réserve | moyenne |
 
 Avec T2 tenue, le refus de la porte mesuré à sec sur la sortie de v0.30.0 vaut pour l'énoncé que v0.30.0 signe et stocke.
+
+## Passage -3 (note de 2026-11-26T08:31:26Z)
+
+[Journal](chains-v0300-signature-3.log), lancé sur `c0849369` : 25 OK, 4 KO.
+
+**T1 : tenue.** Tous les contrôles repris de S1 à S6 sont OK, dans les deux versions. Cela comprend l'échec ouvert de v0.29.9 et l'échec fermé de v0.30.0 sans signataire, que le Recorder ne compte pas.
+
+**T2 et T3 : non décidées.** Les 4 KO viennent de la normalisation du banc, pas de Chains :
+- l'annotation `chains.tekton.dev/signed` est recopiée par Chains dans `internalParameters.annotations`, que le banc ne nettoyait pas ;
+- le `content` des `byproducts` est lui aussi en base64 et contient l'hôte ;
+- le digest du sujet est écrit sans le préfixe `sha256:`, alors que le remplacement exigeait ce préfixe.
+
+Les écarts affichés touchent ces seuls chemins, dans les deux versions. Ils sont tronqués à 20 lignes : le reste n'est pas vu.
+
+Correction : `banc.sh` `6f9c4e1ed98f2d08`. Il nettoie `internalParameters.annotations`, décode le `content` des `byproducts` en texte, remplace le digest sans son préfixe et affiche 40 lignes d'écart. Prédictions T2 et T3 inchangées. Passage -4.
