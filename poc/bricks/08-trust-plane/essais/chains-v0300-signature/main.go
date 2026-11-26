@@ -16,6 +16,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -30,6 +32,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 	"github.com/sigstore/cosign/v2/pkg/cosign"
 	"github.com/tektoncd/chains/pkg/chains"
+	_ "github.com/tektoncd/chains/pkg/chains/formats/all" // comme pkg/reconciler/*/controller.go
 	"github.com/tektoncd/chains/pkg/chains/objects"
 	"github.com/tektoncd/chains/pkg/chains/storage"
 	"github.com/tektoncd/chains/pkg/config"
@@ -85,10 +88,25 @@ var donnees = map[string]string{
 	"builddefinition.buildtype":                    "https://tekton.dev/chains/v2/slsa-tekton",
 }
 
-func lire(f string, remplace *strings.Replacer, v any) {
+func lire(f string, remplace *strings.Replacer, v metav1.Object) {
 	b, err := os.ReadFile(f)
 	must(err)
 	must(json.Unmarshal([]byte(remplace.Replace(string(b))), v))
+	// Les objets ont été capturés après signature en service : on retire ce que Chains y a posé, pour repartir d'un objet neuf.
+	a := v.GetAnnotations()
+	for k := range a {
+		if strings.HasPrefix(k, "chains.tekton.dev/") {
+			delete(a, k)
+		}
+	}
+	v.SetAnnotations(a)
+	var fin []string
+	for _, x := range v.GetFinalizers() {
+		if !strings.HasPrefix(x, "chains.tekton.dev") {
+			fin = append(fin, x)
+		}
+	}
+	v.SetFinalizers(fin)
 }
 
 func annotationsChains(m metav1.ObjectMeta) map[string]string {
@@ -113,7 +131,7 @@ func main() {
 		l, err := net.Listen("tcp", "127.0.0.1:0")
 		must(err)
 		must(os.WriteFile(os.Args[2], []byte(fmt.Sprint(l.Addr().(*net.TCPAddr).Port)), 0o644))
-		must(http.Serve(l, registry.New()))
+		must(http.Serve(l, registry.New(registry.Logger(log.New(io.Discard, "", 0)))))
 	case "image":
 		img, err := random.Image(512, 1)
 		must(err)

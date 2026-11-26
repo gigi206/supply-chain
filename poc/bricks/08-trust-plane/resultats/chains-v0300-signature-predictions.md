@@ -31,3 +31,13 @@ Un KO de montage (code non nul hors des cas prédits, `main.go` différent de ce
 - Zot : on utilise un registre en mémoire.
 - La porte (`ec validate image`) et `ivpol` face à un énoncé réellement signé par v0.30.0 : c'est la mesure suivante, qui pourra partir de ce registre.
 - La transparence (désactivée en service).
+
+## Premier passage, non valable (note de 2026-11-26T08:26:08Z)
+
+[Journal](chains-v0300-signature.log), lancé à 08:25:16Z : 2 KO, tous deux dus au montage, pas à Chains.
+
+- Le programme n'importait pas `pkg/chains/formats/all`, que le contrôleur importe dans `pkg/reconciler/*/controller.go`. Aucun format n'était donc enregistré (« Format slsa/v2alpha4 … was not found ») et aucune attestation n'a été produite. Seule la signature simplesigning existait, et `cosign verify` l'a validée dans les deux versions.
+- Les objets ont été capturés après leur signature en service : ils portaient déjà `chains.tekton.dev/signed` et les finaliseurs de Chains. Le cas « aucun signataire » ne pouvait donc rien montrer sur l'annotation.
+- Une indication à confirmer au second passage : sans signataire, v0.29.9 ne rend aucune erreur pour l'image (simplesigning), tandis que v0.30.0 rend « no signer x509 configured for oci ». C'est le changement b1c0af9 (« échec ouvert »).
+
+Corrections dans `main.go` (`76e03e674842ed47`) : import de `formats/all` ; retrait, à la lecture, des annotations `chains.tekton.dev/*` et des finaliseurs `chains.tekton.dev*` ; registre sans journal HTTP. Prédictions inchangées. Second passage : `SUFFIXE=-2`.

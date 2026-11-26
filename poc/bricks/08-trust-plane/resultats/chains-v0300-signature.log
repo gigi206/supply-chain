@@ -1,0 +1,170 @@
+# banc.sh, 2026-11-26T08:25:16Z, dépôt 0e14f5e6, script d4d525d7fc66af10, main.go 8c0e51f0b2f8837e
+cosign : v3.1.4
+src29 : commit 89219ea5443fe3164715b9a93f7e6fd16d56b38a, main.go identique, binaire 2b6745d94930f8f2
+src30 : commit b59bced2524ec2da5dcbe3f916c2109262b9b819, main.go identique, binaire 3245e81601328637
+cas : j7-sample-app, 3 TaskRuns, digest d'origine sha256:f5e6bcb0e0fb…
+OK   clé jetable créée : cosign.key cosign.password cosign.pub 
+## v29
+2026/11/26 09:25:17 GET /v2/
+2026/11/26 09:25:17 HEAD /v2/builds/sample-app/manifests/banc 404 NAME_UNKNOWN Unknown name
+2026/11/26 09:25:17 HEAD /v2/builds/sample-app/blobs/sha256:5ebc95adc49090e6e7771b4990497dc23c83678d246caa7fef53f12093627aae 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:17 HEAD /v2/builds/sample-app/blobs/sha256:af81fef284d177a83ad10aad6d7b523c7cda192f1f2011516bba4ef4b021a668 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:17 POST /v2/builds/sample-app/blobs/uploads/
+2026/11/26 09:25:17 POST /v2/builds/sample-app/blobs/uploads/
+2026/11/26 09:25:17 PATCH /v2/builds/sample-app/blobs/uploads/3328585712252651020
+2026/11/26 09:25:17 PATCH /v2/builds/sample-app/blobs/uploads/7238809679382356314
+2026/11/26 09:25:17 PUT /v2/builds/sample-app/blobs/uploads/3328585712252651020?digest=sha256%3A5ebc95adc49090e6e7771b4990497dc23c83678d246caa7fef53f12093627aae
+2026/11/26 09:25:17 PUT /v2/builds/sample-app/blobs/uploads/7238809679382356314?digest=sha256%3Aaf81fef284d177a83ad10aad6d7b523c7cda192f1f2011516bba4ef4b021a668
+2026/11/26 09:25:17 PUT /v2/builds/sample-app/manifests/banc
+image du banc : sha256:6a3d2ef9e85a…
+2026/11/26 09:25:17 GET /v2/
+2026/11/26 09:25:17 GET /v2/builds/sample-app/manifests/sha256:6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520
+2026/11/26 09:25:17 GET /v2/
+2026/11/26 09:25:17 GET /v2/builds/sample-app/manifests/sha256-6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:17 GET /v2/
+2026/11/26 09:25:17 GET /v2/builds/sample-app/manifests/sha256-6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:17 GET /v2/
+2026/11/26 09:25:17 HEAD /v2/builds/sample-app/manifests/sha256-6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:17 HEAD /v2/builds/sample-app/blobs/sha256:cc849bf0bda39c1ffcca175b52e98826ab259882d4aeedc16861c277091dcbeb 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:17 HEAD /v2/builds/sample-app/blobs/sha256:eec833793d083af1e649f7786d83cf9b592915f8f0f45fc1bcf56b901db2a84f 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:17 POST /v2/builds/sample-app/blobs/uploads/
+2026/11/26 09:25:17 POST /v2/builds/sample-app/blobs/uploads/
+2026/11/26 09:25:17 PATCH /v2/builds/sample-app/blobs/uploads/3612080884066432755
+2026/11/26 09:25:17 PATCH /v2/builds/sample-app/blobs/uploads/7608255725229111721
+2026/11/26 09:25:17 PUT /v2/builds/sample-app/blobs/uploads/3612080884066432755?digest=sha256%3Acc849bf0bda39c1ffcca175b52e98826ab259882d4aeedc16861c277091dcbeb
+2026/11/26 09:25:17 PUT /v2/builds/sample-app/blobs/uploads/7608255725229111721?digest=sha256%3Aeec833793d083af1e649f7786d83cf9b592915f8f0f45fc1bcf56b901db2a84f
+2026/11/26 09:25:17 PUT /v2/builds/sample-app/manifests/sha256-6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520.sig
+OK   v29 signer, code : 0
+{"pipelinerun/j7-sample-app":"","taskrun/j7-sample-app-construire":"","taskrun/j7-sample-app-preparer":"","taskrun/j7-sample-app-publier":""}
+{"compte:mrcount":4,"compte:sgcount":1,"compte:stcount":1}
+{"pipelinerun/j7-sample-app":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-construire":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-preparer":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-publier":["chains.tekton.dev/signed"]}
+avertissements et erreurs du journal zap : 4
+      1 WARN	Format slsa/v2alpha4 configured for tekton.dev/v1/PipelineRun: tekton-pipeline-run was not found
+      3 WARN	Format slsa/v2alpha4 configured for tekton.dev/v1/TaskRun: tekton was not found
+OK   v29 erreurs de Sign : 0
+2026/11/26 09:25:18 GET /v2/
+2026/11/26 09:25:18 GET /v2/builds/sample-app/referrers/sha256:6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520 404 METHOD_UNKNOWN We don't understand your method + url
+2026/11/26 09:25:18 GET /v2/builds/sample-app/manifests/sha256-6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:18 GET /v2/builds/sample-app/manifests/sha256-6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520.sig
+2026/11/26 09:25:18 GET /v2/builds/sample-app/blobs/sha256:eec833793d083af1e649f7786d83cf9b592915f8f0f45fc1bcf56b901db2a84f
+OK   v29 cosign verify (simplesigning), code : 0
+2026/11/26 09:25:18 GET /v2/
+2026/11/26 09:25:18 GET /v2/builds/sample-app/referrers/sha256:6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520 404 METHOD_UNKNOWN We don't understand your method + url
+2026/11/26 09:25:18 GET /v2/builds/sample-app/manifests/sha256-6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:18 GET /v2/builds/sample-app/manifests/sha256-6a3d2ef9e85ad5cdee8617cc9f2dc1a598cb9841e92fe2ea00145f86f1e48520.att 404 MANIFEST_UNKNOWN Unknown manifest
+KO   v29 cosign verify-attestation, code : obtenu « 1 », attendu « 0 »
+WARNING: Skipping tlog verification is an insecure practice that lacks transparency and auditability verification for the attestation.
+Error: no matching attestations: 
+error during command execution: no matching attestations: 
+attestations vérifiées : 0
+2026/11/26 09:25:18 GET /v2/
+2026/11/26 09:25:18 HEAD /v2/builds/sans-cle/manifests/banc 404 NAME_UNKNOWN Unknown name
+2026/11/26 09:25:18 HEAD /v2/builds/sans-cle/blobs/sha256:e36fc05f05c7b389e1fb27e0294c67418ffe965289f4a53018b7971c9155cb47 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:18 POST /v2/builds/sans-cle/blobs/uploads/
+2026/11/26 09:25:18 HEAD /v2/builds/sans-cle/blobs/sha256:04116b7406bb268e5a02de91fab215e2fc5014fcd001e9a2681233bb382941f0 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:18 POST /v2/builds/sans-cle/blobs/uploads/
+2026/11/26 09:25:18 PATCH /v2/builds/sans-cle/blobs/uploads/6151537452119672197
+2026/11/26 09:25:18 PATCH /v2/builds/sans-cle/blobs/uploads/6353111525869093880
+2026/11/26 09:25:18 PUT /v2/builds/sans-cle/blobs/uploads/6151537452119672197?digest=sha256%3Ae36fc05f05c7b389e1fb27e0294c67418ffe965289f4a53018b7971c9155cb47
+2026/11/26 09:25:18 PUT /v2/builds/sans-cle/blobs/uploads/6353111525869093880?digest=sha256%3A04116b7406bb268e5a02de91fab215e2fc5014fcd001e9a2681233bb382941f0
+2026/11/26 09:25:18 PUT /v2/builds/sans-cle/manifests/banc
+aucun signataire, Sign :
+{"pipelinerun/j7-sample-app":"","taskrun/j7-sample-app-construire":"","taskrun/j7-sample-app-preparer":"","taskrun/j7-sample-app-publier":""}
+aucun signataire, recorder : {"compte:mrcount":4}
+aucun signataire, annotations : {"pipelinerun/j7-sample-app":{"chains.tekton.dev/signed":"true"},"taskrun/j7-sample-app-construire":{"chains.tekton.dev/signed":"true"},"taskrun/j7-sample-app-preparer":{"chains.tekton.dev/signed":"true"},"taskrun/j7-sample-app-publier":{"chains.tekton.dev/signed":"true"}}
+2026/11/26 09:25:18 GET /v2/
+2026/11/26 09:25:18 GET /v2/builds/sans-cle/manifests/sha256:6ec04337c642552c665a85f4f5c915dc8e15342116a8d56e70183c9797ba2737
+2026/11/26 09:25:18 GET /v2/builds/sans-cle/manifests/sha256-6ec04337c642552c665a85f4f5c915dc8e15342116a8d56e70183c9797ba2737.att 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:18 GET /v2/builds/sans-cle/manifests/sha256-6ec04337c642552c665a85f4f5c915dc8e15342116a8d56e70183c9797ba2737.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:18 GET /v2/builds/sans-cle/referrers/sha256:6ec04337c642552c665a85f4f5c915dc8e15342116a8d56e70183c9797ba2737 404 METHOD_UNKNOWN We don't understand your method + url
+2026/11/26 09:25:18 GET /v2/builds/sans-cle/manifests/sha256-6ec04337c642552c665a85f4f5c915dc8e15342116a8d56e70183c9797ba2737 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:18 GET /v2/builds/sans-cle/manifests/sha256-6ec04337c642552c665a85f4f5c915dc8e15342116a8d56e70183c9797ba2737.sbom 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:18 GET /v2/builds/sans-cle/referrers/sha256:6ec04337c642552c665a85f4f5c915dc8e15342116a8d56e70183c9797ba2737 404 METHOD_UNKNOWN We don't understand your method + url
+2026/11/26 09:25:18 GET /v2/builds/sans-cle/manifests/sha256-6ec04337c642552c665a85f4f5c915dc8e15342116a8d56e70183c9797ba2737 404 MANIFEST_UNKNOWN Unknown manifest
+aucun signataire, cosign tree :
+  📦 Supply Chain Security Related artifacts for an image: REGISTRE/builds/sans-cle@sha256:6ec04337c642…
+  No Supply Chain Security Related Artifacts found for image REGISTRE/builds/sans-cle@sha256:6ec04337c642…,
+   start creating one with simply running$ cosign sign <img>## v30
+2026/11/26 09:25:18 GET /v2/
+2026/11/26 09:25:18 HEAD /v2/builds/sample-app/manifests/banc 404 NAME_UNKNOWN Unknown name
+2026/11/26 09:25:18 HEAD /v2/builds/sample-app/blobs/sha256:421911f3637922ed18d2a03586ebb41d6611aa7e2c2ce40ee5824148a6a2ea02 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:18 HEAD /v2/builds/sample-app/blobs/sha256:b3fcb5aa9af0983fb072d526e80845c6f1d9971ab01edc351ed8af22737630f0 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:18 POST /v2/builds/sample-app/blobs/uploads/
+2026/11/26 09:25:18 POST /v2/builds/sample-app/blobs/uploads/
+2026/11/26 09:25:18 PATCH /v2/builds/sample-app/blobs/uploads/4591999563941456059
+2026/11/26 09:25:18 PATCH /v2/builds/sample-app/blobs/uploads/7182520924450327469
+2026/11/26 09:25:18 PUT /v2/builds/sample-app/blobs/uploads/4591999563941456059?digest=sha256%3A421911f3637922ed18d2a03586ebb41d6611aa7e2c2ce40ee5824148a6a2ea02
+2026/11/26 09:25:18 PUT /v2/builds/sample-app/blobs/uploads/7182520924450327469?digest=sha256%3Ab3fcb5aa9af0983fb072d526e80845c6f1d9971ab01edc351ed8af22737630f0
+2026/11/26 09:25:18 PUT /v2/builds/sample-app/manifests/banc
+image du banc : sha256:11ba1cb1a15e…
+2026/11/26 09:25:18 GET /v2/
+2026/11/26 09:25:18 GET /v2/builds/sample-app/manifests/sha256:11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c
+2026/11/26 09:25:18 GET /v2/
+2026/11/26 09:25:18 GET /v2/builds/sample-app/manifests/sha256-11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:18 GET /v2/
+2026/11/26 09:25:18 GET /v2/builds/sample-app/manifests/sha256-11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:18 GET /v2/
+2026/11/26 09:25:18 HEAD /v2/builds/sample-app/manifests/sha256-11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:18 HEAD /v2/builds/sample-app/blobs/sha256:41fb8f7fdd0bbee0989540a4afc93649c5e011bcaedb2656f84f5897cb76f00b 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:18 HEAD /v2/builds/sample-app/blobs/sha256:95443bfefb65f5a3a3da85379c769bd895e25a33d43a48716fe2ce7f97d5a2aa 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:18 POST /v2/builds/sample-app/blobs/uploads/
+2026/11/26 09:25:18 POST /v2/builds/sample-app/blobs/uploads/
+2026/11/26 09:25:18 PATCH /v2/builds/sample-app/blobs/uploads/2752630066760470089
+2026/11/26 09:25:18 PATCH /v2/builds/sample-app/blobs/uploads/5767399775187109332
+2026/11/26 09:25:18 PUT /v2/builds/sample-app/blobs/uploads/5767399775187109332?digest=sha256%3A41fb8f7fdd0bbee0989540a4afc93649c5e011bcaedb2656f84f5897cb76f00b
+2026/11/26 09:25:18 PUT /v2/builds/sample-app/blobs/uploads/2752630066760470089?digest=sha256%3A95443bfefb65f5a3a3da85379c769bd895e25a33d43a48716fe2ce7f97d5a2aa
+2026/11/26 09:25:18 PUT /v2/builds/sample-app/manifests/sha256-11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c.sig
+OK   v30 signer, code : 0
+{"pipelinerun/j7-sample-app":"","taskrun/j7-sample-app-construire":"","taskrun/j7-sample-app-preparer":"","taskrun/j7-sample-app-publier":""}
+{"compte:mrcount":4,"compte:sgcount":1,"compte:stcount":1}
+{"pipelinerun/j7-sample-app":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-construire":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-preparer":["chains.tekton.dev/signed"],"taskrun/j7-sample-app-publier":["chains.tekton.dev/signed"]}
+avertissements et erreurs du journal zap : 4
+      1 WARN	Format slsa/v2alpha4 configured for tekton.dev/v1/PipelineRun: tekton-pipeline-run was not found
+      3 WARN	Format slsa/v2alpha4 configured for tekton.dev/v1/TaskRun: tekton was not found
+OK   v30 erreurs de Sign : 0
+2026/11/26 09:25:18 GET /v2/
+2026/11/26 09:25:18 GET /v2/builds/sample-app/referrers/sha256:11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c 404 METHOD_UNKNOWN We don't understand your method + url
+2026/11/26 09:25:18 GET /v2/builds/sample-app/manifests/sha256-11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:18 GET /v2/builds/sample-app/manifests/sha256-11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c.sig
+2026/11/26 09:25:18 GET /v2/builds/sample-app/blobs/sha256:95443bfefb65f5a3a3da85379c769bd895e25a33d43a48716fe2ce7f97d5a2aa
+OK   v30 cosign verify (simplesigning), code : 0
+2026/11/26 09:25:19 GET /v2/
+2026/11/26 09:25:19 GET /v2/builds/sample-app/referrers/sha256:11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c 404 METHOD_UNKNOWN We don't understand your method + url
+2026/11/26 09:25:19 GET /v2/builds/sample-app/manifests/sha256-11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:19 GET /v2/builds/sample-app/manifests/sha256-11ba1cb1a15e8f31a2183277928fdfc19afa35b56f6a87d40e60eb61178d376c.att 404 MANIFEST_UNKNOWN Unknown manifest
+KO   v30 cosign verify-attestation, code : obtenu « 1 », attendu « 0 »
+WARNING: Skipping tlog verification is an insecure practice that lacks transparency and auditability verification for the attestation.
+Error: no matching attestations: 
+error during command execution: no matching attestations: 
+attestations vérifiées : 0
+2026/11/26 09:25:19 GET /v2/
+2026/11/26 09:25:19 HEAD /v2/builds/sans-cle/manifests/banc 404 NAME_UNKNOWN Unknown name
+2026/11/26 09:25:19 HEAD /v2/builds/sans-cle/blobs/sha256:6ed6e4dc38181d9c2efbf32c1c3d2d975cfe9cd5cff9a3e065f4156b1dd5638f 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:19 HEAD /v2/builds/sans-cle/blobs/sha256:e7456158ba1d9e6720584ac8c1dad4b38ff9e10f9753ede2e20b402c88c2aac1 404 BLOB_UNKNOWN Unknown blob
+2026/11/26 09:25:19 POST /v2/builds/sans-cle/blobs/uploads/
+2026/11/26 09:25:19 PATCH /v2/builds/sans-cle/blobs/uploads/1984985316648509181
+2026/11/26 09:25:19 POST /v2/builds/sans-cle/blobs/uploads/
+2026/11/26 09:25:19 PUT /v2/builds/sans-cle/blobs/uploads/1984985316648509181?digest=sha256%3A6ed6e4dc38181d9c2efbf32c1c3d2d975cfe9cd5cff9a3e065f4156b1dd5638f
+2026/11/26 09:25:19 PATCH /v2/builds/sans-cle/blobs/uploads/481691038012849263
+2026/11/26 09:25:19 PUT /v2/builds/sans-cle/blobs/uploads/481691038012849263?digest=sha256%3Ae7456158ba1d9e6720584ac8c1dad4b38ff9e10f9753ede2e20b402c88c2aac1
+2026/11/26 09:25:19 PUT /v2/builds/sans-cle/manifests/banc
+aucun signataire, Sign :
+{"pipelinerun/j7-sample-app":"","taskrun/j7-sample-app-construire":"","taskrun/j7-sample-app-preparer":"","taskrun/j7-sample-app-publier":"1 error occurred:\n\t* no signer x509 configured for oci\n\n"}
+aucun signataire, recorder : {"compte:mrcount":3}
+aucun signataire, annotations : {"pipelinerun/j7-sample-app":{"chains.tekton.dev/signed":"true"},"taskrun/j7-sample-app-construire":{"chains.tekton.dev/signed":"true"},"taskrun/j7-sample-app-preparer":{"chains.tekton.dev/signed":"true"},"taskrun/j7-sample-app-publier":{"chains.tekton.dev/retries":"0","chains.tekton.dev/signed":"true"}}
+2026/11/26 09:25:19 GET /v2/
+2026/11/26 09:25:19 GET /v2/builds/sans-cle/manifests/sha256:c5febb76f52160090e3a8f663d9b308aed6b29d160ef04b87f0adc7a3dd3817c
+2026/11/26 09:25:19 GET /v2/builds/sans-cle/manifests/sha256-c5febb76f52160090e3a8f663d9b308aed6b29d160ef04b87f0adc7a3dd3817c.att 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:19 GET /v2/builds/sans-cle/manifests/sha256-c5febb76f52160090e3a8f663d9b308aed6b29d160ef04b87f0adc7a3dd3817c.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:19 GET /v2/builds/sans-cle/referrers/sha256:c5febb76f52160090e3a8f663d9b308aed6b29d160ef04b87f0adc7a3dd3817c 404 METHOD_UNKNOWN We don't understand your method + url
+2026/11/26 09:25:19 GET /v2/builds/sans-cle/manifests/sha256-c5febb76f52160090e3a8f663d9b308aed6b29d160ef04b87f0adc7a3dd3817c 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:19 GET /v2/builds/sans-cle/manifests/sha256-c5febb76f52160090e3a8f663d9b308aed6b29d160ef04b87f0adc7a3dd3817c.sbom 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/26 09:25:19 GET /v2/builds/sans-cle/referrers/sha256:c5febb76f52160090e3a8f663d9b308aed6b29d160ef04b87f0adc7a3dd3817c 404 METHOD_UNKNOWN We don't understand your method + url
+2026/11/26 09:25:19 GET /v2/builds/sans-cle/manifests/sha256-c5febb76f52160090e3a8f663d9b308aed6b29d160ef04b87f0adc7a3dd3817c 404 MANIFEST_UNKNOWN Unknown manifest
+aucun signataire, cosign tree :
+  📦 Supply Chain Security Related artifacts for an image: REGISTRE/builds/sans-cle@sha256:c5febb76f521…
+  No Supply Chain Security Related Artifacts found for image REGISTRE/builds/sans-cle@sha256:c5febb76f521…,
+   start creating one with simply running$ cosign sign <img>## comparaison
+v29 : 
+v30 : 
+## bilan : 2 KO
