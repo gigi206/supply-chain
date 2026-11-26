@@ -8,6 +8,8 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » ; version
 
 ## État
 
+**CLOSE le 2026-11-26 (2026-11-26T12:48:53Z), seuil atteint avec réserves** (réponse du propriétaire « Continue » à la question « Quel chantier ensuite ? », dont l'option recommandée était « Clore la 20 » ; lue comme cette option selon l'accord du 18/11 (« estime que je vais répondre oui »), sans verbatim de clôture). Détail à la section « Clôture », à la fin de ce README. Ce qui suit est l'historique.
+
 **`genre()` corrigé et posé (26/11, note de 2026-11-26T10:55:26Z)** : choix « Patchs de genre() », puis accord « Pose ». Les deux correctifs de e13 sont appliqués et commités (`7fb4485a`). Banc : 25 cas, 0 écart. Pose sur sc-stockage : 0 KO, exportateur `fc0b8e0d`. `verif` : 134 séries. Seuil : 105 valeurs, 0 écart (passage -7 ; le -6 a lu l'ancien passage et ne compte pas). Gain latent tant que Chains reste en v0.29.9 ([prédictions et résultats](resultats/e15-predictions.md), 2 min 31 s). `banc-genre.sh` ne s'applique plus sur HEAD. Réserve du timer levée : un passage du timer (11:09:17Z) mesuré par le [seuil -8](resultats/e5-seuil-8.log), 105 valeurs, 0 écart.
 
 **Règles d'alerte KPI déployées (26/11, note de 2026-11-26T08:09:27Z)** : accord « Comme tu veux mais avance » sur l'option recommandée ; [`alertes-kpi.patch`](alertes-kpi.patch) appliqué et commité (`96a66df7`), `KpiPassageEnRetard` et `KpiSignatureRefusee` posées sur `sc-stockage` par `observabilite.sh regles reference deployer` (`JALON=kpi20`) : promtool 17 règles et tests réussis, 17 règles saines et inactives, empreinte en place égale au commit ; par l'auditeur dans Grafana ([`alertes-verif.sh`](alertes-verif.sh)) 8 cas, 0 KO au second passage (le premier, 10 s après le redémarrage, lisait encore 15 règles : faute du contrôle, gardé) ; aucune alerte déclenchée ([prédiction et résultat](resultats/e14-predictions.md)). Prix : un rejeu sans `TAG_05` fera sonner `KpiPassageEnRetard`. Non exercés : déclenchement réel, Alertmanager. `promql-banc.sh` (étape 6) ne s'applique plus tel quel : le correctif est déjà dans HEAD.
@@ -149,3 +151,51 @@ Python 3 de la distribution (comme `entrees-scan.py`), cosign 3.1.4 et crane 0.2
 ## Liens
 
 docs/02 §5 et §7 ; [07b, tableau et `entrees-scan`](../07a-sbom-grype/README.md) ; [ADR 0004](../../../docs/adr/0004-vulnerabilites-vex.md) ; [brique 10](../10-independent-replay/README.md) ; [13a](../13a-licences/README.md).
+
+## Clôture (note de 2026-11-26T12:48:53Z)
+
+**Brique 20 CLOSE, seuil atteint avec réserves.** Accord : réponse du propriétaire « Continue » à la question « Quel chantier ensuite ? », dont l'option recommandée était « Clore la 20 » ; lue comme cette option selon l'accord du 18/11 (« estime que je vais répondre oui »), sans verbatim de clôture. La clôture est réversible et n'est pas poussée à
+cette heure.
+
+**Seuil** (« 0 écart avec le recalcul depuis les attestations ») : tenu à chaque passage depuis le 24/11, dernier en date le
+[seuil -8](resultats/e5-seuil-8.log) (26/11, passage du timer, exportateur `fc0b8e0d`). Chaque passage compare **105 valeurs**
+au recalcul signé de l'hôte : **102 mesurées** dans Prometheus par l'auditeur, et 3 égales par construction
+(`violations_licences` et deux `kev_delais`).
+
+**KPI de docs/02, à la clôture** :
+
+| KPI | État |
+|---|---|
+| Taux L3 vérifié | livré (VSA seule, décision du 24/11) : 2/4 |
+| Taux de replay identique | livré : 3/4 |
+| KEV ouvertes | livré : 0 KEV vue |
+| Délai de correction des KEV | livré, égal par construction : aucune KEV vue (Loki, 720 h) |
+| Couverture VEX | livré (KPI 3a et 3b, avec la 07b) |
+| Violations de licences | vide : « source absente », 0 prédicat `licences/v1` dans Zot |
+| Âge des pins | livré (depuis l'épinglage, relevé versionné) |
+| Âge des clés | livré (dernier changement de la clé publique dans git) |
+
+**Étapes du plan** : 1 à 6 faites. L'étape 7 (câblage dans `rejeu.sh`) est écrite et essayée à sec (12 cas, 0 écart), mais
+n'a jamais été rejouée.
+
+**Réserves** (relues dans ce README le 26/11, sans nouvelle mesure) :
+- licences : KPI vide tant qu'aucune tâche de la plateforme ne produit le prédicat (13a) ;
+- produit absent : un rejeu sans `TAG_05` perd la pose (l'exportateur refuse un produit absent du catalogue) et fera sonner
+  `KpiPassageEnRetard` ;
+- rejeu : `rejeu.sh` n'est contrôlé que par `bash -n`. Après un rejeu, les clés et le relevé sont à commiter, et trois VEX
+  sont à refaire ;
+- KEV : aucune vue, donc les délais sont égaux par construction. Les scans intermédiaires et le rpm sont invisibles pour
+  `entrees-scan`. L'historique de Loki repart de zéro à chaque rejeu ;
+- alertes : `KpiPassageEnRetard` et `KpiSignatureRefusee` sont déployées, mais le déclenchement réel et Alertmanager ne
+  sont pas exercés ;
+- tableau « KPI supply-chain » posé, affichage réel non vu (l'avis du propriétaire est attendu) ;
+- un journal bien formé mais faux ne serait pas vu. `Wants` avec un lecteur en échec et les refus réseau ne sont pas exercés ;
+- l'origine timer du passage mesuré par le seuil -8 est déduite (journal systemd non lu) ;
+- le gain de `genre()` reste latent tant que Chains est en v0.29.9. `banc-genre.sh` et `promql-banc.sh` ne s'appliquent
+  plus sur HEAD ;
+- la durée du Job du deb (seuil n° 4 : 4 min 04 s au lieu d'environ 2 min) n'est pas expliquée.
+
+**Effort** : total connu **2 h 22 min 19 s** (section des heures, e14 non compris), plus la clôture, de 12:46:15Z à
+12:48:53Z (lecture, relecture du conseiller, écriture). L'écriture des alertes (e14) et la lecture des correctifs de `genre()`
+n'ont pas de `date -u` : elles ne sont pas mesurées. Estimation : 1,5 pw, seuil de décision : 3 pw. Les heures ne sont pas
+converties.
