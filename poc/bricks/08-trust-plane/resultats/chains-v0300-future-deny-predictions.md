@@ -1,9 +1,10 @@
 # Témoin de future_deny_rule : prédictions et résultats
 
 Banc : `essais/chains-v0300-signature/future-deny.sh`. `trusted_task.future_deny_rule` est la seule règle du paquet
-`trusted_task` restée sans témoin au [banc des témoins](chains-v0300-temoins-predictions.md). Elle ne s'active qu'avec
+`trusted_task` qui lit les tâches restée sans témoin au [banc des témoins](chains-v0300-temoins-predictions.md). Elle ne s'active qu'avec
 `trusted_task_rules`, alors que la liste revue en service est à l'ancien format `trusted_tasks`. Ce n'est donc pas « sans
-témoin possible » mais « sans témoin dans la configuration en service ».
+témoin possible » mais « sans témoin dans la configuration en service ». (`data` et `data_format`, qui jugent la donnée,
+n'ont pas de témoin non plus ; `tagged` avertit déjà, sans témoin délibéré.)
 
 Le banc signe les objets de j7 tels quels, par v0.29.9 et par v0.30.0, sur une image neuve (même banc de signature que les
 témoins, clé jetable, registre en mémoire). Il les juge ensuite par `ec validate image` sous trois politiques, qui ne diffèrent
@@ -145,8 +146,9 @@ G1 à G6 tenues. G7 n'est pas tenue, et c'est elle qui porte les 3 KO.
   `publier` est dans l'énoncé signé, sous `pipelineTask/publier`.
 - **G7** (sortie d'erreur d'ec)
   - `service` et `eteint` : 9 lignes pour v0.29.9, comme prédit.
-  - `regles`, `futur` et `immediat` : 12 lignes, soit 4 échecs de récupération par bundle au lieu de 3. Le nouveau système,
-    une fois actif, demande donc les manifestes une fois de plus. Mon compte ne tenait pas compte de ce changement.
+  - `regles`, `futur` et `immediat` : 12 lignes, soit 4 échecs de récupération par bundle au lieu de 3. Déduit du compte, non
+    mesuré autrement : le nouveau système, une fois actif, demande les manifestes une fois de plus. Mon compte ne tenait
+    pas compte de ce changement. Le script commité attend toujours 9 et rend donc 3 KO par construction (noté dans son en-tête).
   - v0.30.0 : 0 ligne partout.
 
 Rien n'est relancé, pour ne pas corriger un compte après l'avoir vu.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Témoin de trusted_task.future_deny_rule (conforma/policy, commit épinglé dans politique.sh), seule règle du paquet trusted_task
-# restée sans témoin : elle ne s'active qu'avec trusted_task_rules (rule_data), alors que la liste revue en service est à l'ancien
+# qui lit les tâches restée sans témoin (data et data_format n'en ont pas, tagged sans témoin délibéré) : elle ne s'active qu'avec trusted_task_rules (rule_data), alors que la liste revue en service est à l'ancien
 # format trusted_tasks. Les objets de j7-sample-app sont signés tels quels par v0.29.9 et v0.30.0 sur une image neuve (banc de
 # signature, main.go inchangé), puis jugés comme dans temoins.sh (ec v0.10.42) sous trois politiques qui ne diffèrent que par
 # le ruleData de policy.yaml :
@@ -12,7 +12,9 @@
 # Critère : pour v0.29.9, regles ne change aucun code, futur n'ajoute que l'avertissement future_deny_rule, immediat que le
 # refus trusted, eteint rien ; pour v0.30.0, rien ne change, et le bundle de publier-image est contrôlé dans l'énoncé signé.
 # Passage -2 : trusted_task_rules_enabled (défaut false, lib/rule_data) manquait au passage 1 ; cas immediat et eteint ajoutés ;
-# la sortie d'erreur d'ec est contrôlée (les bundles ne sont pas dans le registre du banc : 9 lignes pour v0.29.9).
+# la sortie d'erreur d'ec est contrôlée (les bundles ne sont pas dans le registre du banc : 9 lignes pour v0.29.9 prédites).
+# Mesuré au passage -2 : 12 lignes pour regles, futur et immediat (système actif), 9 pour service et eteint. Tel quel, le
+# script attend 9 partout et rend donc 3 KO par construction ; non corrigé pour ne pas ajuster un compte après l'avoir vu.
 # La liste de règles est fabriquée pour le banc : le résultat ne dit rien de la porte en service, qui n'a pas trusted_task_rules.
 # Tout tourne dans un espace réseau neuf (unshare -rn, boucle locale seule) : aucun appel ne peut sortir de l'hôte.
 # Usage (racine du dépôt) : [SUFFIXE=-2] mise exec -- bash poc/bricks/08-trust-plane/essais/chains-v0300-signature/future-deny.sh
