@@ -124,3 +124,38 @@ règle du banc n'a de champ `versions`.
 - **G6** (`eteint`) : aucun code ajouté ni retiré face à `service`, pour les deux versions.
 - **G7** : chaque jugement v0.29.9 écrit 9 lignes d'erreur, toutes des échecs de récupération des manifestes. Les
   jugements v0.30.0 n'en écrivent aucune. 0 KO.
+
+**Résultat du passage -2 (2026-11-26T10:22:52Z à 10:23:03Z, 63 OK, 3 KO, [journal](chains-v0300-future-deny-2.log))** :
+G1 à G6 tenues. G7 n'est pas tenue, et c'est elle qui porte les 3 KO.
+
+| Code `trusted_task.*` (v0.29.9) | `service` | `regles` | `futur` | `immediat` | `eteint` |
+|---|---|---|---|---|---|
+| `future_deny_rule` | succès | succès | **avertissement** | succès | succès |
+| `trusted` | succès | succès | succès | **refus** | succès |
+| `tagged` | avertissement | avertissement | avertissement | avertissement | avertissement |
+| les six autres | succès | succès | succès | succès | succès |
+
+- **v0.29.9**
+  - `futur` ajoute le seul avertissement `future_deny_rule` : « Task "publier" will be denied by rule pattern
+    "oci://REGISTRE/tekton/tasks/publier-image" starting on 2099-12-31T00:00:00Z. », de terme `publier-image`.
+  - `immediat` ajoute le seul refus `trusted_task.trusted`, de terme `publier-image` et de raison `deny_rule`.
+    `trusted_parameters` reste en succès. Ce témoin montre que, sous `regles`, l'`allow` est bien jugé.
+  - `eteint` ne change rien face à `service` : sans activation, la donnée est ignorée, comme au passage 1.
+- **v0.30.0** : rien ne change sous les cinq politiques. Les règles n'ont aucune tâche à juger, alors que le bundle de
+  `publier` est dans l'énoncé signé, sous `pipelineTask/publier`.
+- **G7** (sortie d'erreur d'ec)
+  - `service` et `eteint` : 9 lignes pour v0.29.9, comme prédit.
+  - `regles`, `futur` et `immediat` : 12 lignes, soit 4 échecs de récupération par bundle au lieu de 3. Le nouveau système,
+    une fois actif, demande donc les manifestes une fois de plus. Mon compte ne tenait pas compte de ce changement.
+  - v0.30.0 : 0 ligne partout.
+
+Rien n'est relancé, pour ne pas corriger un compte après l'avoir vu.
+
+`future_deny_rule` a désormais un témoin. Avec une liste au nouveau format, activée, elle avertit pour v0.29.9 et reste muette
+pour v0.30.0, comme les autres règles de tâches. Dans la configuration en service, elle ne peut rien signaler pour deux
+raisons, toutes deux mesurées : la liste revue est à l'ancien format, et le nouveau système est éteint par défaut
+(`trusted_task_rules_enabled`, défaut `false`).
+
+Réserves : celles écrites avant le lancement. La liste de règles est fabriquée. ec est seul juge, `reserve-c` n'ayant pas
+d'équivalent. Il n'y a qu'un cas (j7). Les bundles sont absents du registre du banc, et aucune règle `versions` n'est
+essayée. Rien n'est ouvert chez un tiers.

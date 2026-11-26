@@ -215,3 +215,5 @@ la règle ne voit pas le champ, qui est bien dans l'énoncé signé. La réserve
 **Résultat du passage -2 (2026-11-26T09:46:53Z, 0 KO, [journal](chains-v0300-champ-kata-2.log))** : K1 et K2 tenues. Les
 attestations lues sont bien celles du passage -3 : digest gardé au préfixe du journal, sujet signé égal à ce digest, pour les
 deux versions.
+
+Réserve ajoutée le 2026-11-26T10:23:47Z, mesurée par le [banc de future_deny_rule](chains-v0300-future-deny-predictions.md) : les bundles ne sont pas dans le registre de ce banc, et chaque jugement v0.29.9 écrit 9 lignes d'erreur d'ec (`failed to fetch image`, sortie non contrôlée ici). `ec.oci.image_manifests` rend alors `{}`, sans être indéfini. L'ancien système, celui de la porte en service, ignore les manifestes (`is_trusted_task(task, _)`) : aucun effet sur ces résultats n'est attendu, mais ce point est lu, pas mesuré avec les bundles présents.
