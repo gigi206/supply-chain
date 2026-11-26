@@ -1,0 +1,285 @@
+# temoins.sh, 2026-11-26T09:34:30Z, dépôt f3fe8414, script 22bca118bf2566ff, main.go 76e03e674842ed47
+OK   réseau du banc : interfaces : 1
+OK   réseau du banc : routes de la table principale : 0
+OK   ec : empreinte du verrou (politique.sh) : 895c6f7e63cfefe6257a2e54c052c3d90803e8127adf5a7eb13f245262859abf
+OK   kyverno : version (mise.toml) : 1.19.2
+ec : v0.10.42 ; cosign : v3.1.4 ; oras : 1.3.6
+src29 : commit 89219ea5443fe3164715b9a93f7e6fd16d56b38a, main.go identique, binaire 984b202a73690182
+src30 : commit b59bced2524ec2da5dcbe3f916c2109262b9b819, main.go identique, binaire 380f637667285595
+OK   bibliothèque : arbre de ebd3fbd270297c15f590f4023360465ffb41d4fe : 0fd26021bb08582553f392565ca0faf316c51229
+cas : j7-sample-app, 3 TaskRuns, PipelineRun 9539952b… ; source attendue : https://sc-stockage.poc.test:3000/workspace/sample-app.git @ 6391fd437f26…
+## politiques
+OK   noms remplacés dans porte.rego et taches.yml : 1 15
+OK   policy.yaml : seuls les chemins changent : 4
+OK   témoin courant : lignes ajoutées dans taches.yml ; changées dans policy.yaml : 1 1
+  34a35
+  >       expires_on: "2099-12-31T00:00:00Z"
+OK   reserve-c rendue : 0
+## objets des témoins
+OK   sujet : fichiers changés (seul publier) : tr-j7-sample-app-publier 
+  145c145
+  <         "value": "sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7"
+  ---
+  >         "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+OK   echec : fichiers changés (seul preparer) : tr-j7-sample-app-preparer 
+  119c119
+  <         "status": "True",
+  ---
+  >         "status": "False",
+OK   parametre : fichiers changés (seul publier) : tr-j7-sample-app-publier 
+  48c48
+  <         "value": "sha256:f5e6bcb0e0fb4c88608f5d6148b2825c970184537b2a0f622fead335cfe7e7c7"
+  ---
+  >         "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+OK   artefact : fichiers changés (seul construire) : tr-j7-sample-app-construire 
+  40a41,46
+  >     "params": [
+  >       {
+  >         "name": "SOURCE_ARTIFACT",
+  >         "value": "oci:sc-stockage.poc.test:5000/entrees/absent@sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  >       }
+  >     ],
+OK   epingle : fichiers changés (seul publier) : tr-j7-sample-app-publier 
+  76c76
+  <           "value": "sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b"
+  ---
+  >           "value": "sc-stockage.poc.test:5000/tekton/tasks/publier-image"
+## base v29
+OK   base-29 : signer, code : 0
+OK   base-29 : erreurs de Sign : 0
+OK   base-29 : signature de l'image (cosign verify) : signée
+OK   base-29 : attestations sur l'image : 2
+OK   base-29 : bundles créés et vérifiés, dernier publié : pr
+OK   base-29 : ec, code (--strict=false) : 0
+ec : porte.fermeture_plateforme=R trusted_task.tagged=A 
+OK   base-29 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : trusted_task.tagged=avert 
+## base v30
+OK   base-30 : signer, code : 0
+OK   base-30 : erreurs de Sign : 0
+OK   base-30 : signature de l'image (cosign verify) : signée
+OK   base-30 : attestations sur l'image : 2
+OK   base-30 : bundles créés et vérifiés, dernier publié : pr
+OK   base-30 : ec, code (--strict=false) : 0
+ec : porte.taches_vues=R slsa_build_scripted_build.build_task_image_results_found=R tasks.pipeline_has_tasks=R 
+OK   base-30 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : slsa_build_scripted_build.build_task_image_results_found=ko tasks.pipeline_has_tasks=ko 
+## sujet v29
+OK   sujet-29 : signer, code : 0
+OK   sujet-29 : erreurs de Sign : 0
+OK   sujet-29 : signature de l'image (cosign verify) : non signée
+OK   sujet-29 : attestations sur l'image : 1
+OK   sujet-29 : bundles créés et vérifiés, dernier publié : pr
+OK   sujet v29 : dépendance de publier dans l'énoncé du PipelineRun : pipelineTask
+OK   sujet v29 : champ changé présent dans l'énoncé signé : true
+OK   sujet-29 : ec, code (--strict=false) : 0
+ec : builtin.image.signature_check=R porte.fermeture_plateforme=R porte.image_signature=R slsa_build_scripted_build.subject_build_task_matches=R trusted_task.tagged=A 
+OK   sujet-29 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : builtin.image.signature_check=ko slsa_build_scripted_build.subject_build_task_matches=ko trusted_task.tagged=avert 
+## sujet v30
+OK   sujet-30 : signer, code : 0
+OK   sujet-30 : erreurs de Sign : 0
+OK   sujet-30 : signature de l'image (cosign verify) : non signée
+OK   sujet-30 : attestations sur l'image : 1
+OK   sujet-30 : bundles créés et vérifiés, dernier publié : pr
+OK   sujet v30 : dépendance de publier dans l'énoncé du PipelineRun : pipelineTask/publier
+OK   sujet v30 : champ changé présent dans l'énoncé signé : true
+OK   sujet-30 : ec, code (--strict=false) : 0
+ec : builtin.image.signature_check=R porte.image_signature=R porte.taches_vues=R slsa_build_scripted_build.build_task_image_results_found=R tasks.pipeline_has_tasks=R 
+OK   sujet-30 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : builtin.image.signature_check=ko slsa_build_scripted_build.build_task_image_results_found=ko tasks.pipeline_has_tasks=ko 
+## echec v29
+OK   echec-29 : signer, code : 0
+OK   echec-29 : erreurs de Sign : 0
+OK   echec-29 : signature de l'image (cosign verify) : signée
+OK   echec-29 : attestations sur l'image : 2
+OK   echec-29 : bundles créés et vérifiés, dernier publié : pr
+OK   echec v29 : dépendance de preparer dans l'énoncé du PipelineRun : pipelineTask
+OK   echec v29 : champ changé présent dans l'énoncé signé : true
+OK   echec-29 : ec, code (--strict=false) : 0
+ec : porte.fermeture_plateforme=R tasks.successful_pipeline_tasks=R trusted_task.tagged=A 
+OK   echec-29 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : tasks.successful_pipeline_tasks=ko trusted_task.tagged=avert 
+## echec v30
+OK   echec-30 : signer, code : 0
+OK   echec-30 : erreurs de Sign : 0
+OK   echec-30 : signature de l'image (cosign verify) : signée
+OK   echec-30 : attestations sur l'image : 2
+OK   echec-30 : bundles créés et vérifiés, dernier publié : pr
+OK   echec v30 : dépendance de preparer dans l'énoncé du PipelineRun : pipelineTask/preparer
+OK   echec v30 : champ changé présent dans l'énoncé signé : true
+OK   echec-30 : ec, code (--strict=false) : 0
+ec : porte.taches_vues=R slsa_build_scripted_build.build_task_image_results_found=R tasks.pipeline_has_tasks=R 
+OK   echec-30 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : slsa_build_scripted_build.build_task_image_results_found=ko tasks.pipeline_has_tasks=ko 
+## parametre v29
+OK   parametre-29 : signer, code : 0
+OK   parametre-29 : erreurs de Sign : 0
+OK   parametre-29 : signature de l'image (cosign verify) : signée
+OK   parametre-29 : attestations sur l'image : 2
+OK   parametre-29 : bundles créés et vérifiés, dernier publié : pr
+OK   parametre v29 : dépendance de publier dans l'énoncé du PipelineRun : pipelineTask
+OK   parametre v29 : champ changé présent dans l'énoncé signé : true
+OK   parametre-29 : ec, code (--strict=false) : 0
+ec : porte.fermeture_plateforme=R trusted_task.tagged=A trusted_task.trusted_parameters=R 
+OK   parametre-29 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : trusted_task.tagged=avert trusted_task.trusted_parameters=ko 
+## parametre v30
+OK   parametre-30 : signer, code : 0
+OK   parametre-30 : erreurs de Sign : 0
+OK   parametre-30 : signature de l'image (cosign verify) : signée
+OK   parametre-30 : attestations sur l'image : 2
+OK   parametre-30 : bundles créés et vérifiés, dernier publié : pr
+OK   parametre v30 : dépendance de publier dans l'énoncé du PipelineRun : pipelineTask/publier
+OK   parametre v30 : champ changé présent dans l'énoncé signé : true
+OK   parametre-30 : ec, code (--strict=false) : 0
+ec : porte.taches_vues=R slsa_build_scripted_build.build_task_image_results_found=R tasks.pipeline_has_tasks=R 
+OK   parametre-30 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : slsa_build_scripted_build.build_task_image_results_found=ko tasks.pipeline_has_tasks=ko 
+## artefact v29
+OK   artefact-29 : signer, code : 0
+OK   artefact-29 : erreurs de Sign : 0
+OK   artefact-29 : signature de l'image (cosign verify) : signée
+OK   artefact-29 : attestations sur l'image : 2
+OK   artefact-29 : bundles créés et vérifiés, dernier publié : pr
+OK   artefact v29 : dépendance de construire dans l'énoncé du PipelineRun : pipelineTask
+OK   artefact v29 : champ changé présent dans l'énoncé signé : true
+OK   artefact-29 : ec, code (--strict=false) : 0
+ec : porte.fermeture_plateforme=R trusted_task.tagged=A trusted_task.valid_trusted_artifact_inputs=R 
+OK   artefact-29 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : trusted_task.tagged=avert trusted_task.valid_trusted_artifact_inputs=ko 
+## artefact v30
+OK   artefact-30 : signer, code : 0
+OK   artefact-30 : erreurs de Sign : 0
+OK   artefact-30 : signature de l'image (cosign verify) : signée
+OK   artefact-30 : attestations sur l'image : 2
+OK   artefact-30 : bundles créés et vérifiés, dernier publié : pr
+OK   artefact v30 : dépendance de construire dans l'énoncé du PipelineRun : pipelineTask/construire
+OK   artefact v30 : champ changé présent dans l'énoncé signé : true
+OK   artefact-30 : ec, code (--strict=false) : 0
+ec : porte.taches_vues=R slsa_build_scripted_build.build_task_image_results_found=R tasks.pipeline_has_tasks=R 
+OK   artefact-30 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : slsa_build_scripted_build.build_task_image_results_found=ko tasks.pipeline_has_tasks=ko 
+## epingle v29
+OK   epingle-29 : signer, code : 0
+OK   epingle-29 : erreurs de Sign : 0
+OK   epingle-29 : signature de l'image (cosign verify) : signée
+OK   epingle-29 : attestations sur l'image : 2
+OK   epingle-29 : bundles créés et vérifiés, dernier publié : pr
+OK   epingle v29 : dépendance de publier dans l'énoncé du PipelineRun : pipelineTask
+OK   epingle v29 : champ changé présent dans l'énoncé signé : true
+OK   epingle-29 : ec, code (--strict=false) : 0
+ec : porte.fermeture_plateforme=R trusted_task.pinned=A trusted_task.tagged=A trusted_task.trusted=R 
+OK   epingle-29 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : trusted_task.pinned=avert trusted_task.tagged=avert trusted_task.trusted=ko 
+## epingle v30
+OK   epingle-30 : signer, code : 0
+OK   epingle-30 : erreurs de Sign : 0
+OK   epingle-30 : signature de l'image (cosign verify) : signée
+OK   epingle-30 : attestations sur l'image : 2
+OK   epingle-30 : bundles créés et vérifiés, dernier publié : pr
+OK   epingle v30 : dépendance de publier dans l'énoncé du PipelineRun : pipelineTask/publier
+OK   epingle v30 : champ changé présent dans l'énoncé signé : true
+OK   epingle-30 : ec, code (--strict=false) : 0
+ec : porte.taches_vues=R slsa_build_scripted_build.build_task_image_results_found=R tasks.pipeline_has_tasks=R 
+OK   epingle-30 : kyverno, provenance retenue : DIAG 9539952b-07a7-4a0b-a6e1-084304d0e8af
+reserve-c : slsa_build_scripted_build.build_task_image_results_found=ko tasks.pipeline_has_tasks=ko 
+## courant (liste revue avec expires_on), images de base
+OK   courant-29 : ec, code (--strict=false) : 0
+ec : porte.fermeture_plateforme=R trusted_task.current=A trusted_task.tagged=A 
+OK   courant-30 : ec, code (--strict=false) : 0
+ec : porte.taches_vues=R slsa_build_scripted_build.build_task_image_results_found=R tasks.pipeline_has_tasks=R 
+## référence (base)
+OK   base v29, ec : codes refusés : porte.fermeture_plateforme 
+OK   base v30, ec : codes refusés : porte.taches_vues slsa_build_scripted_build.build_task_image_results_found tasks.pipeline_has_tasks 
+OK   base v29, reserve-c : ko : 0
+OK   base v30, reserve-c : ko : slsa_build_scripted_build.build_task_image_results_found tasks.pipeline_has_tasks 
+## témoins : état de la règle visée (base v29 → témoin v29 | base v30 → témoin v30)
+  ec sujet builtin.image.signature_check : succès → refus | succès → refus
+  ec sujet porte.image_signature : succès → refus | succès → refus
+  ec sujet slsa_build_scripted_build.subject_build_task_matches : succès → refus | succès → succès
+  rc sujet builtin.image.signature_check : ok → ko | ok → ko
+  rc sujet slsa_build_scripted_build.subject_build_task_matches : ok → ko | ok → ok
+  ec echec tasks.successful_pipeline_tasks : succès → refus | absent → absent
+  rc echec tasks.successful_pipeline_tasks : ok → ko | ok → ok
+  ec parametre trusted_task.trusted_parameters : succès → refus | succès → succès
+  rc parametre trusted_task.trusted_parameters : ok → ko | ok → ok
+  ec artefact trusted_task.valid_trusted_artifact_inputs : succès → refus | succès → succès
+  rc artefact trusted_task.valid_trusted_artifact_inputs : ok → ko | ok → ok
+  ec epingle trusted_task.pinned : succès → avertissement | succès → succès
+  ec epingle trusted_task.trusted : succès → refus | succès → succès
+  rc epingle trusted_task.pinned : ok → avert | ok → ok
+  rc epingle trusted_task.trusted : ok → ko | ok → ok
+  ec courant trusted_task.current : succès → avertissement | succès → succès
+## contrôles des témoins
+OK   sujet v29, ec : codes ajoutés : builtin.image.signature_check=refus porte.image_signature=refus slsa_build_scripted_build.subject_build_task_matches=refus 
+OK   sujet v29, ec : codes retirés : 
+OK   sujet v30, ec : codes ajoutés : builtin.image.signature_check=refus porte.image_signature=refus 
+OK   sujet v30, ec : codes retirés : 
+OK   sujet : builtin.image.signature_check, succès pour v29 de base : succès
+OK   sujet : porte.image_signature, succès pour v29 de base : succès
+OK   sujet : slsa_build_scripted_build.subject_build_task_matches, succès pour v29 de base : succès
+OK   echec v29, ec : codes ajoutés : tasks.successful_pipeline_tasks=refus 
+OK   echec v29, ec : codes retirés : 
+OK   echec v30, ec : codes ajoutés : 
+OK   echec v30, ec : codes retirés : 
+OK   echec : tasks.successful_pipeline_tasks, succès pour v29 de base : succès
+OK   parametre v29, ec : codes ajoutés : trusted_task.trusted_parameters=refus 
+OK   parametre v29, ec : codes retirés : 
+OK   parametre v30, ec : codes ajoutés : 
+OK   parametre v30, ec : codes retirés : 
+OK   parametre : trusted_task.trusted_parameters, succès pour v29 de base : succès
+OK   artefact v29, ec : codes ajoutés : trusted_task.valid_trusted_artifact_inputs=refus 
+OK   artefact v29, ec : codes retirés : 
+OK   artefact v30, ec : codes ajoutés : 
+OK   artefact v30, ec : codes retirés : 
+OK   artefact : trusted_task.valid_trusted_artifact_inputs, succès pour v29 de base : succès
+OK   epingle v29, ec : codes ajoutés : trusted_task.pinned=avertissement trusted_task.trusted=refus 
+OK   epingle v29, ec : codes retirés : 
+OK   epingle v30, ec : codes ajoutés : 
+OK   epingle v30, ec : codes retirés : 
+OK   epingle : trusted_task.pinned, succès pour v29 de base : succès
+OK   epingle : trusted_task.trusted, succès pour v29 de base : succès
+OK   courant v29, ec : codes ajoutés : trusted_task.current=avertissement 
+OK   courant v29, ec : codes retirés : 
+OK   courant v30, ec : codes ajoutés : 
+OK   courant v30, ec : codes retirés : 
+OK   courant : trusted_task.current, succès pour v29 de base : succès
+OK   sujet v29, reserve-c : codes ajoutés : builtin.image.signature_check=ko slsa_build_scripted_build.subject_build_task_matches=ko 
+OK   sujet v29, reserve-c : codes retirés : 
+OK   sujet v30, reserve-c : codes ajoutés : builtin.image.signature_check=ko 
+OK   sujet v30, reserve-c : codes retirés : 
+OK   echec v29, reserve-c : codes ajoutés : tasks.successful_pipeline_tasks=ko 
+OK   echec v29, reserve-c : codes retirés : 
+OK   echec v30, reserve-c : codes ajoutés : 
+OK   echec v30, reserve-c : codes retirés : 
+OK   parametre v29, reserve-c : codes ajoutés : trusted_task.trusted_parameters=ko 
+OK   parametre v29, reserve-c : codes retirés : 
+OK   parametre v30, reserve-c : codes ajoutés : 
+OK   parametre v30, reserve-c : codes retirés : 
+OK   artefact v29, reserve-c : codes ajoutés : trusted_task.valid_trusted_artifact_inputs=ko 
+OK   artefact v29, reserve-c : codes retirés : 
+OK   artefact v30, reserve-c : codes ajoutés : 
+OK   artefact v30, reserve-c : codes retirés : 
+OK   epingle v29, reserve-c : codes ajoutés : trusted_task.pinned=avert trusted_task.trusted=ko 
+OK   epingle v29, reserve-c : codes retirés : 
+OK   epingle v30, reserve-c : codes ajoutés : 
+OK   epingle v30, reserve-c : codes retirés : 
+sujet  builtin.image.signature_check : Image signature check failed: no signatures found
+sujet  porte.image_signature : aucune signature d'image (seulement des attestations)
+sujet  slsa_build_scripted_build.subject_build_task_matches : The attestation subject, "REGISTRE/builds/sample-app@sha256:91d4b82f6764…", does not match any of the images built
+echec  tasks.successful_pipeline_tasks : Pipeline task "preparer" did not complete successfully, "Failed"
+parametre  trusted_task.trusted_parameters : The "digest" parameter of the "publier" PipelineTask includes an untrusted digest: sha256:000000000000…
+artefact  trusted_task.valid_trusted_artifact_inputs : Code tampering detected, input "oci:REGISTRE/entrees/absent@sha256:000000000000…" for task "construire" was not produced by the pipeline as attested.
+epingle  trusted_task.trusted : PipelineTask "publier" uses an untrusted task reference: oci://REGISTRE/tekton/tasks/publier-image@. Please upgrade the task version to: sha256:d21931f3807b…
+epingle  trusted_task.pinned : Pipeline task "publier" uses an unpinned task reference, oci://REGISTRE/tekton/tasks/publier-image@
+courant  trusted_task.current : A newer version of task "publier" exists. Please update before 2099-12-31T00:00:00Z. The current bundle is "oci://REGISTRE/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd742
+## règles sans témoin possible ici
+OK   v29 : tâches lues dans la provenance du PipelineRun : 3
+OK   build_script_used : tâches avec un champ steps au premier niveau (v29) : 0
+OK   build_script_used : état (v29 | v30) : succès | succès
+OK   future_deny_rule : trusted_task_rules dans la liste revue : 0
+OK   future_deny_rule : état (v29 | v30) : succès | succès
+OK   preparation_appariee : construire-deb dans j7 (v29) : 0
+OK   preparation_appariee : état (v29 | v30) : succès | succès
+## bilan : 0 KO, 2026-11-26T09:34:58Z

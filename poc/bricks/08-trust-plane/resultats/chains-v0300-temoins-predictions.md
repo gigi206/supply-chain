@@ -117,13 +117,13 @@ Commit de la prédiction : `983aa98d`. [Journal](chains-v0300-temoins-2.log) : 2
 - chez `ec` : `subject_build_task_matches`, `successful_pipeline_tasks`, `trusted_parameters`, `valid_trusted_artifact_inputs`, `pinned` et `current` ;
 - sous reserve-c : les mêmes, sauf `current`, que reserve-c n'a pas.
 
-Pour v0.30.0, le même champ changé ne change rien : elles réussissent à vide. Pour `successful_pipeline_tasks` chez `ec`, la règle reste absente (elle dépend de `pipeline_has_tasks`).
+Pour v0.30.0, le même champ changé ne change rien. Cinq réussissent à vide chez `ec`, et `successful_pipeline_tasks` y reste absente (elle dépend de `pipeline_has_tasks`). Les cinq de reserve-c réussissent à vide. Que le champ changé soit bien dans l'énoncé signé par v0.30.0 n'est contrôlé qu'au passage -3.
 
-Trois règles n'ont pas de témoin possible sur j7, et elles réussissent à vide pour v0.29.9 aussi :
+Trois règles n'ont pas de témoin possible ici, pour trois raisons différentes. Elles réussissent à vide pour v0.29.9 aussi :
 
-- `build_script_used`, faute de champ `steps` lisible ;
-- `future_deny_rule`, faute de `trusted_task_rules` ;
-- `preparation_appariee`, faute de voie deb.
+- `build_script_used` tient à la forme v1 de la provenance. Elle réussit pour v0.29.9 alors qu'aucune tâche n'a de champ `steps` au premier niveau (mesuré), c'est-à-dire alors que sa condition de refus est vraie. La cause (`build_task.name` indéfini) est une lecture, non mesurée. Cette règle concerne la porte en service, pas seulement la montée ;
+- `future_deny_rule` tient au format de la liste revue : elle ne s'active qu'avec `trusted_task_rules` ;
+- `preparation_appariee` tient au cas j7 : elle ne vise que la voie deb.
 
 Le témoin sujet retire aussi la signature de l'image, pour les deux versions. Il ne prouve donc la règle visée que par l'état de cette règle, pas par un ensemble de codes inchangé par ailleurs.
 
@@ -133,7 +133,7 @@ Réserves, celles écrites d'avance :
 - un témoin par règle, sur un seul champ ;
 - `current` témoigné par la liste revue, chez `ec` seulement.
 
-Non couverts : KMS, contrôleur, Zot réel, admission, la porte Kyverno de l'autre session ; `build_script_used` et `future_deny_rule` sur une autre forme de provenance ou de liste ; `preparation_appariee` sur un cas deb.
+Non couverts : KMS, contrôleur, Zot réel, admission, la porte Kyverno de l'autre session ; `build_script_used` et `future_deny_rule` sur une autre forme de provenance ou de liste ; `preparation_appariee` sur un cas deb. Le témoin `construction_kata` du passage -3 de la porte a le même trou que celui comblé ici au passage -3 : son champ changé n'a pas été contrôlé dans l'énoncé signé par v0.30.0.
 
 ## Prédiction du passage -3 (2026-11-26T09:34:15Z)
 
@@ -153,3 +153,14 @@ Prédiction : Y1 à Y5 inchangées, et Y6 :
 | Y6 (rejeu de la lecture) | Pour chaque témoin sur objets, la dépendance de la tâche changée s'appelle `pipelineTask` pour v0.29.9 et `pipelineTask/<nom>` pour v0.30.0. Elle porte le champ changé dans les deux cas |
 
 0 KO attendu.
+
+## Résultat du passage -3 (note de 2026-11-26T09:35:19Z)
+
+Commit de la prédiction : `f3fe8414`. [Journal](chains-v0300-temoins-3.log) : 2026-11-26T09:34:30Z → 09:34:58Z, 28 s, 184 OK, 0 KO. L'état des règles visées est identique à celui du passage -2.
+
+| Prédiction | Verdict |
+|---|---|
+| Y1 à Y5 | **Tenues**, comme au passage -2 |
+| Y6 (rejeu) | **Tenue** : pour les cinq témoins sur objets, la dépendance de la tâche changée s'appelle `pipelineTask` (v0.29.9) et `pipelineTask/<nom>` (v0.30.0). Elle porte le champ changé dans les deux énoncés signés |
+
+Le « rien ne change » de v0.30.0 n'est donc pas une mutation perdue : les règles reçoivent le champ fautif sous `pipelineTask/<nom>`, ne le voient pas, et réussissent. Chez `ec`, `successful_pipeline_tasks` reste absente.
