@@ -7,6 +7,7 @@
 # temoins.sh (passage -3), avec deux contrôles qui ne changent que l'entrée non signée :
 #   nom          champ name (= étiquette tekton.dev/pipelineTask) ajouté au premier niveau de chaque TaskRun   la règle doit refuser
 #   nom-etapes   même chose, plus steps non vide                                                              la règle doit se taire
+# Passage -2 : chaque valeur est contrôlée (attendu) et les erreurs de toutes les requêtes sont gardées (2>>).
 # Tout tourne dans un espace réseau neuf (unshare -rn, boucle locale seule) : aucun appel ne peut sortir de l'hôte.
 # Usage (racine du dépôt) : [SUFFIXE=-2] mise exec -- bash poc/bricks/08-trust-plane/essais/chains-v0300-signature/cause-build-script.sh
 set -uo pipefail
@@ -49,9 +50,19 @@ muter() { # version variante : entrée de ec opa eval
     | jq "(.attestations[0].statement.predicate.buildDefinition.resolvedDependencies[] | select((.name // \"\") | startswith(\"pipelineTask\")) | .content)
           |= (@base64d | fromjson | $filtre | tojson | @base64)" > "$T/entree-$1-$2.json"
 }
-evaluer() { # version variante requête
-  ec opa eval --format raw -d "$T/biblio/policy" -i "$T/entree-$1-$2.json" "$3" 2> "$T/err-$1-$2"
+evaluer() { # version variante requête (erreurs ajoutées, jamais écrasées, d'une requête à l'autre)
+  ec opa eval --format raw -d "$T/biblio/policy" -i "$T/entree-$1-$2.json" "$3" 2>> "$T/err-$1-$2"
 }
+# Passage -2 : valeurs attendues (Z1 à Z4), dans l'ordre : attestations de PipelineRun | tâches vues | tâches de construction
+# (étiquette:name:étapes) | refus de la règle | message de build_script_used
+declare -A ATTENDU=(
+  [29-base]='1|3|publier:ABSENT:0||'
+  [29-nom]='1|3|publier:publier:0|slsa_build_scripted_build.build_script_used|Build task "publier" does not contain any steps'
+  [29-nom-etapes]='1|3|publier:publier:1||'
+  [30-base]='1|0||slsa_build_scripted_build.build_task_image_results_found|'
+  [30-nom]='1|0||slsa_build_scripted_build.build_task_image_results_found|'
+  [30-nom-etapes]='1|0||slsa_build_scripted_build.build_task_image_results_found|'
+)
 {
   echo "## cause de build_script_used, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   attendu "ec : empreinte du binaire (politique.sh)" "$(sha256sum "$(command -v ec)" | cut -c1-64)" "$EC_BIN"
@@ -68,11 +79,12 @@ evaluer() { # version variante requête
       muter "$v" "$m"
       A='data.lib.pipelinerun_attestations[0]'
       echo "-- v$v $m"
-      echo "   attestations de PipelineRun : $(evaluer "$v" "$m" 'count(data.lib.pipelinerun_attestations)')"
-      echo "   tâches vues : $(evaluer "$v" "$m" "count(data.lib.tekton.tasks($A))")"
-      echo "   tâches de construction (étiquette:name:étapes) : $(evaluer "$v" "$m" "concat(\" \", [sprintf(\"%s:%s:%d\", [t.metadata.labels[\"tekton.dev/pipelineTask\"], object.get(t, \"name\", \"ABSENT\"), count(data.slsa_build_scripted_build.task_steps(t))]) | some t in data.lib.tekton.build_tasks($A)])")"
-      echo "   refus de la règle : $(evaluer "$v" "$m" "concat(\" \", sort([r.code | some r in data.slsa_build_scripted_build.deny]))")"
-      echo "   message de build_script_used : $(evaluer "$v" "$m" "concat(\" | \", [r.msg | some r in data.slsa_build_scripted_build.deny; r.code == \"$REGLE\"])")"
+      IFS='|' read -r z_att z_taches z_constr z_refus z_msg <<< "${ATTENDU[$v-$m]}"
+      attendu "v$v $m : attestations de PipelineRun" "$(evaluer "$v" "$m" 'count(data.lib.pipelinerun_attestations)')" "$z_att"
+      attendu "v$v $m : tâches vues" "$(evaluer "$v" "$m" "count(data.lib.tekton.tasks($A))")" "$z_taches"
+      attendu "v$v $m : tâches de construction (étiquette:name:étapes)" "$(evaluer "$v" "$m" "concat(\" \", [sprintf(\"%s:%s:%d\", [t.metadata.labels[\"tekton.dev/pipelineTask\"], object.get(t, \"name\", \"ABSENT\"), count(data.slsa_build_scripted_build.task_steps(t))]) | some t in data.lib.tekton.build_tasks($A)])")" "$z_constr"
+      attendu "v$v $m : refus de la règle" "$(evaluer "$v" "$m" "concat(\" \", sort([r.code | some r in data.slsa_build_scripted_build.deny]))")" "$z_refus"
+      attendu "v$v $m : message de build_script_used" "$(evaluer "$v" "$m" "concat(\" | \", [r.msg | some r in data.slsa_build_scripted_build.deny; r.code == \"$REGLE\"])")" "$z_msg"
       [ ! -s "$T/err-$v-$m" ] || { echo "KO   v$v $m : erreurs d'évaluation"; sed 's/^/     /' "$T/err-$v-$m" | head -5; ko=$((ko + 1)); }
     done
   done

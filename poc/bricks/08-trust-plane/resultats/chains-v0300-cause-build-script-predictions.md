@@ -47,3 +47,12 @@ pas sur une vraie correction de la bibliothèque.
 
 Réserves : un seul cas (j7), une seule tâche de construction ; entrée non signée pour les deux contrôles, la signature n'étant
 pas jugée par `ec opa eval`. Rien n'est ouvert chez le projet tiers.
+
+## Prédiction du passage -2 (2026-11-26T09:46:27Z)
+
+Relecture du conseiller : au passage 1, les valeurs de Z1 à Z4 étaient affichées, pas contrôlées, et le fichier d'erreurs de
+chaque entrée était écrasé à chaque requête, si bien que seule la dernière requête était contrôlée. Un refus vide aurait la
+même allure si une requête avait échoué. Au passage -2, chaque valeur passe par `attendu` et les erreurs de toutes les
+requêtes sont gardées.
+
+- **Z5** : les valeurs du passage 1, contrôlées une à une (30 contrôles), et aucune erreur d'évaluation ; 0 KO.

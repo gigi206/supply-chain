@@ -2,6 +2,7 @@
 # Lecture seule : le champ changé par le témoin construction_kata (porte.sh, passage -3 : TaskRun construire en runc au lieu
 # de kata) est-il dans l'énoncé signé du PipelineRun, pour v0.29.9 (dépendance pipelineTask) et v0.30.0 (pipelineTask/<nom>) ?
 # Lit les attestations vérifiées par cosign verify-attestation au passage -3, gardées dans le dossier de travail de porte.sh.
+# Passage -2 : les attestations lues sont reliées au passage -3 (digest gardé, préfixe au journal, sujet signé).
 # Usage (racine du dépôt) : [SUFFIXE=-2] bash poc/bricks/08-trust-plane/essais/chains-v0300-signature/champ-kata.sh
 set -uo pipefail
 export LC_ALL=C.UTF-8
@@ -33,6 +34,10 @@ attendu() { # libellé obtenu attendu
       attendu "v$v : runc ailleurs" "$(tr ' ' '\n' <<< "$etat" | grep -v '>construire=' | grep -c '=runc$')" 0
     done < "$W/att-kata-$v.json"
     attendu "v$v : énoncés du PipelineRun lus" "$n" 1
+    # passage -2 : les fichiers gardés sont ceux du passage -3 de porte.sh (digest de l'image du témoin, préfixe au journal)
+    D=$(cat "$W/digest-kata-$v")
+    attendu "v$v : digest gardé = préfixe du journal porte-3" "$(grep -c "^image du témoin v$v : ${D:0:19}…$" "$depot/poc/bricks/08-trust-plane/resultats/chains-v0300-porte-3.log")" 1
+    attendu "v$v : sujet de chaque attestation = digest gardé" "$(while read -r e; do jq -r '.payload' <<< "$e" | base64 -d | jq --arg d "${D#sha256:}" '[.subject[].digest.sha256] | any(. == $d)'; done < "$W/att-kata-$v.json" | sort -u | tr '\n' ' ')" "true "
   done
   echo "## bilan : $ko KO, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   [ "$ko" -eq 0 ]

@@ -207,3 +207,7 @@ vérifiées par `cosign verify-attestation` au passage -3 (`att-kata-<v>.json`) 
 du PipelineRun porte `construire` en `runc` (sous `pipelineTask` pour v0.29.9, sous `pipelineTask/construire` pour v0.30.0),
 et aucun autre TaskRun en `runc`. Le « non signalé » de `construction_kata` pour v0.30.0 n'est donc pas une mutation perdue :
 la règle ne voit pas le champ, qui est bien dans l'énoncé signé. La réserve écrite au banc des témoins est levée.
+
+**Prédiction du passage -2 (2026-11-26T09:46:27Z)** : relecture du conseiller, rien ne reliait les fichiers gardés au passage
+-3 archivé. **K2** : pour chaque version, le digest gardé (`digest-kata-<v>`) a le préfixe écrit au journal
+[`chains-v0300-porte-3.log`](chains-v0300-porte-3.log) (« image du témoin »), et chaque attestation lue a ce digest pour sujet.
