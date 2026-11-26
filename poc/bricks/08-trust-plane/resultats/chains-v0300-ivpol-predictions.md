@@ -8,7 +8,7 @@ Choix du propriétaire du 26/11 : « Banc ivpol à sec ».
 
 [`ivpol.sh`](../essais/chains-v0300-signature/ivpol.sh) part du banc de signature, avec `main.go` inchangé. Il signe les vrais objets de `j7-sample-app`, une fois avec v0.29.9 et une fois avec v0.30.0, chaque version sur sa propre image, dans un registre en mémoire servi en HTTP sur 127.0.0.1. Le CLI Kyverno 1.19.2, épinglé dans `mise.toml`, juge ensuite chaque image par `kyverno apply`.
 
-Kyverno lit la même entrée qu'en service : des bundles Sigstore v0.3 publiés en referrers de l'image, dans le dépôt séparé `horodatage/bundles`. Le banc les fabrique comme `tsa/horodater.sh` :
+Kyverno lit la même forme d'entrée que le job d'horodatage produit : des bundles Sigstore v0.3 publiés en referrers de l'image, dans le dépôt séparé `horodatage/bundles`. Le banc les fabrique comme `tsa/horodater.sh` :
 
 - `cosign bundle create` sur chaque enveloppe de Chains ;
 - puis `cosign verify-blob-attestation`, qui vérifie la clé, le sujet et le prédicat.
@@ -89,9 +89,9 @@ Commit de la prédiction : `bd3d3f70`. [Journal](chains-v0300-ivpol-2.log) : 202
 - `successful_pipeline_tasks` ;
 - les autres règles `trusted_task.*`.
 
-`trusted_task.tagged` passe d'avertissement à succès : la règle ne voit plus de tâche.
+`trusted_task.tagged` passe d'avertissement à succès, ce qui est cohérent avec une règle qui ne voit plus de tâche (sans témoin). Écart de parité : `tasks.successful_pipeline_tasks` est `ok` sous reserve-c pour v0.30.0, mais absent chez `ec`.
 
-Le contrôle 9 admet les deux versions : il ne vérifie que la signature des bundles et ne lit pas leur contenu. La montée de Chains ne change donc rien pour lui.
+Le contrôle 9 admet les deux versions dans ce banc : il ne vérifie que la signature des bundles et ne lit pas leur contenu. La voie avec jeton TSA et `tsaCertChain` n'est pas mesurée. Ce banc ne dit pas non plus quelle politique est posée dans le cluster : ce n'est pas vérifié.
 
 Réserves, celles écrites d'avance :
 
