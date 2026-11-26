@@ -96,3 +96,21 @@ pas jugé ici.
 Réserves : celles écrites avant le lancement. Les règles sont jugées par `ec opa eval` ; les énoncés des témoins ne sont pas
 signés ; l'égalité avec un énoncé signé n'est mesurée que pour v0.29.9 ; il n'y a qu'un PipelineRun deb. Rien n'est ouvert
 chez un tiers.
+
+## Corrections après relecture du conseiller (2026-11-26T09:59:51Z)
+
+Rien n'est relancé, ces corrections ne touchent que le texte.
+- **Le passage 1 a mesuré l'écart entre étiquette et bundle.** Son témoin portait l'étiquette `preparer-deb` et le bundle
+  `preparer-entrees` : la tâche a été reconnue sous les deux noms, `_presente("preparer-deb")` était satisfaite et
+  `preparation_appariee` s'est tue (sur une entrée non signée). La phrase « le banc ne l'a pas mesuré » du paragraphe
+  « Lu en passant » est donc fausse pour cette entrée. Restent non mesurés : la possibilité qu'un tel TaskRun sorte de
+  Tekton, et son refus par `trusted_task`.
+- **L'origine de l'étiquette `tekton.dev/task` n'est pas vérifiée.** Elle vient d'un commentaire de la bibliothèque
+  (`refs.rego`) qui dit seulement que le contrôleur de Tekton l'ajoute. Les trois TaskRuns deb ont une étiquette égale au
+  paramètre `name`, ce qui ne permet pas de distinguer le nom de la Task résolue du nom demandé. Parmi les 81 TaskRuns
+  capturés, seuls 5 (`essai-confiance`) n'ont pas l'étiquette, et le réconciliateur n'est pas dans le `vendor/` de la source.
+  Dans le témoin du passage -2, « comme Tekton l'écrirait » est donc une hypothèse.
+- **Portée.** `preparation_appariee` était la seule règle **du paquet `porte`** restée sans témoin. `future_deny_rule` reste
+  sans témoin, et `build_script_used` n'a qu'une cause mesurée.
+- **Réserve ajoutée.** L'énoncé signé en service (`sorties/<deb>.signe.json`, sha256 `5906e434…` au journal) n'est relié à
+  P1 que par son nom : le journal du 25/11 n'écrit pas son empreinte.

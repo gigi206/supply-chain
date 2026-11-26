@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Témoin de porte.preparation_appariee sur la voie deb (sample-app-deb-6391fd43…), seule règle de la porte restée sans témoin :
+# Témoin de porte.preparation_appariee sur la voie deb (sample-app-deb-6391fd43…), seule règle du paquet porte restée sans témoin :
 # j7 n'a pas de construire-deb. Sans signature : les énoncés sont ceux du banc à sec du 25/11 (banc29, banc30 : format
 # slsa/v2alpha4 de v0.29.9 et v0.30.0 appelé sur les objets capturés), plus l'énoncé signé en service (v0.29.9, gardé par le
 # banc à sec, égal à la sortie de banc29 selon P1). Les règles du paquet porte sont évaluées par ec opa eval (politique du
@@ -7,8 +7,8 @@
 # Cas :
 #   signe-29            énoncé signé en service, inchangé
 #   base-29, base-30    sortie à sec sur les objets capturés
-#   temoin-29, -30      sortie à sec, TaskRun preparer désigné comme preparer-entrees, comme Tekton l'écrit quand il résout
-#                       ce bundle : étiquette tekton.dev/task (nom lu d'abord par task_ref) et paramètres name et bundle de
+#   temoin-29, -30      sortie à sec, TaskRun preparer désigné comme preparer-entrees (hypothèse : Tekton pose l'étiquette
+#                       depuis la Task résolue, lu dans un commentaire de la bibliothèque, non vérifié) : étiquette tekton.dev/task (nom lu d'abord par task_ref) et paramètres name et bundle de
 #                       taskRef (_tache reconnaît le nom ou le dépôt du bundle ; même digest) ; aucun autre champ changé
 # Passage -2 : le passage 1 ne changeait pas l'étiquette, la tâche témoin restait reconnue comme preparer-deb.
 # Tout tourne dans un espace réseau neuf (unshare -rn, boucle locale seule) : aucun appel ne peut sortir de l'hôte. Les règles
